@@ -1,0 +1,4 @@
+<!ENTITY dnssec.securedLabel "Secured by DNSSEC">
+<!ENTITY dnssec.unsecuredLabel "Not secured by DNSSEC">
+<!ENTITY dnssec.thisDomainLabel "This domain:">
+<!ENTITY dnssec.thisDomainLabel2 "is secured by DNSSEC.">

@@ -1,0 +1,6 @@
+content	dnssec	content/
+locale	dnssec	en-US	locale/en-US/
+locale	dnssec	cs-CZ	locale/cs-CZ/
+skin	dnssec	classic/1.0	skin/
+overlay	chrome://browser/content/browser.xul	chrome://dnssec/content/firefoxOverlay.xul
+style	chrome://global/content/customizeToolbar.xul	chrome://dnssec/skin/overlay.css

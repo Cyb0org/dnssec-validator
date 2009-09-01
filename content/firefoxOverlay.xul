@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://dnssec/skin/overlay.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://dnssec/locale/dnssec.dtd">
+<overlay id="dnssec-overlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script src="overlay.js"/>
+  <stringbundleset id="stringbundleset">
+    <stringbundle id="dnssec-strings" src="chrome://dnssec/locale/dnssec.properties"/>
+  </stringbundleset>
+
+  <!-- Temp button -->
+  <toolbarpalette id="BrowserToolbarPalette">
+    <toolbarbutton id="dnssec-toolbar-button"
+      oncommand="dnssec.onToolbarButtonCommand()"/>
+  </toolbarpalette>
+
+  <popupset id="mainPopupSet">
+    <!-- Popup for DNSSEC information -->
+    <panel id="dnssec-popup" position="after_start" hidden="true" noautofocus="true"
+           onpopuphidden="focusAndSelectUrlBar();" norestorefocus="true">
+<!--           onpopupshown="document.getElementById('identity-popup-more-info-button').focus();" -->
+<!--           chromedir="&locale.dir;" -->
+      <hbox id="dnssec-popup-container" align="top">
+        <image id="dnssec-popup-icon"/>
+        <vbox id="dnssec-popup-content-box">
+          <label id="dnssec-popup-securedLabel" value="&dnssec.securedLabel;"/>
+          <label id="dnssec-popup-unsecuredLabel" value="&dnssec.unsecuredLabel;"/>
+          <separator/>
+          <label id="dnssec-popup-domainLabel" value="&dnssec.thisDomainLabel;"/>
+          <description id="dnssec-popup-content-host"/>
+          <!-- description id="dnssec-popup-content-host">MMM</description -->
+          <label id="dnssec-popup-domainLabel2" value="&dnssec.thisDomainLabel2;"/>
+          <separator/>
+          <description id="dnssec-popup-security-detail-label"/>
+        </vbox>
+      </hbox>
+    </panel>
+  </popupset>
+
+  <textbox id="urlbar">
+<!--
+    onfocus="document.getElementById('dnssec-box').style.MozUserFocus= 'normal'"
+    onblur="document.getElementById('dnssec-box').style.MozUserFocus = 'ignore';" -->
+
+    <!-- DNSSEC button in urlbar -->
+    <box id="dnssec-box" role="button"
+         onclick="getDnssecHandler().handleDnssecButtonEvent(event);"
+         onkeypress="getDnssecHandler().handleDnssecButtonEvent(event);">
+<!--         hidden="true" -->
+<!--         chromedir="&locale.dir;" -->
+       <!-- stack id="dnssec-icons-stack" -->
+         <image id="dnssec-icon" validate="never"/>
+       <!-- /stack -->
+    </box>
+  </textbox>
+
+</overlay>

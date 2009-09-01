@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+  <Description about="urn:mozilla:install-manifest">
+    <em:id>dnssec@nic.cz</em:id>
+    <em:name>DNSSEC</em:name>
+    <em:version>0.01</em:version>
+    <em:creator>Zbynek Michl</em:creator>
+    <em:description>DNSSEC connection validator</em:description>
+    <em:homepageURL>http://www.nic.cz</em:homepageURL>
+    <em:iconURL>chrome://dnssec/skin/dnssec.png</em:iconURL>
+    <em:localized>
+      <Description>
+        <em:locale>cs-CZ</em:locale>
+        <em:name>DNSSEC</em:name>
+        <em:description>DNSSEC rozsireni</em:description>
+        <em:creator>Zbynek Michl</em:creator>
+      </Description>
+    </em:localized>
+    <em:targetApplication>
+      <Description>
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- firefox -->
+        <em:minVersion>3.0</em:minVersion>
+        <em:maxVersion>3.5.*</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+  </Description>
+</RDF>
