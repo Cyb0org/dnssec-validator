@@ -45,6 +45,23 @@ var dnssec = {
 window.addEventListener("load", function(e) { dnssec.onLoad(e); }, false);
 
 
+/* XPCOM validation call */
+function XpcomDnssecValidationRequest() {
+  try {
+    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+    const cid = "@nic.cz/dnssecValidator;1";
+    var obj = Components.classes[cid].createInstance();
+    obj = obj.QueryInterface(Components.interfaces.dnssecIValidator);
+  } catch (err) {
+    alert(err);
+    return;
+  }
+  var res = obj.Add(1, 2);
+//  alert('Performing 1 + 2. Returned ' + res + '.');
+  dump('Performing 1 + 2. Returned ' + res + '.\n');
+}
+
+
 /**
  * Utility class to handle manipulations of the dnssec indicators in the UI
  */
@@ -89,6 +106,9 @@ DnssecHandler.prototype = {
   // Determine the security of the domain and connection and, if necessary,
   // update the UI to reflect this. Intended to be called by onSecurityChange.
   checkSecurity : function(state, location) {
+
+    // Temp
+    XpcomDnssecValidationRequest();
 
     this._lastLocation = location;
 
