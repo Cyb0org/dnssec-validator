@@ -1,0 +1,4 @@
+BUILD DEPENDENCES
+--------------------
+libldns-dev
+xulrunner-dev

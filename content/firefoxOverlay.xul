@@ -9,10 +9,10 @@
   </stringbundleset>
 
   <!-- Temp button -->
-  <toolbarpalette id="BrowserToolbarPalette">
+  <!-- toolbarpalette id="BrowserToolbarPalette">
     <toolbarbutton id="dnssec-toolbar-button"
       oncommand="dnssec.onToolbarButtonCommand()"/>
-  </toolbarpalette>
+  </toolbarpalette -->
 
   <popupset id="mainPopupSet">
     <!-- Popup for DNSSEC information -->

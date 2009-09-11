@@ -1,11 +1,13 @@
-var dnssec = {
-  onLoad: function() {
-    // initialization code
-    this.initialized = true;
-    tmpstate = 2;
-//    getDnssecHandler()._dnssecBox.hidden = true;
-  },
-  onToolbarButtonCommand: function(e) {
+/*
+https://developer.mozilla.org/en/Code_snippets/Progress_Listeners
+https://developer.mozilla.org/en/XPCOM_Interface_Reference/nsIURI
+*/
+
+var dnssecExt_urlBarListener = {
+
+  onLocationChange: function(aWebProgress, aRequest, aLocationURI)
+  {
+    dump('onLocationChange1\n');
 
     var location = gBrowser.contentWindow.location;
     var locationObj = {};
@@ -18,48 +20,68 @@ var dnssec = {
       // e.g. about:blank. The _state for these pages means we won't need these
       // properties anyways, though.
     }
+    getDnssecHandler().checkSecurity(locationObj);
 
-//    alert(tmpstate);
 
-    getDnssecHandler().checkSecurity(tmpstate, locationObj);
+//    dnssecExtension.processNewURL(aLocationURI);
+  },
+  onSecurityChange: function(aWebProgress, aRequest, aState)
+  {
+    dump('onSecurityChange\n');
+  }
 
-// window.XULBrowserWindow._state
 /*
-    switch (tmpstate) {
-    case 4:
-      tmpstate = 262146;
-      break;
-    case 262146:
-      tmpstate = 1310722;
-      break;
-    case 1310722:
-    default:
-      tmpstate = 4;
-      break;
-    }
-//    alert(tmpstate);
+  onStateChange: function(aWebProgress, aRequest, aStateFlags, aStatus)
+  {
+    dump('onStateChange\n');
+  },
+  onProgressChange: function(aWebProgress, aRequest,
+                             aCurSelfProgress, aMaxSelfProgress,
+                             aCurTotalProgress, aMaxTotalProgress)
+  {
+    dump('onProgressChange\n');
+  },
+  onStatusChange: function(aWebProgress, aRequest, aStatus, aMessage)
+  {
+    dump('onStatusChange\n');
+  },
 */
-  }
-
 };
-window.addEventListener("load", function(e) { dnssec.onLoad(e); }, false);
 
+var dnssecExtension = {
+  oldURL: null,
+  
+  init: function() {
 
-/* XPCOM validation call */
-function XpcomDnssecValidationRequest() {
-  try {
-    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-    const cid = "@nic.cz/dnssecValidator;1";
-    var obj = Components.classes[cid].createInstance();
-    obj = obj.QueryInterface(Components.interfaces.dnssecIValidator);
-  } catch (err) {
-    alert(err);
-    return;
+    getDnssecHandler()._dnssecBox.hidden = true;
+
+    // Listen for webpage loads
+    gBrowser.addProgressListener(dnssecExt_urlBarListener,
+        Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
+  },
+  
+  uninit: function() {
+    gBrowser.removeProgressListener(dnssecExt_urlBarListener);
+  },
+
+  processNewURL: function(aLocationURI) {
+    dump('aLocationURI: ' + aLocationURI.host + '\n');
+    dump('oldURL: ' + this.oldURL + '\n');
+    if (aLocationURI.host == this.oldURL)
+      return;
+    
+    // now we know the url is new...
+//    alert(aLocationURI.spec);
+    dump('onLocationChange2\n');
+
+    this.oldURL = aLocationURI.host;
   }
-  var res = obj.Add(1, 2);
-//  alert('Performing 1 + 2. Returned ' + res + '.');
-  dump('Performing 1 + 2. Returned ' + res + '.\n');
-}
+};
+
+window.addEventListener("load", function() {dnssecExtension.init()}, false);
+window.addEventListener("unload", function() {dnssecExtension.uninit()}, false);
+
+
 
 
 /**
@@ -105,30 +127,41 @@ DnssecHandler.prototype = {
 
   // Determine the security of the domain and connection and, if necessary,
   // update the UI to reflect this. Intended to be called by onSecurityChange.
-  checkSecurity : function(state, location) {
-
-    // Temp
-    XpcomDnssecValidationRequest();
+  checkSecurity : function(location) {
 
     this._lastLocation = location;
 
+    /* XPCOM validation call */
+    try {
+      netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+      const cid = "@nic.cz/dnssecValidator;1";
+      var obj = Components.classes[cid].createInstance();
+      obj = obj.QueryInterface(Components.interfaces.dnssecIValidator);
+    } catch (err) {
+      dump(err);
+      return;
+    }
+
+    var res = obj.Validate(location.hostname, 4);
+    dump('retval: ' + res + '\n');
+
     // Temp hardcoded states
-    switch (tmpstate) {
-    case 2:
+    switch (res) {
+    case 0:
       this.setMode(this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED);
       this._dnssecBox.hidden = false;
-      tmpstate = 1;
+//      tmpstate = 1;
       break;
     case 1:
       this.setMode(this.DNSSEC_MODE_DOMAIN_SECURED);
       this._dnssecBox.hidden = false;
-      tmpstate = 0;
+//      tmpstate = 0;
       break;
-    case 0:
+    case 2:
     default:
       this.setMode(this.DNSSEC_MODE_UNSECURED);
       this._dnssecBox.hidden = true;
-      tmpstate = 2;
+//      tmpstate = 2;
       break;
     }
 
