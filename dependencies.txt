@@ -1,4 +1,4 @@
-BUILD DEPENDENCES
+BUILD DEPENDENCIES
 --------------------
 libldns-dev
 xulrunner-dev
