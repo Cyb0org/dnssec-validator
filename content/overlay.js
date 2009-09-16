@@ -7,49 +7,31 @@ var dnssecExt_urlBarListener = {
 
   onLocationChange: function(aWebProgress, aRequest, aLocationURI)
   {
-    dump('onLocationChange1\n');
-
-    var location = gBrowser.contentWindow.location;
-    var locationObj = {};
-    try {
-      locationObj.host = location.host;
-      locationObj.hostname = location.hostname;
-      locationObj.port = location.port;
-    } catch (ex) {
-      // Can sometimes throw if the URL being visited has no host/hostname,
-      // e.g. about:blank. The _state for these pages means we won't need these
-      // properties anyways, though.
-    }
-    getDnssecHandler().checkSecurity(locationObj);
-
-
-//    dnssecExtension.processNewURL(aLocationURI);
+//    dump('onLocationChange1\n');
+    dnssecExtension.processNewURL(aLocationURI);
   },
   onSecurityChange: function(aWebProgress, aRequest, aState)
   {
-    dump('onSecurityChange\n');
-  }
-
-/*
+//    dump('onSecurityChange\n');
+  },
   onStateChange: function(aWebProgress, aRequest, aStateFlags, aStatus)
   {
-    dump('onStateChange\n');
+//    dump('onStateChange\n');
   },
   onProgressChange: function(aWebProgress, aRequest,
                              aCurSelfProgress, aMaxSelfProgress,
                              aCurTotalProgress, aMaxTotalProgress)
   {
-    dump('onProgressChange\n');
+//    dump('onProgressChange\n');
   },
   onStatusChange: function(aWebProgress, aRequest, aStatus, aMessage)
   {
-    dump('onStatusChange\n');
-  },
-*/
+//    dump('onStatusChange\n');
+  }
 };
 
 var dnssecExtension = {
-  oldURL: null,
+  oldHost: null,
   
   init: function() {
 
@@ -65,16 +47,26 @@ var dnssecExtension = {
   },
 
   processNewURL: function(aLocationURI) {
-    dump('aLocationURI: ' + aLocationURI.host + '\n');
-    dump('oldURL: ' + this.oldURL + '\n');
-    if (aLocationURI.host == this.oldURL)
-      return;
-    
-    // now we know the url is new...
-//    alert(aLocationURI.spec);
-    dump('onLocationChange2\n');
+//    dump('onLocationChange2\n');
 
-    this.oldURL = aLocationURI.host;
+    var host = null;
+    // try to prevent strange NS_ERRORS from StringBundle...
+    try {
+      host = aLocationURI.host;
+    } catch(ex) {
+//      dump(ex);
+    }
+
+    // test for hostname change
+    if (host == this.oldHost) {
+      return;
+    }
+
+    // check DNS security
+    getDnssecHandler().checkSecurity(host);
+
+    // remember last hostname
+    this.oldHost = host;
   }
 };
 
@@ -111,8 +103,8 @@ DnssecHandler.prototype = {
   DNSSEC_MODE_DOMAIN_SECURED            : "securedDomain",           // Only domain is secured
   DNSSEC_MODE_UNSECURED                 : "unsecuredDnssec",         // No trusted security information
 
-  // Cache the most recent Location seen in checkSecurity
-  _lastLocation : null,
+  // Cache the most recent hostname seen in checkSecurity
+  _hostName : null,
 
 
   // Build out a cache of the elements that we need frequently
@@ -127,9 +119,9 @@ DnssecHandler.prototype = {
 
   // Determine the security of the domain and connection and, if necessary,
   // update the UI to reflect this. Intended to be called by onSecurityChange.
-  checkSecurity : function(location) {
+  checkSecurity : function(host) {
 
-    this._lastLocation = location;
+    this._hostName = host;
 
     /* XPCOM validation call */
     try {
@@ -138,30 +130,27 @@ DnssecHandler.prototype = {
       var obj = Components.classes[cid].createInstance();
       obj = obj.QueryInterface(Components.interfaces.dnssecIValidator);
     } catch (err) {
-      dump(err);
+      dump(err + '\n');
       return;
     }
 
-    var res = obj.Validate(location.hostname, 4);
+    var res = obj.Validate(this._hostName, 4);
     dump('retval: ' + res + '\n');
 
-    // Temp hardcoded states
+    /* set appropriate state */
     switch (res) {
     case 0:
       this.setMode(this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED);
       this._dnssecBox.hidden = false;
-//      tmpstate = 1;
       break;
     case 1:
       this.setMode(this.DNSSEC_MODE_DOMAIN_SECURED);
       this._dnssecBox.hidden = false;
-//      tmpstate = 0;
       break;
     case 2:
     default:
       this.setMode(this.DNSSEC_MODE_UNSECURED);
       this._dnssecBox.hidden = true;
-//      tmpstate = 2;
       break;
     }
 
@@ -176,11 +165,11 @@ DnssecHandler.prototype = {
       this._eTLDService = Cc["@mozilla.org/network/effective-tld-service;1"]
                          .getService(Ci.nsIEffectiveTLDService);
     try {
-      return this._eTLDService.getBaseDomainFromHost(this._lastLocation.hostname);
+      return this._eTLDService.getBaseDomainFromHost(this._hostName);
     } catch (e) {
       // If something goes wrong (e.g. hostname is an IP address) just fail back
       // to the full domain.
-      return this._lastLocation.hostname;
+      return this._hostName;
     }
   },
   
