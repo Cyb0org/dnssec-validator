@@ -11,7 +11,7 @@
   <!-- Temp button -->
   <!-- toolbarpalette id="BrowserToolbarPalette">
     <toolbarbutton id="dnssec-toolbar-button"
-      oncommand="dnssec.onToolbarButtonCommand()"/>
+      oncommand="dnssecExtension.onToolbarButtonCommand();"/>
   </toolbarpalette -->
 
   <popupset id="mainPopupSet">

@@ -3,6 +3,14 @@ https://developer.mozilla.org/en/Code_snippets/Progress_Listeners
 https://developer.mozilla.org/en/XPCOM_Interface_Reference/nsIURI
 */
 
+// Temp function
+function sleep(delay)
+{
+  var start = new Date().getTime();
+  while (new Date().getTime() < start + delay);
+}
+
+
 var dnssecExt_urlBarListener = {
 
   onLocationChange: function(aWebProgress, aRequest, aLocationURI)
@@ -35,7 +43,8 @@ var dnssecExtension = {
   
   init: function() {
 
-    getDnssecHandler()._dnssecBox.hidden = true;
+    // Set unknown security state
+    getDnssecHandler().setSecurityState(getDnssecHandler().DNSSEC_STATE_UNSECURED);
 
     // Listen for webpage loads
     gBrowser.addProgressListener(dnssecExt_urlBarListener,
@@ -67,7 +76,14 @@ var dnssecExtension = {
 
     // remember last hostname
     this.oldHost = host;
+  },
+
+/*
+  onToolbarButtonCommand: function() {
+
   }
+*/
+
 };
 
 window.addEventListener("load", function() {dnssecExtension.init()}, false);
@@ -103,6 +119,11 @@ DnssecHandler.prototype = {
   DNSSEC_MODE_DOMAIN_SECURED            : "securedDomain",           // Only domain is secured
   DNSSEC_MODE_UNSECURED                 : "unsecuredDnssec",         // No trusted security information
 
+  // Constants to control security states
+  DNSSEC_STATE_CONNECTION_DOMAIN_SECURED : 0,
+  DNSSEC_STATE_DOMAIN_SECURED            : 1,
+  DNSSEC_STATE_UNSECURED                 : 2,
+
   // Cache the most recent hostname seen in checkSecurity
   _hostName : null,
 
@@ -116,43 +137,95 @@ DnssecHandler.prototype = {
     this._dnssecPopupSecLabel = document.getElementById("dnssec-popup-security-detail-label");
   },
 
+  /* Set appropriate security state */
+  setSecurityState : function(state) {
 
-  // Determine the security of the domain and connection and, if necessary,
-  // update the UI to reflect this. Intended to be called by onSecurityChange.
-  checkSecurity : function(host) {
-
-    this._hostName = host;
-
-    /* XPCOM validation call */
-    try {
-      netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-      const cid = "@nic.cz/dnssecValidator;1";
-      var obj = Components.classes[cid].createInstance();
-      obj = obj.QueryInterface(Components.interfaces.dnssecIValidator);
-    } catch (err) {
-      dump(err + '\n');
-      return;
-    }
-
-    var res = obj.Validate(this._hostName, 4);
-    dump('retval: ' + res + '\n');
-
-    /* set appropriate state */
-    switch (res) {
-    case 0:
+    switch (state) {
+    case this.DNSSEC_STATE_CONNECTION_DOMAIN_SECURED:
       this.setMode(this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED);
       this._dnssecBox.hidden = false;
       break;
-    case 1:
+    case this.DNSSEC_STATE_DOMAIN_SECURED:
       this.setMode(this.DNSSEC_MODE_DOMAIN_SECURED);
       this._dnssecBox.hidden = false;
       break;
-    case 2:
+    case this.DNSSEC_STATE_UNSECURED:
     default:
       this.setMode(this.DNSSEC_MODE_UNSECURED);
       this._dnssecBox.hidden = true;
       break;
     }
+
+  },
+
+  // Determine the security of the domain and connection and, if necessary,
+  // update the UI to reflect this. Intended to be called by onLocationChange.
+  checkSecurity : function(host) {
+
+    // Set unknown security state
+    this.setSecurityState(this.DNSSEC_STATE_UNSECURED);
+
+    this._hostName = host;
+    var cls = Components.classes['@mozilla.org/network/dns-service;1'];
+    var iface = Components.interfaces.nsIDNSService;
+    var dns = cls.getService(iface);
+
+    var dnslistener = {
+      // Called when async host lookup completes
+      onLookupComplete: function(aRequest, aRecord, aStatus) {
+
+        var ipver = 4; // Default address if resolving fails
+
+        if (aRecord && aRecord.hasMore()) {   // Address list is not empty
+
+          var addr = aRecord.getNextAddrAsString();
+          dump('Browser address: ' + addr + '\n');
+
+          // Check IP version
+          if (addr.indexOf(":") != -1) {
+            // ipv6
+            ipver = 6;
+          } else if (addr.indexOf(".") != -1) {
+            // ipv4
+            ipver = 4;
+          }
+
+        }
+
+        dump('Browser IP ver: ' + ipver + '\n');
+
+        /* XPCOM validation call */
+        try {
+          netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+          const cid = "@nic.cz/dnssecValidator;1";
+          var obj = Components.classes[cid].createInstance();
+          obj = obj.QueryInterface(Components.interfaces.dnssecIValidator);
+        } catch (err) {
+          dump(err + '\n');
+          return;
+        }
+
+        var res = obj.Validate(getDnssecHandler()._hostName, ipver);
+        dump('XPCOM retval: ' + res + '\n');
+
+        // Set appropriate state
+        getDnssecHandler().setSecurityState(res);
+
+      }
+    };
+
+    // Thread on which onLookupComplete should be called
+    var th;
+    if (Components.classes["@mozilla.org/event-queue-service;1"]) {
+      const EQS = Components.classes["@mozilla.org/event-queue-service;1"].getService(Components.interfaces.nsIEventQueueService);
+      th = EQS.getSpecialEventQueue(EQS.CURRENT_THREAD_EVENT_QUEUE);
+    } else {
+      th = Components.classes["@mozilla.org/thread-manager;1"].getService().mainThread;
+    }
+
+    // Get browser's IP address(es) that uses to connect to the remote site.
+    // Uses browser's internal resolver cache
+    dns.asyncResolve(host, 0, dnslistener, th); // Components.interfaces.nsIDNSService.RESOLVE_BYPASS_CACHE
 
   },
   
