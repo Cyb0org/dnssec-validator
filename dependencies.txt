@@ -1,4 +1,16 @@
 BUILD DEPENDENCIES
 --------------------
-libldns-dev
+
+Linux:
+
 xulrunner-dev
+
+
+
+MAC 10.5:
+xcode (gcc, make, ...) - required g++ >= 4.2
+xulrunner SDK
+
+(www.macports.org)
+libidl
+xpidl: libintl.3.dylib -> libintl.dylib
