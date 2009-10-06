@@ -1,4 +1,4 @@
 <!ENTITY dnssec.securedLabel "Zabezpečeno DNSSEC">
 <!ENTITY dnssec.unsecuredLabel "Nezabezpečeno DNSSEC">
-<!ENTITY dnssec.thisDomainLabel "Tato doména:">
-<!ENTITY dnssec.thisDomainLabel2 "je zabezpečena technologií DNSSEC.">
+<!ENTITY dnssec.thisDomainLabel "Doménové jméno:">
+<!ENTITY dnssec.thisDomainLabel2 "je zabezpečeno technologií DNSSEC.">
