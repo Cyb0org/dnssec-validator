@@ -44,7 +44,7 @@ var dnssecExtension = {
   init: function() {
 
     // Set unknown security state
-    getDnssecHandler().setSecurityState(getDnssecHandler().DNSSEC_STATE_UNSECURED);
+    getDnssecHandler().setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED);
 
     // Listen for webpage loads
     gBrowser.addProgressListener(dnssecExt_urlBarListener,
@@ -69,7 +69,7 @@ var dnssecExtension = {
 
     if ((host == null) || (host.search(/^[A-Za-z0-9]+([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,4}$/) == -1)) {   // test for valid hostname
       // Set unknown security state
-      getDnssecHandler().setSecurityState(this.DNSSEC_STATE_UNSECURED);
+      getDnssecHandler().setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED);
       this.oldHost = host;
       return;
     } else if (host == this.oldHost) {   // test for hostname change
@@ -108,6 +108,9 @@ function DnssecHandler() {
   this._staticStrings[this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED] = {
     security_label: this._stringBundle.getString("dnssec.connection.secured")
   };
+  this._staticStrings[this.DNSSEC_MODE_DOMAIN_SIGNATURE_SECURED] = {
+    security_label: this._stringBundle.getString("dnssec.connection.unsecured")
+  };
   this._staticStrings[this.DNSSEC_MODE_DOMAIN_SECURED] = {
     security_label: this._stringBundle.getString("dnssec.connection.unsecured")
   };
@@ -122,6 +125,7 @@ DnssecHandler.prototype = {
 
   // Mode strings used to control CSS display
   DNSSEC_MODE_CONNECTION_DOMAIN_SECURED : "securedConnectionDomain", // Domain and also connection are secured
+  DNSSEC_MODE_DOMAIN_SIGNATURE_SECURED  : "securedDomainSignature",  // Domain is secured and has a valid signature, but no chain of trust
   DNSSEC_MODE_DOMAIN_SECURED            : "securedDomain",           // Only domain is secured
   DNSSEC_MODE_UNSECURED                 : "unsecuredDnssec",         // No trusted security information
 
@@ -145,6 +149,10 @@ DnssecHandler.prototype = {
       this.setMode(this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED);
       this._dnssecBox.hidden = false;
       break;
+    case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_SIGNATURE_SECURED:
+      this.setMode(this.DNSSEC_MODE_DOMAIN_SIGNATURE_SECURED);
+      this._dnssecBox.hidden = false;
+      break;
     case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_SECURED:
       this.setMode(this.DNSSEC_MODE_DOMAIN_SECURED);
       this._dnssecBox.hidden = false;
@@ -163,7 +171,7 @@ DnssecHandler.prototype = {
   checkSecurity : function(host) {
 
     // Set unknown security state
-//    this.setSecurityState(this.DNSSEC_STATE_UNSECURED);
+//    this.setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED);
 
     this._hostName = host;
     var cls = Components.classes['@mozilla.org/network/dns-service;1'];
@@ -226,7 +234,7 @@ DnssecHandler.prototype = {
     // Get browser's IP address(es) that uses to connect to the remote site.
     // Uses browser's internal resolver cache
 //    dump('HOST: ' +  host + '\n');
-    dns.asyncResolve(host, 0, dnslistener, th); // Components.interfaces.nsIDNSService.RESOLVE_BYPASS_CACHE
+    dns.asyncResolve(host, 0, dnslistener, th); // Ci.nsIDNSService.RESOLVE_BYPASS_CACHE
 
   },
   

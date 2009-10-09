@@ -28,7 +28,6 @@
           <separator/>
           <label id="dnssec-popup-domainLabel" value="&dnssec.thisDomainLabel;"/>
           <description id="dnssec-popup-content-host"/>
-          <!-- description id="dnssec-popup-content-host">MMM</description -->
           <label id="dnssec-popup-domainLabel2" value="&dnssec.thisDomainLabel2;"/>
           <separator/>
           <description id="dnssec-popup-security-detail-label"/>

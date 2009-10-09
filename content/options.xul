@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<!DOCTYPE prefwindow SYSTEM "chrome://dnssec/locale/prefwindow.dtd">
+<prefwindow id="dnssecPreferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" title="&prefwindow.title;">
+  <prefpane id="pane1" label="&pane1.title;">
+    <preferences>
+      <preference id="usemydnsserver" name="extensions.dnssec.usemydnsserver" type="bool"/>
+      <preference id="dnsservername" name="extensions.dnssec.dnsservername" type="string"/> <!-- note that this is only an ASCII string - use unichar for unicode strings -->
+    </preferences>
+    <checkbox id="usemydnsserverpref" preference="usemydnsserver" label="&usemydnsserver.label;" accesskey="&usemydnsserver.accesskey;"/>
+    <textbox id="dnsservernamepref" preference="dnsservername"/>
+  </prefpane>
+</prefwindow>
