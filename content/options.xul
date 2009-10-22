@@ -4,10 +4,10 @@
 <prefwindow id="dnssecPreferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" title="&prefwindow.title;">
   <prefpane id="pane1" label="&pane1.title;">
     <preferences>
-      <preference id="usemydnsserver" name="extensions.dnssec.usemydnsserver" type="bool"/>
-      <preference id="dnsservername" name="extensions.dnssec.dnsservername" type="string"/> <!-- note that this is only an ASCII string - use unichar for unicode strings -->
+      <preference id="useoptdnsserver" name="extensions.dnssec.useoptdnsserver" type="bool"/>
+      <preference id="optdnsservername" name="extensions.dnssec.optdnsservername" type="string"/> <!-- note that this is only an ASCII string - use unichar for unicode strings -->
     </preferences>
-    <checkbox id="usemydnsserverpref" preference="usemydnsserver" label="&usemydnsserver.label;" accesskey="&usemydnsserver.accesskey;"/>
-    <textbox id="dnsservernamepref" preference="dnsservername"/>
+    <checkbox preference="useoptdnsserver" label="&useoptdnsserver.label;" accesskey="&useoptdnsserver.accesskey;"/>
+    <textbox preference="optdnsservername"/>
   </prefpane>
 </prefwindow>

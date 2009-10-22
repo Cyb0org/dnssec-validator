@@ -83,12 +83,16 @@ var dnssecExtension = {
     this.oldHost = host;
   },
 
-/*
+
   onToolbarButtonCommand: function() {
 
+    if (Components.classes["@mozilla.org/preferences-service;1"]
+       .getService(Components.interfaces.nsIPrefBranch)
+       .getBoolPref("extensions.dnssec.useoptdnsserver"))
+      alert ("useoptdnsserverpref.checked\n");
 
   },
-*/
+
 
 };
 
@@ -213,7 +217,7 @@ DnssecHandler.prototype = {
           return;
         }
 
-        var res = obj.Validate(getDnssecHandler()._hostName, ipver);
+        var res = obj.Validate(getDnssecHandler()._hostName, ipver, "127.0.0.1");
         dump('XPCOM retval: ' + res + '\n');
 
         // Set appropriate state

@@ -1,4 +1,4 @@
 <!ENTITY prefwindow.title "DNSSEC preferences">
 <!ENTITY pane1.title "DNSSEC preferences">
-<!ENTITY usemydnsserver.label "Ignore /etc/resolv.conf and use this DNS server">
-<!ENTITY usemydnsserver.accesskey "D">
+<!ENTITY useoptdnsserver.label "Ignore /etc/resolv.conf and use this DNS server">
+<!ENTITY useoptdnsserver.accesskey "D">
