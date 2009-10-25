@@ -3,6 +3,7 @@
 #   by Nickolay Ponomarev <asqueella@gmail.com>
 #   (original version based on Nathan Yergler's build script)
 # Most recent version is at <http://kb.mozillazine.org/Bash_build_script>
+# Script has been modified by Zbynek Michl <zbynek.michl@nic.cz>
 
 # This script assumes the following directory structure:
 # ./
@@ -79,7 +80,7 @@ zip -0 -r $JAR_FILE `cat files`
 echo "Copying various files to $TMP_DIR folder..."
 for DIR in $ROOT_DIRS; do
   mkdir $TMP_DIR/$DIR
-  FILES="`find $DIR -path '*CVS*' -prune -o -type f -print | grep -v \~`"
+  FILES="`find $DIR -path '*CVS*' -prune -o -xtype f -print | grep -v \~`"
   echo $FILES >> files
   cp -v --parents $FILES $TMP_DIR
 done

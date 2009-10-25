@@ -217,7 +217,7 @@ DnssecHandler.prototype = {
           return;
         }
 
-        var res = obj.Validate(getDnssecHandler()._hostName, ipver, "127.0.0.1");
+        var res = obj.Validate(getDnssecHandler()._hostName, ipver, "172.20.20.40");
         dump('XPCOM retval: ' + res + '\n');
 
         // Set appropriate state
