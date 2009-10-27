@@ -4,15 +4,16 @@
 <overlay id="dnssec-overlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script src="overlay.js"/>
+  <script src="options.js"/>
   <stringbundleset id="stringbundleset">
     <stringbundle id="dnssec-strings" src="chrome://dnssec/locale/dnssec.properties"/>
   </stringbundleset>
 
   <!-- Temp button -->
-  <toolbarpalette id="BrowserToolbarPalette">
+  <!-- toolbarpalette id="BrowserToolbarPalette">
     <toolbarbutton id="dnssec-toolbar-button"
       oncommand="dnssecExtension.onToolbarButtonCommand();"/>
-  </toolbarpalette>
+  </toolbarpalette -->
 
   <popupset id="mainPopupSet">
     <!-- Popup for DNSSEC information -->

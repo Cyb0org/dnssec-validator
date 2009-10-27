@@ -43,6 +43,11 @@ var dnssecExtension = {
   
   init: function() {
 
+    // Ignore /etc/resolv.conf and use given DNS server on Windows platform
+    if (navigator.platform.toLowerCase() == "win32") {
+      dnssecExtPrefs.setBool("useoptdnsserver", true);
+    }
+
     // Set unknown security state
     getDnssecHandler().setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED);
 
@@ -83,16 +88,12 @@ var dnssecExtension = {
     this.oldHost = host;
   },
 
-
+/*
   onToolbarButtonCommand: function() {
 
-    if (Components.classes["@mozilla.org/preferences-service;1"]
-       .getService(Components.interfaces.nsIPrefBranch)
-       .getBoolPref("extensions.dnssec.useoptdnsserver"))
-      alert ("useoptdnsserverpref.checked\n");
 
   },
-
+*/
 
 };
 
@@ -217,7 +218,13 @@ DnssecHandler.prototype = {
           return;
         }
 
-        var res = obj.Validate(getDnssecHandler()._hostName, ipver, "172.20.20.40");
+        var nameserver = null;   // use /etc/resolv.conf as default
+
+        if (dnssecExtPrefs.getBool("useoptdnsserver") || (navigator.platform.toLowerCase() == "win32")) {
+          nameserver = dnssecExtPrefs.getChar("optdnsservername");
+        }
+
+        var res = obj.Validate(getDnssecHandler()._hostName, ipver, nameserver);
         dump('XPCOM retval: ' + res + '\n');
 
         // Set appropriate state

@@ -2,12 +2,13 @@
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <!DOCTYPE prefwindow SYSTEM "chrome://dnssec/locale/prefwindow.dtd">
 <prefwindow id="dnssecPreferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" title="&prefwindow.title;">
+  <script src="options.js"/>
   <prefpane id="pane1" label="&pane1.title;">
     <preferences>
       <preference id="useoptdnsserver" name="extensions.dnssec.useoptdnsserver" type="bool"/>
       <preference id="optdnsservername" name="extensions.dnssec.optdnsservername" type="string"/> <!-- note that this is only an ASCII string - use unichar for unicode strings -->
     </preferences>
-    <checkbox preference="useoptdnsserver" label="&useoptdnsserver.label;" accesskey="&useoptdnsserver.accesskey;"/>
-    <textbox preference="optdnsservername"/>
+    <checkbox id="dnssec-pref-useoptdnsserver" preference="useoptdnsserver" label="&useoptdnsserver.label;" accesskey="&useoptdnsserver.accesskey;" oncommand="dnssecExtPrefs.useoptdnsserverClick();"/>
+    <textbox id="dnssec-pref-optdnsservername" preference="optdnsservername"/>
   </prefpane>
 </prefwindow>

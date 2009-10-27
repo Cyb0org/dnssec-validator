@@ -1,4 +1,4 @@
-<!ENTITY prefwindow.title "CZ DNSSEC preferences">
-<!ENTITY pane1.title "DNSSEC preferences">
-<!ENTITY useoptdnsserver.label "Ignore /etc/resolv.conf and use this DNS server">
+<!ENTITY prefwindow.title "Nastavení DNSSECu">
+<!ENTITY pane1.title "Nastavení DNSSECu">
+<!ENTITY useoptdnsserver.label "Ignorovat /etc/resolv.conf a použít následující DNS server">
 <!ENTITY useoptdnsserver.accesskey "D">

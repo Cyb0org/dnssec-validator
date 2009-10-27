@@ -5,17 +5,18 @@
     <em:id>dnssec@nic.cz</em:id>
     <em:name>DNSSEC</em:name>
     <em:version>0.01</em:version>
-    <em:creator>Zbynek Michl</em:creator>
-    <em:description>DNSSEC connection validator</em:description>
-    <em:homepageURL>http://www.nic.cz</em:homepageURL>
+    <em:creator>CZ.NIC, z. s. p. o.</em:creator>
+    <em:description>DNSSEC validator</em:description>
+    <em:homepageURL>http://labs.nic.cz</em:homepageURL>
     <em:iconURL>chrome://dnssec/skin/dnssec.png</em:iconURL>
     <em:optionsURL>chrome://dnssec/content/options.xul</em:optionsURL>
     <em:localized>
       <Description>
         <em:locale>cs-CZ</em:locale>
         <em:name>DNSSEC</em:name>
-        <em:description>DNSSEC rozsireni</em:description>
-        <em:creator>Zbynek Michl</em:creator>
+        <em:description>DNSSEC validator</em:description>
+        <em:creator>CZ.NIC, z. s. p. o.</em:creator>
+        <em:homepageURL>http://labs.nic.cz</em:homepageURL>
       </Description>
     </em:localized>
     <em:targetApplication>
