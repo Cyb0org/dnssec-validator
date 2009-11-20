@@ -4,7 +4,7 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>dnssec@nic.cz</em:id>
     <em:name>DNSSEC</em:name>
-    <em:version>0.04alpha</em:version>
+    <em:version>0.05alpha</em:version>
     <em:creator>CZ.NIC, z. s. p. o.</em:creator>
     <em:description>DNSSEC validator</em:description>
     <em:homepageURL>http://labs.nic.cz</em:homepageURL>
