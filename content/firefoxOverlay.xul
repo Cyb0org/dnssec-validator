@@ -42,15 +42,17 @@
     onfocus="document.getElementById('dnssec-box').style.MozUserFocus= 'normal'"
     onblur="document.getElementById('dnssec-box').style.MozUserFocus = 'ignore';" -->
 
-    <!-- DNSSEC button in urlbar -->
-    <box id="dnssec-box" role="button"
-         onclick="getDnssecHandler().handleDnssecButtonEvent(event);"
-         onkeypress="getDnssecHandler().handleDnssecButtonEvent(event);">
-<!--         hidden="true" -->
-<!--         chromedir="&locale.dir;" -->
-       <!-- stack id="dnssec-icons-stack" -->
-         <image id="dnssec-icon" validate="never"/>
-       <!-- /stack -->
+    <box id="dnssec-outerbox">
+      <!-- DNSSEC button in urlbar -->
+      <hbox id="dnssec-box" role="button"
+           onclick="getDnssecHandler().handleDnssecButtonEvent(event);"
+           onkeypress="getDnssecHandler().handleDnssecButtonEvent(event);">
+<!--           hidden="true" -->
+<!--           chromedir="&locale.dir;" -->
+        <!-- stack id="dnssec-icons-stack" -->
+          <image id="dnssec-icon" validate="never"/>
+        <!-- /stack -->
+      </hbox>
     </box>
   </textbox>
 

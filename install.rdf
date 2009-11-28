@@ -4,11 +4,11 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>dnssec@nic.cz</em:id>
     <em:name>DNSSEC</em:name>
-    <em:version>0.05alpha</em:version>
+    <em:version>0.06alpha</em:version>
     <em:creator>CZ.NIC, z. s. p. o.</em:creator>
     <em:description>DNSSEC validator</em:description>
     <em:homepageURL>http://labs.nic.cz</em:homepageURL>
-    <em:iconURL>chrome://dnssec/skin/dnssec.png</em:iconURL>
+    <em:iconURL>chrome://dnssec/skin/key_icon.png</em:iconURL>
     <em:optionsURL>chrome://dnssec/content/options.xul</em:optionsURL>
     <em:localized>
       <Description>
