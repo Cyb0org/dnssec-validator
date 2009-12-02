@@ -39,9 +39,14 @@ var dnssecExt_urlBarListener = {
 };
 
 var dnssecExtension = {
+  debugOutput: 0,
+  debugPrefix: "dnssec: ",
   oldHost: null,
   
   init: function() {
+
+    // Enable debugging information on stdout if desired
+    if (dnssecExtPrefs.getBool("debugoutput")) this.debugOutput = 1;
 
     // Ignore /etc/resolv.conf and use given DNS server on Windows platform
     if (navigator.platform.toLowerCase() == "win32") {
@@ -187,25 +192,27 @@ DnssecHandler.prototype = {
       // Called when async host lookup completes
       onLookupComplete: function(aRequest, aRecord, aStatus) {
 
-        var ipver = 4; // Default address if resolving fails
+        var useipv6 = 0; // Default version is ipv4 if resolving fails
 
         if (aRecord && aRecord.hasMore()) {   // Address list is not empty
 
           var addr = aRecord.getNextAddrAsString();
-          dump('Browser address: ' + addr + '\n');
+          if (dnssecExtension.debugOutput)
+            dump(dnssecExtension.debugPrefix + 'Browser address: ' + addr + '\n');
 
           // Check IP version
           if (addr.indexOf(":") != -1) {
             // ipv6
-            ipver = 6;
+            useipv6 = 1;
           } else if (addr.indexOf(".") != -1) {
             // ipv4
-            ipver = 4;
+            useipv6 = 0;
           }
 
         }
 
-        dump('Browser IP ver: ' + ipver + '\n');
+        if (dnssecExtension.debugOutput)
+          dump(dnssecExtension.debugPrefix + 'Browser uses IPv6: ' + useipv6 + '\n');
 
         /* XPCOM validation call */
         try {
@@ -224,8 +231,19 @@ DnssecHandler.prototype = {
           nameserver = dnssecExtPrefs.getChar("optdnsservername");
         }
 
-        var res = obj.Validate(getDnssecHandler()._hostName, ipver, nameserver);
-        dump('XPCOM retval: ' + res + '\n');
+        // Create variable to pass options
+        var options = (dnssecExtension.debugOutput << Ci.dnssecIValidator.XPCOM_INPUT_FLAG_DEBUGOUTPUT)
+                      | (useipv6 << Ci.dnssecIValidator.XPCOM_INPUT_FLAG_USEIPV6);
+
+        if (dnssecExtension.debugOutput)
+          dump(dnssecExtension.debugPrefix + 'Validation parameters: '
+               + getDnssecHandler()._hostName + '; ' + options + '; ' + nameserver + '\n');
+
+        // Call XPCOM validation
+        var res = obj.Validate(getDnssecHandler()._hostName, options, nameserver);
+
+        if (dnssecExtension.debugOutput)
+          dump(dnssecExtension.debugPrefix + 'XPCOM return value: ' + res + '\n');
 
         // Set appropriate state
         getDnssecHandler().setSecurityState(res);

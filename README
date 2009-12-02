@@ -1,0 +1,14 @@
+DNSSEC Validator extension for Mozilla Firefox
+-------------------------------------------------------------------------------
+
+INSTALLATION
+---------------
+Select "dnssec.xpi" in File -> Open dialog and follow wizard instructions
+
+
+DEBUGGING
+------------
+For enable debug info of an extension to stdout, set next Firefox preferences
+in "about:config" and reboot browser:
+ - "browser.dom.window.dump.enabled" to "true"
+ - "extensions.dnssec.debugoutput" to "true"
