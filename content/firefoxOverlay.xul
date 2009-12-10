@@ -28,6 +28,7 @@
           <label id="dnssec-popup-unsecuredLabel" value="&dnssec.unsecuredLabel;"/>
           <separator/>
           <label id="dnssec-popup-domainLabel" value="&dnssec.thisDomainLabel;"/>
+          <label id="dnssec-popup-nodomainLabel" value="&dnssec.thisNoDomainLabel;"/>
           <description id="dnssec-popup-content-host"/>
           <label id="dnssec-popup-domainLabel2" value="&dnssec.thisDomainLabel2;"/>
           <separator/>

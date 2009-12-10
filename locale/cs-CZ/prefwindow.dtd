@@ -1,4 +1,6 @@
 <!ENTITY prefwindow.title "Nastavení DNSSECu">
 <!ENTITY pane1.title "Nastavení DNSSECu">
+<!ENTITY usetcp.label "Použít TCP protokol místo výchozího UDP">
+<!ENTITY usetcp.accesskey "T">
 <!ENTITY useoptdnsserver.label "Ignorovat /etc/resolv.conf a použít následující DNS server">
 <!ENTITY useoptdnsserver.accesskey "D">

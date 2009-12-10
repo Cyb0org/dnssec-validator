@@ -1,6 +1,6 @@
 /* Temp button */
 #dnssec-toolbar-button {
-  list-style-image: url("chrome://dnssec/skin/urlbar-button.png");
+  list-style-image: url("chrome://dnssec/skin/key_orange.png");
 }
 
 /* DNSSEC icons stack */
@@ -22,7 +22,7 @@
   height: 20px;
   padding: 0px 2px;
 /*  max-height: 20px; */
-  list-style-image: url("chrome://dnssec/skin/urlbar-button.png"); /* 35x20 */
+  list-style-image: url("chrome://dnssec/skin/key_white.png"); /* 35x20 */
 /*  -moz-image-region: rect(0px, 35px, 20px, 0px); */
 }
 
@@ -43,20 +43,20 @@
   outline: 1px dotted -moz-DialogText;
 }
 
-#dnssec-box.securedDomain {
-/*  background-color: rgba(30, 80, 170, 0.7);  blue */
-  background-color: rgba(238, 46, 36, 0.8); /* red */
-/*  background-color: transparent; */
+#dnssec-box.securedConnectionInvSigDomain,
+#dnssec-box.invalidDomainSignature {
+  background-color: rgba(238, 46, 36, 1.0); /* red */
   color: white;
 }
 
-#dnssec-box.securedDomainSignature {
-  background-color: rgba(236, 197, 63, 0.8); /* orange */
+#dnssec-box.validDomainSignature {
+  background-color: rgba(238, 142, 40, 1.0); /* orange */
   color: white;
 }
 
-#dnssec-box.securedConnectionDomain {
-  background-color: rgba(50, 150, 50, 0.8); /* green */
+#dnssec-box.securedConnectionDomain,
+#dnssec-box.securedConnectionNoDomain {
+  background-color: rgba(110, 180, 63, 1.0); /* green */
   color: white;
 }
 
@@ -80,19 +80,26 @@
   height: 38px;
   width: 130px;
   padding: 0;
-  list-style-image: url("chrome://dnssec/skin/dnssec_unsecured.png");
+/*  list-style-image: url("chrome://dnssec/skin/dnssec_unsecured_red.png");*/
 /*  -moz-image-region: rect(0px 40px 40px 0px); */
 
 /*  background-color: #4c69bc; */
 }
 
-#dnssec-popup.securedDomain > #dnssec-popup-container > #dnssec-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/dnssec_unsecured.png");
+#dnssec-popup.validDomainSignature > #dnssec-popup-container > #dnssec-popup-icon {
+  list-style-image: url("chrome://dnssec/skin/dnssec_unsecured_orange.png");
 /* -moz-image-region: rect(64px, 64px, 128px, 0px); */
 }
 
-#dnssec-popup.securedConnectionDomain > #dnssec-popup-container > #dnssec-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/dnssec_secured.png");
+#dnssec-popup.securedConnectionInvSigDomain > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.invalidDomainSignature > #dnssec-popup-container > #dnssec-popup-icon {
+  list-style-image: url("chrome://dnssec/skin/dnssec_unsecured_red.png");
+/* -moz-image-region: rect(64px, 64px, 128px, 0px); */
+}
+
+#dnssec-popup.securedConnectionDomain > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.securedConnectionNoDomain > #dnssec-popup-container > #dnssec-popup-icon {
+  list-style-image: url("chrome://dnssec/skin/dnssec_secured_green.png");
 /*  -moz-image-region: rect(128px, 64px, 192px, 0px); */
 }
 
@@ -113,6 +120,11 @@
   display: none;
 }
 
+#dnssec-popup-domainLabel,
+#dnssec-popup-nodomainLabel {
+  display: none;
+}
+
 #dnssec-popup-content-host {
   font-weight: bold;
   max-width: 300px;
@@ -127,9 +139,16 @@
 }
 
 
-/* DNSSEC UI */
-#dnssec-popup-content-box.unsecuredDnssec > #dnssec-popup-unsecuredLabel,
-#dnssec-popup-content-box.securedDomain > #dnssec-popup-unsecuredLabel,
-#dnssec-popup-content-box.securedConnectionDomain > #dnssec-popup-securedLabel {
+/* DNSSEC popup UI */
+#dnssec-popup-content-box.securedConnectionDomain > #dnssec-popup-securedLabel,
+#dnssec-popup-content-box.securedConnectionDomain > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.securedConnectionNoDomain > #dnssec-popup-securedLabel,
+#dnssec-popup-content-box.securedConnectionNoDomain > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.securedConnectionInvSigDomain > #dnssec-popup-securedLabel,
+#dnssec-popup-content-box.securedConnectionInvSigDomain > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.validDomainSignature > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.validDomainSignature > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.invalidDomainSignature > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.invalidDomainSignature > #dnssec-popup-domainLabel {
   display: inline;
 }

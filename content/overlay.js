@@ -116,16 +116,19 @@ function DnssecHandler() {
   this._stringBundle = document.getElementById("dnssec-strings");
   this._staticStrings = {};
   this._staticStrings[this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED] = {
-    security_label: this._stringBundle.getString("dnssec.connection.secured")
+    security_label: this._stringBundle.getString("dnssec.connection.domain.secured")
   };
-  this._staticStrings[this.DNSSEC_MODE_DOMAIN_SIGNATURE_SECURED] = {
-    security_label: this._stringBundle.getString("dnssec.connection.unsecured")
+  this._staticStrings[this.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED] = {
+    security_label: this._stringBundle.getString("dnssec.connection.nodomain.secured")
   };
-  this._staticStrings[this.DNSSEC_MODE_DOMAIN_SECURED] = {
-    security_label: this._stringBundle.getString("dnssec.connection.unsecured")
+  this._staticStrings[this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED] = {
+    security_label: this._stringBundle.getString("dnssec.connection.invsigdomain.secured")
   };
-  this._staticStrings[this.DNSSEC_MODE_UNSECURED] = {
-    security_label: this._stringBundle.getString("dnssec.connection.unsecured")
+  this._staticStrings[this.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID] = {
+    security_label: this._stringBundle.getString("dnssec.domain.signature.valid")
+  };
+  this._staticStrings[this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID] = {
+    security_label: this._stringBundle.getString("dnssec.domain.signature.invalid")
   };
 
   this._cacheElements();
@@ -134,10 +137,19 @@ function DnssecHandler() {
 DnssecHandler.prototype = {
 
   // Mode strings used to control CSS display
-  DNSSEC_MODE_CONNECTION_DOMAIN_SECURED : "securedConnectionDomain", // Domain and also connection are secured
-  DNSSEC_MODE_DOMAIN_SIGNATURE_SECURED  : "securedDomainSignature",  // Domain is secured and has a valid signature, but no chain of trust
-  DNSSEC_MODE_DOMAIN_SECURED            : "securedDomain",           // Only domain is secured
-  DNSSEC_MODE_UNSECURED                 : "unsecuredDnssec",         // No trusted security information
+
+  // Domain and also connection are secured
+  DNSSEC_MODE_CONNECTION_DOMAIN_SECURED       : "securedConnectionDomain",
+  // Connection is secured, but domain name does not exist
+  DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED     : "securedConnectionNoDomain",
+  // Connection is secured, but domain name signature is invalid
+  DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED : "securedConnectionInvSigDomain",
+  // Domain is secured and has a valid signature, but no chain of trust
+  DNSSEC_MODE_DOMAIN_SIGNATURE_VALID          : "validDomainSignature",
+  // Domain is secured, but has an invalid signature
+  DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID        : "invalidDomainSignature",
+  // No trusted security information
+  DNSSEC_MODE_UNSECURED                       : "unsecuredDnssec",
 
   // Cache the most recent hostname seen in checkSecurity
   _hostName : null,
@@ -155,19 +167,28 @@ DnssecHandler.prototype = {
   setSecurityState : function(state) {
 
     switch (state) {
-    case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_CONNECTION_SECURED:
+    case Ci.dnssecIValidator.XPCOM_EXIT_CONNECTION_DOMAIN_SECURED:
       this.setMode(this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED);
       this._dnssecBox.hidden = false;
       break;
-    case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_SIGNATURE_SECURED:
-      this.setMode(this.DNSSEC_MODE_DOMAIN_SIGNATURE_SECURED);
+    case Ci.dnssecIValidator.XPCOM_EXIT_CONNECTION_NODOMAIN_SECURED:
+      this.setMode(this.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED);
       this._dnssecBox.hidden = false;
       break;
-    case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_SECURED:
-      this.setMode(this.DNSSEC_MODE_DOMAIN_SECURED);
+    case Ci.dnssecIValidator.XPCOM_EXIT_CONNECTION_INVSIGDOMAIN_SECURED:
+      this.setMode(this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED);
+      this._dnssecBox.hidden = false;
+      break;
+    case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_SIGNATURE_VALID:
+      this.setMode(this.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID);
+      this._dnssecBox.hidden = false;
+      break;
+    case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_SIGNATURE_INVALID:
+      this.setMode(this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID);
       this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED:
+    case Ci.dnssecIValidator.XPCOM_EXIT_UNKNOWN:
     default:
       this.setMode(this.DNSSEC_MODE_UNSECURED);
       this._dnssecBox.hidden = true;
@@ -192,7 +213,7 @@ DnssecHandler.prototype = {
       // Called when async host lookup completes
       onLookupComplete: function(aRequest, aRecord, aStatus) {
 
-        var useipv6 = 0; // Default version is ipv4 if resolving fails
+        var resolvipv6 = 0; // Default version is ipv4 if resolving fails
 
         if (aRecord && aRecord.hasMore()) {   // Address list is not empty
 
@@ -203,16 +224,16 @@ DnssecHandler.prototype = {
           // Check IP version
           if (addr.indexOf(":") != -1) {
             // ipv6
-            useipv6 = 1;
+            resolvipv6 = 1;
           } else if (addr.indexOf(".") != -1) {
             // ipv4
-            useipv6 = 0;
+            resolvipv6 = 0;
           }
 
         }
 
         if (dnssecExtension.debugOutput)
-          dump(dnssecExtension.debugPrefix + 'Browser uses IPv6: ' + useipv6 + '\n');
+          dump(dnssecExtension.debugPrefix + 'Browser uses IPv6 resolving: ' + resolvipv6 + '\n');
 
         /* XPCOM validation call */
         try {
@@ -232,8 +253,10 @@ DnssecHandler.prototype = {
         }
 
         // Create variable to pass options
-        var options = (dnssecExtension.debugOutput << Ci.dnssecIValidator.XPCOM_INPUT_FLAG_DEBUGOUTPUT)
-                      | (useipv6 << Ci.dnssecIValidator.XPCOM_INPUT_FLAG_USEIPV6);
+        var options = 0;
+        if (dnssecExtension.debugOutput) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_DEBUGOUTPUT;
+        if (dnssecExtPrefs.getBool("usetcp")) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_USETCP;
+        if (resolvipv6) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_RESOLVIPV6;
 
         if (dnssecExtension.debugOutput)
           dump(dnssecExtension.debugPrefix + 'Validation parameters: '
@@ -266,24 +289,7 @@ DnssecHandler.prototype = {
     dns.asyncResolve(host, 0, dnslistener, th); // Ci.nsIDNSService.RESOLVE_BYPASS_CACHE
 
   },
-  
-  /**
-   * Return the eTLD+1 version of the current hostname
-   */
-  getEffectiveHost : function() {
-    // Cache the eTLDService if this is our first time through
-    if (!this._eTLDService)
-      this._eTLDService = Cc["@mozilla.org/network/effective-tld-service;1"]
-                         .getService(Ci.nsIEffectiveTLDService);
-    try {
-      return this._eTLDService.getBaseDomainFromHost(this._hostName);
-    } catch (e) {
-      // If something goes wrong (e.g. hostname is an IP address) just fail back
-      // to the full domain.
-      return this._hostName;
-    }
-  },
-  
+
   /**
    * Update the UI to reflect the specified mode, which should be one of the
    * DNSSEC_MODE_* constants.
@@ -302,36 +308,40 @@ DnssecHandler.prototype = {
     if (this._dnssecPopup.state == "open")
       this.setPopupMessages(newMode);
   },
-  
+
   /**
    * Set up the messages for the primary security UI based on the specified mode,
    *
    * @param newMode The newly set security mode. Should be one of the DNSSEC_MODE_* constants.
    */
   setSecurityMessages : function(newMode) {
-    if (newMode == this.DNSSEC_MODE_DOMAIN_SECURED) {
-      // Cache the override service the first time we need to check it
-      if (!this._overrideService)
-        this._overrideService = Components.classes["@mozilla.org/security/certoverride;1"]
-                                          .getService(Components.interfaces.nsICertOverrideService);
 
-      // Domain is secured, but connection not
-      var tooltip = this._stringBundle.getString("dnssec.tooltip.unsecured");
-      
-    }
-    else if (newMode == this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED) {
-      // Both domain and connection are secured
+    var tooltip;
+
+    switch (newMode) {
+    // Both domain and connection are secured
+    case this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED:
+    // Both non-existing domain and connection are secured
+    case this.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED:
+    // Connection is secured, but domain signature is invalid
+    case this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED:
       tooltip = this._stringBundle.getString("dnssec.tooltip.secured");
-    }
-    else {
-      // Unknown
+      break;
+    // Domain signature is valid
+    case this.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID:
+    // Domain signature is invalid
+    case this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID:
       tooltip = this._stringBundle.getString("dnssec.tooltip.unsecured");
+      break;
+    // Unknown
+    default:
+      tooltip = "";
     }
-    
+
     // Push the appropriate strings out to the UI
     this._dnssecBox.tooltipText = tooltip;
   },
-  
+
   /**
    * Set up the title and content messages for the security message popup,
    * based on the specified mode
@@ -345,22 +355,9 @@ DnssecHandler.prototype = {
     
     // Set the static strings up front
     this._dnssecPopupSecLabel.textContent = this._staticStrings[newMode].security_label;
-    
-    if (newMode == this.DNSSEC_MODE_DOMAIN_SECURED) {
-//      var host = this.getEffectiveHost();
-      var host = this._hostName;
-    }
-    else if (newMode == this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED) {
-//      host = this.getEffectiveHost();
-      host = this._hostName;
-    }
-    else {
-      // This string will be hidden in CSS anyhow
-      host = "";
-    }
-    
+
     // Push the appropriate strings out to the UI
-    this._dnssecPopupContentHost.textContent = host;
+    this._dnssecPopupContentHost.textContent = this._hostName;
   },
 
   hideDnssecPopup : function() {

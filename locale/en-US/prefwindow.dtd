@@ -1,4 +1,6 @@
 <!ENTITY prefwindow.title "DNSSEC preferences">
 <!ENTITY pane1.title "DNSSEC preferences">
+<!ENTITY usetcp.label "Use TCP protocol instead of default UDP">
+<!ENTITY usetcp.accesskey "T">
 <!ENTITY useoptdnsserver.label "Ignore /etc/resolv.conf and use this DNS server">
 <!ENTITY useoptdnsserver.accesskey "D">
