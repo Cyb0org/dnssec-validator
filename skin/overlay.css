@@ -1,6 +1,7 @@
 /* Temp button */
 #dnssec-toolbar-button {
-  list-style-image: url("chrome://dnssec/skin/key_orange.png");
+  list-style-image: url("chrome://dnssec/skin/key.png");
+  -moz-image-region: rect(0px, 35px, 20px, 0px);
 }
 
 /* DNSSEC icons stack */
@@ -22,8 +23,8 @@
   height: 20px;
   padding: 0px 2px;
 /*  max-height: 20px; */
-  list-style-image: url("chrome://dnssec/skin/key_white.png"); /* 35x20 */
-/*  -moz-image-region: rect(0px, 35px, 20px, 0px); */
+  list-style-image: url("chrome://dnssec/skin/key.png"); /* 35x20 */
+  -moz-image-region: rect(0px, 35px, 20px, 0px);
 }
 
 
@@ -87,20 +88,20 @@
 }
 
 #dnssec-popup.validDomainSignature > #dnssec-popup-container > #dnssec-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/dnssec_unsecured_orange.png");
-/* -moz-image-region: rect(64px, 64px, 128px, 0px); */
+  list-style-image: url("chrome://dnssec/skin/logo.png");
+  -moz-image-region: rect(0px, 390px, 38px, 260px);
 }
 
 #dnssec-popup.securedConnectionInvSigDomain > #dnssec-popup-container > #dnssec-popup-icon,
 #dnssec-popup.invalidDomainSignature > #dnssec-popup-container > #dnssec-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/dnssec_unsecured_red.png");
-/* -moz-image-region: rect(64px, 64px, 128px, 0px); */
+  list-style-image: url("chrome://dnssec/skin/logo.png");
+  -moz-image-region: rect(0px, 260px, 38px, 130px);
 }
 
 #dnssec-popup.securedConnectionDomain > #dnssec-popup-container > #dnssec-popup-icon,
 #dnssec-popup.securedConnectionNoDomain > #dnssec-popup-container > #dnssec-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/dnssec_secured_green.png");
-/*  -moz-image-region: rect(128px, 64px, 192px, 0px); */
+  list-style-image: url("chrome://dnssec/skin/logo.png");
+  -moz-image-region: rect(0px, 130px, 38px, 0px);
 }
 
 

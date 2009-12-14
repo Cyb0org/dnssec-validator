@@ -5,11 +5,11 @@
     <em:id>dnssec@nic.cz</em:id>
     <em:name>DNSSEC</em:name>
     <em:description>DNSSEC validator</em:description>
-    <em:version>0.08alpha</em:version>
+    <em:version>0.09alpha</em:version>
     <em:creator>CZ.NIC, z. s. p. o.</em:creator>
     <em:developer>Zbynek Michl</em:developer>
     <em:homepageURL>http://labs.nic.cz</em:homepageURL>
-    <em:iconURL>chrome://dnssec/skin/key_icon.png</em:iconURL>
+    <em:iconURL>chrome://dnssec/skin/icon.png</em:iconURL>
     <em:optionsURL>chrome://dnssec/content/options.xul</em:optionsURL>
     <em:targetPlatform>Darwin_ppc-gcc3</em:targetPlatform>
     <em:targetPlatform>Darwin_x86-gcc3</em:targetPlatform>
