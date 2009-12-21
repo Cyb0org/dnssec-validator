@@ -34,25 +34,30 @@ make
 
 ### LINUX (expected Debian GNU/Linux unstable x86_64) ###
 
-
-xulrunner-dev
+xulrunner SDK:
+xulrunner-dev package
+ftp://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.4/sdk/xulrunner-1.9.1.4.en-US.linux-i686.sdk.tar.bz2
 
 
 ### MAC OS X ###
 
+Xcode for Mac-only Development (gcc, make, ...):
+http://developer.apple.com/technology/xcode.html
 
-xcode (gcc, make, ...) - required g++ >= 4.2
-xulrunner SDK
-http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.4/sdk/xulrunner-1.9.1.4.en-US.mac-i386.sdk.tar.bz2
-http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.4/sdk/xulrunner-1.9.1.4.en-US.mac-powerpc.sdk.tar.bz2
+xulrunner SDK:
+ftp://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.4/sdk/xulrunner-1.9.1.4.en-US.mac-i386.sdk.tar.bz2
+ftp://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.4/sdk/xulrunner-1.9.1.4.en-US.mac-powerpc.sdk.tar.bz2
 
 (www.macports.org)
-libidl
-xpidl: libintl.3.dylib -> libintl.dylib
+(libidl)
+(xpidl: libintl.3.dylib -> libintl.dylib)
 
 
 ### Windows ###
 
-http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.4/sdk/xulrunner-1.9.1.4.en-US.win32.sdk.zip
+xulrunner SDK:
+ftp://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.4/sdk/xulrunner-1.9.1.4.en-US.win32.sdk.zip
+
+mingw-w64:
 http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Release%20for%20GCC%204.4.1/mingw-w32-bin_x86-64-linux_4.4.1a.tar.bz2/download
-http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Release%20for%20GCC%204.4.1/mingw-w64-bin_x86-64-linux_4.4.1-1a.tar.bz2/download
+(http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Release%20for%20GCC%204.4.1/mingw-w64-bin_x86-64-linux_4.4.1-1a.tar.bz2/download)
