@@ -42,7 +42,7 @@ var dnssecExtension = {
   debugOutput: 0,
   debugPrefix: "dnssec: ",
   oldHost: null,
-  
+
   init: function() {
 
     // Enable debugging information on stdout if desired
@@ -54,7 +54,7 @@ var dnssecExtension = {
     }
 
     // Set unknown security state
-    getDnssecHandler().setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED);
+    getDnssecHandler().setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
 
     // Listen for webpage loads
     gBrowser.addProgressListener(dnssecExt_urlBarListener,
@@ -79,7 +79,7 @@ var dnssecExtension = {
 
     if ((host == null) || (host.search(/^[A-Za-z0-9]+([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,4}$/) == -1)) {   // test for valid hostname
       // Set unknown security state
-      getDnssecHandler().setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED);
+      getDnssecHandler().setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
       this.oldHost = host;
       return;
     } else if (host == this.oldHost) {   // test for hostname change
@@ -96,7 +96,6 @@ var dnssecExtension = {
 /*
   onToolbarButtonCommand: function() {
 
-
   },
 */
 
@@ -104,8 +103,6 @@ var dnssecExtension = {
 
 window.addEventListener("load", function() {dnssecExtension.init()}, false);
 window.addEventListener("unload", function() {dnssecExtension.uninit()}, false);
-
-
 
 
 /**
@@ -118,6 +115,9 @@ function DnssecHandler() {
   this._staticStrings[this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED] = {
     security_label: this._stringBundle.getString("dnssec.connection.domain.secured")
   };
+  this._staticStrings[this.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED] = {
+    security_label: this._stringBundle.getString("dnssec.connection.domain.invipaddr.secured")
+  };
   this._staticStrings[this.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED] = {
     security_label: this._stringBundle.getString("dnssec.connection.nodomain.secured")
   };
@@ -127,8 +127,14 @@ function DnssecHandler() {
   this._staticStrings[this.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID] = {
     security_label: this._stringBundle.getString("dnssec.domain.signature.valid")
   };
+  this._staticStrings[this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID] = {
+    security_label: this._stringBundle.getString("dnssec.invipaddr.domain.signature.valid")
+  };
   this._staticStrings[this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID] = {
     security_label: this._stringBundle.getString("dnssec.domain.signature.invalid")
+  };
+  this._staticStrings[this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID] = {
+    security_label: this._stringBundle.getString("dnssec.invipaddr.domain.signature.invalid")
   };
 
   this._cacheElements();
@@ -139,17 +145,23 @@ DnssecHandler.prototype = {
   // Mode strings used to control CSS display
 
   // Domain and also connection are secured
-  DNSSEC_MODE_CONNECTION_DOMAIN_SECURED       : "securedConnectionDomain",
+  DNSSEC_MODE_CONNECTION_DOMAIN_SECURED           : "securedConnectionDomain",
+  // Domain and also connection are secured but browser's IP address is invalid
+  DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED : "securedConnectionDomainInvIPaddr",
   // Connection is secured, but domain name does not exist
-  DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED     : "securedConnectionNoDomain",
+  DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED         : "securedConnectionNoDomain",
   // Connection is secured, but domain name signature is invalid
-  DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED : "securedConnectionInvSigDomain",
+  DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED     : "securedConnectionInvSigDomain",
   // Domain is secured and has a valid signature, but no chain of trust
-  DNSSEC_MODE_DOMAIN_SIGNATURE_VALID          : "validDomainSignature",
-  // Domain is secured, but has an invalid signature
-  DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID        : "invalidDomainSignature",
+  DNSSEC_MODE_DOMAIN_SIGNATURE_VALID              : "validDomainSignature",
+  // Domain is secured and has a valid signature, but browser's IP address is invalid
+  DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID    : "validDomainSignatureInvIPaddr",
+  // Domain is secured, but it has an invalid signature
+  DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID            : "invalidDomainSignature",
+  // Domain is secured, but signature and browser's IP address are invalid
+  DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID  : "invalidDomainSignatureInvIPaddr",
   // No trusted security information
-  DNSSEC_MODE_UNSECURED                       : "unsecuredDnssec",
+  DNSSEC_MODE_UNSECURED                           : "unsecuredDnssec",
 
   // Cache the most recent hostname seen in checkSecurity
   _hostName : null,
@@ -164,11 +176,15 @@ DnssecHandler.prototype = {
   },
 
   /* Set appropriate security state */
-  setSecurityState : function(state) {
+  setSecurityState : function(state, invipaddr) {
 
     switch (state) {
     case Ci.dnssecIValidator.XPCOM_EXIT_CONNECTION_DOMAIN_SECURED:
-      this.setMode(this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED);
+      if (!invipaddr) {
+        this.setMode(this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED);
+      } else {
+        this.setMode(this.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED);
+      }
       this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_CONNECTION_NODOMAIN_SECURED:
@@ -180,11 +196,19 @@ DnssecHandler.prototype = {
       this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_SIGNATURE_VALID:
-      this.setMode(this.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID);
+      if (!invipaddr) {
+        this.setMode(this.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID);
+      } else {
+        this.setMode(this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID);
+      }
       this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_SIGNATURE_INVALID:
-      this.setMode(this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID);
+      if (!invipaddr) {
+        this.setMode(this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID);
+      } else {
+        this.setMode(this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID);
+      }
       this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED:
@@ -214,10 +238,11 @@ DnssecHandler.prototype = {
       onLookupComplete: function(aRequest, aRecord, aStatus) {
 
         var resolvipv6 = 0; // Default version is ipv4 if resolving fails
+        var addr = "";
 
         if (aRecord && aRecord.hasMore()) {   // Address list is not empty
 
-          var addr = aRecord.getNextAddrAsString();
+          addr = aRecord.getNextAddrAsString();
           if (dnssecExtension.debugOutput)
             dump(dnssecExtension.debugPrefix + 'Browser address: ' + addr + '\n');
 
@@ -235,7 +260,7 @@ DnssecHandler.prototype = {
         if (dnssecExtension.debugOutput)
           dump(dnssecExtension.debugPrefix + 'Browser uses IPv6 resolving: ' + resolvipv6 + '\n');
 
-        /* XPCOM validation call */
+        /* Use validator's XPCOM interface */
         try {
           netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
           const cid = "@nic.cz/dnssecValidator;1";
@@ -263,13 +288,33 @@ DnssecHandler.prototype = {
                + getDnssecHandler()._hostName + '; ' + options + '; ' + nameserver + '\n');
 
         // Call XPCOM validation
-        var res = obj.Validate(getDnssecHandler()._hostName, options, nameserver);
+        var resaddrs = {};
+        var res = obj.Validate(getDnssecHandler()._hostName, options, nameserver, resaddrs);
 
         if (dnssecExtension.debugOutput)
-          dump(dnssecExtension.debugPrefix + 'XPCOM return value: ' + res + '\n');
+          dump(dnssecExtension.debugPrefix + 'Getting return values: ' + res + '; '
+               + resaddrs.value + '\n');
+
+
+        var invipaddr = 0; // Browser's IP addresses are presumed as valid
+        if (aRecord && resaddrs.value) {
+          aRecord.rewind();
+          while (aRecord.hasMore()) {   // Address list has another item
+
+            addr = aRecord.getNextAddrAsString();
+
+            // Check if each browser's address is present in DNSSEC address resolved list
+            if (resaddrs.value.indexOf(addr) == -1) invipaddr = 1;
+
+            if (dnssecExtension.debugOutput)
+              dump(dnssecExtension.debugPrefix + 'Checking browser IP: '
+                   + addr + ', address is invalid...' + invipaddr + '\n');
+
+          }
+        }
 
         // Set appropriate state
-        getDnssecHandler().setSecurityState(res);
+        getDnssecHandler().setSecurityState(res, invipaddr);
 
       }
     };
@@ -321,6 +366,8 @@ DnssecHandler.prototype = {
     switch (newMode) {
     // Both domain and connection are secured
     case this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED:
+    // Domain and also connection are secured but browser's IP address is invalid
+    case this.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED:
     // Both non-existing domain and connection are secured
     case this.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED:
     // Connection is secured, but domain signature is invalid
@@ -329,8 +376,10 @@ DnssecHandler.prototype = {
       break;
     // Domain signature is valid
     case this.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID:
+    case this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID:
     // Domain signature is invalid
     case this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID:
+    case this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID:
       tooltip = this._stringBundle.getString("dnssec.tooltip.unsecured");
       break;
     // Unknown

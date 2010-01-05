@@ -5,7 +5,7 @@
     <em:id>dnssec@nic.cz</em:id>
     <em:name>DNSSEC</em:name>
     <em:description>DNSSEC validator</em:description>
-    <em:version>0.09alpha</em:version>
+    <em:version>0.10alpha</em:version>
     <em:creator>CZ.NIC, z. s. p. o.</em:creator>
     <em:developer>Zbynek Michl</em:developer>
     <em:homepageURL>http://labs.nic.cz</em:homepageURL>
