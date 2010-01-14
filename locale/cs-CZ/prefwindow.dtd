@@ -1,6 +1,15 @@
 <!ENTITY prefwindow.title "Nastavení DNSSECu">
 <!ENTITY pane1.title "Nastavení DNSSECu">
+<!ENTITY groupboxgeneral.label "Obecné">
 <!ENTITY usetcp.label "Použít TCP protokol místo výchozího UDP">
 <!ENTITY usetcp.accesskey "T">
-<!ENTITY useoptdnsserver.label "Ignorovat /etc/resolv.conf a použít následující DNS server">
-<!ENTITY useoptdnsserver.accesskey "D">
+<!ENTITY groupboxdnsserver.label "DNS server">
+<!ENTITY radiogroupdnsserver.label "Použít následující DNS server(y):">
+<!ENTITY radiodnsserversystem.label "Načíst ze systému">
+<!ENTITY radiodnsserversystem.accesskey "S">
+<!ENTITY radiodnsservercznic.label "DNSSEC validující resolvery CZ.NICu">
+<!ENTITY radiodnsservercznic.accesskey "C">
+<!ENTITY radiodnsserveroarc.label "DNSSEC validující resolvery OARCu">
+<!ENTITY radiodnsserveroarc.accesskey "O">
+<!ENTITY radiodnsserveropt.label "Vlastní:">
+<!ENTITY radiodnsserveropt.accesskey "V">

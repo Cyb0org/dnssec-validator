@@ -96,6 +96,7 @@ var dnssecExtension = {
 /*
   onToolbarButtonCommand: function() {
 
+
   },
 */
 
@@ -238,7 +239,7 @@ DnssecHandler.prototype = {
       onLookupComplete: function(aRequest, aRecord, aStatus) {
 
         var resolvipv6 = 0; // Default version is ipv4 if resolving fails
-        var addr = "";
+        var addr = null;
 
         if (aRecord && aRecord.hasMore()) {   // Address list is not empty
 
@@ -271,10 +272,12 @@ DnssecHandler.prototype = {
           return;
         }
 
-        var nameserver = null;   // use /etc/resolv.conf as default
-
-        if (dnssecExtPrefs.getBool("useoptdnsserver") || (navigator.platform.toLowerCase() == "win32")) {
-          nameserver = dnssecExtPrefs.getChar("optdnsservername");
+        // Get DNS resolver address(es)
+        var nameserver;
+        if ((dnssecExtPrefs.getInt("dnsserverchoose") == 0) && (navigator.platform.toLowerCase() == "win32")) {
+          nameserver = "217.31.57.6"; // Windows hardcoded - system resolver conf not yet implemented
+        } else {
+          nameserver = dnssecExtPrefs.getChar("dnsserveraddr");
         }
 
         // Create variable to pass options
@@ -296,12 +299,14 @@ DnssecHandler.prototype = {
                + resaddrs.value + '\n');
 
 
+        // Temporarily checking only first address
         var invipaddr = 0; // Browser's IP addresses are presumed as valid
-        if (aRecord && resaddrs.value) {
-          aRecord.rewind();
-          while (aRecord.hasMore()) {   // Address list has another item
+//        if (aRecord && resaddrs.value) {
+        if (addr && resaddrs.value) {
+//          aRecord.rewind();
+//          while (aRecord.hasMore()) {   // Address list has another item
 
-            addr = aRecord.getNextAddrAsString();
+//            addr = aRecord.getNextAddrAsString();
 
             // Check if each browser's address is present in DNSSEC address resolved list
             if (resaddrs.value.indexOf(addr) == -1) invipaddr = 1;
@@ -310,7 +315,7 @@ DnssecHandler.prototype = {
               dump(dnssecExtension.debugPrefix + 'Checking browser IP: '
                    + addr + ', address is invalid...' + invipaddr + '\n');
 
-          }
+//          }
         }
 
         // Set appropriate state
