@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ***** BEGIN LICENSE BLOCK *****
+Copyright 2010 CZ.NIC, z.s.p.o.
+
+This file is part of DNSSEC Validator Add-on.
+
+DNSSEC Validator Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC Validator Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** -->
+
 <RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:em="http://www.mozilla.org/2004/em-rdf#">
   <Description about="urn:mozilla:install-manifest">
     <em:id>dnssec@nic.cz</em:id>
-    <em:name>DNSSEC</em:name>
-    <em:description>DNSSEC validator</em:description>
-    <em:version>0.11alpha</em:version>
+    <em:name>DNSSEC Validator</em:name>
+    <em:description>Checks whether domain names in the address bar are secured
+                    by DNSSEC.</em:description>
+    <em:version>0.12alpha</em:version>
     <em:creator>CZ.NIC, z. s. p. o.</em:creator>
     <em:developer>Zbynek Michl</em:developer>
     <em:homepageURL>http://labs.nic.cz</em:homepageURL>
@@ -19,8 +40,9 @@
     <em:localized>
       <Description>
         <em:locale>cs-CZ</em:locale>
-        <em:name>DNSSEC</em:name>
-        <em:description>DNSSEC validator</em:description>
+        <em:name>DNSSEC validátor</em:name>
+        <em:description>Kontroluje zabezpečení doménového jména v adresním
+                        řádku DNSSEC protokolem.</em:description>
         <em:creator>CZ.NIC, z. s. p. o.</em:creator>
         <em:developer>Zbyněk Michl</em:developer>
         <em:homepageURL>http://labs.nic.cz</em:homepageURL>

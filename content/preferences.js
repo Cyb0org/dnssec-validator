@@ -1,3 +1,21 @@
+/* ***** BEGIN LICENSE BLOCK *****
+Copyright 2010 CZ.NIC, z.s.p.o.
+
+This file is part of DNSSEC Validator Add-on.
+
+DNSSEC Validator Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC Validator Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** */
 
 // DNSSEC preferences functions
 var dnssecExtPrefs = {
@@ -75,16 +93,26 @@ var dnssecExtPrefs = {
 	},
 
 
-    pane1Load : function() {
-      // enable optional DNS address textbox only if appropriate radio button is selected
-      var mycheck = document.getElementById("dnssec-pref-useoptdnsserver").selected;
-      document.getElementById("dnssec-pref-optdnsserveraddr").disabled = !mycheck;
-
+    instantApply : function() {
+      try {
+        return Components.classes["@mozilla.org/preferences-service;1"]
+                         .getService(Components.interfaces.nsIPrefBranch)
+                         .getBoolPref("browser.preferences.instantApply");
+      } catch (ex) {
+        return null;
+      }
     },
 
-    dnsserverchooseCommand : function() {
-      this.pane1Load();
+    checkOptdnsserveraddr : function() {
+      if (checkIPaddr.test_ipv4(document.getElementById("dnssec-pref-optdnsserveraddr").value)
+          || checkIPaddr.test_ipv6(document.getElementById("dnssec-pref-optdnsserveraddr").value)) {
+        return true;
+      } else {
+        return false;
+      }
+    },
 
+    savePrefs : function() {
       switch (document.getElementById("dnssec-pref-dnsserverchoose").value) {
       case '1': // CZ.NIC's ODVR
         this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-cznicdnsserveraddr").value);
@@ -93,26 +121,46 @@ var dnssecExtPrefs = {
         this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-oarcdnsserveraddr").value);
         break;
       case '3': // User's own
-        this.optdnsserveraddrInput();
+        if (this.checkOptdnsserveraddr()) {
+          this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-optdnsserveraddr").value);
+//          document.getElementById("dnssec-pref-optdnsserveraddr").setAttribute("style", "color: black");
+        } else {
+//          document.getElementById("dnssec-pref-optdnsserveraddr").setAttribute("style", "color: red");
+        }
         break;
       case '0': // System
       default:
         this.setChar("dnsserveraddr", ""); // empty string for using system resolver conf
         break;
       }
+    },
 
+    setOptdnsserveraddrbox : function() {
+      // enable optional DNS address textbox only if appropriate radio button is selected
+      var mycheck = document.getElementById("dnssec-pref-useoptdnsserver").selected;
+      document.getElementById("dnssec-pref-optdnsserveraddr").disabled = !mycheck;
+    },
+
+    pane1Load : function() {
+      this.setOptdnsserveraddrbox();
+    },
+
+    dnsserverchooseCommand : function() {
+      this.setOptdnsserveraddrbox();
+
+      if (this.instantApply()) {
+        this.savePrefs();
+      }
     },
 
     optdnsserveraddrInput : function() {
-      if (checkIPaddr.test_ipv4(document.getElementById("dnssec-pref-optdnsserveraddr").value)
-          || checkIPaddr.test_ipv6(document.getElementById("dnssec-pref-optdnsserveraddr").value)) {
-        this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-optdnsserveraddr").value);
-//        document.getElementById("dnssec-pref-optdnsserveraddr").setAttribute("style", "color: black");
-      } else {
-//        document.getElementById("dnssec-pref-optdnsserveraddr").setAttribute("style", "color: red");
-
+      if (this.instantApply()) {
+        this.savePrefs();
       }
+    },
 
+    windowDialogaccept : function() {
+      this.savePrefs();
     },
 
 };
@@ -182,7 +230,7 @@ var checkIPaddr = {
     }
 
     // Check colon-count for compressed format
-    if (this.substr_count(ip, ':') < 8)
+    if (this.substr_count(ip, ':')<8)
     {
       var match = ip.match(/^(?::|(?:[a-f0-9]{1,4}:)+):(?:(?:[a-f0-9]{1,4}:)*[a-f0-9]{1,4})?$/i);
       return match != null;

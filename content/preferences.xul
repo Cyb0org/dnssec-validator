@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ***** BEGIN LICENSE BLOCK *****
+Copyright 2010 CZ.NIC, z.s.p.o.
+
+This file is part of DNSSEC Validator Add-on.
+
+DNSSEC Validator Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC Validator Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** -->
+
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <!DOCTYPE prefwindow SYSTEM "chrome://dnssec/locale/prefwindow.dtd">
-<prefwindow id="dnssecPreferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-            title="&prefwindow.title;">
+<prefwindow id="dnssec-pref-window" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+            title="&prefwindow.title;" ondialogaccept="dnssecExtPrefs.windowDialogaccept();">
   <script src="preferences.js"/>
-  <prefpane id="pane1" label="&pane1.title;" onpaneload="dnssecExtPrefs.pane1Load();">
+  <prefpane id="dnssec-pref-pane1" onpaneload="dnssecExtPrefs.pane1Load();">
     <preferences>
       <preference id="usetcp" name="extensions.dnssec.usetcp" type="bool"/>
       <preference id="dnsserverchoose" name="extensions.dnssec.dnsserverchoose" type="int"/>
@@ -21,13 +41,13 @@
         <description value="&radiogroupdnsserver.label;"/>
         <radio label="&radiodnsserversystem.label;" accesskey="&radiodnsserversystem.accesskey;" value="0"/>
         <radio label="&radiodnsservercznic.label;" accesskey="&radiodnsservercznic.accesskey;" value="1"/>
-        <textbox id="dnssec-pref-cznicdnsserveraddr" value="217.31.57.6" disabled="true" hidden="false"/>
+        <textbox id="dnssec-pref-cznicdnsserveraddr" value="217.31.57.6" disabled="true" hidden="true"/>
         <radio label="&radiodnsserveroarc.label;" accesskey="&radiodnsserveroarc.accesskey;" value="2"/>
-        <textbox id="dnssec-pref-oarcdnsserveraddr" value="149.20.64.20 2001:4f8:3:2bc:1::64:20 149.20.64.21 2001:4f8:3:2bc:1::64:21" disabled="true" hidden="false"/>
+        <textbox id="dnssec-pref-oarcdnsserveraddr" value="149.20.64.20 2001:4f8:3:2bc:1::64:20 149.20.64.21 2001:4f8:3:2bc:1::64:21" disabled="true" hidden="true"/>
         <hbox>
           <radio id="dnssec-pref-useoptdnsserver" label="&radiodnsserveropt.label;" accesskey="&radiodnsserveropt.accesskey;" value="3"/>
-            <textbox id="dnssec-pref-optdnsserveraddr" preference="optdnsserveraddr" maxlength="39" oninput="dnssecExtPrefs.optdnsserveraddrInput();"/>
-            <!-- 39 is max length for IPv4 and IPv6 address notation -->
+          <textbox id="dnssec-pref-optdnsserveraddr" preference="optdnsserveraddr" maxlength="39" oninput="dnssecExtPrefs.optdnsserveraddrInput();"/>
+          <!-- 39 is max length for IPv4 and IPv6 address notation -->
         </hbox>
       </radiogroup>
     </groupbox>
