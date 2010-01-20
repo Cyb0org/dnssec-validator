@@ -18,16 +18,16 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** -->
 
 <!ENTITY prefwindow.title "Validator Preferences">
-<!ENTITY groupboxgeneral.label "General">
-<!ENTITY usetcp.label "Use TCP protocol instead of default UDP">
+<!ENTITY groupboxprotocol.label "Protocol">
+<!ENTITY usetcp.label "Use TCP instead of UDP">
 <!ENTITY usetcp.accesskey "T">
-<!ENTITY groupboxdnsserver.label "DNS server">
-<!ENTITY radiogroupdnsserver.label "Use next DNS server(s):">
-<!ENTITY radiodnsserversystem.label "Read from a system">
+<!ENTITY groupboxdnsserver.label "Resolver">
+<!ENTITY radiogroupdnsserver.label "DNS server(s) used for name resolution:">
+<!ENTITY radiodnsserversystem.label "Use system settings">
 <!ENTITY radiodnsserversystem.accesskey "S">
 <!ENTITY radiodnsservercznic.label "CZ.NIC's DNSSEC validating resolvers">
 <!ENTITY radiodnsservercznic.accesskey "C">
-<!ENTITY radiodnsserveroarc.label "OARC's DNSSEC validating resolver">
+<!ENTITY radiodnsserveroarc.label "OARC's DNSSEC validating resolvers">
 <!ENTITY radiodnsserveroarc.accesskey "O">
-<!ENTITY radiodnsserveropt.label "My own:">
+<!ENTITY radiodnsserveropt.label "Custom:">
 <!ENTITY radiodnsserveropt.accesskey "M">

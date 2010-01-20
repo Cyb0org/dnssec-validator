@@ -32,7 +32,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
       <preference id="optdnsserveraddr" name="extensions.dnssec.optdnsserveraddr" type="string"/>
     </preferences>
     <groupbox>
-      <caption label="&groupboxgeneral.label;"/>
+      <caption label="&groupboxprotocol.label;"/>
       <checkbox id="dnssec-pref-usetcp" preference="usetcp" label="&usetcp.label;" accesskey="&usetcp.accesskey;"/>
     </groupbox>
     <groupbox>

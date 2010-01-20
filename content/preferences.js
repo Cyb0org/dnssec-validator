@@ -20,6 +20,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 // DNSSEC preferences functions
 var dnssecExtPrefs = {
 
+    instantApply : true, // default value that changes on pref window load
+
     // Some parts of next code are used from UrlbarExt project
 
 	prefObj : Components.classes["@mozilla.org/preferences-service;1"]
@@ -93,7 +95,7 @@ var dnssecExtPrefs = {
 	},
 
 
-    instantApply : function() {
+    isInstantApply : function() {
       try {
         return Components.classes["@mozilla.org/preferences-service;1"]
                          .getService(Components.interfaces.nsIPrefBranch)
@@ -142,19 +144,20 @@ var dnssecExtPrefs = {
     },
 
     pane1Load : function() {
+      this.instantApply = this.isInstantApply();
       this.setOptdnsserveraddrbox();
     },
 
     dnsserverchooseCommand : function() {
       this.setOptdnsserveraddrbox();
 
-      if (this.instantApply()) {
+      if (this.instantApply) {
         this.savePrefs();
       }
     },
 
     optdnsserveraddrInput : function() {
-      if (this.instantApply()) {
+      if (this.instantApply) {
         this.savePrefs();
       }
     },
