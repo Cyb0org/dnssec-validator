@@ -24,9 +24,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
   <Description about="urn:mozilla:install-manifest">
     <em:id>dnssec@nic.cz</em:id>
     <em:name>DNSSEC Validator</em:name>
-    <em:description>Checks whether domain names in the address bar are secured
-                    by DNSSEC.</em:description>
-    <em:version>0.13alpha</em:version>
+    <em:description>Checks whether domain names in the address bar are secured by DNSSEC.</em:description>
+    <em:version>0.14alpha</em:version>
     <em:creator>CZ.NIC, z. s. p. o.</em:creator>
     <em:developer>Zbynek Michl</em:developer>
     <em:homepageURL>http://labs.nic.cz</em:homepageURL>
@@ -41,8 +40,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
       <Description>
         <em:locale>cs-CZ</em:locale>
         <em:name>DNSSEC validátor</em:name>
-        <em:description>Kontroluje zabezpečení doménového jména v adresním
-                        řádku DNSSEC protokolem.</em:description>
+        <em:description>Kontroluje zabezpečení doménového jména v adresním řádku DNSSEC protokolem.</em:description>
         <em:creator>CZ.NIC, z. s. p. o.</em:creator>
         <em:developer>Zbyněk Michl</em:developer>
         <em:homepageURL>http://labs.nic.cz</em:homepageURL>

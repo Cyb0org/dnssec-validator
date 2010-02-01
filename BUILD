@@ -37,9 +37,17 @@ make
 
 ### LINUX (expected Debian GNU/Linux unstable amd64) ###
 
+GCC:
+gcc-4.4 package (v4.2 should be enough)
+g++-4.4 package (v4.2 should be enough)
+(lib32gcc1)
+(lib32stdc++6)
+
 xulrunner SDK:
 xulrunner-dev package
 ftp://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.4/sdk/xulrunner-1.9.1.4.en-US.linux-i686.sdk.tar.bz2
+
+(ia32-libs)
 
 
 ### MAC OS X ###
@@ -57,6 +65,9 @@ ftp://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.4/sdk/xulrunner-1
 
 
 ### Windows ###
+
+Microsoft Visual C++ 2008 Express Edition:
+http://www.microsoft.com/express/Downloads/
 
 xulrunner SDK:
 ftp://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.4/sdk/xulrunner-1.9.1.4.en-US.win32.sdk.zip

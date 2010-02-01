@@ -53,19 +53,16 @@ var dnssecExt_urlBarListener = {
 };
 
 var dnssecExtension = {
-  debugOutput: 0,
+  debugOutput: false,
   debugPrefix: "dnssec: ",
+  debugStartNotice: "----- DNSSEC debug start -----\n",
+  debugEndNotice: "----- DNSSEC debug end -----\n",
   oldHost: null,
 
   init: function() {
 
     // Enable debugging information on stdout if desired
-    if (dnssecExtPrefs.getBool("debugoutput")) this.debugOutput = 1;
-
-    // Ignore /etc/resolv.conf and use given DNS server on Windows platform
-    if (navigator.platform.toLowerCase() == "win32") {
-      dnssecExtPrefs.setBool("useoptdnsserver", true);
-    }
+    if (dnssecExtPrefs.getBool("debugoutput")) this.debugOutput = true;
 
     // Set unknown security state
     getDnssecHandler().setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
@@ -107,12 +104,15 @@ var dnssecExtension = {
     this.oldHost = host;
   },
 
-/*
-  onToolbarButtonCommand: function() {
 
+  onToolbarButtonCommand: function() {
+    var tmp = false;
+
+    tmp = Boolean(1 == 2);
+    alert(tmp);
 
   },
-*/
+
 
 };
 
@@ -252,28 +252,34 @@ DnssecHandler.prototype = {
       // Called when async host lookup completes
       onLookupComplete: function(aRequest, aRecord, aStatus) {
 
-        var resolvipv6 = 0; // Default version is ipv4 if resolving fails
+        var resolvipv4 = false; // No IPv4 resolving as default
+        var resolvipv6 = false; // No IPv6 resolving as default
         var addr = null;
 
-        if (aRecord && aRecord.hasMore()) {   // Address list is not empty
+        if (dnssecExtension.debugOutput) dump (dnssecExtension.debugStartNotice);
+
+        while (aRecord && aRecord.hasMore()) {   // Address list is not empty
 
           addr = aRecord.getNextAddrAsString();
-          if (dnssecExtension.debugOutput)
-            dump(dnssecExtension.debugPrefix + 'Browser address: ' + addr + '\n');
+//          if (dnssecExtension.debugOutput)
+//            dump(dnssecExtension.debugPrefix + 'Browser address: ' + addr + '\n');
 
           // Check IP version
           if (addr.indexOf(":") != -1) {
             // ipv6
-            resolvipv6 = 1;
+            resolvipv6 = true;
           } else if (addr.indexOf(".") != -1) {
             // ipv4
-            resolvipv6 = 0;
+            resolvipv4 = true;
           }
 
+          // No need to check more addresses
+          if (resolvipv4 && resolvipv6) break;
         }
 
         if (dnssecExtension.debugOutput)
-          dump(dnssecExtension.debugPrefix + 'Browser uses IPv6 resolving: ' + resolvipv6 + '\n');
+          dump(dnssecExtension.debugPrefix + 'Browser uses IPv4/IPv6 resolving: '
+               + resolvipv4 + '/' + resolvipv6 + '\n');
 
         /* Use validator's XPCOM interface */
         try {
@@ -298,6 +304,7 @@ DnssecHandler.prototype = {
         var options = 0;
         if (dnssecExtension.debugOutput) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_DEBUGOUTPUT;
         if (dnssecExtPrefs.getBool("usetcp")) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_USETCP;
+        if (resolvipv4) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_RESOLVIPV4;
         if (resolvipv6) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_RESOLVIPV6;
 
         if (dnssecExtension.debugOutput)
@@ -314,26 +321,30 @@ DnssecHandler.prototype = {
 
 
         // Temporarily checking only first address
-        var invipaddr = 0; // Browser's IP addresses are presumed as valid
-//        if (aRecord && resaddrs.value) {
-        if (addr && resaddrs.value) {
-//          aRecord.rewind();
-//          while (aRecord.hasMore()) {   // Address list has another item
+        var invipaddr = false; // Browser's IP addresses are presumed as valid
+        if (aRecord && resaddrs.value) {
+//        if (addr && resaddrs.value) {
+          aRecord.rewind();
+          while (aRecord.hasMore()) {   // Address list has another item
 
-//            addr = aRecord.getNextAddrAsString();
+            addr = aRecord.getNextAddrAsString();
 
             // Check if each browser's address is present in DNSSEC address resolved list
-            if (resaddrs.value.indexOf(addr) == -1) invipaddr = 1;
+            if (resaddrs.value.indexOf(addr) == -1) invipaddr = true;
 
             if (dnssecExtension.debugOutput)
               dump(dnssecExtension.debugPrefix + 'Checking browser IP: '
                    + addr + ', address is invalid...' + invipaddr + '\n');
 
-//          }
+            // No need to check more addresses
+            if (invipaddr) break;
+          }
         }
 
         // Set appropriate state
         getDnssecHandler().setSecurityState(res, invipaddr);
+
+        if (dnssecExtension.debugOutput) dump (dnssecExtension.debugEndNotice);
 
       }
     };
