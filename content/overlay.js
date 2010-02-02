@@ -278,8 +278,8 @@ DnssecHandler.prototype = {
         }
 
         if (dnssecExtension.debugOutput)
-          dump(dnssecExtension.debugPrefix + 'Browser uses IPv4/IPv6 resolving: '
-               + resolvipv4 + '/' + resolvipv6 + '\n');
+          dump(dnssecExtension.debugPrefix + 'Browser uses IPv4/IPv6 resolving: \"'
+               + resolvipv4 + '/' + resolvipv6 + '\"\n');
 
         /* Use validator's XPCOM interface */
         try {
@@ -308,16 +308,16 @@ DnssecHandler.prototype = {
         if (resolvipv6) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_RESOLVIPV6;
 
         if (dnssecExtension.debugOutput)
-          dump(dnssecExtension.debugPrefix + 'Validation parameters: '
-               + getDnssecHandler()._hostName + '; ' + options + '; ' + nameserver + '\n');
+          dump(dnssecExtension.debugPrefix + 'Validation parameters: \"'
+               + getDnssecHandler()._hostName + '; ' + options + '; ' + nameserver + '\"\n');
 
         // Call XPCOM validation
         var resaddrs = {};
         var res = obj.Validate(getDnssecHandler()._hostName, options, nameserver, resaddrs);
 
         if (dnssecExtension.debugOutput)
-          dump(dnssecExtension.debugPrefix + 'Getting return values: ' + res + '; '
-               + resaddrs.value + '\n');
+          dump(dnssecExtension.debugPrefix + 'Getting return values: \"' + res + '; '
+               + resaddrs.value + '\"\n');
 
 
         // Temporarily checking only first address
@@ -334,7 +334,7 @@ DnssecHandler.prototype = {
 
             if (dnssecExtension.debugOutput)
               dump(dnssecExtension.debugPrefix + 'Checking browser IP: '
-                   + addr + ', address is invalid...' + invipaddr + '\n');
+                   + addr + '; address is invalid: ' + invipaddr + '\n');
 
             // No need to check more addresses
             if (invipaddr) break;
