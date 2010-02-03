@@ -64,8 +64,10 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 #dnssec-box.securedConnectionDomainInvIPaddr,
+#dnssec-box.securedConnectionNoDomainInvIPaddr,
 #dnssec-box.validDomainSignatureInvIPaddr,
 #dnssec-box.securedConnectionInvSigDomain,
+#dnssec-box.securedConnectionInvSigDomainInvIPaddr,
 #dnssec-box.invalidDomainSignature,
 #dnssec-box.invalidDomainSignatureInvIPaddr {
   background-color: rgba(238, 46, 36, 1.0); /* red */
@@ -117,7 +119,9 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 /* red */
 #dnssec-popup.securedConnectionDomainInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.securedConnectionNoDomainInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon,
 #dnssec-popup.securedConnectionInvSigDomain > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.securedConnectionInvSigDomainInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon,
 #dnssec-popup.invalidDomainSignature > #dnssec-popup-container > #dnssec-popup-icon,
 #dnssec-popup.validDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon,
 #dnssec-popup.invalidDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon {
@@ -173,10 +177,14 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-popup-content-box.securedConnectionDomain > #dnssec-popup-domainLabel,
 #dnssec-popup-content-box.securedConnectionDomainInvIPaddr > #dnssec-popup-securedLabel,
 #dnssec-popup-content-box.securedConnectionDomainInvIPaddr > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.securedConnectionNoDomainInvIPaddr > #dnssec-popup-securedLabel,
+#dnssec-popup-content-box.securedConnectionNoDomainInvIPaddr > #dnssec-popup-nodomainLabel,
 #dnssec-popup-content-box.securedConnectionNoDomain > #dnssec-popup-securedLabel,
 #dnssec-popup-content-box.securedConnectionNoDomain > #dnssec-popup-nodomainLabel,
 #dnssec-popup-content-box.securedConnectionInvSigDomain > #dnssec-popup-securedLabel,
 #dnssec-popup-content-box.securedConnectionInvSigDomain > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.securedConnectionInvSigDomainInvIPaddr > #dnssec-popup-securedLabel,
+#dnssec-popup-content-box.securedConnectionInvSigDomainInvIPaddr > #dnssec-popup-domainLabel,
 #dnssec-popup-content-box.validDomainSignature > #dnssec-popup-unsecuredLabel,
 #dnssec-popup-content-box.validDomainSignature > #dnssec-popup-domainLabel,
 #dnssec-popup-content-box.validDomainSignatureInvIPaddr > #dnssec-popup-unsecuredLabel,

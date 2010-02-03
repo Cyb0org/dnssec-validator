@@ -136,8 +136,14 @@ function DnssecHandler() {
   this._staticStrings[this.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED] = {
     security_label: this._stringBundle.getString("dnssec.connection.nodomain.secured")
   };
+  this._staticStrings[this.DNSSEC_MODE_CONNECTION_NODOMAIN_INVIPADDR_SECURED] = {
+    security_label: this._stringBundle.getString("dnssec.connection.nodomain.invipaddr.secured")
+  };
   this._staticStrings[this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED] = {
     security_label: this._stringBundle.getString("dnssec.connection.invsigdomain.secured")
+  };
+  this._staticStrings[this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED] = {
+    security_label: this._stringBundle.getString("dnssec.connection.invsigdomain.invipaddr.secured")
   };
   this._staticStrings[this.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID] = {
     security_label: this._stringBundle.getString("dnssec.domain.signature.valid")
@@ -165,8 +171,12 @@ DnssecHandler.prototype = {
   DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED : "securedConnectionDomainInvIPaddr",
   // Connection is secured, but domain name does not exist
   DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED         : "securedConnectionNoDomain",
+  // Non-existent domain and also connection are secured but browser's IP address is invalid
+  DNSSEC_MODE_CONNECTION_NODOMAIN_INVIPADDR_SECURED : "securedConnectionNoDomainInvIPaddr",
   // Connection is secured, but domain name signature is invalid
   DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED     : "securedConnectionInvSigDomain",
+  // Connection is secured, but domain name signature and browser's IP address are invalid
+  DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED : "securedConnectionInvSigDomainInvIPaddr",
   // Domain is secured and has a valid signature, but no chain of trust
   DNSSEC_MODE_DOMAIN_SIGNATURE_VALID              : "validDomainSignature",
   // Domain is secured and has a valid signature, but browser's IP address is invalid
@@ -203,11 +213,19 @@ DnssecHandler.prototype = {
       this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_CONNECTION_NODOMAIN_SECURED:
-      this.setMode(this.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED);
+      if (!invipaddr) {
+        this.setMode(this.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED);
+      } else {
+        this.setMode(this.DNSSEC_MODE_CONNECTION_NODOMAIN_INVIPADDR_SECURED);
+      }
       this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_CONNECTION_INVSIGDOMAIN_SECURED:
-      this.setMode(this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED);
+      if (!invipaddr) {
+        this.setMode(this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED);
+      } else {
+        this.setMode(this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED);
+      }
       this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_SIGNATURE_VALID:
@@ -322,8 +340,7 @@ DnssecHandler.prototype = {
 
         // Temporarily checking only first address
         var invipaddr = false; // Browser's IP addresses are presumed as valid
-        if (aRecord && resaddrs.value) {
-//        if (addr && resaddrs.value) {
+        if (aRecord) {
           aRecord.rewind();
           while (aRecord.hasMore()) {   // Address list has another item
 
@@ -398,10 +415,14 @@ DnssecHandler.prototype = {
     case this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED:
     // Domain and also connection are secured but browser's IP address is invalid
     case this.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED:
-    // Both non-existing domain and connection are secured
+    // Both non-existent domain and connection are secured
     case this.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED:
+    // Non-existent domain and also connection are secured but browser's IP address is invalid
+    case this.DNSSEC_MODE_CONNECTION_NODOMAIN_INVIPADDR_SECURED:
     // Connection is secured, but domain signature is invalid
     case this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED:
+    // Connection is secured, but domain signature and browser's IP address are invalid
+    case this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED:
       tooltip = this._stringBundle.getString("dnssec.tooltip.secured");
       break;
     // Domain signature is valid
