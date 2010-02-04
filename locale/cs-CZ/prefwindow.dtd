@@ -18,9 +18,6 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** -->
 
 <!ENTITY prefwindow.title "Nastavení validátoru">
-<!ENTITY groupboxprotocol.label "Protokol">
-<!ENTITY usetcp.label "Použít TCP místo UDP">
-<!ENTITY usetcp.accesskey "T">
 <!ENTITY groupboxdnsserver.label "Resolver">
 <!ENTITY radiogroupdnsserver.label "DNS server(y) používané pro překlad jmen:">
 <!ENTITY radiodnsserversystem.label "Načíst ze systému">

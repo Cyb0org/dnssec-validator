@@ -18,9 +18,6 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** -->
 
 <!ENTITY prefwindow.title "Validator Preferences">
-<!ENTITY groupboxprotocol.label "Protocol">
-<!ENTITY usetcp.label "Use TCP instead of UDP">
-<!ENTITY usetcp.accesskey "T">
 <!ENTITY groupboxdnsserver.label "Resolver">
 <!ENTITY radiogroupdnsserver.label "DNS server(s) used for name resolution:">
 <!ENTITY radiodnsserversystem.label "Use system settings">

@@ -28,7 +28,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
     <em:version>0.14alpha</em:version>
     <em:creator>CZ.NIC, z. s. p. o.</em:creator>
     <em:developer>Zbynek Michl</em:developer>
-    <em:homepageURL>http://labs.nic.cz</em:homepageURL>
+    <em:homepageURL>http://labs.nic.cz/dnssec-validator/</em:homepageURL>
     <em:iconURL>chrome://dnssec/skin/icon.png</em:iconURL>
     <em:optionsURL>chrome://dnssec/content/preferences.xul</em:optionsURL>
     <em:targetPlatform>Darwin_ppc-gcc3</em:targetPlatform>
@@ -43,14 +43,14 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
         <em:description>Kontroluje zabezpečení doménového jména v adresním řádku DNSSEC protokolem.</em:description>
         <em:creator>CZ.NIC, z. s. p. o.</em:creator>
         <em:developer>Zbyněk Michl</em:developer>
-        <em:homepageURL>http://labs.nic.cz</em:homepageURL>
+        <em:homepageURL>http://labs.nic.cz/dnssec-validator/</em:homepageURL>
       </Description>
     </em:localized>
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- firefox -->
         <em:minVersion>3.0</em:minVersion>
-        <em:maxVersion>4.0.*</em:maxVersion>
+        <em:maxVersion>3.6.*</em:maxVersion>
       </Description>
     </em:targetApplication>
   </Description>

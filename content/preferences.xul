@@ -26,22 +26,19 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
   <script src="preferences.js"/>
   <prefpane id="dnssec-pref-pane1" onpaneload="dnssecExtPrefs.pane1Load();">
     <preferences>
+      <preference id="debugoutput" name="extensions.dnssec.debugoutput" type="bool"/>
       <preference id="usetcp" name="extensions.dnssec.usetcp" type="bool"/>
       <preference id="dnsserverchoose" name="extensions.dnssec.dnsserverchoose" type="int"/>
       <preference id="dnsserveraddr" name="extensions.dnssec.dnsserveraddr" type="string"/>
       <preference id="optdnsserveraddr" name="extensions.dnssec.optdnsserveraddr" type="string"/>
     </preferences>
     <groupbox>
-      <caption label="&groupboxprotocol.label;"/>
-      <checkbox id="dnssec-pref-usetcp" preference="usetcp" label="&usetcp.label;" accesskey="&usetcp.accesskey;"/>
-    </groupbox>
-    <groupbox>
       <caption label="&groupboxdnsserver.label;"/>
       <radiogroup id="dnssec-pref-dnsserverchoose" preference="dnsserverchoose" oncommand="dnssecExtPrefs.dnsserverchooseCommand();">
         <description value="&radiogroupdnsserver.label;"/>
         <radio label="&radiodnsserversystem.label;" accesskey="&radiodnsserversystem.accesskey;" value="0"/>
         <radio label="&radiodnsservercznic.label;" accesskey="&radiodnsservercznic.accesskey;" value="1"/>
-        <textbox id="dnssec-pref-cznicdnsserveraddr" value="217.31.57.6" disabled="true" hidden="true"/>
+        <textbox id="dnssec-pref-cznicdnsserveraddr" value="217.31.204.130 2001:1488:800:400::130 217.31.204.131 2001:1488:800:400::131" disabled="true" hidden="true"/>
         <radio label="&radiodnsserveroarc.label;" accesskey="&radiodnsserveroarc.accesskey;" value="2"/>
         <textbox id="dnssec-pref-oarcdnsserveraddr" value="149.20.64.20 2001:4f8:3:2bc:1::64:20 149.20.64.21 2001:4f8:3:2bc:1::64:21" disabled="true" hidden="true"/>
         <hbox>
