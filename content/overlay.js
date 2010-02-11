@@ -311,12 +311,7 @@ DnssecHandler.prototype = {
         }
 
         // Get DNS resolver address(es)
-        var nameserver;
-        if ((dnssecExtPrefs.getChar("dnsserveraddr") == "") && (navigator.platform.toLowerCase() == "win32")) {
-          nameserver = "217.31.57.6"; // Windows hardcoded - system resolver conf not yet implemented
-        } else {
-          nameserver = dnssecExtPrefs.getChar("dnsserveraddr");
-        }
+        var nameserver = dnssecExtPrefs.getChar("dnsserveraddr");
 
         // Create variable to pass options
         var options = 0;
