@@ -10,29 +10,29 @@ openssl (http://www.openssl.org)
 No need to get these libraries, already built in GIT.
 
 openssl:
-* ./Configure linux-x86_64 shared -fPIC                      [Lin]
-* ./Configure linux-generic32 shared -fPIC -m32              [Lin]
-* ./Configure darwin-i386-cc shared                          [Mac]
-* ./Configure darwin-ppc-cc shared                           [Mac]
+* ./Configure linux-x86_64 shared -fPIC                           [Lin]
+* ./Configure linux-generic32 shared -fPIC -m32                   [Lin]
+* ./Configure darwin-i386-cc shared -mmacosx-version-min=10.4     [Mac]
+* ./Configure darwin-ppc-cc shared -mmacosx-version-min=10.4      [Mac]
 make
 make test
 ln -s . lib                            (needed for successful build of libldns)
-* http://www.slproweb.com/download/Win32OpenSSL-0_9_8l.exe   [Win]
-* mv libeay32.dll crypto.dll                                 [Win]
-* (strip -x -S ...)                                          [Lin]
+* http://www.slproweb.com/download/Win32OpenSSL-0_9_8l.exe        [Win]
+* mv libeay32.dll crypto.dll                                      [Win]
+* (strip -x -S ...)                                               [Lin]
 
 libldns:
-* export CFLAGS="-m64 -fPIC"                                 [Lin]
-* export CFLAGS="-m32 -fPIC"                                 [Lin]
-* export CFLAGS="-arch i386"                                 [Mac]
-* export CFLAGS="-arch ppc"                                  [Mac]
-* export CC="$HOME/tools/mingw-w32/bin/i686-w64-mingw32-gcc" [Win]
-* ./configure --with-ssl=../openssl-0.9.8l --host=mingw32    [Win]
-* [Makefile: s/-l.../-Wl,-l.../]                             [Win]
-* ./configure --with-ssl=../openssl-0.9.8l                   [Lin, Mac]
+* export CFLAGS="-m64 -fPIC"                                      [Lin]
+* export CFLAGS="-m32 -fPIC"                                      [Lin]
+* export CFLAGS="-arch i386 -mmacosx-version-min=10.4"            [Mac]
+* export CFLAGS="-arch ppc -mmacosx-version-min=10.4"             [Mac]
+* export CC="$HOME/tools/mingw-w32/bin/i686-w64-mingw32-gcc"      [Win]
+* ./configure --with-ssl=../openssl-0.9.8l --host=mingw32         [Win]
+* [Makefile: s/-l.../-Wl,-l.../]                                  [Win]
+* ./configure --with-ssl=../openssl-0.9.8l                        [Lin, Mac]
 make
-* (strip -x -S ...)                                          [Lin]
-* (i686-w64-mingw32-strip -x -S ...)                         [Win]
+* (strip -x -S ...)                                               [Lin]
+* (i686-w64-mingw32-strip -x -S ...)                              [Win]
 
 
 ### LINUX (expected Debian GNU/Linux unstable amd64) ###
@@ -52,7 +52,7 @@ ftp://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.4/sdk/xulrunner-1
 
 ### MAC OS X ###
 
-Xcode for Mac-only Development (gcc, make, ...):
+Xcode 3.1 for Mac-only Development (gcc, make, ...):
 http://developer.apple.com/technology/xcode.html
 
 xulrunner SDK:

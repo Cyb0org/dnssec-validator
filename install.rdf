@@ -28,6 +28,9 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
     <em:version>0.14alpha</em:version>
     <em:creator>CZ.NIC, z. s. p. o.</em:creator>
     <em:developer>Zbynek Michl</em:developer>
+    <em:contributor>Tomasz Hatlapa</em:contributor>
+    <em:contributor>Ondrej Sury</em:contributor>
+    <em:contributor>Pavel Tuma</em:contributor>
     <em:homepageURL>http://labs.nic.cz/dnssec-validator/</em:homepageURL>
     <em:iconURL>chrome://dnssec/skin/icon.png</em:iconURL>
     <em:optionsURL>chrome://dnssec/content/preferences.xul</em:optionsURL>
@@ -43,6 +46,9 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
         <em:description>Kontroluje zabezpečení doménového jména v adresním řádku DNSSEC protokolem.</em:description>
         <em:creator>CZ.NIC, z. s. p. o.</em:creator>
         <em:developer>Zbyněk Michl</em:developer>
+        <em:contributor>Tomasz Hatlapa</em:contributor>
+        <em:contributor>Ondřej Surý</em:contributor>
+        <em:contributor>Pavel Tůma</em:contributor>
         <em:homepageURL>http://labs.nic.cz/dnssec-validator/</em:homepageURL>
       </Description>
     </em:localized>
