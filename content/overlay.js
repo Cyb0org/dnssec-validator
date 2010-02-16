@@ -104,15 +104,11 @@ var dnssecExtension = {
     this.oldHost = host;
   },
 
-
+/*
   onToolbarButtonCommand: function() {
-    var tmp = false;
-
-    tmp = Boolean(1 == 2);
-    alert(tmp);
 
   },
-
+*/
 
 };
 
