@@ -19,6 +19,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 pref("extensions.dnssec.debugoutput", false);
 pref("extensions.dnssec.usetcp", false);
+pref("extensions.dnssec.dnsserverchoose", 0);
+pref("extensions.dnssec.dnsserverpresetchoose", 0);
 pref("extensions.dnssec.dnsserveraddr", "");
 pref("extensions.dnssec.optdnsserveraddr", "127.0.0.1");
 // See http://kb.mozillazine.org/Localize_extension_descriptions

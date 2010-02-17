@@ -22,9 +22,9 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY radiogroupdnsserver.label "DNS server(y) používané pro překlad jmen:">
 <!ENTITY radiodnsserversystem.label "Načíst ze systému">
 <!ENTITY radiodnsserversystem.accesskey "S">
-<!ENTITY radiodnsservercznic.label "DNSSEC validující resolvery CZ.NICu">
-<!ENTITY radiodnsservercznic.accesskey "C">
-<!ENTITY radiodnsserveroarc.label "DNSSEC validující resolvery OARCu">
-<!ENTITY radiodnsserveroarc.accesskey "O">
+<!ENTITY radiodnsserverpreset.label "DNSSEC validující resolvery:">
+<!ENTITY radiodnsserverpreset.accesskey "D">
+<!ENTITY menuitemdnsservercznic.label "CZ.NICu">
+<!ENTITY menuitemdnsserveroarc.label "OARCu">
 <!ENTITY radiodnsserveropt.label "Vlastní:">
 <!ENTITY radiodnsserveropt.accesskey "V">

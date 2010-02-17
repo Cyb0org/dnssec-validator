@@ -116,13 +116,18 @@ var dnssecExtPrefs = {
 
     savePrefs : function() {
       switch (document.getElementById("dnssec-pref-dnsserverchoose").value) {
-      case '1': // CZ.NIC's ODVR
-        this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-cznicdnsserveraddr").value);
+      case '1': // Preset resolvers
+        switch (document.getElementById("dnssec-pref-dnsserverpresetchoose").value) {
+        case '1': // OARC's ODVR
+          this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-oarcdnsserveraddr").value);
+          break;
+        case '0': // CZ.NIC's ODVR
+        default:
+          this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-cznicdnsserveraddr").value);
+          break;
+        }
         break;
-      case '2': // OARC's ODVR
-        this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-oarcdnsserveraddr").value);
-        break;
-      case '3': // User's own
+      case '2': // Custom resolver
         if (this.checkOptdnsserveraddr()) {
           this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-optdnsserveraddr").value);
 //          document.getElementById("dnssec-pref-optdnsserveraddr").setAttribute("style", "color: black");
@@ -137,23 +142,34 @@ var dnssecExtPrefs = {
       }
     },
 
-    setOptdnsserveraddrbox : function() {
+    setElementsattributes : function() {
+
+      var mycheck;
+
+      // enable preset DNS resolvers menulist only if appropriate radio button is selected
+      mycheck = document.getElementById("dnssec-pref-usepresetdnsserver").selected;
+      document.getElementById("dnssec-pref-dnsserverpresetchoose").disabled = !mycheck;
+
       // enable optional DNS address textbox only if appropriate radio button is selected
-      var mycheck = document.getElementById("dnssec-pref-useoptdnsserver").selected;
+      mycheck = document.getElementById("dnssec-pref-useoptdnsserver").selected;
       document.getElementById("dnssec-pref-optdnsserveraddr").disabled = !mycheck;
     },
 
     pane1Load : function() {
       this.instantApply = this.isInstantApply();
-      this.setOptdnsserveraddrbox();
+      this.setElementsattributes();
     },
 
     dnsserverchooseCommand : function() {
-      this.setOptdnsserveraddrbox();
+      this.setElementsattributes();
 
       if (this.instantApply) {
         this.savePrefs();
       }
+    },
+
+    dnsserverpresetchooseCommand : function() {
+      this.dnsserverchooseCommand();
     },
 
     optdnsserveraddrInput : function() {
