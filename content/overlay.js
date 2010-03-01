@@ -53,6 +53,7 @@ var dnssecExt_urlBarListener = {
 };
 
 var dnssecExtension = {
+  dnssecExtID: "dnssec@nic.cz",
   debugOutput: false,
   debugPrefix: "dnssec: ",
   debugStartNotice: "----- DNSSEC debug start -----\n",
@@ -70,6 +71,29 @@ var dnssecExtension = {
     // Listen for webpage loads
     gBrowser.addProgressListener(dnssecExt_urlBarListener,
         Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
+
+    // Get current extension version
+    var dnssecExtVersion = Components.classes["@mozilla.org/extensions/manager;1"]
+                           .getService(Components.interfaces.nsIExtensionManager)
+                           .getItemForID(this.dnssecExtID)
+                           .version.toString();
+
+    // Get saved extension version
+    var dnssecExtOldVersion = dnssecExtPrefs.getChar("version");
+
+    // Display initialisation page if appropriate
+    if (dnssecExtVersion != dnssecExtOldVersion) {
+      dnssecExtPrefs.setChar("version", dnssecExtVersion);  // Save new version
+      try {
+        setTimeout(function() {
+          if (gBrowser) {
+            gBrowser.selectedTab = gBrowser.addTab('http://labs.nic.cz/dnssec-validator/');
+          }
+        }, 100);
+      } catch(ex) {
+//        dump(ex);
+      }
+    }
   },
   
   uninit: function() {
@@ -301,8 +325,8 @@ DnssecHandler.prototype = {
           const cid = "@nic.cz/dnssecValidator;1";
           var obj = Components.classes[cid].createInstance();
           obj = obj.QueryInterface(Components.interfaces.dnssecIValidator);
-        } catch (err) {
-          dump(err + '\n');
+        } catch (ex) {
+          dump(ex + '\n');
           return;
         }
 
