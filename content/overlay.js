@@ -85,11 +85,19 @@ var dnssecExtension = {
     if (dnssecExtVersion != dnssecExtOldVersion) {
       dnssecExtPrefs.setChar("version", dnssecExtVersion);  // Save new version
       try {
-        setTimeout(function() {
-          if (gBrowser) {
-            gBrowser.selectedTab = gBrowser.addTab('http://labs.nic.cz/dnssec-validator/');
-          }
-        }, 100);
+        // Create the timer
+        var timer = Components.classes["@mozilla.org/timer;1"]
+                    .createInstance(Components.interfaces.nsITimer);
+ 
+        // Define timer callback
+        timer.initWithCallback(
+          function() {
+            if (gBrowser) {
+              gBrowser.selectedTab = gBrowser.addTab('http://labs.nic.cz/dnssec-validator/');
+            }
+          },
+          100,
+          Components.interfaces.nsITimer.TYPE_ONE_SHOT);
       } catch(ex) {
 //        dump(ex);
       }
