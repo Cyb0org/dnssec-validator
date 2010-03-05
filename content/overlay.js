@@ -25,6 +25,41 @@ function sleep(delay)
 }
 
 
+/* DNSSEC Validator's internal cache */
+var dnssecExtCache = {
+
+  cache: null,
+
+  init: function() {
+    this.cache = new Array();
+  },
+
+  record: function(name, address, state, expire) {
+    this.name = name;
+    this.address = address;
+    this.state = state;
+    this.expire = expire;
+  },
+
+  addRecord: function(name, address, state, expire) {
+//    this.cache.push(new this.record('www.nic.cz', '192.168.0.1', -1, 0));
+    this.cache.push(new this.record(name, address, state, expire));
+  },
+
+  printContent: function() {
+    var i;
+    var c = this.cache;
+    dump('records count: ' + c.length + '\n');
+    for (i = 0; i < c.length; i++) {
+      dump('r' + i + ': "' + c[i].name + '", "' + c[i].address + '", "'
+           + c[i].state + '", "' + c[i].expire + '"\n');
+    }
+
+  },
+
+
+};
+
 var dnssecExt_urlBarListener = {
 
   onLocationChange: function(aWebProgress, aRequest, aLocationURI)
@@ -67,6 +102,9 @@ var dnssecExtension = {
 
     // Set unknown security state
     getDnssecHandler().setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
+
+    // Initialize internal cache
+    dnssecExtCache.init();
 
     // Listen for webpage loads
     gBrowser.addProgressListener(dnssecExt_urlBarListener,
@@ -136,11 +174,11 @@ var dnssecExtension = {
     this.oldHost = host;
   },
 
-/*
+
   onToolbarButtonCommand: function() {
 
   },
-*/
+
 
 };
 
@@ -361,7 +399,15 @@ DnssecHandler.prototype = {
                + resaddrs.value + '\"\n');
 
 
-        // Temporarily checking only first address
+        dump('HERE1\n');
+        dnssecExtCache.printContent();
+        dnssecExtCache.addRecord(getDnssecHandler()._hostName, resaddrs.value, res, 0);
+        dnssecExtCache.printContent();
+        dump('HERE2\n');
+
+
+
+        // Check browser's IP address(es)
         var invipaddr = false; // Browser's IP addresses are presumed as valid
         if (aRecord) {
           aRecord.rewind();
