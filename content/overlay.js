@@ -34,16 +34,22 @@ var dnssecExtCache = {
     this.cache = new Array();
   },
 
-  record: function(name, address, state, expire) {
-    this.name = name;
-    this.address = address;
-    this.state = state;
-    this.expire = expire;
+  record: function(n, a, s, e) {
+    this.name = n;
+    this.address = a;
+    this.state = s;
+    this.expire = e;
   },
 
   addRecord: function(name, address, state, expire) {
-//    this.cache.push(new this.record('www.nic.cz', '192.168.0.1', -1, 0));
-    this.cache.push(new this.record(name, address, state, expire));
+
+    // Get current time
+    var cur_t = new Date().getTime();
+
+    // Record expiration time
+    var exp_t = cur_t + expire * 1000; // expire is in seconds
+
+    this.cache.push(new this.record(name, address, state, exp_t));
   },
 
   printContent: function() {
@@ -57,6 +63,24 @@ var dnssecExtCache = {
 
   },
 
+
+  delExpiredRecords: function() {
+
+    var i;
+    var c = this.cache;
+
+    // Get current time
+    var cur_t = new Date().getTime();
+
+    for (i = 0; i < c.length; i++) {
+      if (cur_t > c[i].expire) {
+        if (dnssecExtension.debugOutput) dump(dnssecExtension.debugPrefix +
+                                              'Deleting cache r: ' + i + '\n');
+        c.splice(i, 1);
+      }
+    }
+
+  },
 
 };
 
@@ -176,6 +200,8 @@ var dnssecExtension = {
 
 
   onToolbarButtonCommand: function() {
+
+    dnssecExtCache.delExpiredRecords();
 
   },
 
@@ -401,7 +427,7 @@ DnssecHandler.prototype = {
 
         dump('HERE1\n');
         dnssecExtCache.printContent();
-        dnssecExtCache.addRecord(getDnssecHandler()._hostName, resaddrs.value, res, 0);
+        dnssecExtCache.addRecord(getDnssecHandler()._hostName, resaddrs.value, res, 10);
         dnssecExtCache.printContent();
         dump('HERE2\n');
 
