@@ -34,8 +34,7 @@ var dnssecExtCache = {
     this.cache = new Array();
   },
 
-  record: function(n, a, s, e) {
-    this.name = n;
+  record: function(a, s, e) {
     this.address = a;
     this.state = s;
     this.expire = e;
@@ -49,40 +48,40 @@ var dnssecExtCache = {
     // Record expiration time
     var exp_t = cur_t + expire * 1000; // expire is in seconds
 
-    this.cache.push(new this.record(name, address, state, exp_t));
+    this.cache[name] = new this.record(address, state, exp_t);
   },
 
   printContent: function() {
-    var i;
+    var i = 0;
+    var n;
     var c = this.cache;
-    dump('records count: ' + c.length + '\n');
-    for (i = 0; i < c.length; i++) {
-      dump('r' + i + ': "' + c[i].name + '", "' + c[i].address + '", "'
-           + c[i].state + '", "' + c[i].expire + '"\n');
+    for (n in c) {
+      dump('r' + i + ': "' + n + '": "' + c[n].address + '", "'
+           + c[n].state + '", "' + c[n].expire + '"\n');
+      i++;
     }
-
+    dump('Total records count: ' + i + '\n');
   },
 
 
   delExpiredRecords: function() {
-
-    var i;
     var c = this.cache;
 
     // Get current time
     var cur_t = new Date().getTime();
 
-    for (i = 0; i < c.length; i++) {
-      if (cur_t > c[i].expire) {
+    for (n in c) {
+      if (cur_t > c[n].expire) {
         if (dnssecExtension.debugOutput) dump(dnssecExtension.debugPrefix +
-                                              'Deleting cache r: ' + i + '\n');
-        c.splice(i, 1);
+                                              'Deleting cache r: "' + n + '"\n');
+        delete c[n];
       }
     }
 
   },
 
 };
+
 
 var dnssecExt_urlBarListener = {
 
