@@ -34,21 +34,47 @@ var dnssecExtCache = {
     this.cache = new Array();
   },
 
-  record: function(a, s, e) {
-    this.address = a;
-    this.state = s;
-    this.expire = e;
+  record: function(a, e4, e6, s) {
+/*
+    this.addrs = a;         // resolved IP address list (IPv4 or IPv6)
+    this.opts = new function() {   // options
+      this.ipv4 = v4;       // IPv4 resolving has been used
+      this.ipv6 = v6;       // IPv6 resolving has been used
+    };
+    this.state = s;         // result state
+    this.expire = e;        // time of record expiration
+*/
+/*
+    this.ipv4 = new function() {
+      this.addrs = a4;     // resolved IPv4 address list
+      this.expir = e4;     // time of address expiration
+    };
+    this.ipv6 = new function() {
+      this.addrs = a6;     // resolved IPv6 address list
+      this.expir = e6;     // time of address expiration
+    };
+    this.state = s;        // result state
+*/
+
+    this.addrs = a;        // resolved IPv4 and IPv6 address list
+    this.expir = new function() {
+      this.ipv4 = e4;      // time of IPv4 address expiration
+      this.ipv6 = e6;      // time of IPv6 address expiration
+    };
+    this.state = s;        // result state
+
   },
 
-  addRecord: function(name, address, state, expire) {
+  addRecord: function(name, addrs, expir4, expir6, state) {
 
     // Get current time
     var cur_t = new Date().getTime();
 
     // Record expiration time
-    var exp_t = cur_t + expire * 1000; // expire is in seconds
+    var exp4_t = cur_t + expir4 * 1000;   // expire4 is in seconds
+    var exp6_t = cur_t + expir6 * 1000;   // expire6 is in seconds
 
-    this.cache[name] = new this.record(address, state, exp_t);
+    this.cache[name] = new this.record(addrs, exp4_t, exp6_t, state);
   },
 
   printContent: function() {
@@ -56,8 +82,8 @@ var dnssecExtCache = {
     var n;
     var c = this.cache;
     for (n in c) {
-      dump('r' + i + ': "' + n + '": "' + c[n].address + '", "'
-           + c[n].state + '", "' + c[n].expire + '"\n');
+      dump('r' + i + ': \"' + n + '\": \"' + c[n].addrs + '\"; ' + c[n].expir.ipv4
+           + '; ' + c[n].expir.ipv6 + '; ' + c[n].state + '\n');
       i++;
     }
     dump('Total records count: ' + i + '\n');
@@ -71,15 +97,24 @@ var dnssecExtCache = {
     var cur_t = new Date().getTime();
 
     for (n in c) {
-      if (cur_t > c[n].expire) {
+      if (cur_t > c[n].expir.ipv4 && cur_t > c[n].expir.ipv6) {
         if (dnssecExtension.debugOutput) dump(dnssecExtension.debugPrefix +
-                                              'Deleting cache r: "' + n + '"\n');
+                                              'Deleting cache r: \"' + n + '\"\n');
         delete c[n];
       }
     }
-
   },
 
+/*
+  existsValidRecord: function(n) {
+
+    var c = this.cache;
+    var cur_t = new Date().getTime();
+
+    return (typeof(n) != 'undefined' && cur_t <= c[n].expir.ipv4 && cur_t <= c[n].expir.ipv6) ? true : false);
+
+  }
+*/
 };
 
 
@@ -417,16 +452,18 @@ DnssecHandler.prototype = {
 
         // Call XPCOM validation
         var resaddrs = {};
-        var res = obj.Validate(getDnssecHandler()._hostName, options, nameserver, resaddrs);
+        var ttl4 = {};
+        var ttl6 = {};
+        var res = obj.Validate(getDnssecHandler()._hostName, options, nameserver, resaddrs, ttl4, ttl6);
 
         if (dnssecExtension.debugOutput)
-          dump(dnssecExtension.debugPrefix + 'Getting return values: \"' + res + '; '
-               + resaddrs.value + '\"\n');
+          dump(dnssecExtension.debugPrefix + 'Getting return values: ' + res + '; \"'
+               + resaddrs.value + '\"; ' + ttl4.value + '; ' + ttl6.value + '\n');
 
 
         dump('HERE1\n');
         dnssecExtCache.printContent();
-        dnssecExtCache.addRecord(getDnssecHandler()._hostName, resaddrs.value, res, 10);
+        dnssecExtCache.addRecord(getDnssecHandler()._hostName, resaddrs.value, ttl4.value, ttl6.value, res);
         dnssecExtCache.printContent();
         dump('HERE2\n');
 
@@ -441,7 +478,7 @@ DnssecHandler.prototype = {
             addr = aRecord.getNextAddrAsString();
 
             // Check if each browser's address is present in DNSSEC address resolved list
-            if (resaddrs.value.indexOf(addr) == -1) invipaddr = true;
+            if (resaddrs.value.indexOf(' ' + addr + ' ') == -1) invipaddr = true;
 
             if (dnssecExtension.debugOutput)
               dump(dnssecExtension.debugPrefix + 'Checking browser IP: '
