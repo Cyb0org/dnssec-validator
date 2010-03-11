@@ -77,13 +77,32 @@ var dnssecExtCache = {
     this.cache[name] = new this.record(addrs, exp4_t, exp6_t, state);
   },
 
+  getRecord: function(n) {
+    var c = this.cache;
+
+    if (typeof(c[n]) != 'undefined') {
+      return [c[n].addrs, c[n].expir.ipv4, c[n].expir.ipv6, c[n].state];
+    }
+    return ['', '', '', ''];
+  },
+
   printContent: function() {
     var i = 0;
     var n;
     var c = this.cache;
+    var cur_t = new Date().getTime();
+    var ttl4;
+    var ttl6;
+
     for (n in c) {
+
+      /* compute TTL in seconds */
+      ttl4 = Math.round((c[n].expir.ipv4 - cur_t) / 1000);
+      ttl6 = Math.round((c[n].expir.ipv6 - cur_t) / 1000);
+
       dump('r' + i + ': \"' + n + '\": \"' + c[n].addrs + '\"; ' + c[n].expir.ipv4
-           + '; ' + c[n].expir.ipv6 + '; ' + c[n].state + '\n');
+           + ' (' + ttl4 + '); ' + c[n].expir.ipv6 + ' (' + ttl6 + '); '
+           + c[n].state + '\n');
       i++;
     }
     dump('Total records count: ' + i + '\n');
@@ -106,14 +125,16 @@ var dnssecExtCache = {
   },
 
 
-  existsValidRecordAddrs: function(n, v) {
+  existsUnexpiredRecord: function(n, v4, v6) {
 
     var c = this.cache;
     var cur_t = new Date().getTime();
 
     if (typeof(c[n]) != 'undefined') {
-      return ((v == 4 && cur_t <= c[n].expir.ipv4) ||
-              (v == 6 && cur_t <= c[n].expir.ipv6) ? true : false);
+      return (( v4 &&  v6 && cur_t <= c[n].expir.ipv4 && cur_t <= c[n].expir.ipv6) ||
+              ( v4 && !v6 && cur_t <= c[n].expir.ipv4) ||
+              (!v4 &&  v6 && cur_t <= c[n].expir.ipv6)
+              ? true : false);
     }
     return false;
   },
@@ -238,13 +259,7 @@ var dnssecExtension = {
 
   onToolbarButtonCommand: function() {
 
-//    var r = dnssecExtCache.test();
-//    alert(r[0] + '; ' + r[1]);
-
-//    alert('4: ' + dnssecExtCache.existsValidRecordAddrs('www.nic.cz', 5));
-//    alert('6: ' + dnssecExtCache.existsValidRecordAddrs('www.nic.cz', 6));
-
-//    dnssecExtCache.delExpiredRecords();
+    dnssecExtCache.delExpiredRecords();
 
   },
 
@@ -406,7 +421,6 @@ DnssecHandler.prototype = {
       // Called when request is not cached already
       doXPCOMvalidation: function(dn, resolvipv4, resolvipv6) {
 
-
         // Use validator's XPCOM interface
         try {
           netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -438,16 +452,48 @@ DnssecHandler.prototype = {
         var ttl6 = {};
         var res = obj.Validate(dn, options, nameserver, resaddrs, ttl4, ttl6);
 
+/*
         if (dnssecExtension.debugOutput)
           dump(dnssecExtension.debugPrefix + 'Getting return values: ' + res + '; \"'
                + resaddrs.value + '\"; ' + ttl4.value + '; ' + ttl6.value + '\n');
-
-//        return [res, resaddrs.value, ttl4.value, ttl6.value];
-        return [res, resaddrs, ttl4, ttl6];
+*/
+        return [resaddrs.value, ttl4.value, ttl6.value, res];
+//        return [resaddrs, ttl4, ttl6, res];
 
       },
 
 
+      // Get validated data from cache or by XPCOM call
+      getValidatedData: function(dn, v4, v6) {
+
+        var ext = dnssecExtension;
+        var cache = dnssecExtCache;
+        var resArr;
+
+        if (cache.existsUnexpiredRecord(dn, v4, v6)) {
+          if (ext.debugOutput)
+            dump(ext.debugPrefix + 'Reading IPv4/IPv6 record "' + dn + '" from cache ('
+                 + v4 + '/' + v6 + ')...\n');
+          resArr = cache.getRecord(dn);
+        } else {
+          if (ext.debugOutput)
+            dump(ext.debugPrefix + 'Using XPCOM to get IPv4/IPv6 record "' + dn
+                 + '" (' + v4 + '/' + v6 + ')...\n');
+          resArr = this.doXPCOMvalidation(dn, v4, v6);
+          if (dnssecExtPrefs.getInt("cacheflushinterval")) // do not cache if 0
+            cache.addRecord(dn, resArr[0], resArr[1], resArr[2], resArr[3]);
+            // need to flush old cache records
+        }
+
+        if (ext.debugOutput)
+          dump(ext.debugPrefix + 'Getting return values: ' + resArr[3] + '; \"'
+               + resArr[0] + '\"; ' + resArr[1] + '; ' + resArr[2] + '\n');
+
+        var resaddrs = resArr[0];
+        var res = resArr[3];
+
+        return [resaddrs, res];
+      },
 
 
       // Called when async host lookup completes
@@ -481,65 +527,17 @@ DnssecHandler.prototype = {
           dump(dnssecExtension.debugPrefix + 'Browser uses IPv4/IPv6 resolving: \"'
                + resolvipv4 + '/' + resolvipv6 + '\"\n');
 
+        // Get validated data from cache or by XPCOM call
+        var resaddrs = '';
+        var res = -1;
+        var resArr = this.getValidatedData(dn, resolvipv4, resolvipv6);
+        resaddrs = resArr[0];
+        res = resArr[1];
 
-/*
-        if (resolvipv4 && resolvipv6) {
-          if (existsValidRecordAddrs(dn, 4) && existsValidRecordAddrs(dn, 6)) {
-            
-          }
-*/
-
-        var rvArr = this.doXPCOMvalidation(dn, resolvipv4, resolvipv6);
-        var res = rvArr[0];
-        var resaddrs = rvArr[1];
-        var ttl4 = rvArr[2];
-        var ttl6 = rvArr[3];
-
-
-/*
-        // Use validator's XPCOM interface
-        try {
-          netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-          const cid = "@nic.cz/dnssecValidator;1";
-          var obj = Components.classes[cid].createInstance();
-          obj = obj.QueryInterface(Components.interfaces.dnssecIValidator);
-        } catch (ex) {
-          dump(ex + '\n');
-          return;
+        if (dnssecExtension.debugOutput) {
+          dump(dnssecExtension.debugPrefix + 'Cache content:\n');
+          dnssecExtCache.printContent();
         }
-
-        // Get DNS resolver address(es)
-        var nameserver = dnssecExtPrefs.getChar("dnsserveraddr");
-
-        // Create variable to pass options
-        var options = 0;
-        if (dnssecExtension.debugOutput) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_DEBUGOUTPUT;
-        if (dnssecExtPrefs.getBool("usetcp")) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_USETCP;
-        if (resolvipv4) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_RESOLVIPV4;
-        if (resolvipv6) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_RESOLVIPV6;
-
-        if (dnssecExtension.debugOutput)
-          dump(dnssecExtension.debugPrefix + 'Validation parameters: \"'
-               + dn + '; ' + options + '; ' + nameserver + '\"\n');
-
-        // Call XPCOM validation
-        var resaddrs = {};
-        var ttl4 = {};
-        var ttl6 = {};
-        var res = obj.Validate(dn, options, nameserver, resaddrs, ttl4, ttl6);
-
-        if (dnssecExtension.debugOutput)
-          dump(dnssecExtension.debugPrefix + 'Getting return values: ' + res + '; \"'
-               + resaddrs.value + '\"; ' + ttl4.value + '; ' + ttl6.value + '\n');
-*/
-
-        dump('HERE1\n');
-        dnssecExtCache.printContent();
-        dnssecExtCache.addRecord(dn, resaddrs.value, ttl4.value, ttl6.value, res);
-        dnssecExtCache.printContent();
-        dump('HERE2\n');
-
-
 
         // Check browser's IP address(es)
         var invipaddr = false; // Browser's IP addresses are presumed as valid
@@ -550,7 +548,7 @@ DnssecHandler.prototype = {
             addr = aRecord.getNextAddrAsString();
 
             // Check if each browser's address is present in DNSSEC address resolved list
-            if (resaddrs.value.indexOf(' ' + addr + ' ') == -1) invipaddr = true;
+            if (resaddrs.indexOf(' ' + addr + ' ') == -1) invipaddr = true;
 
             if (dnssecExtension.debugOutput)
               dump(dnssecExtension.debugPrefix + 'Checking browser IP: '

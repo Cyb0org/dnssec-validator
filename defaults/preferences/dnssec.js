@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
+pref("extensions.dnssec.cacheflushinterval", 600); // in seconds, 0 to cache disable
 pref("extensions.dnssec.debugoutput", false);
 pref("extensions.dnssec.usetcp", false);
 pref("extensions.dnssec.dnsserverchoose", 0);

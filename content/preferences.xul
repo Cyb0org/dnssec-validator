@@ -26,12 +26,14 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
   <script src="preferences.js"/>
   <prefpane id="dnssec-pref-pane1" onpaneload="dnssecExtPrefs.pane1Load();">
     <preferences>
+      <preference id="cacheflushinterval" name="extensions.dnssec.cacheflushinterval" type="int"/>
       <preference id="debugoutput" name="extensions.dnssec.debugoutput" type="bool"/>
       <preference id="usetcp" name="extensions.dnssec.usetcp" type="bool"/>
       <preference id="dnsserverchoose" name="extensions.dnssec.dnsserverchoose" type="int"/>
       <preference id="dnsserverpresetchoose" name="extensions.dnssec.dnsserverpresetchoose" type="int"/>
       <preference id="dnsserveraddr" name="extensions.dnssec.dnsserveraddr" type="string"/>
       <preference id="optdnsserveraddr" name="extensions.dnssec.optdnsserveraddr" type="string"/>
+      <preference id="version" name="extensions.dnssec.version" type="string"/>
     </preferences>
     <groupbox>
       <caption label="&groupboxdnsserver.label;"/>
