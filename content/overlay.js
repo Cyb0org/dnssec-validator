@@ -28,6 +28,8 @@ function sleep(delay)
 /* DNSSEC Validator's internal cache */
 var dnssecExtCache = {
 
+  flushTimer: null,
+  flushInterval: 0,
   cache: null,
 
   init: function() {
@@ -125,6 +127,11 @@ var dnssecExtCache = {
   },
 
 
+  delAllRecords: function() {
+    this.cache = [];
+  },
+
+
   existsUnexpiredRecord: function(n, v4, v6) {
 
     var c = this.cache;
@@ -182,15 +189,34 @@ var dnssecExtension = {
     // Enable debugging information on stdout if desired
     if (dnssecExtPrefs.getBool("debugoutput")) this.debugOutput = true;
 
+    // Get cache flush interval (0 is for cache disable)
+    dnssecExtCache.flushInterval = dnssecExtPrefs.getInt("cacheflushinterval");
+
     // Set unknown security state
     getDnssecHandler().setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
+
 
     // Initialize internal cache
     dnssecExtCache.init();
 
+    // Create the timer for cache flushing
+    dnssecExtCache.flushTimer = Components.classes["@mozilla.org/timer;1"]
+                                .createInstance(Components.interfaces.nsITimer);
+dump('int: ' + dnssecExtCache.flushInterval + '\n');
+    // Define cache flush timer callback
+    dnssecExtCache.flushTimer.initWithCallback(
+      function() {
+        dump('TIMER: ' + new Date().getTime() + '\n');
+//        dnssecExtCache.delExpiredRecords();
+      },
+      /*1000,*/ dnssecExtCache.flushInterval,
+      Components.interfaces.nsITimer.TYPE_REPEATING_SLACK); // repeat periodically
+
+
     // Listen for webpage loads
     gBrowser.addProgressListener(dnssecExt_urlBarListener,
         Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
+
 
     // Get current extension version
     var dnssecExtVersion = Components.classes["@mozilla.org/extensions/manager;1"]
@@ -204,24 +230,22 @@ var dnssecExtension = {
     // Display initialisation page if appropriate
     if (dnssecExtVersion != dnssecExtOldVersion) {
       dnssecExtPrefs.setChar("version", dnssecExtVersion);  // Save new version
-      try {
-        // Create the timer
-        var timer = Components.classes["@mozilla.org/timer;1"]
-                    .createInstance(Components.interfaces.nsITimer);
- 
-        // Define timer callback
-        timer.initWithCallback(
-          function() {
-            if (gBrowser) {
-              gBrowser.selectedTab = gBrowser.addTab('http://labs.nic.cz/dnssec-validator/');
-            }
-          },
-          100,
-          Components.interfaces.nsITimer.TYPE_ONE_SHOT);
-      } catch(ex) {
-//        dump(ex);
-      }
+
+      // Create the timer
+      var tmpTimer = Components.classes["@mozilla.org/timer;1"]
+                     .createInstance(Components.interfaces.nsITimer);
+
+      // Define timer callback
+      tmpTimer.initWithCallback(
+        function() {
+          if (gBrowser) {
+            gBrowser.selectedTab = gBrowser.addTab('http://labs.nic.cz/dnssec-validator/');
+          }
+        },
+        100,
+        Components.interfaces.nsITimer.TYPE_ONE_SHOT);
     }
+
   },
   
   uninit: function() {
@@ -259,7 +283,7 @@ var dnssecExtension = {
 
   onToolbarButtonCommand: function() {
 
-    dnssecExtCache.delExpiredRecords();
+//    dnssecExtCache.delExpiredRecords();
 
   },
 
