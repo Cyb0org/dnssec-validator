@@ -29,11 +29,40 @@ function sleep(delay)
 var dnssecExtCache = {
 
   flushTimer: null,
-  flushInterval: 0,
+  flushInterval: 0,     // in seconds (0 is for cache disable)
   cache: null,
 
   init: function() {
+
+    // Create new array for caching
     this.cache = new Array();
+
+    // Get cache flush interval
+    this.flushInterval = dnssecExtPrefs.getInt("cacheflushinterval");
+
+    // Create the timer for cache flushing
+    if (dnssecExtension.debugOutput) {
+      dump(dnssecExtension.debugPrefix + 'Initializing flush timer with interval: '
+           + this.flushInterval + ' s\n');
+    }
+
+    this.flushTimer = Components.classes["@mozilla.org/timer;1"]
+                      .createInstance(Components.interfaces.nsITimer);
+
+    // Define cache flush timer callback
+    this.flushTimer.initWithCallback(
+      function() {
+        if (dnssecExtension.debugOutput) {
+          dump(dnssecExtension.debugPrefix + 'Flushing cache...\n');
+        }
+        dnssecExtCache.delExpiredRecords();
+        if (dnssecExtension.debugOutput) {
+          dnssecExtCache.printContent();
+        }
+      },
+      this.flushInterval * 1000,
+      Components.interfaces.nsITimer.TYPE_REPEATING_SLACK); // repeat periodically
+
   },
 
   record: function(a, e4, e6, s) {
@@ -96,15 +125,16 @@ var dnssecExtCache = {
     var ttl4;
     var ttl6;
 
+    dump(dnssecExtension.debugPrefix + 'Cache content:\n');
     for (n in c) {
 
       /* compute TTL in seconds */
       ttl4 = Math.round((c[n].expir.ipv4 - cur_t) / 1000);
       ttl6 = Math.round((c[n].expir.ipv6 - cur_t) / 1000);
 
-      dump('r' + i + ': \"' + n + '\": \"' + c[n].addrs + '\"; ' + c[n].expir.ipv4
-           + ' (' + ttl4 + '); ' + c[n].expir.ipv6 + ' (' + ttl6 + '); '
-           + c[n].state + '\n');
+      dump('r' + i + ': \"' + n + '\": \"' + c[n].addrs + '\"; '
+           + c[n].expir.ipv4 + ' (' + ttl4 + '); ' + c[n].expir.ipv6 + ' ('
+           + ttl6 + '); ' + c[n].state + '\n');
       i++;
     }
     dump('Total records count: ' + i + '\n');
@@ -180,8 +210,8 @@ var dnssecExtension = {
   dnssecExtID: "dnssec@nic.cz",
   debugOutput: false,
   debugPrefix: "dnssec: ",
-  debugStartNotice: "----- DNSSEC debug start -----\n",
-  debugEndNotice: "----- DNSSEC debug end -----\n",
+  debugStartNotice: "----- DNSSEC resolving start -----\n",
+  debugEndNotice: "----- DNSSEC resolving end -----\n",
   oldHost: null,
 
   init: function() {
@@ -189,29 +219,11 @@ var dnssecExtension = {
     // Enable debugging information on stdout if desired
     if (dnssecExtPrefs.getBool("debugoutput")) this.debugOutput = true;
 
-    // Get cache flush interval (0 is for cache disable)
-    dnssecExtCache.flushInterval = dnssecExtPrefs.getInt("cacheflushinterval");
-
     // Set unknown security state
     getDnssecHandler().setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
 
-
-    // Initialize internal cache
+    // Initialize internal cache and timer
     dnssecExtCache.init();
-
-    // Create the timer for cache flushing
-    dnssecExtCache.flushTimer = Components.classes["@mozilla.org/timer;1"]
-                                .createInstance(Components.interfaces.nsITimer);
-dump('int: ' + dnssecExtCache.flushInterval + '\n');
-    // Define cache flush timer callback
-    dnssecExtCache.flushTimer.initWithCallback(
-      function() {
-        dump('TIMER: ' + new Date().getTime() + '\n');
-//        dnssecExtCache.delExpiredRecords();
-      },
-      /*1000,*/ dnssecExtCache.flushInterval,
-      Components.interfaces.nsITimer.TYPE_REPEATING_SLACK); // repeat periodically
-
 
     // Listen for webpage loads
     gBrowser.addProgressListener(dnssecExt_urlBarListener,
@@ -504,9 +516,10 @@ DnssecHandler.prototype = {
             dump(ext.debugPrefix + 'Using XPCOM to get IPv4/IPv6 record "' + dn
                  + '" (' + v4 + '/' + v6 + ')...\n');
           resArr = this.doXPCOMvalidation(dn, v4, v6);
-          if (dnssecExtPrefs.getInt("cacheflushinterval")) // do not cache if 0
+          if (dnssecExtCache.flushInterval) { // do not cache if 0
             cache.addRecord(dn, resArr[0], resArr[1], resArr[2], resArr[3]);
-            // need to flush old cache records
+            // need to flush all records when disabling cache
+          }
         }
 
         if (ext.debugOutput)
@@ -559,7 +572,6 @@ DnssecHandler.prototype = {
         res = resArr[1];
 
         if (dnssecExtension.debugOutput) {
-          dump(dnssecExtension.debugPrefix + 'Cache content:\n');
           dnssecExtCache.printContent();
         }
 
