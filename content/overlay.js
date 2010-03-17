@@ -302,6 +302,7 @@ var dnssecExtension = {
 
 };
 
+
 window.addEventListener("load", function() {dnssecExtension.init()}, false);
 window.addEventListener("unload", function() {dnssecExtension.uninit()}, false);
 
@@ -739,7 +740,8 @@ var gDnssecHandler;
  * used instead of referencing the global variable directly or creating new instances
  */
 function getDnssecHandler() {
-  if (!gDnssecHandler)
+  if (!gDnssecHandler) {
     gDnssecHandler = new DnssecHandler();
+  }
   return gDnssecHandler;
 }
