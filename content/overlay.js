@@ -565,6 +565,9 @@ DnssecHandler.prototype = {
           dump(dnssecExtension.debugPrefix + 'Browser uses IPv4/IPv6 resolving: \"'
                + resolvipv4 + '/' + resolvipv6 + '\"\n');
 
+        // Resolve IPv4 if no version is desired
+        if (!resolvipv4 && !resolvipv6) resolvipv4 = true;
+
         // Get validated data from cache or by XPCOM call
         var resaddrs = '';
         var res = -1;
