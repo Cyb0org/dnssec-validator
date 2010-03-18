@@ -144,15 +144,15 @@ var dnssecExtPrefs = {
 
     setElementsattributes : function() {
 
-      var mycheck;
+      var tmpCheck;
 
       // enable preset DNS resolvers menulist only if appropriate radio button is selected
-      mycheck = document.getElementById("dnssec-pref-usepresetdnsserver").selected;
-      document.getElementById("dnssec-pref-dnsserverpresetchoose").disabled = !mycheck;
+      tmpCheck = document.getElementById("dnssec-pref-usepresetdnsserver").selected;
+      document.getElementById("dnssec-pref-dnsserverpresetchoose").disabled = !tmpCheck;
 
       // enable optional DNS address textbox only if appropriate radio button is selected
-      mycheck = document.getElementById("dnssec-pref-useoptdnsserver").selected;
-      document.getElementById("dnssec-pref-optdnsserveraddr").disabled = !mycheck;
+      tmpCheck = document.getElementById("dnssec-pref-useoptdnsserver").selected;
+      document.getElementById("dnssec-pref-optdnsserveraddr").disabled = !tmpCheck;
     },
 
     pane1Load : function() {
