@@ -99,7 +99,7 @@ var dnssecExtCache = {
   addRecord: function(name, addrs, expir4, expir6, state) {
 
     // Get current time
-    var cur_t = new Date().getTime();
+    const cur_t = new Date().getTime();
 
     // Record expiration time
     var exp4_t = cur_t + expir4 * 1000;   // expire4 is in seconds
@@ -109,7 +109,7 @@ var dnssecExtCache = {
   },
 
   getRecord: function(n) {
-    var c = this.cache;
+    const c = this.cache;
 
     if (typeof(c[n]) != 'undefined') {
       return [c[n].addrs, c[n].expir.ipv4, c[n].expir.ipv6, c[n].state];
@@ -120,8 +120,8 @@ var dnssecExtCache = {
   printContent: function() {
     var i = 0;
     var n;
-    var c = this.cache;
-    var cur_t = new Date().getTime();
+    const c = this.cache;
+    const cur_t = new Date().getTime();
     var ttl4;
     var ttl6;
 
@@ -142,10 +142,10 @@ var dnssecExtCache = {
 
 
   delExpiredRecords: function() {
-    var c = this.cache;
+    const c = this.cache;
 
     // Get current time
-    var cur_t = new Date().getTime();
+    const cur_t = new Date().getTime();
 
     for (n in c) {
       if (cur_t > c[n].expir.ipv4 && cur_t > c[n].expir.ipv6) {
@@ -164,8 +164,8 @@ var dnssecExtCache = {
 
   existsUnexpiredRecord: function(n, v4, v6) {
 
-    var c = this.cache;
-    var cur_t = new Date().getTime();
+    const c = this.cache;
+    const cur_t = new Date().getTime();
 
     if (typeof(c[n]) != 'undefined') {
       return (( v4 &&  v6 && cur_t <= c[n].expir.ipv4 && cur_t <= c[n].expir.ipv6) ||
