@@ -26,6 +26,7 @@ function sleep(delay)
 
 
 /* DNSSEC Validator's internal cache */
+/* Only one instance for all browser's windows */
 var dnssecExtCache = {
 
   flushTimer: null,
@@ -206,6 +207,12 @@ var dnssecExt_urlBarListener = {
   }
 };
 
+var sharedObj = {
+
+    val: 0
+
+};
+
 var dnssecExtension = {
   dnssecExtID: "dnssec@nic.cz",
   debugOutput: false,
@@ -220,10 +227,25 @@ var dnssecExtension = {
     if (dnssecExtPrefs.getBool("debugoutput")) this.debugOutput = true;
 
     // Set unknown security state
-    getDnssecHandler().setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
+    gDnssecHandler.setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
 
-    // Initialize internal cache and timer
-    dnssecExtCache.init();
+//    var myext = Application.extensions.get("dnssec@nic.cz");
+//dnssecExtCache.printContent();
+    // Internal cache - only one instance for all browser's windows
+//    if (!Application.storage.has("dnssecExtCache")) {
+
+      // Create new cache instance
+//      Application.storage.set("dnssecExtCache", dnssecExtCache);
+
+      // Initialize cache and timer
+      dnssecExtCache.init();
+//    } else {
+
+      // Use existing cache instance (overwrite default global instance)
+//      dnssecExtCache = Application.storage.get("dnssecExtCache", null);
+//    }
+//dnssecExtCache.printContent();
+
 
     // Listen for webpage loads
     gBrowser.addProgressListener(dnssecExt_urlBarListener,
@@ -278,7 +300,7 @@ var dnssecExtension = {
 
     if ((host == null) || (host.search(/^[A-Za-z0-9]+([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,4}$/) == -1)) {   // test for valid hostname
       // Set unknown security state
-      getDnssecHandler().setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
+      gDnssecHandler.setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
       this.oldHost = host;
       return;
     } else if (host == this.oldHost) {   // test for hostname change
@@ -286,7 +308,7 @@ var dnssecExtension = {
     }
 
     // check DNS security
-    getDnssecHandler().checkSecurity(host);
+    gDnssecHandler.checkSecurity(host);
 
     // remember last hostname
     this.oldHost = host;
@@ -295,8 +317,59 @@ var dnssecExtension = {
 
   onToolbarButtonCommand: function() {
 
-//    dnssecExtCache.delExpiredRecords();
+//    dnssecExtCache = Application.storage.get("dnssecExtCache", null);
+    dnssecExtCache.printContent();
 
+/*
+    alert(sharedObj.val);
+
+    // Internal cache - only one instance for all browser's windows
+    if (!Application.storage.has("sharedObj")) {
+alert('init');
+      // Create new cache instance
+      Application.storage.set("sharedObj", sharedObj);
+
+      // Initialize cache and timer
+      sharedObj.val = 1;
+    } else {
+alert('using');
+      // Use existing cache instance (overwrite default global instance)
+      sharedObj = Application.storage.get("sharedObj", null);
+      sharedObj.val++;
+    }
+    alert(sharedObj.val);
+*/
+
+//    alert(Application.version);
+//    alert(Application.extensions.get("dnssec@nic.cz").version);
+//    alert(Application.extensions.get("dnssec@nic.cz").firstRun);
+
+//    dnssecExtCache.delExpiredRecords();
+//    dnssecExtCache.printContent();
+
+//var aaa = Application.storage.get("xxx",);
+
+//     var aaa = Application.storage.set("xxx", "a");
+//alert(Application.storage.get("dnssecExtCache", null));
+/*
+    if (typeof(Application.storage.get("xxx", "undefined")) == "undefined") {
+      alert("true");
+    } else {
+      alert("false");
+    }
+*/
+//    alert(typeof(dnssecExtCache));
+
+//    var tmparr = [7, 8 , 9];
+//    Application.storage.set("mykey", tmparr);
+
+/*
+    var data = Application.storage.get("mykey", false);
+
+    alert(data[0]);
+    data[0] = 1;
+    alert(data[0]);
+*/
   },
 
 
@@ -310,8 +383,9 @@ window.addEventListener("unload", function() {dnssecExtension.uninit()}, false);
 /**
  * Utility class to handle manipulations of the dnssec indicators in the UI
  */
-
+/*
 function DnssecHandler() {
+
   this._stringBundle = document.getElementById("dnssec-strings");
   this._staticStrings = {};
   this._staticStrings[this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED] = {
@@ -349,6 +423,8 @@ function DnssecHandler() {
 }
 
 DnssecHandler.prototype = {
+*/
+var gDnssecHandler = {
 
   // Mode strings used to control CSS display
 
@@ -375,19 +451,89 @@ DnssecHandler.prototype = {
   // No trusted security information
   DNSSEC_MODE_UNSECURED                           : "unsecuredDnssec",
 
+  // Tooltips
+  DNSSEC_TOOLTIP_SECURED   : "securedTooltip",
+  DNSSEC_TOOLTIP_UNSECURED : "unsecuredTooltip",
+
   // Cache the most recent hostname seen in checkSecurity
   _hostName : null,
+ 
+  // Smart getters
+  get _securityLabel () {
+    delete this._stringBundle;
+    this._stringBundle = document.getElementById("dnssec-strings");
+
+    delete this._securityLabel;
+    this._securityLabel = {};
+
+    this._securityLabel[this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED] =
+      this._stringBundle.getString("dnssec.connection.domain.secured");
+    this._securityLabel[this.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED] =
+      this._stringBundle.getString("dnssec.connection.domain.invipaddr.secured");
+    this._securityLabel[this.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED] =
+      this._stringBundle.getString("dnssec.connection.nodomain.secured");
+    this._securityLabel[this.DNSSEC_MODE_CONNECTION_NODOMAIN_INVIPADDR_SECURED] =
+      this._stringBundle.getString("dnssec.connection.nodomain.invipaddr.secured");
+    this._securityLabel[this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED] =
+      this._stringBundle.getString("dnssec.connection.invsigdomain.secured");
+    this._securityLabel[this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED] =
+      this._stringBundle.getString("dnssec.connection.invsigdomain.invipaddr.secured");
+    this._securityLabel[this.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID] =
+      this._stringBundle.getString("dnssec.domain.signature.valid");
+    this._securityLabel[this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID] =
+      this._stringBundle.getString("dnssec.invipaddr.domain.signature.valid");
+    this._securityLabel[this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID] =
+      this._stringBundle.getString("dnssec.domain.signature.invalid");
+    this._securityLabel[this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID] =
+      this._stringBundle.getString("dnssec.invipaddr.domain.signature.invalid");
+
+    return this._securityLabel;
+  },
+  get _tooltipLabel () {
+    delete this._stringBundle;
+    this._stringBundle = document.getElementById("dnssec-strings");
+
+    delete this._tooltipLabel;
+    this._tooltipLabel = {};
+
+    this._tooltipLabel[this.DNSSEC_TOOLTIP_SECURED] =
+      this._stringBundle.getString("dnssec.tooltip.secured");
+    this._tooltipLabel[this.DNSSEC_TOOLTIP_UNSECURED] =
+      this._stringBundle.getString("dnssec.tooltip.unsecured");
+
+    return this._tooltipLabel;
+  },
+  get _dnssecPopup () {
+    delete this._dnssecPopup;
+    return this._dnssecPopup = document.getElementById("dnssec-popup");
+  },
+  get _dnssecBox () {
+    delete this._dnssecBox;
+    return this._dnssecBox = document.getElementById("dnssec-box");
+  },
+  get _dnssecPopupContentBox () {
+    delete this._dnssecPopupContentBox;
+    return this._dnssecPopupContentBox =
+      document.getElementById("dnssec-popup-content-box");
+  },
+  get _dnssecPopupContentHost () {
+    delete this._dnssecPopupContentHost;
+    return this._dnssecPopupContentHost =
+      document.getElementById("dnssec-popup-content-host");
+  },
+  get _dnssecPopupSecLabel () {
+    delete this._dnssecPopupSecLabel;
+    return this._dnssecPopupSecLabel =
+      document.getElementById("dnssec-popup-security-detail-label");
+  },
 
   // Build out a cache of the elements that we need frequently
   _cacheElements : function() {
-    this._dnssecPopup = document.getElementById("dnssec-popup");
+    delete this._dnssecBox;
     this._dnssecBox = document.getElementById("dnssec-box");
-    this._dnssecPopupContentBox = document.getElementById("dnssec-popup-content-box");
-    this._dnssecPopupContentHost = document.getElementById("dnssec-popup-content-host");
-    this._dnssecPopupSecLabel = document.getElementById("dnssec-popup-security-detail-label");
   },
 
-  /* Set appropriate security state */
+  // Set appropriate security state
   setSecurityState : function(state, invipaddr) {
 
     switch (state) {
@@ -537,7 +683,7 @@ DnssecHandler.prototype = {
       // Called when async host lookup completes
       onLookupComplete: function(aRequest, aRecord, aStatus) {
 
-        var dn = getDnssecHandler()._hostName;
+        var dn = gDnssecHandler._hostName;
         var resolvipv4 = false; // No IPv4 resolving as default
         var resolvipv6 = false; // No IPv6 resolving as default
         var addr = null;
@@ -600,7 +746,7 @@ DnssecHandler.prototype = {
         }
 
         // Set appropriate state
-        getDnssecHandler().setSecurityState(res, invipaddr);
+        gDnssecHandler.setSecurityState(res, invipaddr);
 
         if (dnssecExtension.debugOutput) dump (dnssecExtension.debugEndNotice);
 
@@ -664,7 +810,7 @@ DnssecHandler.prototype = {
     case this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED:
     // Connection is secured, but domain signature and browser's IP address are invalid
     case this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED:
-      tooltip = this._stringBundle.getString("dnssec.tooltip.secured");
+      tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_SECURED];
       break;
     // Domain signature is valid
     case this.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID:
@@ -672,7 +818,7 @@ DnssecHandler.prototype = {
     // Domain signature is invalid
     case this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID:
     case this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID:
-      tooltip = this._stringBundle.getString("dnssec.tooltip.unsecured");
+      tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_UNSECURED];
       break;
     // Unknown
     default:
@@ -695,7 +841,8 @@ DnssecHandler.prototype = {
     this._dnssecPopupContentBox.className = newMode;
     
     // Set the static strings up front
-    this._dnssecPopupSecLabel.textContent = this._staticStrings[newMode].security_label;
+//    this._dnssecPopupSecLabel.textContent = this._staticStrings[newMode].security_label;
+    this._dnssecPopupSecLabel.textContent = this._securityLabel[newMode];
 
     // Push the appropriate strings out to the UI
     this._dnssecPopupContentHost.textContent = this._hostName;
@@ -735,16 +882,45 @@ DnssecHandler.prototype = {
     this._dnssecPopup.openPopup(this._dnssecBox, 'after_start');
   }
 };
+/*
+var dnssecSharedData = {
+  handler: null
+};
+*/
 
-var gDnssecHandler;
+//var gDnssecHandler;
+
+//var gDnssecHandler = {};
 
 /**
  * Returns the singleton instance of the dnssec handler class. Should always be
  * used instead of referencing the global variable directly or creating new instances
  */
+/*
 function getDnssecHandler() {
   if (!gDnssecHandler) {
     gDnssecHandler = new DnssecHandler();
   }
   return gDnssecHandler;
 }
+*/
+
+/*
+function getDnssecHandler() {
+
+//  var gDnssecHandler;
+
+  if (!Application.storage.has("gDnssecHandler")) {
+    alert('new');
+    gDnssecHandler = new DnssecHandler();
+    Application.storage.set("gDnssecHandler", gDnssecHandler);
+
+  } else {
+    alert('old');
+    gDnssecHandler = Application.storage.get("gDnssecHandler", null);
+
+  }
+  
+  return gDnssecHandler;
+}
+*/

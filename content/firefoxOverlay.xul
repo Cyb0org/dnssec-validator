@@ -66,8 +66,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
     <box id="dnssec-outerbox">
       <!-- DNSSEC button in urlbar -->
       <hbox id="dnssec-box" role="button"
-           onclick="getDnssecHandler().handleDnssecButtonEvent(event);"
-           onkeypress="getDnssecHandler().handleDnssecButtonEvent(event);">
+           onclick="gDnssecHandler.handleDnssecButtonEvent(event);"
+           onkeypress="gDnssecHandler.handleDnssecButtonEvent(event);">
 <!--           hidden="true" -->
 <!--           chromedir="&locale.dir;" -->
         <!-- stack id="dnssec-icons-stack" -->
