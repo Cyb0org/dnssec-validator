@@ -26,21 +26,23 @@ function sleep(delay)
 
 
 /* DNSSEC Validator's internal cache */
-/* Only one instance for all browser's windows */
+/* Shared with all instances (browser's windows) */
 var dnssecExtCache = {
 
   flushTimer: null,
   flushInterval: 0,     // in seconds (0 is for cache disable)
-  cache: null,
+  data: null,
 
   init: function() {
 
     // Create new array for caching
-    this.cache = new Array();
+    this.data = new Array();
 
     // Get cache flush interval
     this.flushInterval = dnssecExtPrefs.getInt("cacheflushinterval");
 
+// Timer cache flushing currently does not work
+/*
     // Create the timer for cache flushing
     if (dnssecExtension.debugOutput) {
       dump(dnssecExtension.debugPrefix + 'Initializing flush timer with interval: '
@@ -48,22 +50,16 @@ var dnssecExtCache = {
     }
 
     this.flushTimer = Components.classes["@mozilla.org/timer;1"]
-                      .createInstance(Components.interfaces.nsITimer);
+                                .createInstance(Components.interfaces.nsITimer);
 
     // Define cache flush timer callback
     this.flushTimer.initWithCallback(
       function() {
-        if (dnssecExtension.debugOutput) {
-          dump(dnssecExtension.debugPrefix + 'Flushing cache...\n');
-        }
         dnssecExtCache.delExpiredRecords();
-        if (dnssecExtension.debugOutput) {
-          dnssecExtCache.printContent();
-        }
       },
       this.flushInterval * 1000,
       Components.interfaces.nsITimer.TYPE_REPEATING_SLACK); // repeat periodically
-
+*/
   },
 
   record: function(a, e4, e6, s) {
@@ -94,7 +90,6 @@ var dnssecExtCache = {
       this.ipv6 = e6;      // time of IPv6 address expiration
     };
     this.state = s;        // result state
-
   },
 
   addRecord: function(name, addrs, expir4, expir6, state) {
@@ -106,11 +101,12 @@ var dnssecExtCache = {
     var exp4_t = cur_t + expir4 * 1000;   // expire4 is in seconds
     var exp6_t = cur_t + expir6 * 1000;   // expire6 is in seconds
 
-    this.cache[name] = new this.record(addrs, exp4_t, exp6_t, state);
+    delete this.data[name];
+    this.data[name] = new this.record(addrs, exp4_t, exp6_t, state);
   },
 
   getRecord: function(n) {
-    const c = this.cache;
+    const c = this.data;
 
     if (typeof(c[n]) != 'undefined') {
       return [c[n].addrs, c[n].expir.ipv4, c[n].expir.ipv6, c[n].state];
@@ -121,7 +117,7 @@ var dnssecExtCache = {
   printContent: function() {
     var i = 0;
     var n;
-    const c = this.cache;
+    const c = this.data;
     const cur_t = new Date().getTime();
     var ttl4;
     var ttl6;
@@ -129,7 +125,7 @@ var dnssecExtCache = {
     dump(dnssecExtension.debugPrefix + 'Cache content:\n');
     for (n in c) {
 
-      /* compute TTL in seconds */
+      // compute TTL in seconds
       ttl4 = Math.round((c[n].expir.ipv4 - cur_t) / 1000);
       ttl6 = Math.round((c[n].expir.ipv6 - cur_t) / 1000);
 
@@ -141,12 +137,15 @@ var dnssecExtCache = {
     dump('Total records count: ' + i + '\n');
   },
 
-
   delExpiredRecords: function() {
-    const c = this.cache;
+    const c = this.data;
 
     // Get current time
     const cur_t = new Date().getTime();
+
+    if (dnssecExtension.debugOutput) {
+      dump(dnssecExtension.debugPrefix + 'Flushing expired cache records...\n');
+    }
 
     for (n in c) {
       if (cur_t > c[n].expir.ipv4 && cur_t > c[n].expir.ipv6) {
@@ -157,15 +156,13 @@ var dnssecExtCache = {
     }
   },
 
-
   delAllRecords: function() {
-    this.cache = [];
+    delete this.data;
+    this.data = new Array();
   },
 
-
   existsUnexpiredRecord: function(n, v4, v6) {
-
-    const c = this.cache;
+    const c = this.data;
     const cur_t = new Date().getTime();
 
     if (typeof(c[n]) != 'undefined') {
@@ -207,11 +204,6 @@ var dnssecExt_urlBarListener = {
   }
 };
 
-var sharedObj = {
-
-    val: 0
-
-};
 
 var dnssecExtension = {
   dnssecExtID: "dnssec@nic.cz",
@@ -219,6 +211,7 @@ var dnssecExtension = {
   debugPrefix: "dnssec: ",
   debugStartNotice: "----- DNSSEC resolving start -----\n",
   debugEndNotice: "----- DNSSEC resolving end -----\n",
+  pageShowTimer: null,
   oldHost: null,
 
   init: function() {
@@ -229,48 +222,47 @@ var dnssecExtension = {
     // Set unknown security state
     gDnssecHandler.setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
 
-//    var myext = Application.extensions.get("dnssec@nic.cz");
-//dnssecExtCache.printContent();
-    // Internal cache - only one instance for all browser's windows
-//    if (!Application.storage.has("dnssecExtCache")) {
+    // Get DNSSEC Validator extension object
+    var dnssecExt = Application.extensions.get(this.dnssecExtID);
 
-      // Create new cache instance
-//      Application.storage.set("dnssecExtCache", dnssecExtCache);
 
+// Shared cache is temporarily disabled (only works for tabs)
+/*
+    // Shared cache - only one instance for all browser's windows
+    if (!dnssecExt.storage.has("dnssecExtCache")) {
+
+      // Create new instance
+      dnssecExt.storage.set("dnssecExtCache", dnssecExtCache);
+*/
       // Initialize cache and timer
       dnssecExtCache.init();
-//    } else {
+/*
+    } else {
 
-      // Use existing cache instance (overwrite default global instance)
-//      dnssecExtCache = Application.storage.get("dnssecExtCache", null);
-//    }
-//dnssecExtCache.printContent();
-
+      // Use existing shared cache instance (overwrite default global instance)
+      delete dnssecExtCache;
+      dnssecExtCache = dnssecExt.storage.get("dnssecExtCache", null);
+    }
+*/
 
     // Listen for webpage loads
     gBrowser.addProgressListener(dnssecExt_urlBarListener,
         Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
 
 
-    // Get current extension version
-    var dnssecExtVersion = Components.classes["@mozilla.org/extensions/manager;1"]
-                           .getService(Components.interfaces.nsIExtensionManager)
-                           .getItemForID(this.dnssecExtID)
-                           .version.toString();
-
     // Get saved extension version
     var dnssecExtOldVersion = dnssecExtPrefs.getChar("version");
 
     // Display initialisation page if appropriate
-    if (dnssecExtVersion != dnssecExtOldVersion) {
-      dnssecExtPrefs.setChar("version", dnssecExtVersion);  // Save new version
+    if (dnssecExt.version != dnssecExtOldVersion) {
+      dnssecExtPrefs.setChar("version", dnssecExt.version);  // Save new version
 
       // Create the timer
-      var tmpTimer = Components.classes["@mozilla.org/timer;1"]
-                     .createInstance(Components.interfaces.nsITimer);
+      this.pageShowTimer = Components.classes["@mozilla.org/timer;1"]
+                           .createInstance(Components.interfaces.nsITimer);
 
       // Define timer callback
-      tmpTimer.initWithCallback(
+      this.pageShowTimer.initWithCallback(
         function() {
           if (gBrowser) {
             gBrowser.selectedTab = gBrowser.addTab('http://labs.nic.cz/dnssec-validator/');
@@ -317,59 +309,6 @@ var dnssecExtension = {
 
   onToolbarButtonCommand: function() {
 
-//    dnssecExtCache = Application.storage.get("dnssecExtCache", null);
-    dnssecExtCache.printContent();
-
-/*
-    alert(sharedObj.val);
-
-    // Internal cache - only one instance for all browser's windows
-    if (!Application.storage.has("sharedObj")) {
-alert('init');
-      // Create new cache instance
-      Application.storage.set("sharedObj", sharedObj);
-
-      // Initialize cache and timer
-      sharedObj.val = 1;
-    } else {
-alert('using');
-      // Use existing cache instance (overwrite default global instance)
-      sharedObj = Application.storage.get("sharedObj", null);
-      sharedObj.val++;
-    }
-    alert(sharedObj.val);
-*/
-
-//    alert(Application.version);
-//    alert(Application.extensions.get("dnssec@nic.cz").version);
-//    alert(Application.extensions.get("dnssec@nic.cz").firstRun);
-
-//    dnssecExtCache.delExpiredRecords();
-//    dnssecExtCache.printContent();
-
-//var aaa = Application.storage.get("xxx",);
-
-//     var aaa = Application.storage.set("xxx", "a");
-//alert(Application.storage.get("dnssecExtCache", null));
-/*
-    if (typeof(Application.storage.get("xxx", "undefined")) == "undefined") {
-      alert("true");
-    } else {
-      alert("false");
-    }
-*/
-//    alert(typeof(dnssecExtCache));
-
-//    var tmparr = [7, 8 , 9];
-//    Application.storage.set("mykey", tmparr);
-
-/*
-    var data = Application.storage.get("mykey", false);
-
-    alert(data[0]);
-    data[0] = 1;
-    alert(data[0]);
-*/
   },
 
 
@@ -383,47 +322,6 @@ window.addEventListener("unload", function() {dnssecExtension.uninit()}, false);
 /**
  * Utility class to handle manipulations of the dnssec indicators in the UI
  */
-/*
-function DnssecHandler() {
-
-  this._stringBundle = document.getElementById("dnssec-strings");
-  this._staticStrings = {};
-  this._staticStrings[this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED] = {
-    security_label: this._stringBundle.getString("dnssec.connection.domain.secured")
-  };
-  this._staticStrings[this.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED] = {
-    security_label: this._stringBundle.getString("dnssec.connection.domain.invipaddr.secured")
-  };
-  this._staticStrings[this.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED] = {
-    security_label: this._stringBundle.getString("dnssec.connection.nodomain.secured")
-  };
-  this._staticStrings[this.DNSSEC_MODE_CONNECTION_NODOMAIN_INVIPADDR_SECURED] = {
-    security_label: this._stringBundle.getString("dnssec.connection.nodomain.invipaddr.secured")
-  };
-  this._staticStrings[this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED] = {
-    security_label: this._stringBundle.getString("dnssec.connection.invsigdomain.secured")
-  };
-  this._staticStrings[this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED] = {
-    security_label: this._stringBundle.getString("dnssec.connection.invsigdomain.invipaddr.secured")
-  };
-  this._staticStrings[this.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID] = {
-    security_label: this._stringBundle.getString("dnssec.domain.signature.valid")
-  };
-  this._staticStrings[this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID] = {
-    security_label: this._stringBundle.getString("dnssec.invipaddr.domain.signature.valid")
-  };
-  this._staticStrings[this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID] = {
-    security_label: this._stringBundle.getString("dnssec.domain.signature.invalid")
-  };
-  this._staticStrings[this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID] = {
-    security_label: this._stringBundle.getString("dnssec.invipaddr.domain.signature.invalid")
-  };
-
-  this._cacheElements();
-}
-
-DnssecHandler.prototype = {
-*/
 var gDnssecHandler = {
 
   // Mode strings used to control CSS display
@@ -663,7 +561,7 @@ var gDnssecHandler = {
             dump(ext.debugPrefix + 'Using XPCOM to get IPv4/IPv6 record "' + dn
                  + '" (' + v4 + '/' + v6 + ')...\n');
           resArr = this.doXPCOMvalidation(dn, v4, v6);
-          if (dnssecExtCache.flushInterval) { // do not cache if 0
+          if (cache.flushInterval) { // do not cache if 0
             cache.addRecord(dn, resArr[0], resArr[1], resArr[2], resArr[3]);
             // need to flush all records when disabling cache
           }
@@ -720,6 +618,12 @@ var gDnssecHandler = {
         var resArr = this.getValidatedData(dn, resolvipv4, resolvipv6);
         resaddrs = resArr[0];
         res = resArr[1];
+
+        // Temporary deleting of expired cache records until
+        // cache flush timer will be working
+        if (dnssecExtCache.flushInterval) {
+          dnssecExtCache.delExpiredRecords();
+        }
 
         if (dnssecExtension.debugOutput) {
           dnssecExtCache.printContent();
@@ -882,15 +786,8 @@ var gDnssecHandler = {
     this._dnssecPopup.openPopup(this._dnssecBox, 'after_start');
   }
 };
-/*
-var dnssecSharedData = {
-  handler: null
-};
-*/
 
 //var gDnssecHandler;
-
-//var gDnssecHandler = {};
 
 /**
  * Returns the singleton instance of the dnssec handler class. Should always be
@@ -901,26 +798,6 @@ function getDnssecHandler() {
   if (!gDnssecHandler) {
     gDnssecHandler = new DnssecHandler();
   }
-  return gDnssecHandler;
-}
-*/
-
-/*
-function getDnssecHandler() {
-
-//  var gDnssecHandler;
-
-  if (!Application.storage.has("gDnssecHandler")) {
-    alert('new');
-    gDnssecHandler = new DnssecHandler();
-    Application.storage.set("gDnssecHandler", gDnssecHandler);
-
-  } else {
-    alert('old');
-    gDnssecHandler = Application.storage.get("gDnssecHandler", null);
-
-  }
-  
   return gDnssecHandler;
 }
 */
