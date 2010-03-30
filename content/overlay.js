@@ -108,7 +108,7 @@ var dnssecExtCache = {
   getRecord: function(n) {
     const c = this.data;
 
-    if (typeof(c[n]) != 'undefined') {
+    if (typeof c[n] != 'undefined') {
       return [c[n].addrs, c[n].expir.ipv4, c[n].expir.ipv6, c[n].state];
     }
     return ['', '', '', ''];
@@ -165,7 +165,7 @@ var dnssecExtCache = {
     const c = this.data;
     const cur_t = new Date().getTime();
 
-    if (typeof(c[n]) != 'undefined') {
+    if (typeof c[n] != 'undefined') {
       return (( v4 &&  v6 && cur_t <= c[n].expir.ipv4 && cur_t <= c[n].expir.ipv6) ||
               ( v4 && !v6 && cur_t <= c[n].expir.ipv4) ||
               (!v4 &&  v6 && cur_t <= c[n].expir.ipv6)
@@ -212,7 +212,6 @@ var dnssecExtension = {
   debugStartNotice: "----- DNSSEC resolving start -----\n",
   debugEndNotice: "----- DNSSEC resolving end -----\n",
   pageShowTimer: null,
-  oldHost: null,
 
   init: function() {
 
@@ -279,31 +278,28 @@ var dnssecExtension = {
   },
 
   processNewURL: function(aLocationURI) {
-//    dump('onLocationChange2\n');
-
     var host = null;
-    // try to prevent strange NS_ERRORS from StringBundle...
+
     try {
-      host = aLocationURI.host;
+      // Get punycoded hostname
+      host = aLocationURI.asciiHost;
     } catch(ex) {
 //      dump(ex);
     }
 
+    if (host == null ||
+        host == '' ||                    // Empty string
+        host.search(/[A-Za-z]/) == -1) { // Eliminate IPv4 and IPv6 addr notation
 
-    if ((host == null) || (host.search(/^[A-Za-z0-9]+([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,4}$/) == -1)) {   // test for valid hostname
       // Set unknown security state
       gDnssecHandler.setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
-      this.oldHost = host;
-      return;
-    } else if (host == this.oldHost) {   // test for hostname change
+
       return;
     }
 
-    // check DNS security
+    // Check DNS security
     gDnssecHandler.checkSecurity(host);
 
-    // remember last hostname
-    this.oldHost = host;
   },
 
 
@@ -660,7 +656,8 @@ var gDnssecHandler = {
     // Thread on which onLookupComplete should be called
     var th;
     if (Components.classes["@mozilla.org/event-queue-service;1"]) {
-      const EQS = Components.classes["@mozilla.org/event-queue-service;1"].getService(Components.interfaces.nsIEventQueueService);
+      const EQS = Components.classes["@mozilla.org/event-queue-service;1"]
+                            .getService(Components.interfaces.nsIEventQueueService);
       th = EQS.getSpecialEventQueue(EQS.CURRENT_THREAD_EVENT_QUEUE);
     } else {
       th = Components.classes["@mozilla.org/thread-manager;1"].getService().mainThread;
