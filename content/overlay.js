@@ -278,18 +278,19 @@ var dnssecExtension = {
   },
 
   processNewURL: function(aLocationURI) {
-    var host = null;
+    var asciiHost = null;
+    var utf8Host = null;
 
     try {
-      // Get punycoded hostname
-      host = aLocationURI.asciiHost;
+      asciiHost = aLocationURI.asciiHost;     // Get punycoded hostname
+      utf8Host = aLocationURI.host;           // Get UTF-8 encoded hostname
     } catch(ex) {
 //      dump(ex);
     }
 
-    if (host == null ||
-        host == '' ||                    // Empty string
-        host.search(/[A-Za-z]/) == -1) { // Eliminate IPv4 and IPv6 addr notation
+    if (asciiHost == null ||
+        asciiHost == '' ||                    // Empty string
+        asciiHost.search(/[A-Za-z]/) == -1) { // Eliminate IPv4 and IPv6 addr notation
 
       // Set unknown security state
       gDnssecHandler.setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
@@ -298,7 +299,7 @@ var dnssecExtension = {
     }
 
     // Check DNS security
-    gDnssecHandler.checkSecurity(host);
+    gDnssecHandler.checkSecurity(asciiHost, utf8Host);
 
   },
 
@@ -350,7 +351,8 @@ var gDnssecHandler = {
   DNSSEC_TOOLTIP_UNSECURED : "unsecuredTooltip",
 
   // Cache the most recent hostname seen in checkSecurity
-  _hostName : null,
+  _asciiHostName : null,
+  _utf8HostName : null,
  
   // Smart getters
   get _securityLabel () {
@@ -483,12 +485,13 @@ var gDnssecHandler = {
 
   // Determine the security of the domain and connection and, if necessary,
   // update the UI to reflect this. Intended to be called by onLocationChange.
-  checkSecurity : function(host) {
+  checkSecurity : function(asciiHost, utf8Host) {
 
     // Set unknown security state
 //    this.setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED);
 
-    this._hostName = host;
+    this._asciiHostName = asciiHost;
+    this._utf8HostName = utf8Host;
     var cls = Components.classes['@mozilla.org/network/dns-service;1'];
     var iface = Components.interfaces.nsIDNSService;
     var dns = cls.getService(iface);
@@ -577,7 +580,7 @@ var gDnssecHandler = {
       // Called when async host lookup completes
       onLookupComplete: function(aRequest, aRecord, aStatus) {
 
-        var dn = gDnssecHandler._hostName;
+        var dn = gDnssecHandler._asciiHostName;
         var resolvipv4 = false; // No IPv4 resolving as default
         var resolvipv6 = false; // No IPv6 resolving as default
         var addr = null;
@@ -666,7 +669,7 @@ var gDnssecHandler = {
     // Get browser's IP address(es) that uses to connect to the remote site.
     // Uses browser's internal resolver cache
 //    dump('HOST: ' +  host + '\n');
-    dns.asyncResolve(host, 0, dnslistener, th); // Ci.nsIDNSService.RESOLVE_BYPASS_CACHE
+    dns.asyncResolve(asciiHost, 0, dnslistener, th); // Ci.nsIDNSService.RESOLVE_BYPASS_CACHE
 
   },
 
@@ -742,11 +745,25 @@ var gDnssecHandler = {
     this._dnssecPopupContentBox.className = newMode;
     
     // Set the static strings up front
-//    this._dnssecPopupSecLabel.textContent = this._staticStrings[newMode].security_label;
     this._dnssecPopupSecLabel.textContent = this._securityLabel[newMode];
 
     // Push the appropriate strings out to the UI
-    this._dnssecPopupContentHost.textContent = this._hostName;
+    this._dnssecPopupContentHost.textContent = this._utf8HostName;
+
+    var idnService = Components.classes["@mozilla.org/network/idn-service;1"]
+                               .getService(Components.interfaces.nsIIDNService);
+
+    var idnName;
+
+    // Encode to UTF-8 if browser's url bar contains domain name
+    // in punycode already
+    if (idnService.isACE(this._utf8HostName)) {
+      idnName = idnService.convertACEtoUTF8(this._utf8HostName);
+    } else {
+      idnName = "";
+    }
+
+    this._dnssecPopupContentHost.tooltipText = idnName;
   },
 
   hideDnssecPopup : function() {
