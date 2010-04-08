@@ -303,7 +303,6 @@ var dnssecExtension = {
 
   },
 
-
   onToolbarButtonCommand: function() {
 
   },
@@ -492,24 +491,26 @@ var gDnssecHandler = {
 
     this._asciiHostName = asciiHost;
     this._utf8HostName = utf8Host;
-    var cls = Components.classes['@mozilla.org/network/dns-service;1'];
-    var iface = Components.interfaces.nsIDNSService;
-    var dns = cls.getService(iface);
 
-    var dnslistener = {
+    var dnsService = Components.classes["@mozilla.org/network/dns-service;1"]
+                     .getService(Components.interfaces.nsIDNSService);
+
+
+    var dnsListener = {
 
       // Called when request is not cached already
       doXPCOMvalidation: function(dn, resolvipv4, resolvipv6) {
 
         // Use validator's XPCOM interface
         try {
-          netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-          const cid = "@nic.cz/dnssecValidator;1";
-          var obj = Components.classes[cid].createInstance();
-          obj = obj.QueryInterface(Components.interfaces.dnssecIValidator);
+//          netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+//          var obj = Components.classes["@nic.cz/dnssecValidator;1"]
+//                    .createInstance(Components.interfaces.dnssecIValidator);
+          var obj = Components.classes["@nic.cz/dnssecValidator;1"]
+                    .getService(Components.interfaces.dnssecIValidator);
         } catch (ex) {
-          dump(ex + '\n');
-          return;
+//          dump(ex + '\n');
+//          return;
         }
 
         // Get DNS resolver address(es)
@@ -657,19 +658,13 @@ var gDnssecHandler = {
     };
 
     // Thread on which onLookupComplete should be called
-    var th;
-    if (Components.classes["@mozilla.org/event-queue-service;1"]) {
-      const EQS = Components.classes["@mozilla.org/event-queue-service;1"]
-                            .getService(Components.interfaces.nsIEventQueueService);
-      th = EQS.getSpecialEventQueue(EQS.CURRENT_THREAD_EVENT_QUEUE);
-    } else {
-      th = Components.classes["@mozilla.org/thread-manager;1"].getService().mainThread;
-    }
+    var th = Components.classes["@mozilla.org/thread-manager;1"]
+             .getService(Components.interfaces.nsIThreadManager)
+             .mainThread;
 
     // Get browser's IP address(es) that uses to connect to the remote site.
     // Uses browser's internal resolver cache
-//    dump('HOST: ' +  host + '\n');
-    dns.asyncResolve(asciiHost, 0, dnslistener, th); // Ci.nsIDNSService.RESOLVE_BYPASS_CACHE
+    dnsService.asyncResolve(asciiHost, 0, dnsListener, th); // Ci.nsIDNSService.RESOLVE_BYPASS_CACHE
 
   },
 
@@ -751,7 +746,7 @@ var gDnssecHandler = {
     this._dnssecPopupContentHost.textContent = this._utf8HostName;
 
     var idnService = Components.classes["@mozilla.org/network/idn-service;1"]
-                               .getService(Components.interfaces.nsIIDNService);
+                     .getService(Components.interfaces.nsIIDNService);
 
     var idnName;
 
