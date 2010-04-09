@@ -533,13 +533,45 @@ var gDnssecHandler = {
         var ttl6 = {};
         var res = obj.Validate(dn, options, nameserver, resaddrs, ttl4, ttl6);
 
+/* Asynchronous XPCOM validation
+   - need to solve GUI conflicts and race conditions */
+/*
+        var res = null;
+        var bgTaskComplete = false;
+
+        var bgTask = {
+          run: function() {
+            dump('H1\n');
+            sleep(10000);
+            res = obj.Validate(dn, options, nameserver, resaddrs, ttl4, ttl6);
+            bgTaskComplete = true;
+            dump('H2\n');
+          }
+        };
+
+        var bgThread = Components.classes["@mozilla.org/thread-manager;1"]
+                 .getService(Components.interfaces.nsIThreadManager)
+                 .newThread(0);
+        bgThread.dispatch(bgTask, bgThread.DISPATCH_NORMAL);
+
+        var curThread = Components.classes["@mozilla.org/thread-manager;1"]
+                        .getService(Components.interfaces.nsIThreadManager)
+                        .currentThread;
+
+        var i = 0;
+        while (!bgTaskComplete) {
+          dump('NC' + i++ + '\n');
+          curThread.processNextEvent(true);
+        }
+        dump('H3: ' + i + '\n');
+*/
+
 /*
         if (dnssecExtension.debugOutput)
           dump(dnssecExtension.debugPrefix + 'Getting return values: ' + res + '; \"'
                + resaddrs.value + '\"; ' + ttl4.value + '; ' + ttl6.value + '\n');
 */
         return [resaddrs.value, ttl4.value, ttl6.value, res];
-//        return [resaddrs, ttl4, ttl6, res];
 
       },
 
@@ -657,7 +689,7 @@ var gDnssecHandler = {
       },
     };
 
-    // Thread on which onLookupComplete should be called
+    // Thread on which onLookupComplete should be called after lookup
     var th = Components.classes["@mozilla.org/thread-manager;1"]
              .getService(Components.interfaces.nsIThreadManager)
              .mainThread;
