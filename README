@@ -9,6 +9,6 @@ Select "dnssec.xpi" in File -> Open dialog and follow wizard instructions
 DEBUGGING
 ------------
 For enable debug info of an extension to stdout, set next Firefox preferences
-in "about:config" and reboot browser:
+in "about:config":
  - "browser.dom.window.dump.enabled" to "true"
  - "extensions.dnssec.debugoutput" to "true"

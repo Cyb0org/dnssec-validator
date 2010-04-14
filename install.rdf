@@ -43,7 +43,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
     <em:localized>
       <Description>
         <em:locale>cs-CZ</em:locale>
-        <em:name>DNSSEC validátor</em:name>
+        <em:name>DNSSEC Validátor</em:name>
         <em:description>Kontroluje zabezpečení doménového jména v adresním řádku DNSSEC protokolem.</em:description>
         <em:creator>CZ.NIC, z. s. p. o.</em:creator>
         <em:developer>Zbyněk Michl</em:developer>
@@ -58,7 +58,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- firefox -->
         <em:minVersion>3.0</em:minVersion>
-        <em:maxVersion>3.7.*</em:maxVersion>
+        <em:maxVersion>3.6.*</em:maxVersion>
       </Description>
     </em:targetApplication>
   </Description>

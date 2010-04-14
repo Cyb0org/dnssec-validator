@@ -26,7 +26,7 @@ function sleep(delay)
 
 
 /* DNSSEC Validator's internal cache */
-/* Shared with all instances (browser's windows) */
+/* Shared with all window tabs */
 var dnssecExtCache = {
 
   flushTimer: null,
@@ -39,9 +39,9 @@ var dnssecExtCache = {
     this.data = new Array();
 
     // Get cache flush interval
-    this.flushInterval = dnssecExtPrefs.getInt("cacheflushinterval");
+    this.getFlushInterval();
 
-// Timer cache flushing currently does not work
+// Timer cache flushing is currently disabled
 /*
     // Create the timer for cache flushing
     if (dnssecExtension.debugOutput) {
@@ -60,6 +60,10 @@ var dnssecExtCache = {
       this.flushInterval * 1000,
       Components.interfaces.nsITimer.TYPE_REPEATING_SLACK); // repeat periodically
 */
+  },
+
+  getFlushInterval: function() {
+    this.flushInterval = dnssecExtPrefs.getInt("cacheflushinterval");
   },
 
   record: function(a, e4, e6, s) {
@@ -157,6 +161,11 @@ var dnssecExtCache = {
   },
 
   delAllRecords: function() {
+
+    if (dnssecExtension.debugOutput) {
+      dump(dnssecExtension.debugPrefix + 'Flushing all cache records...\n');
+    }
+
     delete this.data;
     this.data = new Array();
   },
@@ -177,7 +186,7 @@ var dnssecExtCache = {
 };
 
 
-var dnssecExt_urlBarListener = {
+var dnssecExtUrlBarListener = {
 
   onLocationChange: function(aWebProgress, aRequest, aLocationURI)
   {
@@ -205,6 +214,46 @@ var dnssecExt_urlBarListener = {
 };
 
 
+/* Observe preference changes */
+var dnssecExtPrefObserver = {
+
+  _branch: null,
+
+  register: function() {
+    var prefService = Components.classes["@mozilla.org/preferences-service;1"]
+                                .getService(Components.interfaces.nsIPrefService);
+
+    // Add the observer
+    this._branch = prefService.getBranch(dnssecExtPrefs.prefBranch);
+    this._branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
+    this._branch.addObserver("", this, false);
+  },
+
+  unregister: function() {
+    if (!this._branch) return;
+    this._branch.removeObserver("", this);
+  },
+
+  observe: function(aSubject, aTopic, aData) {
+    if (aTopic != "nsPref:changed") return;
+    // aSubject is the nsIPrefBranch we're observing (after appropriate QI)
+    // aData is the name of the pref that's been changed (relative to aSubject)
+    switch (aData) {
+    case "debugoutput":     // Change debugging to stdout
+      dnssecExtension.getDebugOutput();
+      break;
+    case "dnsserveraddr":   // Flush all cache records
+      dnssecExtCache.delAllRecords();
+      break;
+    case "cacheflushinterval":
+      dnssecExtCache.getFlushInterval();
+      if (!dnssecExtCache.flushInterval) dnssecExtCache.delAllRecords();
+      break;
+    }
+  }
+};
+
+
 var dnssecExtension = {
   dnssecExtID: "dnssec@nic.cz",
   debugOutput: false,
@@ -216,10 +265,13 @@ var dnssecExtension = {
   init: function() {
 
     // Enable debugging information on stdout if desired
-    if (dnssecExtPrefs.getBool("debugoutput")) this.debugOutput = true;
+    this.getDebugOutput();
 
     // Set unknown security state
     gDnssecHandler.setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
+
+    // Register preferences observer
+    dnssecExtPrefObserver.register();
 
     // Get DNSSEC Validator extension object
     var dnssecExt = Application.extensions.get(this.dnssecExtID);
@@ -245,7 +297,7 @@ var dnssecExtension = {
 */
 
     // Listen for webpage loads
-    gBrowser.addProgressListener(dnssecExt_urlBarListener,
+    gBrowser.addProgressListener(dnssecExtUrlBarListener,
         Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
 
 
@@ -272,9 +324,13 @@ var dnssecExtension = {
     }
 
   },
-  
+
+  getDebugOutput: function() {
+    this.debugOutput = dnssecExtPrefs.getBool("debugoutput");
+  },
+
   uninit: function() {
-    gBrowser.removeProgressListener(dnssecExt_urlBarListener);
+    gBrowser.removeProgressListener(dnssecExtUrlBarListener);
   },
 
   processNewURL: function(aLocationURI) {
@@ -303,11 +359,11 @@ var dnssecExtension = {
 
   },
 
+/*
   onToolbarButtonCommand: function() {
 
   },
-
-
+*/
 };
 
 
@@ -352,7 +408,7 @@ var gDnssecHandler = {
   // Cache the most recent hostname seen in checkSecurity
   _asciiHostName : null,
   _utf8HostName : null,
- 
+
   // Smart getters
   get _securityLabel () {
     delete this._stringBundle;
@@ -503,7 +559,6 @@ var gDnssecHandler = {
 
         // Use validator's XPCOM interface
         try {
-//          netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 //          var obj = Components.classes["@nic.cz/dnssecValidator;1"]
 //                    .createInstance(Components.interfaces.dnssecIValidator);
           var obj = Components.classes["@nic.cz/dnssecValidator;1"]
@@ -595,7 +650,6 @@ var gDnssecHandler = {
           resArr = this.doXPCOMvalidation(dn, v4, v6);
           if (cache.flushInterval) { // do not cache if 0
             cache.addRecord(dn, resArr[0], resArr[1], resArr[2], resArr[3]);
-            // need to flush all records when disabling cache
           }
         }
 
@@ -713,7 +767,7 @@ var gDnssecHandler = {
 
     this._dnssecBox.className = newMode;
     this.setSecurityMessages(newMode);
-    
+
     // Update the popup too, if it's open
     if (this._dnssecPopup.state == "open")
       this.setPopupMessages(newMode);
@@ -767,10 +821,10 @@ var gDnssecHandler = {
    * @param newMode The newly set security mode. Should be one of the DNSSEC_MODE_* constants.
    */
   setPopupMessages : function(newMode) {
-      
+
     this._dnssecPopup.className = newMode;
     this._dnssecPopupContentBox.className = newMode;
-    
+
     // Set the static strings up front
     this._dnssecPopupSecLabel.textContent = this._securityLabel[newMode];
 
@@ -782,8 +836,8 @@ var gDnssecHandler = {
 
     var idnName;
 
-    // Encode to UTF-8 if browser's url bar contains domain name
-    // in punycode already
+    // Encode to UTF-8 if IDN domain name is not in browser's whitelist
+    // See "network.IDN.whitelist.*"
     if (idnService.isACE(this._utf8HostName)) {
       idnName = idnService.convertACEtoUTF8(this._utf8HostName);
     } else {
@@ -803,7 +857,7 @@ var gDnssecHandler = {
   handleDnssecButtonEvent : function(event) {
 
     event.stopPropagation();
- 
+
     if ((event.type == "click" && event.button != 0) ||
         (event.type == "keypress" && event.charCode != KeyEvent.DOM_VK_SPACE &&
          event.keyCode != KeyEvent.DOM_VK_RETURN))
@@ -827,18 +881,3 @@ var gDnssecHandler = {
     this._dnssecPopup.openPopup(this._dnssecBox, 'after_start');
   }
 };
-
-//var gDnssecHandler;
-
-/**
- * Returns the singleton instance of the dnssec handler class. Should always be
- * used instead of referencing the global variable directly or creating new instances
- */
-/*
-function getDnssecHandler() {
-  if (!gDnssecHandler) {
-    gDnssecHandler = new DnssecHandler();
-  }
-  return gDnssecHandler;
-}
-*/
