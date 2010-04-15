@@ -18,11 +18,12 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
 // Temp function
-function sleep(delay)
-{
+/*
+function sleep(delay) {
   var start = new Date().getTime();
   while (new Date().getTime() < start + delay);
 }
+*/
 
 
 /* DNSSEC Validator's internal cache */
