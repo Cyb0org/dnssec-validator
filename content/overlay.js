@@ -835,17 +835,20 @@ var gDnssecHandler = {
     var idnService = Components.classes["@mozilla.org/network/idn-service;1"]
                      .getService(Components.interfaces.nsIIDNService);
 
-    var idnName;
+    var tooltipName;
 
-    // Encode to UTF-8 if IDN domain name is not in browser's whitelist
-    // See "network.IDN.whitelist.*"
     if (idnService.isACE(this._utf8HostName)) {
-      idnName = idnService.convertACEtoUTF8(this._utf8HostName);
+      // Encode to UTF-8 if IDN domain name is not in browser's whitelist
+      // See "network.IDN.whitelist.*"
+      tooltipName = idnService.convertACEtoUTF8(this._utf8HostName);
+    } else if (idnService.isACE(this._asciiHostName)) {
+      // Use punycoded name
+      tooltipName = this._asciiHostName;
     } else {
-      idnName = "";
+      tooltipName = "";
     }
 
-    this._dnssecPopupContentHost.tooltipText = idnName;
+    this._dnssecPopupContentHost.tooltipText = tooltipName;
   },
 
   hideDnssecPopup : function() {
