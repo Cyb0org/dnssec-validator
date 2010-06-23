@@ -191,26 +191,26 @@ var dnssecExtUrlBarListener = {
 
   onLocationChange: function(aWebProgress, aRequest, aLocationURI)
   {
-//    dump('onLocationChange1\n');
+    dump('Event: onLocationChange; URL: ' + aLocationURI.host + '\n');
     dnssecExtension.processNewURL(aLocationURI);
   },
   onSecurityChange: function(aWebProgress, aRequest, aState)
   {
-//    dump('onSecurityChange\n');
+//    dump('Event: onSecurityChange\n');
   },
   onStateChange: function(aWebProgress, aRequest, aStateFlags, aStatus)
   {
-//    dump('onStateChange\n');
+//    dump('Event: onStateChange\n');
   },
   onProgressChange: function(aWebProgress, aRequest,
                              aCurSelfProgress, aMaxSelfProgress,
                              aCurTotalProgress, aMaxTotalProgress)
   {
-//    dump('onProgressChange\n');
+//    dump('Event: onProgressChange\n');
   },
   onStatusChange: function(aWebProgress, aRequest, aStatus, aMessage)
   {
-//    dump('onStatusChange\n');
+//    dump('Event: onStatusChange\n');
   }
 };
 
@@ -347,7 +347,10 @@ var dnssecExtension = {
 
     if (asciiHost == null ||
         asciiHost == '' ||                    // Empty string
-        asciiHost.search(/[A-Za-z]/) == -1) { // Eliminate IPv4 and IPv6 addr notation
+        asciiHost.indexOf(":") != -1 ||       // Eliminate IPv6 addr notation
+        asciiHost.search(/[A-Za-z]/) == -1) { // Eliminate IPv4 addr notation
+
+      dump(dnssecExtension.debugPrefix + 'Invalid domain name: "' + asciiHost + '"\n');
 
       // Set unknown security state
       gDnssecHandler.setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
@@ -401,6 +404,14 @@ var gDnssecHandler = {
   DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID  : "invalidDomainSignatureInvIPaddr",
   // No trusted security information
   DNSSEC_MODE_UNSECURED                           : "unsecuredDnssec",
+  // Non-existent domain is secured and has a valid signature, but no chain of trust
+  DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID            : "validNoDomainSignature",
+  // Non-existent domain is secured and has a valid signature, but browser's IP address is invalid
+  DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID  : "validNoDomainSignatureInvIPaddr",
+  // Non-existent domain is secured, but it has an invalid signature
+  DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID          : "invalidNoDomainSignature",
+  // Non-existent domain is secured, but signature and browser's IP address are invalid
+  DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID : "invalidNoDomainSignatureInvIPaddr",
 
   // Tooltips
   DNSSEC_TOOLTIP_SECURED   : "securedTooltip",
@@ -438,6 +449,14 @@ var gDnssecHandler = {
       this._stringBundle.getString("dnssec.domain.signature.invalid");
     this._securityLabel[this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID] =
       this._stringBundle.getString("dnssec.invipaddr.domain.signature.invalid");
+    this._securityLabel[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID] =
+      this._stringBundle.getString("dnssec.nodomain.signature.valid");
+    this._securityLabel[this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID] =
+      this._stringBundle.getString("dnssec.invipaddr.nodomain.signature.valid");
+    this._securityLabel[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID] =
+      this._stringBundle.getString("dnssec.nodomain.signature.invalid");
+    this._securityLabel[this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID] =
+      this._stringBundle.getString("dnssec.invipaddr.nodomain.signature.invalid");
 
     return this._securityLabel;
   },
@@ -526,6 +545,22 @@ var gDnssecHandler = {
         this.setMode(this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID);
       } else {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID);
+      }
+      this._dnssecBox.hidden = false;
+      break;
+    case Ci.dnssecIValidator.XPCOM_EXIT_NODOMAIN_SIGNATURE_VALID:
+      if (!invipaddr) {
+        this.setMode(this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID);
+      } else {
+        this.setMode(this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID);
+      }
+      this._dnssecBox.hidden = false;
+      break;
+    case Ci.dnssecIValidator.XPCOM_EXIT_NODOMAIN_SIGNATURE_INVALID:
+      if (!invipaddr) {
+        this.setMode(this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID);
+      } else {
+        this.setMode(this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID);
       }
       this._dnssecBox.hidden = false;
       break;
@@ -804,6 +839,12 @@ var gDnssecHandler = {
     // Domain signature is invalid
     case this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID:
     case this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID:
+    // Non-existent domain signature is valid
+    case this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID:
+    case this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID:
+    // Non-existent domain signature is invalid
+    case this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID:
+    case this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID:
       tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_UNSECURED];
       break;
     // Unknown

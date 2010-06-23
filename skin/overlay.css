@@ -66,15 +66,19 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-box.securedConnectionDomainInvIPaddr,
 #dnssec-box.securedConnectionNoDomainInvIPaddr,
 #dnssec-box.validDomainSignatureInvIPaddr,
+#dnssec-box.validNoDomainSignatureInvIPaddr,
 #dnssec-box.securedConnectionInvSigDomain,
 #dnssec-box.securedConnectionInvSigDomainInvIPaddr,
 #dnssec-box.invalidDomainSignature,
-#dnssec-box.invalidDomainSignatureInvIPaddr {
+#dnssec-box.invalidDomainSignatureInvIPaddr,
+#dnssec-box.invalidNoDomainSignature,
+#dnssec-box.invalidNoDomainSignatureInvIPaddr {
   background-color: rgba(238, 46, 36, 1.0); /* red */
   color: white;
 }
 
-#dnssec-box.validDomainSignature {
+#dnssec-box.validDomainSignature,
+#dnssec-box.validNoDomainSignature {
   background-color: rgba(238, 142, 40, 1.0); /* orange */
   color: white;
 }
@@ -112,7 +116,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 /* orange */
-#dnssec-popup.validDomainSignature > #dnssec-popup-container > #dnssec-popup-icon {
+#dnssec-popup.validDomainSignature > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.validNoDomainSignature > #dnssec-popup-container > #dnssec-popup-icon {
   list-style-image: url("chrome://dnssec/skin/logo.png");
   -moz-image-region: rect(0px, 390px, 38px, 260px);
 }
@@ -124,7 +129,10 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-popup.securedConnectionInvSigDomainInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon,
 #dnssec-popup.invalidDomainSignature > #dnssec-popup-container > #dnssec-popup-icon,
 #dnssec-popup.validDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon,
-#dnssec-popup.invalidDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon {
+#dnssec-popup.invalidDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.invalidNoDomainSignature > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.validNoDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.invalidNoDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon {
   list-style-image: url("chrome://dnssec/skin/logo.png");
   -moz-image-region: rect(0px, 260px, 38px, 130px);
 }
@@ -192,6 +200,14 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-popup-content-box.invalidDomainSignature > #dnssec-popup-unsecuredLabel,
 #dnssec-popup-content-box.invalidDomainSignature > #dnssec-popup-domainLabel,
 #dnssec-popup-content-box.invalidDomainSignatureInvIPaddr > #dnssec-popup-unsecuredLabel,
-#dnssec-popup-content-box.invalidDomainSignatureInvIPaddr > #dnssec-popup-domainLabel {
+#dnssec-popup-content-box.invalidDomainSignatureInvIPaddr > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.validNoDomainSignature > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.validNoDomainSignature > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.validNoDomainSignatureInvIPaddr > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.validNoDomainSignatureInvIPaddr > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.invalidNoDomainSignature > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.invalidNoDomainSignature > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.invalidNoDomainSignatureInvIPaddr > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.invalidNoDomainSignatureInvIPaddr > #dnssec-popup-nodomainLabel {
   display: inline;
 }
