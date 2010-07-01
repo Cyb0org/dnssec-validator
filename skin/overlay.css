@@ -89,6 +89,16 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
   color: white;
 }
 
+#dnssec-box.unsecuredDnssec {
+  background-color: rgba(180, 180, 180, 1.0); /* grey */
+  color: white;
+}
+
+#dnssec-box.action {
+  background-color: rgba(100, 175, 255, 1.0); /* light blue */
+  color: white;
+}
+
 /*
 #dnssec-box:hover {
   background-color: rgba(255, 0, 0, 0.7);

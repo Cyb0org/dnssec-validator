@@ -127,7 +127,10 @@ var dnssecExtCache = {
     var ttl4;
     var ttl6;
 
-    dump(dnssecExtension.debugPrefix + 'Cache content:\n');
+    if (dnssecExtension.debugOutput) {
+      dump(dnssecExtension.debugPrefix + 'Cache content:\n');
+    }
+
     for (n in c) {
 
       // compute TTL in seconds
@@ -191,7 +194,7 @@ var dnssecExtUrlBarListener = {
 
   onLocationChange: function(aWebProgress, aRequest, aLocationURI)
   {
-    dump('Event: onLocationChange; URL: ' + aLocationURI.host + '\n');
+//    dump('Event: onLocationChange\n');
     dnssecExtension.processNewURL(aLocationURI);
   },
   onSecurityChange: function(aWebProgress, aRequest, aState)
@@ -345,18 +348,23 @@ var dnssecExtension = {
 //      dump(ex);
     }
 
+    if (this.debugOutput)
+      dump(dnssecExtension.debugPrefix + 'ASCII domain name: "' + asciiHost + '"');
+
     if (asciiHost == null ||
         asciiHost == '' ||                    // Empty string
         asciiHost.indexOf(":") != -1 ||       // Eliminate IPv6 addr notation
         asciiHost.search(/[A-Za-z]/) == -1) { // Eliminate IPv4 addr notation
 
-      dump(dnssecExtension.debugPrefix + 'Invalid domain name: "' + asciiHost + '"\n');
+      if (this.debugOutput) dump(' ...invalid\n');
 
       // Set unknown security state
       gDnssecHandler.setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
 
       return;
     }
+
+    if (this.debugOutput) dump(' ...valid\n');
 
     // Check DNS security
     gDnssecHandler.checkSecurity(asciiHost, utf8Host);
@@ -579,7 +587,7 @@ var gDnssecHandler = {
   checkSecurity : function(asciiHost, utf8Host) {
 
     // Set unknown security state
-//    this.setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED);
+//    this.setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
 
     this._asciiHostName = asciiHost;
     this._utf8HostName = utf8Host;
@@ -708,7 +716,8 @@ var gDnssecHandler = {
         var resolvipv6 = false; // No IPv6 resolving as default
         var addr = null;
 
-        if (dnssecExtension.debugOutput) dump (dnssecExtension.debugStartNotice);
+        if (dnssecExtension.debugOutput)
+          dump(dnssecExtension.debugPrefix + dnssecExtension.debugStartNotice);
 
         while (aRecord && aRecord.hasMore()) {   // Address list is not empty
 
@@ -774,7 +783,8 @@ var gDnssecHandler = {
         // Set appropriate state
         gDnssecHandler.setSecurityState(res, invipaddr);
 
-        if (dnssecExtension.debugOutput) dump (dnssecExtension.debugEndNotice);
+        if (dnssecExtension.debugOutput)
+          dump(dnssecExtension.debugPrefix + dnssecExtension.debugEndNotice);
 
       },
     };
