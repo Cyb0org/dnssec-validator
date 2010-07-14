@@ -25,14 +25,14 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
     <em:id>dnssec@nic.cz</em:id>
     <em:name>DNSSEC Validator</em:name>
     <em:description>Checks whether domain names in the address bar are secured by DNSSEC.</em:description>
-    <em:version>0.16alpha</em:version>
+    <em:version>0.17dev</em:version>
     <em:creator>CZ.NIC, z. s. p. o.</em:creator>
     <em:developer>Zbynek Michl</em:developer>
     <em:contributor>Matej Dioszegi</em:contributor>
     <em:contributor>Tomasz Hatlapa</em:contributor>
     <em:contributor>Ondrej Sury</em:contributor>
     <em:contributor>Pavel Tuma</em:contributor>
-    <em:homepageURL>http://labs.nic.cz/dnssec-validator/</em:homepageURL>
+    <em:homepageURL>http://dnssec-validator.cz</em:homepageURL>
     <em:iconURL>chrome://dnssec/skin/icon.png</em:iconURL>
     <em:optionsURL>chrome://dnssec/content/preferences.xul</em:optionsURL>
     <em:targetPlatform>Darwin_ppc-gcc3</em:targetPlatform>
@@ -51,14 +51,15 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
         <em:contributor>Tomasz Hatlapa</em:contributor>
         <em:contributor>Ondřej Surý</em:contributor>
         <em:contributor>Pavel Tůma</em:contributor>
-        <em:homepageURL>http://labs.nic.cz/dnssec-validator/</em:homepageURL>
+        <em:homepageURL>http://dnssec-validator.cz</em:homepageURL>
       </Description>
     </em:localized>
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- firefox -->
         <em:minVersion>3.0</em:minVersion>
-        <em:maxVersion>3.6.*</em:maxVersion>
+        <!-- em:maxVersion>3.6.*</em:maxVersion -->
+        <em:maxVersion>4.*</em:maxVersion>
       </Description>
     </em:targetApplication>
   </Description>

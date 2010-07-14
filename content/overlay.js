@@ -320,7 +320,7 @@ var dnssecExtension = {
       this.pageShowTimer.initWithCallback(
         function() {
           if (gBrowser) {
-            gBrowser.selectedTab = gBrowser.addTab('http://labs.nic.cz/dnssec-validator/');
+            gBrowser.selectedTab = gBrowser.addTab('http://www.dnssec-validator.cz');
           }
         },
         100,
