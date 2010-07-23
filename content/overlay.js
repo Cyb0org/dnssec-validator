@@ -25,7 +25,6 @@ function sleep(delay) {
 }
 */
 
-
 /* DNSSEC Validator's internal cache */
 /* Shared with all window tabs */
 var dnssecExtCache = {
@@ -244,7 +243,10 @@ var dnssecExtPrefObserver = {
     // aData is the name of the pref that's been changed (relative to aSubject)
     switch (aData) {
     case "debugoutput":     // Change debugging to stdout
-      dnssecExtension.getDebugOutput();
+      dnssecExtension.getDebugOutputFlag();
+      break;
+    case "asyncresolve":     // Change sync/async resolving
+      dnssecExtension.getAsyncResolveFlag();
       break;
     case "dnsserveraddr":   // Flush all cache records
       dnssecExtCache.delAllRecords();
@@ -264,22 +266,27 @@ var dnssecExtension = {
   debugPrefix: "dnssec: ",
   debugStartNotice: "----- DNSSEC resolving start -----\n",
   debugEndNotice: "----- DNSSEC resolving end -----\n",
-  pageShowTimer: null,
+  asyncResolve: false,
+  timer: null,
+  resolvingActive: false,
+  oldAsciiHost: null,
 
   init: function() {
 
     // Enable debugging information on stdout if desired
-    this.getDebugOutput();
+    this.getDebugOutputFlag();
 
-    // Set unknown security state
-    gDnssecHandler.setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
+    // Enable asynchronous resolving
+    this.getAsyncResolveFlag();
+
+    // Set error mode (no icon)
+    gDnssecHandler.setMode(gDnssecHandler.DNSSEC_MODE_ERROR);
 
     // Register preferences observer
     dnssecExtPrefObserver.register();
 
     // Get DNSSEC Validator extension object
     var dnssecExt = Application.extensions.get(this.dnssecExtID);
-
 
 // Shared cache is temporarily disabled (only works for tabs)
 /*
@@ -300,10 +307,13 @@ var dnssecExtension = {
     }
 */
 
+    // Create the timer
+    this.timer = Components.classes["@mozilla.org/timer;1"]
+                 .createInstance(Components.interfaces.nsITimer);
+
     // Listen for webpage loads
     gBrowser.addProgressListener(dnssecExtUrlBarListener,
         Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
-
 
     // Get saved extension version
     var dnssecExtOldVersion = dnssecExtPrefs.getChar("version");
@@ -312,12 +322,8 @@ var dnssecExtension = {
     if (dnssecExt.version != dnssecExtOldVersion) {
       dnssecExtPrefs.setChar("version", dnssecExt.version);  // Save new version
 
-      // Create the timer
-      this.pageShowTimer = Components.classes["@mozilla.org/timer;1"]
-                           .createInstance(Components.interfaces.nsITimer);
-
       // Define timer callback
-      this.pageShowTimer.initWithCallback(
+      this.timer.initWithCallback(
         function() {
           if (gBrowser) {
             gBrowser.selectedTab = gBrowser.addTab('http://www.dnssec-validator.cz');
@@ -326,11 +332,14 @@ var dnssecExtension = {
         100,
         Components.interfaces.nsITimer.TYPE_ONE_SHOT);
     }
-
   },
 
-  getDebugOutput: function() {
+  getDebugOutputFlag: function() {
     this.debugOutput = dnssecExtPrefs.getBool("debugoutput");
+  },
+
+  getAsyncResolveFlag: function() {
+    this.asyncResolve = dnssecExtPrefs.getBool("asyncresolve");
   },
 
   uninit: function() {
@@ -342,29 +351,63 @@ var dnssecExtension = {
     var utf8Host = null;
 
     try {
-      asciiHost = aLocationURI.asciiHost;     // Get punycoded hostname
-      utf8Host = aLocationURI.host;           // Get UTF-8 encoded hostname
+      asciiHost = aLocationURI.asciiHost;       // Get punycoded hostname
+      utf8Host = aLocationURI.host;             // Get UTF-8 encoded hostname
     } catch(ex) {
 //      dump(ex);
     }
 
     if (this.debugOutput)
-      dump(dnssecExtension.debugPrefix + 'ASCII domain name: "' + asciiHost + '"');
+      dump(this.debugPrefix + 'ASCII domain name: "' + asciiHost + '"');
 
     if (asciiHost == null ||
-        asciiHost == '' ||                    // Empty string
-        asciiHost.indexOf(":") != -1 ||       // Eliminate IPv6 addr notation
-        asciiHost.search(/[A-Za-z]/) == -1) { // Eliminate IPv4 addr notation
+        asciiHost == '' ||                      // Empty string
+        asciiHost.indexOf(":") != -1 ||         // Eliminate IPv6 addr notation
+        asciiHost.search(/[A-Za-z]/) == -1) {   // Eliminate IPv4 addr notation
 
       if (this.debugOutput) dump(' ...invalid\n');
 
-      // Set unknown security state
-      gDnssecHandler.setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
+      // Set error mode (no icon)
+      gDnssecHandler.setMode(gDnssecHandler.DNSSEC_MODE_ERROR);
 
+      // Remember last hostname
+//      this.oldAsciiHost = asciiHost;
+
+      return;
+
+    // Eliminate duplicated queries that Firefox sometimes does
+    // when onLocationChange event occurs
+    } else if (asciiHost == this.oldAsciiHost) {
+      if (this.debugOutput) dump(' ...duplicated\n');
       return;
     }
 
     if (this.debugOutput) dump(' ...valid\n');
+
+    // Remember last hostname
+//    this.oldAsciiHost = asciiHost;
+
+    // Detect if any resolving is already running
+    if (this.resolvingActive) {
+
+      if (this.debugOutput)
+        dump(this.debugPrefix + 'Activating resolving timer\n');
+
+      // Cancel running timer if any
+      this.timer.cancel();
+
+      // Define timer callback
+      this.timer.initWithCallback(
+        function() {
+          dump(dnssecExtension.debugPrefix + 'Starting timer action\n');
+          dnssecExtension.processNewURL(aLocationURI);
+        },
+        500,
+        Components.interfaces.nsITimer.TYPE_ONE_SHOT);
+
+      // Do not continue to the critical section
+      return;
+    }
 
     // Check DNS security
     gDnssecHandler.checkSecurity(asciiHost, utf8Host);
@@ -410,7 +453,7 @@ var gDnssecHandler = {
   DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID            : "invalidDomainSignature",
   // Domain is secured, but signature and browser's IP address are invalid
   DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID  : "invalidDomainSignatureInvIPaddr",
-  // No trusted security information
+  // No DNSSEC signature
   DNSSEC_MODE_UNSECURED                           : "unsecuredDnssec",
   // Non-existent domain is secured and has a valid signature, but no chain of trust
   DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID            : "validNoDomainSignature",
@@ -420,10 +463,15 @@ var gDnssecHandler = {
   DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID          : "invalidNoDomainSignature",
   // Non-existent domain is secured, but signature and browser's IP address are invalid
   DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID : "invalidNoDomainSignatureInvIPaddr",
+  // Getting security status
+  DNSSEC_MODE_ACTION : "actionDnssec",
+  // Error or unknown state occured
+  DNSSEC_MODE_ERROR : "errorDnssec",
 
   // Tooltips
   DNSSEC_TOOLTIP_SECURED   : "securedTooltip",
   DNSSEC_TOOLTIP_UNSECURED : "unsecuredTooltip",
+  DNSSEC_TOOLTIP_ACTION    : "actionTooltip",
 
   // Cache the most recent hostname seen in checkSecurity
   _asciiHostName : null,
@@ -465,6 +513,8 @@ var gDnssecHandler = {
       this._stringBundle.getString("dnssec.nodomain.signature.invalid");
     this._securityLabel[this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID] =
       this._stringBundle.getString("dnssec.invipaddr.nodomain.signature.invalid");
+    this._securityLabel[this.DNSSEC_MODE_UNSECURED] =
+      this._stringBundle.getString("dnssec.unsecured");
 
     return this._securityLabel;
   },
@@ -479,6 +529,8 @@ var gDnssecHandler = {
       this._stringBundle.getString("dnssec.tooltip.secured");
     this._tooltipLabel[this.DNSSEC_TOOLTIP_UNSECURED] =
       this._stringBundle.getString("dnssec.tooltip.unsecured");
+    this._tooltipLabel[this.DNSSEC_TOOLTIP_ACTION] =
+      this._stringBundle.getString("dnssec.tooltip.action");
 
     return this._tooltipLabel;
   },
@@ -522,7 +574,7 @@ var gDnssecHandler = {
       } else {
         this.setMode(this.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED);
       }
-      this._dnssecBox.hidden = false;
+//      this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_CONNECTION_NODOMAIN_SECURED:
       if (!invipaddr) {
@@ -530,7 +582,7 @@ var gDnssecHandler = {
       } else {
         this.setMode(this.DNSSEC_MODE_CONNECTION_NODOMAIN_INVIPADDR_SECURED);
       }
-      this._dnssecBox.hidden = false;
+//      this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_CONNECTION_INVSIGDOMAIN_SECURED:
       if (!invipaddr) {
@@ -538,7 +590,7 @@ var gDnssecHandler = {
       } else {
         this.setMode(this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED);
       }
-      this._dnssecBox.hidden = false;
+//      this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_SIGNATURE_VALID:
       if (!invipaddr) {
@@ -546,7 +598,7 @@ var gDnssecHandler = {
       } else {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID);
       }
-      this._dnssecBox.hidden = false;
+//      this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_SIGNATURE_INVALID:
       if (!invipaddr) {
@@ -554,7 +606,7 @@ var gDnssecHandler = {
       } else {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID);
       }
-      this._dnssecBox.hidden = false;
+//      this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_NODOMAIN_SIGNATURE_VALID:
       if (!invipaddr) {
@@ -562,7 +614,7 @@ var gDnssecHandler = {
       } else {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID);
       }
-      this._dnssecBox.hidden = false;
+//      this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_NODOMAIN_SIGNATURE_INVALID:
       if (!invipaddr) {
@@ -570,13 +622,17 @@ var gDnssecHandler = {
       } else {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID);
       }
-      this._dnssecBox.hidden = false;
+//      this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED:
-    case Ci.dnssecIValidator.XPCOM_EXIT_UNKNOWN:
-    default:
       this.setMode(this.DNSSEC_MODE_UNSECURED);
-      this._dnssecBox.hidden = true;
+//      this._dnssecBox.hidden = false;
+      break;
+    case Ci.dnssecIValidator.XPCOM_EXIT_UNKNOWN:
+    case Ci.dnssecIValidator.XPCOM_EXIT_FAILED:
+    default:
+      this.setMode(this.DNSSEC_MODE_ERROR);
+//      this._dnssecBox.hidden = true;
       break;
     }
 
@@ -586,8 +642,11 @@ var gDnssecHandler = {
   // update the UI to reflect this. Intended to be called by onLocationChange.
   checkSecurity : function(asciiHost, utf8Host) {
 
-    // Set unknown security state
-//    this.setSecurityState(Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED, -1);
+    // Set resolving active flag
+    dnssecExtension.resolvingActive = true;
+
+    // Set action state
+    this.setMode(this.DNSSEC_MODE_ACTION);
 
     this._asciiHostName = asciiHost;
     this._utf8HostName = utf8Host;
@@ -603,9 +662,9 @@ var gDnssecHandler = {
 
         // Use validator's XPCOM interface
         try {
-//          var obj = Components.classes["@nic.cz/dnssecValidator;1"]
+//          var dsv = Components.classes["@nic.cz/dnssecValidator;1"]
 //                    .createInstance(Components.interfaces.dnssecIValidator);
-          var obj = Components.classes["@nic.cz/dnssecValidator;1"]
+          var dsv = Components.classes["@nic.cz/dnssecValidator;1"]
                     .getService(Components.interfaces.dnssecIValidator);
         } catch (ex) {
 //          dump(ex + '\n');
@@ -627,51 +686,45 @@ var gDnssecHandler = {
                + dn + '; ' + options + '; ' + nameserver + '\"\n');
 
         // Call XPCOM validation
+        var res = null;
         var resaddrs = {};
         var ttl4 = {};
         var ttl6 = {};
-        var res = obj.Validate(dn, options, nameserver, resaddrs, ttl4, ttl6);
 
-/* Asynchronous XPCOM validation
-   - need to solve GUI conflicts and race conditions */
-/*
-        var res = null;
-        var bgTaskComplete = false;
+        if (!dnssecExtension.asyncResolve) {   // Synchronous XPCOM validation
+          res = dsv.Validate(dn, options, nameserver, resaddrs, ttl4, ttl6);
+        } else {   // Asynchronous XPCOM validation
 
-        var bgTask = {
-          run: function() {
-            dump('H1\n');
-            sleep(10000);
-            res = obj.Validate(dn, options, nameserver, resaddrs, ttl4, ttl6);
-            bgTaskComplete = true;
-            dump('H2\n');
+          var bgTaskComplete = false;
+
+          // Background task for XPCOM validation
+          var bgTask = {
+            run: function() {
+              res = dsv.Validate(dn, options, nameserver, resaddrs, ttl4, ttl6);
+              bgTaskComplete = true;
+            }
+          };
+
+          // Create new thread to run background task
+          var bgThread = Components.classes["@mozilla.org/thread-manager;1"]
+                         .getService(Components.interfaces.nsIThreadManager)
+                         .newThread(0);
+
+          bgThread.dispatch(bgTask, bgThread.DISPATCH_NORMAL);
+
+          // Get current thread
+          var curThread = Components.classes["@mozilla.org/thread-manager;1"]
+                          .getService(Components.interfaces.nsIThreadManager)
+                          .currentThread;
+
+          // Current thread has to UI non-blocking wait until
+          // background resolving does not finish
+          while (!bgTaskComplete) {
+            curThread.processNextEvent(true);
           }
-        };
-
-        var bgThread = Components.classes["@mozilla.org/thread-manager;1"]
-                 .getService(Components.interfaces.nsIThreadManager)
-                 .newThread(0);
-        bgThread.dispatch(bgTask, bgThread.DISPATCH_NORMAL);
-
-        var curThread = Components.classes["@mozilla.org/thread-manager;1"]
-                        .getService(Components.interfaces.nsIThreadManager)
-                        .currentThread;
-
-        var i = 0;
-        while (!bgTaskComplete) {
-          dump('NC' + i++ + '\n');
-          curThread.processNextEvent(true);
         }
-        dump('H3: ' + i + '\n');
-*/
 
-/*
-        if (dnssecExtension.debugOutput)
-          dump(dnssecExtension.debugPrefix + 'Getting return values: ' + res + '; \"'
-               + resaddrs.value + '\"; ' + ttl4.value + '; ' + ttl6.value + '\n');
-*/
         return [resaddrs.value, ttl4.value, ttl6.value, res];
-
       },
 
 
@@ -697,9 +750,11 @@ var gDnssecHandler = {
           }
         }
 
-        if (ext.debugOutput)
+        if (ext.debugOutput) {
+          dump(ext.debugPrefix + 'Queried domain name: ' + dn + '\n');
           dump(ext.debugPrefix + 'Getting return values: ' + resArr[3] + '; \"'
                + resArr[0] + '\"; ' + resArr[1] + '; ' + resArr[2] + '\n');
+        }
 
         var resaddrs = resArr[0];
         var res = resArr[3];
@@ -780,12 +835,16 @@ var gDnssecHandler = {
           }
         }
 
-        // Set appropriate state
-        gDnssecHandler.setSecurityState(res, invipaddr);
+        // Set appropriate state if host name does not changed
+        // during resolving process (tab has not been switched)
+        if (dn == gBrowser.currentURI.asciiHost)
+          gDnssecHandler.setSecurityState(res, invipaddr);
 
         if (dnssecExtension.debugOutput)
           dump(dnssecExtension.debugPrefix + dnssecExtension.debugEndNotice);
 
+        // Resolving has finished
+        dnssecExtension.resolvingActive = false;
       },
     };
 
@@ -855,7 +914,13 @@ var gDnssecHandler = {
     // Non-existent domain signature is invalid
     case this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID:
     case this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID:
+    // No DNSSEC signature
+    case this.DNSSEC_MODE_UNSECURED:
       tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_UNSECURED];
+      break;
+    // Getting security status
+    case this.DNSSEC_MODE_ACTION:
+      tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_ACTION];
       break;
     // Unknown
     default:
@@ -917,6 +982,10 @@ var gDnssecHandler = {
         (event.type == "keypress" && event.charCode != KeyEvent.DOM_VK_SPACE &&
          event.keyCode != KeyEvent.DOM_VK_RETURN))
       return; // Left click, space or enter only
+
+    // No popup window while getting security status
+    if (this._dnssecBox && this._dnssecBox.className == this.DNSSEC_MODE_ACTION)
+      return;
 
     // Revert the contents of the location bar, see bug 406779
 //    handleURLBarRevert(); // firefox 3.5 fixed

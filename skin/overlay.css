@@ -73,30 +73,29 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-box.invalidDomainSignatureInvIPaddr,
 #dnssec-box.invalidNoDomainSignature,
 #dnssec-box.invalidNoDomainSignatureInvIPaddr {
-  background-color: rgba(238, 46, 36, 1.0); /* red */
-  color: white;
+  background-color: rgba(238, 46, 36, 1.0);     /* red */
 }
 
 #dnssec-box.validDomainSignature,
 #dnssec-box.validNoDomainSignature {
-  background-color: rgba(238, 142, 40, 1.0); /* orange */
-  color: white;
+  background-color: rgba(238, 142, 40, 1.0);    /* orange */
 }
 
 #dnssec-box.securedConnectionDomain,
 #dnssec-box.securedConnectionNoDomain {
-  background-color: rgba(110, 180, 63, 1.0); /* green */
-  color: white;
+  background-color: rgba(110, 180, 63, 1.0);    /* green */
 }
 
 #dnssec-box.unsecuredDnssec {
-  background-color: rgba(180, 180, 180, 1.0); /* grey */
-  color: white;
+  background-color: rgba(180, 180, 180, 1.0);   /* grey */
 }
 
-#dnssec-box.action {
-  background-color: rgba(100, 175, 255, 1.0); /* light blue */
-  color: white;
+#dnssec-box.actionDnssec {
+  background-color: rgba(100, 175, 255, 1.0);   /* light blue */
+}
+
+#dnssec-box.errorDnssec {
+  display: none;
 }
 
 /*
@@ -172,7 +171,9 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 #dnssec-popup-domainLabel,
-#dnssec-popup-nodomainLabel {
+#dnssec-popup-nodomainLabel,
+#dnssec-popup-securedDomainLabel,
+#dnssec-popup-unsecuredDomainLabel {
   display: none;
 }
 
@@ -193,31 +194,48 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 /* DNSSEC popup UI */
 #dnssec-popup-content-box.securedConnectionDomain > #dnssec-popup-securedLabel,
 #dnssec-popup-content-box.securedConnectionDomain > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.securedConnectionDomain > #dnssec-popup-securedDomainLabel,
 #dnssec-popup-content-box.securedConnectionDomainInvIPaddr > #dnssec-popup-securedLabel,
 #dnssec-popup-content-box.securedConnectionDomainInvIPaddr > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.securedConnectionDomainInvIPaddr > #dnssec-popup-securedDomainLabel,
 #dnssec-popup-content-box.securedConnectionNoDomainInvIPaddr > #dnssec-popup-securedLabel,
 #dnssec-popup-content-box.securedConnectionNoDomainInvIPaddr > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.securedConnectionNoDomainInvIPaddr > #dnssec-popup-securedDomainLabel,
 #dnssec-popup-content-box.securedConnectionNoDomain > #dnssec-popup-securedLabel,
 #dnssec-popup-content-box.securedConnectionNoDomain > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.securedConnectionNoDomain > #dnssec-popup-securedDomainLabel,
 #dnssec-popup-content-box.securedConnectionInvSigDomain > #dnssec-popup-securedLabel,
 #dnssec-popup-content-box.securedConnectionInvSigDomain > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.securedConnectionInvSigDomain > #dnssec-popup-securedDomainLabel,
 #dnssec-popup-content-box.securedConnectionInvSigDomainInvIPaddr > #dnssec-popup-securedLabel,
 #dnssec-popup-content-box.securedConnectionInvSigDomainInvIPaddr > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.securedConnectionInvSigDomainInvIPaddr > #dnssec-popup-securedDomainLabel,
 #dnssec-popup-content-box.validDomainSignature > #dnssec-popup-unsecuredLabel,
 #dnssec-popup-content-box.validDomainSignature > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.validDomainSignature > #dnssec-popup-securedDomainLabel,
 #dnssec-popup-content-box.validDomainSignatureInvIPaddr > #dnssec-popup-unsecuredLabel,
 #dnssec-popup-content-box.validDomainSignatureInvIPaddr > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.validDomainSignatureInvIPaddr > #dnssec-popup-securedDomainLabel,
 #dnssec-popup-content-box.invalidDomainSignature > #dnssec-popup-unsecuredLabel,
 #dnssec-popup-content-box.invalidDomainSignature > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.invalidDomainSignature > #dnssec-popup-securedDomainLabel,
 #dnssec-popup-content-box.invalidDomainSignatureInvIPaddr > #dnssec-popup-unsecuredLabel,
 #dnssec-popup-content-box.invalidDomainSignatureInvIPaddr > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.invalidDomainSignatureInvIPaddr > #dnssec-popup-securedDomainLabel,
 #dnssec-popup-content-box.validNoDomainSignature > #dnssec-popup-unsecuredLabel,
 #dnssec-popup-content-box.validNoDomainSignature > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.validNoDomainSignature > #dnssec-popup-securedDomainLabel,
 #dnssec-popup-content-box.validNoDomainSignatureInvIPaddr > #dnssec-popup-unsecuredLabel,
 #dnssec-popup-content-box.validNoDomainSignatureInvIPaddr > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.validNoDomainSignatureInvIPaddr > #dnssec-popup-securedDomainLabel,
 #dnssec-popup-content-box.invalidNoDomainSignature > #dnssec-popup-unsecuredLabel,
 #dnssec-popup-content-box.invalidNoDomainSignature > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.invalidNoDomainSignature > #dnssec-popup-securedDomainLabel,
 #dnssec-popup-content-box.invalidNoDomainSignatureInvIPaddr > #dnssec-popup-unsecuredLabel,
-#dnssec-popup-content-box.invalidNoDomainSignatureInvIPaddr > #dnssec-popup-nodomainLabel {
+#dnssec-popup-content-box.invalidNoDomainSignatureInvIPaddr > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.invalidNoDomainSignatureInvIPaddr > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.unsecuredDnssec > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.unsecuredDnssec > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.unsecuredDnssec > #dnssec-popup-unsecuredDomainLabel {
   display: inline;
 }

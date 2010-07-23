@@ -50,7 +50,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
           <label id="dnssec-popup-domainLabel" value="&dnssec.thisDomainLabel;"/>
           <label id="dnssec-popup-nodomainLabel" value="&dnssec.thisNoDomainLabel;"/>
           <description id="dnssec-popup-content-host"/>
-          <label id="dnssec-popup-domainLabel2" value="&dnssec.thisDomainLabel2;"/>
+          <label id="dnssec-popup-securedDomainLabel" value="&dnssec.thisSecuredDomainLabel;"/>
+          <label id="dnssec-popup-unsecuredDomainLabel" value="&dnssec.thisUnsecuredDomainLabel;"/>
           <separator/>
           <description id="dnssec-popup-security-detail-label"/>
         </vbox>
