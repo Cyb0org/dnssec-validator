@@ -268,7 +268,6 @@ var dnssecExtension = {
   debugEndNotice: "----- DNSSEC resolving end -----\n",
   asyncResolve: false,
   timer: null,
-  resolvingActive: false,
   oldAsciiHost: null,
 
   init: function() {
@@ -284,9 +283,6 @@ var dnssecExtension = {
 
     // Register preferences observer
     dnssecExtPrefObserver.register();
-
-    // Get DNSSEC Validator extension object
-    var dnssecExt = Application.extensions.get(this.dnssecExtID);
 
 // Shared cache is temporarily disabled (only works for tabs)
 /*
@@ -311,10 +307,24 @@ var dnssecExtension = {
     this.timer = Components.classes["@mozilla.org/timer;1"]
                  .createInstance(Components.interfaces.nsITimer);
 
+    // Get DNSSEC Validator extension object
+    if (Application.extensions) {   // Firefox < 3.7, sync
+      var dnssecExt = Application.extensions.get(this.dnssecExtID);
+      this.showHomepage(dnssecExt);
+    } else {   // Firefox >= 3.7, async
+      Application.getExtensions(function(extensions) {
+        var dnssecExt = extensions.get(dnssecExtension.dnssecExtID);
+        dnssecExtension.showHomepage(dnssecExt);
+      });
+    }
+
     // Listen for webpage loads
     gBrowser.addProgressListener(dnssecExtUrlBarListener,
         Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
 
+  },
+
+  showHomepage: function(dnssecExt) {
     // Get saved extension version
     var dnssecExtOldVersion = dnssecExtPrefs.getChar("version");
 
@@ -387,28 +397,6 @@ var dnssecExtension = {
     // Remember last hostname
 //    this.oldAsciiHost = asciiHost;
 
-    // Detect if any resolving is already running
-    if (this.resolvingActive) {
-
-      if (this.debugOutput)
-        dump(this.debugPrefix + 'Activating resolving timer\n');
-
-      // Cancel running timer if any
-      this.timer.cancel();
-
-      // Define timer callback
-      this.timer.initWithCallback(
-        function() {
-          dump(dnssecExtension.debugPrefix + 'Starting timer action\n');
-          dnssecExtension.processNewURL(aLocationURI);
-        },
-        500,
-        Components.interfaces.nsITimer.TYPE_ONE_SHOT);
-
-      // Do not continue to the critical section
-      return;
-    }
-
     // Check DNS security
     gDnssecHandler.checkSecurity(asciiHost, utf8Host);
 
@@ -476,6 +464,9 @@ var gDnssecHandler = {
   // Cache the most recent hostname seen in checkSecurity
   _asciiHostName : null,
   _utf8HostName : null,
+
+  // Resolving lock
+  _resolvingActive: 0,
 
   // Smart getters
   get _securityLabel () {
@@ -642,8 +633,31 @@ var gDnssecHandler = {
   // update the UI to reflect this. Intended to be called by onLocationChange.
   checkSecurity : function(asciiHost, utf8Host) {
 
-    // Set resolving active flag
-    dnssecExtension.resolvingActive = true;
+    // Detect if any resolving is already running
+    // and lock the critical section - this should be atomic
+    if (this._resolvingActive++) {
+
+      // Counter has been increment to 2, decrement it back to 1
+      this._resolvingActive--;
+
+      if (dnssecExtension.debugOutput)
+        dump(dnssecExtension.debugPrefix + 'Activating resolving timer\n');
+
+      // Cancel running timer if any
+      dnssecExtension.timer.cancel();
+
+      // Define timer callback
+      dnssecExtension.timer.initWithCallback(
+        function() {
+          dump(dnssecExtension.debugPrefix + 'Starting timer action\n');
+          dnssecExtension.processNewURL(aLocationURI);
+        },
+        500,
+        Components.interfaces.nsITimer.TYPE_ONE_SHOT);
+
+      // Do not continue to the critical section
+      return;
+    }
 
     // Set action state
     this.setMode(this.DNSSEC_MODE_ACTION);
@@ -844,7 +858,7 @@ var gDnssecHandler = {
           dump(dnssecExtension.debugPrefix + dnssecExtension.debugEndNotice);
 
         // Resolving has finished
-        dnssecExtension.resolvingActive = false;
+        gDnssecHandler._resolvingActive--;
       },
     };
 
