@@ -23,15 +23,15 @@ ln -s . lib                            (needed for successful build of libldns)
 * (strip -x -S ...)                                                                        [Lin]
 * (i586-mingw32msvc-strip -x -S ...)                                                       [Win]
 
-libldns r3283:
+libldns r3294:
 * export CFLAGS="-m64 -fPIC"                                                               [Lin]
 * export CFLAGS="-m32 -fPIC"                                                               [Lin]
 * export CFLAGS="-arch i386 -mmacosx-version-min=10.4 -fPIC"                               [Mac]
 * export CFLAGS="-arch ppc -mmacosx-version-min=10.4"                                      [Mac]
 * export CC="i586-mingw32msvc-gcc"                                                         [Win]
-* ./configure --enable-gost --disable-shared --with-ssl=../openssl-1.0.0a --host=mingw32   [Win]
+* ./configure --disable-shared --with-ssl=../openssl-1.0.0a --host=mingw32                 [Win]
 * [Makefile: s/-l.../-Wl,-l.../]                                                           [Win]
-* ./configure --enable-gost --disable-shared --with-ssl=../openssl-1.0.0a                  [Lin, Mac]
+* ./configure --disable-shared --with-ssl=../openssl-1.0.0a                           [Lin, Mac]
 make
 * i586-mingw32msvc-ranlib .libs/libldns.a                                                  [Win]
 * (strip -x -S ...)                                                                        [Lin]

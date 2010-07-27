@@ -35,7 +35,6 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
     <em:homepageURL>http://dnssec-validator.cz</em:homepageURL>
     <em:iconURL>chrome://dnssec/skin/icon.png</em:iconURL>
     <em:optionsURL>chrome://dnssec/content/preferences.xul</em:optionsURL>
-    <em:targetPlatform>Darwin_ppc-gcc3</em:targetPlatform>
     <em:targetPlatform>Darwin_x86-gcc3</em:targetPlatform>
     <em:targetPlatform>Linux_x86-gcc3</em:targetPlatform>
     <em:targetPlatform>Linux_x86_64-gcc3</em:targetPlatform>
