@@ -46,6 +46,10 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
   -moz-image-region: rect(0px, 35px, 20px, 0px);
 }
 
+#dnssec-box.unsecuredDnssec > #dnssec-icon {
+  -moz-image-region: rect(0px, 70px, 20px, 35px);
+}
+
 
 /* DNSSEC indicator */
 #dnssec-outerbox {
@@ -73,21 +77,21 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-box.invalidDomainSignatureInvIPaddr,
 #dnssec-box.invalidNoDomainSignature,
 #dnssec-box.invalidNoDomainSignatureInvIPaddr {
-  background-color: rgba(238, 46, 36, 1.0);     /* red */
+  background-color: rgba(240, 41, 20, 1.0);     /* red */
 }
 
 #dnssec-box.validDomainSignature,
 #dnssec-box.validNoDomainSignature {
-  background-color: rgba(238, 142, 40, 1.0);    /* orange */
+  background-color: rgba(247, 145, 14, 1.0);    /* orange */
 }
 
 #dnssec-box.securedConnectionDomain,
 #dnssec-box.securedConnectionNoDomain {
-  background-color: rgba(110, 180, 63, 1.0);    /* green */
+  background-color: rgba(106, 177, 63, 1.0);    /* green */
 }
 
 #dnssec-box.unsecuredDnssec {
-  background-color: rgba(180, 180, 180, 1.0);   /* grey */
+  background-color: rgba(168, 168, 168, 1.0);   /* grey */
 }
 
 #dnssec-box.actionDnssec {
