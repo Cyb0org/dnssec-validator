@@ -364,7 +364,7 @@ var dnssecExtension = {
       asciiHost = aLocationURI.asciiHost;       // Get punycoded hostname
       utf8Host = aLocationURI.host;             // Get UTF-8 encoded hostname
     } catch(ex) {
-//      dump(ex);
+//      dump(ex + '\n');
     }
 
     if (this.debugOutput)
@@ -381,21 +381,17 @@ var dnssecExtension = {
       gDnssecHandler.setMode(gDnssecHandler.DNSSEC_MODE_ERROR);
 
       // Remember last hostname
-//      this.oldAsciiHost = asciiHost;
+      this.oldAsciiHost = asciiHost;
 
       return;
 
-    // Eliminate duplicated queries that Firefox sometimes does
-    // when onLocationChange event occurs
+    // Eliminate duplicated queries
     } else if (asciiHost == this.oldAsciiHost) {
       if (this.debugOutput) dump(' ...duplicated\n');
       return;
     }
 
     if (this.debugOutput) dump(' ...valid\n');
-
-    // Remember last hostname
-//    this.oldAsciiHost = asciiHost;
 
     // Check DNS security
     gDnssecHandler.checkSecurity(asciiHost, utf8Host);
@@ -565,7 +561,6 @@ var gDnssecHandler = {
       } else {
         this.setMode(this.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED);
       }
-//      this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_CONNECTION_NODOMAIN_SECURED:
       if (!invipaddr) {
@@ -573,7 +568,6 @@ var gDnssecHandler = {
       } else {
         this.setMode(this.DNSSEC_MODE_CONNECTION_NODOMAIN_INVIPADDR_SECURED);
       }
-//      this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_CONNECTION_INVSIGDOMAIN_SECURED:
       if (!invipaddr) {
@@ -581,7 +575,6 @@ var gDnssecHandler = {
       } else {
         this.setMode(this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED);
       }
-//      this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_SIGNATURE_VALID:
       if (!invipaddr) {
@@ -589,7 +582,6 @@ var gDnssecHandler = {
       } else {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID);
       }
-//      this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_SIGNATURE_INVALID:
       if (!invipaddr) {
@@ -597,7 +589,6 @@ var gDnssecHandler = {
       } else {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID);
       }
-//      this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_NODOMAIN_SIGNATURE_VALID:
       if (!invipaddr) {
@@ -605,7 +596,6 @@ var gDnssecHandler = {
       } else {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID);
       }
-//      this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_NODOMAIN_SIGNATURE_INVALID:
       if (!invipaddr) {
@@ -613,17 +603,14 @@ var gDnssecHandler = {
       } else {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID);
       }
-//      this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED:
       this.setMode(this.DNSSEC_MODE_UNSECURED);
-//      this._dnssecBox.hidden = false;
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_UNKNOWN:
     case Ci.dnssecIValidator.XPCOM_EXIT_FAILED:
     default:
       this.setMode(this.DNSSEC_MODE_ERROR);
-//      this._dnssecBox.hidden = true;
       break;
     }
 
@@ -650,7 +637,7 @@ var gDnssecHandler = {
       dnssecExtension.timer.initWithCallback(
         function() {
           dump(dnssecExtension.debugPrefix + 'Starting timer action\n');
-          dnssecExtension.processNewURL(aLocationURI);
+          dnssecExtension.processNewURL(gBrowser.currentURI);
         },
         500,
         Components.interfaces.nsITimer.TYPE_ONE_SHOT);
@@ -661,6 +648,9 @@ var gDnssecHandler = {
 
     // Set action state
     this.setMode(this.DNSSEC_MODE_ACTION);
+
+    // Remember last host name to eliminate duplicated queries
+    dnssecExtension.oldAsciiHost = asciiHost;
 
     this._asciiHostName = asciiHost;
     this._utf8HostName = utf8Host;
