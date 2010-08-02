@@ -224,7 +224,7 @@ var dnssecExtPrefObserver = {
 
   register: function() {
     var prefService = Components.classes["@mozilla.org/preferences-service;1"]
-                                .getService(Components.interfaces.nsIPrefService);
+                      .getService(Components.interfaces.nsIPrefService);
 
     // Add the observer
     this._branch = prefService.getBranch(dnssecExtPrefs.prefBranch);
@@ -275,11 +275,14 @@ var dnssecExtension = {
     // Enable debugging information on stdout if desired
     this.getDebugOutputFlag();
 
-    // Enable asynchronous resolving
+    // Enable asynchronous resolving if desired
     this.getAsyncResolveFlag();
 
     // Set error mode (no icon)
     gDnssecHandler.setMode(gDnssecHandler.DNSSEC_MODE_ERROR);
+
+    // Reset resolving flag
+    dnssecExtPrefs.setBool("resolvingactive", false);
 
     // Register preferences observer
     dnssecExtPrefObserver.register();
@@ -381,7 +384,7 @@ var dnssecExtension = {
       gDnssecHandler.setMode(gDnssecHandler.DNSSEC_MODE_ERROR);
 
       // Remember last hostname
-      this.oldAsciiHost = asciiHost;
+//      this.oldAsciiHost = asciiHost;
 
       return;
 
@@ -460,9 +463,6 @@ var gDnssecHandler = {
   // Cache the most recent hostname seen in checkSecurity
   _asciiHostName : null,
   _utf8HostName : null,
-
-  // Resolving lock
-  _resolvingActive: 0,
 
   // Smart getters
   get _securityLabel () {
@@ -622,10 +622,11 @@ var gDnssecHandler = {
 
     // Detect if any resolving is already running
     // and lock the critical section - this should be atomic
-    if (this._resolvingActive++) {
+    if (dnssecExtPrefs.getBool("resolvingactive") ||
+        dnssecExtPrefs.setBool("resolvingactive", true)) {
 
-      // Counter has been increment to 2, decrement it back to 1
-      this._resolvingActive--;
+      // Set error mode (no icon)
+      gDnssecHandler.setMode(gDnssecHandler.DNSSEC_MODE_ERROR);
 
       if (dnssecExtension.debugOutput)
         dump(dnssecExtension.debugPrefix + 'Activating resolving timer\n');
@@ -650,7 +651,7 @@ var gDnssecHandler = {
     this.setMode(this.DNSSEC_MODE_ACTION);
 
     // Remember last host name to eliminate duplicated queries
-    dnssecExtension.oldAsciiHost = asciiHost;
+//    dnssecExtension.oldAsciiHost = asciiHost;
 
     this._asciiHostName = asciiHost;
     this._utf8HostName = utf8Host;
@@ -848,7 +849,7 @@ var gDnssecHandler = {
           dump(dnssecExtension.debugPrefix + dnssecExtension.debugEndNotice);
 
         // Resolving has finished
-        gDnssecHandler._resolvingActive--;
+        dnssecExtPrefs.setBool("resolvingactive", false);
       },
     };
 
@@ -872,6 +873,8 @@ var gDnssecHandler = {
       // No DNSSEC box means the DNSSEC box is not visible, in which
       // case there's nothing to do.
       return;
+    } else if (newMode == this.DNSSEC_MODE_ACTION) { // Close window for this state
+      this.hideDnssecPopup();
     }
 
     this._dnssecBox.className = newMode;

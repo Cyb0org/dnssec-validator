@@ -34,6 +34,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
       <preference id="dnsserveraddr" name="extensions.dnssec.dnsserveraddr" type="string"/>
       <preference id="optdnsserveraddr" name="extensions.dnssec.optdnsserveraddr" type="string"/>
       <preference id="version" name="extensions.dnssec.version" type="string"/>
+      <preference id="resolvingactive" name="extensions.dnssec.resolvingactive" type="bool"/>
     </preferences>
     <groupbox>
       <caption label="&groupboxdnsserver.label;"/>

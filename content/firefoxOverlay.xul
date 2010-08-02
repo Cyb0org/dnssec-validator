@@ -38,9 +38,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
   <popupset id="mainPopupSet">
     <!-- Popup for DNSSEC information -->
     <panel id="dnssec-popup" position="after_start" hidden="true" noautofocus="true"
-           onpopuphidden="focusAndSelectUrlBar();" norestorefocus="true">
-<!--           onpopupshown="document.getElementById('identity-popup-more-info-button').focus();" -->
-<!--           chromedir="&locale.dir;" -->
+           onpopuphidden="focusAndSelectUrlBar();" norestorefocus="true"
+           onblur="gDnssecHandler.hideDnssecPopup();">
       <hbox id="dnssec-popup-container" align="top">
         <image id="dnssec-popup-icon"/>
         <vbox id="dnssec-popup-content-box">
