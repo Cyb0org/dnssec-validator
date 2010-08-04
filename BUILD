@@ -10,8 +10,8 @@ openssl (https://www.openssl.org)
 No need to get these libraries, they are already built in GIT.
 
 openssl 1.0.0a:
-* ./Configure linux-x86_64 enable-static-engine -fPIC                                      [Lin]
-* ./Configure linux-generic32 enable-static-engine -fPIC -m32                              [Lin]
+* ./Configure linux-x86_64 enable-static-engine -D_GNU_SOURCE -fPIC                        [Lin]
+* ./Configure linux-generic32 enable-static-engine -D_GNU_SOURCE -fPIC -m32                [Lin]
 * (./Configure darwin-i386-cc shared -mmacosx-version-min=10.4)                            [Mac]
 * ./Configure darwin-i386-cc enable-static-engine -mmacosx-version-min=10.4 -fPIC          [Mac]
 * (./Configure darwin-ppc-cc shared -mmacosx-version-min=10.4)                             [Mac]
