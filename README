@@ -1,4 +1,4 @@
-DNSSEC Validator extension for Mozilla Firefox
+DNSSEC Validator extension for Mozilla Firefox <http://www.dnssec-validator.cz>
 -------------------------------------------------------------------------------
 
 INSTALLATION
@@ -13,6 +13,8 @@ system of browser's hidden preferences (about:config). There are available
 these parameters:
  - extensions.dnssec.debugoutput [boolean]
    -> print debug information to standard output (see section DEBUGGING)
+ - extensions.dnssec.asyncresolve [boolean]
+   -> enable asynchronous resolving
  - extensions.dnssec.usetcp [boolean]
    -> use TCP instead of default UDP for resolving
  - extensions.dnssec.cacheflushinterval [integer]

@@ -126,9 +126,7 @@ var dnssecExtCache = {
     var ttl4;
     var ttl6;
 
-    if (dnssecExtension.debugOutput) {
-      dump(dnssecExtension.debugPrefix + 'Cache content:\n');
-    }
+    dump(dnssecExtension.debugPrefix + 'Cache content:\n');
 
     for (n in c) {
 
@@ -275,14 +273,14 @@ var dnssecExtension = {
     // Enable debugging information on stdout if desired
     this.getDebugOutputFlag();
 
+    if (this.debugOutput)
+      dump(this.debugPrefix + 'Start of add-on init\n');
+
     // Enable asynchronous resolving if desired
     this.getAsyncResolveFlag();
 
     // Set error mode (no icon)
     gDnssecHandler.setMode(gDnssecHandler.DNSSEC_MODE_ERROR);
-
-    // Reset resolving flag
-    dnssecExtPrefs.setBool("resolvingactive", false);
 
     // Register preferences observer
     dnssecExtPrefObserver.register();
@@ -325,6 +323,8 @@ var dnssecExtension = {
     gBrowser.addProgressListener(dnssecExtUrlBarListener,
         Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
 
+    if (this.debugOutput)
+      dump(this.debugPrefix + 'End of add-on init\n');
   },
 
   showHomepage: function(dnssecExt) {
@@ -356,7 +356,17 @@ var dnssecExtension = {
   },
 
   uninit: function() {
+
+    if (this.debugOutput)
+      dump(this.debugPrefix + 'Start of add-on uninit\n');
+
     gBrowser.removeProgressListener(dnssecExtUrlBarListener);
+
+    // Reset resolving flag
+    dnssecExtPrefs.setBool("resolvingactive", false);
+
+    if (this.debugOutput)
+      dump(this.debugPrefix + 'End of add-on uninit\n');
   },
 
   processNewURL: function(aLocationURI) {
@@ -620,10 +630,8 @@ var gDnssecHandler = {
   // update the UI to reflect this. Intended to be called by onLocationChange.
   checkSecurity : function(asciiHost, utf8Host) {
 
-    // Detect if any resolving is already running
-    // and lock the critical section - this should be atomic
-    if (dnssecExtPrefs.getBool("resolvingactive") ||
-        dnssecExtPrefs.setBool("resolvingactive", true)) {
+    // Detect if any resolving is already running...
+    if (dnssecExtPrefs.getBool("resolvingactive")) {
 
       // Set error mode (no icon)
       gDnssecHandler.setMode(gDnssecHandler.DNSSEC_MODE_ERROR);
@@ -637,7 +645,8 @@ var gDnssecHandler = {
       // Define timer callback
       dnssecExtension.timer.initWithCallback(
         function() {
-          dump(dnssecExtension.debugPrefix + 'Starting timer action\n');
+          if (dnssecExtension.debugOutput)
+            dump(dnssecExtension.debugPrefix + 'Starting timer action\n');
           dnssecExtension.processNewURL(gBrowser.currentURI);
         },
         500,
@@ -646,6 +655,15 @@ var gDnssecHandler = {
       // Do not continue to the critical section
       return;
     }
+
+    // ...and lock the critical section - this should be atomic in FF
+    if (dnssecExtension.debugOutput) {
+      dump(dnssecExtension.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
+      dump(dnssecExtension.debugPrefix + 'Locking section...\n');
+    }
+    dnssecExtPrefs.setBool("resolvingactive", true);
+    if (dnssecExtension.debugOutput)
+      dump(dnssecExtension.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
 
     // Set action state
     this.setMode(this.DNSSEC_MODE_ACTION);
@@ -705,8 +723,10 @@ var gDnssecHandler = {
           // Background task for XPCOM validation
           var bgTask = {
             run: function() {
+//              dump('H1\n');
               res = dsv.Validate(dn, options, nameserver, resaddrs, ttl4, ttl6);
               bgTaskComplete = true;
+//              dump('H2\n');
             }
           };
 
@@ -724,9 +744,15 @@ var gDnssecHandler = {
 
           // Current thread has to UI non-blocking wait until
           // background resolving does not finish
+//          var i = 0;
           while (!bgTaskComplete) {
+//            dump('C: ' + i++ + '; ');
             curThread.processNextEvent(true);
           }
+//          dump('\n' + 'H3: ' + i + '\n');
+
+          // Shutdown background thread
+          bgThread.shutdown();
         }
 
         return [resaddrs.value, ttl4.value, ttl6.value, res];
@@ -849,7 +875,13 @@ var gDnssecHandler = {
           dump(dnssecExtension.debugPrefix + dnssecExtension.debugEndNotice);
 
         // Resolving has finished
+        if (dnssecExtension.debugOutput) {
+          dump(dnssecExtension.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
+          dump(dnssecExtension.debugPrefix + 'Unlocking section...\n');
+        }
         dnssecExtPrefs.setBool("resolvingactive", false);
+        if (dnssecExtension.debugOutput)
+          dump(dnssecExtension.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
       },
     };
 
