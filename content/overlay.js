@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
+window.addEventListener("load", function() { dnssecExtension.init(); }, false);
+window.addEventListener("unload", function() { dnssecExtension.uninit(); }, false);
+
 // Temp function
 /*
 function sleep(delay) {
@@ -280,7 +283,7 @@ var dnssecExtension = {
     this.getAsyncResolveFlag();
 
     // Set error mode (no icon)
-    gDnssecHandler.setMode(gDnssecHandler.DNSSEC_MODE_ERROR);
+    dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
 
     // Register preferences observer
     dnssecExtPrefObserver.register();
@@ -391,7 +394,7 @@ var dnssecExtension = {
       if (this.debugOutput) dump(' ...invalid\n');
 
       // Set error mode (no icon)
-      gDnssecHandler.setMode(gDnssecHandler.DNSSEC_MODE_ERROR);
+      dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
 
       // Remember last hostname
 //      this.oldAsciiHost = asciiHost;
@@ -407,7 +410,7 @@ var dnssecExtension = {
     if (this.debugOutput) dump(' ...valid\n');
 
     // Check DNS security
-    gDnssecHandler.checkSecurity(asciiHost, utf8Host);
+    dnssecExtHandler.checkSecurity(asciiHost, utf8Host);
 
   },
 
@@ -419,14 +422,10 @@ var dnssecExtension = {
 };
 
 
-window.addEventListener("load", function() {dnssecExtension.init()}, false);
-window.addEventListener("unload", function() {dnssecExtension.uninit()}, false);
-
-
 /**
  * Utility class to handle manipulations of the dnssec indicators in the UI
  */
-var gDnssecHandler = {
+var dnssecExtHandler = {
 
   // Mode strings used to control CSS display
 
@@ -634,7 +633,7 @@ var gDnssecHandler = {
     if (dnssecExtPrefs.getBool("resolvingactive")) {
 
       // Set error mode (no icon)
-      gDnssecHandler.setMode(gDnssecHandler.DNSSEC_MODE_ERROR);
+      dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
 
       if (dnssecExtension.debugOutput)
         dump(dnssecExtension.debugPrefix + 'Activating resolving timer\n');
@@ -797,7 +796,7 @@ var gDnssecHandler = {
       // Called when async host lookup completes
       onLookupComplete: function(aRequest, aRecord, aStatus) {
 
-        var dn = gDnssecHandler._asciiHostName;
+        var dn = dnssecExtHandler._asciiHostName;
         var resolvipv4 = false; // No IPv4 resolving as default
         var resolvipv6 = false; // No IPv6 resolving as default
         var addr = null;
@@ -869,7 +868,7 @@ var gDnssecHandler = {
         // Set appropriate state if host name does not changed
         // during resolving process (tab has not been switched)
         if (dn == gBrowser.currentURI.asciiHost)
-          gDnssecHandler.setSecurityState(res, invipaddr);
+          dnssecExtHandler.setSecurityState(res, invipaddr);
 
         if (dnssecExtension.debugOutput)
           dump(dnssecExtension.debugPrefix + dnssecExtension.debugEndNotice);

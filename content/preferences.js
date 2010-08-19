@@ -20,173 +20,173 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 // DNSSEC preferences functions
 var dnssecExtPrefs = {
 
-    instantApply : true, // default value that changes on pref window load
+  instantApply : true, // default value that changes on pref window load
 
-    // Some parts of next code are used from UrlbarExt project
+  // Some parts of next code are used from UrlbarExt project
 
-	prefObj : Components.classes["@mozilla.org/preferences-service;1"]
-			.getService(Components.interfaces.nsIPrefBranch),
-	prefBranch : "extensions.dnssec.",
+  prefObj : Components.classes["@mozilla.org/preferences-service;1"]
+            .getService(Components.interfaces.nsIPrefBranch),
+  prefBranch : "extensions.dnssec.",
 
-	getInt : function(prefName) {
-		try {
-			return this.prefObj.getIntPref(this.prefBranch + prefName);
-		} catch (ex) {
-			return null;
-		}
-	},
+  getInt : function(prefName) {
+    try {
+      return this.prefObj.getIntPref(this.prefBranch + prefName);
+    } catch (ex) {
+      return null;
+    }
+  },
 
-	getBool : function(prefName) {
-		try {
-			return this.prefObj.getBoolPref(this.prefBranch + prefName);
-		} catch (ex) {
-			return null;
-		}
-	},
+  getBool : function(prefName) {
+    try {
+      return this.prefObj.getBoolPref(this.prefBranch + prefName);
+    } catch (ex) {
+      return null;
+    }
+  },
 
-	getChar : function(prefName) {
-		try {
-			return this.prefObj.getCharPref(this.prefBranch + prefName);
-		} catch (ex) {
-			return null;
-		}
-	},
+  getChar : function(prefName) {
+    try {
+      return this.prefObj.getCharPref(this.prefBranch + prefName);
+    } catch (ex) {
+      return null;
+    }
+  },
 
-	setChar : function(prefName, prefValue) {
-		try {
-			return this.prefObj.setCharPref(this.prefBranch + prefName,
-					prefValue);
-		} catch (ex) {
-			return null;
-		}
-	},
+  setChar : function(prefName, prefValue) {
+    try {
+      return this.prefObj.setCharPref(this.prefBranch + prefName,
+          prefValue);
+    } catch (ex) {
+      return null;
+    }
+  },
 
-	setBool : function(prefName, prefValue) {
-		try {
-			return this.prefObj.setBoolPref(this.prefBranch + prefName,
-					prefValue);
-		} catch (ex) {
-			return null;
-		}
-	},
+  setBool : function(prefName, prefValue) {
+    try {
+      return this.prefObj.setBoolPref(this.prefBranch + prefName,
+          prefValue);
+    } catch (ex) {
+      return null;
+    }
+  },
 
-	setInt : function(prefName, prefValue) {
-		try {
-			return this.prefObj.setIntPref(this.prefBranch + prefName,
-					prefValue);
-		} catch (ex) {
-			return null;
-		}
-	},
+  setInt : function(prefName, prefValue) {
+    try {
+      return this.prefObj.setIntPref(this.prefBranch + prefName,
+          prefValue);
+    } catch (ex) {
+      return null;
+    }
+  },
 
-	resetUserPref : function(prefName) {
-		try {
-			this.prefObj.clearUserPref(this.prefBranch + prefName);
-		} catch (ex) {
-		}
-	},
+  resetUserPref : function(prefName) {
+    try {
+      this.prefObj.clearUserPref(this.prefBranch + prefName);
+    } catch (ex) {
+    }
+  },
 
-	hasUserValue : function(prefName) {
-		try {
-			return this.prefObj.prefHasUserValue(this.prefBranch + prefName);
-		} catch (ex) {
-			return null;
-		}
-	},
+  hasUserValue : function(prefName) {
+    try {
+      return this.prefObj.prefHasUserValue(this.prefBranch + prefName);
+    } catch (ex) {
+      return null;
+    }
+  },
 
 
-    isInstantApply : function() {
-      try {
-        return Components.classes["@mozilla.org/preferences-service;1"]
-                         .getService(Components.interfaces.nsIPrefBranch)
-                         .getBoolPref("browser.preferences.instantApply");
-      } catch (ex) {
-        return null;
-      }
-    },
+  isInstantApply : function() {
+    try {
+      return Components.classes["@mozilla.org/preferences-service;1"]
+             .getService(Components.interfaces.nsIPrefBranch)
+             .getBoolPref("browser.preferences.instantApply");
+    } catch (ex) {
+      return null;
+    }
+  },
 
-    checkOptdnsserveraddr : function() {
-      if (checkIPaddr.test_ipv4(document.getElementById("dnssec-pref-optdnsserveraddr").value)
-          || checkIPaddr.test_ipv6(document.getElementById("dnssec-pref-optdnsserveraddr").value)) {
-        return true;
-      } else {
-        return false;
-      }
-    },
+  checkOptdnsserveraddr : function() {
+    if (dnssecExtCheckIPaddr.test_ipv4(document.getElementById("dnssec-pref-optdnsserveraddr").value)
+        || dnssecExtCheckIPaddr.test_ipv6(document.getElementById("dnssec-pref-optdnsserveraddr").value)) {
+      return true;
+    } else {
+      return false;
+    }
+  },
 
-    savePrefs : function() {
-      switch (document.getElementById("dnssec-pref-dnsserverchoose").value) {
-      case '1': // Preset resolvers
-        switch (document.getElementById("dnssec-pref-dnsserverpresetchoose").value) {
-        case '1': // OARC's ODVR
-          this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-oarcdnsserveraddr").value);
-          break;
-        case '0': // CZ.NIC's ODVR
-        default:
-          this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-cznicdnsserveraddr").value);
-          break;
-        }
+  savePrefs : function() {
+    switch (document.getElementById("dnssec-pref-dnsserverchoose").value) {
+    case '1': // Preset resolvers
+      switch (document.getElementById("dnssec-pref-dnsserverpresetchoose").value) {
+      case '1': // OARC's ODVR
+        this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-oarcdnsserveraddr").value);
         break;
-      case '2': // Custom resolver
-        if (this.checkOptdnsserveraddr()) {
-          this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-optdnsserveraddr").value);
-//          document.getElementById("dnssec-pref-optdnsserveraddr").setAttribute("style", "color: black");
-        } else {
-//          document.getElementById("dnssec-pref-optdnsserveraddr").setAttribute("style", "color: red");
-        }
-        break;
-      case '0': // System
+      case '0': // CZ.NIC's ODVR
       default:
-        this.setChar("dnsserveraddr", ""); // empty string for using system resolver conf
+        this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-cznicdnsserveraddr").value);
         break;
       }
-    },
-
-    setElementsattributes : function() {
-
-      var tmpCheck;
-
-      // enable preset DNS resolvers menulist only if appropriate radio button is selected
-      tmpCheck = document.getElementById("dnssec-pref-usepresetdnsserver").selected;
-      document.getElementById("dnssec-pref-dnsserverpresetchoose").disabled = !tmpCheck;
-
-      // enable optional DNS address textbox only if appropriate radio button is selected
-      tmpCheck = document.getElementById("dnssec-pref-useoptdnsserver").selected;
-      document.getElementById("dnssec-pref-optdnsserveraddr").disabled = !tmpCheck;
-    },
-
-    pane1Load : function() {
-      this.instantApply = this.isInstantApply();
-      this.setElementsattributes();
-    },
-
-    dnsserverchooseCommand : function() {
-      this.setElementsattributes();
-
-      if (this.instantApply) {
-        this.savePrefs();
+      break;
+    case '2': // Custom resolver
+      if (this.checkOptdnsserveraddr()) {
+        this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-optdnsserveraddr").value);
+//        document.getElementById("dnssec-pref-optdnsserveraddr").setAttribute("style", "color: black");
+      } else {
+//        document.getElementById("dnssec-pref-optdnsserveraddr").setAttribute("style", "color: red");
       }
-    },
+      break;
+    case '0': // System
+    default:
+      this.setChar("dnsserveraddr", ""); // empty string for using system resolver conf
+      break;
+    }
+  },
 
-    dnsserverpresetchooseCommand : function() {
-      this.dnsserverchooseCommand();
-    },
+  setElementsattributes : function() {
 
-    optdnsserveraddrInput : function() {
-      if (this.instantApply) {
-        this.savePrefs();
-      }
-    },
+    var tmpCheck;
 
-    windowDialogaccept : function() {
+    // enable preset DNS resolvers menulist only if appropriate radio button is selected
+    tmpCheck = document.getElementById("dnssec-pref-usepresetdnsserver").selected;
+    document.getElementById("dnssec-pref-dnsserverpresetchoose").disabled = !tmpCheck;
+
+    // enable optional DNS address textbox only if appropriate radio button is selected
+    tmpCheck = document.getElementById("dnssec-pref-useoptdnsserver").selected;
+    document.getElementById("dnssec-pref-optdnsserveraddr").disabled = !tmpCheck;
+  },
+
+  pane1Load : function() {
+    this.instantApply = this.isInstantApply();
+    this.setElementsattributes();
+  },
+
+  dnsserverchooseCommand : function() {
+    this.setElementsattributes();
+
+    if (this.instantApply) {
       this.savePrefs();
-    },
+    }
+  },
+
+  dnsserverpresetchooseCommand : function() {
+    this.dnsserverchooseCommand();
+  },
+
+  optdnsserveraddrInput : function() {
+    if (this.instantApply) {
+      this.savePrefs();
+    }
+  },
+
+  windowDialogaccept : function() {
+    this.savePrefs();
+  },
 
 };
 
 
 // Functions for IP address notation validation
-var checkIPaddr = {
+var dnssecExtCheckIPaddr = {
 
   // Used from http://ipv6blog.net/ipv6-validation-javascript/
 

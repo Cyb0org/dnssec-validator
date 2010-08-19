@@ -39,7 +39,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
     <!-- Popup for DNSSEC information -->
     <panel id="dnssec-popup" position="after_start" hidden="true" noautofocus="true"
            onpopuphidden="focusAndSelectUrlBar();" norestorefocus="true"
-           onblur="gDnssecHandler.hideDnssecPopup();">
+           onblur="dnssecExtHandler.hideDnssecPopup();">
       <hbox id="dnssec-popup-container" align="top">
         <image id="dnssec-popup-icon"/>
         <vbox id="dnssec-popup-content-box">
@@ -66,8 +66,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
     <box id="dnssec-outerbox">
       <!-- DNSSEC button in urlbar -->
       <hbox id="dnssec-box" role="button"
-           onclick="gDnssecHandler.handleDnssecButtonEvent(event);"
-           onkeypress="gDnssecHandler.handleDnssecButtonEvent(event);">
+           onclick="dnssecExtHandler.handleDnssecButtonEvent(event);"
+           onkeypress="dnssecExtHandler.handleDnssecButtonEvent(event);">
 <!--           hidden="true" -->
 <!--           chromedir="&locale.dir;" -->
         <!-- stack id="dnssec-icons-stack" -->

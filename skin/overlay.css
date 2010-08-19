@@ -50,6 +50,10 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
   -moz-image-region: rect(0px, 70px, 20px, 35px);
 }
 
+#dnssec-box.actionDnssec > #dnssec-icon {
+  list-style-image: url("chrome://dnssec/skin/key_action.gif"); /* 35x20 */
+}
+
 
 /* DNSSEC indicator */
 #dnssec-outerbox {
@@ -57,7 +61,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 #dnssec-box {
-  background-color: -moz-dialog; /* grey */
+  background-color: rgba(221, 221, 221, 1.0);   /* grey */
+/*  background-color: -moz-dialog; */ /* grey */
   color: -moz-dialogtext; /* black */
 /*  -moz-border-end: 1px solid ThreeDShadow; */
 /*  max-height: 20px; */
@@ -92,10 +97,6 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 #dnssec-box.unsecuredDnssec {
   background-color: rgba(168, 168, 168, 1.0);   /* grey */
-}
-
-#dnssec-box.actionDnssec {
-  background-color: rgba(100, 175, 255, 1.0);   /* light blue */
 }
 
 #dnssec-box.errorDnssec {
