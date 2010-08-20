@@ -28,8 +28,7 @@ function sleep(delay) {
 }
 */
 
-/* DNSSEC Validator's internal cache */
-/* Shared with all window tabs */
+/* DNSSEC Validator's internal cache - shared with all window tabs */
 var dnssecExtCache = {
 
   flushTimer: null,
@@ -422,9 +421,207 @@ var dnssecExtension = {
 };
 
 
-/**
- * Utility class to handle manipulations of the dnssec indicators in the UI
- */
+/* Get security status through XPCOM library call or from cache */
+var dnssecExtResolver = {
+
+  // Called when request is not cached already
+  doXPCOMvalidation: function(dn, resolvipv4, resolvipv6) {
+
+    // Use validator's XPCOM interface
+    try {
+//      var dsv = Components.classes["@nic.cz/dnssecValidator;1"]
+//                .createInstance(Components.interfaces.dnssecIValidator);
+      var dsv = Components.classes["@nic.cz/dnssecValidator;1"]
+                .getService(Components.interfaces.dnssecIValidator);
+    } catch (ex) {
+//      dump(ex + '\n');
+//      return;
+    }
+
+    // Get DNS resolver address(es)
+    var nameserver = dnssecExtPrefs.getChar("dnsserveraddr");
+
+    // Create variable to pass options
+    var options = 0;
+    if (dnssecExtension.debugOutput) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_DEBUGOUTPUT;
+    if (dnssecExtPrefs.getBool("usetcp")) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_USETCP;
+    if (resolvipv4) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_RESOLVIPV4;
+    if (resolvipv6) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_RESOLVIPV6;
+
+    if (dnssecExtension.debugOutput)
+      dump(dnssecExtension.debugPrefix + 'Validation parameters: \"'
+           + dn + '; ' + options + '; ' + nameserver + '\"\n');
+
+    // Call XPCOM validation
+    var res = null;
+    var resaddrs = {};
+    var ttl4 = {};
+    var ttl6 = {};
+
+    if (!dnssecExtension.asyncResolve) {   // Synchronous XPCOM validation
+      res = dsv.Validate(dn, options, nameserver, resaddrs, ttl4, ttl6);
+    } else {   // Asynchronous XPCOM validation
+
+      var bgTaskComplete = false;
+
+      // Background task for XPCOM validation
+      var bgTask = {
+        run: function() {
+//          dump('H1\n');
+          res = dsv.Validate(dn, options, nameserver, resaddrs, ttl4, ttl6);
+          bgTaskComplete = true;
+//          dump('H2\n');
+        }
+      };
+
+      // Create new thread to run background task
+      var bgThread = Components.classes["@mozilla.org/thread-manager;1"]
+                     .getService(Components.interfaces.nsIThreadManager)
+                     .newThread(0);
+
+      bgThread.dispatch(bgTask, bgThread.DISPATCH_NORMAL);
+
+      // Get current thread
+      var curThread = Components.classes["@mozilla.org/thread-manager;1"]
+                      .getService(Components.interfaces.nsIThreadManager)
+                      .mainThread;
+
+      // Current thread has to UI non-blocking wait until
+      // background resolving does not finish
+//      var i = 0;
+      while (!bgTaskComplete) {
+//        dump('C: ' + i++ + '; ');
+        curThread.processNextEvent(true);
+      }
+//      dump('\n' + 'H3: ' + i + '\n');
+
+      // Shutdown background thread
+      bgThread.shutdown();
+    }
+
+    return [resaddrs.value, ttl4.value, ttl6.value, res];
+  },
+
+
+  // Get validated data from cache or by XPCOM call
+  getValidatedData: function(dn, v4, v6) {
+
+    var ext = dnssecExtension;
+    var cache = dnssecExtCache;
+    var resArr;
+
+    if (cache.existsUnexpiredRecord(dn, v4, v6)) {
+      if (ext.debugOutput)
+        dump(ext.debugPrefix + 'Reading IPv4/IPv6 record "' + dn + '" from cache ('
+             + v4 + '/' + v6 + ')...\n');
+      resArr = cache.getRecord(dn);
+    } else {
+      if (ext.debugOutput)
+        dump(ext.debugPrefix + 'Using XPCOM to get IPv4/IPv6 record "' + dn
+             + '" (' + v4 + '/' + v6 + ')...\n');
+      resArr = this.doXPCOMvalidation(dn, v4, v6);
+      if (cache.flushInterval) { // do not cache if 0
+        cache.addRecord(dn, resArr[0], resArr[1], resArr[2], resArr[3]);
+      }
+    }
+
+    if (ext.debugOutput) {
+      dump(ext.debugPrefix + 'Queried domain name: ' + dn + '\n');
+      dump(ext.debugPrefix + 'Getting return values: ' + resArr[3] + '; \"'
+           + resArr[0] + '\"; ' + resArr[1] + '; ' + resArr[2] + '\n');
+    }
+
+    var resaddrs = resArr[0];
+    var res = resArr[3];
+
+    return [resaddrs, res];
+  },
+
+
+  // Called when browser async host lookup completes
+  onBrowserLookupComplete: function(dn, aRecord) {
+
+//    var dn = dnssecExtHandler._asciiHostName;
+    var resolvipv4 = false; // No IPv4 resolving as default
+    var resolvipv6 = false; // No IPv6 resolving as default
+    var addr = null;
+
+    if (dnssecExtension.debugOutput)
+      dump(dnssecExtension.debugPrefix + dnssecExtension.debugStartNotice);
+
+    while (aRecord && aRecord.hasMore()) {   // Address list is not empty
+
+      addr = aRecord.getNextAddrAsString();
+
+      // Check IP version
+      if (addr.indexOf(":") != -1) {
+        // ipv6
+        resolvipv6 = true;
+      } else if (addr.indexOf(".") != -1) {
+        // ipv4
+        resolvipv4 = true;
+      }
+
+      // No need to check more addresses
+      if (resolvipv4 && resolvipv6) break;
+    }
+
+    if (dnssecExtension.debugOutput)
+      dump(dnssecExtension.debugPrefix + 'Browser uses IPv4/IPv6 resolving: \"'
+           + resolvipv4 + '/' + resolvipv6 + '\"\n');
+
+    // Resolve IPv4 if no version is desired
+    if (!resolvipv4 && !resolvipv6) resolvipv4 = true;
+
+    // Get validated data from cache or by XPCOM call
+    var resaddrs = '';
+    var res = -1;
+    var resArr = this.getValidatedData(dn, resolvipv4, resolvipv6);
+    resaddrs = resArr[0];
+    res = resArr[1];
+
+    // Temporary deleting of expired cache records until
+    // cache flush timer will be working
+    if (dnssecExtCache.flushInterval) {
+      dnssecExtCache.delExpiredRecords();
+    }
+
+    if (dnssecExtension.debugOutput) {
+      dnssecExtCache.printContent();
+    }
+
+    // Check browser's IP address(es)
+    var invipaddr = false; // Browser's IP addresses are presumed as valid
+    if (aRecord) {
+      aRecord.rewind();
+      while (aRecord.hasMore()) {   // Address list has another item
+
+        addr = aRecord.getNextAddrAsString();
+
+        // Check if each browser's address is present in DNSSEC address resolved list
+        if (resaddrs.indexOf(' ' + addr + ' ') == -1) invipaddr = true;
+
+        if (dnssecExtension.debugOutput)
+          dump(dnssecExtension.debugPrefix + 'Checking browser IP: '
+               + addr + '; address is invalid: ' + invipaddr + '\n');
+
+        // No need to check more addresses
+        if (invipaddr) break;
+      }
+    }
+
+    // Set appropriate state if host name does not changed
+    // during resolving process (tab has not been switched)
+    if (dn == gBrowser.currentURI.asciiHost)
+      dnssecExtHandler.setSecurityState(res, invipaddr);
+
+    if (dnssecExtension.debugOutput)
+      dump(dnssecExtension.debugPrefix + dnssecExtension.debugEndNotice);
+  },
+};
+
+
+/* Utility class to handle manipulations of the dnssec indicators in the UI */
 var dnssecExtHandler = {
 
   // Mode strings used to control CSS display
@@ -629,11 +826,14 @@ var dnssecExtHandler = {
   // update the UI to reflect this. Intended to be called by onLocationChange.
   checkSecurity : function(asciiHost, utf8Host) {
 
+    // Set action state
+    this.setMode(this.DNSSEC_MODE_ACTION);
+
     // Detect if any resolving is already running...
     if (dnssecExtPrefs.getBool("resolvingactive")) {
 
       // Set error mode (no icon)
-      dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
+//      dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
 
       if (dnssecExtension.debugOutput)
         dump(dnssecExtension.debugPrefix + 'Activating resolving timer\n');
@@ -665,7 +865,7 @@ var dnssecExtHandler = {
       dump(dnssecExtension.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
 
     // Set action state
-    this.setMode(this.DNSSEC_MODE_ACTION);
+//    this.setMode(this.DNSSEC_MODE_ACTION);
 
     // Remember last host name to eliminate duplicated queries
 //    dnssecExtension.oldAsciiHost = asciiHost;
@@ -679,199 +879,11 @@ var dnssecExtHandler = {
 
     var dnsListener = {
 
-      // Called when request is not cached already
-      doXPCOMvalidation: function(dn, resolvipv4, resolvipv6) {
-
-        // Use validator's XPCOM interface
-        try {
-//          var dsv = Components.classes["@nic.cz/dnssecValidator;1"]
-//                    .createInstance(Components.interfaces.dnssecIValidator);
-          var dsv = Components.classes["@nic.cz/dnssecValidator;1"]
-                    .getService(Components.interfaces.dnssecIValidator);
-        } catch (ex) {
-//          dump(ex + '\n');
-//          return;
-        }
-
-        // Get DNS resolver address(es)
-        var nameserver = dnssecExtPrefs.getChar("dnsserveraddr");
-
-        // Create variable to pass options
-        var options = 0;
-        if (dnssecExtension.debugOutput) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_DEBUGOUTPUT;
-        if (dnssecExtPrefs.getBool("usetcp")) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_USETCP;
-        if (resolvipv4) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_RESOLVIPV4;
-        if (resolvipv6) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_RESOLVIPV6;
-
-        if (dnssecExtension.debugOutput)
-          dump(dnssecExtension.debugPrefix + 'Validation parameters: \"'
-               + dn + '; ' + options + '; ' + nameserver + '\"\n');
-
-        // Call XPCOM validation
-        var res = null;
-        var resaddrs = {};
-        var ttl4 = {};
-        var ttl6 = {};
-
-        if (!dnssecExtension.asyncResolve) {   // Synchronous XPCOM validation
-          res = dsv.Validate(dn, options, nameserver, resaddrs, ttl4, ttl6);
-        } else {   // Asynchronous XPCOM validation
-
-          var bgTaskComplete = false;
-
-          // Background task for XPCOM validation
-          var bgTask = {
-            run: function() {
-//              dump('H1\n');
-              res = dsv.Validate(dn, options, nameserver, resaddrs, ttl4, ttl6);
-              bgTaskComplete = true;
-//              dump('H2\n');
-            }
-          };
-
-          // Create new thread to run background task
-          var bgThread = Components.classes["@mozilla.org/thread-manager;1"]
-                         .getService(Components.interfaces.nsIThreadManager)
-                         .newThread(0);
-
-          bgThread.dispatch(bgTask, bgThread.DISPATCH_NORMAL);
-
-          // Get current thread
-          var curThread = Components.classes["@mozilla.org/thread-manager;1"]
-                          .getService(Components.interfaces.nsIThreadManager)
-                          .currentThread;
-
-          // Current thread has to UI non-blocking wait until
-          // background resolving does not finish
-//          var i = 0;
-          while (!bgTaskComplete) {
-//            dump('C: ' + i++ + '; ');
-            curThread.processNextEvent(true);
-          }
-//          dump('\n' + 'H3: ' + i + '\n');
-
-          // Shutdown background thread
-          bgThread.shutdown();
-        }
-
-        return [resaddrs.value, ttl4.value, ttl6.value, res];
-      },
-
-
-      // Get validated data from cache or by XPCOM call
-      getValidatedData: function(dn, v4, v6) {
-
-        var ext = dnssecExtension;
-        var cache = dnssecExtCache;
-        var resArr;
-
-        if (cache.existsUnexpiredRecord(dn, v4, v6)) {
-          if (ext.debugOutput)
-            dump(ext.debugPrefix + 'Reading IPv4/IPv6 record "' + dn + '" from cache ('
-                 + v4 + '/' + v6 + ')...\n');
-          resArr = cache.getRecord(dn);
-        } else {
-          if (ext.debugOutput)
-            dump(ext.debugPrefix + 'Using XPCOM to get IPv4/IPv6 record "' + dn
-                 + '" (' + v4 + '/' + v6 + ')...\n');
-          resArr = this.doXPCOMvalidation(dn, v4, v6);
-          if (cache.flushInterval) { // do not cache if 0
-            cache.addRecord(dn, resArr[0], resArr[1], resArr[2], resArr[3]);
-          }
-        }
-
-        if (ext.debugOutput) {
-          dump(ext.debugPrefix + 'Queried domain name: ' + dn + '\n');
-          dump(ext.debugPrefix + 'Getting return values: ' + resArr[3] + '; \"'
-               + resArr[0] + '\"; ' + resArr[1] + '; ' + resArr[2] + '\n');
-        }
-
-        var resaddrs = resArr[0];
-        var res = resArr[3];
-
-        return [resaddrs, res];
-      },
-
-
       // Called when async host lookup completes
       onLookupComplete: function(aRequest, aRecord, aStatus) {
 
-        var dn = dnssecExtHandler._asciiHostName;
-        var resolvipv4 = false; // No IPv4 resolving as default
-        var resolvipv6 = false; // No IPv6 resolving as default
-        var addr = null;
-
-        if (dnssecExtension.debugOutput)
-          dump(dnssecExtension.debugPrefix + dnssecExtension.debugStartNotice);
-
-        while (aRecord && aRecord.hasMore()) {   // Address list is not empty
-
-          addr = aRecord.getNextAddrAsString();
-
-          // Check IP version
-          if (addr.indexOf(":") != -1) {
-            // ipv6
-            resolvipv6 = true;
-          } else if (addr.indexOf(".") != -1) {
-            // ipv4
-            resolvipv4 = true;
-          }
-
-          // No need to check more addresses
-          if (resolvipv4 && resolvipv6) break;
-        }
-
-        if (dnssecExtension.debugOutput)
-          dump(dnssecExtension.debugPrefix + 'Browser uses IPv4/IPv6 resolving: \"'
-               + resolvipv4 + '/' + resolvipv6 + '\"\n');
-
-        // Resolve IPv4 if no version is desired
-        if (!resolvipv4 && !resolvipv6) resolvipv4 = true;
-
-        // Get validated data from cache or by XPCOM call
-        var resaddrs = '';
-        var res = -1;
-        var resArr = this.getValidatedData(dn, resolvipv4, resolvipv6);
-        resaddrs = resArr[0];
-        res = resArr[1];
-
-        // Temporary deleting of expired cache records until
-        // cache flush timer will be working
-        if (dnssecExtCache.flushInterval) {
-          dnssecExtCache.delExpiredRecords();
-        }
-
-        if (dnssecExtension.debugOutput) {
-          dnssecExtCache.printContent();
-        }
-
-        // Check browser's IP address(es)
-        var invipaddr = false; // Browser's IP addresses are presumed as valid
-        if (aRecord) {
-          aRecord.rewind();
-          while (aRecord.hasMore()) {   // Address list has another item
-
-            addr = aRecord.getNextAddrAsString();
-
-            // Check if each browser's address is present in DNSSEC address resolved list
-            if (resaddrs.indexOf(' ' + addr + ' ') == -1) invipaddr = true;
-
-            if (dnssecExtension.debugOutput)
-              dump(dnssecExtension.debugPrefix + 'Checking browser IP: '
-                   + addr + '; address is invalid: ' + invipaddr + '\n');
-
-            // No need to check more addresses
-            if (invipaddr) break;
-          }
-        }
-
-        // Set appropriate state if host name does not changed
-        // during resolving process (tab has not been switched)
-        if (dn == gBrowser.currentURI.asciiHost)
-          dnssecExtHandler.setSecurityState(res, invipaddr);
-
-        if (dnssecExtension.debugOutput)
-          dump(dnssecExtension.debugPrefix + dnssecExtension.debugEndNotice);
+        // Check hostname security state
+        dnssecExtResolver.onBrowserLookupComplete(dnssecExtHandler._asciiHostName, aRecord);
 
         // Resolving has finished
         if (dnssecExtension.debugOutput) {
@@ -881,7 +893,7 @@ var dnssecExtHandler = {
         dnssecExtPrefs.setBool("resolvingactive", false);
         if (dnssecExtension.debugOutput)
           dump(dnssecExtension.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
-      },
+      }
     };
 
     // Thread on which onLookupComplete should be called after lookup
@@ -1031,7 +1043,7 @@ var dnssecExtHandler = {
     // Make sure that the display:none style we set in xul is removed now that
     // the popup is actually needed
     this._dnssecPopup.hidden = false;
-    
+
     // Tell the popup to consume dismiss clicks, to avoid bug 395314
     this._dnssecPopup.popupBoxObject
         .setConsumeRollupEvent(Ci.nsIPopupBoxObject.ROLLUP_CONSUME);
