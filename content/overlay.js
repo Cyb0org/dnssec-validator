@@ -640,6 +640,8 @@ var dnssecExtHandler = {
   DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED : "securedConnectionInvSigDomainInvIPaddr",
   // Domain is secured and has a valid signature, but no chain of trust
   DNSSEC_MODE_DOMAIN_SIGNATURE_VALID              : "validDomainSignature",
+  // Authoritative domain is secured and has a valid signature, but no chain of trust
+  DNSSEC_MODE_AUTH_DOMAIN_SIGNATURE_VALID         : "validDomainSignature",
   // Domain is secured and has a valid signature, but browser's IP address is invalid
   DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID    : "validDomainSignatureInvIPaddr",
   // Domain is secured, but it has an invalid signature
@@ -650,6 +652,8 @@ var dnssecExtHandler = {
   DNSSEC_MODE_UNSECURED                           : "unsecuredDnssec",
   // Non-existent domain is secured and has a valid signature, but no chain of trust
   DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID            : "validNoDomainSignature",
+  // Authoritative non-existent domain is secured and has a valid signature, but no chain of trust
+  DNSSEC_MODE_AUTH_NODOMAIN_SIGNATURE_VALID       : "validNoDomainSignature",
   // Non-existent domain is secured and has a valid signature, but browser's IP address is invalid
   DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID  : "validNoDomainSignatureInvIPaddr",
   // Non-existent domain is secured, but it has an invalid signature
@@ -692,6 +696,8 @@ var dnssecExtHandler = {
       this._stringBundle.getString("dnssec.connection.invsigdomain.invipaddr.secured");
     this._securityLabel[this.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID] =
       this._stringBundle.getString("dnssec.domain.signature.valid");
+    this._securityLabel[this.DNSSEC_MODE_AUTH_DOMAIN_SIGNATURE_VALID] =
+      this._stringBundle.getString("dnssec.auth.domain.signature.valid");
     this._securityLabel[this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID] =
       this._stringBundle.getString("dnssec.invipaddr.domain.signature.valid");
     this._securityLabel[this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID] =
@@ -700,6 +706,8 @@ var dnssecExtHandler = {
       this._stringBundle.getString("dnssec.invipaddr.domain.signature.invalid");
     this._securityLabel[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID] =
       this._stringBundle.getString("dnssec.nodomain.signature.valid");
+    this._securityLabel[this.DNSSEC_MODE_AUTH_NODOMAIN_SIGNATURE_VALID] =
+      this._stringBundle.getString("dnssec.auth.nodomain.signature.valid");
     this._securityLabel[this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID] =
       this._stringBundle.getString("dnssec.invipaddr.nodomain.signature.valid");
     this._securityLabel[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID] =
@@ -789,6 +797,13 @@ var dnssecExtHandler = {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID);
       }
       break;
+    case Ci.dnssecIValidator.XPCOM_EXIT_AUTH_DOMAIN_SIGNATURE_VALID:
+      if (!invipaddr) {
+        this.setMode(this.DNSSEC_MODE_AUTH_DOMAIN_SIGNATURE_VALID);
+      } else {
+        this.setMode(this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID);
+      }
+      break;
     case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_SIGNATURE_INVALID:
       if (!invipaddr) {
         this.setMode(this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID);
@@ -799,6 +814,13 @@ var dnssecExtHandler = {
     case Ci.dnssecIValidator.XPCOM_EXIT_NODOMAIN_SIGNATURE_VALID:
       if (!invipaddr) {
         this.setMode(this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID);
+      } else {
+        this.setMode(this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID);
+      }
+      break;
+    case Ci.dnssecIValidator.XPCOM_EXIT_AUTH_NODOMAIN_SIGNATURE_VALID:
+      if (!invipaddr) {
+        this.setMode(this.DNSSEC_MODE_AUTH_NODOMAIN_SIGNATURE_VALID);
       } else {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID);
       }
@@ -954,12 +976,14 @@ var dnssecExtHandler = {
       break;
     // Domain signature is valid
     case this.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID:
+    case this.DNSSEC_MODE_AUTH_DOMAIN_SIGNATURE_VALID:
     case this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID:
     // Domain signature is invalid
     case this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID:
     case this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID:
     // Non-existent domain signature is valid
     case this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID:
+    case this.DNSSEC_MODE_AUTH_NODOMAIN_SIGNATURE_VALID:
     case this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID:
     // Non-existent domain signature is invalid
     case this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID:
