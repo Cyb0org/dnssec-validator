@@ -46,7 +46,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
   -moz-image-region: rect(0px, 35px, 20px, 0px);
 }
 
-#dnssec-box.unsecuredDnssec > #dnssec-icon {
+#dnssec-box.unsecuredDomain > #dnssec-icon,
+#dnssec-box.unsecuredNoDomain > #dnssec-icon {
   -moz-image-region: rect(0px, 70px, 20px, 35px);
 }
 
@@ -95,7 +96,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
   background-color: rgba(106, 177, 63, 1.0);    /* green */
 }
 
-#dnssec-box.unsecuredDnssec {
+#dnssec-box.unsecuredDomain,
+#dnssec-box.unsecuredNoDomain {
   background-color: rgba(168, 168, 168, 1.0);   /* grey */
 }
 
@@ -239,8 +241,11 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-popup-content-box.invalidNoDomainSignatureInvIPaddr > #dnssec-popup-unsecuredLabel,
 #dnssec-popup-content-box.invalidNoDomainSignatureInvIPaddr > #dnssec-popup-nodomainLabel,
 #dnssec-popup-content-box.invalidNoDomainSignatureInvIPaddr > #dnssec-popup-securedDomainLabel,
-#dnssec-popup-content-box.unsecuredDnssec > #dnssec-popup-unsecuredLabel,
-#dnssec-popup-content-box.unsecuredDnssec > #dnssec-popup-domainLabel,
-#dnssec-popup-content-box.unsecuredDnssec > #dnssec-popup-unsecuredDomainLabel {
+#dnssec-popup-content-box.unsecuredDomain > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.unsecuredDomain > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.unsecuredDomain > #dnssec-popup-unsecuredDomainLabel,
+#dnssec-popup-content-box.unsecuredNoDomain > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.unsecuredNoDomain > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.unsecuredNoDomain > #dnssec-popup-unsecuredDomainLabel {
   display: inline;
 }

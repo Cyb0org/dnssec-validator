@@ -649,7 +649,9 @@ var dnssecExtHandler = {
   // Domain is secured, but signature and browser's IP address are invalid
   DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID  : "invalidDomainSignatureInvIPaddr",
   // No DNSSEC signature
-  DNSSEC_MODE_UNSECURED                           : "unsecuredDnssec",
+  DNSSEC_MODE_DOMAIN_UNSECURED                    : "unsecuredDomain",
+  // No NSEC/NSEC3 for non-existent domain name
+  DNSSEC_MODE_NODOMAIN_UNSECURED                  : "unsecuredNoDomain",
   // Non-existent domain is secured and has a valid signature, but no chain of trust
   DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID            : "validNoDomainSignature",
   // Authoritative non-existent domain is secured and has a valid signature, but no chain of trust
@@ -714,8 +716,10 @@ var dnssecExtHandler = {
       this._stringBundle.getString("dnssec.nodomain.signature.invalid");
     this._securityLabel[this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID] =
       this._stringBundle.getString("dnssec.invipaddr.nodomain.signature.invalid");
-    this._securityLabel[this.DNSSEC_MODE_UNSECURED] =
-      this._stringBundle.getString("dnssec.unsecured");
+    this._securityLabel[this.DNSSEC_MODE_DOMAIN_UNSECURED] =
+      this._stringBundle.getString("dnssec.domain.unsecured");
+    this._securityLabel[this.DNSSEC_MODE_NODOMAIN_UNSECURED] =
+      this._stringBundle.getString("dnssec.nodomain.unsecured");
 
     return this._securityLabel;
   },
@@ -832,8 +836,11 @@ var dnssecExtHandler = {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID);
       }
       break;
-    case Ci.dnssecIValidator.XPCOM_EXIT_UNSECURED:
-      this.setMode(this.DNSSEC_MODE_UNSECURED);
+    case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_UNSECURED:
+      this.setMode(this.DNSSEC_MODE_DOMAIN_UNSECURED);
+      break;
+    case Ci.dnssecIValidator.XPCOM_EXIT_NODOMAIN_UNSECURED:
+      this.setMode(this.DNSSEC_MODE_NODOMAIN_UNSECURED);
       break;
     case Ci.dnssecIValidator.XPCOM_EXIT_UNKNOWN:
     case Ci.dnssecIValidator.XPCOM_EXIT_FAILED:
@@ -989,7 +996,8 @@ var dnssecExtHandler = {
     case this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID:
     case this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID:
     // No DNSSEC signature
-    case this.DNSSEC_MODE_UNSECURED:
+    case this.DNSSEC_MODE_DOMAIN_UNSECURED:
+    case this.DNSSEC_MODE_NODOMAIN_UNSECURED:
       tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_UNSECURED];
       break;
     // Getting security status
