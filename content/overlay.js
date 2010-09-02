@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
+var Cc = Components.classes;
+var Ci = Components.interfaces;
+
 window.addEventListener("load", function() { dnssecExtension.init(); }, false);
 window.addEventListener("unload", function() { dnssecExtension.uninit(); }, false);
 
@@ -69,27 +72,6 @@ var dnssecExtCache = {
   },
 
   record: function(a, e4, e6, s) {
-/*
-    this.addrs = a;         // resolved IP address list (IPv4 or IPv6)
-    this.opts = new function() {   // options
-      this.ipv4 = v4;       // IPv4 resolving has been used
-      this.ipv6 = v6;       // IPv6 resolving has been used
-    };
-    this.state = s;         // result state
-    this.expire = e;        // time of record expiration
-*/
-/*
-    this.ipv4 = new function() {
-      this.addrs = a4;     // resolved IPv4 address list
-      this.expir = e4;     // time of address expiration
-    };
-    this.ipv6 = new function() {
-      this.addrs = a6;     // resolved IPv6 address list
-      this.expir = e6;     // time of address expiration
-    };
-    this.state = s;        // result state
-*/
-
     this.addrs = a;        // resolved IPv4 and IPv6 address list
     this.expir = new function() {
       this.ipv4 = e4;      // time of IPv4 address expiration
@@ -372,10 +354,12 @@ var dnssecExtension = {
   },
 
   processNewURL: function(aLocationURI) {
+    var scheme = null;
     var asciiHost = null;
     var utf8Host = null;
 
     try {
+      scheme = aLocationURI.scheme;             // Get URI scheme
       asciiHost = aLocationURI.asciiHost;       // Get punycoded hostname
       utf8Host = aLocationURI.host;             // Get UTF-8 encoded hostname
     } catch(ex) {
@@ -383,10 +367,13 @@ var dnssecExtension = {
     }
 
     if (this.debugOutput)
-      dump(this.debugPrefix + 'ASCII domain name: "' + asciiHost + '"');
+      dump(this.debugPrefix + 'Scheme: "' + scheme + '"; ' +
+           'ASCII domain name: "' + asciiHost + '"');
 
-    if (asciiHost == null ||
+    if (scheme == 'chrome' ||                   // Eliminate chrome scheme
+        asciiHost == null ||
         asciiHost == '' ||                      // Empty string
+        asciiHost.indexOf("\\") != -1 ||        // Eliminate addr containing '\'
         asciiHost.indexOf(":") != -1 ||         // Eliminate IPv6 addr notation
         asciiHost.search(/[A-Za-z]/) == -1) {   // Eliminate IPv4 addr notation
 
