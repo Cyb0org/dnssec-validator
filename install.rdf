@@ -25,10 +25,11 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
     <em:id>dnssec@nic.cz</em:id>
     <em:name>DNSSEC Validator</em:name>
     <em:description>Checks whether domain names in the address bar are secured by DNSSEC.</em:description>
-    <em:version>0.17.4beta</em:version>
+    <em:version>0.17.5beta</em:version>
     <em:creator>CZ.NIC</em:creator>
     <em:developer>Zbynek Michl</em:developer>
     <em:contributor>Matej Dioszegi</em:contributor>
+    <em:contributor>Ondrej Filip</em:contributor>
     <em:contributor>Tomasz Hatlapa</em:contributor>
     <em:contributor>Ondrej Sury</em:contributor>
     <em:contributor>Pavel Tuma</em:contributor>
@@ -48,6 +49,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
         <em:creator>CZ.NIC</em:creator>
         <em:developer>Zbyněk Michl</em:developer>
         <em:contributor>Matej Dioszegi</em:contributor>
+        <em:contributor>Ondřej Filip</em:contributor>
         <em:contributor>Tomasz Hatlapa</em:contributor>
         <em:contributor>Ondřej Surý</em:contributor>
         <em:contributor>Pavel Tůma</em:contributor>
