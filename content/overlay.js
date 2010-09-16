@@ -628,7 +628,7 @@ var dnssecExtHandler = {
   // Domain is secured and has a valid signature, but no chain of trust
   DNSSEC_MODE_DOMAIN_SIGNATURE_VALID              : "validDomainSignature",
   // Authoritative domain is secured and has a valid signature, but no chain of trust
-  DNSSEC_MODE_AUTH_DOMAIN_SIGNATURE_VALID         : "validDomainSignature",
+  DNSSEC_MODE_AUTH_DOMAIN_SIGNATURE_VALID         : "validAuthDomainSignature",
   // Domain is secured and has a valid signature, but browser's IP address is invalid
   DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID    : "validDomainSignatureInvIPaddr",
   // Domain is secured, but it has an invalid signature
@@ -642,7 +642,7 @@ var dnssecExtHandler = {
   // Non-existent domain is secured and has a valid signature, but no chain of trust
   DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID            : "validNoDomainSignature",
   // Authoritative non-existent domain is secured and has a valid signature, but no chain of trust
-  DNSSEC_MODE_AUTH_NODOMAIN_SIGNATURE_VALID       : "validNoDomainSignature",
+  DNSSEC_MODE_AUTH_NODOMAIN_SIGNATURE_VALID       : "validAuthNoDomainSignature",
   // Non-existent domain is secured and has a valid signature, but browser's IP address is invalid
   DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID  : "validNoDomainSignatureInvIPaddr",
   // Non-existent domain is secured, but it has an invalid signature
