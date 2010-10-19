@@ -18,10 +18,13 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
 /* Temp button */
+/*
 #dnssec-toolbar-button {
   list-style-image: url("chrome://dnssec/skin/key.png");
   -moz-image-region: rect(0px, 35px, 20px, 0px);
 }
+*/
+
 
 /* DNSSEC icons stack */
 /*
@@ -133,13 +136,22 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 /*  background-color: #4c69bc; */
 }
 
+#dnssec-popup {
+  list-style-image: url("chrome://dnssec/skin/logo.png");
+}
+
+/* grey */
+#dnssec-popup.unsecuredDomain > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.unsecuredNoDomain > #dnssec-popup-container > #dnssec-popup-icon {
+  -moz-image-region: rect(0px, 130px, 38px, 0px);
+}
+
 /* orange */
 #dnssec-popup.validDomainSignature > #dnssec-popup-container > #dnssec-popup-icon,
 #dnssec-popup.validAuthDomainSignature > #dnssec-popup-container > #dnssec-popup-icon,
 #dnssec-popup.validNoDomainSignature > #dnssec-popup-container > #dnssec-popup-icon,
 #dnssec-popup.validAuthNoDomainSignature > #dnssec-popup-container > #dnssec-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/logo.png");
-  -moz-image-region: rect(0px, 390px, 38px, 260px);
+  -moz-image-region: rect(0px, 520px, 38px, 390px);
 }
 
 /* red */
@@ -153,15 +165,13 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-popup.invalidNoDomainSignature > #dnssec-popup-container > #dnssec-popup-icon,
 #dnssec-popup.validNoDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon,
 #dnssec-popup.invalidNoDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/logo.png");
-  -moz-image-region: rect(0px, 260px, 38px, 130px);
+  -moz-image-region: rect(0px, 390px, 38px, 260px);
 }
 
 /* green */
 #dnssec-popup.securedConnectionDomain > #dnssec-popup-container > #dnssec-popup-icon,
 #dnssec-popup.securedConnectionNoDomain > #dnssec-popup-container > #dnssec-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/logo.png");
-  -moz-image-region: rect(0px, 130px, 38px, 0px);
+  -moz-image-region: rect(0px, 260px, 38px, 130px);
 }
 
 

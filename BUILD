@@ -23,7 +23,7 @@ ln -s . lib                            (needed for successful build of libldns)
 * (strip -x -S ...)                                                                        [Lin]
 * (i586-mingw32msvc-strip -x -S ...)                                                       [Win]
 
-libldns r3338:
+libldns r3366:
 * export CFLAGS="-m64 -fPIC"                                                               [Lin]
 * export CFLAGS="-m32 -fPIC"                                                               [Lin]
 * export CFLAGS="-arch i386 -mmacosx-version-min=10.4 -fPIC"                               [Mac]
