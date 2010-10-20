@@ -17,7 +17,7 @@
 # DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 # ***** END LICENSE BLOCK *****
 
-EXTENSION_VERSION = `cat install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p'`
+EXTENSION_VERSION = $(shell cat install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p')
 
 all: sys_linux sys_macosx sys_windows
 
@@ -27,15 +27,15 @@ sys_linux:
 	mkdir -p platform/Linux_x86_64-gcc3/components && ln -s ../../../xpcom/dnssecValidator_linux-x64.so platform/Linux_x86_64-gcc3/components/dnssecValidator.so
 	mkdir -p platform/Linux_x86-gcc3/components && ln -s ../../../xpcom/dnssecValidator_linux-x86.so platform/Linux_x86-gcc3/components/dnssecValidator.so
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86_64-gcc3<\/em:targetPlatform><em:targetPlatform>Linux_x86-gcc3<\/em:targetPlatform>/g' install.rdf.template > install.rdf
-	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-linux.xpi
+	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-linux.xpi && ln -sf dnssec_validator-$(EXTENSION_VERSION)-linux.xpi dnssec_validator-linux.xpi
 
 sys_macosx:
 	@echo '### Creating package for Mac OS X... ###'
 	rm -rf platform
-	mkdir -p platform/Darwin_x86-gcc3/components && ln -s ../../../xpcom/dnssecValidator_macosx-x86.dylib platform/Darwin_x86-gcc3/components/dnssecValidator.so
-	mkdir -p platform/Darwin_ppc-gcc3/components && ln -s ../../../xpcom/dnssecValidator_macosx-ppc.dylib platform/Darwin_ppc-gcc3/components/dnssecValidator.so
+	mkdir -p platform/Darwin_x86-gcc3/components && ln -s ../../../xpcom/dnssecValidator_macosx-x86.dylib platform/Darwin_x86-gcc3/components/dnssecValidator.dylib
+	mkdir -p platform/Darwin_ppc-gcc3/components && ln -s ../../../xpcom/dnssecValidator_macosx-ppc.dylib platform/Darwin_ppc-gcc3/components/dnssecValidator.dylib
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform><em:targetPlatform>Darwin_ppc-gcc3<\/em:targetPlatform>/g' install.rdf.template > install.rdf
-	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-macosx.xpi
+	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-macosx.xpi && ln -sf dnssec_validator-$(EXTENSION_VERSION)-macosx.xpi dnssec_validator-macosx.xpi
 
 sys_windows:
 	@echo '### Creating package for Windows... ###'
@@ -43,7 +43,7 @@ sys_windows:
 	mkdir -p platform/WINNT_x86-msvc/components && ln -s ../../../xpcom/windows/dnssecWinStubLoader/Release/dnssecWinStubLoader.dll platform/WINNT_x86-msvc/components/dnssecWinStubLoader.dll
 	mkdir -p platform/WINNT_x86-msvc/libraries && ln -s ../../../xpcom/windows/dnssecValidator/Release/dnssecValidator.dll platform/WINNT_x86-msvc/libraries/dnssecValidator.dll && ln -s ../../../xpcom/ds_windows-x86.dll platform/WINNT_x86-msvc/libraries/ds_windows-x86.dll
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>WINNT_x86-msvc<\/em:targetPlatform>/g' install.rdf.template > install.rdf
-	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-windows.xpi
+	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-windows.xpi && ln -sf dnssec_validator-$(EXTENSION_VERSION)-windows.xpi dnssec_validator-windows.xpi
 
 clean:
 	rm -rf platform
