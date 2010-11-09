@@ -10,32 +10,32 @@ openssl (https://www.openssl.org)
 No need to get these libraries, they are already built in GIT.
 
 openssl 1.0.0a:
-* ./Configure linux-x86_64 enable-static-engine -D_GNU_SOURCE -fPIC                        [Lin]
-* ./Configure linux-generic32 enable-static-engine -D_GNU_SOURCE -fPIC -m32                [Lin]
-* (./Configure darwin-i386-cc shared -mmacosx-version-min=10.4)                            [Mac]
-* ./Configure darwin-i386-cc enable-static-engine -mmacosx-version-min=10.4 -fPIC          [Mac]
-* (./Configure darwin-ppc-cc shared -mmacosx-version-min=10.4)                             [Mac]
-* ./Configure darwin-ppc-cc enable-static-engine -mmacosx-version-min=10.4                 [Mac]
-* ./Configure --cross-compile-prefix=i586-mingw32msvc- mingw enable-static-engine          [Win]
+* ./Configure linux-x86_64 enable-static-engine -D_GNU_SOURCE -fPIC -Wa,--noexecstack               [Lin]
+* ./Configure linux-generic32 enable-static-engine -D_GNU_SOURCE -fPIC -m32 -Wa,--noexecstack       [Lin]
+* (./Configure darwin-i386-cc shared -mmacosx-version-min=10.4)                                     [Mac]
+* ./Configure darwin-i386-cc enable-static-engine -mmacosx-version-min=10.4 -fPIC                   [Mac]
+* (./Configure darwin-ppc-cc shared -mmacosx-version-min=10.4)                                      [Mac]
+* ./Configure darwin-ppc-cc enable-static-engine -mmacosx-version-min=10.4                          [Mac]
+* ./Configure --cross-compile-prefix=i586-mingw32msvc- mingw enable-static-engine                   [Win]
 make
 make test
 ln -s . lib                            (needed for successful build of libldns)
-* (strip -x -S ...)                                                                        [Lin]
-* (i586-mingw32msvc-strip -x -S ...)                                                       [Win]
+* (strip -x -S ...)                                                                                 [Lin]
+* (i586-mingw32msvc-strip -x -S ...)                                                                [Win]
 
 libldns r3366:
-* export CFLAGS="-m64 -fPIC"                                                               [Lin]
-* export CFLAGS="-m32 -fPIC"                                                               [Lin]
-* export CFLAGS="-arch i386 -mmacosx-version-min=10.4 -fPIC"                               [Mac]
-* export CFLAGS="-arch ppc -mmacosx-version-min=10.4"                                      [Mac]
-* export CC="i586-mingw32msvc-gcc"                                                         [Win]
-* ./configure --disable-shared --with-ssl=../openssl-1.0.0a --host=mingw32                 [Win]
-* [Makefile: s/-l.../-Wl,-l.../]                                                           [Win]
-* ./configure --disable-shared --with-ssl=../openssl-1.0.0a                           [Lin, Mac]
+* export CFLAGS="-m64 -fPIC"                                                                        [Lin]
+* export CFLAGS="-m32 -fPIC"                                                                        [Lin]
+* export CFLAGS="-arch i386 -mmacosx-version-min=10.4 -fPIC"                                        [Mac]
+* export CFLAGS="-arch ppc -mmacosx-version-min=10.4"                                               [Mac]
+* export CC="i586-mingw32msvc-gcc"                                                                  [Win]
+* ./configure --disable-shared --with-ssl=../openssl-1.0.0a --host=mingw32                          [Win]
+* [Makefile: s/-l.../-Wl,-l.../]                                                                    [Win]
+* ./configure --disable-shared --with-ssl=../openssl-1.0.0a                                    [Lin, Mac]
 make
-* i586-mingw32msvc-ranlib .libs/libldns.a                                                  [Win]
-* (strip -x -S ...)                                                                        [Lin]
-* (i586-mingw32msvc-strip -x -S ...)                                                       [Win]
+* i586-mingw32msvc-ranlib .libs/libldns.a                                                           [Win]
+* (strip -x -S ...)                                                                                 [Lin]
+* (i586-mingw32msvc-strip -x -S ...)                                                                [Win]
 
 
 ### LINUX (expected Debian GNU/Linux unstable amd64) ###
