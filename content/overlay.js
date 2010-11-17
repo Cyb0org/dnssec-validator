@@ -227,7 +227,7 @@ var dnssecExtPrefObserver = {
     case "debugoutput":     // Change debugging to stdout
       dnssecExtension.getDebugOutputFlag();
       break;
-    case "asyncresolve":     // Change sync/async resolving
+    case "asyncresolve":    // Change sync/async resolving
       dnssecExtension.getAsyncResolveFlag();
       break;
     case "dnsserveraddr":   // Flush all cache records
@@ -236,6 +236,10 @@ var dnssecExtPrefObserver = {
     case "cacheflushinterval":
       dnssecExtCache.getFlushInterval();
       if (!dnssecExtCache.flushInterval) dnssecExtCache.delAllRecords();
+      break;
+    case "popupfgcolor":   // Change popup-window fore/background color
+    case "popupbgcolor":
+      dnssecExtension.getPopupColors();
       break;
     }
   }
@@ -265,6 +269,9 @@ var dnssecExtension = {
 
     // Set error mode (no icon)
     dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
+
+    // Change popup-window fore/background color if desired
+    this.getPopupColors();
 
     // Register preferences observer
     dnssecExtPrefObserver.register();
@@ -337,6 +344,12 @@ var dnssecExtension = {
 
   getAsyncResolveFlag: function() {
     this.asyncResolve = dnssecExtPrefs.getBool("asyncresolve");
+  },
+
+  getPopupColors: function() {
+    var dpw = document.getElementById("dnssec-popup-container");
+    dpw.style.color = dnssecExtPrefs.getChar("popupfgcolor");
+    dpw.style.backgroundColor = dnssecExtPrefs.getChar("popupbgcolor");
   },
 
   uninit: function() {

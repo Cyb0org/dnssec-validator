@@ -20,6 +20,12 @@ these parameters:
  - extensions.dnssec.cacheflushinterval [integer]
    -> interval of flushing expired cache records
       (in seconds, "0" stands for disabled cache)
+ - extensions.dnssec.popupfgcolor [string]
+ - extensions.dnssec.popupbgcolor [string]
+   -> popup-window text and background color
+      (use color notation according to "https://developer.mozilla.org/en/CSS/
+       color_value" (e.g. "#ffffff", "white", etc.), or leave empty for using
+       theme colors)
 
 Please do not change any other add-on's option here except those mentioned
 above.

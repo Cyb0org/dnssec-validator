@@ -26,5 +26,7 @@ pref("extensions.dnssec.dnsserverpresetchoose", 0);
 pref("extensions.dnssec.dnsserveraddr", "");
 pref("extensions.dnssec.optdnsserveraddr", "127.0.0.1");
 pref("extensions.dnssec.version", "");
+pref("extensions.dnssec.popupfgcolor", "");
+pref("extensions.dnssec.popupbgcolor", "");
 // See http://kb.mozillazine.org/Localize_extension_descriptions
 // pref("extensions.dnssec@zbynek.michl.description", "chrome://dnssec/locale/dnssec.properties");

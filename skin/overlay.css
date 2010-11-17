@@ -39,7 +39,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-/* Favicon */
+/* Key icon */
 #dnssec-icon {
   width: 39px;
   height: 20px;
@@ -66,8 +66,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 #dnssec-box {
   background-color: rgba(221, 221, 221, 1.0);   /* grey */
-/*  background-color: -moz-dialog; */ /* grey */
-  color: -moz-dialogtext; /* black */
+/*  background-color: -moz-dialog; */
+/*  color: -moz-dialogtext; */
 /*  -moz-border-end: 1px solid ThreeDShadow; */
 /*  max-height: 20px; */
 }
@@ -120,23 +120,9 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 /* DNSSEC popup images */
 #dnssec-popup-icon {
-/*
-  height: 64px;
-  width: 64px;
-  padding: 0;
-  list-style-image: url("chrome://browser/skin/identity.png");
-  -moz-image-region: rect(0px, 64px, 64px, 0px);
-*/
   height: 38px;
   width: 130px;
   padding: 0;
-/*  list-style-image: url("chrome://dnssec/skin/dnssec_unsecured_red.png");*/
-/*  -moz-image-region: rect(0px 40px 40px 0px); */
-
-/*  background-color: #4c69bc; */
-}
-
-#dnssec-popup {
   list-style-image: url("chrome://dnssec/skin/logo.png");
 }
 
@@ -206,7 +192,6 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 /* DNSSEC popup bounding box */
 #dnssec-popup-container {
-  background-image: none;
   min-width: 280px;
   padding: 10px;
 }
