@@ -172,7 +172,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-popup-securedLabel,
 #dnssec-popup-unsecuredLabel {
   font-weight: bold;
-  max-width: 300px;
+  max-width: 335px;
   font-size: 140%;
   display: none;
 }
@@ -186,7 +186,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 #dnssec-popup-content-host {
   font-weight: bold;
-  max-width: 300px;
+  max-width: 335px;
 }
 
 

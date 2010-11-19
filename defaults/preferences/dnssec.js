@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
+pref("extensions.dnssec@nic.cz.name", "chrome://dnssec/locale/dnssec.properties");
+pref("extensions.dnssec@nic.cz.description", "chrome://dnssec/locale/dnssec.properties");
 pref("extensions.dnssec.asyncresolve", true);
 pref("extensions.dnssec.cacheflushinterval", 3600); // in seconds, 0 to cache disable
 pref("extensions.dnssec.debugoutput", false);
