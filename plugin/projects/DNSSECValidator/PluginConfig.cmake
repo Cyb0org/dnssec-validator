@@ -34,7 +34,7 @@ set(MOZILLA_PLUGINID "nic.cz/DNSSECValidator")
 # strings
 set(FBSTRING_CompanyName "CZ.NIC Labs")
 set(FBSTRING_FileDescription "DNSSEC Validator Plug-in")
-set(FBSTRING_PLUGIN_VERSION "1.0.0")
+set(FBSTRING_PLUGIN_VERSION "0.0.1")
 set(FBSTRING_LegalCopyright "Copyright 2010 CZ.NIC Labs")
 set(FBSTRING_PluginFileName "np${PLUGIN_NAME}.dll")
 set(FBSTRING_ProductName "DNSSEC Validator")
@@ -48,3 +48,6 @@ set(FBMAC_USE_CARBON 1)
 set(FBMAC_USE_COCOA 1)
 set(FBMAC_USE_COREGRAPHICS 1)
 set(FBMAC_USE_COREANIMATION 0)
+
+# disable plugin drawing support
+set(FB_GUI_DISABLED 1)
