@@ -31,15 +31,26 @@ public:
 
     // Method echo
     FB::variant echo(const FB::variant& msg);
-    
+
     // Method test-event
     void testEvent(const FB::variant& s);
+
+
+    FB::VariantList Validate(const std::string& domain, const uint16_t options,
+                             const std::string& optdnssrv);
+
+    bool ValidateAsync(const std::string& domain, const uint16_t options,
+                       const std::string& optdnssrv, const FB::JSObjectPtr &callback);
+
 
 private:
     DNSSECValidatorWeakPtr m_plugin;
     FB::BrowserHostPtr m_host;
 
     std::string m_testString;
+
+    void ValidateAsync_thread(const std::string& domain, const uint16_t options,
+                              const std::string& optdnssrv, const FB::JSObjectPtr &callback);
 };
 
 #endif // H_DNSSECValidatorAPI

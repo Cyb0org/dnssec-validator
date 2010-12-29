@@ -18,12 +18,12 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
 /* Temp button */
-/*
+
 #dnssec-toolbar-button {
   list-style-image: url("chrome://dnssec/skin/key.png");
   -moz-image-region: rect(0px, 35px, 20px, 0px);
 }
-*/
+
 
 
 /* DNSSEC icons stack */

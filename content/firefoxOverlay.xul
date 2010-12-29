@@ -22,6 +22,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <?xml-stylesheet href="chrome://dnssec/skin/overlay.css" type="text/css"?>
 <!DOCTYPE overlay SYSTEM "chrome://dnssec/locale/dnssec.dtd">
 <overlay id="dnssec-overlay"
+         xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script src="overlay.js"/>
   <script src="preferences.js"/>
@@ -30,10 +31,10 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
   </stringbundleset>
 
   <!-- Temp button -->
-  <!-- toolbarpalette id="BrowserToolbarPalette">
+  <toolbarpalette id="BrowserToolbarPalette">
     <toolbarbutton id="dnssec-toolbar-button"
       oncommand="dnssecExtension.onToolbarButtonCommand();"/>
-  </toolbarpalette -->
+  </toolbarpalette>
 
   <popupset id="mainPopupSet">
     <!-- Popup for DNSSEC information -->
@@ -63,6 +64,9 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
     onfocus="document.getElementById('dnssec-box').style.MozUserFocus= 'normal'"
     onblur="document.getElementById('dnssec-box').style.MozUserFocus = 'ignore';" -->
 
+    <!-- DNSSEC plugin -->
+    <html:object id="dnssec-plugin" type="application/x-dnssecvalidator" width="0" height="0"></html:object>
+
     <box id="dnssec-outerbox">
       <!-- DNSSEC button in urlbar -->
       <hbox id="dnssec-box" role="button"
@@ -76,5 +80,4 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
       </hbox>
     </box>
   </textbox>
-
 </overlay>

@@ -49,9 +49,9 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif ()
 
 # set header file directories
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../lib/ldns
-                    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/openssl
-                    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/linux/${BUILD_ARCH})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../lib/linux/${BUILD_ARCH}
+                    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/ldns
+                    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/openssl/include)
 
 # set static library paths
 add_library(ldns STATIC IMPORTED)

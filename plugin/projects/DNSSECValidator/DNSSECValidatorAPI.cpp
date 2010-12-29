@@ -10,6 +10,16 @@
 
 #include "DNSSECValidatorAPI.h"
 
+//#include "npfunctions.h"
+//#include "npapi.h"
+#include <iostream>
+//#include <stdio.h>
+//#include <string.h>
+extern "C" {   /* use C language linkage */
+  #include "ds.h"
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn DNSSECValidatorAPI::DNSSECValidatorAPI(DNSSECValidatorPtr plugin, FB::BrowserHostPtr host)
 ///
@@ -24,6 +34,9 @@ DNSSECValidatorAPI::DNSSECValidatorAPI(DNSSECValidatorPtr plugin, FB::BrowserHos
 {
     registerMethod("echo",      make_method(this, &DNSSECValidatorAPI::echo));
     registerMethod("testEvent", make_method(this, &DNSSECValidatorAPI::testEvent));
+    registerMethod("Validate", make_method(this, &DNSSECValidatorAPI::Validate));
+    registerMethod("ValidateAsync", make_method(this, &DNSSECValidatorAPI::ValidateAsync));
+    registerMethod("ValidateAsync_thread", make_method(this, &DNSSECValidatorAPI::ValidateAsync_thread));
 
     // Read-write property
     registerProperty("testString",
@@ -35,9 +48,9 @@ DNSSECValidatorAPI::DNSSECValidatorAPI(DNSSECValidatorPtr plugin, FB::BrowserHos
     registerProperty("version",
                      make_property(this,
                         &DNSSECValidatorAPI::get_version));
-    
-    
-    registerEvent("onfired");    
+
+
+    registerEvent("onfired");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -97,3 +110,40 @@ void DNSSECValidatorAPI::testEvent(const FB::variant& var)
     FireEvent("onfired", FB::variant_list_of(var)(true)(1));
 }
 
+
+
+FB::VariantList DNSSECValidatorAPI::Validate(const std::string& domain, const uint16_t options,
+                                             const std::string& optdnssrv)
+{
+    FB::VariantList reslist;
+    short rv;
+    char *tmpptr = NULL;
+    uint32_t ttl4, ttl6;
+
+    rv = ds_validate(domain.c_str(), options, optdnssrv.c_str(), &tmpptr, &ttl4, &ttl6);
+
+    reslist.push_back((std::string)tmpptr);
+    reslist.push_back(ttl4);
+    reslist.push_back(ttl6);
+    reslist.push_back(rv);
+
+    ds_free_resaddrsbuf();
+
+    return reslist;
+}
+
+bool DNSSECValidatorAPI::ValidateAsync(const std::string& domain, const uint16_t options,
+                                       const std::string& optdnssrv, const FB::JSObjectPtr &callback)
+{
+    std::cout << "ValidateAsync() call\n";
+    boost::thread t(boost::bind(&DNSSECValidatorAPI::ValidateAsync_thread,
+         FB::ptr_cast<DNSSECValidatorAPI>(shared_ptr()), domain, options, optdnssrv, callback));
+    return true; // the thread is started
+}
+
+void DNSSECValidatorAPI::ValidateAsync_thread(const std::string& domain, const uint16_t options,
+                                              const std::string& optdnssrv, const FB::JSObjectPtr &callback)
+{
+    std::cout << "ValidateAsync_thread call\n";
+    callback->InvokeAsync("", FB::variant_list_of(shared_ptr())(Validate(domain, options, optdnssrv)));
+}
