@@ -18,14 +18,21 @@
 # ***** END LICENSE BLOCK *****
 
 EXTENSION_VERSION = $(shell cat install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p')
+PLUGIN_ROOT = plugin
+PLUGIN_NAME = DNSSECValidator
 
-all: sys_linux sys_macosx sys_windows
+#all: sys_linux sys_macosx sys_windows
 
 sys_linux:
 	@echo '### Creating package for Linux... ###'
-	rm -rf platform
-	mkdir -p platform/Linux_x86_64-gcc3/components && ln -s ../../../xpcom/dnssecValidator_linux-x64.so platform/Linux_x86_64-gcc3/components/dnssecValidator.so
-	mkdir -p platform/Linux_x86-gcc3/components && ln -s ../../../xpcom/dnssecValidator_linux-x86.so platform/Linux_x86-gcc3/components/dnssecValidator.so
+	rm -rf platform $(PLUGIN_ROOT)/build
+	./$(PLUGIN_ROOT)/FireBreath/prepmake.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m64 -DCMAKE_CXX_FLAGS=-m64
+	make -C $(PLUGIN_ROOT)/build
+	mkdir -p platform/Linux_x86_64-gcc3/plugins && mv $(PLUGIN_ROOT)/build/bin/$(PLUGIN_NAME)/np$(PLUGIN_NAME).so platform/Linux_x86_64-gcc3/plugins/np$(PLUGIN_NAME)_x64.so
+	rm -rf $(PLUGIN_ROOT)/build
+	./$(PLUGIN_ROOT)/FireBreath/prepmake.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32
+	make -C $(PLUGIN_ROOT)/build
+	mkdir -p platform/Linux_x86-gcc3/plugins && mv $(PLUGIN_ROOT)/build/bin/$(PLUGIN_NAME)/np$(PLUGIN_NAME).so platform/Linux_x86-gcc3/plugins/np$(PLUGIN_NAME)_x86.so
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86_64-gcc3<\/em:targetPlatform><em:targetPlatform>Linux_x86-gcc3<\/em:targetPlatform>/g' install.rdf.template > install.rdf
 	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-linux.xpi && ln -sf dnssec_validator-$(EXTENSION_VERSION)-linux.xpi dnssec_validator-linux.xpi
 
