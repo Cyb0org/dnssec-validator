@@ -49,8 +49,8 @@ OpenSSL used as well as that of the covered work.
 #include "dnssecStates.gen"
 //#include "ds.h"
 
-#define DEBUG_PREFIX "dnssec: xpcom: "
-#define ERROR_PREFIX "dnssec: xpcom: error: "
+#define DEBUG_PREFIX "dnssec: npapi: "
+#define ERROR_PREFIX "dnssec: npapi: error: "
 #define MAX_IPADDRLEN 39             /* max len of IPv4 and IPv6 addr notation */
 #define MAX_SRCHLSTLEN 6*256         /* max len of searchlist */
 
@@ -428,10 +428,10 @@ short ds_read_resolver(ldns_resolver **res, const char *str) {
 /* read input options into a structure */
 void ds_init_opts(const uint16_t options) {
 
-  opts.debug = options & XPCOM_INPUT_FLAG_DEBUGOUTPUT;
-  opts.usetcp = options & XPCOM_INPUT_FLAG_USETCP;
-  opts.resolvipv4 = options & XPCOM_INPUT_FLAG_RESOLVIPV4;
-  opts.resolvipv6 = options & XPCOM_INPUT_FLAG_RESOLVIPV6;
+  opts.debug = options & NPAPI_INPUT_FLAG_DEBUGOUTPUT;
+  opts.usetcp = options & NPAPI_INPUT_FLAG_USETCP;
+  opts.resolvipv4 = options & NPAPI_INPUT_FLAG_RESOLVIPV4;
+  opts.resolvipv6 = options & NPAPI_INPUT_FLAG_RESOLVIPV6;
 }
 
 
@@ -750,7 +750,7 @@ short ds_validate_rrsets(ldns_resolver *res, ldns_rdf *dn,
   size_t i;
 
   /* initialize variables */
-  retval = XPCOM_EXIT_FAILED;        /* default exit status */
+  retval = NPAPI_EXIT_FAILED;        /* default exit status */
   s = LDNS_STATUS_OK;
   ap = NULL;
   rrlist = NULL;
@@ -820,12 +820,12 @@ short ds_validate_rrsets(ldns_resolver *res, ldns_rdf *dn,
       }
 
       if (ldns_pkt_ad(ap)) {   /* AD bit is set in answer */
-        retval = XPCOM_EXIT_CONNECTION_DOMAIN_SECURED;
+        retval = NPAPI_EXIT_CONNECTION_DOMAIN_SECURED;
       } else {
 
         tmp_dn = ldns_rdf_clone(dn);
         tmp_qt = qt;
-        tmp_rv = XPCOM_EXIT_DOMAIN_SIGNATURE_VALID; /* assume this security state */
+        tmp_rv = NPAPI_EXIT_DOMAIN_SIGNATURE_VALID; /* assume this security state */
 
         if (opts.debug) {
           printf(DEBUG_PREFIX "Start of RRSET(s) validation...\n");
@@ -845,28 +845,28 @@ short ds_validate_rrsets(ldns_resolver *res, ldns_rdf *dn,
           /* get RRSIG record(s) from answer */
           if (ds_get_rrsiglist(&rrsiglist, ap, tmp_dn, tmp_qt, res) != 0) {
             fprintf(stderr, ERROR_PREFIX "CNAME/A/AAAA rrsiglist getting failed!\n");
-            retval = XPCOM_EXIT_FAILED;
+            retval = NPAPI_EXIT_FAILED;
             goto closure;
           }
 
           if (!rrsiglist) { /* RRSIG does not exist */
-            tmp_rv = ds_get_worse_case(tmp_rv, XPCOM_EXIT_DOMAIN_UNSECURED);
+            tmp_rv = ds_get_worse_case(tmp_rv, NPAPI_EXIT_DOMAIN_UNSECURED);
           } else {
 
             /* get DNSKEY record(s) */
             keylist = ds_get_keylist(rrsiglist, res);
             if (!keylist) {
               fprintf(stderr, ERROR_PREFIX "keylist failed!\n");
-              retval = XPCOM_EXIT_FAILED;
+              retval = NPAPI_EXIT_FAILED;
               goto closure;
             }
 
             s = ds_rr_verify(rrlist, rrsiglist, keylist);
 
             if (s == LDNS_STATUS_OK) {
-              tmp_rv = ds_get_worse_case(tmp_rv, XPCOM_EXIT_DOMAIN_SIGNATURE_VALID);
+              tmp_rv = ds_get_worse_case(tmp_rv, NPAPI_EXIT_DOMAIN_SIGNATURE_VALID);
             } else {
-              tmp_rv = ds_get_worse_case(tmp_rv, XPCOM_EXIT_DOMAIN_SIGNATURE_INVALID);
+              tmp_rv = ds_get_worse_case(tmp_rv, NPAPI_EXIT_DOMAIN_SIGNATURE_INVALID);
             }
           }
 
@@ -885,8 +885,8 @@ short ds_validate_rrsets(ldns_resolver *res, ldns_rdf *dn,
         }
 
         /* test for AA bit in answer */
-        if (ldns_pkt_aa(ap) && retval == XPCOM_EXIT_DOMAIN_SIGNATURE_VALID) {
-          retval = XPCOM_EXIT_AUTH_DOMAIN_SIGNATURE_VALID;
+        if (ldns_pkt_aa(ap) && retval == NPAPI_EXIT_DOMAIN_SIGNATURE_VALID) {
+          retval = NPAPI_EXIT_AUTH_DOMAIN_SIGNATURE_VALID;
         }
 
         if (opts.debug) {
@@ -898,7 +898,7 @@ short ds_validate_rrsets(ldns_resolver *res, ldns_rdf *dn,
     } else { /* response code is not NOERROR */
 
       if (ldns_pkt_get_rcode(ap) != LDNS_RCODE_NXDOMAIN) { /* unknown state */
-        retval = XPCOM_EXIT_UNKNOWN;
+        retval = NPAPI_EXIT_UNKNOWN;
       } else { /* domain name does not exist */
 
         /* get SOA RR from answer packet */
@@ -911,7 +911,7 @@ short ds_validate_rrsets(ldns_resolver *res, ldns_rdf *dn,
         }
 
         if (ldns_pkt_ad(ap)) {
-          retval = XPCOM_EXIT_CONNECTION_NODOMAIN_SECURED; /* AD bit is set in answer */
+          retval = NPAPI_EXIT_CONNECTION_NODOMAIN_SECURED; /* AD bit is set in answer */
         } else { /* AD bit is not set in answer */
 
           /* try to get NSEC/NSEC3 from answer */
@@ -947,17 +947,17 @@ short ds_validate_rrsets(ldns_resolver *res, ldns_rdf *dn,
             }
 
             if (s == LDNS_STATUS_OK) {
-              retval = ldns_pkt_aa(ap) ? XPCOM_EXIT_AUTH_NODOMAIN_SIGNATURE_VALID
-                                       : XPCOM_EXIT_NODOMAIN_SIGNATURE_VALID;
+              retval = ldns_pkt_aa(ap) ? NPAPI_EXIT_AUTH_NODOMAIN_SIGNATURE_VALID
+                                       : NPAPI_EXIT_NODOMAIN_SIGNATURE_VALID;
             } else {
-              retval = XPCOM_EXIT_NODOMAIN_SIGNATURE_INVALID;
+              retval = NPAPI_EXIT_NODOMAIN_SIGNATURE_INVALID;
             }
 
             /* free used resources */
             ldns_rr_list_deep_free(rrsiglist);
 
           } else {   /* no NSEC/NSEC3 */
-            retval = XPCOM_EXIT_NODOMAIN_UNSECURED;
+            retval = NPAPI_EXIT_NODOMAIN_UNSECURED;
           }
         }
       }
@@ -989,9 +989,9 @@ short ds_validate_rrsets(ldns_resolver *res, ldns_rdf *dn,
       /* read TTL */
       *ttl = ldns_rr_ttl(ldns_rr_list_rr(alist, 0));
 
-      retval = XPCOM_EXIT_CONNECTION_INVSIGDOMAIN_SECURED;
+      retval = NPAPI_EXIT_CONNECTION_INVSIGDOMAIN_SECURED;
     } else {
-      retval = XPCOM_EXIT_UNKNOWN;
+      retval = NPAPI_EXIT_UNKNOWN;
     }
 
   }
@@ -1076,9 +1076,9 @@ short ds_validate(const char *domain, const uint16_t options,
   WSADATA wsaData;
 #endif
 
-  retval = XPCOM_EXIT_FAILED;
-  retval_ipv4 = XPCOM_EXIT_FAILED;
-  retval_ipv6 = XPCOM_EXIT_FAILED;
+  retval = NPAPI_EXIT_FAILED;
+  retval_ipv4 = NPAPI_EXIT_FAILED;
+  retval_ipv6 = NPAPI_EXIT_FAILED;
   dn = NULL;
   res = NULL;
   *ttl4 = *ttl6 = 0;                 /* IPv4 and IPv6 addresses TTL */

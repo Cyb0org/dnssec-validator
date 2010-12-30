@@ -413,7 +413,6 @@ var dnssecExtension = {
 
   },
 
-
   onToolbarButtonCommand: function() {
 
   },
@@ -457,11 +456,12 @@ var dnssecExtResolver = {
     var nameserver = dnssecExtPrefs.getChar("dnsserveraddr");
 
     // Create variable to pass options
+    var c = dnssecExtNPAPIConst;
     var options = 0;
-    if (dnssecExtension.debugOutput) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_DEBUGOUTPUT;
-    if (dnssecExtPrefs.getBool("usetcp")) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_USETCP;
-    if (resolvipv4) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_RESOLVIPV4;
-    if (resolvipv6) options |= Ci.dnssecIValidator.XPCOM_INPUT_FLAG_RESOLVIPV6;
+    if (dnssecExtension.debugOutput) options |= c.NPAPI_INPUT_FLAG_DEBUGOUTPUT;
+    if (dnssecExtPrefs.getBool("usetcp")) options |= c.NPAPI_INPUT_FLAG_USETCP;
+    if (resolvipv4) options |= c.NPAPI_INPUT_FLAG_RESOLVIPV4;
+    if (resolvipv6) options |= c.NPAPI_INPUT_FLAG_RESOLVIPV6;
 
     if (dnssecExtension.debugOutput)
       dump(dnssecExtension.debugPrefix + 'Validation parameters: \"'
@@ -811,78 +811,80 @@ var dnssecExtHandler = {
   // Set appropriate security state
   setSecurityState : function(state, invipaddr) {
 
+    var c = dnssecExtNPAPIConst;
+
     switch (state) {
-    case Ci.dnssecIValidator.XPCOM_EXIT_CONNECTION_DOMAIN_SECURED:
+    case c.NPAPI_EXIT_CONNECTION_DOMAIN_SECURED:
       if (!invipaddr) {
         this.setMode(this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED);
       } else {
         this.setMode(this.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED);
       }
       break;
-    case Ci.dnssecIValidator.XPCOM_EXIT_CONNECTION_NODOMAIN_SECURED:
+    case c.NPAPI_EXIT_CONNECTION_NODOMAIN_SECURED:
       if (!invipaddr) {
         this.setMode(this.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED);
       } else {
         this.setMode(this.DNSSEC_MODE_CONNECTION_NODOMAIN_INVIPADDR_SECURED);
       }
       break;
-    case Ci.dnssecIValidator.XPCOM_EXIT_CONNECTION_INVSIGDOMAIN_SECURED:
+    case c.NPAPI_EXIT_CONNECTION_INVSIGDOMAIN_SECURED:
       if (!invipaddr) {
         this.setMode(this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED);
       } else {
         this.setMode(this.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED);
       }
       break;
-    case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_SIGNATURE_VALID:
+    case c.NPAPI_EXIT_DOMAIN_SIGNATURE_VALID:
       if (!invipaddr) {
         this.setMode(this.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID);
       } else {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID);
       }
       break;
-    case Ci.dnssecIValidator.XPCOM_EXIT_AUTH_DOMAIN_SIGNATURE_VALID:
+    case c.NPAPI_EXIT_AUTH_DOMAIN_SIGNATURE_VALID:
       if (!invipaddr) {
         this.setMode(this.DNSSEC_MODE_AUTH_DOMAIN_SIGNATURE_VALID);
       } else {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID);
       }
       break;
-    case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_SIGNATURE_INVALID:
+    case c.NPAPI_EXIT_DOMAIN_SIGNATURE_INVALID:
       if (!invipaddr) {
         this.setMode(this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID);
       } else {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID);
       }
       break;
-    case Ci.dnssecIValidator.XPCOM_EXIT_NODOMAIN_SIGNATURE_VALID:
+    case c.NPAPI_EXIT_NODOMAIN_SIGNATURE_VALID:
       if (!invipaddr) {
         this.setMode(this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID);
       } else {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID);
       }
       break;
-    case Ci.dnssecIValidator.XPCOM_EXIT_AUTH_NODOMAIN_SIGNATURE_VALID:
+    case c.NPAPI_EXIT_AUTH_NODOMAIN_SIGNATURE_VALID:
       if (!invipaddr) {
         this.setMode(this.DNSSEC_MODE_AUTH_NODOMAIN_SIGNATURE_VALID);
       } else {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID);
       }
       break;
-    case Ci.dnssecIValidator.XPCOM_EXIT_NODOMAIN_SIGNATURE_INVALID:
+    case c.NPAPI_EXIT_NODOMAIN_SIGNATURE_INVALID:
       if (!invipaddr) {
         this.setMode(this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID);
       } else {
         this.setMode(this.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID);
       }
       break;
-    case Ci.dnssecIValidator.XPCOM_EXIT_DOMAIN_UNSECURED:
+    case c.NPAPI_EXIT_DOMAIN_UNSECURED:
       this.setMode(this.DNSSEC_MODE_DOMAIN_UNSECURED);
       break;
-    case Ci.dnssecIValidator.XPCOM_EXIT_NODOMAIN_UNSECURED:
+    case c.NPAPI_EXIT_NODOMAIN_UNSECURED:
       this.setMode(this.DNSSEC_MODE_NODOMAIN_UNSECURED);
       break;
-    case Ci.dnssecIValidator.XPCOM_EXIT_UNKNOWN:
-    case Ci.dnssecIValidator.XPCOM_EXIT_FAILED:
+    case c.NPAPI_EXIT_UNKNOWN:
+    case c.NPAPI_EXIT_FAILED:
     default:
       this.setMode(this.DNSSEC_MODE_ERROR);
       break;

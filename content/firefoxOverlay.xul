@@ -26,6 +26,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script src="overlay.js"/>
   <script src="preferences.js"/>
+  <script src="npapi_const.js"/>
   <stringbundleset id="stringbundleset">
     <stringbundle id="dnssec-strings" src="chrome://dnssec/locale/dnssec.properties"/>
   </stringbundleset>
