@@ -49,5 +49,8 @@ set(FBMAC_USE_COCOA 0)
 set(FBMAC_USE_COREGRAPHICS 0)
 set(FBMAC_USE_COREANIMATION 0)
 
+# If you want to register per-machine on Windows, uncomment this line
+#set (FB_ATLREG_MACHINEWIDE 1)
+
 # disable plugin drawing support
 set(FB_GUI_DISABLED 1)
