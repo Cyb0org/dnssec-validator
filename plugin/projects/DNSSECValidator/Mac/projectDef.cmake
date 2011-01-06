@@ -32,7 +32,22 @@ set(LOCALIZED "Mac/bundle_template/Localized.r")
 
 add_mac_plugin(${PROJNAME} ${PLIST} ${STRINGS} ${LOCALIZED} SOURCES)
 
+# set header file directories
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../lib/macosx
+                    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/ldns
+                    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/openssl/include)
+
+# set static (universal) library paths
+add_library(ldns STATIC IMPORTED)
+set_property(TARGET ldns PROPERTY IMPORTED_LOCATION
+             ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/macosx/libldns.a)
+add_library(crypto STATIC IMPORTED)
+set_property(TARGET crypto PROPERTY IMPORTED_LOCATION
+             ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/macosx/libcrypto.a)
+
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
 target_link_libraries(${PROJNAME}
     ${PLUGIN_INTERNAL_DEPS}
+    ldns
+    crypto
     )

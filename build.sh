@@ -80,9 +80,17 @@ zip -0 -r $JAR_FILE `cat files`
 echo "Copying various files to $TMP_DIR folder..."
 for DIR in $ROOT_DIRS; do
   mkdir $TMP_DIR/$DIR
-  FILES="`find $DIR -path '*CVS*' -prune -o -xtype f -print | grep -v \~`"
+  FILES="`find -L $DIR -path '*CVS*' -prune -o -type f -print | grep -v \~`"
   echo $FILES >> files
-  cp -v --parents $FILES $TMP_DIR
+#  cp -v --parents $FILES $TMP_DIR
+  for FILE in $FILES; do
+    FILEPATH=$(dirname $FILE)
+    DESTPATH=$TMP_DIR/$FILEPATH
+    if [ ! -d $DESTPATH ]; then
+      mkdir -p $DESTPATH
+    fi
+    cp -v $FILE $DESTPATH
+  done
 done
 
 # Copy other files to the root of future XPI.
@@ -95,18 +103,18 @@ done
 
 cd $TMP_DIR
 
-if [ -f "chrome.manifest" ]; then
-  echo "Preprocessing chrome.manifest..."
-  # You think this is scary?
-  #s/^(content\s+\S*\s+)(\S*\/)$/\1jar:chrome\/$APP_NAME\.jar!\/\2/
-  #s/^(skin|locale)(\s+\S*\s+\S*\s+)(.*\/)$/\1\2jar:chrome\/$APP_NAME\.jar!\/\3/
-  #
-  # Then try this! (Same, but with characters escaped for bash :)
-  sed -i -r s/^\(content\\s+\\S*\\s+\)\(\\S*\\/\)$/\\1jar:chrome\\/$APP_NAME\\.jar!\\/\\2/ chrome.manifest
-  sed -i -r s/^\(skin\|locale\)\(\\s+\\S*\\s+\\S*\\s+\)\(.*\\/\)$/\\1\\2jar:chrome\\/$APP_NAME\\.jar!\\/\\3/ chrome.manifest
-
-  # (it simply adds jar:chrome/whatever.jar!/ at appropriate positions of chrome.manifest)
-fi
+#if [ -f "chrome.manifest" ]; then
+#  echo "Preprocessing chrome.manifest..."
+#  # You think this is scary?
+#  #s/^(content\s+\S*\s+)(\S*\/)$/\1jar:chrome\/$APP_NAME\.jar!\/\2/
+#  #s/^(skin|locale)(\s+\S*\s+\S*\s+)(.*\/)$/\1\2jar:chrome\/$APP_NAME\.jar!\/\3/
+#  #
+#  # Then try this! (Same, but with characters escaped for bash :)
+#  sed -i -r s/^\(content\\s+\\S*\\s+\)\(\\S*\\/\)$/\\1jar:chrome\\/$APP_NAME\\.jar!\\/\\2/ chrome.manifest
+#  sed -i -r s/^\(skin\|locale\)\(\\s+\\S*\\s+\\S*\\s+\)\(.*\\/\)$/\\1\\2jar:chrome\\/$APP_NAME\\.jar!\\/\\3/ chrome.manifest
+#
+#  # (it simply adds jar:chrome/whatever.jar!/ at appropriate positions of chrome.manifest)
+#fi
 
 # generate the XPI file
 echo "Generating $APP_NAME.xpi..."

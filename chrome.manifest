@@ -17,10 +17,10 @@
 # DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 # ***** END LICENSE BLOCK *****
 
-content	dnssec	content/
-locale	dnssec	en-US	locale/en-US/
-locale	dnssec	cs-CZ	locale/cs-CZ/
-locale	dnssec	de-DE	locale/de-DE/
-skin	dnssec	classic/1.0	skin/
+content	dnssec	jar:chrome/dnssec.jar!/content/
+locale	dnssec	en-US	jar:chrome/dnssec.jar!/locale/en-US/
+locale	dnssec	cs-CZ	jar:chrome/dnssec.jar!/locale/cs-CZ/
+locale	dnssec	de-DE	jar:chrome/dnssec.jar!/locale/de-DE/
+skin	dnssec	classic/1.0	jar:chrome/dnssec.jar!/skin/
 overlay	chrome://browser/content/browser.xul	chrome://dnssec/content/firefoxOverlay.xul
 #style	chrome://global/content/customizeToolbar.xul	chrome://dnssec/skin/overlay.css

@@ -38,9 +38,10 @@ sys_linux:
 
 sys_macosx:
 	@echo '### Creating package for Mac OS X... ###'
-	rm -rf platform
-	mkdir -p platform/Darwin_x86-gcc3/components && ln -s ../../../xpcom/dnssecValidator_macosx-x86.dylib platform/Darwin_x86-gcc3/components/dnssecValidator.dylib
-	mkdir -p platform/Darwin_ppc-gcc3/components && ln -s ../../../xpcom/dnssecValidator_macosx-ppc.dylib platform/Darwin_ppc-gcc3/components/dnssecValidator.dylib
+	rm -rf platform $(PLUGIN_ROOT)/build
+	./$(PLUGIN_ROOT)/FireBreath/prepmac.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386;ppc"
+	cd $(PLUGIN_ROOT)/build && xcodebuild && cd ../..
+	mkdir -p platform/Darwin/plugins && mv $(PLUGIN_ROOT)/build/projects/$(PLUGIN_NAME)/Debug/$(PLUGIN_NAME).plugin platform/Darwin/plugins/
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform><em:targetPlatform>Darwin_ppc-gcc3<\/em:targetPlatform>/g' install.rdf.template > install.rdf
 	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-macosx.xpi && ln -sf dnssec_validator-$(EXTENSION_VERSION)-macosx.xpi dnssec_validator-macosx.xpi
 
