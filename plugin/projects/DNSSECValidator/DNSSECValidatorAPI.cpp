@@ -15,9 +15,6 @@
 #include <iostream>
 //#include <stdio.h>
 //#include <string.h>
-extern "C" {   /* use C language linkage */
-  #include "ds.h"
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////

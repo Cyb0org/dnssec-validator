@@ -11,6 +11,10 @@
 #include "BrowserHost.h"
 #include "DNSSECValidator.h"
 
+extern "C" {   /* use C language linkage */
+  #include "ds.h"
+}
+
 #ifndef H_DNSSECValidatorAPI
 #define H_DNSSECValidatorAPI
 

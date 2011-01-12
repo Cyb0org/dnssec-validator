@@ -14,11 +14,16 @@ set (PROJNAME ${PLUGIN_NAME})
 
 browserplugin_project(${PROJNAME})
 
+# add validating library to build on UNIX
+if (NOT WIN32)
+    set(DSLIB ds.c)
+endif ()
+
 file (GLOB GENERAL RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     [^.]*.cpp
-    [^.]*.c
     [^.]*.h
     [^.]*.cmake
+    ${DSLIB}
     )
 
 # Generated files are stored in ${GENERATED} by the project configuration

@@ -30,7 +30,13 @@ OpenSSL used as well as that of the covered work.
 #ifndef XP_WIN
   #include <stdint.h>
 #else
-  #include "windows/stdint.h"
+  #if (_MSC_VER < 1300)
+    typedef unsigned short    uint16_t;
+    typedef unsigned int      uint32_t;
+  #else
+    typedef unsigned __int16  uint16_t;
+    typedef unsigned __int32  uint32_t;
+  #endif
 #endif
 
 /* main validating function */
