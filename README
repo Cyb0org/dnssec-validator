@@ -3,7 +3,7 @@ DNSSEC Validator extension for Mozilla Firefox <http://www.dnssec-validator.cz>
 
 INSTALLATION
 ---------------
-Select "dnssec.xpi" in File -> Open dialog and follow wizard instructions
+Select "dnssec_validator-*.xpi" in File -> Open dialog and follow wizard instructions
 
 
 CONFIGURATION

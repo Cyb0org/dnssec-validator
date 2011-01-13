@@ -1,13 +1,55 @@
-This file describes DNSSEC Firefox extension build dependencies
+This file describes DNSSEC Firefox add-on build dependencies
 and build instructions.
+
+
+### GENERAL REQUIREMENTS ###
+  - OS: GNU/Linux | Mac OS X | MS Windows
+  - CMake <http://www.cmake.org>
+  - FireBreath <http://www.firebreath.org>
+
+
+### LINUX (expected Debian GNU/Linux unstable amd64) ###
+  # apt-get install gcc g++ lib32gcc1 lib32stdc++6 make git cmake zip sed
+  $ git clone git://github.com/firebreath/FireBreath.git plugin/FireBreath
+  $ make sys_linux
+  $ ls dnssec_validator-<version>-linux.xpi
+
+
+### MAC OS X ###
+  - install Xcode 3.1 for Mac-only Development (gcc, make, ...)
+    <http://developer.apple.com/technology/xcode.html>
+  - install MacPorts <http://www.macports.org/install.php>
+  $ sudo port install git-core cmake
+  $ git clone git://github.com/firebreath/FireBreath.git plugin/FireBreath
+  $ make sys_macosx
+  $ ls dnssec_validator-<version>-macosx.xpi
+
+
+### WINDOWS ###
+  Part 1 - to be built on Linux:
+  # apt-get install gcc-mingw32 make git sed zip
+  $ git clone git://github.com/firebreath/FireBreath.git plugin/FireBreath
+  $ make sys_windows_pre
+
+  Part 2 - to be built on Windows:
+  - install Microsoft Visual C++ 2008 Express Edition
+    <http://www.microsoft.com/express/Downloads/>
+  - install CMake <http://www.cmake.org/cmake/resources/software.html>
+  > plugin\FireBreath\prep2008.cmd plugin\projects plugin\build
+  - run VC++, open plugin/build/FireBreath.sln, and build it
+
+  Part 3 - to be built on Linux:
+  $ make sys_windows_post
+  $ ls dnssec_validator-<version>-windows.xpi
 
 
 ### LIBRARIES ###
 
+Note: No need to get/build these libraries. They are already built in the Git
+repository in the ./plugin/lib directory.
+
 libldns (https://www.nlnetlabs.nl/projects/ldns/)
 openssl (https://www.openssl.org)
-
-No need to get these libraries, they are already built in GIT.
 
 openssl 1.0.0a:
 * ./Configure linux-x86_64 enable-static-engine -D_GNU_SOURCE -fPIC -Wa,--noexecstack               [Lin]
@@ -36,44 +78,3 @@ make
 * i586-mingw32msvc-ranlib .libs/libldns.a                                                           [Win]
 * (strip -x -S ...)                                                                                 [Lin]
 * (i586-mingw32msvc-strip -x -S ...)                                                                [Win]
-
-
-### LINUX (expected Debian GNU/Linux unstable amd64) ###
-
-GCC:
-gcc-4.4 package (v4.2 should be enough)
-g++-4.4 package (v4.2 should be enough)
-(lib32gcc1)
-(lib32stdc++6)
-
-xulrunner SDK:
-xulrunner-dev package
-ftp://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.7/sdk/xulrunner-1.9.1.7.en-US.linux-i686.sdk.tar.bz2
-
-(ia32-libs)
-
-
-### MAC OS X ###
-
-Xcode 3.1 for Mac-only Development (gcc, make, ...):
-http://developer.apple.com/technology/xcode.html
-
-xulrunner SDK:
-ftp://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.7/sdk/xulrunner-1.9.1.7.en-US.mac-i386.sdk.tar.bz2
-ftp://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.7/sdk/xulrunner-1.9.1.7.en-US.mac-powerpc.sdk.tar.bz2
-
-(www.macports.org)
-(libidl)
-(xpidl: libintl.3.dylib -> libintl.dylib)
-
-
-### Windows ###
-
-Microsoft Visual C++ 2008 Express Edition:
-http://www.microsoft.com/express/Downloads/
-
-xulrunner SDK:
-ftp://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.7/sdk/xulrunner-1.9.1.7.en-US.win32.sdk.zip
-
-MingW32/MingW64:
-gcc-mingw32 package
