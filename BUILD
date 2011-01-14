@@ -4,7 +4,7 @@ and build instructions.
 
 ### GENERAL REQUIREMENTS ###
   - OS: GNU/Linux | Mac OS X | MS Windows
-  - CMake <http://www.cmake.org>
+  - CMake >=2.8 <http://www.cmake.org>
   - FireBreath <http://www.firebreath.org>
 
 

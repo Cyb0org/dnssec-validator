@@ -45,5 +45,6 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
         <em:maxVersion>4.*</em:maxVersion>
       </Description>
     </em:targetApplication>
+    <em:unpack>true</em:unpack>
   </Description>
 </RDF>
