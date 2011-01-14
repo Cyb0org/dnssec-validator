@@ -29,22 +29,24 @@ X86_MINGW_STRIP = i586-mingw32msvc-strip
 sys_linux:
 	@echo '### Creating package for Linux... ###'
 	rm -rf platform $(PLUGIN_ROOT)/build tmp_build
-	./$(PLUGIN_ROOT)/FireBreath/prepmake.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m64 -DCMAKE_CXX_FLAGS=-m64 -DFB_GUI_DISABLED=1
+	./$(PLUGIN_ROOT)/FireBreath/prepmake.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m64 -DCMAKE_CXX_FLAGS=-m64 -DCMAKE_BUILD_TYPE=MinSizeRel -DFB_GUI_DISABLED=1
 	make -C $(PLUGIN_ROOT)/build
 	mkdir -p platform/Linux_x86_64-gcc3/plugins && mv $(PLUGIN_ROOT)/build/bin/$(PLUGIN_NAME)/np$(PLUGIN_NAME).so platform/Linux_x86_64-gcc3/plugins/np$(PLUGIN_NAME)_x64.so
 	rm -rf $(PLUGIN_ROOT)/build
-	./$(PLUGIN_ROOT)/FireBreath/prepmake.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32 -DFB_GUI_DISABLED=1
+	./$(PLUGIN_ROOT)/FireBreath/prepmake.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32 -DCMAKE_BUILD_TYPE=MinSizeRel -DFB_GUI_DISABLED=1
 	make -C $(PLUGIN_ROOT)/build
 	mkdir -p platform/Linux_x86-gcc3/plugins && mv $(PLUGIN_ROOT)/build/bin/$(PLUGIN_NAME)/np$(PLUGIN_NAME).so platform/Linux_x86-gcc3/plugins/np$(PLUGIN_NAME)_x86.so
+	strip -x -S platform/Linux_x86_64-gcc3/plugins/np$(PLUGIN_NAME)_x64.so platform/Linux_x86-gcc3/plugins/np$(PLUGIN_NAME)_x86.so
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86_64-gcc3<\/em:targetPlatform><em:targetPlatform>Linux_x86-gcc3<\/em:targetPlatform>/g' install.rdf.template > install.rdf
 	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-linux.xpi && ln -sf dnssec_validator-$(EXTENSION_VERSION)-linux.xpi dnssec_validator-linux.xpi
 
 sys_macosx:
 	@echo '### Creating package for Mac OS X... ###'
 	rm -rf platform $(PLUGIN_ROOT)/build tmp_build
-	./$(PLUGIN_ROOT)/FireBreath/prepmac.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386;ppc"
+	./$(PLUGIN_ROOT)/FireBreath/prepmac.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386;ppc" -DCMAKE_BUILD_TYPE=MinSizeRel
 	cd $(PLUGIN_ROOT)/build && xcodebuild && cd ../..
 	mkdir -p platform/Darwin/plugins && mv $(PLUGIN_ROOT)/build/projects/$(PLUGIN_NAME)/Debug/$(PLUGIN_NAME).plugin platform/Darwin/plugins/
+	strip -x -S platform/Darwin/plugins/$(PLUGIN_NAME).plugin/Contents/MacOS/$(PLUGIN_NAME)
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform><em:targetPlatform>Darwin_ppc-gcc3<\/em:targetPlatform>/g' install.rdf.template > install.rdf
 	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-macosx.xpi && ln -sf dnssec_validator-$(EXTENSION_VERSION)-macosx.xpi dnssec_validator-macosx.xpi
 

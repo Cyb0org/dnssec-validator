@@ -36,7 +36,8 @@ and build instructions.
     <http://www.microsoft.com/express/Downloads/>
   - install CMake <http://www.cmake.org/cmake/resources/software.html>
   > plugin\FireBreath\prep2008.cmd plugin\projects plugin\build
-  - run VC++, open plugin/build/FireBreath.sln, and build it
+  - run VC++, open plugin/build/FireBreath.sln, select "MinSizeRel"
+    configuration (Build -> Configuration Manager...) and build it
 
   Part 3 - to be built on Linux:
   $ make sys_windows_post
