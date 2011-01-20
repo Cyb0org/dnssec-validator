@@ -9,7 +9,7 @@ and build instructions.
 
 
 ### LINUX (expected Debian GNU/Linux unstable amd64) ###
-  # apt-get install gcc g++ lib32gcc1 lib32stdc++6 make git cmake zip sed
+  # apt-get install gcc g++ lib32gcc1 lib32stdc++6 libc6-dev-i386 make git cmake zip sed pkg-config libgtk2.0-dev
   $ git clone git://github.com/firebreath/FireBreath.git plugin/FireBreath
   $ make sys_linux
   $ ls dnssec_validator-<version>-linux.xpi
@@ -57,12 +57,15 @@ openssl 1.0.0a:
 * ./Configure linux-generic32 enable-static-engine -D_GNU_SOURCE -fPIC -m32 -Wa,--noexecstack       [Lin]
 * (./Configure darwin-i386-cc shared -mmacosx-version-min=10.4)                                     [Mac]
 * ./Configure darwin-i386-cc enable-static-engine -mmacosx-version-min=10.4 -fPIC                   [Mac]
-* (./Configure darwin-ppc-cc shared -mmacosx-version-min=10.4)                                      [Mac]
-* ./Configure darwin-ppc-cc enable-static-engine -mmacosx-version-min=10.4                          [Mac]
+* (./Configure darwin64-x86_64-cc shared -mmacosx-version-min=10.4)                                 [Mac]
+* ./Configure darwin64-x86_64-cc enable-static-engine -mmacosx-version-min=10.4                     [Mac]
 * ./Configure --cross-compile-prefix=i586-mingw32msvc- mingw enable-static-engine                   [Win]
 make
 make test
 ln -s . lib                            (needed for successful build of libldns)
+* mv libcrypto.a libcrypto.a.i386                                                                   [Mac]
+* mv libcrypto.a libcrypto.a.x86_64                                                                 [Mac]
+* lipo -create -output libcrypto.a libcrypto.a.i386 libcrypto.a.x86_64                              [Mac]
 * (strip -x -S ...)                                                                                 [Lin]
 * (i586-mingw32msvc-strip -x -S ...)                                                                [Win]
 
@@ -70,12 +73,15 @@ libldns r3366:
 * export CFLAGS="-m64 -fPIC"                                                                        [Lin]
 * export CFLAGS="-m32 -fPIC"                                                                        [Lin]
 * export CFLAGS="-arch i386 -mmacosx-version-min=10.4 -fPIC"                                        [Mac]
-* export CFLAGS="-arch ppc -mmacosx-version-min=10.4"                                               [Mac]
+* export CFLAGS="-arch x86_64 -mmacosx-version-min=10.4"                                            [Mac]
 * export CC="i586-mingw32msvc-gcc"                                                                  [Win]
 * ./configure --disable-shared --with-ssl=../openssl-1.0.0a --host=mingw32                          [Win]
 * [Makefile: s/-l.../-Wl,-l.../]                                                                    [Win]
 * ./configure --disable-shared --with-ssl=../openssl-1.0.0a                                    [Lin, Mac]
 make
 * i586-mingw32msvc-ranlib .libs/libldns.a                                                           [Win]
+* mv lib/libldns.a libldns.a.i386                                                                   [Mac]
+* mv lib/libldns.a libldns.a.x86_64                                                                 [Mac]
+* lipo -create -output libldns.a libldns.a.i386 libldns.a.x86_64                                    [Mac]
 * (strip -x -S ...)                                                                                 [Lin]
 * (i586-mingw32msvc-strip -x -S ...)                                                                [Win]

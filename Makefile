@@ -38,17 +38,17 @@ sys_linux:
 	mv $(PLUGIN_ROOT)/build/bin/$(PLUGIN_NAME)/np$(PLUGIN_NAME).so plugins/np$(PLUGIN_NAME)_x86.so
 	strip -x -S plugins/np$(PLUGIN_NAME)_x64.so plugins/np$(PLUGIN_NAME)_x86.so
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86_64-gcc3<\/em:targetPlatform><em:targetPlatform>Linux_x86-gcc3<\/em:targetPlatform>/g' install.rdf.template > install.rdf
-	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-linux.xpi && ln -sf dnssec_validator-$(EXTENSION_VERSION)-linux.xpi dnssec_validator-linux.xpi
+	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-linux.xpi
 
 sys_macosx:
 	@echo '### Creating package for Mac OS X... ###'
 	rm -rf plugins $(PLUGIN_ROOT)/build tmp_build
-	./$(PLUGIN_ROOT)/FireBreath/prepmac.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386;ppc" -DCMAKE_BUILD_TYPE=MinSizeRel
+	./$(PLUGIN_ROOT)/FireBreath/prepmac.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" -DCMAKE_BUILD_TYPE=MinSizeRel
 	cd $(PLUGIN_ROOT)/build && xcodebuild && cd ../..
 	mkdir plugins && mv $(PLUGIN_ROOT)/build/projects/$(PLUGIN_NAME)/Debug/$(PLUGIN_NAME).plugin plugins/
 	strip -x -S plugins/$(PLUGIN_NAME).plugin/Contents/MacOS/$(PLUGIN_NAME)
-	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform><em:targetPlatform>Darwin_ppc-gcc3<\/em:targetPlatform>/g' install.rdf.template > install.rdf
-	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-macosx.xpi && ln -sf dnssec_validator-$(EXTENSION_VERSION)-macosx.xpi dnssec_validator-macosx.xpi
+	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform><em:targetPlatform>Darwin_x86_64-gcc3<\/em:targetPlatform>/g' install.rdf.template > install.rdf
+	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-macosx.xpi
 
 sys_windows_pre:
 	@echo '### Compiling validation library for Windows... ###'
@@ -62,7 +62,7 @@ sys_windows_post:
 	@echo '### Creating package for Windows... ###'
 	mv $(PLUGIN_ROOT)/build/bin/$(PLUGIN_NAME)/Debug/np$(PLUGIN_NAME).dll plugins/
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>WINNT_x86-msvc<\/em:targetPlatform>/g' install.rdf.template > install.rdf
-	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-windows.xpi && ln -sf dnssec_validator-$(EXTENSION_VERSION)-windows.xpi dnssec_validator-windows.xpi
+	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-windows.xpi
 
 clean:
 	rm -rf plugins $(PLUGIN_ROOT)/build tmp_build
