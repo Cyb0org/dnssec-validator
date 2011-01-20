@@ -359,6 +359,9 @@ var dnssecExtension = {
 
     gBrowser.removeProgressListener(dnssecExtUrlBarListener);
 
+    // Unregister preferences observer
+    dnssecExtPrefObserver.unregister();
+
     // Reset resolving flag
     dnssecExtPrefs.setBool("resolvingactive", false);
 
