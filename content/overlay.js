@@ -425,32 +425,16 @@ var dnssecExtResolver = {
 
   // Called when request is not cached already
   doNPAPIvalidation: function(dn, resolvipv4, resolvipv6, aRecord) {
-/*
-    // Use validator's XPCOM interface
-    try {
-//      var dsv = Components.classes["@nic.cz/dnssecValidator;1"]
-//                .createInstance(Components.interfaces.dnssecIValidator);
-      var dsv = Components.classes["@nic.cz/dnssecValidator;1"]
-                .getService(Components.interfaces.dnssecIValidator);
-    } catch (ex) {
-//      dump(ex + '\n');
-//      return;
-    }
-*/
+
+    // Plugin callback
     function NPAPIcallback(plug, resArr) {
 
-      dump('callback\n');
       if (dnssecExtCache.flushInterval) { // do not cache if 0
         dnssecExtCache.addRecord(dn, resArr[0], resArr[1], resArr[2], resArr[3]);
       }
       dnssecExtResolver.setValidatedData(dn, resArr, aRecord);
 
     }
-
-
-    // Get binary plugin
-    var dsp = document.getElementById("dnssec-plugin");
-
 
     // Get DNS resolver address(es)
     var nameserver = dnssecExtPrefs.getChar("dnsserveraddr");
@@ -468,19 +452,26 @@ var dnssecExtResolver = {
            + dn + '; ' + options + '; ' + nameserver + '\"\n');
 
     // Call NPAPI validation
-/*
-    var res = null;
-    var resaddrs = {};
-    var ttl4 = {};
-    var ttl6 = {};
-*/
+    try {
+      // Get the binary plugin
+      var dsp = document.getElementById("dnssec-plugin");
 
-    if (!dnssecExtension.asyncResolve) {   // Synchronous NPAPI validation
-      NPAPIcallback(null, dsp.Validate(dn, options, nameserver));
-    } else {   // Asynchronous NPAPI validation
-      dsp.ValidateAsync(dn, options, nameserver, NPAPIcallback);
+      if (!dnssecExtension.asyncResolve) {   // Synchronous NPAPI validation
+        NPAPIcallback(null, dsp.Validate(dn, options, nameserver));
+      } else {   // Asynchronous NPAPI validation
+        dsp.ValidateAsync(dn, options, nameserver, NPAPIcallback);
+      }
+    } catch (ex) {
+        dump(dnssecExtension.debugPrefix + 'Error: Plugin call failed!\n');
+
+        // Set error mode (no icon)
+        dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
+
+        // Reset resolving flag
+        dnssecExtPrefs.setBool("resolvingactive", false);
+
+        return;
     }
-
 
   },
 
