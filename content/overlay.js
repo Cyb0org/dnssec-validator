@@ -465,17 +465,16 @@ var dnssecExtResolver = {
         dsp.ValidateAsync(dn, options, nameserver, NPAPIcallback);
       }
     } catch (ex) {
-        dump(dnssecExtension.debugPrefix + 'Error: Plugin call failed!\n');
+      dump(dnssecExtension.debugPrefix + 'Error: Plugin call failed!\n');
 
-        // Set error mode (no icon)
-        dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
+      // Set error mode (no icon)
+      dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
 
-        // Reset resolving flag
-        dnssecExtPrefs.setBool("resolvingactive", false);
+      // Reset resolving flag
+      dnssecExtPrefs.setBool("resolvingactive", false);
 
-        return;
+      return;
     }
-
   },
 
 
@@ -570,7 +569,6 @@ var dnssecExtResolver = {
   // Called when browser async host lookup completes
   onBrowserLookupComplete: function(dn, aRecord) {
 
-//    var dn = dnssecExtHandler._asciiHostName;
     var resolvipv4 = false; // No IPv4 resolving as default
     var resolvipv6 = false; // No IPv6 resolving as default
     var addr = null;
@@ -602,54 +600,8 @@ var dnssecExtResolver = {
     // Resolve IPv4 if no version is desired
     if (!resolvipv4 && !resolvipv6) resolvipv4 = true;
 
-
     this.getValidatedData(dn, resolvipv4, resolvipv6, aRecord);
-/*
-    // Get validated data from cache or by XPCOM call
-    var resaddrs = '';
-    var res = -1;
-    var resArr = this.getValidatedData(dn, resolvipv4, resolvipv6);
-    resaddrs = resArr[0];
-    res = resArr[1];
 
-    // Temporary deleting of expired cache records until
-    // cache flush timer will be working
-    if (dnssecExtCache.flushInterval) {
-      dnssecExtCache.delExpiredRecords();
-    }
-
-    if (dnssecExtension.debugOutput) {
-      dnssecExtCache.printContent();
-    }
-
-    // Check browser's IP address(es)
-    var invipaddr = false; // Browser's IP addresses are presumed as valid
-    if (aRecord) {
-      aRecord.rewind();
-      while (aRecord.hasMore()) {   // Address list has another item
-
-        addr = aRecord.getNextAddrAsString();
-
-        // Check if each browser's address is present in DNSSEC address resolved list
-        if (resaddrs.indexOf(' ' + addr + ' ') == -1) invipaddr = true;
-
-        if (dnssecExtension.debugOutput)
-          dump(dnssecExtension.debugPrefix + 'Checking browser IP: '
-               + addr + '; address is invalid: ' + invipaddr + '\n');
-
-        // No need to check more addresses
-        if (invipaddr) break;
-      }
-    }
-
-    // Set appropriate state if host name does not changed
-    // during resolving process (tab has not been switched)
-    if (dn == gBrowser.currentURI.asciiHost)
-      dnssecExtHandler.setSecurityState(res, invipaddr);
-
-    if (dnssecExtension.debugOutput)
-      dump(dnssecExtension.debugPrefix + dnssecExtension.debugEndNotice);
-*/
   },
 };
 

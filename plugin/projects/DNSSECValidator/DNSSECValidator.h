@@ -52,4 +52,3 @@ typedef boost::weak_ptr<DNSSECValidator> DNSSECValidatorWeakPtr;
 
 
 #endif
-

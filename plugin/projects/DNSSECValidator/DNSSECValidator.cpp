@@ -107,4 +107,3 @@ bool DNSSECValidator::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow 
     // The window is about to be detached; act appropriately
     return false;
 }
-

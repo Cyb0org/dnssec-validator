@@ -1,10 +1,10 @@
 /**********************************************************\ 
- 
+
  Auto-generated Factory.cpp
- 
+
  This file contains the auto-generated factory methods 
  for the DNSSECValidator project
- 
+
 \**********************************************************/
 
 #include "FactoryBase.h"
@@ -24,7 +24,7 @@ public:
     {
         return boost::make_shared<DNSSECValidator>();
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////
     /// @see FB::FactoryBase::globalPluginInitialize
     ///////////////////////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ public:
     {
         DNSSECValidator::StaticInitialize();
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////
     /// @see FB::FactoryBase::globalPluginDeinitialize
     ///////////////////////////////////////////////////////////////////////////////
@@ -52,4 +52,3 @@ FB::FactoryBasePtr getFactoryInstance()
     static boost::shared_ptr<PluginFactory> factory = boost::make_shared<PluginFactory>();
     return factory;
 }
-
