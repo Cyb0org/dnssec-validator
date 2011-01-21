@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
-Copyright 2010 CZ.NIC, z.s.p.o.
+Copyright 2010, 2011 CZ.NIC, z.s.p.o.
 
 This file is part of DNSSEC Validator Add-on.
 
@@ -415,11 +415,11 @@ var dnssecExtension = {
     dnssecExtHandler.checkSecurity(asciiHost, utf8Host);
 
   },
-
+/*
   onToolbarButtonCommand: function() {
 
   },
-
+*/
 };
 
 
