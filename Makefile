@@ -36,7 +36,7 @@ sys_linux:
 	./$(PLUGIN_ROOT)/FireBreath/prepmake.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32 -DCMAKE_BUILD_TYPE=MinSizeRel -DFB_GUI_DISABLED=1
 	make -C $(PLUGIN_ROOT)/build
 	mv $(PLUGIN_ROOT)/build/bin/$(PLUGIN_NAME)/np$(PLUGIN_NAME).so plugins/np$(PLUGIN_NAME)_x86.so
-	strip -x -S plugins/np$(PLUGIN_NAME)_x64.so plugins/np$(PLUGIN_NAME)_x86.so
+	strip plugins/np$(PLUGIN_NAME)_x64.so plugins/np$(PLUGIN_NAME)_x86.so
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86_64-gcc3<\/em:targetPlatform><em:targetPlatform>Linux_x86-gcc3<\/em:targetPlatform>/g' install.rdf.template > install.rdf
 	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-linux.xpi
 
@@ -60,7 +60,7 @@ sys_windows_pre:
 
 sys_windows_post:
 	@echo '### Creating package for Windows... ###'
-	mv $(PLUGIN_ROOT)/build/bin/$(PLUGIN_NAME)/Debug/np$(PLUGIN_NAME).dll plugins/
+	mv $(PLUGIN_ROOT)/build/bin/$(PLUGIN_NAME)/MinSizeRel/np$(PLUGIN_NAME).dll plugins/
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>WINNT_x86-msvc<\/em:targetPlatform>/g' install.rdf.template > install.rdf
 	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-windows.xpi
 
