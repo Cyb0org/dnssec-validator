@@ -79,7 +79,7 @@ FB::VariantList DNSSECValidatorAPI::Validate(const std::string& domain, const ui
 
     rv = ds_validate(domain.c_str(), options, optdnssrv.c_str(), &tmpptr, &ttl4, &ttl6);
 
-    reslist.push_back((std::string)tmpptr);
+    reslist.push_back(tmpptr ? (std::string)tmpptr : "");
     reslist.push_back(ttl4);
     reslist.push_back(ttl6);
     reslist.push_back(rv);
