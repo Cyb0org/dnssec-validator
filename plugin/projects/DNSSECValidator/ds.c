@@ -299,26 +299,16 @@ short ds_read_resolver_win(ldns_buffer *resbuf, ldns_buffer *srchbuf) {
     dwSize = MAX_SRCHLSTLEN;
     /* read custom searchlist value */
     dwRet = RegQueryValueEx(hKey, "SearchList", NULL, NULL, (BYTE*)szSearchList, &dwSize);
-    if (dwRet == ERROR_SUCCESS) {
-      if (dwSize > 1) {   /* custom searchlist is not empty */
-        ldns_buffer_printf(srchbuf, szSearchList); /* save searchlist into a buffer */
-      } else {   /* read searchlist obtained by DHCP */
-        dwSize = MAX_SRCHLSTLEN; /* set maximum available buffer size */
-        dwRet = RegQueryValueEx(hKey, "DhcpDomain", NULL, NULL, (BYTE*)szSearchList, &dwSize);
-        if (dwRet == ERROR_SUCCESS) {
-          if (dwSize > 1) {   /* DHCP searchlist is not empty */
-            ldns_buffer_printf(srchbuf, szSearchList); /* save searchlist into a buffer */
-          }
-        } else {
-          fprintf(stderr, ERROR_PREFIX "Win: RegQueryValueEx(DhcpDomain) failed\n");
-          RegCloseKey(hKey);
-          return -1;
-        }
+    if (dwRet == ERROR_SUCCESS && dwSize > 1) { /* custom searchlist exists and is not empty */
+      ldns_buffer_printf(srchbuf, szSearchList); /* save searchlist into the buffer */
+    } else {   /* read searchlist obtained by DHCP */
+      dwSize = MAX_SRCHLSTLEN; /* set maximum available buffer size */
+      dwRet = RegQueryValueEx(hKey, "DhcpDomain", NULL, NULL, (BYTE*)szSearchList, &dwSize);
+      if (dwRet == ERROR_SUCCESS && dwSize > 1) { /* DHCP searchlist exists and is not empty */
+        ldns_buffer_printf(srchbuf, szSearchList); /* save searchlist into the buffer */
+      } else {
+        if (opts.debug) printf(DEBUG_PREFIX "Win: Cannot get SearchList nor DhcpDomain value data\n");
       }
-    } else {
-      fprintf(stderr, ERROR_PREFIX "Win: RegQueryValueEx(SearchList) failed\n");
-      RegCloseKey(hKey);
-      return -1;
     }
     RegCloseKey(hKey);
   } else {
