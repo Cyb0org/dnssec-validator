@@ -32,6 +32,8 @@ and build instructions.
   $ make sys_windows_pre
 
   Part 2 - to be built on Windows:
+  - install Windows Driver Kit (7.1.0 or later)
+    <http://www.microsoft.com/whdc/DevTools/WDK/WDKpkg.mspx>
   - install Microsoft Visual C++ 2008 Express Edition
     <http://www.microsoft.com/express/Downloads/>
   - install CMake <http://www.cmake.org/cmake/resources/software.html>
