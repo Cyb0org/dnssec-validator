@@ -20,6 +20,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #include "JSObject.h"
 #include "variant_list.h"
 #include "DOM/Document.h"
+#include "DOM/Window.h"
 
 #include "DNSSECValidatorAPI.h"
 
@@ -35,6 +36,10 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ///////////////////////////////////////////////////////////////////////////////
 DNSSECValidatorAPI::DNSSECValidatorAPI(DNSSECValidatorPtr plugin, FB::BrowserHostPtr host) : m_plugin(plugin), m_host(host)
 {
+    // Allow privileged access only
+    if (m_host->getDOMWindow()->getLocation() != "chrome://browser/content/browser.xul")
+        return;
+
     registerMethod("Validate", make_method(this, &DNSSECValidatorAPI::Validate));
     registerMethod("ValidateAsync", make_method(this, &DNSSECValidatorAPI::ValidateAsync));
     registerMethod("ValidateAsync_thread", make_method(this, &DNSSECValidatorAPI::ValidateAsync_thread));
