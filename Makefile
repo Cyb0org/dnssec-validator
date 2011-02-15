@@ -29,11 +29,11 @@ X86_MINGW_STRIP = i586-mingw32msvc-strip
 sys_linux:
 	@echo '### Creating package for Linux... ###'
 	rm -rf plugins $(PLUGIN_ROOT)/build tmp_build
-	./$(PLUGIN_ROOT)/FireBreath/prepmake.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m64 -DCMAKE_CXX_FLAGS=-m64 -DCMAKE_BUILD_TYPE=MinSizeRel -DFB_GUI_DISABLED=1
+	./$(PLUGIN_ROOT)/FireBreath/prepmake.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m64 -DCMAKE_CXX_FLAGS=-m64 -DCMAKE_BUILD_TYPE=MinSizeRel
 	make -C $(PLUGIN_ROOT)/build
 	mkdir plugins && mv $(PLUGIN_ROOT)/build/bin/$(PLUGIN_NAME)/np$(PLUGIN_NAME).so plugins/np$(PLUGIN_NAME)_x64.so
 	rm -rf $(PLUGIN_ROOT)/build
-	./$(PLUGIN_ROOT)/FireBreath/prepmake.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32 -DCMAKE_BUILD_TYPE=MinSizeRel -DFB_GUI_DISABLED=1
+	./$(PLUGIN_ROOT)/FireBreath/prepmake.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32 -DCMAKE_BUILD_TYPE=MinSizeRel
 	make -C $(PLUGIN_ROOT)/build
 	mv $(PLUGIN_ROOT)/build/bin/$(PLUGIN_NAME)/np$(PLUGIN_NAME).so plugins/np$(PLUGIN_NAME)_x86.so
 	strip plugins/np$(PLUGIN_NAME)_x64.so plugins/np$(PLUGIN_NAME)_x86.so
