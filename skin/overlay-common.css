@@ -1,0 +1,256 @@
+/* ***** BEGIN LICENSE BLOCK *****
+Copyright 2010, 2011 CZ.NIC, z.s.p.o.
+
+This file is part of DNSSEC Validator Add-on.
+
+DNSSEC Validator Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC Validator Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** */
+
+/* Temp button */
+/*
+#dnssec-toolbar-button {
+  list-style-image: url("chrome://dnssec/skin/key.png");
+  -moz-image-region: rect(0px, 35px, 16px, 0px);
+}
+*/
+
+
+/* DNSSEC icons stack */
+/*
+#dnssec-icons-stack {
+  -moz-margin-start: 0px;
+
+  width: 43px;
+  height: 20px;
+  padding: 0px 4px;
+  background: url(chrome://dnssec/skin/urlbar-button.png) center center no-repeat;
+}
+*/
+
+
+/* Key icon */
+#dnssec-icon {
+  width: 35px;
+  height: 16px;
+  list-style-image: url("chrome://dnssec/skin/key.png"); /* 35x16 */
+  -moz-image-region: rect(0px, 35px, 16px, 0px);
+}
+
+#dnssec-box.unsecuredDomain > #dnssec-icon,
+#dnssec-box.unsecuredNoDomain > #dnssec-icon {
+  -moz-image-region: rect(0px, 70px, 16px, 35px);
+}
+
+#dnssec-box.actionDnssec > #dnssec-icon {
+  list-style-image: url("chrome://dnssec/skin/key_action.gif"); /* 35x16 */
+}
+
+
+/* DNSSEC indicator */
+#dnssec-outerbox {
+  -moz-box-align: center;
+}
+
+#dnssec-box {
+  width: 39px;
+  height: 20px;
+  padding: 2px 2px;
+  background-color: rgba(221, 221, 221, 1.0);   /* grey */
+/*  background-color: -moz-dialog; */
+/*  color: -moz-dialogtext; */
+/*  -moz-border-end: 1px solid ThreeDShadow; */
+}
+
+#dnssec-box:focus {
+  outline: 1px dotted -moz-DialogText;
+}
+
+#dnssec-box.securedConnectionDomainInvIPaddr,
+#dnssec-box.securedConnectionNoDomainInvIPaddr,
+#dnssec-box.validDomainSignatureInvIPaddr,
+#dnssec-box.validNoDomainSignatureInvIPaddr,
+#dnssec-box.securedConnectionInvSigDomain,
+#dnssec-box.securedConnectionInvSigDomainInvIPaddr,
+#dnssec-box.invalidDomainSignature,
+#dnssec-box.invalidDomainSignatureInvIPaddr,
+#dnssec-box.invalidNoDomainSignature,
+#dnssec-box.invalidNoDomainSignatureInvIPaddr {
+  background-color: rgba(240, 41, 20, 1.0);     /* red */
+}
+
+#dnssec-box.validDomainSignature,
+#dnssec-box.validAuthDomainSignature,
+#dnssec-box.validNoDomainSignature,
+#dnssec-box.validAuthNoDomainSignature {
+  background-color: rgba(247, 145, 14, 1.0);    /* orange */
+}
+
+#dnssec-box.securedConnectionDomain,
+#dnssec-box.securedConnectionNoDomain {
+  background-color: rgba(106, 177, 63, 1.0);    /* green */
+}
+
+#dnssec-box.unsecuredDomain,
+#dnssec-box.unsecuredNoDomain {
+  background-color: rgba(168, 168, 168, 1.0);   /* grey */
+}
+
+#dnssec-box.errorDnssec {
+  display: none;
+}
+
+/*
+#dnssec-box:hover {
+  background-color: rgba(255, 0, 0, 0.7);
+  color: white;
+}
+*/
+
+
+/* DNSSEC popup images */
+#dnssec-popup-icon {
+  height: 38px;
+  width: 130px;
+  padding: 0;
+  list-style-image: url("chrome://dnssec/skin/logo.png");
+}
+
+/* grey */
+#dnssec-popup.unsecuredDomain > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.unsecuredNoDomain > #dnssec-popup-container > #dnssec-popup-icon {
+  -moz-image-region: rect(0px, 130px, 38px, 0px);
+}
+
+/* orange */
+#dnssec-popup.validDomainSignature > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.validAuthDomainSignature > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.validNoDomainSignature > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.validAuthNoDomainSignature > #dnssec-popup-container > #dnssec-popup-icon {
+  -moz-image-region: rect(0px, 520px, 38px, 390px);
+}
+
+/* red */
+#dnssec-popup.securedConnectionDomainInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.securedConnectionNoDomainInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.securedConnectionInvSigDomain > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.securedConnectionInvSigDomainInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.invalidDomainSignature > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.validDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.invalidDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.invalidNoDomainSignature > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.validNoDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.invalidNoDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-icon {
+  -moz-image-region: rect(0px, 390px, 38px, 260px);
+}
+
+/* green */
+#dnssec-popup.securedConnectionDomain > #dnssec-popup-container > #dnssec-popup-icon,
+#dnssec-popup.securedConnectionNoDomain > #dnssec-popup-container > #dnssec-popup-icon {
+  -moz-image-region: rect(0px, 260px, 38px, 130px);
+}
+
+
+/* DNSSEC popup body text */
+#dnssec-popup-content-box > label,
+#dnssec-popup-content-box > description {
+  white-space: pre-wrap;
+  padding-left: 15px;
+  margin: 0px;
+}
+
+#dnssec-popup-securedLabel,
+#dnssec-popup-unsecuredLabel {
+  font-weight: bold;
+  max-width: 335px;
+  font-size: 140%;
+  display: none;
+}
+
+#dnssec-popup-domainLabel,
+#dnssec-popup-nodomainLabel,
+#dnssec-popup-securedDomainLabel,
+#dnssec-popup-unsecuredDomainLabel {
+  display: none;
+}
+
+#dnssec-popup-content-host {
+  font-weight: bold;
+  max-width: 335px;
+}
+
+
+/* DNSSEC popup bounding box */
+#dnssec-popup-container {
+  min-width: 280px;
+  padding: 10px;
+}
+
+
+/* DNSSEC popup UI */
+#dnssec-popup-content-box.securedConnectionDomain > #dnssec-popup-securedLabel,
+#dnssec-popup-content-box.securedConnectionDomain > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.securedConnectionDomain > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.securedConnectionDomainInvIPaddr > #dnssec-popup-securedLabel,
+#dnssec-popup-content-box.securedConnectionDomainInvIPaddr > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.securedConnectionDomainInvIPaddr > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.securedConnectionNoDomainInvIPaddr > #dnssec-popup-securedLabel,
+#dnssec-popup-content-box.securedConnectionNoDomainInvIPaddr > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.securedConnectionNoDomainInvIPaddr > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.securedConnectionNoDomain > #dnssec-popup-securedLabel,
+#dnssec-popup-content-box.securedConnectionNoDomain > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.securedConnectionNoDomain > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.securedConnectionInvSigDomain > #dnssec-popup-securedLabel,
+#dnssec-popup-content-box.securedConnectionInvSigDomain > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.securedConnectionInvSigDomain > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.securedConnectionInvSigDomainInvIPaddr > #dnssec-popup-securedLabel,
+#dnssec-popup-content-box.securedConnectionInvSigDomainInvIPaddr > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.securedConnectionInvSigDomainInvIPaddr > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.validDomainSignature > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.validDomainSignature > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.validDomainSignature > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.validAuthDomainSignature > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.validAuthDomainSignature > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.validAuthDomainSignature > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.validDomainSignatureInvIPaddr > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.validDomainSignatureInvIPaddr > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.validDomainSignatureInvIPaddr > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.invalidDomainSignature > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.invalidDomainSignature > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.invalidDomainSignature > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.invalidDomainSignatureInvIPaddr > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.invalidDomainSignatureInvIPaddr > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.invalidDomainSignatureInvIPaddr > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.validNoDomainSignature > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.validNoDomainSignature > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.validNoDomainSignature > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.validAuthNoDomainSignature > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.validAuthNoDomainSignature > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.validAuthNoDomainSignature > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.validNoDomainSignatureInvIPaddr > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.validNoDomainSignatureInvIPaddr > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.validNoDomainSignatureInvIPaddr > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.invalidNoDomainSignature > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.invalidNoDomainSignature > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.invalidNoDomainSignature > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.invalidNoDomainSignatureInvIPaddr > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.invalidNoDomainSignatureInvIPaddr > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.invalidNoDomainSignatureInvIPaddr > #dnssec-popup-securedDomainLabel,
+#dnssec-popup-content-box.unsecuredDomain > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.unsecuredDomain > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box.unsecuredDomain > #dnssec-popup-unsecuredDomainLabel,
+#dnssec-popup-content-box.unsecuredNoDomain > #dnssec-popup-unsecuredLabel,
+#dnssec-popup-content-box.unsecuredNoDomain > #dnssec-popup-nodomainLabel,
+#dnssec-popup-content-box.unsecuredNoDomain > #dnssec-popup-unsecuredDomainLabel {
+  display: inline;
+}

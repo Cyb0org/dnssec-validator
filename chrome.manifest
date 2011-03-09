@@ -1,5 +1,5 @@
 # ***** BEGIN LICENSE BLOCK *****
-# Copyright 2010 CZ.NIC, z.s.p.o.
+# Copyright 2010, 2011 CZ.NIC, z.s.p.o.
 #
 # This file is part of DNSSEC Validator Add-on.
 #
@@ -22,5 +22,6 @@ locale	dnssec	en-US	jar:chrome/dnssec.jar!/locale/en-US/
 locale	dnssec	cs-CZ	jar:chrome/dnssec.jar!/locale/cs-CZ/
 locale	dnssec	de-DE	jar:chrome/dnssec.jar!/locale/de-DE/
 skin	dnssec	classic/1.0	jar:chrome/dnssec.jar!/skin/
+override	chrome://dnssec/skin/overlay.css	chrome://dnssec/skin/overlay-win-ff4.css	os=WINNT	appversion>=4.0*
 overlay	chrome://browser/content/browser.xul	chrome://dnssec/content/firefoxOverlay.xul
 #style	chrome://global/content/customizeToolbar.xul	chrome://dnssec/skin/overlay.css
