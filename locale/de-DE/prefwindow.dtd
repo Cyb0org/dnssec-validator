@@ -26,5 +26,5 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY radiodnsserverpreset.accesskey "D">
 <!ENTITY menuitemdnsservercznic.label "CZ.NIC">
 <!ENTITY menuitemdnsserveroarc.label "OARC">
-<!ENTITY radiodnsserveropt.label "Benutzer:">
-<!ENTITY radiodnsserveropt.accesskey "B">
+<!ENTITY radiodnsserveropt.label "Eigener:">
+<!ENTITY radiodnsserveropt.accesskey "E">
