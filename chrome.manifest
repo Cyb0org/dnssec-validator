@@ -20,6 +20,7 @@
 content	dnssec	jar:chrome/dnssec.jar!/content/
 locale	dnssec	en-US	jar:chrome/dnssec.jar!/locale/en-US/
 locale	dnssec	cs-CZ	jar:chrome/dnssec.jar!/locale/cs-CZ/
+locale	dnssec	bg-BG	jar:chrome/dnssec.jar!/locale/bg-BG/
 locale	dnssec	de-DE	jar:chrome/dnssec.jar!/locale/de-DE/
 skin	dnssec	classic/1.0	jar:chrome/dnssec.jar!/skin/
 override	chrome://dnssec/skin/overlay.css	chrome://dnssec/skin/overlay-win-ff4.css	os=WINNT	appversion>=4.0*
