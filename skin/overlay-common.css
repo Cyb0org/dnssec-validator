@@ -47,6 +47,10 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
   -moz-image-region: rect(0px, 35px, 16px, 0px);
 }
 
+#dnssec-box.errorDnssec > #dnssec-icon {
+  -moz-image-region: rect(0px, 105px, 16px, 70px);
+}
+
 #dnssec-box.unsecuredDomain > #dnssec-icon,
 #dnssec-box.unsecuredNoDomain > #dnssec-icon {
   -moz-image-region: rect(0px, 70px, 16px, 35px);
@@ -101,12 +105,13 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
   background-color: rgba(106, 177, 63, 1.0);    /* green */
 }
 
+#dnssec-box.errorDnssec,
 #dnssec-box.unsecuredDomain,
 #dnssec-box.unsecuredNoDomain {
   background-color: rgba(168, 168, 168, 1.0);   /* grey */
 }
 
-#dnssec-box.errorDnssec {
+#dnssec-box.inactionDnssec {
   display: none;
 }
 

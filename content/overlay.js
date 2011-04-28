@@ -267,8 +267,8 @@ var dnssecExtension = {
     // Enable asynchronous resolving if desired
     this.getAsyncResolveFlag();
 
-    // Set error mode (no icon)
-    dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
+    // Set inaction mode (no icon)
+    dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_INACTION);
 
     // Change popup-window fore/background color if desired
     this.getPopupColors();
@@ -395,8 +395,8 @@ var dnssecExtension = {
 
       if (this.debugOutput) dump(' ...invalid\n');
 
-      // Set error mode (no icon)
-      dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
+      // Set inaction mode (no icon)
+      dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_INACTION);
 
       // Remember last hostname
 //      this.oldAsciiHost = asciiHost;
@@ -467,7 +467,7 @@ var dnssecExtResolver = {
     } catch (ex) {
       dump(dnssecExtension.debugPrefix + 'Error: Plugin call failed!\n');
 
-      // Set error mode (no icon)
+      // Set error mode
       dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
 
       // Reset resolving flag
@@ -649,6 +649,8 @@ var dnssecExtHandler = {
   DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID : "invalidNoDomainSignatureInvIPaddr",
   // Getting security status
   DNSSEC_MODE_ACTION : "actionDnssec",
+  // Inaction status
+  DNSSEC_MODE_INACTION : "inactionDnssec",
   // Error or unknown state occured
   DNSSEC_MODE_ERROR : "errorDnssec",
 
@@ -656,6 +658,7 @@ var dnssecExtHandler = {
   DNSSEC_TOOLTIP_SECURED   : "securedTooltip",
   DNSSEC_TOOLTIP_UNSECURED : "unsecuredTooltip",
   DNSSEC_TOOLTIP_ACTION    : "actionTooltip",
+  DNSSEC_TOOLTIP_ERROR     : "errorTooltip",
 
   // Cache the most recent hostname seen in checkSecurity
   _asciiHostName : null,
@@ -721,6 +724,8 @@ var dnssecExtHandler = {
       this._stringBundle.getString("dnssec.tooltip.unsecured");
     this._tooltipLabel[this.DNSSEC_TOOLTIP_ACTION] =
       this._stringBundle.getString("dnssec.tooltip.action");
+    this._tooltipLabel[this.DNSSEC_TOOLTIP_ERROR] =
+      this._stringBundle.getString("dnssec.tooltip.error");
 
     return this._tooltipLabel;
   },
@@ -848,8 +853,8 @@ var dnssecExtHandler = {
     // Detect if any resolving is already running...
     if (dnssecExtPrefs.getBool("resolvingactive")) {
 
-      // Set error mode (no icon)
-//      dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
+      // Set inaction mode (no icon)
+//      dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_INACTION);
 
       if (dnssecExtension.debugOutput)
         dump(dnssecExtension.debugPrefix + 'Activating resolving timer\n');
@@ -924,7 +929,8 @@ var dnssecExtHandler = {
       // No DNSSEC box means the DNSSEC box is not visible, in which
       // case there's nothing to do.
       return;
-    } else if (newMode == this.DNSSEC_MODE_ACTION) { // Close window for this state
+    } else if (newMode == this.DNSSEC_MODE_ACTION || // Close window for these states
+               newMode == this.DNSSEC_MODE_ERROR) {
       this.hideDnssecPopup();
     }
 
@@ -982,6 +988,10 @@ var dnssecExtHandler = {
     // Getting security status
     case this.DNSSEC_MODE_ACTION:
       tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_ACTION];
+      break;
+    // An error occured
+    case this.DNSSEC_MODE_ERROR:
+      tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_ERROR];
       break;
     // Unknown
     default:
@@ -1044,8 +1054,10 @@ var dnssecExtHandler = {
          event.keyCode != KeyEvent.DOM_VK_RETURN))
       return; // Left click, space or enter only
 
-    // No popup window while getting security status
-    if (this._dnssecBox && this._dnssecBox.className == this.DNSSEC_MODE_ACTION)
+    // No popup window while...
+    if (this._dnssecBox &&
+       (this._dnssecBox.className == this.DNSSEC_MODE_ACTION || // getting security status
+        this._dnssecBox.className == this.DNSSEC_MODE_ERROR))   // get an error
       return;
 
     // Revert the contents of the location bar, see bug 406779
