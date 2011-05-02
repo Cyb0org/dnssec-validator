@@ -916,7 +916,19 @@ var dnssecExtHandler = {
 
     // Get browser's IP address(es) that uses to connect to the remote site.
     // Uses browser's internal resolver cache
-    dnsService.asyncResolve(asciiHost, 0, dnsListener, th); // Ci.nsIDNSService.RESOLVE_BYPASS_CACHE
+    try {
+      dnsService.asyncResolve(asciiHost, 0, dnsListener, th); // Ci.nsIDNSService.RESOLVE_BYPASS_CACHE
+    } catch(ex) {
+      dump(dnssecExtension.debugPrefix + 'Error: Browser\'s async DNS lookup failed!\n');
+
+      // Set error mode
+      dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
+
+      // Reset resolving flag
+      dnssecExtPrefs.setBool("resolvingactive", false);
+
+      return;
+    }
 
   },
 
