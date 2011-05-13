@@ -32,12 +32,17 @@ and build instructions.
   $ make sys_windows_pre
 
   Part 2 - to be built on Windows:
-  - install Windows Driver Kit (7.1.0 or later)
-    <http://www.microsoft.com/whdc/DevTools/WDK/WDKpkg.mspx>
-  - install Microsoft Visual C++ 2008 Express Edition
-    <http://www.microsoft.com/express/Downloads/>
-  - install CMake <http://www.cmake.org/cmake/resources/software.html>
-  > plugin\FireBreath\prep2008.cmd plugin\projects plugin\build
+  - install CMake <http://www.cmake.org/cmake/resources/software.html>  
+  Visual Studio Professional variant:
+    - install Microsoft Visual Studio 2010 Professional Edition
+      <http://www.microsoft.com/visualstudio/en-us/home>
+    > plugin\FireBreath\prep2010.cmd plugin\projects plugin\build
+  Visual Studio Express variant:
+    - install Windows Driver Kit (7.1.0 or later)
+      <http://www.microsoft.com/whdc/DevTools/WDK/WDKpkg.mspx>
+    - install Microsoft Visual C++ 2008 Express Edition
+      <http://www.microsoft.com/express/Downloads/>
+    > plugin\FireBreath\prep2008.cmd plugin\projects plugin\build
   - run VC++, open plugin/build/FireBreath.sln, select "MinSizeRel"
     configuration (Build -> Configuration Manager...) and build it
 
