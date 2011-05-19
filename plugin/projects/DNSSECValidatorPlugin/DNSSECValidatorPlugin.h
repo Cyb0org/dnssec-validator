@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-#ifndef H_DNSSECValidatorPLUGIN
-#define H_DNSSECValidatorPLUGIN
+#ifndef H_DNSSECValidatorPluginPLUGIN
+#define H_DNSSECValidatorPluginPLUGIN
 
 #include "PluginWindow.h"
 #include "PluginEvents/MouseEvents.h"
@@ -26,15 +26,15 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "PluginCore.h"
 
-class DNSSECValidator : public FB::PluginCore
+class DNSSECValidatorPlugin : public FB::PluginCore
 {
 public:
     static void StaticInitialize();
     static void StaticDeinitialize();
 
 public:
-    DNSSECValidator();
-    virtual ~DNSSECValidator();
+    DNSSECValidatorPlugin();
+    virtual ~DNSSECValidatorPlugin();
 
 public:
     void onPluginReady();
@@ -58,8 +58,8 @@ public:
     virtual bool onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *);
     /** END EVENTDEF -- DON'T CHANGE THIS LINE **/
 };
-typedef boost::shared_ptr<DNSSECValidator> DNSSECValidatorPtr;
-typedef boost::weak_ptr<DNSSECValidator> DNSSECValidatorWeakPtr;
+typedef boost::shared_ptr<DNSSECValidatorPlugin> DNSSECValidatorPluginPtr;
+typedef boost::weak_ptr<DNSSECValidatorPlugin> DNSSECValidatorPluginWeakPtr;
 
 
 #endif

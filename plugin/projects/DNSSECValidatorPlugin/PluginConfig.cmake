@@ -17,18 +17,18 @@
 # DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 # ***** END LICENSE BLOCK *****
 
-set(PLUGIN_NAME "DNSSECValidator")
+set(PLUGIN_NAME "DNSSECValidatorPlugin")
 set(PLUGIN_PREFIX "DSV")
 set(COMPANY_NAME "CZNICLabs")
 
 # ActiveX constants:
-set(FBTYPELIB_NAME DNSSECValidatorLib)
-set(FBTYPELIB_DESC "DNSSECValidator 1.0 Type Library")
-set(IFBControl_DESC "DNSSECValidator Control Interface")
-set(FBControl_DESC "DNSSECValidator Control Class")
-set(IFBComJavascriptObject_DESC "DNSSECValidator IComJavascriptObject Interface")
-set(FBComJavascriptObject_DESC "DNSSECValidator ComJavascriptObject Class")
-set(IFBComEventSource_DESC "DNSSECValidator IFBComEventSource Interface")
+set(FBTYPELIB_NAME DNSSECValidatorPluginLib)
+set(FBTYPELIB_DESC "DNSSECValidatorPlugin 1.0 Type Library")
+set(IFBControl_DESC "DNSSECValidatorPlugin Control Interface")
+set(FBControl_DESC "DNSSECValidatorPlugin Control Class")
+set(IFBComJavascriptObject_DESC "DNSSECValidatorPlugin IComJavascriptObject Interface")
+set(FBComJavascriptObject_DESC "DNSSECValidatorPlugin ComJavascriptObject Class")
+set(IFBComEventSource_DESC "DNSSECValidatorPlugin IFBComEventSource Interface")
 set(AXVERSION_NUM "1")
 
 # NOTE: THESE GUIDS *MUST* BE UNIQUE TO YOUR PLUGIN/ACTIVEX CONTROL!  YES, ALL OF THEM!
@@ -40,18 +40,18 @@ set(FBComJavascriptObject_GUID f4d53565-80c3-55d6-930c-c71248cc7c6b)
 set(IFBComEventSource_GUID 5244e87f-f56a-5c71-9e23-5944da961431)
 
 # these are the pieces that are relevant to using it from Javascript
-set(ACTIVEX_PROGID "CZNICLabs.DNSSECValidator")
-set(MOZILLA_PLUGINID "nic.cz/DNSSECValidator")
+set(ACTIVEX_PROGID "CZNICLabs.DNSSECValidatorPlugin")
+set(MOZILLA_PLUGINID "nic.cz/DNSSECValidatorPlugin")
 
 # strings
 set(FBSTRING_CompanyName "CZ.NIC Labs")
-set(FBSTRING_FileDescription "DNSSEC Validator Plug-in")
-set(FBSTRING_PLUGIN_VERSION "1.0.1")
+set(FBSTRING_FileDescription "Plug-in used by DNSSEC Validator extension")
+set(FBSTRING_PLUGIN_VERSION "1.0.2")
 set(FBSTRING_LegalCopyright "Copyright 2010, 2011 CZ.NIC Labs")
 set(FBSTRING_PluginFileName "np${PLUGIN_NAME}.dll")
-set(FBSTRING_ProductName "DNSSEC Validator")
+set(FBSTRING_ProductName "DNSSEC Validator Plug-in")
 set(FBSTRING_FileExtents "")
-set(FBSTRING_PluginName "DNSSEC Validator")
+set(FBSTRING_PluginName "DNSSEC Validator Plug-in")
 set(FBSTRING_MIMEType "application/x-dnssecvalidator")
 
 # Mac plugin settings

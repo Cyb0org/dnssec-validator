@@ -18,18 +18,18 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
 #include "NpapiTypes.h"
-#include "DNSSECValidatorAPI.h"
+#include "DNSSECValidatorPluginAPI.h"
 
-#include "DNSSECValidator.h"
+#include "DNSSECValidatorPlugin.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-/// @fn DNSSECValidator::StaticInitialize()
+/// @fn DNSSECValidatorPlugin::StaticInitialize()
 ///
 /// @brief  Called from PluginFactory::globalPluginInitialize()
 ///
 /// @see FB::FactoryBase::globalPluginInitialize
 ///////////////////////////////////////////////////////////////////////////////
-void DNSSECValidator::StaticInitialize()
+void DNSSECValidatorPlugin::StaticInitialize()
 {
     // Place one-time initialization stuff here; note that there isn't an absolute guarantee that
     // this will only execute once per process, just a guarantee that it won't execute again until
@@ -37,34 +37,34 @@ void DNSSECValidator::StaticInitialize()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-/// @fn DNSSECValidator::StaticInitialize()
+/// @fn DNSSECValidatorPlugin::StaticInitialize()
 ///
 /// @brief  Called from PluginFactory::globalPluginDeinitialize()
 ///
 /// @see FB::FactoryBase::globalPluginDeinitialize
 ///////////////////////////////////////////////////////////////////////////////
-void DNSSECValidator::StaticDeinitialize()
+void DNSSECValidatorPlugin::StaticDeinitialize()
 {
     // Place one-time deinitialization stuff here
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-/// @brief  DNSSECValidator constructor.  Note that your API is not available
+/// @brief  DNSSECValidatorPlugin constructor.  Note that your API is not available
 ///         at this point, nor the window.  For best results wait to use
 ///         the JSAPI object until the onPluginReady method is called
 ///////////////////////////////////////////////////////////////////////////////
-DNSSECValidator::DNSSECValidator()
+DNSSECValidatorPlugin::DNSSECValidatorPlugin()
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-/// @brief  DNSSECValidator destructor.
+/// @brief  DNSSECValidatorPlugin destructor.
 ///////////////////////////////////////////////////////////////////////////////
-DNSSECValidator::~DNSSECValidator()
+DNSSECValidatorPlugin::~DNSSECValidatorPlugin()
 {
 }
 
-void DNSSECValidator::onPluginReady()
+void DNSSECValidatorPlugin::onPluginReady()
 {
     // When this is called, the BrowserHost is attached, the JSAPI object is
     // created, and we are ready to interact with the page and such.  The
@@ -78,41 +78,41 @@ void DNSSECValidator::onPluginReady()
 ///
 /// Note that m_host is your BrowserHost and shared_ptr returns a
 /// FB::PluginCorePtr, which can be used to provide a
-/// boost::weak_ptr<DNSSECValidator> for your JSAPI class.
+/// boost::weak_ptr<DNSSECValidatorPlugin> for your JSAPI class.
 ///
 /// Be very careful where you hold a shared_ptr to your plugin class from,
 /// as it could prevent your plugin class from getting destroyed properly.
 ///////////////////////////////////////////////////////////////////////////////
-FB::JSAPIPtr DNSSECValidator::createJSAPI()
+FB::JSAPIPtr DNSSECValidatorPlugin::createJSAPI()
 {
     // m_host is the BrowserHost
-    return FB::JSAPIPtr(new DNSSECValidatorAPI(FB::ptr_cast<DNSSECValidator>(shared_ptr()), m_host));
+    return FB::JSAPIPtr(new DNSSECValidatorPluginAPI(FB::ptr_cast<DNSSECValidatorPlugin>(shared_ptr()), m_host));
 }
 
-bool DNSSECValidator::onMouseDown(FB::MouseDownEvent *evt, FB::PluginWindow *)
+bool DNSSECValidatorPlugin::onMouseDown(FB::MouseDownEvent *evt, FB::PluginWindow *)
 {
     //printf("Mouse down at: %d, %d\n", evt->m_x, evt->m_y);
     return false;
 }
 
-bool DNSSECValidator::onMouseUp(FB::MouseUpEvent *evt, FB::PluginWindow *)
+bool DNSSECValidatorPlugin::onMouseUp(FB::MouseUpEvent *evt, FB::PluginWindow *)
 {
     //printf("Mouse up at: %d, %d\n", evt->m_x, evt->m_y);
     return false;
 }
 
-bool DNSSECValidator::onMouseMove(FB::MouseMoveEvent *evt, FB::PluginWindow *)
+bool DNSSECValidatorPlugin::onMouseMove(FB::MouseMoveEvent *evt, FB::PluginWindow *)
 {
     //printf("Mouse move at: %d, %d\n", evt->m_x, evt->m_y);
     return false;
 }
-bool DNSSECValidator::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *)
+bool DNSSECValidatorPlugin::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *)
 {
     // The window is attached; act appropriately
     return false;
 }
 
-bool DNSSECValidator::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *)
+bool DNSSECValidatorPlugin::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *)
 {
     // The window is about to be detached; act appropriately
     return false;

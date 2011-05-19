@@ -19,7 +19,7 @@
 
 EXTENSION_VERSION = $(shell cat install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p')
 PLUGIN_ROOT = plugin
-PLUGIN_NAME = DNSSECValidator
+PLUGIN_NAME = DNSSECValidatorPlugin
 
 X86_MINGW_CC = i586-mingw32msvc-gcc
 X86_MINGW_STRIP = i586-mingw32msvc-strip

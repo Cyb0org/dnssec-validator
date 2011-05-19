@@ -18,7 +18,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
 #include "FactoryBase.h"
-#include "DNSSECValidator.h"
+#include "DNSSECValidatorPlugin.h"
 #include <boost/make_shared.hpp>
 
 class PluginFactory : public FB::FactoryBase
@@ -32,7 +32,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////////
     FB::PluginCorePtr createPlugin(const std::string& mimetype)
     {
-        return boost::make_shared<DNSSECValidator>();
+        return boost::make_shared<DNSSECValidatorPlugin>();
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////////
     void globalPluginInitialize()
     {
-        DNSSECValidator::StaticInitialize();
+        DNSSECValidatorPlugin::StaticInitialize();
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////////
     void globalPluginDeinitialize()
     {
-        DNSSECValidator::StaticDeinitialize();
+        DNSSECValidatorPlugin::StaticDeinitialize();
     }
 };
 

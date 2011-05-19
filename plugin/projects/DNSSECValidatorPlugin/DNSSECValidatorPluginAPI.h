@@ -22,22 +22,22 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/weak_ptr.hpp>
 #include "JSAPIAuto.h"
 #include "BrowserHost.h"
-#include "DNSSECValidator.h"
+#include "DNSSECValidatorPlugin.h"
 
 extern "C" {   /* use C language linkage */
   #include "ds.h"
 }
 
-#ifndef H_DNSSECValidatorAPI
-#define H_DNSSECValidatorAPI
+#ifndef H_DNSSECValidatorPluginAPI
+#define H_DNSSECValidatorPluginAPI
 
-class DNSSECValidatorAPI : public FB::JSAPIAuto
+class DNSSECValidatorPluginAPI : public FB::JSAPIAuto
 {
 public:
-    DNSSECValidatorAPI(DNSSECValidatorPtr plugin, FB::BrowserHostPtr host);
-    virtual ~DNSSECValidatorAPI();
+    DNSSECValidatorPluginAPI(DNSSECValidatorPluginPtr plugin, FB::BrowserHostPtr host);
+    virtual ~DNSSECValidatorPluginAPI();
 
-    DNSSECValidatorPtr getPlugin();
+    DNSSECValidatorPluginPtr getPlugin();
 
     // Synchronous validation method
     // INPUTS:
@@ -57,11 +57,11 @@ public:
                        const std::string& optdnssrv, const FB::JSObjectPtr &callback);
 
 private:
-    DNSSECValidatorWeakPtr m_plugin;
+    DNSSECValidatorPluginWeakPtr m_plugin;
     FB::BrowserHostPtr m_host;
 
     void ValidateAsync_thread(const std::string& domain, const uint16_t options,
                               const std::string& optdnssrv, const FB::JSObjectPtr &callback);
 };
 
-#endif // H_DNSSECValidatorAPI
+#endif // H_DNSSECValidatorPluginAPI
