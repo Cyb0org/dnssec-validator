@@ -1,0 +1,23 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DNSSECValidator", "DNSSECValidator\DNSSECValidator.vcxproj", "{4DADA8CE-AFEA-4A56-8914-A5009FE74CE4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DNSSECValidatorPS", "DNSSECValidator\DNSSECValidatorPS.vcxproj", "{961A7CFE-1ACE-4F74-AC34-476DB1B4BBE1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4DADA8CE-AFEA-4A56-8914-A5009FE74CE4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4DADA8CE-AFEA-4A56-8914-A5009FE74CE4}.Debug|Win32.Build.0 = Debug|Win32
+		{4DADA8CE-AFEA-4A56-8914-A5009FE74CE4}.Release|Win32.ActiveCfg = Release|Win32
+		{4DADA8CE-AFEA-4A56-8914-A5009FE74CE4}.Release|Win32.Build.0 = Release|Win32
+		{961A7CFE-1ACE-4F74-AC34-476DB1B4BBE1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{961A7CFE-1ACE-4F74-AC34-476DB1B4BBE1}.Release|Win32.ActiveCfg = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

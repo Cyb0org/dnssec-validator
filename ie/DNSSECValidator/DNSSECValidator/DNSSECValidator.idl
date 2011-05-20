@@ -1,0 +1,36 @@
+// DNSSECValidator.idl : IDL source for DNSSECValidator
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (DNSSECValidator.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(D5F3AD9A-0C8E-40C5-9AE5-91292E2C5147),
+	dual,
+	nonextensible,
+	helpstring("IDNSSECValidatorBHO Interface"),
+	pointer_default(unique)
+]
+interface IDNSSECValidatorBHO : IDispatch{
+};
+[
+	uuid(32E1D5C5-5C64-4094-8E7B-8597EFE203D9),
+	version(1.0),
+	helpstring("DNSSECValidator 1.0 Type Library")
+]
+library DNSSECValidatorLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(022901CD-E83F-49F6-8960-96BB39E1A187),
+		helpstring("DNSSECValidatorBHO Class")
+	]
+	coclass DNSSECValidatorBHO
+	{
+		[default] interface IDNSSECValidatorBHO;
+	};
+};

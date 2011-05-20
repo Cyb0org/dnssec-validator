@@ -1,0 +1,26 @@
+HKCR
+{
+	DNSSECValidator.DNSSECValidator.1 = s 'DNSSECValidatorBHO Class'
+	{
+		CLSID = s '{022901CD-E83F-49F6-8960-96BB39E1A187}'
+	}
+	DNSSECValidator.DNSSECValidatorBH = s 'DNSSECValidatorBHO Class'
+	{
+		CLSID = s '{022901CD-E83F-49F6-8960-96BB39E1A187}'
+		CurVer = s 'DNSSECValidator.DNSSECValidator.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {022901CD-E83F-49F6-8960-96BB39E1A187} = s 'DNSSECValidatorBHO Class'
+		{
+			ProgID = s 'DNSSECValidator.DNSSECValidator.1'
+			VersionIndependentProgID = s 'DNSSECValidator.DNSSECValidatorBH'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			'TypeLib' = s '{32E1D5C5-5C64-4094-8E7B-8597EFE203D9}'
+		}
+	}
+}
