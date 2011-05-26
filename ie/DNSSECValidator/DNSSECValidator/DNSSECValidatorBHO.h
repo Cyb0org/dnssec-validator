@@ -43,6 +43,16 @@ extern "C" {					// use C language linkage
 
 ////////////////////////////////////////////////
 
+
+#define MAX_STR_LEN		1024
+
+typedef struct {                // structure to save preferences
+	char szDnsserveraddr[MAX_STR_LEN];
+	DWORD dwDebugoutput;
+	DWORD dwUsetcp;
+} dsv_preferences;
+
+
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
 #endif
@@ -57,13 +67,18 @@ class ATL_NO_VTABLE CDNSSECValidatorBHO :
 //class constructor
 public:
 	CDNSSECValidatorBHO(){ //initializing elements
-			//result=0;
-			hTabWnd=NULL;//main Handle Tab Window reference
-			hWndNewPane=NULL; // main Handle Tab Status Bar Pane
-			domain=NULL; //current domain for each tab
-			predomain=NULL; 
+		//result=0;
+		hTabWnd=NULL; //main Handle Tab Window reference
+		hWndNewPane=NULL; // main Handle Tab Status Bar Pane
+		domain=NULL; //current domain for each tab
+		predomain=NULL;
+
+		// default preference settings
+		prefs.szDnsserveraddr[0] = '\0';
+		prefs.dwDebugoutput = 0;
+		prefs.dwUsetcp = 0;
 	}
-DECLARE_REGISTRY_RESOURCEID(IDR_DNSSECVERIFY4IENAVBHO)
+DECLARE_REGISTRY_RESOURCEID(IDR_DNSSECVALIDATORBHO)
 DECLARE_PROTECT_FINAL_CONSTRUCT()
 BEGIN_COM_MAP(CDNSSECValidatorBHO)
 	COM_INTERFACE_ENTRY(IDNSSECValidatorBHO)
@@ -122,7 +137,11 @@ private:
 	// to draw the icon
 	static LRESULT CALLBACK PWProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	// sets the security status icon
-	void setSecurityState(void);
+	void SetSecurityState(void);
+	// loads preference settings from the Windows registry
+	void LoadOptions(void);
+	// preferences variable
+	dsv_preferences prefs;
 };
 
 

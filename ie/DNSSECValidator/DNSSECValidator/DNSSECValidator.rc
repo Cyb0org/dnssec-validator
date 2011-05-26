@@ -118,8 +118,8 @@ END
 // REGISTRY
 //
 
-IDR_DNSSECVERIFY4IENAV  REGISTRY                "DNSSECValidator.rgs"
-IDR_DNSSECVERIFY4IENAVBHO REGISTRY                "DNSSECValidatorBHO.rgs"
+IDR_DNSSECVALIDATOR  REGISTRY                "DNSSECValidator.rgs"
+IDR_DNSSECVALIDATORBHO REGISTRY                "DNSSECValidatorBHO.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -42,6 +42,7 @@ WORD CDNSSECValidatorBHO::statldicon=IDI_ICON_KEY_GREY;// default icon status co
 int CDNSSECValidatorBHO::position=0; //default position
 
 #define DEBUG_PREFIX "dnssec: "
+#define DSV_REG_KEY L"SOFTWARE\\CZ.NIC\\DNSSEC Validator"
 
 // key icon dimensions
 #define ICON_KEY_WIDTH  39
@@ -174,6 +175,28 @@ void CDNSSECValidatorBHO::displaydnssecstatus(void) {
 	}
 }
 
+// loads preference settings from the Windows registry
+void CDNSSECValidatorBHO::LoadOptions(void) {
+	ATLTRACE(DEBUG_PREFIX "LoadOptions() call\n");
+	
+	DWORD dwRet, dwSize;
+	HKEY hKey;
+
+	// open DNSSEC Validator registry key if exists
+	dwRet = RegOpenKeyEx(HKEY_CURRENT_USER, DSV_REG_KEY, 0, KEY_READ, &hKey);
+	if (dwRet == ERROR_SUCCESS) {
+		// set maximum available buffer size
+		dwSize = MAX_STR_LEN;
+		// read preferences
+		dwRet = RegQueryValueExA(hKey, "dnsserveraddr", NULL, NULL, (BYTE*)prefs.szDnsserveraddr, &dwSize);
+		dwRet = RegQueryValueExA(hKey, "debugoutput", NULL, NULL, (BYTE*)&prefs.dwDebugoutput, &dwSize);
+		dwRet = RegQueryValueExA(hKey, "usetcp", NULL, NULL, (BYTE*)&prefs.dwUsetcp, &dwSize);
+		RegCloseKey(hKey);
+	} else {
+		ATLTRACE(DEBUG_PREFIX "Cannot open DNSSEC Validator's registry key\n");
+	}
+}
+
 //checkdomainstatus: It checks whether a domain is a DNSSEC domain
 void CDNSSECValidatorBHO::checkdomainstatus(void) {
 	ATLTRACE(DEBUG_PREFIX "checkdomainstatus() call\n");
@@ -184,17 +207,29 @@ void CDNSSECValidatorBHO::checkdomainstatus(void) {
 	tmpdomain=URL2domain(predomain);
 	strcpy_s(domain,2048,tmpdomain);
 
+	LoadOptions();
+
+	// temporary hardcoded requested IP version
+	bool resolvipv4 = true;
+	bool resolvipv6 = false;
+
+	uint16_t options = 0;
+	if (prefs.dwDebugoutput) options |= NPAPI_INPUT_FLAG_DEBUGOUTPUT;
+	if (prefs.dwUsetcp) options |= NPAPI_INPUT_FLAG_USETCP;
+	if (resolvipv4) options |= NPAPI_INPUT_FLAG_RESOLVIPV4;
+	if (resolvipv6) options |= NPAPI_INPUT_FLAG_RESOLVIPV6;
+
 	char *tmpptr = NULL;
-    uint32_t ttl4, ttl6;
-    result = ds_validate(domain, 4, "217.31.204.130", &tmpptr, &ttl4, &ttl6);   // dnsres1.nic.cz
+	uint32_t ttl4, ttl6;
+	result = ds_validate(domain, options, prefs.szDnsserveraddr, &tmpptr, &ttl4, &ttl6);
 	ds_free_resaddrsbuf();
 
-	setSecurityState();
+	SetSecurityState();
 }
 
 // sets the appropriate security state
-void CDNSSECValidatorBHO::setSecurityState(void) {
-	ATLTRACE(DEBUG_PREFIX "setSecurityState() call\n");
+void CDNSSECValidatorBHO::SetSecurityState(void) {
+	ATLTRACE(DEBUG_PREFIX "SetSecurityState() call\n");
 
 	switch (result) {
 	case NPAPI_EXIT_CONNECTION_DOMAIN_SECURED:

@@ -3,8 +3,8 @@
 // Used by DNSSECValidator.rc
 //
 #define IDS_PROJNAME                    100
-#define IDR_DNSSECVERIFY4IENAV          101
-#define IDR_DNSSECVERIFY4IENAVBHO       102
+#define IDR_DNSSECVALIDATOR             101
+#define IDR_DNSSECVALIDATORBHO          102
 #define IDR_MENU_POPUP                  104
 #define IDI_ICON_KEY_GREEN              206
 #define IDI_ICON_KEY_ACTION             208
