@@ -310,9 +310,8 @@ var dnssecExtension = {
       });
     }
 
-    // Listen for webpage loads
-    gBrowser.addProgressListener(dnssecExtUrlBarListener,
-        Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
+    // Listen for webpage events
+    gBrowser.addProgressListener(dnssecExtUrlBarListener);
 
     if (this.debugOutput)
       dump(this.debugPrefix + 'End of add-on init\n');
