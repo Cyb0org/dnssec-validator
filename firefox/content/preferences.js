@@ -182,6 +182,31 @@ var dnssecExtPrefs = {
     this.savePrefs();
   },
 
+  showPrefWindow : function() {
+    var optionsURL = "chrome://dnssec/content/preferences.xul";
+
+    // Check if the pref window is not already opened
+    var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+                       .getService(Components.interfaces.nsIWindowMediator);
+    var enumerator = wm.getEnumerator(null);
+    while(enumerator.hasMoreElements()) {
+      var win = enumerator.getNext();
+      if (win.document.documentURI == optionsURL) {
+        win.focus();
+        return;
+      }
+    }
+
+    // Open the pref window
+    var features = "chrome,titlebar,toolbar,centerscreen";
+    try {
+      features += this.isInstantApply() ? ",dialog=no" : ",modal";
+    } catch (e) {
+      features += ",modal";
+    }
+    window.openDialog(optionsURL, "", features);
+  },
+
 };
 
 

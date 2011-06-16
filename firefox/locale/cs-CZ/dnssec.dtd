@@ -23,3 +23,5 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY dnssec.thisNoDomainLabel "Neexistující doménové jméno:">
 <!ENTITY dnssec.thisSecuredDomainLabel "je zabezpečeno technologií DNSSEC.">
 <!ENTITY dnssec.thisUnsecuredDomainLabel "není zabezpečeno technologií DNSSEC.">
+<!ENTITY dnssec.preferences.label "Předvolby">
+<!ENTITY dnssec.preferences.accesskey "P">

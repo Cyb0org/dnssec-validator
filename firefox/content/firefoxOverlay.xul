@@ -58,6 +58,10 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
         </vbox>
       </hbox>
     </panel>
+    <menupopup id="dnssec-context-menu">
+      <menuitem label="&dnssec.preferences.label;" accesskey="&dnssec.preferences.accesskey;"
+                oncommand="dnssecExtPrefs.showPrefWindow();"/>
+    </menupopup>
   </popupset>
 
   <textbox id="urlbar">
@@ -74,7 +78,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
       <!-- DNSSEC button in urlbar -->
       <hbox id="dnssec-box" role="button"
            onclick="dnssecExtHandler.handleDnssecButtonEvent(event);"
-           onkeypress="dnssecExtHandler.handleDnssecButtonEvent(event);">
+           onkeypress="dnssecExtHandler.handleDnssecButtonEvent(event);"
+           context="dnssec-context-menu">
 <!--           hidden="true" -->
 <!--           chromedir="&locale.dir;" -->
         <!-- stack id="dnssec-icons-stack" -->

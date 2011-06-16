@@ -23,3 +23,5 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY dnssec.thisNoDomainLabel "Несъществуващо домейн име:">
 <!ENTITY dnssec.thisSecuredDomainLabel "е защитен от DNSSEC.">
 <!ENTITY dnssec.thisUnsecuredDomainLabel "не е защитен от DNSSEC.">
+<!ENTITY dnssec.preferences.label "Настройки">
+<!ENTITY dnssec.preferences.accesskey "Н">
