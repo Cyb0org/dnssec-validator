@@ -47,7 +47,7 @@ sys_macosx:
 	rm -rf plugins $(PLUGIN_ROOT)/build $(PLUGIN_TMP)
 	./$(PLUGIN_ROOT)/FireBreath/prepmac.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" -DCMAKE_BUILD_TYPE=MinSizeRel
 	cd $(PLUGIN_ROOT)/build && xcodebuild && cd ../..
-	mkdir plugins && cp $(PLUGIN_ROOT)/build/projects/$(PLUGIN_NAME)/Debug/$(PLUGIN_NAME).plugin plugins/
+	mkdir plugins && cp -R $(PLUGIN_ROOT)/build/projects/$(PLUGIN_NAME)/Debug/$(PLUGIN_NAME).plugin plugins/
 	strip -x -S plugins/$(PLUGIN_NAME).plugin/Contents/MacOS/$(PLUGIN_NAME)
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform><em:targetPlatform>Darwin_x86_64-gcc3<\/em:targetPlatform>/g' install.rdf.template > install.rdf
 	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-macosx.xpi
