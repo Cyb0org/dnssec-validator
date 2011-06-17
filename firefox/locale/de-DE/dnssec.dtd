@@ -23,5 +23,5 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY dnssec.thisNoDomainLabel "Nicht existierender Domainname:">
 <!ENTITY dnssec.thisSecuredDomainLabel "wird gesichert durch DNSSEC.">
 <!ENTITY dnssec.thisUnsecuredDomainLabel "wird nicht gesichert durch DNSSEC.">
-<!ENTITY dnssec.preferences.label "Einstellungen">
+<!ENTITY dnssec.preferences.label "Einstellungen...">
 <!ENTITY dnssec.preferences.accesskey "E">
