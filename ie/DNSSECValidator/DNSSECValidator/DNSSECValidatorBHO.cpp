@@ -38,7 +38,7 @@ extern HINSTANCE GHins;
 
 WNDPROC CDNSSECValidatorBHO::WProcStatus=NULL; //WNDPROC status
 bool CDNSSECValidatorBHO::WarnBlockAid=true; //at the begining, all domain elements can be navigated
-WORD CDNSSECValidatorBHO::statldicon=IDI_ICON_KEY_GREY;// default icon status color, GRAY
+WORD CDNSSECValidatorBHO::statldicon=IDI_ICON_KEY_GREY;// default icon status color, GREY
 int CDNSSECValidatorBHO::position=0; //default position
 
 #define DEBUG_PREFIX "dnssec: "
@@ -100,6 +100,19 @@ HRESULT CDNSSECValidatorBHO::Connect() {
   return hr;
 }
 
+
+// draw icon to the status bar
+void CDNSSECValidatorBHO::DrawIcon(void) {
+	ATLTRACE(DEBUG_PREFIX "DrawIcon() call\n");
+
+	// redrawing the Status bar pane with the current status icon
+	RedrawWindow(hWndNewPane, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+	
+	// setting again the status icon regards the Shape/Size of the Window 
+	MoveWindow(hWndNewPane, position, 1, ICON_KEY_WIDTH, ICON_KEY_HEIGHT, TRUE);
+}
+
+
 //Invoke: This method allows to obtain MSIE events
 STDMETHODIMP CDNSSECValidatorBHO::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS *pDispParams, VARIANT *pvarResult, EXCEPINFO *pExcepInfo, UINT *puArgErr) {
     ATLTRACE(DEBUG_PREFIX "Invoke() call\n");
@@ -113,14 +126,16 @@ STDMETHODIMP CDNSSECValidatorBHO::Invoke(DISPID dispidMember, REFIID riid, LCID 
 	if (SUCCEEDED(hr)) {
 		switch(dispidMember) {	
 			case DISPID_WINDOWSTATECHANGED : {
-				statldicon=ldicon; //current status
-				//redrawing the Status bar pane with the current status icon
-				RedrawWindow(hWndNewPane,NULL,NULL,RDW_INVALIDATE|RDW_UPDATENOW);
-				//setting again the status icon regards the Shape/Size of the Window 
-				MoveWindow(hWndNewPane, position, 1, ICON_KEY_WIDTH, ICON_KEY_HEIGHT, TRUE);
+				ATLTRACE(DEBUG_PREFIX "Invoke(): DISPID_WINDOWSTATECHANGED\n");
+				statldicon = ldicon; // current status
+				DrawIcon();
 			} break;
 
 			case DISPID_BEFORENAVIGATE2 : {	
+				ATLTRACE(DEBUG_PREFIX "Invoke(): DISPID_BEFORENAVIGATE2\n");
+				statldicon = IDI_ICON_KEY_ACTION; // action icon
+				DrawIcon();
+
 				//this element helps the plugin to extract the URL
 				//allocated in memory of MSIE
 				ATLASSERT((*pDispParams).rgvarg[5].vt = VT_BYREF | VT_BSTR);
@@ -140,7 +155,7 @@ STDMETHODIMP CDNSSECValidatorBHO::Invoke(DISPID dispidMember, REFIID riid, LCID 
 //displaydnssecstatus: It displays DNSSEC status function
 void CDNSSECValidatorBHO::displaydnssecstatus(void) {
 	ATLTRACE(DEBUG_PREFIX "displaydnssecstatus() call\n");
-	
+
 	//the next lines allow to the plugin to cast the URL name to
 	//a "standard readable" string char*
 	//but now in the case of the domain name
@@ -200,7 +215,7 @@ void CDNSSECValidatorBHO::LoadOptions(void) {
 //checkdomainstatus: It checks whether a domain is a DNSSEC domain
 void CDNSSECValidatorBHO::checkdomainstatus(void) {
 	ATLTRACE(DEBUG_PREFIX "checkdomainstatus() call\n");
-	
+
 	//temporal element that helps to fragment the given URL in a domain
 	char* tmpdomain = NULL;
 	tmpdomain= (char*)malloc(2048*sizeof(char));

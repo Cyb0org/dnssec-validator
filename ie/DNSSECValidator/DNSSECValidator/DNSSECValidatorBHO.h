@@ -136,6 +136,7 @@ private:
 	static LRESULT CALLBACK NSProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	// to draw the icon
 	static LRESULT CALLBACK PWProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	void DrawIcon(void);
 	// sets the security status icon
 	void SetSecurityState(void);
 	// loads preference settings from the Windows registry
