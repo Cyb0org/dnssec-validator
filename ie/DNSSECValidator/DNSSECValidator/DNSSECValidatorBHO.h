@@ -72,11 +72,17 @@ public:
 		hWndNewPane=NULL; // main Handle Tab Status Bar Pane
 		domain=NULL; //current domain for each tab
 		predomain=NULL;
-
+		
 		// default preference settings
 		prefs.szDnsserveraddr[0] = '\0';
 		prefs.dwDebugoutput = 0;
 		prefs.dwUsetcp = 0;
+
+		// Initialize the critical section one time only
+		if (!csInitialized) {
+			InitializeCriticalSectionAndSpinCount(&cs, 0x00000400);
+			csInitialized = true;
+		}
 	}
 DECLARE_REGISTRY_RESOURCEID(IDR_DNSSECVALIDATORBHO)
 DECLARE_PROTECT_FINAL_CONSTRUCT()
@@ -143,6 +149,10 @@ private:
 	void LoadOptions(void);
 	// preferences variable
 	dsv_preferences prefs;
+
+	// CS for safe resolving library calling
+	static bool csInitialized;
+	static CRITICAL_SECTION cs;
 };
 
 

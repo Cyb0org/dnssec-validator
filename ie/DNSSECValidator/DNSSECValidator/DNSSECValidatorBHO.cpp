@@ -40,6 +40,8 @@ WNDPROC CDNSSECValidatorBHO::WProcStatus=NULL; //WNDPROC status
 bool CDNSSECValidatorBHO::WarnBlockAid=true; //at the begining, all domain elements can be navigated
 WORD CDNSSECValidatorBHO::statldicon=IDI_ICON_KEY_GREY;// default icon status color, GREY
 int CDNSSECValidatorBHO::position=0; //default position
+CRITICAL_SECTION CDNSSECValidatorBHO::cs;
+bool CDNSSECValidatorBHO::csInitialized = false;
 
 #define DEBUG_PREFIX "dnssec: "
 #define DSV_REG_KEY L"SOFTWARE\\CZ.NIC\\DNSSEC Validator"
@@ -51,7 +53,7 @@ int CDNSSECValidatorBHO::position=0; //default position
 //SetSite: this function initializes the BHO object to extract and connect with the MSIE architecture
 STDMETHODIMP CDNSSECValidatorBHO::SetSite(IUnknown *pUnkSite) {
   ATLTRACE(DEBUG_PREFIX "SetSite() call\n");
-  
+
   // Retrieve and store the IWebBrowser2 pointer 
   m_spWebBrowser2 = pUnkSite; 
   if (m_spWebBrowser2 == NULL) //invalid if no IWebBrowser2 is loaded
@@ -234,10 +236,18 @@ void CDNSSECValidatorBHO::checkdomainstatus(void) {
 	if (resolvipv4) options |= NPAPI_INPUT_FLAG_RESOLVIPV4;
 	if (resolvipv6) options |= NPAPI_INPUT_FLAG_RESOLVIPV6;
 
+	// Request ownership of the critical section
+	EnterCriticalSection(&cs);
+	ATLTRACE(DEBUG_PREFIX "Critical section begin\n");
+
 	char *tmpptr = NULL;
 	uint32_t ttl4, ttl6;
 	result = ds_validate(domain, options, prefs.szDnsserveraddr, &tmpptr, &ttl4, &ttl6);
 	ds_free_resaddrsbuf();
+	
+	// Release ownership of the critical section
+	ATLTRACE(DEBUG_PREFIX "Critical section end\n");
+	LeaveCriticalSection(&cs);
 
 	SetSecurityState();
 }
