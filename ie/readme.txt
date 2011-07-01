@@ -28,7 +28,10 @@ above.
 
 DEBUGGING
 ------------
-TODO
+For enabling debug info of an extension:
+ - select "Debug" configuration (Build -> Configuration Manager...)
+ - run IE in single process mode (set HKEY_CURRENT_USER\Software\Microsoft\
+   Internet Explorer\Main\TabProcGrowth = 0 [REG_DWORD])
 
 
 TODO
