@@ -298,6 +298,9 @@ void CDNSSECValidatorBHO::SetSecurityState(void) {
 		ldicon = IDI_ICON_KEY_GREY_YT;
 		break;
     }
+
+	statldicon = ldicon;
+	RefreshIcon();
 }
 
 //to convert BSTR data to char data
