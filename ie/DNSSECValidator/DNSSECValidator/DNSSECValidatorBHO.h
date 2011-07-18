@@ -72,7 +72,7 @@ public:
 		hWndNewPane=NULL; // main Handle Tab Status Bar Pane
 		domain=NULL; //current domain for each tab
 		predomain=NULL;
-		
+
 		// default preference settings
 		prefs.szDnsserveraddr[0] = '\0';
 		prefs.dwDebugoutput = 0;
@@ -142,7 +142,7 @@ private:
 	static LRESULT CALLBACK NSProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	// to draw the icon
 	static LRESULT CALLBACK PWProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-	void DrawIcon(void);
+	void RefreshIcon(void);
 	// sets the security status icon
 	void SetSecurityState(void);
 	// loads preference settings from the Windows registry

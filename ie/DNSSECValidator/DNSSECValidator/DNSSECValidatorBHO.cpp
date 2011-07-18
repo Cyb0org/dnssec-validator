@@ -103,9 +103,9 @@ HRESULT CDNSSECValidatorBHO::Connect() {
 }
 
 
-// draw icon to the status bar
-void CDNSSECValidatorBHO::DrawIcon(void) {
-	ATLTRACE(DEBUG_PREFIX "DrawIcon() call\n");
+// refresh icon in the status bar (WM_PAINT invocation)
+void CDNSSECValidatorBHO::RefreshIcon(void) {
+	ATLTRACE(DEBUG_PREFIX "RefreshIcon() call\n");
 
 	// redrawing the Status bar pane with the current status icon
 	RedrawWindow(hWndNewPane, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
@@ -122,6 +122,8 @@ STDMETHODIMP CDNSSECValidatorBHO::Invoke(DISPID dispidMember, REFIID riid, LCID 
 	USES_CONVERSION;//avoiding warnings with respect to ATL DATA_TYPE element
 	HWND hwnd=NULL;
 
+	ATLTRACE(DEBUG_PREFIX "dispidMember: %d\n");
+
 	//loading MSIE elements
 	HRESULT hr = m_spWebBrowser2->get_HWND((LONG_PTR*)&hwnd);
 	//succeed?
@@ -130,14 +132,11 @@ STDMETHODIMP CDNSSECValidatorBHO::Invoke(DISPID dispidMember, REFIID riid, LCID 
 			case DISPID_WINDOWSTATECHANGED : {
 				ATLTRACE(DEBUG_PREFIX "Invoke(): DISPID_WINDOWSTATECHANGED\n");
 				statldicon = ldicon; // current status
-				DrawIcon();
+				RefreshIcon();
 			} break;
 
 			case DISPID_BEFORENAVIGATE2 : {	
 				ATLTRACE(DEBUG_PREFIX "Invoke(): DISPID_BEFORENAVIGATE2\n");
-				statldicon = IDI_ICON_KEY_ACTION; // action icon
-				DrawIcon();
-
 				//this element helps the plugin to extract the URL
 				//allocated in memory of MSIE
 				ATLASSERT((*pDispParams).rgvarg[5].vt = VT_BYREF | VT_BSTR);
@@ -224,6 +223,9 @@ void CDNSSECValidatorBHO::checkdomainstatus(void) {
 	tmpdomain=URL2domain(predomain);
 	strcpy_s(domain,2048,tmpdomain);
 
+	statldicon = IDI_ICON_KEY_ACTION; // action icon
+	RefreshIcon();
+	
 	LoadOptions();
 
 	// temporary hardcoded requested IP version
