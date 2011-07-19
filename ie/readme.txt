@@ -18,7 +18,7 @@ Parameters:
    -> list containing DNS resolver's IPv4/IPv6 address(es)
       (system DNS configuration is used when list is empty or does not exist)
  - debugoutput [REG_DWORD]
-   -> print debug information to standard output (see section DEBUGGING)
+   -> print resolving library debug information to standard output
  - usetcp [REG_DWORD]
    -> use TCP instead of default UDP for resolving
 
