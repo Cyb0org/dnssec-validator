@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <?xml-stylesheet type="text/xsl" href="is.xsl" ?>
 <!DOCTYPE msi [
    <!ELEMENT msi   (summary,table*)>
@@ -341,6 +341,7 @@
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>DNSSECValidator.dll</td><td>{E22B0DD6-CD60-4743-8FCE-C3888F347406}</td><td>INSTALLDIR</td><td>2</td><td/><td>dnssecvalidator.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT</td><td>{143D2512-D7AE-4DC0-A061-3B13F667A7CF}</td><td>INSTALLDIR</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ds_windows_x86.dll</td><td>{8E878052-6582-4B20-98D7-839491DB112F}</td><td>INSTALLDIR</td><td>2</td><td/><td>ds_windows_x86.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
@@ -1859,6 +1860,7 @@
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>AlwaysInstall</td><td>DNSSECValidator.dll</td></row>
+		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT</td></row>
 		<row><td>AlwaysInstall</td><td>ds_windows_x86.dll</td></row>
 	</table>
 
@@ -1874,8 +1876,10 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
+		<row><td>copying.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>copying.txt</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ISPROJECTDIR&gt;\..\..\..\DNSSECValidator\copying.txt</td><td>1</td><td/></row>
 		<row><td>dnssecvalidator.dll</td><td>DNSSECValidator.dll</td><td>DNSSEC~1.DLL|DNSSECValidator.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ISPROJECTDIR&gt;\..\..\..\DNSSECValidator\DNSSECValidator\Release\DNSSECValidator.dll</td><td>1</td><td/></row>
 		<row><td>ds_windows_x86.dll</td><td>ds_windows_x86.dll</td><td>DS_WIN~1.DLL|ds_windows-x86.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ISPROJECTDIR&gt;\..\..\..\..\tmp_build\ds_windows-x86.dll</td><td>1</td><td/></row>
+		<row><td>readme.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>readme.txt</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ISPROJECTDIR&gt;\..\..\..\DNSSECValidator\readme.txt</td><td>1</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
@@ -2133,6 +2137,7 @@
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
 		<row><td>DNSSECValidator.dll</td><td/><td/><td>_9EC953DF_A44E_4E72_816B_F87165FBA909_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT</td><td/><td/><td>_B9ACAD14_68AF_4103_8CC4_2F8104357D72_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ds_windows_x86.dll</td><td/><td/><td>_769298E9_B43F_49EA_9DFF_BE0ED03C3204_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
@@ -4090,7 +4095,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>ISTheme</td><td>InstallShield Blue.theme</td></row>
 		<row><td>ISUSLock</td><td>{629C220D-D165-4F9E-B620-1F5276B33E27}</td></row>
 		<row><td>ISUSSignature</td><td>{3F5F4B9A-C5FC-462E-96A9-F949CE3FB843}</td></row>
-		<row><td>ISVisitedViews</td><td>viewAssistant,viewAppFiles,viewProject,viewISToday</td></row>
+		<row><td>ISVisitedViews</td><td>viewAssistant,viewAppFiles,viewProject,viewISToday,viewRealSetupDesign,viewSetupDesign,viewSetupTypes,viewFeatureFiles,viewDependencies,viewSystemSearch,viewSupportFiles,viewRelease</td></row>
 		<row><td>Limited</td><td>1</td></row>
 		<row><td>LockPermissionMode</td><td>1</td></row>
 		<row><td>MsiExecCmdLineOptions</td><td/></row>
