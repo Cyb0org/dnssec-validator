@@ -36,6 +36,7 @@
 #define IDS_DNSSEC_THISUNSECUREDDOMAIN_LABEL 128
 #define IDS_NONE                        129
 #define IDS_ADDON_INIT                  130
+#define IDS_DNSSEC_ERROR_LABEL          131
 #define IDI_ICON_KEY_GREEN              206
 #define IDI_ICON_KEY_ACTION             208
 #define IDI_ICON_KEY_GREY               210

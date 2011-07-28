@@ -398,6 +398,10 @@ void CDNSSECValidatorBHO::SetSecurityState(void) {
     case NPAPI_EXIT_FAILED:
     default:
 		ldicon = IDI_ICON_KEY_GREY_YT;
+
+		tiicon = TTI_ERROR;
+		til1title = IDS_DNSSEC_ERROR_LABEL;
+		til2dn = IDS_DNSSEC_TOOLTIP_ERROR;
 		break;
     }
 

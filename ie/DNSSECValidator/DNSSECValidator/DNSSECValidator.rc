@@ -118,7 +118,7 @@ BEGIN
     IDS_DNSSEC_TOOLTIP_UNSECURED "Not secured by DNSSEC"
     IDS_DNSSEC_TOOLTIP_ACTION "Getting the DNSSEC status"
     IDS_DNSSEC_TOOLTIP_ERROR 
-                            "An error occurred while getting the DNSSEC status"
+                            "An error occurred while getting the DNSSEC status for:"
     IDS_DNSSEC_SECURED_LABEL "Secured by DNSSEC"
     IDS_DNSSEC_UNSECURED_LABEL "Not secured by DNSSEC"
     IDS_DNSSEC_THISDOMAIN_LABEL "Domain name:"
@@ -131,6 +131,7 @@ BEGIN
     IDS_DNSSEC_THISUNSECUREDDOMAIN_LABEL "is not secured by DNSSEC."
     IDS_NONE                " "
     IDS_ADDON_INIT          "Add-on initialized"
+    IDS_DNSSEC_ERROR_LABEL  "Error"
 END
 
 #endif    // English resources
