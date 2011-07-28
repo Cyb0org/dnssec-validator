@@ -41,5 +41,4 @@ Differences against Firefox version:
  - no asynchronous mode
  - no browser (system) IP comparison
  - no icon refreshing when switching back to an opened tab
- - no popup window with information text
  - no preferences window

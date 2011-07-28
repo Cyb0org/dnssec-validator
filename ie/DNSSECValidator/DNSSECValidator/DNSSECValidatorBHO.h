@@ -75,6 +75,9 @@ public:
 		domain=NULL; //current domain for each tab
 		predomain=NULL;
 
+		// tooltip init
+		tiInitialized = false;
+
 		// default preference settings
 		prefs.szDnsserveraddr[0] = '\0';
 		prefs.dwDebugoutput = 0;
@@ -155,6 +158,13 @@ private:
 	// CS for safe resolving library calling
 	static bool csInitialized;
 	static CRITICAL_SECTION cs;
+
+	// creates a tooltip for showing information texts
+	void CreateIconTooltip(HWND hwndParent);
+	void CreateToolTipForRect(HWND hwndParent);
+	HWND hwndTT;
+	TOOLINFO ti;
+	bool tiInitialized;
 };
 
 

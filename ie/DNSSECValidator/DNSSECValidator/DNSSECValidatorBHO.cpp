@@ -52,6 +52,9 @@ bool CDNSSECValidatorBHO::csInitialized = false;
 #define ICON_KEY_WIDTH  39
 #define ICON_KEY_HEIGHT 19
 
+// size of the buffer to read strings
+#define STR_BUF_SIZE	512
+
 //SetSite: this function initializes the BHO object to extract and connect with the MSIE architecture
 STDMETHODIMP CDNSSECValidatorBHO::SetSite(IUnknown *pUnkSite) {
   ATLTRACE(DEBUG_PREFIX "SetSite() call\n");
@@ -82,7 +85,10 @@ STDMETHODIMP CDNSSECValidatorBHO::SetSite(IUnknown *pUnkSite) {
 
   //Drawing the Status bar Pane element
   ::SetWindowLongPtr(hWndNewPane, GWL_WNDPROC, reinterpret_cast<LONG_PTR>(&PWProc));
-  
+
+  // Init the tooltip (this does not work in IE8)
+  //CreateIconTooltip(hWndNewPane);
+
   // Connect to the container for receiving event notifications
   return Connect();
 }
@@ -219,6 +225,12 @@ void CDNSSECValidatorBHO::LoadOptions(void) {
 void CDNSSECValidatorBHO::checkdomainstatus(void) {
 	ATLTRACE(DEBUG_PREFIX "checkdomainstatus() call\n");
 
+	// tooltip initialization
+	if (!tiInitialized) {
+		CreateIconTooltip(hWndNewPane);
+		tiInitialized = true;
+	}
+
 	//temporal element that helps to fragment the given URL in a domain
 	char* tmpdomain = NULL;
 	tmpdomain= (char*)malloc(2048*sizeof(char));
@@ -260,40 +272,128 @@ void CDNSSECValidatorBHO::checkdomainstatus(void) {
 void CDNSSECValidatorBHO::SetSecurityState(void) {
 	ATLTRACE(DEBUG_PREFIX "SetSecurityState() call\n");
 
+	wchar_t tmpbuf[STR_BUF_SIZE];
+	wchar_t tibuf[STR_BUF_SIZE*4] = TEXT("\0"); // buffer to store tooltip string
+	
+	// init strings
+	WORD tiicon = TTI_NONE;
+	WORD til1title = IDS_NONE;
+	WORD til2dn = IDS_NONE;
+	WORD til3sec = IDS_NONE;
+	WORD tidesc = IDS_NONE;
+	
+	// configure the appropriate tooltip strings and icons
 	switch (result) {
 	case NPAPI_EXIT_CONNECTION_DOMAIN_SECURED:
 		ldicon = IDI_ICON_KEY_GREEN;
+		
+		tiicon = TTI_INFO;
+		til1title = IDS_DNSSEC_SECURED_LABEL;
+		til2dn = IDS_DNSSEC_THISDOMAIN_LABEL;
+		til3sec = IDS_DNSSEC_THISSECUREDDOMAIN_LABEL;
+		tidesc = IDS_DNSSEC_CONNECTION_DOMAIN_SECURED;
 		break;
+	
 	case NPAPI_EXIT_CONNECTION_NODOMAIN_SECURED:
 		ldicon = IDI_ICON_KEY_GREEN;
+		
+		tiicon = TTI_INFO;
+		til1title = IDS_DNSSEC_SECURED_LABEL;
+		til2dn = IDS_DNSSEC_THISNODOMAIN_LABEL;
+		til3sec = IDS_DNSSEC_THISSECUREDDOMAIN_LABEL;
+		tidesc = IDS_DNSSEC_CONNECTION_NODOMAIN_SECURED;
 		break;
-    case NPAPI_EXIT_CONNECTION_INVSIGDOMAIN_SECURED:
+    
+	case NPAPI_EXIT_CONNECTION_INVSIGDOMAIN_SECURED:
 		ldicon = IDI_ICON_KEY_RED;
+
+		tiicon = TTI_ERROR;
+		til1title = IDS_DNSSEC_SECURED_LABEL;
+		til2dn = IDS_DNSSEC_THISDOMAIN_LABEL;
+		til3sec = IDS_DNSSEC_THISSECUREDDOMAIN_LABEL;
+		tidesc = IDS_DNSSEC_CONNECTION_INVSIGDOMAIN_SECURED;
 		break;
-    case NPAPI_EXIT_DOMAIN_SIGNATURE_VALID:
+    
+	case NPAPI_EXIT_DOMAIN_SIGNATURE_VALID:
 		ldicon = IDI_ICON_KEY_ORANGE;
+
+		tiicon = TTI_WARNING;
+		til1title = IDS_DNSSEC_UNSECURED_LABEL;
+		til2dn = IDS_DNSSEC_THISDOMAIN_LABEL;
+		til3sec = IDS_DNSSEC_THISSECUREDDOMAIN_LABEL;
+		tidesc = IDS_DNSSEC_DOMAIN_SIGNATURE_VALID;
 		break;
-    case NPAPI_EXIT_AUTH_DOMAIN_SIGNATURE_VALID:
+    
+	case NPAPI_EXIT_AUTH_DOMAIN_SIGNATURE_VALID:
     	ldicon = IDI_ICON_KEY_ORANGE;
+		
+		tiicon = TTI_WARNING;
+		til1title = IDS_DNSSEC_UNSECURED_LABEL;
+		til2dn = IDS_DNSSEC_THISDOMAIN_LABEL;
+		til3sec = IDS_DNSSEC_THISSECUREDDOMAIN_LABEL;
+		tidesc = IDS_DNSSEC_AUTH_DOMAIN_SIGNATURE_VALID;
 		break;
-    case NPAPI_EXIT_DOMAIN_SIGNATURE_INVALID:
+    
+	case NPAPI_EXIT_DOMAIN_SIGNATURE_INVALID:
        	ldicon = IDI_ICON_KEY_RED;
+
+		tiicon = TTI_ERROR;
+		til1title = IDS_DNSSEC_UNSECURED_LABEL;
+		til2dn = IDS_DNSSEC_THISDOMAIN_LABEL;
+		til3sec = IDS_DNSSEC_THISSECUREDDOMAIN_LABEL;
+		tidesc = IDS_DNSSEC_DOMAIN_SIGNATURE_INVALID;
 		break;
-    case NPAPI_EXIT_NODOMAIN_SIGNATURE_VALID:
+    
+	case NPAPI_EXIT_NODOMAIN_SIGNATURE_VALID:
        	ldicon = IDI_ICON_KEY_ORANGE;
+
+		tiicon = TTI_WARNING;
+		til1title = IDS_DNSSEC_UNSECURED_LABEL;
+		til2dn = IDS_DNSSEC_THISNODOMAIN_LABEL;
+		til3sec = IDS_DNSSEC_THISSECUREDDOMAIN_LABEL;
+		tidesc = IDS_DNSSEC_NODOMAIN_SIGNATURE_VALID;
 		break;
-    case NPAPI_EXIT_AUTH_NODOMAIN_SIGNATURE_VALID:
+    
+	case NPAPI_EXIT_AUTH_NODOMAIN_SIGNATURE_VALID:
        	ldicon = IDI_ICON_KEY_ORANGE;
+
+		tiicon = TTI_WARNING;
+		til1title = IDS_DNSSEC_UNSECURED_LABEL;
+		til2dn = IDS_DNSSEC_THISNODOMAIN_LABEL;
+		til3sec = IDS_DNSSEC_THISSECUREDDOMAIN_LABEL;
+		tidesc = IDS_DNSSEC_AUTH_NODOMAIN_SIGNATURE_VALID;
 		break;
-    case NPAPI_EXIT_NODOMAIN_SIGNATURE_INVALID:
+    
+	case NPAPI_EXIT_NODOMAIN_SIGNATURE_INVALID:
 		ldicon = IDI_ICON_KEY_RED;
+
+		tiicon = TTI_ERROR;
+		til1title = IDS_DNSSEC_UNSECURED_LABEL;
+		til2dn = IDS_DNSSEC_THISNODOMAIN_LABEL;
+		til3sec = IDS_DNSSEC_THISSECUREDDOMAIN_LABEL;
+		tidesc = IDS_DNSSEC_NODOMAIN_SIGNATURE_INVALID;
 		break;
-    case NPAPI_EXIT_DOMAIN_UNSECURED:
+    
+	case NPAPI_EXIT_DOMAIN_UNSECURED:
 		ldicon = IDI_ICON_KEY_GREY_RC;
+
+		tiicon = TTI_INFO;
+		til1title = IDS_DNSSEC_UNSECURED_LABEL;
+		til2dn = IDS_DNSSEC_THISDOMAIN_LABEL;
+		til3sec = IDS_DNSSEC_THISUNSECUREDDOMAIN_LABEL;
+		tidesc = IDS_DNSSEC_DOMAIN_UNSECURED;
 		break;
+	
 	case NPAPI_EXIT_NODOMAIN_UNSECURED:
 		ldicon = IDI_ICON_KEY_GREY_RC;
+
+		tiicon = TTI_INFO;
+		til1title = IDS_DNSSEC_UNSECURED_LABEL;
+		til2dn = IDS_DNSSEC_THISNODOMAIN_LABEL;
+		til3sec = IDS_DNSSEC_THISUNSECUREDDOMAIN_LABEL;
+		tidesc = IDS_DNSSEC_NODOMAIN_UNSECURED;
 		break;
+	
 	case NPAPI_EXIT_UNKNOWN:
     case NPAPI_EXIT_FAILED:
     default:
@@ -301,8 +401,35 @@ void CDNSSECValidatorBHO::SetSecurityState(void) {
 		break;
     }
 
+	// show appropriate key icon
 	statldicon = ldicon;
 	RefreshIcon();
+	
+	
+	// setup tooltip string
+	LoadStringW(GHins, til2dn, tmpbuf, STR_BUF_SIZE);
+	wcsncat(tibuf, tmpbuf, STR_BUF_SIZE);
+	wcsncat(tibuf, TEXT("\n"), 1);
+	
+	mbstowcs(tmpbuf, domain, STR_BUF_SIZE);
+	wcsncat(tibuf, tmpbuf, STR_BUF_SIZE);
+	wcsncat(tibuf, TEXT("\n"), 1);
+
+	LoadStringW(GHins, til3sec, tmpbuf, STR_BUF_SIZE);
+	wcsncat(tibuf, tmpbuf, STR_BUF_SIZE);
+	wcsncat(tibuf, TEXT("\n\n"), 2);
+
+	LoadStringW(GHins, tidesc, tmpbuf, STR_BUF_SIZE);
+	wcsncat(tibuf, tmpbuf, STR_BUF_SIZE);
+	
+	// set the tooltip title string
+	LoadStringW(GHins, til1title, tmpbuf, STR_BUF_SIZE);
+	SendMessage(hwndTT, TTM_SETTITLE, tiicon, (LPARAM)tmpbuf);
+
+	// set the tooltip text string
+	ti.lpszText = tibuf;
+	SendMessage(hwndTT, TTM_UPDATETIPTEXT, 0, (LPARAM) (LPTOOLINFO) &ti);
+	
 }
 
 //to convert BSTR data to char data
@@ -376,6 +503,7 @@ LRESULT CALLBACK CDNSSECValidatorBHO::PWProc(HWND hWnd, UINT message, WPARAM wPa
 			break;
 		}
 	    //clicking on the icon, RIGTH||LEFT click button on the mouse device
+/*
 		case WM_RBUTTONUP : {
 			ATLTRACE("PWProc: WM_RBUTTONUP\n");
 		    // Get the coordinates of the parent window's client area.
@@ -410,10 +538,13 @@ LRESULT CALLBACK CDNSSECValidatorBHO::PWProc(HWND hWnd, UINT message, WPARAM wPa
 			}
 			break;
  		}
+*/
+/*
 		case WM_LBUTTONUP : {
 			ATLTRACE("PWProc: WM_LBUTTONUP\n");
 			break;
 		}
+*/
 		default: {
 			break;
 		}
@@ -424,6 +555,37 @@ LRESULT CALLBACK CDNSSECValidatorBHO::PWProc(HWND hWnd, UINT message, WPARAM wPa
 	// window and the changes WON'T be performed
 	return ::DefWindowProc(hWnd, message, wParam, lParam );
 }
+
+
+// creates the tootlip bubble
+void CDNSSECValidatorBHO::CreateIconTooltip(HWND hwndParent)
+{
+    ATLTRACE("CreateIconTooltip() call\n");
+	
+	// Create a tooltip.
+    hwndTT = CreateWindowEx(WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, 
+                                 WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP | TTS_BALLOON,
+                                 CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 
+                                 hwndParent, NULL, GHins, NULL);
+
+    SetWindowPos(hwndTT, HWND_TOPMOST, 0, 0, 0, 0, 
+                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+
+    // Set up "tool" information. In this case, the "tool" is the entire parent window.
+    //TOOLINFO ti = { 0 };
+	ti.cbSize   = TTTOOLINFOA_V2_SIZE;
+    ti.uFlags   = TTF_SUBCLASS;
+    ti.hwnd     = hwndParent;
+    ti.hinst    = GHins;
+    ti.lpszText = MAKEINTRESOURCE(IDS_ADDON_INIT);
+    
+    GetClientRect(hwndParent, &ti.rect);
+
+    SendMessage(hwndTT, TTM_SETMAXTIPWIDTH, 0, 300);
+	
+	// Associate the tooltip with the "tool" window.
+    SendMessage(hwndTT, TTM_ADDTOOL, 0, (LPARAM) (LPTOOLINFO) &ti);
+} 
 
 
 void CDNSSECValidatorBHO::InitDraw(void) {

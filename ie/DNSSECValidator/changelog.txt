@@ -1,0 +1,3 @@
+v0.1.1 / 28.07.2011
+- New tooltip bubble with the information text and the icon
+- Ready for localization

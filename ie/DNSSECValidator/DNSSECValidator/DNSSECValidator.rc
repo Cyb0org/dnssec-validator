@@ -16,6 +16,27 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
+// Czech resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CSY)
+LANGUAGE LANG_CZECH, SUBLANG_NEUTRAL
+#pragma code_page(1250)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_ADDON_INIT          "Doplnìk inicializován"
+END
+
+#endif    // Czech resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
 // Czech (Czech Republic) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CSY)
@@ -37,6 +58,82 @@ IDI_ICON_KEY_ORANGE     ICON                    "res\\key_orange.ico"
 IDI_ICON_KEY_RED        ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_GREY_YT    ICON                    "res\\key_grey_yt.ico"
 #endif    // Czech (Czech Republic) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_PROJNAME            "DNSSECValidator"
+    IDS_DNSSEC_CONNECTION_DOMAIN_SECURED 
+                            "Your computer is also secured by DNSSEC for this particular domain, so you are secured against domain name spoofing."
+    IDS_DNSSEC_CONNECTION_DOMAIN_INVIPADDR_SECURED 
+                            "Your computer is also secured by DNSSEC for this particular domain, but browser's and DNSSEC add-on's IP addresses of the server mismatch, so it could indicate spoofed domain name!"
+    IDS_DNSSEC_CONNECTION_NODOMAIN_SECURED 
+                            "Your computer is also secured by DNSSEC for this particular domain, so you are secured against non-existent domain name spoofing."
+    IDS_DNSSEC_CONNECTION_NODOMAIN_INVIPADDR_SECURED 
+                            "Your computer is also secured by DNSSEC for this particular domain. However browser's IP address is probably spoofed, because inserted domain name does not exist!"
+    IDS_DNSSEC_CONNECTION_INVSIGDOMAIN_SECURED 
+                            "Your computer is also secured by DNSSEC for this particular domain, but invalid domain name signature has been detected. It could indicate spoofed domain name!"
+    IDS_DNSSEC_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED 
+                            "Your computer is also secured by DNSSEC for this particular domain, but invalid domain name signature and invalid browser's IP address has been detected. It could indicate spoofed domain name!"
+    IDS_DNSSEC_DOMAIN_SIGNATURE_VALID 
+                            "But your computer is not secured by DNSSEC for this particular domain. Therefore authentication chain has not been established and domain name might be spoofed!"
+    IDS_DNSSEC_AUTH_DOMAIN_SIGNATURE_VALID 
+                            "But your resolver is authoritative DNS server for this domain name, so it cannot be validated by DNSSEC."
+    IDS_DNSSEC_INVIPADDR_DOMAIN_SIGNATURE_VALID 
+                            "But your computer is not secured by DNSSEC for this particular domain. In addition browser's and DNSSEC add-on's IP addresses of the server mismatch, so it could indicate spoofed domain name!"
+    IDS_DNSSEC_DOMAIN_SIGNATURE_INVALID 
+                            "But your computer is not secured by DNSSEC for this particular domain. Domain name has invalid signature in addition, so it could indicate spoofed name!"
+    IDS_DNSSEC_INVIPADDR_DOMAIN_SIGNATURE_INVALID 
+                            "But your computer is not secured by DNSSEC for this particular domain. Domain name has invalid signature in addition, and browser's and DNSSEC add-on's IP addresses of the server mismatch, so it could indicate spoofed domain name!"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_DNSSEC_NODOMAIN_SIGNATURE_VALID 
+                            "But your computer is not secured by DNSSEC for this particular domain. Therefore authentication chain has not been established and domain name might actually exists!"
+    IDS_DNSSEC_AUTH_NODOMAIN_SIGNATURE_VALID 
+                            "But your resolver is authoritative DNS server for this domain name, so its non-existence cannot be validated by DNSSEC."
+    IDS_DNSSEC_INVIPADDR_NODOMAIN_SIGNATURE_VALID 
+                            "But your computer is not secured by DNSSEC for this particular domain. In addition browser's IP address is probably spoofed, because inserted domain name apparently does not exist!"
+    IDS_DNSSEC_NODOMAIN_SIGNATURE_INVALID 
+                            "But your computer is not secured by DNSSEC for this particular domain. In addition proof of domain name non-existence is not valid, so it probably indicates that domain name actually exists!"
+    IDS_DNSSEC_INVIPADDR_NODOMAIN_SIGNATURE_INVALID 
+                            "But your computer is not secured by DNSSEC for this particular domain. In addition proof of domain name non-existence is not valid, therefore browser's IP address is probably spoofed!"
+    IDS_DNSSEC_DOMAIN_UNSECURED " "
+    IDS_DNSSEC_NODOMAIN_UNSECURED " "
+    IDS_DNSSEC_TOOLTIP_SECURED "Secured by DNSSEC"
+    IDS_DNSSEC_TOOLTIP_UNSECURED "Not secured by DNSSEC"
+    IDS_DNSSEC_TOOLTIP_ACTION "Getting the DNSSEC status"
+    IDS_DNSSEC_TOOLTIP_ERROR 
+                            "An error occurred while getting the DNSSEC status"
+    IDS_DNSSEC_SECURED_LABEL "Secured by DNSSEC"
+    IDS_DNSSEC_UNSECURED_LABEL "Not secured by DNSSEC"
+    IDS_DNSSEC_THISDOMAIN_LABEL "Domain name:"
+    IDS_DNSSEC_THISNODOMAIN_LABEL "Non-existent domain name:"
+    IDS_DNSSEC_THISSECUREDDOMAIN_LABEL "is secured by DNSSEC."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_DNSSEC_THISUNSECUREDDOMAIN_LABEL "is not secured by DNSSEC."
+    IDS_NONE                " "
+    IDS_ADDON_INIT          "Add-on initialized"
+END
+
+#endif    // English resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -82,8 +179,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,1,0,0
- PRODUCTVERSION 0,1,0,0
+ FILEVERSION 0,1,1,0
+ PRODUCTVERSION 0,1,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -99,11 +196,11 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "CZ.NIC Labs"
-            VALUE "FileVersion", "0.1.0.0"
+            VALUE "FileVersion", "0.1.1.0"
             VALUE "InternalName", "DNSSECValidator.dll"
             VALUE "OriginalFilename", "DNSSECValidator.dll"
             VALUE "ProductName", "DNSSEC Validator"
-            VALUE "ProductVersion", "0.1.0.0"
+            VALUE "ProductVersion", "0.1.1.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -118,8 +215,8 @@ END
 // REGISTRY
 //
 
-IDR_DNSSECVALIDATOR  REGISTRY                "DNSSECValidator.rgs"
-IDR_DNSSECVALIDATORBHO REGISTRY                "DNSSECValidatorBHO.rgs"
+IDR_DNSSECVALIDATOR     REGISTRY                "DNSSECValidator.rgs"
+IDR_DNSSECVALIDATORBHO  REGISTRY                "DNSSECValidatorBHO.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -132,17 +229,6 @@ BEGIN
     BEGIN
         MENUITEM "About...",                    ID_ABOUT
     END
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE
-BEGIN
-    IDS_PROJNAME            "DNSSECValidator"
 END
 
 #endif    // English (United States) resources
