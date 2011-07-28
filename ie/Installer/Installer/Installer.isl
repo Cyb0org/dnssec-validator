@@ -1876,6 +1876,7 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
+		<row><td>changelog.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>CHANGE~1.TXT|changelog.txt</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ISPROJECTDIR&gt;\..\..\..\DNSSECValidator\changelog.txt</td><td>1</td><td/></row>
 		<row><td>copying.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>copying.txt</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ISPROJECTDIR&gt;\..\..\..\DNSSECValidator\copying.txt</td><td>1</td><td/></row>
 		<row><td>dnssecvalidator.dll</td><td>DNSSECValidator.dll</td><td>DNSSEC~1.DLL|DNSSECValidator.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ISPROJECTDIR&gt;\..\..\..\DNSSECValidator\DNSSECValidator\Release\DNSSECValidator.dll</td><td>1</td><td/></row>
 		<row><td>ds_windows_x86.dll</td><td>ds_windows_x86.dll</td><td>DS_WIN~1.DLL|ds_windows-x86.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ISPROJECTDIR&gt;\..\..\..\..\tmp_build\ds_windows-x86.dll</td><td>1</td><td/></row>
@@ -4474,7 +4475,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>ProductCode</td><td>{6A75B1AF-0BD2-420C-9C8F-86BCB8E86D9D}</td><td/></row>
 		<row><td>ProductName</td><td>DNSSEC Validator</td><td/></row>
-		<row><td>ProductVersion</td><td>0.1.0</td><td/></row>
+		<row><td>ProductVersion</td><td>0.1.1</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
