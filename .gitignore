@@ -1,0 +1,11 @@
+ie/DNSSECValidator/*.sdf
+ie/DNSSECValidator/*.suo
+ie/DNSSECValidator/DNSSECValidator/Debug/
+ie/DNSSECValidator/DNSSECValidator/Release/
+ie/DNSSECValidator/DNSSECValidator/*.aps
+ie/DNSSECValidator/DNSSECValidator/*.user
+ie/DNSSECValidator/DNSSECValidator/DNSSECValidator_i.c
+ie/DNSSECValidator/DNSSECValidator/DNSSECValidator_i.h
+ie/DNSSECValidator/DNSSECValidator/DNSSECValidator_p.c
+ie/Installer/*.suo
+ie/Installer/Installer/Installer/
