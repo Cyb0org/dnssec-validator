@@ -11,6 +11,7 @@ and build instructions.
 ### LINUX (expected Debian GNU/Linux unstable amd64) ###
   # apt-get install gcc g++ lib32gcc1 lib32stdc++6 libc6-dev-i386 make git cmake zip sed pkg-config libgtk2.0-dev
   $ git clone git://github.com/firebreath/FireBreath.git plugin/FireBreath
+  $ (cd plugin/FireBreath; git checkout f21613137c4c0cfb24679197ea706b31effdd956)
   $ make sys_linux
   $ ls dnssec_validator-<version>-linux.xpi
 
@@ -21,6 +22,7 @@ and build instructions.
   - install MacPorts <http://www.macports.org/install.php>
   $ sudo port install git-core cmake
   $ git clone git://github.com/firebreath/FireBreath.git plugin/FireBreath
+  $ (cd plugin/FireBreath; git checkout f21613137c4c0cfb24679197ea706b31effdd956)
   $ make sys_macosx
   $ ls dnssec_validator-<version>-macosx.xpi
 
@@ -29,6 +31,7 @@ and build instructions.
   Part 1 - to be built on Linux:
   # apt-get install gcc-mingw32 make git sed zip
   $ git clone git://github.com/firebreath/FireBreath.git plugin/FireBreath
+  $ (cd plugin/FireBreath; git checkout f21613137c4c0cfb24679197ea706b31effdd956)
   $ make sys_windows_pre
 
   Part 2 - to be built on Windows:
