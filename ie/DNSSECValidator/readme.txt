@@ -2,6 +2,15 @@ DNSSEC Validator extension for Microsoft Internet Explorer
 <http://www.dnssec-validator.cz>
 ----------------------------------------------------------
 
+BUILD PREREQUISITES
+----------------------
+ - Microsoft Visual Studio 2010 Professional Edition
+   <http://www.microsoft.com/visualstudio/en-us/home>
+ - Windows Template Library 8.1
+   <http://wtl.sourceforge.net>
+   (extract WTL81_9127.zip into ie/WTL81/ directory)
+
+
 INSTALLATION
 ---------------
 TODO
