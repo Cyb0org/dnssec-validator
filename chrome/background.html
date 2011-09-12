@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+    <object id="dnssec-plugin" type="application/x-dnssecvalidator" width="0" height="0"></object>
+    <script>
+        // Called when the url of a tab changes.
+        function onUrlChange(tabId, changeInfo, tab) {
+            var domain = tab.url.match(/^[\w-]+:\/*\[?([\w\.:-]+)\]?(?::\d+)?/)[1]; /**/
+            var plugin = document.getElementById("dnssec-plugin");
+            var result = plugin.Validate(domain, 5, "172.20.20.23");
+	        console.log("result: " + result);
+            if (result[3] == 11) { // NPAPI_EXIT_CONNECTION_DOMAIN_SECURED
+                chrome.pageAction.show(tabId);
+            }
+        };
+
+        // Listen for any changes to the URL of any tab.
+        chrome.tabs.onUpdated.addListener(onUrlChange);
+    </script>
+</body>
+</html>

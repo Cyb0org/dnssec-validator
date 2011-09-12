@@ -1,0 +1,24 @@
+<html>
+<head>
+</head>
+<body>
+    <style>
+        body {
+        min-width:350px;
+        overflow-x:hidden;
+        }
+    </style>
+    <div id="status-label"></div>
+    <script>
+        function addText(id, str){
+            if (document.createTextNode){
+                var tn = document.createTextNode(str);
+                document.getElementById(id).appendChild(tn);
+                //document.body.appendChild(tn);
+            }
+        }
+
+        addText("status-label", "Domain name: XXX is secured by DNSSEC.");
+    </script>
+</body>
+</html>
