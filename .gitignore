@@ -12,6 +12,7 @@ ie/Installer/Installer/Installer/
 ie/WTL81/
 firefox/dnssec_validator-*.xpi
 firefox/plugins/
+firefox/install.rdf
 plugin/FireBreath/
 plugin/build/
 tmp_build/
