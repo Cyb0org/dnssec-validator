@@ -5,15 +5,249 @@
 <body>
     <object id="dnssec-plugin" type="application/x-dnssecvalidator" width="0" height="0"></object>
     <script>
+        var dnssecExtNPAPIConst = {
+          NPAPI_EXIT_FAILED                          : -1, /* domain name resolution failed */
+          NPAPI_EXIT_UNKNOWN                         :  0, /* state is unknown */
+          NPAPI_EXIT_CONNECTION_INVSIGDOMAIN_SECURED :  1, /* connection is secured, but domain has invalid signature */
+          NPAPI_EXIT_NODOMAIN_SIGNATURE_INVALID      :  2, /* domain name does not exist and NSEC/NSEC3 is not valid */
+          NPAPI_EXIT_DOMAIN_SIGNATURE_INVALID        :  3, /* domain signature is not valid */
+          NPAPI_EXIT_NODOMAIN_UNSECURED              :  4, /* non-existent domain is not secured */
+          NPAPI_EXIT_DOMAIN_UNSECURED                :  5, /* domain is not secured */
+          NPAPI_EXIT_NODOMAIN_SIGNATURE_VALID        :  6, /* non-existent domain NSEC/NSEC3 is valid, but COT is not established */
+          NPAPI_EXIT_AUTH_NODOMAIN_SIGNATURE_VALID   :  7, /* non-existent authoritative domain NSEC/NSEC3 is valid, but COT is not established */
+          NPAPI_EXIT_DOMAIN_SIGNATURE_VALID          :  8, /* domain signature is valid, but COT is not established */
+          NPAPI_EXIT_AUTH_DOMAIN_SIGNATURE_VALID     :  9, /* authoritative domain signature is valid, but COT is not established */
+          NPAPI_EXIT_CONNECTION_NODOMAIN_SECURED     : 10, /* connection is secured, but domain name does not exist */
+          NPAPI_EXIT_CONNECTION_DOMAIN_SECURED       : 11, /* both domain and connection are secured */
+          NPAPI_INPUT_FLAG_DEBUGOUTPUT               :  1, /* debug output */
+          NPAPI_INPUT_FLAG_USETCP                    :  2, /* use TCP instead of default UDP */
+          NPAPI_INPUT_FLAG_RESOLVIPV4                :  4, /* resolve IPv4 address (A record) */
+          NPAPI_INPUT_FLAG_RESOLVIPV6                :  8, /* resolve IPv6 address (AAAA record) */
+        };
+
+        var dnssecModes = {
+          // Domain and also connection are secured
+          DNSSEC_MODE_CONNECTION_DOMAIN_SECURED           : "securedConnectionDomain",
+          // Domain and also connection are secured but browser's IP address is invalid
+          DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED : "securedConnectionDomainInvIPaddr",
+          // Connection is secured, but domain name does not exist
+          DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED         : "securedConnectionNoDomain",
+          // Non-existent domain and also connection are secured but browser's IP address is invalid
+          DNSSEC_MODE_CONNECTION_NODOMAIN_INVIPADDR_SECURED : "securedConnectionNoDomainInvIPaddr",
+          // Connection is secured, but domain name signature is invalid
+          DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED     : "securedConnectionInvSigDomain",
+          // Connection is secured, but domain name signature and browser's IP address are invalid
+          DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED : "securedConnectionInvSigDomainInvIPaddr",
+          // Domain is secured and has a valid signature, but no chain of trust
+          DNSSEC_MODE_DOMAIN_SIGNATURE_VALID              : "validDomainSignature",
+          // Authoritative domain is secured and has a valid signature, but no chain of trust
+          DNSSEC_MODE_AUTH_DOMAIN_SIGNATURE_VALID         : "validAuthDomainSignature",
+          // Domain is secured and has a valid signature, but browser's IP address is invalid
+          DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID    : "validDomainSignatureInvIPaddr",
+          // Domain is secured, but it has an invalid signature
+          DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID            : "invalidDomainSignature",
+          // Domain is secured, but signature and browser's IP address are invalid
+          DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID  : "invalidDomainSignatureInvIPaddr",
+          // No DNSSEC signature
+          DNSSEC_MODE_DOMAIN_UNSECURED                    : "unsecuredDomain",
+          // No NSEC/NSEC3 for non-existent domain name
+          DNSSEC_MODE_NODOMAIN_UNSECURED                  : "unsecuredNoDomain",
+          // Non-existent domain is secured and has a valid signature, but no chain of trust
+          DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID            : "validNoDomainSignature",
+          // Authoritative non-existent domain is secured and has a valid signature, but no chain of trust
+          DNSSEC_MODE_AUTH_NODOMAIN_SIGNATURE_VALID       : "validAuthNoDomainSignature",
+          // Non-existent domain is secured and has a valid signature, but browser's IP address is invalid
+          DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID  : "validNoDomainSignatureInvIPaddr",
+          // Non-existent domain is secured, but it has an invalid signature
+          DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID          : "invalidNoDomainSignature",
+          // Non-existent domain is secured, but signature and browser's IP address are invalid
+          DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID : "invalidNoDomainSignatureInvIPaddr",
+          // Getting security status
+          DNSSEC_MODE_ACTION : "actionDnssec",
+          // Inaction status
+          DNSSEC_MODE_INACTION : "inactionDnssec",
+          // Error or unknown state occured
+          DNSSEC_MODE_ERROR : "errorDnssec",
+
+          // Tooltips
+          DNSSEC_TOOLTIP_SECURED   : "securedTooltip",
+          DNSSEC_TOOLTIP_UNSECURED : "unsecuredTooltip",
+          DNSSEC_TOOLTIP_ACTION    : "actionTooltip",
+          DNSSEC_TOOLTIP_ERROR     : "errorTooltip",
+
+            
+        };
+
+        function setMode(newMode, tabId) {
+            var icon = "icon_grey.png";
+
+            switch (newMode) {
+            /* green icon */
+
+            // Both domain and connection are secured
+            case this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED:
+            // Both non-existent domain and connection are secured
+            case this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED:
+              icon = "icon.png";
+              break;
+
+            /* grey icon */
+
+            // No DNSSEC signature
+            case this.dnssecModes.DNSSEC_MODE_DOMAIN_UNSECURED:
+            case this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED:
+              icon = "icon_grey2.png";
+              break;
+
+            /* orange icon */
+
+            // Domain signature is valid
+            case this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID:
+            case this.dnssecModes.DNSSEC_MODE_AUTH_DOMAIN_SIGNATURE_VALID:
+            // Non-existent domain signature is valid
+            case this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID:
+            case this.dnssecModes.DNSSEC_MODE_AUTH_NODOMAIN_SIGNATURE_VALID:
+              icon = "icon_orange.png";
+              break;
+
+            /* red icon */
+
+            // Domain and also connection are secured but browser's IP address is invalid
+            case this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED:
+            // Non-existent domain and also connection are secured but browser's IP address is invalid
+            case this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_INVIPADDR_SECURED:
+            // Connection is secured, but domain signature is invalid
+            case this.dnssecModes.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED:
+            // Connection is secured, but domain signature and browser's IP address are invalid
+            case this.dnssecModes.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED:
+            // Domain signature is invalid
+            case this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID:
+            // Domain signature is valid
+            case this.dnssecModes.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID:
+            // Domain signature is invalid
+            case this.dnssecModes.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID:
+            // Non-existent domain signature is invalid
+            case this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID:
+            // Non-existent domain signature is valid
+            case this.dnssecModes.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID:
+            // Non-existent domain signature is invalid
+            case this.dnssecModes.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID:
+              icon = "icon_red.png";
+              break;
+            // Getting security status
+            case this.dnssecModes.DNSSEC_MODE_ACTION:
+              icon = "icon_action.gif";
+              break;
+            // An error occured
+            case this.dnssecModes.DNSSEC_MODE_ERROR:
+            // Unknown
+            default:
+              icon = "icon_unknown.png";
+            }
+
+            chrome.pageAction.setIcon({path: icon,
+                                           tabId: tabId});
+            chrome.pageAction.show(tabId);
+        };
+
         // Called when the url of a tab changes.
         function onUrlChange(tabId, changeInfo, tab) {
             var domain = tab.url.match(/^[\w-]+:\/*\[?([\w\.:-]+)\]?(?::\d+)?/)[1]; /**/
             var plugin = document.getElementById("dnssec-plugin");
             var result = plugin.Validate(domain, 5, "172.20.20.23");
-	        console.log("result: " + result);
-            if (result[3] == 11) { // NPAPI_EXIT_CONNECTION_DOMAIN_SECURED
-                chrome.pageAction.show(tabId);
+	        console.log("result: " + domain + ";" + result);
+
+            var c = this.dnssecExtNPAPIConst;
+
+            var icon = "";
+            var state = result[3];
+            var invipaddr = false;
+
+            switch (state) {
+            case c.NPAPI_EXIT_CONNECTION_DOMAIN_SECURED:
+              if (!invipaddr) {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED, tabId);
+              } else {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED, tabId);
+              }
+              break;
+            case c.NPAPI_EXIT_CONNECTION_NODOMAIN_SECURED:
+              if (!invipaddr) {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED, tabId);
+              } else {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_INVIPADDR_SECURED, tabId);
+              }
+              break;
+            case c.NPAPI_EXIT_CONNECTION_INVSIGDOMAIN_SECURED:
+              if (!invipaddr) {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED, tabId);
+              } else {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED, tabId);
+              }
+              break;
+            case c.NPAPI_EXIT_DOMAIN_SIGNATURE_VALID:
+              if (!invipaddr) {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID, tabId);
+              } else {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID, tabId);
+              }
+              break;
+            case c.NPAPI_EXIT_AUTH_DOMAIN_SIGNATURE_VALID:
+              if (!invipaddr) {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_AUTH_DOMAIN_SIGNATURE_VALID, tabId);
+              } else {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID, tabId);
+              }
+              break;
+            case c.NPAPI_EXIT_DOMAIN_SIGNATURE_INVALID:
+              if (!invipaddr) {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID, tabId);
+              } else {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID, tabId);
+              }
+              break;
+            case c.NPAPI_EXIT_NODOMAIN_SIGNATURE_VALID:
+              if (!invipaddr) {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID, tabId);
+              } else {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID, tabId);
+              }
+              break;
+            case c.NPAPI_EXIT_AUTH_NODOMAIN_SIGNATURE_VALID:
+              if (!invipaddr) {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_AUTH_NODOMAIN_SIGNATURE_VALID, tabId);
+              } else {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID, tabId);
+              }
+              break;
+            case c.NPAPI_EXIT_NODOMAIN_SIGNATURE_INVALID:
+              if (!invipaddr) {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID, tabId);
+              } else {
+                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID, tabId);
+              }
+              break;
+            case c.NPAPI_EXIT_DOMAIN_UNSECURED:
+              this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_UNSECURED, tabId);
+              break;
+            case c.NPAPI_EXIT_NODOMAIN_UNSECURED:
+              this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED, tabId);
+              break;
+            case c.NPAPI_EXIT_UNKNOWN:
+            case c.NPAPI_EXIT_FAILED:
+            default:
+              this.setMode(this.dnssecModes.DNSSEC_MODE_ERROR, tabId);
+              break;
             }
+
+
+           // if (result[3] == c.NPAPI_EXIT_CONNECTION_DOMAIN_SECURED) { // NPAPI_EXIT_CONNECTION_DOMAIN_SECURED
+           //     chrome.pageAction.setIcon({path: "icon.png",
+           //                                    tabId: tabId});
+           // } else {
+           //     chrome.pageAction.setIcon({path: "icon_grey.png",
+           //                                    tabId: tabId});
+           // }
         };
 
         // Listen for any changes to the URL of any tab.
