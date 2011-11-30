@@ -152,6 +152,13 @@
 
         // Called when the url of a tab changes.
         function onUrlChange(tabId, changeInfo, tab) {
+            
+            // hide icon for chrome:// urls
+            if (tab.url.match(/^chrome:\/\//)) {
+                chrome.pageAction.hide(tabId);
+                return;
+            }
+
             var domain = tab.url.match(/^[\w-]+:\/*\[?([\w\.:-]+)\]?(?::\d+)?/)[1]; /**/
             var plugin = document.getElementById("dnssec-plugin");
             var result = plugin.Validate(domain, 5, "172.20.20.23");
