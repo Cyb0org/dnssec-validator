@@ -1,0 +1,48 @@
+var defaultResolver = ""; // LDNS will use system resolver if empty string is passed
+var defaultCustomResolver = "127.0.0.1";
+
+function loadOptions() {
+        // choice of resolver
+	var dnssecResolver = localStorage["dnssecResolver"];
+        // IP address of custom resolver
+        var dnssecCustomResolver = localStorage["dnssecCustomResolver"];
+
+	if (dnssecResolver == undefined) {
+		dnssecResolver = defaultResolver;
+	}
+	if (dnssecCustomResolver == undefined) {
+		dnssecCustomResolver = defaultCustomResolver;
+	}
+
+        document.dnssecSettings.customResolver.value = dnssecCustomResolver;
+
+
+	var radiogroup = document.dnssecSettings.resolver;
+	for (var i = 0; i < radiogroup.length; i++) {
+		var child = radiogroup[i];
+			if (child.value == dnssecResolver) {
+			    child.checked = "true";
+			    break;
+		}
+	}
+}
+
+function saveOptions() {
+	var radiogroup = document.dnssecSettings.resolver;
+        var resolver;
+	for (var i = 0; i < radiogroup.length; i++) {
+		var child = radiogroup[i];
+			if (child.checked == true) {
+                            resolver = child.value;
+			    break;
+		}
+	}
+	localStorage["dnssecResolver"] = resolver;
+	localStorage["dnssecCustomResolver"] = document.dnssecSettings.customResolver.value;
+}
+
+function eraseOptions() {
+	localStorage.removeItem("dnssecResolver");
+	localStorage.removeItem("dnssecCustomResolver");
+	location.reload();
+}

@@ -79,7 +79,7 @@
         };
 
         function setMode(newMode, tabId) {
-            var icon = "icon_grey.png";
+            var icon;
 
             switch (newMode) {
             /* green icon */
@@ -145,30 +145,54 @@
               icon = "icon_unknown.png";
             }
 
+            //console.log("icon: " + icon);
             chrome.pageAction.setIcon({path: icon,
                                            tabId: tabId});
             chrome.pageAction.show(tabId);
         };
 
+        function getResolver() {
+            var resolver = "";
+            var dnssecResolver = localStorage["dnssecResolver"];
+            if (dnssecResolver != undefined) {
+                resolver = dnssecResolver;
+
+                if (resolver == "custom") {
+                    var dnssecCustomResolver = localStorage["dnssecCustomResolver"];
+                    if (dnssecCustomResolver != undefined) {
+                        resolver = dnssecCustomResolver;
+                    } else {
+                        // We shouldn't get here unless someone deletes part of
+                        // localStorage with the custom resolver setting.
+                        // Empty string causes LDNS to use system settings.
+                        resolver = "";
+                    }
+                }
+            }
+
+            return resolver;
+        };
+        
         // Called when the url of a tab changes.
         function onUrlChange(tabId, changeInfo, tab) {
             
-            // hide icon for chrome:// urls
-            if (tab.url.match(/^chrome:\/\//)) {
+            // hide icon for chrome:// and chrome-extension:// urls
+            if (tab.url.match(/^chrome(?:-extension)?:\/\//)) {
                 chrome.pageAction.hide(tabId);
                 return;
             }
 
+            var resolver = this.getResolver();
             var domain = tab.url.match(/^[\w-]+:\/*\[?([\w\.:-]+)\]?(?::\d+)?/)[1]; /**/
             var plugin = document.getElementById("dnssec-plugin");
-            var result = plugin.Validate(domain, 5, "172.20.20.23");
+            var result = plugin.Validate(domain, 5, resolver);
 	        console.log("result: " + domain + ";" + result);
 
             var c = this.dnssecExtNPAPIConst;
 
             var icon = "";
             var state = result[3];
-            var invipaddr = false;
+            var invipaddr = false; // can't check IP used by Chrome - no API yet
 
             switch (state) {
             case c.NPAPI_EXIT_CONNECTION_DOMAIN_SECURED:
@@ -247,14 +271,6 @@
               break;
             }
 
-
-           // if (result[3] == c.NPAPI_EXIT_CONNECTION_DOMAIN_SECURED) { // NPAPI_EXIT_CONNECTION_DOMAIN_SECURED
-           //     chrome.pageAction.setIcon({path: "icon.png",
-           //                                    tabId: tabId});
-           // } else {
-           //     chrome.pageAction.setIcon({path: "icon_grey.png",
-           //                                    tabId: tabId});
-           // }
         };
 
         // Listen for any changes to the URL of any tab.

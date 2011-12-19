@@ -3,6 +3,7 @@
   "version": "0.1",
   "description": "Shows DNSSEC status",
   "background_page": "background.html",
+  "options_page": "options.html",
   "page_action" :
   {
     "default_icon" : "icon.png",
