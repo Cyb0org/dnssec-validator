@@ -78,7 +78,7 @@
             
         };
 
-        function setMode(newMode, tabId) {
+        function setMode(newMode, tabId, domain) {
             var icon;
 
             switch (newMode) {
@@ -149,6 +149,12 @@
             chrome.pageAction.setIcon({path: icon,
                                            tabId: tabId});
             chrome.pageAction.show(tabId);
+            //chrome.pageAction.setTitle({tabId: tabId, 
+            //                            title: "DNSSEC status for " + domain + ": " + newMode});
+            
+            // This is extremely fucking annoying, but chrome.extension.getViews() won't work
+            // unless popup is opened, so we set the validation result like GET parameters.
+            chrome.pageAction.setPopup({tabId: tabId, popup: "popup.html?" + domain + "," + newMode});
         };
 
         function getResolver() {
@@ -176,6 +182,9 @@
         // Called when the url of a tab changes.
         function onUrlChange(tabId, changeInfo, tab) {
             
+            // reset any old popup
+            chrome.pageAction.setPopup({tabId: tabId, popup: ""});
+
             // hide icon for chrome:// and chrome-extension:// urls
             if (tab.url.match(/^chrome(?:-extension)?:\/\//)) {
                 chrome.pageAction.hide(tabId);
@@ -197,77 +206,77 @@
             switch (state) {
             case c.NPAPI_EXIT_CONNECTION_DOMAIN_SECURED:
               if (!invipaddr) {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED, tabId, domain);
               } else {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED, tabId, domain);
               }
               break;
             case c.NPAPI_EXIT_CONNECTION_NODOMAIN_SECURED:
               if (!invipaddr) {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED, tabId, domain);
               } else {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_INVIPADDR_SECURED, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_INVIPADDR_SECURED, tabId, domain);
               }
               break;
             case c.NPAPI_EXIT_CONNECTION_INVSIGDOMAIN_SECURED:
               if (!invipaddr) {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED, tabId, domain);
               } else {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED, tabId, domain);
               }
               break;
             case c.NPAPI_EXIT_DOMAIN_SIGNATURE_VALID:
               if (!invipaddr) {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_VALID, tabId, domain);
               } else {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID, tabId, domain);
               }
               break;
             case c.NPAPI_EXIT_AUTH_DOMAIN_SIGNATURE_VALID:
               if (!invipaddr) {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_AUTH_DOMAIN_SIGNATURE_VALID, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_AUTH_DOMAIN_SIGNATURE_VALID, tabId, domain);
               } else {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID, tabId, domain);
               }
               break;
             case c.NPAPI_EXIT_DOMAIN_SIGNATURE_INVALID:
               if (!invipaddr) {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID, tabId, domain);
               } else {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID, tabId, domain);
               }
               break;
             case c.NPAPI_EXIT_NODOMAIN_SIGNATURE_VALID:
               if (!invipaddr) {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID, tabId, domain);
               } else {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID, tabId, domain);
               }
               break;
             case c.NPAPI_EXIT_AUTH_NODOMAIN_SIGNATURE_VALID:
               if (!invipaddr) {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_AUTH_NODOMAIN_SIGNATURE_VALID, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_AUTH_NODOMAIN_SIGNATURE_VALID, tabId, domain);
               } else {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID, tabId, domain);
               }
               break;
             case c.NPAPI_EXIT_NODOMAIN_SIGNATURE_INVALID:
               if (!invipaddr) {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID, tabId, domain);
               } else {
-                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID, tabId);
+                this.setMode(this.dnssecModes.DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID, tabId, domain);
               }
               break;
             case c.NPAPI_EXIT_DOMAIN_UNSECURED:
-              this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_UNSECURED, tabId);
+              this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_UNSECURED, tabId, domain);
               break;
             case c.NPAPI_EXIT_NODOMAIN_UNSECURED:
-              this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED, tabId);
+              this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED, tabId, domain);
               break;
             case c.NPAPI_EXIT_UNKNOWN:
             case c.NPAPI_EXIT_FAILED:
             default:
-              this.setMode(this.dnssecModes.DNSSEC_MODE_ERROR, tabId);
+              this.setMode(this.dnssecModes.DNSSEC_MODE_ERROR, tabId, domain);
               break;
             }
 

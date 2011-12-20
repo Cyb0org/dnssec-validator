@@ -1,13 +1,14 @@
 {
   "name": "DNSSEC Validator",
+  "default_locale": "en",
   "version": "0.1",
   "description": "Shows DNSSEC status",
   "background_page": "background.html",
   "options_page": "options.html",
   "page_action" :
   {
-    "default_icon" : "icon.png",
-    "default_title" : "Secured by DNSSEC",
+    "default_icon" : "icon_unknown.png",
+    "default_title" : "DNSSEC Validator",
     "popup": "popup.html"
   },
   "permissions" : [
