@@ -1,13 +1,16 @@
 <html>
+
 <head>
-</head>
-<body>
     <style>
         body {
+        font: 0.9em Verdana, Arial, Helvetica; max-width: 43em;
         min-width:350px;
         overflow-x:hidden;
         }
     </style>
+</head>
+
+<body>
     <div id="status-label"><strong id="domain-name"></strong>: </div>
     <div id="long-text"></div>
     <script>
@@ -26,4 +29,5 @@
         addText("long-text", chrome.i18n.getMessage(statusString));
     </script>
 </body>
+
 </html>
