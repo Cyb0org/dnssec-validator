@@ -16,3 +16,8 @@ plugin/FireBreath/
 plugin/build/
 tmp_build/
 .*.swp
+
+#packed Chrome extension and keys
+chrome.crx
+chrome.der
+chrome.pem
