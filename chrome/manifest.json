@@ -1,7 +1,7 @@
 {
   "name": "DNSSEC Validator",
   "default_locale": "en",
-  "version": "0.1",
+  "version": "0.1.1",
   "description": "Shows DNSSEC status",
   "background_page": "background.html",
   "options_page": "options.html",
