@@ -6,6 +6,8 @@ function loadOptions() {
 	var dnssecResolver = localStorage["dnssecResolver"];
         // IP address of custom resolver
         var dnssecCustomResolver = localStorage["dnssecCustomResolver"];
+        // debug output of resolving to stderr
+        var debugOutput = localStorage["dnssecDebugOutput"];
 
 	if (dnssecResolver == undefined) {
 		dnssecResolver = defaultResolver;
@@ -13,9 +15,11 @@ function loadOptions() {
 	if (dnssecCustomResolver == undefined) {
 		dnssecCustomResolver = defaultCustomResolver;
 	}
+        // OMG localstorage has everything as text
+        debugOutput = (debugOutput == undefined || debugOutput == "false") ? false : true;
 
         document.dnssecSettings.customResolver.value = dnssecCustomResolver;
-
+        document.dnssecSettings.debugOutput.checked = debugOutput;
 
 	var radiogroup = document.dnssecSettings.resolver;
 	for (var i = 0; i < radiogroup.length; i++) {
@@ -30,6 +34,7 @@ function loadOptions() {
 function saveOptions() {
 	var radiogroup = document.dnssecSettings.resolver;
         var resolver;
+
 	for (var i = 0; i < radiogroup.length; i++) {
 		var child = radiogroup[i];
 			if (child.checked == true) {
@@ -37,12 +42,15 @@ function saveOptions() {
 			    break;
 		}
 	}
+
 	localStorage["dnssecResolver"] = resolver;
 	localStorage["dnssecCustomResolver"] = document.dnssecSettings.customResolver.value;
+        localStorage["dnssecDebugOutput"] = document.dnssecSettings.debugOutput.checked;
 }
 
 function eraseOptions() {
 	localStorage.removeItem("dnssecResolver");
 	localStorage.removeItem("dnssecCustomResolver");
+	localStorage.removeItem("dnssecDebugOutput");
 	location.reload();
 }

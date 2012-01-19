@@ -178,6 +178,16 @@
 
             return resolver;
         };
+
+        function getDebugFlag() {
+            var debugOutput = localStorage["dnssecDebugOutput"];
+            
+            if (debugOutput == undefined || debugOutput == "false") {
+                return 0;
+            }
+
+            return debugOutput ? this.dnssecExtNPAPIConst.NPAPI_INPUT_FLAG_DEBUGOUTPUT : 0;
+        };
         
         // Called when the url of a tab changes.
         function onUrlChange(tabId, changeInfo, tab) {
@@ -194,8 +204,11 @@
             var resolver = this.getResolver();
             var domain = tab.url.match(/^[\w-]+:\/*\[?([\w\.:-]+)\]?(?::\d+)?/)[1]; /**/
             var plugin = document.getElementById("dnssec-plugin");
-            var result = plugin.Validate(domain, 5, resolver);
-	        console.log("result: " + domain + ";" + result);
+            var result = plugin.Validate(domain, 
+                                            this.dnssecExtNPAPIConst.NPAPI_INPUT_FLAG_RESOLVIPV4 | 
+                                            this.getDebugFlag(),
+                                            resolver);
+            // console.log("result: " + domain + ";" + result);
 
             var c = this.dnssecExtNPAPIConst;
 
