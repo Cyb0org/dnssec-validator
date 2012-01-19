@@ -1,0 +1,32 @@
+<html>
+
+<head>
+    <title>DNSSEC Validator preferences</title>
+    <script type="text/javascript" src="options.js"></script>
+    <style>
+        body {
+        font: 0.9em Verdana, Arial, Helvetica; max-width: 43em;
+        }
+    </style>
+</head>
+
+<body onload="loadOptions()">
+	<h1>DNSSEC Validator preferences</h1>
+        <h3>DNS resolver</h3>
+
+            <form name="dnssecSettings">
+		<input type="radio" name="resolver" value="" checked="true">Use system settings</input><br/>
+		<input type="radio" name="resolver" value="217.31.204.130 2001:1488:800:400::130 217.31.204.131 2001:1488:800:400::131">CZ.NIC's validating resolvers</input><br/>
+		<input type="radio" name="resolver" value="149.20.64.20 2001:4f8:3:2bc:1::64:20 149.20.64.21 2001:4f8:3:2bc:1::64:21">OARC's validating resolvers</input><br/>
+		<input type="radio" name="resolver" value="custom">Custom resolver:</input>
+                    <input name="customResolver" value="127.0.0.1" /> <br/>
+                <br />
+
+                <input type="checkbox" name="debugOutput">Debug output to stderr</input><br/>
+                <br />
+
+                <button onclick="saveOptions()">Save</button>
+            </form>
+</body>
+
+</html>

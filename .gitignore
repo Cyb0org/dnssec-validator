@@ -16,3 +16,14 @@ firefox/install.rdf
 plugin/FireBreath/
 plugin/build/
 tmp_build/
+.*.swp
+
+#compiled plugin libraries
+chrome/*.so
+chrome/*.dll
+chrome/DNSSECValidatorPlugin.plugin
+
+#packed Chrome extension and keys
+*.crx
+chrome.der
+chrome.pem
