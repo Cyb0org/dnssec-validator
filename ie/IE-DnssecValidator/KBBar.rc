@@ -152,7 +152,7 @@ BEGIN
     COMBOBOX        IDC_COMBO, 102, 52, 70, 120 ,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 	CONTROL			"Use TCP connection instead of UDP", IDC_TCP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 92 , 150 ,10
 	CONTROL			"Display text for the key icon", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 104 , 150 ,10
-	CONTROL			"Print debug information to standard output", IDC_DEBUG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 116, 150 ,10
+	CONTROL			"Print debug information to standard output", IDC_DEBUG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 116, 155 ,10
 END
 
 /////////////////////////////////////////////////////////////////////////////
@@ -290,7 +290,7 @@ BEGIN
 	//state 7 - ORANGE
 	IDS_STATE7_TEXT_TOOLTIP "Not secured by DNSSEC"
 	IDS_STATE7_TEXT_DOMAIN  "is not secured by DNSSEC."
-	IDS_STATE7_TEXT_MAIN	"But your computer is not secured by DNSSEC for this particular domain. In addition browser's IP address is probably spoofed, because inserted domain name apparently does not exist!"
+	IDS_STATE7_TEXT_MAIN	"But your computer is not secured by DNSSEC for this particular domain. In addition the target IP address is probably spoofed, because inserted domain name apparently does not exist!"
 
 	//state 8 - RED
 	IDS_STATE8_TEXT_TOOLTIP "Not secured by DNSSEC"
@@ -481,7 +481,7 @@ BEGIN
 	//state 1 - GREEN	
 	IDS_STATE1_TEXT_TOOLTIP "Zabezpeèeno DNSSEC"
 	IDS_STATE1_TEXT_DOMAIN  "je zabezpeèeno technologií DNSSEC."
-	IDS_STATE1_TEXT_MAIN	"Jelikož i Váš poèítaè je pøi pøístupu k vzdálenému serveru zabezpeèen technologií DNSSEC, jste ochránìni proti podvržení doménového jména."
+	IDS_STATE1_TEXT_MAIN	"Jelikož i Váš poèítaè je pøi pøístupu k vzdálenému serveru zabezpeèen technologií DNSSEC, jste ochránìni proti podvržení neexistujícího doménového jména."
 
 	//state 2 - RED
 	IDS_STATE2_TEXT_TOOLTIP "Zabezpeèeno DNSSEC"
@@ -577,7 +577,7 @@ BEGIN
     COMBOBOX        IDC_COMBO, 122, 52, 70, 120 ,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 	CONTROL			"Použít TCP spojení místo UDP", IDC_TCP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 92 , 150 ,10
 	CONTROL			"Zobrazovat texty za ikonou klíèku", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 104 , 150 ,10
-	CONTROL			"Výpis ladicích informací na standardní výstup", IDC_DEBUG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 116, 150 ,10
+	CONTROL			"Výpis ladicích informací na standardní výstup", IDC_DEBUG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 116, 155 ,10
 END
 
 
@@ -747,9 +747,9 @@ BEGIN
 	ICON            IDI_ICON_KEY_MIRROR,IDC_STATIC,20,20,0,0
 	GROUPBOX        "Über plugin",IDC_STATIC,10,7,230,80
     LTEXT           "DNSSEC Validator für Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
-    LTEXT           "Add-on plugin für DNSSEC überprüfung",IDC_STATIC,50,30,180,10
-    LTEXT           "Support browsers: 32-bit version von IE6, IE7, IE8, IE9",IDC_STATIC,50,40,180,10
-    LTEXT           "Alfa version 1.0", IDC_STATIC,50,50,180,10
+    LTEXT           "Add-on für DNSSEC Validierung",IDC_STATIC,50,30,180,10
+    LTEXT           "Unterstützte Versionen: 32-bit Versionen von IE6, IE7, IE8, IE9",IDC_STATIC,50,40,180,10
+    LTEXT           "Version 1.0 Alfa", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
 	LTEXT           "https://labs.nic.cz/page/1031/", IDC_LINK,10,95,120,10
@@ -772,9 +772,9 @@ BEGIN
 	CONTROL			" Eigener:", IDC_R3,"Button",BS_AUTORADIOBUTTON, 15, 71, 40, 10  
     EDITTEXT        IDC_EDIT, 55, 69, 80 ,12 ,ES_AUTOHSCROLL
     COMBOBOX        IDC_COMBO, 102, 52, 70, 120 ,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-	CONTROL			"Verwenden Sie TCP-Verbindung anstelle von UDP", IDC_TCP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 92 , 160 ,10
-	CONTROL			"Anzeigetext für die Schlüssel-Symbol", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 104 , 150 ,10
-	CONTROL			"Drucken Sie Debug-Informationen an die Standardausgabe", IDC_DEBUG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 116, 180 ,10
+	CONTROL			"TCP-Verbindung anstelle von UDP vorziehen", IDC_TCP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 92 , 160 ,10
+	CONTROL			"Legende neben dem Schlüssel-Symbol zeigen", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 104 , 150 ,10
+	CONTROL			"Die Debug-Informationen an den Standardoutput", IDC_DEBUG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 116, 180 ,10
 END
 
 /////////////////////////////////////////////////////////////////////////////
@@ -871,58 +871,58 @@ BEGIN
 	IDS_DNSSEC_KEY_TEXT_6 " DNS connection error"
 
 	// Deafult
-	IDS_PRE_TEXT_OK		"Domainname:"	
-	IDS_PRE_TEXT_FAIL	"Nicht existierender Domainname:"
+	IDS_PRE_TEXT_OK		"Domäne:"	
+	IDS_PRE_TEXT_FAIL	"Nicht existierender Domäne:"
     
 	// state 0 - GREEN 
 	IDS_STATE0_TEXT_TOOLTIP "Gesichert durch DNSSEC"
 	IDS_STATE0_TEXT_DOMAIN  "wird gesichert durch DNSSEC."
-	IDS_STATE0_TEXT_MAIN	"Ihr Computer wird auch durch DNSSEC für diese Domain geschützt, so dass sie gegen Domainnamenfälschungen (Spoofing) geschützt sind."	
+	IDS_STATE0_TEXT_MAIN	"Ihr Computer ist auch durch DNSSEC für diese Domain geschützt, so dass sie gegen Fälschungen der Domain-Namen geschützt sind."	
 
 	//state 1 - GREEN	
 	IDS_STATE1_TEXT_TOOLTIP "Gesichert durch DNSSEC"
 	IDS_STATE1_TEXT_DOMAIN  "wird gesichert durch DNSSEC."
-	IDS_STATE1_TEXT_MAIN	"Ihr Computer wird auch durch DNSSEC für diese Domain geschützt, aber die IP des Browsers und die des DNSSEC-Addons unterscheiden sich, so dass der Domainname gefälscht sein könnte (Spoofing)!"
+	IDS_STATE1_TEXT_MAIN	"Ihr Computer ist auch durch DNSSEC für diese Domäne geschützt, so dass sie gegen den unterschieben einer nicht existierender Domäne geschützt sind."
 
 	//state 2 - RED
 	IDS_STATE2_TEXT_TOOLTIP "Gesichert durch DNSSEC"
 	IDS_STATE2_TEXT_DOMAIN  "wird gesichert durch DNSSEC."
-	IDS_STATE2_TEXT_MAIN	"Ihr Computer wird auch durch DNSSEC für diese Domain geschützt, aber eine ungültige Domainsignatur wurde entdeckt, so dass der Domainname gefälscht sein könnte (Spoofing)!"
+	IDS_STATE2_TEXT_MAIN	"Ihr Computer ist auch durch DNSSEC für diese Domain geschützt, aber eine ungültige Signatur für diese Domäne wurde entdeckt. Dass heißt dass die Domäne gefälscht sein könnte!"
 
 	//state 3 - ORANGE
 	IDS_STATE3_TEXT_TOOLTIP "Nicht gesichert durch DNSSEC"
 	IDS_STATE3_TEXT_DOMAIN  "wird gesichert durch DNSSEC."
-	IDS_STATE3_TEXT_MAIN	"Aber Ihr Computer wird nicht durch DNSSEC für diese bestimmte Domain gesichert. Somit kann die Autorisierungskette nicht etablibiert werden und die Domain könnte gefälscht sein (Spoofing)!"
+	IDS_STATE3_TEXT_MAIN	"Aber Ihr Computer ist nicht durch DNSSEC für diese bestimmte Domäne gesichert. Somit kann die Autorisierungskette nicht etabliert werden und die Domain könnte gefälscht sein!"
 
 	//state 4 - RED
 	IDS_STATE4_TEXT_TOOLTIP "Nicht gesichert durch DNSSEC"
 	IDS_STATE4_TEXT_DOMAIN  "wird gesichert durch DNSSEC."
-	IDS_STATE4_TEXT_MAIN	"Aber Ihr Resolver ist ein autorisierter DNS-Server für diesen Domainnamen, so dass seine Nichtexistenz nicht durch DNSSEC validiert werden kann."
+	IDS_STATE4_TEXT_MAIN	"Aber Ihr Resolver ist ein autorisierter DNS-Server für diesen Domäne, so dass die Nichtexistenz dieser Domäne nicht durch DNSSEC validiert werden kann."
 
 	//state 5 - ???
 	IDS_STATE5_TEXT_TOOLTIP "Nicht gesichert durch DNSSEC"
 	IDS_STATE5_TEXT_DOMAIN  "wird nicht gesichert durch DNSSEC."
-	IDS_STATE5_TEXT_MAIN	"Aber Ihr Computer wird nicht durch DNSSEC für diese bestimmte Domain gesichert. Der Domainname hat eine ungültige Signatur, was auf einen einen gefälschten Namen hindeuten könnte (Spoofing)."
+	IDS_STATE5_TEXT_MAIN	"Aber Ihr Computer ist nicht durch DNSSEC für diese bestimmte Domäne gesichert. Die Domäne hat eine ungültige Signatur, was auf einen gefälschten Namen hindeuten kann."
 
 	//state 6 - ???
 	IDS_STATE6_TEXT_TOOLTIP "Nicht gesichert durch DNSSEC"
 	IDS_STATE6_TEXT_DOMAIN  "wird nicht gesichert durch DNSSEC."
-	IDS_STATE6_TEXT_MAIN	"Aber Ihr Resolver ist ein autorisierter DNS-Server für diesen Domainnamen, so dass seine Nichtexistenz nicht durch DNSSEC validiert werden kann."
+	IDS_STATE6_TEXT_MAIN	"Aber Ihr Resolver ist ein autorisierter DNS-Server für diesen Domäne, so dass seine Nichtexistenz nicht durch DNSSEC validiert werden kann."
 
 	//state 7 - ORANGE
 	IDS_STATE7_TEXT_TOOLTIP "Nicht gesichert durch DNSSEC"
 	IDS_STATE7_TEXT_DOMAIN  "wird nicht gesichert durch DNSSEC."
-	IDS_STATE7_TEXT_MAIN	"Aber Ihr Computer wird nicht durch DNSSEC für diese bestimmte Domain gesichert. Zudem ist die Browser-IP wahrscheinlich gefälscht (IP-Spoofing), da der eigefügte Domainname anscheinend nicht existiert!"
+	IDS_STATE7_TEXT_MAIN	"Aber Ihr Computer ist nicht durch DNSSEC für diese bestimmte Domäne gesichert. Zudem ist die Ziel-IP-Adresse wahrscheinlich gefälscht, da der eingefügte Domain-Name anscheinend nicht existiert!"
 
 	//state 8 - RED
 	IDS_STATE8_TEXT_TOOLTIP "Nicht gesichert durch DNSSEC"
 	IDS_STATE8_TEXT_DOMAIN  "wird nicht gesichert durch DNSSEC."
-	IDS_STATE8_TEXT_MAIN	"Aber Ihr Computer wird nicht durch DNSSEC für diese bestimmte Domain gesichert. Zudem ist die Beweis der Nichtexistenz ungültig, was darauf hindeutet, dass der Domainname tatsächlich existiert."
+	IDS_STATE8_TEXT_MAIN	"Aber Ihr Computer ist nicht durch DNSSEC für diese bestimmte Domäne gesichert. Zudem ist der Beweis der Nichtexistenz ungültig, was an eine tatsächliche Existenz der Domäne hindeuten kann."
 
 	//state 9 - RED
 	IDS_STATE9_TEXT_TOOLTIP "Nicht gesichert durch DNSSEC"
 	IDS_STATE9_TEXT_DOMAIN  "wird nicht gesichert durch DNSSEC."
-	IDS_STATE9_TEXT_MAIN	"Ihr Computer wird nicht auch durch DNSSEC für diese Domain geschützt, so dass nicht sie gegen Domainnamenfälschungen (Spoofing) geschützt sind."
+	IDS_STATE9_TEXT_MAIN	"Ihr Computer ist nicht durch DNSSEC für diese Domäne geschützt, so dass sie nicht gegen eine Fälschung dieser Domäne geschützt sind."
 
     IDS_NONE                " "
     IDS_ADDON_INIT          "Add-on initialisiert"
