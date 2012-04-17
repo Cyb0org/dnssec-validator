@@ -7,7 +7,6 @@
       "32": "icon.png",
       "48": "icon.png"
    },
-   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDLg7uLMbBIZxLUJOIaXOVdNKqYXWtxiIa4bnF2o3gjIH5IKdmPg62K9uTKuiElPR0U/y7z+t8D3RY5JvgKyxImf4RADuLwxYw0gQyjR0t4ZQICQ4Ulw80GSmirHPMqrX+C9WqnFyFH90USpM9ApVnfSL7JIiouTnTpBkSAyaTudwIDAQAB",
    "name": "DNSSEC Validator",
    "options_page": "options.html",
    "page_action": {
