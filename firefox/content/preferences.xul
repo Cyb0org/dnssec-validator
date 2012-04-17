@@ -54,7 +54,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
             </menupopup>
           </menulist>
         </hbox>
-        <textbox id="dnssec-pref-cznicdnsserveraddr" value="217.31.204.130 2001:1488:800:400::130 217.31.204.131 2001:1488:800:400::131" disabled="true" hidden="true"/>
+        <textbox id="dnssec-pref-cznicdnsserveraddr" value="217.31.204.130 2001:1488:800:400::130 193.29.206.206 2001:678:1::206" disabled="true" hidden="true"/>
         <textbox id="dnssec-pref-oarcdnsserveraddr" value="149.20.64.20 2001:4f8:3:2bc:1::64:20 149.20.64.21 2001:4f8:3:2bc:1::64:21" disabled="true" hidden="true"/>
         <hbox>
           <radio id="dnssec-pref-useoptdnsserver" label="&radiodnsserveropt.label;" accesskey="&radiodnsserveropt.accesskey;" value="2"/>
