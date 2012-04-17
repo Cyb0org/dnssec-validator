@@ -30,6 +30,8 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #include "KBBarBand.h"
 
 CHyperLink m_link;
+CKBBarBand* m_pBarBand;
+LANGID lang;
 /*
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -90,7 +92,6 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* 
 		}//if
 	}
 	
-	LANGID lang;
 	lang = GetSystemDefaultLangID();
 	if (lang==0x0405){
 	// 0x0405 CZ
@@ -273,11 +274,6 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 	case WM_INITDIALOG:
         {
 		//ATLTRACE("WM_INITDIALOG\n");
-       
-		//CZ.NIC 217.31.204.130 2001:1488:800:400::130 217.31.204.131 2001:1488:800:400::131
-	   
-		//OARC 149.20.64.20 2001:4f8:3:2bc:1::64:20 149.20.64.21 2001:4f8:3:2bc:1::64:21
-
 		::SendDlgItemMessage(hwndDlg, IDC_COMBO, CB_INITSTORAGE, 2, 10);
 		::SendDlgItemMessage(hwndDlg, IDC_COMBO, CB_INSERTSTRING, 0, (LPARAM)"CZ.NIC");
 		::SendDlgItemMessage(hwndDlg, IDC_COMBO, CB_INSERTSTRING, 1, (LPARAM)"OARC");
@@ -313,6 +309,66 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 				//ATLTRACE("WM_COMMAND\n");
 				case IDOK:
 					{
+							
+				TCHAR szPath[MAX_PATH];
+				if ( SUCCEEDED( SHGetFolderPath( NULL, CSIDL_LOCAL_APPDATA, NULL, SHGFP_TYPE_CURRENT, szPath ) ) )
+					{
+					PathAppend( szPath, INI_FILE_PATH);
+								short dwVal;
+								int msgboxID;
+								// save keytext setting into Register
+								dwVal = (short)::SendMessage(::GetDlgItem(hwndDlg, IDC_SHOWTEXT), BM_GETCHECK, 0, 0);
+								textkey = dwVal;
+								if (dwVal) WritePrivateProfileString("DNSSEC", "keytext", "1", szPath);
+								else WritePrivateProfileString("DNSSEC", "keytext", "0", szPath);
+
+								dwVal = (short)::SendMessage(::GetDlgItem(hwndDlg, IDC_TCP), BM_GETCHECK, 0, 0);
+								tcpudp = dwVal;
+								if (dwVal) WritePrivateProfileString("DNSSEC", "tcpudp", "1", szPath);
+								else WritePrivateProfileString("DNSSEC", "tcpudp", "0", szPath);
+
+								// save debugoutput DWORD into Register
+								if (debugoutput_enable!=0) {
+									dwVal = (short)::SendMessage(::GetDlgItem(hwndDlg, IDC_DEBUG), BM_GETCHECK, 0, 0);
+									debugoutput = dwVal;
+									if (dwVal) WritePrivateProfileString("DNSSEC", "debugoutput", "1", szPath);
+									else WritePrivateProfileString("DNSSEC", "debugoutput", "0", szPath);									
+								}
+
+								// save choice setting resolver into Register
+								if (::IsDlgButtonChecked(hwndDlg, IDC_R1))
+								    dwVal = 0;
+								else if (::IsDlgButtonChecked(hwndDlg, IDC_R2))
+								{	
+									short ch;
+									dwVal = 1;
+									ch =(short)::SendMessage(::GetDlgItem(hwndDlg, IDC_COMBO), CB_GETCURSEL,  0 , 0);
+									choice2 = ch;
+									if (ch) WritePrivateProfileString("DNSSEC", "choicedns", "1", szPath);
+									else WritePrivateProfileString("DNSSEC", "choicedns", "0", szPath);														
+								}
+								else if (::IsDlgButtonChecked(hwndDlg, IDC_R3))
+								{
+									dwVal = 2;									
+									TCHAR chText[100];
+									::GetDlgItemText(hwndDlg, IDC_EDIT, chText, 100);
+									char* szVal=(char*)chText;
+									
+									if (ValidateIP(szVal)) WritePrivateProfileString("DNSSEC", "userip", szVal, szPath);
+									else
+									{ if (lang==0x0405) msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Neplatná adresa IPv4!\nIPv4 adresa nebude uložena.", (LPCWSTR)L"Neplatná adresa IPv4", MB_OK | MB_ICONERROR);
+										 else if (lang==0x0407) msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Ungültige IPv4-Adresse!\nIPv4-Adresse werden nicht gespeichert.", (LPCWSTR)L"Ungültige IPv4-Adresse", MB_OK | MB_ICONERROR);
+										 else msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Invalid IPv4 format!\nThe IPv4 address will not set.", (LPCWSTR)L"Invalid IPv4 format", MB_OK | MB_ICONERROR);
+	
+									} // if 																																																
+								}// id IsDlgButtonChecked
+								choice = dwVal;
+								if (dwVal==2) WritePrivateProfileString("DNSSEC", "choice", "2", szPath);
+								else if (dwVal==1) WritePrivateProfileString("DNSSEC", "choice", "1", szPath);	
+								else WritePrivateProfileString("DNSSEC", "choice", "0", szPath);	
+							}
+						/*
+						    // code for register write
 							DWORD dwRet;
 							HKEY hKey;
 							DWORD dwVal;
@@ -361,8 +417,12 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 								if (dwRet == ERROR_ACCESS_DENIED) {	
 								msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Access Denied!\nYou must be logged as Administartor.", (LPCWSTR)L"Access Denied", MB_OK | MB_ICONERROR);
 								}
-								RegCloseKey(hKey);																						
-					EndDialog(hwndDlg, LOWORD(wParam));					
+								RegCloseKey(hKey);	
+
+								*/
+							
+					EndDialog(hwndDlg, LOWORD(wParam));						
+					//if (iMajor==6) m_pBarBand->m_spWebBrowser2->Refresh();
 					break;
 					}
 				case IDCANCEL:

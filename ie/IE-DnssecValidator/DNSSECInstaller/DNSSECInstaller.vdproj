@@ -21,7 +21,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_4F1857E3394F42559A7682567539D895"
+        "MsmKey" = "8:_13C08602937E4A7AA13D25C04FA6D294"
+        "OwnerKey" = "8:_F2E5C1FC25374A91A16076627270CD97"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_81367557439841D9B538AFD6EC9291EE"
         "OwnerKey" = "8:_F2E5C1FC25374A91A16076627270CD97"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -33,26 +39,20 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_99D7A710231A451593295AA901B52E42"
+        "OwnerKey" = "8:_F2E5C1FC25374A91A16076627270CD97"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_AFE3BCF39BE14A3CB32F18CAD0E253CF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_B250AB04C38C48C9B9008184B08AED81"
-        "OwnerKey" = "8:_F2E5C1FC25374A91A16076627270CD97"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_C6A70F4EF72B4DA1AEA118DA288859DA"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_DE02A92D86DA4DF099E2EB4DA632AB06"
-        "OwnerKey" = "8:_F2E5C1FC25374A91A16076627270CD97"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -301,7 +301,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:DNSSEC Validator for IE"
         "ProductCode" = "8:{2EB43437-EFE7-435A-9212-941DD6C4CD72}"
-        "PackageCode" = "8:{2D3F1205-C7B8-4828-849B-89DB88486475}"
+        "PackageCode" = "8:{834006CA-D272-4A15-ABD4-9CCE319AC58A}"
         "UpgradeCode" = "8:{825CD637-7477-4A49-8C6C-D5B8D52EF6DB}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -655,7 +655,7 @@
                             "ContextData" = "8:1;True=1;False=0"
                             "Attributes" = "3:0"
                             "Setting" = "3:0"
-                            "Value" = "3:1"
+                            "Value" = "3:0"
                             "DefaultValue" = "3:1"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -817,11 +817,11 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_4F1857E3394F42559A7682567539D895"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_13C08602937E4A7AA13D25C04FA6D294"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:Microsoft_VC100_ATL_x86.msm"
+            "SourcePath" = "8:Microsoft_VC100_MFC_x86.msm"
                 "Properties"
                 {
                 }
@@ -831,7 +831,7 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_B250AB04C38C48C9B9008184B08AED81"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_81367557439841D9B538AFD6EC9291EE"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
@@ -845,11 +845,11 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_DE02A92D86DA4DF099E2EB4DA632AB06"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_99D7A710231A451593295AA901B52E42"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:Microsoft_VC100_MFC_x86.msm"
+            "SourcePath" = "8:Microsoft_VC100_ATL_x86.msm"
                 "Properties"
                 {
                 }

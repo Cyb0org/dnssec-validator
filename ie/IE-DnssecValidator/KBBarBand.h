@@ -36,34 +36,44 @@ extern "C" {					// use C language linkage
 #include "KBToolBarCtrl.h"
 #include <shlguid.h>     // IID_IWebBrowser2, DIID_DWebBrowserEvents2, etc
 #include <exdispid.h> // DISPID_DOCUMENTCOMPLETE, etc.
+#include <shlobj.h>
+
+#include <shlwapi.h>
+#pragma comment(lib,"shlwapi.lib")
+
 #define TB_MIN_SIZE_X   64
 #define TB_MIN_SIZE_Y   26
 #define TB_MAX_SIZE_Y   40
 #define MAX_STR_LEN		1024
+#define IPADDR_MLEN 64
 #define KEYTEXT				0
 #define RESOLVER			0
 #define RESOLVER2			0
 #define IPUSER		TEXT("127.0.0.1")
-#define IPNIC		TEXT("217.31.204.130")
-#define IPOARC		TEXT("149.20.64.20")
+//CZ.NIC 217.31.204.130 2001:1488:800:400::130 193.29.206.206 2001:678:1::206
+//OARC 149.20.64.20 2001:4f8:3:2bc:1::64:20 149.20.64.21 2001:4f8:3:2bc:1::64:21
+#define IPNIC		TEXT("217.31.204.130 2001:1488:800:400::130 193.29.206.206 2001:678:1::206")
+#define IPOARC		TEXT("149.20.64.20 2001:4f8:3:2bc:1::64:20 149.20.64.21 2001:4f8:3:2bc:1::64:21")
 #define TCPUDP				0
 #define DEBUGVAL			0
 #define DEBUGVAL_ENABLE		0
 #define HKU_REG_KEY TEXT(".DEFAULT\\Software\\CZ.NIC\\DNSSEC Validator")
 #define HKCU_REG_KEY TEXT("Software\\CZ.NIC\\DNSSEC Validator")
-
+#define INI_FILE_PATH _T("\\CZ.NIC\\DNSSEC Validator\\1.0\\dnssec.ini")
 const int BUTTON_INDEX = 0;
 extern HINSTANCE GHins;
 // settings
 extern short textkey;
 extern short choice;
 extern short choice2;
-extern char* dnssecseradr;
+extern char dnssecseradr[IPADDR_MLEN];
 extern char* nic;
 extern char* oarc;
 extern short tcpudp;
 extern short debugoutput;
 extern short debugoutput_enable;
+// variable for IE version check
+extern int iRes,iMajor,iMinor;
 //#if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 //#error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
 //#endif
@@ -194,6 +204,9 @@ public:
 	HRESULT RegGetString(HKEY hKey, LPCTSTR szValueName, LPTSTR * lpszResult);
 	// CALLBACK function
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam);
+	bool FileExists(const TCHAR *fileName);
+	void CreateIniFile();
+
 
 	static int position; //main position of the icon
 	bool m_bFocus;			

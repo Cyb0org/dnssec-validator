@@ -51,6 +51,7 @@ class CKBBarBand;
 /////////////////////////////////////////////////////////////////////////////
 // CKBToolBarCtrl window
 
+
 class CKBToolBarCtrl : public CToolBarCtrl
 {
 // Construction

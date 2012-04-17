@@ -27,6 +27,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #include "KBBar.h"
 #include "KBBarBand.h"
 #include "resource.h"
+#include "shlobj.h"
 //#include <CommCtrl.h>
 // size of buffer for URL parts save
 #define STR_BUF_SIZE	512
@@ -37,7 +38,7 @@ WORD ldiconBar;
 short textkey = KEYTEXT;
 short choice = RESOLVER;
 short choice2 = RESOLVER2;
-char* dnssecseradr = IPUSER;
+char dnssecseradr[IPADDR_MLEN] = "000.000.000.000 0000:0000:0000:0000:0000:0000:0000:0000";
 char* nic = IPNIC;
 char* oarc = IPOARC;
 short tcpudp = TCPUDP;
@@ -61,7 +62,7 @@ CRITICAL_SECTION CKBBarBand::cs;
 // for tooltip creation
 bool CKBBarBand::csInitialized = false;
 bool csInitialized = false;
-
+char DefaultIniData[] = "[DNSSEC]\nkeytext=0\nchoice=0\nchoicedns=0\nuserip=127.0.0.1\ntcpudp=0\ndebugoutput=0";
 //CIPAddressCtrl m_ip; 
 /**************************************************************************/
 // IObjectWithSite implementations
@@ -282,13 +283,11 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 					if (dwMask & OLECMDIDF_WINDOWSTATE_USERVISIBLE)
 					{
 					bool visible = !!(dwFlags & OLECMDIDF_WINDOWSTATE_USERVISIBLE);
-					LoadOptionsFromRegistry();
-					//LoadOptionsFromFile();					
-					RefreshIcon2();
+					//LoadOptionsFromRegistry();
+					LoadOptionsFromFile();
+					RefreshIcon2();					
 					}
 				}
-			
-
 			} break;
 
 			case DISPID_BEFORENAVIGATE2 : {				
@@ -331,9 +330,6 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 				HRESULT hrs = webBrowser2->get_LocationURL(&BURL2);
 				char * predomain4 =_com_util::ConvertBSTRToString(BURL2);
 				char * temp= (char*)malloc(2083*sizeof(char));
-				//ATLTRACE("\n");
-				//ATLTRACE(predomain4);
-				//ATLTRACE("\n");
 				if (strcmp(predomain4,"about:Tabs")==0 || strcmp(predomain4,"about:Blank")==0 || strcmp(predomain4,"about:blank")==0 || strcmp(predomain4,"javascript:false;")==0) 
 				{
 				ldicon = GetBitmapIndex(IDI_ICON_KEY_GREY1);						
@@ -342,9 +338,6 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 				else
 				{
 				temp = UrlToDomain(predomain4);
-				//ATLTRACE("\n");
-				//ATLTRACE(temp);
-				//ATLTRACE("\n");
 					if (strcmp(temp,urladdr)==0)
 					{
 						ldicon = state;
@@ -373,7 +366,7 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 void CKBBarBand::RefreshIcon2(void) {
 	//ATLTRACE( "RefreshIcon() call\n");
 	//MoveWindow(hWndNewPane, 0, 3, StatusBarLenght, ICON_KEY_HEIGHT, TRUE);
-	//RedrawWindow(hWndNewPane, NULL, NULL, RDW_UPDATENOW);
+	//RedrawWindow(hWndNewPane, NULL, NULL, RDW_UPDATENOW);	
 	m_wndToolBar.RepaintButton(BUTTON_INDEX,ldicon);
 	//ATLTRACE("RepaintButton():\n");
 }
@@ -408,18 +401,24 @@ bool CKBBarBand::CreateToolWindow()
 	rcClientParent2=rcClientParent;
 	CWnd* pWndParent = CWnd::FromHandle(m_hWndParent);
 	pWndParent->GetClientRect(&rcClientParent);
-	//CreateIconTooltip(m_wndToolBar);
-	// We need to create a reflection window in between our toolbar control
-	// and the rebar in order to get WM_COMMAND messages sent from the toolbar to its
-	// parent. 
 	
-	LoadOptionsFromRegistry();
-	//LoadOptionsFromFile();
+	// Create ini file if not exists
+	CreateIniFile();
 
+	// Load preferences from registry
+	//LoadOptionsFromRegistry();
+
+	// Load preferences from ini file
+	LoadOptionsFromFile();
+
+	// We need to create a reflection window in between our toolbar control
 	if (!m_wndReflectionWnd.CreateEx(NULL, TOOLBARCLASSNAME,"DNSSEC BAR Module",WS_CHILD | WS_CLIPSIBLINGS | WS_BORDER,rcClientParent.left,rcClientParent.top,rcClientParent.right-rcClientParent.left,rcClientParent.bottom-rcClientParent.top,*pWndParent,NULL,0))
 	return false;
+	// and the rebar in order to get WM_COMMAND messages sent from the toolbar to its
+	// parent. 
 	if (!m_wndToolBar.Create(rcClientParent, &m_wndReflectionWnd, this, GHins))
 	return false;
+	// Set toolbar button bitmap size
 	if (!SendMessage(m_wndToolBar, TB_SETBITMAPSIZE, 0, MAKELPARAM(ICON_KEY_WIDTH, ICON_KEY_HEIGHT)))
 	return false;
 
@@ -433,7 +432,7 @@ bool CKBBarBand::CreateToolWindow()
 		CreateIconTooltip(m_wndToolBar);
 		return true;
 	}
-	// if IE is 9.xx
+	// if IE is 7.xx
 	if (iMajor==7) {
 		CreateIconTooltip(m_wndToolBar);
 		return true;
@@ -870,12 +869,11 @@ void CKBBarBand::CheckDomainStatus(void)
 	strcpy_s(domain,2048,tmpdomain);	
 	
 	char* dnsip; 
-	LoadOptionsFromRegistry();
+	LoadOptionsFromFile();
 	if (choice==2) dnsip = dnssecseradr;
 	else if (choice==1) if (choice2==0) dnsip = nic; else dnsip = oarc;
 	else dnsip = NULL;
-	//LoadOptionsFromFile();
-	// temporary hardcoded requested IP version
+	
 	bool resolvipv4 = true;
 	bool resolvipv6 = false;
 
@@ -885,21 +883,16 @@ void CKBBarBand::CheckDomainStatus(void)
 	if (resolvipv4) options |= NPAPI_INPUT_FLAG_RESOLVIPV4;
 	if (resolvipv6) options |= NPAPI_INPUT_FLAG_RESOLVIPV6;
 
-
 	// Request ownership of the critical section
 	EnterCriticalSection(&cs);
+
 	char *tmpptr = NULL;
 	uint32_t ttl4, ttl6;
 	//ATLTRACE("Critical section begin\n");
-		result = ds_validate(domain, options, dnsip, &tmpptr, &ttl4, &ttl6);
-		ds_free_resaddrsbuf();
-	LeaveCriticalSection(&cs);
-	//DWORD dwAddress;
-	//m_ip.GetAddress(dwAddress);
+	result = ds_validate(domain, options, dnsip, &tmpptr, &ttl4, &ttl6);
+	ds_free_resaddrsbuf();
 
-	//ATLTRACE("\n");
-	//ATLTRACE(tmpptr);
-	//ATLTRACE("\n");
+	LeaveCriticalSection(&cs);
 	SetSecurityStatus();
 }
 
@@ -948,7 +941,7 @@ void CKBBarBand::LoadOptionsFromRegistry(void) {
 		// Get the registry values...
 		hr = RegGetString(hKey,"userip", &szVal);
 		if (FAILED(hr)) return;
-		else dnssecseradr=(char*)szVal;
+		//else dnssecseradr=szVal;
 
 		// Get the registry values...
 		hr = RegGetString(hKey,"nicip", &szVal);
@@ -1040,10 +1033,8 @@ HRESULT CKBBarBand::RegGetString(HKEY hKey, LPCTSTR szValueName, LPTSTR * lpszRe
 // Get DWORD value from Windows registry
 /**************************************************************************/
 HRESULT CKBBarBand::RegGetDWord(HKEY hKey, LPCTSTR szValueName, DWORD * lpdwResult) {
- 
     // Given a value name and an hKey returns a DWORD from the registry.
     // eg. RegGetDWord(hKey, TEXT("my dword"), &dwMyValue);
- 
     LONG lResult;
     DWORD dwDataSize = sizeof(DWORD);
     DWORD dwType = 0;
@@ -1066,18 +1057,87 @@ HRESULT CKBBarBand::RegGetDWord(HKEY hKey, LPCTSTR szValueName, DWORD * lpdwResu
 /**************************************************************************/
 void CKBBarBand::LoadOptionsFromFile(void) {
 
-	ATLTRACE("\nLoadOptionsFromFile\n");
-	_TCHAR dbserver[1000];
-	int dnsadr;
-	
-	GetPrivateProfileString("DNSSEC", "dnsadr", "127.0.0.100", dbserver, 1000, "c:\\ini\\dnssec.ini");
-	ATLTRACE(dbserver);
-	ATLTRACE("\n");
-	dnsadr = GetPrivateProfileInt("DNSSEC", "keytext", 143 , "c:\\ini\\dnssec.ini");
-	if (dnsadr) ATLTRACE("\n1\n"); 
-	else ATLTRACE("\n0\n");
+	//ATLTRACE("\nLoadOptionsFromFile\n");
+	TCHAR szPath[MAX_PATH];
+	char dbserver[IPADDR_MLEN];
+	dbserver[0]='\0';
+	if (SUCCEEDED( SHGetFolderPath( NULL, CSIDL_LOCAL_APPDATA, NULL, SHGFP_TYPE_CURRENT, szPath ))){
+		PathAppend( szPath, INI_FILE_PATH);
+		GetPrivateProfileString("DNSSEC", "userip", "127.0.0.1", dbserver, IPADDR_MLEN, szPath);
+		memcpy(dnssecseradr, dbserver, IPADDR_MLEN);
 
-	WritePrivateProfileString("DNSSEC", "keytext", "11111", "c:\\ini\\dnssec.ini");
-	WritePrivateProfileString("DNSSEC", "nic", "1.1.1.1", "c:\\ini\\dnssec.ini");
-	WritePrivateProfileString("DNSSEC", "choice", "1", "c:\\ini\\dnssec.ini");
+		textkey = GetPrivateProfileInt("DNSSEC", "keytext", 0 , szPath);
+		//if (textkey) ATLTRACE("\n1\n"); else ATLTRACE("\n0\n");
+
+		choice = GetPrivateProfileInt("DNSSEC", "choice", 0 , szPath);
+		//if (choice) ATLTRACE("\n1\n"); else ATLTRACE("\n0\n");
+
+		choice2 = GetPrivateProfileInt("DNSSEC", "choicedns", 0 , szPath);
+		//if (choice2) ATLTRACE("\n1\n"); else ATLTRACE("\n0\n");
+
+		tcpudp = GetPrivateProfileInt("DNSSEC", "tcpudp", 0 , szPath);
+		//if (tcpudp) ATLTRACE("\n1\n"); else ATLTRACE("\n0\n");
+	
+		debugoutput = GetPrivateProfileInt("DNSSEC", "debugoutput", 0 , szPath);
+		//if (debugoutput) ATLTRACE("\n1\n"); else ATLTRACE("\n0\n");
+	}// if SHGetFolderPath
+}
+
+/**************************************************************************/
+// Create INI file if not exists 
+/**************************************************************************/
+void CKBBarBand::CreateIniFile()
+{
+   TCHAR szPath[MAX_PATH];
+   // Get path for each computer, non-user specific and non-roaming data.
+   if ( SUCCEEDED( SHGetFolderPath( NULL, CSIDL_LOCAL_APPDATA, NULL, SHGFP_TYPE_CURRENT, szPath )))
+   {
+   
+	   PathAppend( szPath, INI_FILE_PATH);
+	   
+	   if (!FileExists(szPath)) 
+			{
+			SHGetFolderPath( NULL, CSIDL_LOCAL_APPDATA, NULL, SHGFP_TYPE_CURRENT, szPath );
+			// Append product-specific path - this path needs to already exist
+			// for GetTempFileName to succeed.
+			PathAppend( szPath, _T("\\CZ.NIC") );
+			CreateDirectory(szPath,NULL);
+			PathAppend( szPath, _T("\\DNSSEC Validator") );
+			CreateDirectory(szPath,NULL);
+			PathAppend( szPath, _T("\\1.0") );
+			CreateDirectory(szPath,NULL);
+			// Generate a temporary file name within this folder.
+	  	  	PathAppend( szPath, _T("\\dnssec.ini") );
+			
+			HANDLE hFile = NULL;
+			  
+			DWORD dwBytesToWrite = (DWORD)strlen(DefaultIniData);
+			DWORD dwBytesWritten = 0;
+			BOOL bErrorFlag = FALSE;
+			// Open the file.
+			if (( hFile = CreateFile( szPath, GENERIC_READ|GENERIC_WRITE, 0,NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL )) != INVALID_HANDLE_VALUE )
+			{
+            // Write temporary data (code omitted).
+			   bErrorFlag = WriteFile( 
+                    hFile,           // open file handle
+                    DefaultIniData,      // start of data to write
+                    dwBytesToWrite,  // number of bytes to write
+                    &dwBytesWritten, // number of bytes that were written
+                    NULL);            // no overlapped structure
+			 CloseHandle( hFile );
+			}//if
+		}//if
+	}//if
+}
+
+/**************************************************************************/
+// Return TRUE if file 'fileName' exists
+/**************************************************************************/
+bool CKBBarBand::FileExists(const TCHAR *fileName)
+{
+    DWORD  fileAttr;
+    fileAttr = GetFileAttributes(fileName);
+    if (0xFFFFFFFF == fileAttr)
+        return false;
+    return true;
 }
