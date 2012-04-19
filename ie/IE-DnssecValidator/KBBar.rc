@@ -77,8 +77,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 0,1,1
+ PRODUCTVERSION 0,1,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -94,13 +94,13 @@ BEGIN
         BLOCK "040904B0"
         BEGIN
             VALUE "CompanyName", "CZ.NIC Labs"
-            VALUE "FileDescription", "DNSSEC Validator Module\0"
-            VALUE "FileVersion", "0, 0, 0, 1\0"
-            VALUE "InternalName", "IEdnssec\0"
+            VALUE "FileDescription", "DNSSEC Validator for IE\0"
+            VALUE "FileVersion", "0,1,1\0"
+            VALUE "InternalName", "IEdnssec.dll\0"
             VALUE "LegalCopyright", "Copyright 2012\0"
-            VALUE "OriginalFilename", "IEdnssec.DLL\0"
-            VALUE "ProductName", "DNSSEC Validator Module\0"
-            VALUE "ProductVersion", "0, 0, 0, 1\0"
+            VALUE "OriginalFilename", "IEdnssec.dll\0"
+            VALUE "ProductName", "DNSSEC Validator for IE\0"
+            VALUE "ProductVersion", "0,1,1\0"
             VALUE "OLESelfRegister", "\0"
         END
     END
@@ -127,7 +127,7 @@ BEGIN
     LTEXT           "DNSSEC Validator for Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Add-on plugin for DNSSEC checking",IDC_STATIC,50,30,180,10
     LTEXT           "Support browsers: 32-bit version of IE6, IE7, IE8, IE9",IDC_STATIC,50,40,180,10
-    LTEXT           "Alfa version 1.0", IDC_STATIC,50,50,180,10
+    LTEXT           "Alpha version 0.1.1", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
 	LTEXT           "https://labs.nic.cz/page/1031/", IDC_LINK,10,95,120,10
@@ -151,7 +151,7 @@ BEGIN
     EDITTEXT        IDC_EDIT, 55, 69, 80 ,12 ,ES_AUTOHSCROLL
     COMBOBOX        IDC_COMBO, 102, 52, 70, 120 ,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 	CONTROL			"Use TCP connection instead of UDP", IDC_TCP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 92 , 150 ,10
-	CONTROL			"Display text for the key icon", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 104 , 150 ,10
+	CONTROL			"Display text status besides the key icon", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 104 , 155 ,10
 	CONTROL			"Print debug information to standard output", IDC_DEBUG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 116, 155 ,10
 END
 
@@ -377,8 +377,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 0,1,1
+ PRODUCTVERSION 0,1,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -394,13 +394,13 @@ BEGIN
         BLOCK "040904B0"
         BEGIN
             VALUE "CompanyName", "CZ.NIC Labs"
-            VALUE "FileDescription", "DNSSEC Validátor plugin\0"
-            VALUE "FileVersion", "0, 0, 0, 1\0"
-            VALUE "InternalName", "IEdnssec\0"
+            VALUE "FileDescription", "DNSSEC Validátor pro IE\0"
+            VALUE "FileVersion", "0,1,1\0"
+            VALUE "InternalName", "IEdnssec.dll\0"
             VALUE "LegalCopyright", "Copyright 2012\0"
-            VALUE "OriginalFilename", "IEdnssec.DLL\0"
-            VALUE "ProductName", "DNSSEC Validátor plugin\0"
-            VALUE "ProductVersion", "0, 0, 0, 1\0"
+            VALUE "OriginalFilename", "IEdnssec.dll\0"
+            VALUE "ProductName", "DNSSEC Validátor pro IE\0"
+            VALUE "ProductVersion", "0,1,1\0"
             VALUE "OLESelfRegister", "\0"
         END
     END
@@ -538,27 +538,6 @@ BEGIN
 //
 // Dialog
 //
-/*
-IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 130
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
-    WS_CAPTION | WS_SYSMENU
-CAPTION "Nastavení DNSSEC Validátoru"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "Nastavit",IDOK,90,108,50,14
-    PUSHBUTTON      "Zrušit",IDCANCEL,150,108,50,14
-	ICON            IDI_ICON_KEY_MIRROR,IDC_STATIC,10,105,20,20
-	GROUPBOX        "Resolver",IDC_STATIC,10,7,190,80
-	LTEXT           "DNS server(y) používané pro pøeklad jmen:", IDC_STATIC,15,21,140,10
-	RADIOBUTTON		" Naèíst ze systému", IDC_R1, 15, 35, 100, 10  
-	RADIOBUTTON		" DNSSEC validující resolvery:", IDC_R2, 15, 53, 105, 10    
-	RADIOBUTTON		" Vlastní:", IDC_R3, 15, 71, 40, 10  
-    EDITTEXT        IDC_EDIT, 55, 69, 80 ,12 ,ES_AUTOHSCROLL
-    COMBOBOX        IDC_COMBO, 122, 52, 70, 12 ,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-	CHECKBOX		"Zobrazovat texty za ikonou klíèku", IDC_SHOWTEXT, 10, 92 , 150 ,10
-END
-*/
-
 IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 158
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
@@ -594,7 +573,7 @@ BEGIN
     LTEXT           "DNSSEC Validátor pro Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Zásuvný plugin pro kontrolu DNSSEC",IDC_STATIC,50,30,180,10
     LTEXT           "Podporované prohlížeèe: 32-bit verze IE6, IE7, IE8, IE9",IDC_STATIC,50,40,180,10
-    LTEXT           "Alfa verze 1.0", IDC_STATIC,50,50,180,10
+    LTEXT           "Alfa verze 0.1.1", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
 	LTEXT           "https://labs.nic.cz/page/1031/", IDC_LINK,10,95,120,10
@@ -699,8 +678,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 0,1,1
+ PRODUCTVERSION 0,1,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -716,13 +695,13 @@ BEGIN
         BLOCK "040904B0"
         BEGIN
             VALUE "CompanyName", "CZ.NIC Labs"
-            VALUE "FileDescription", "DNSSEC Validator Modul\0"
-            VALUE "FileVersion", "0, 0, 0, 1\0"
-            VALUE "InternalName", "IEdnssec\0"
+            VALUE "FileDescription", "DNSSEC Validator für IE\0"
+            VALUE "FileVersion", "0,1,1\0"
+            VALUE "InternalName", "IEdnssec.dll\0"
             VALUE "LegalCopyright", "Copyright 2012\0"
-            VALUE "OriginalFilename", "IEdnssec.DLL\0"
-            VALUE "ProductName", "DNSSEC Validator Modul\0"
-            VALUE "ProductVersion", "0, 0, 0, 1\0"
+            VALUE "OriginalFilename", "IEdnssec.dll\0"
+            VALUE "ProductName", "DNSSEC Validator für IE\0"
+            VALUE "ProductVersion", "0,1,1\0"
             VALUE "OLESelfRegister", "\0"
         END
     END
@@ -749,7 +728,7 @@ BEGIN
     LTEXT           "DNSSEC Validator für Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Add-on für DNSSEC Validierung",IDC_STATIC,50,30,180,10
     LTEXT           "Unterstützte Versionen: 32-bit Versionen von IE6, IE7, IE8, IE9",IDC_STATIC,50,40,180,10
-    LTEXT           "Version 1.0 Alfa", IDC_STATIC,50,50,180,10
+    LTEXT           "Version 0.1.1 Alfa", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
 	LTEXT           "https://labs.nic.cz/page/1031/", IDC_LINK,10,95,120,10
@@ -953,16 +932,6 @@ END
 
 #endif    // Germany resources
 /////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

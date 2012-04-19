@@ -107,7 +107,7 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>Dynamic</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <UseOfAtl>Dynamic</UseOfAtl>
+    <UseOfAtl>Static</UseOfAtl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release MinSize|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -368,11 +368,15 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg" </Command>
       <ModuleDefinitionFile>.\KBBar.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>C:\tmp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
+      <EnableUAC>false</EnableUAC>
     </Link>
     <CustomBuildStep>
       <Message>Performing registration</Message>
       <Outputs>$(OutDir)\regsvr32.trg;%(Outputs)</Outputs>
     </CustomBuildStep>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release MinSize|x64'">
     <ClCompile>

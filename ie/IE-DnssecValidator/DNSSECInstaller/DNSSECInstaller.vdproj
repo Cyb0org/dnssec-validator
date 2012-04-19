@@ -21,25 +21,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_13C08602937E4A7AA13D25C04FA6D294"
-        "OwnerKey" = "8:_F2E5C1FC25374A91A16076627270CD97"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_81367557439841D9B538AFD6EC9291EE"
-        "OwnerKey" = "8:_F2E5C1FC25374A91A16076627270CD97"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_92D1BA38CD5F9454FBAA60950108564A"
-        "OwnerKey" = "8:_F2E5C1FC25374A91A16076627270CD97"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_99D7A710231A451593295AA901B52E42"
+        "MsmKey" = "8:_17C3CDDB3FACBB09EAABCB9039B448BC"
         "OwnerKey" = "8:_F2E5C1FC25374A91A16076627270CD97"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -51,8 +33,20 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_B2060FF481AF40CF88F384A922DDE068"
+        "OwnerKey" = "8:_F2E5C1FC25374A91A16076627270CD97"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_C6A70F4EF72B4DA1AEA118DA288859DA"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_C8BC52A958A5489CA9293A917E2CB0C7"
+        "OwnerKey" = "8:_F2E5C1FC25374A91A16076627270CD97"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -106,7 +100,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\dnssec_setup_x86.msi"
+        "OutputFilename" = "8:Release\\dnssec-validator-IE-0.1.1-setup.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -118,7 +112,7 @@
         "InstallerBootstrapper" = "3:2"
             "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
             {
-            "Enabled" = "11:TRUE"
+            "Enabled" = "11:FALSE"
             "PromptEnabled" = "11:TRUE"
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
@@ -158,7 +152,7 @@
             "SourcePath" = "8:..\\res\\key.ico"
             "TargetName" = "8:key.ico"
             "Tag" = "8:"
-            "Folder" = "8:_9C75E19A3A9E497DA47600C07ABF7602"
+            "Folder" = "8:_B608EBA41717437A94AC232BFD9E5F7D"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -173,12 +167,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_92D1BA38CD5F9454FBAA60950108564A"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_17C3CDDB3FACBB09EAABCB9039B448BC"
             {
             "SourcePath" = "8:ds_windows-x86.dll"
             "TargetName" = "8:ds_windows-x86.dll"
             "Tag" = "8:"
-            "Folder" = "8:_9C75E19A3A9E497DA47600C07ABF7602"
+            "Folder" = "8:_B608EBA41717437A94AC232BFD9E5F7D"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -198,7 +192,7 @@
             "SourcePath" = "8:..\\res\\RegDLL.bat"
             "TargetName" = "8:RegDLL.bat"
             "Tag" = "8:"
-            "Folder" = "8:_9C75E19A3A9E497DA47600C07ABF7602"
+            "Folder" = "8:_B608EBA41717437A94AC232BFD9E5F7D"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -218,7 +212,7 @@
             "SourcePath" = "8:..\\res\\UnRegDLL.bat"
             "TargetName" = "8:UnRegDLL.bat"
             "Tag" = "8:"
-            "Folder" = "8:_9C75E19A3A9E497DA47600C07ABF7602"
+            "Folder" = "8:_B608EBA41717437A94AC232BFD9E5F7D"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -239,42 +233,9 @@
         }
         "Folder"
         {
-            "{1525181F-901A-416C-8A58-119130FE478E}:_41AD76C88C5F41CA8F40CE21C3AF56D3"
-            {
-            "Name" = "8:#1912"
-            "AlwaysCreate" = "11:FALSE"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Property" = "8:ProgramFilesFolder"
-                "Folders"
-                {
-                    "{9EF0B969-E518-4E46-987F-47570745A589}:_024802CE3C734E19850906FFC5AA547C"
-                    {
-                    "Name" = "8:CZ.NIC"
-                    "AlwaysCreate" = "11:TRUE"
-                    "Condition" = "8:"
-                    "Transitive" = "11:FALSE"
-                    "Property" = "8:_AA6ED4E6CF534936A614EDCEB3270183"
-                        "Folders"
-                        {
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_9C75E19A3A9E497DA47600C07ABF7602"
-                            {
-                            "Name" = "8:DNSSEC Validator"
-                            "AlwaysCreate" = "11:TRUE"
-                            "Condition" = "8:"
-                            "Transitive" = "11:FALSE"
-                            "Property" = "8:_28F98C6EB18342D790D1F782ADA12A0D"
-                                "Folders"
-                                {
-                                }
-                            }
-                        }
-                    }
-                }
-            }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_B608EBA41717437A94AC232BFD9E5F7D"
             {
-            "DefaultLocation" = "8:[ProgramFilesFolder][Manufacturer]\\[ProductName]"
+            "DefaultLocation" = "8:[ProgramFilesFolder]CZ.NIC\\DNSSEC Validator\\"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -300,15 +261,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:DNSSEC Validator for IE"
-        "ProductCode" = "8:{2EB43437-EFE7-435A-9212-941DD6C4CD72}"
-        "PackageCode" = "8:{834006CA-D272-4A15-ABD4-9CCE319AC58A}"
+        "ProductCode" = "8:{827FC38F-A608-46DB-BA39-27FDC696587C}"
+        "PackageCode" = "8:{0BC0A957-3A9D-4111-B510-63EF230A66E4}"
         "UpgradeCode" = "8:{825CD637-7477-4A49-8C6C-D5B8D52EF6DB}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0"
+        "ProductVersion" = "8:0.1.1"
         "Manufacturer" = "8:CZ.NIC Labs"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://labs.nic.cz/page/1031/"
@@ -817,7 +778,7 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_13C08602937E4A7AA13D25C04FA6D294"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_B2060FF481AF40CF88F384A922DDE068"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
@@ -831,7 +792,7 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_81367557439841D9B538AFD6EC9291EE"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_C8BC52A958A5489CA9293A917E2CB0C7"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
@@ -845,29 +806,15 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_99D7A710231A451593295AA901B52E42"
-            {
-            "UseDynamicProperties" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:Microsoft_VC100_ATL_x86.msm"
-                "Properties"
-                {
-                }
-            "LanguageId" = "3:0"
-            "Exclude" = "11:FALSE"
-            "Folder" = "8:"
-            "Feature" = "8:"
-            "IsolateTo" = "8:"
-            }
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_EE6CCAAA7882443EA6041D67448AE860"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_5E5B2542A09544ADBA08CAE51D5014C6"
             {
             "SourcePath" = "8:"
             "TargetName" = "8:"
             "Tag" = "8:"
-            "Folder" = "8:_9C75E19A3A9E497DA47600C07ABF7602"
+            "Folder" = "8:_B608EBA41717437A94AC232BFD9E5F7D"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -895,7 +842,7 @@
             "SourcePath" = "8:..\\ReleaseMinSize\\IEdnssec.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
-            "Folder" = "8:_9C75E19A3A9E497DA47600C07ABF7602"
+            "Folder" = "8:_B608EBA41717437A94AC232BFD9E5F7D"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"

@@ -2,6 +2,10 @@
 //      or project specific include files that are used frequently,
 //      but are changed infrequently
 
+//#define _AFXDLL
+//#define _AFXEXT
+
+
 #if !defined(AFX_STDAFX_H__A68061D7_9C5C_4243_B0B1_2A6ACBD51547__INCLUDED_)
 #define AFX_STDAFX_H__A68061D7_9C5C_4243_B0B1_2A6ACBD51547__INCLUDED_
 

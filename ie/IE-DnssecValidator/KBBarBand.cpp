@@ -28,6 +28,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #include "KBBarBand.h"
 #include "resource.h"
 #include "shlobj.h"
+#include <string>
 //#include <CommCtrl.h>
 // size of buffer for URL parts save
 #define STR_BUF_SIZE	512
@@ -885,14 +886,36 @@ void CKBBarBand::CheckDomainStatus(void)
 
 	// Request ownership of the critical section
 	EnterCriticalSection(&cs);
-
+	//char str[100] = "\0";
 	char *tmpptr = NULL;
-	uint32_t ttl4, ttl6;
+	uint32_t ttl4, ttl6 = 0;
 	//ATLTRACE("Critical section begin\n");
 	result = ds_validate(domain, options, dnsip, &tmpptr, &ttl4, &ttl6);
-	ds_free_resaddrsbuf();
+	/*char c1[100];
+	char c2[100];
+	char* strttl4;
+	char* strttl6;
+	_itoa_s(ttl4,c1,10);
+	strttl4 = c1;
+	_itoa_s(ttl6,c2,10);
+	strttl6 = c2;
+	ATLTRACE("\n");
+	ATLTRACE(tmpptr);
+	ATLTRACE(" ");
+	ATLTRACE(strttl4);
+	ATLTRACE(" ");
+	ATLTRACE(strttl6);
+	ATLTRACE("\n");
 
+	*/
+	
+	ds_free_resaddrsbuf();
 	LeaveCriticalSection(&cs);
+
+
+	//ATLTRACE("Critical section begin\n");
+	//ATLTRACE("Critical section begin\n");
+
 	SetSecurityStatus();
 }
 
