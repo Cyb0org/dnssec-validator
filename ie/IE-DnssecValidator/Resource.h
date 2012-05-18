@@ -123,6 +123,12 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define	IDC_SHOWTEXT					1015
 #define	IDC_TCP							1016
 #define IDC_DEBUG						1017
+#define IDC_CACHE						1018
+
+#define IDC_IPv4						1020
+#define IDC_IPv6						1021
+#define IDC_IPv46						1022
+
 
 #define ID_MENUPOPUP_OPTION1            32773
 #define ID_MENUPOPUP_OPTION2            32772

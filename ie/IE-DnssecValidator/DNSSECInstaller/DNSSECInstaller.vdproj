@@ -27,14 +27,20 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_AFE3BCF39BE14A3CB32F18CAD0E253CF"
-        "OwnerKey" = "8:_UNDEFINED"
+        "MsmKey" = "8:_5E98DE5C8C3F84665920F660794C469E"
+        "OwnerKey" = "8:_F2E5C1FC25374A91A16076627270CD97"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_B2060FF481AF40CF88F384A922DDE068"
+        "MsmKey" = "8:_7ED693CA63AFE7108B176731B5BF6311"
         "OwnerKey" = "8:_F2E5C1FC25374A91A16076627270CD97"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_AFE3BCF39BE14A3CB32F18CAD0E253CF"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -45,7 +51,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_C8BC52A958A5489CA9293A917E2CB0C7"
+        "MsmKey" = "8:_D73431A5A58D34CF0BDCB1D3EFC2D58B"
         "OwnerKey" = "8:_F2E5C1FC25374A91A16076627270CD97"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -53,6 +59,12 @@
         {
         "MsmKey" = "8:_F2E5C1FC25374A91A16076627270CD97"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FF171B1E46CFB1D5F64E58F8157B71F9"
+        "OwnerKey" = "8:_F2E5C1FC25374A91A16076627270CD97"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -187,6 +199,46 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5E98DE5C8C3F84665920F660794C469E"
+            {
+            "SourcePath" = "8:OLEACC.dll"
+            "TargetName" = "8:OLEACC.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_B608EBA41717437A94AC232BFD9E5F7D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7ED693CA63AFE7108B176731B5BF6311"
+            {
+            "SourcePath" = "8:IMM32.dll"
+            "TargetName" = "8:IMM32.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_B608EBA41717437A94AC232BFD9E5F7D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AFE3BCF39BE14A3CB32F18CAD0E253CF"
             {
             "SourcePath" = "8:..\\res\\RegDLL.bat"
@@ -227,6 +279,46 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D73431A5A58D34CF0BDCB1D3EFC2D58B"
+            {
+            "SourcePath" = "8:MSIMG32.dll"
+            "TargetName" = "8:MSIMG32.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_B608EBA41717437A94AC232BFD9E5F7D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FF171B1E46CFB1D5F64E58F8157B71F9"
+            {
+            "SourcePath" = "8:COMDLG32.dll"
+            "TargetName" = "8:COMDLG32.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_B608EBA41717437A94AC232BFD9E5F7D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -261,15 +353,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:DNSSEC Validator for IE"
-        "ProductCode" = "8:{827FC38F-A608-46DB-BA39-27FDC696587C}"
-        "PackageCode" = "8:{0BC0A957-3A9D-4111-B510-63EF230A66E4}"
+        "ProductCode" = "8:{F61D1886-867F-48F4-A70B-CC7B885561CF}"
+        "PackageCode" = "8:{17FA52F9-6F3B-4BDD-B85D-042481BFD502}"
         "UpgradeCode" = "8:{825CD637-7477-4A49-8C6C-D5B8D52EF6DB}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.1.1"
+        "ProductVersion" = "8:0.2"
         "Manufacturer" = "8:CZ.NIC Labs"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://labs.nic.cz/page/1031/"
@@ -778,34 +870,6 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_B2060FF481AF40CF88F384A922DDE068"
-            {
-            "UseDynamicProperties" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:Microsoft_VC100_MFC_x86.msm"
-                "Properties"
-                {
-                }
-            "LanguageId" = "3:0"
-            "Exclude" = "11:FALSE"
-            "Folder" = "8:"
-            "Feature" = "8:"
-            "IsolateTo" = "8:"
-            }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_C8BC52A958A5489CA9293A917E2CB0C7"
-            {
-            "UseDynamicProperties" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:Microsoft_VC100_CRT_x86.msm"
-                "Properties"
-                {
-                }
-            "LanguageId" = "3:0"
-            "Exclude" = "11:FALSE"
-            "Folder" = "8:"
-            "Feature" = "8:"
-            "IsolateTo" = "8:"
-            }
         }
         "ProjectOutput"
         {

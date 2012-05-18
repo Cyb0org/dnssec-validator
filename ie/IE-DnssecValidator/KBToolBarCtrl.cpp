@@ -281,6 +281,7 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 		else ::SendDlgItemMessage(hwndDlg, IDC_COMBO, CB_SETCURSEL, 0, 0);
 		::EnableWindow(::GetDlgItem(hwndDlg,IDC_COMBO), FALSE);
 		::SendMessage(::GetDlgItem(hwndDlg, IDC_SHOWTEXT), BM_SETCHECK,  textkey ? BST_CHECKED : BST_UNCHECKED, 0);
+		::SendMessage(::GetDlgItem(hwndDlg, IDC_CACHE), BM_SETCHECK,  cache_enable ? BST_CHECKED : BST_UNCHECKED, 0);
 		::SendMessage(::GetDlgItem(hwndDlg, IDC_TCP), BM_SETCHECK,  tcpudp ? BST_CHECKED : BST_UNCHECKED, 0);
 		::SetWindowText(::GetDlgItem(hwndDlg,IDC_EDIT),dnssecseradr);
 		::EnableWindow(::GetDlgItem(hwndDlg,IDC_EDIT), FALSE);			
@@ -300,6 +301,19 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 		else {
 			::CheckRadioButton(hwndDlg, IDC_R1, IDC_R3, IDC_R1);
 		} // if choice
+
+	
+		if (ipv46==1) {
+			::CheckRadioButton(hwndDlg, IDC_IPv4, IDC_IPv46, IDC_IPv4);			
+		}
+		else if (ipv46==2){
+			::CheckRadioButton(hwndDlg, IDC_IPv4, IDC_IPv46, IDC_IPv6);		
+		}
+		else {
+			::CheckRadioButton(hwndDlg, IDC_IPv4, IDC_IPv46, IDC_IPv46);
+		} // if choice
+
+
         break;
 		}	
 	
@@ -321,6 +335,14 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 								textkey = dwVal;
 								if (dwVal) WritePrivateProfileString("DNSSEC", "keytext", "1", szPath);
 								else WritePrivateProfileString("DNSSEC", "keytext", "0", szPath);
+
+
+																// save keytext setting into Register
+								dwVal = (short)::SendMessage(::GetDlgItem(hwndDlg, IDC_CACHE), BM_GETCHECK, 0, 0);
+								textkey = dwVal;
+								if (dwVal) WritePrivateProfileString("DNSSEC", "cache", "1", szPath);
+								else WritePrivateProfileString("DNSSEC", "cache", "0", szPath);
+
 
 								dwVal = (short)::SendMessage(::GetDlgItem(hwndDlg, IDC_TCP), BM_GETCHECK, 0, 0);
 								tcpudp = dwVal;
@@ -365,7 +387,19 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 								choice = dwVal;
 								if (dwVal==2) WritePrivateProfileString("DNSSEC", "choice", "2", szPath);
 								else if (dwVal==1) WritePrivateProfileString("DNSSEC", "choice", "1", szPath);	
-								else WritePrivateProfileString("DNSSEC", "choice", "0", szPath);	
+								else WritePrivateProfileString("DNSSEC", "choice", "0", szPath);
+
+								
+								// save setting IPv4 IPv6 resolver
+								if (::IsDlgButtonChecked(hwndDlg, IDC_IPv4)) WritePrivateProfileString("DNSSEC", "IPv4", "1", szPath);
+								else WritePrivateProfileString("DNSSEC", "IPv4", "0", szPath);
+								if (::IsDlgButtonChecked(hwndDlg, IDC_IPv6)) WritePrivateProfileString("DNSSEC", "IPv6", "1", szPath);
+								else WritePrivateProfileString("DNSSEC", "IPv6", "0", szPath);
+								if (::IsDlgButtonChecked(hwndDlg, IDC_IPv46)) 
+									{
+									WritePrivateProfileString("DNSSEC", "IPv4", "1", szPath);
+									WritePrivateProfileString("DNSSEC", "IPv6", "1", szPath);
+									}							
 							}
 						/*
 						    // code for register write

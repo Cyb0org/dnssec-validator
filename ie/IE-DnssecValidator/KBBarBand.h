@@ -57,9 +57,12 @@ extern "C" {					// use C language linkage
 #define TCPUDP				0
 #define DEBUGVAL			0
 #define DEBUGVAL_ENABLE		0
+#define CACHE				1
+#define IPv4				1
+#define IPv6				0
 #define HKU_REG_KEY TEXT(".DEFAULT\\Software\\CZ.NIC\\DNSSEC Validator")
 #define HKCU_REG_KEY TEXT("Software\\CZ.NIC\\DNSSEC Validator")
-#define INI_FILE_PATH _T("\\CZ.NIC\\DNSSEC Validator\\1.0\\dnssec.ini")
+#define INI_FILE_PATH _T("\\CZ.NIC\\DNSSEC Validator\\0.2\\dnssec.ini")
 const int BUTTON_INDEX = 0;
 extern HINSTANCE GHins;
 // settings
@@ -72,6 +75,10 @@ extern char* oarc;
 extern short tcpudp;
 extern short debugoutput;
 extern short debugoutput_enable;
+extern short cache_enable;
+extern short ipv4;
+extern short ipv6;
+extern short ipv46;
 // variable for IE version check
 extern int iRes,iMajor,iMinor;
 //#if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)

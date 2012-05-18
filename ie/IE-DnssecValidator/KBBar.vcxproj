@@ -105,7 +105,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release MinSize|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseOfMfc>Dynamic</UseOfMfc>
+    <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <UseOfAtl>Static</UseOfAtl>
   </PropertyGroup>
@@ -331,7 +331,7 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg" </Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release MinSize|Win32'">
     <ClCompile>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <StringPooling>true</StringPooling>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -345,7 +345,7 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg" </Command>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <ObjectFileName>.\ReleaseMinSize\</ObjectFileName>
       <ProgramDataBaseFileName>.\ReleaseMinSize\</ProgramDataBaseFileName>
-      <AdditionalIncludeDirectories>C:\tmp;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VirtualData</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <TypeLibraryName>.\ReleaseMinSize\KBBar.tlb</TypeLibraryName>
@@ -366,7 +366,7 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg" </Command>
       <ImportLibrary>.\ReleaseMinSize\KBBar.lib</ImportLibrary>
       <AdditionalDependencies>shlwapi.lib;ds_windows-x86.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\KBBar.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>C:\tmp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\VirtualData;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
       <EnableUAC>false</EnableUAC>
     </Link>
@@ -375,7 +375,7 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg" </Command>
       <Outputs>$(OutDir)\regsvr32.trg;%(Outputs)</Outputs>
     </CustomBuildStep>
     <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release MinSize|x64'">
@@ -541,7 +541,7 @@ echo Warning : Cannot register Unicode DLL on Windows 95
       <ObjectFileName>.\Debug\</ObjectFileName>
       <ProgramDataBaseFileName>.\Debug\</ProgramDataBaseFileName>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <AdditionalIncludeDirectories>C:\tmp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VirtualData;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Midl>
@@ -565,7 +565,7 @@ echo Warning : Cannot register Unicode DLL on Windows 95
       <ImportLibrary>.\Debug\KBBar.lib</ImportLibrary>
       <AdditionalDependencies>shlwapi.lib;ds_windows-x86.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\KBBar.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>C:\tmp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\VirtualData;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <CustomBuildStep>
@@ -954,6 +954,9 @@ echo Warning : Cannot register Unicode DLL on Windows 95
     <None Include="res\key_red.bmp" />
     <None Include="res\key_red.ico" />
     <None Include="res\mirror_key.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\VirtualData\ds_windows-x86.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

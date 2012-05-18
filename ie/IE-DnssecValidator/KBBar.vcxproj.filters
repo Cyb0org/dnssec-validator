@@ -112,11 +112,16 @@
     <None Include="res\key_red.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="dnssecStates.gen">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="res\mirror_key.ico">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="dnssecStates.gen">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\VirtualData\ds_windows-x86.lib">
+      <Filter>Source Files</Filter>
+    </Library>
   </ItemGroup>
 </Project>

@@ -45,6 +45,10 @@ char* oarc = IPOARC;
 short tcpudp = TCPUDP;
 short debugoutput = DEBUGVAL;
 short debugoutput_enable = DEBUGVAL_ENABLE;
+short cache_enable = CACHE;
+short ipv4 = IPv4;
+short ipv6 = IPv6;
+short ipv46 = IPv4;
 // key state memory
 int state;
 // url address memory
@@ -63,7 +67,7 @@ CRITICAL_SECTION CKBBarBand::cs;
 // for tooltip creation
 bool CKBBarBand::csInitialized = false;
 bool csInitialized = false;
-char DefaultIniData[] = "[DNSSEC]\nkeytext=0\nchoice=0\nchoicedns=0\nuserip=127.0.0.1\ntcpudp=0\ndebugoutput=0";
+char DefaultIniData[] = "[DNSSEC]\nkeytext=0\nchoice=0\nchoicedns=0\nuserip=127.0.0.1\ntcpudp=0\ndebugoutput=0\ncache=1\nIPv4=1\nIPv6=0";
 //CIPAddressCtrl m_ip; 
 /**************************************************************************/
 // IObjectWithSite implementations
@@ -307,7 +311,7 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 				}
 				else
 				{
-				temp2 = UrlToDomain(predomain2);
+				/*temp2 = UrlToDomain(predomain2);
 				//ATLTRACE("\n2");
 				//ATLTRACE(temp2);
 				//ATLTRACE(urladdr);
@@ -318,10 +322,11 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 						RefreshIcon2();
 					}
 					else
-					{
-				    ldicon = GetBitmapIndex(IDI_ICON_KEY_ACTION1);				
+					{*/
+				    ldicon = state;
+					//ldicon = GetBitmapIndex(IDI_ICON_KEY_ACTION1);				
 					RefreshIcon2();
-					}
+					/*}*/
 				}	
 			} break;
 
@@ -338,7 +343,7 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 				}
 				else
 				{
-				temp = UrlToDomain(predomain4);
+				/*temp = UrlToDomain(predomain4);
 					if (strcmp(temp,urladdr)==0)
 					{
 						ldicon = state;
@@ -346,11 +351,12 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 					}
 					else
 					{
+					*/
 				    bstrUrlName = BURL2; 
 					DnssecStatus();
-					urladdr = temp;
+					//urladdr = temp;
 					state = ldicon;
-					}
+					/*}*/
 				}
 			} break;
 			//default status
@@ -874,48 +880,56 @@ void CKBBarBand::CheckDomainStatus(void)
 	if (choice==2) dnsip = dnssecseradr;
 	else if (choice==1) if (choice2==0) dnsip = nic; else dnsip = oarc;
 	else dnsip = NULL;
-	
+
+	// enable cache
+	bool cache_en = true;
+	if (cache_enable==1) cache_en = true;
+	else cache_en = false;
+
 	bool resolvipv4 = true;
 	bool resolvipv6 = false;
+
+	if (ipv4==1) resolvipv4 = true;
+    else resolvipv4 = false;
+	
+	if (ipv6==1) resolvipv6 = true;
+    else resolvipv6 = false;
+
+	if ((ipv4==1) && (ipv6==0)) ipv46 = 1;
+	else if ((ipv4==0) && (ipv6==1)) ipv46 = 2;
+	else ipv46 = 3;
+	
+	bool cache_flush = false;
+	bool ipbrowser = false;
 
 	uint16_t options = 0;
 	if (debugoutput) options |= NPAPI_INPUT_FLAG_DEBUGOUTPUT;
 	if (tcpudp) options |= NPAPI_INPUT_FLAG_USETCP;
 	if (resolvipv4) options |= NPAPI_INPUT_FLAG_RESOLVIPV4;
 	if (resolvipv6) options |= NPAPI_INPUT_FLAG_RESOLVIPV6;
+	if (cache_en) options |= NPAPI_INPUT_FLAG_CACHE_ENABLE;
+	if (cache_flush) options |= NPAPI_INPUT_FLAG_CACHE_FLUSH;
+	if (ipbrowser) options |= NPAPI_INPUT_FLAG_IP_BROWSER_CHECK;
 
 	// Request ownership of the critical section
 	EnterCriticalSection(&cs);
 	//char str[100] = "\0";
 	char *tmpptr = NULL;
-	uint32_t ttl4, ttl6 = 0;
+	//uint32_t ttl4, ttl6 = 0;
 	//ATLTRACE("Critical section begin\n");
-	result = ds_validate(domain, options, dnsip, &tmpptr, &ttl4, &ttl6);
-	/*char c1[100];
-	char c2[100];
+	result = dnssec_validate(domain, options, dnsip, &tmpptr);
+/*	
+	ATLTRACE("\n");
+	ATLTRACE(domain);
+	char c1[100];
 	char* strttl4;
-	char* strttl6;
-	_itoa_s(ttl4,c1,10);
+	_itoa_s(result,c1,10);
 	strttl4 = c1;
-	_itoa_s(ttl6,c2,10);
-	strttl6 = c2;
 	ATLTRACE("\n");
-	ATLTRACE(tmpptr);
-	ATLTRACE(" ");
 	ATLTRACE(strttl4);
-	ATLTRACE(" ");
-	ATLTRACE(strttl6);
 	ATLTRACE("\n");
-
 	*/
-	
-	ds_free_resaddrsbuf();
 	LeaveCriticalSection(&cs);
-
-
-	//ATLTRACE("Critical section begin\n");
-	//ATLTRACE("Critical section begin\n");
-
 	SetSecurityStatus();
 }
 
@@ -1102,6 +1116,12 @@ void CKBBarBand::LoadOptionsFromFile(void) {
 		//if (tcpudp) ATLTRACE("\n1\n"); else ATLTRACE("\n0\n");
 	
 		debugoutput = GetPrivateProfileInt("DNSSEC", "debugoutput", 0 , szPath);
+
+		cache_enable = GetPrivateProfileInt("DNSSEC", "cache", 1 , szPath);
+
+		ipv4 = GetPrivateProfileInt("DNSSEC", "IPv4", 1 , szPath);
+
+		ipv6 = GetPrivateProfileInt("DNSSEC", "IPv6", 0 , szPath);
 		//if (debugoutput) ATLTRACE("\n1\n"); else ATLTRACE("\n0\n");
 	}// if SHGetFolderPath
 }
@@ -1127,7 +1147,7 @@ void CKBBarBand::CreateIniFile()
 			CreateDirectory(szPath,NULL);
 			PathAppend( szPath, _T("\\DNSSEC Validator") );
 			CreateDirectory(szPath,NULL);
-			PathAppend( szPath, _T("\\1.0") );
+			PathAppend( szPath, _T("\\0.2") );
 			CreateDirectory(szPath,NULL);
 			// Generate a temporary file name within this folder.
 	  	  	PathAppend( szPath, _T("\\dnssec.ini") );
