@@ -77,8 +77,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,1,1
- PRODUCTVERSION 0,1,1
+ FILEVERSION 0,2,1
+ PRODUCTVERSION 0,2,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -95,12 +95,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "CZ.NIC Labs"
             VALUE "FileDescription", "DNSSEC Validator for IE\0"
-            VALUE "FileVersion", "0,1,1\0"
+            VALUE "FileVersion", "0,2,1\0"
             VALUE "InternalName", "IEdnssec.dll\0"
             VALUE "LegalCopyright", "Copyright 2012\0"
             VALUE "OriginalFilename", "IEdnssec.dll\0"
             VALUE "ProductName", "DNSSEC Validator for IE\0"
-            VALUE "ProductVersion", "0,1,1\0"
+            VALUE "ProductVersion", "0,2,1\0"
             VALUE "OLESelfRegister", "\0"
         END
     END
@@ -127,34 +127,56 @@ BEGIN
     LTEXT           "DNSSEC Validator for Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Add-on plugin for DNSSEC checking",IDC_STATIC,50,30,180,10
     LTEXT           "Support browsers: 32-bit version of IE6, IE7, IE8, IE9",IDC_STATIC,50,40,180,10
-    LTEXT           "Alpha version 0.1.1", IDC_STATIC,50,50,180,10
+    LTEXT           "Prerelease version 0.2.1", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
 	LTEXT           "https://labs.nic.cz/page/1031/", IDC_LINK,10,95,120,10
 END
 
 
-IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 158
+IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 170
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "DNSSEC Validator settings"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "Set",IDOK,90,136,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,150,136,50,14
-	ICON            IDI_ICON_KEY_MIRROR,IDC_STATIC,10,132,20,20
-	GROUPBOX        "Resolver",IDC_STATIC,10,7,190,80
-	LTEXT           "DNS server(s) used for name translation:", IDC_STATIC,15,21,140,10
-	CONTROL			" Get from system",	 IDC_R1,"Button",BS_AUTORADIOBUTTON, 15, 35, 100, 10  
-	CONTROL			" DNSSEC resolver:", IDC_R2,"Button",BS_AUTORADIOBUTTON, 15, 53, 85, 10    
-	CONTROL			" Other:", IDC_R3,"Button",BS_AUTORADIOBUTTON, 15, 71, 40, 10  
-    EDITTEXT        IDC_EDIT, 55, 69, 80 ,12 ,ES_AUTOHSCROLL
-    COMBOBOX        IDC_COMBO, 102, 52, 70, 120 ,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-	CONTROL			"Use TCP connection instead of UDP", IDC_TCP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 92 , 150 ,10
-	CONTROL			"Display text status besides the key icon", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 104 , 155 ,10
-	CONTROL			"Print debug information to standard output", IDC_DEBUG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 116, 155 ,10
+	GROUPBOX        "Resolver",IDC_STATIC,10,7,190,74
+	LTEXT           "DNS server(s) used for name translation:", IDC_STATIC,15,20,140,10
+	CONTROL			" Get from system",			 IDC_R1,"Button",BS_AUTORADIOBUTTON | WS_GROUP, 15, 35, 100, 10  
+	CONTROL			" DNSSEC resolver:", IDC_R2,"Button",BS_AUTORADIOBUTTON, 15, 50, 80, 10    
+	COMBOBOX        IDC_COMBO, 102, 47, 70, 120 ,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+	CONTROL			" Other:",					 IDC_R3,"Button",BS_AUTORADIOBUTTON, 15, 65, 40, 10
+	EDITTEXT        IDC_EDIT, 60, 62, 120 ,12 ,ES_AUTOHSCROLL
+    
+	
+	//GROUPBOX        "Validate",IDC_STATIC,10,74+10,190,50
+	//CONTROL			" Only IPv4 (recommended)",	IDC_IPv4,"Button",BS_AUTORADIOBUTTON | WS_GROUP, 15, 74+10+12, 100, 10  
+	//CONTROL			" Only IPv6",	IDC_IPv6,"Button",BS_AUTORADIOBUTTON, 15, 74+10+24, 100, 10    
+	//CONTROL			" IPv4 and IPv6",	IDC_IPv46,"Button",BS_AUTORADIOBUTTON, 15, 74+10+36, 100, 10 
+
+	CONTROL			"Use TCP connection instead of UDP", IDC_TCP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+12 , 150 ,10
+	CONTROL			"Display text status besides the key icon", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+24 , 150 ,10
+	CONTROL			"Print debug information to standard output", IDC_DEBUG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+36, 155 ,10
+	CONTROL			"Enable internal cache of validator (recommended)", IDC_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+48, 170 ,10
+
+	DEFPUSHBUTTON   "Set",IDOK,90,18+58+48+23,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,150,18+58+48+23,50,14
+	ICON            IDI_ICON_KEY_MIRROR,IDC_STATIC,10,18+58+48+18,20,20
 END
 
+
+IDD_DIALOG_DNSSEC DIALOGEX 0, 0, 350, 90
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP  
+FONT 8, "Arial", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON		"X",IDOK,337,3,10,9
+	CONTROL			IDI_ICON_KEY_GREEN2, IDC_ST6,"Static",SS_BITMAP, 10,10,80,40	
+    CONTROL			"DNSSEC status",IDC_ST1,"Static",SS_LEFT,110,10,190,20 
+    CONTROL         "Domain name:",IDC_ST2,"Static",SS_LEFT,110,25,190,10
+	CONTROL         "www.nic.cz",IDC_ST3,"Static",SS_LEFT,110,33,190,10
+    CONTROL         "Secured/Unsecured",IDC_ST4,"Static",SS_LEFT,110,41,190,10
+	CONTROL         "Additional text",IDC_ST5,"Static",SS_LEFT,110,55,230,65
+END
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
@@ -186,7 +208,18 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_DNSSEC, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 211
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+END
+#endif    // APSTUDIO_INVOKED	
 
 
 
@@ -216,6 +249,11 @@ IDI_ICON_KEY_GREY_RC    ICON                    "res\\key_grey_rc.ico"
 IDI_ICON_KEY_ORANGE     ICON                    "res\\key_orange.ico"
 IDI_ICON_KEY_RED        ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_GREY_YT    ICON                    "res\\key_grey_yt.ico"
+
+IDI_ICON_KEY_GREEN2      BITMAP  DISCARDABLE                    "res\\key_green2.bmp"
+IDI_ICON_KEY_GREY2       BITMAP  DISCARDABLE                    "res\\key_grey2.bmp"
+IDI_ICON_KEY_ORANGE2     BITMAP  DISCARDABLE                    "res\\key_orange2.bmp"
+IDI_ICON_KEY_RED2        BITMAP  DISCARDABLE                    "res\\key_red2.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -249,6 +287,7 @@ BEGIN
 	IDS_DNSSEC_KEY_TEXT_6 " DNS connection error"
 
 	// Deafult
+	IDS_PRE_TEXT_ERROR  "The security of domain name"
 	IDS_PRE_TEXT_OK		"Domain name:"	
 	IDS_PRE_TEXT_FAIL	"Non-existent domain name:"
     
@@ -302,10 +341,15 @@ BEGIN
 	IDS_STATE9_TEXT_DOMAIN  "is not secured by DNSSEC."
 	IDS_STATE9_TEXT_MAIN	"Your computer is not secured by DNSSEC for this particular domain, so you are not secured against domain name spoofing."
 
-    IDS_NONE                " "
+	IDS_IP_MATCH_TEXT_NO    ""
+	IDS_IP_MATCH_TEXT      "Note: The IP address which the browser is using differs from the address which the DNSSEC add-on has resolved. Several webpages use multiple IP adrresses to optimise their workload. In several cases, however, can such behaviour point at a DNS spoofing attempt."
+	
+	IDS_NONE                " "
     IDS_ADDON_INIT          "Add-on initialized"
-    IDS_DNSSEC_ERROR_LABEL  "DNSSEC error"
-	IDS_DNSSEC_ERROR_FAIL   "An error occurred while getting the DNSSEC status."
+    
+	IDS_DNSSEC_ERROR_LABEL  "DNSSEC status unknown"
+	IDS_ERROR_TEXT_DOMAIN   "using DNSSEC technology cannot be verified."
+	IDS_DNSSEC_ERROR_FAIL   "An error occurred while getting the DNSSEC status. This may be caused by loss of connection to the DNS server or the user-chosen validating resolver IP address is not an address of a validating resolver."
 
 	IDS_DNSSEC_OK			 "Secured by DNSSEC"
     IDS_DNSSEC_FAIL			 "Not secured by DNSSEC"
@@ -377,8 +421,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,1,1
- PRODUCTVERSION 0,1,1
+ FILEVERSION 0,2,1
+ PRODUCTVERSION 0,2,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -395,12 +439,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "CZ.NIC Labs"
             VALUE "FileDescription", "DNSSEC Valid·tor pro IE\0"
-            VALUE "FileVersion", "0,1,1\0"
+            VALUE "FileVersion", "0,2,1\0"
             VALUE "InternalName", "IEdnssec.dll\0"
             VALUE "LegalCopyright", "Copyright 2012\0"
             VALUE "OriginalFilename", "IEdnssec.dll\0"
             VALUE "ProductName", "DNSSEC Valid·tor pro IE\0"
-            VALUE "ProductVersion", "0,1,1\0"
+            VALUE "ProductVersion", "0,2,1\0"
             VALUE "OLESelfRegister", "\0"
         END
     END
@@ -438,6 +482,14 @@ IDI_ICON_KEY_ORANGE     ICON                    "res\\key_orange.ico"
 IDI_ICON_KEY_RED        ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_GREY_YT    ICON                    "res\\key_grey_yt.ico"
 IDI_ICON_KEY_MIRROR     ICON                    "res\\mirror_key.ico"
+
+
+IDI_ICON_KEY_GREEN2      BITMAP  DISCARDABLE                    "res\\key_green2.bmp"
+IDI_ICON_KEY_GREY2       BITMAP  DISCARDABLE                    "res\\key_grey2.bmp"
+IDI_ICON_KEY_ORANGE2     BITMAP  DISCARDABLE                    "res\\key_orange2.bmp"
+IDI_ICON_KEY_RED2        BITMAP  DISCARDABLE                    "res\\key_red2.bmp"
+
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
@@ -470,6 +522,7 @@ BEGIN
 	IDS_DNSSEC_KEY_TEXT_5 " NezabezpeËeno DNSSEC technologiÌ"
 	IDS_DNSSEC_KEY_TEXT_6 " P¯i zjiöùov·nÌ DNSSEC zabezpeËenÌ nastala chyba"
 	// Deafult
+	IDS_PRE_TEXT_ERROR  "ZabezpeËenÌ domÈny"
 	IDS_PRE_TEXT_OK		"DomÈnovÈ jmÈno:"	
 	IDS_PRE_TEXT_FAIL	"NeexistujÌcÌ domÈnovÈ jmÈno:"
     
@@ -523,10 +576,15 @@ BEGIN
 	IDS_STATE9_TEXT_DOMAIN  "nenÌ zabezpeËeno technologiÌ DNSSEC."
 	IDS_STATE9_TEXT_MAIN	"Jelikoû†V·ö poËÌtaË nenÌ p¯i p¯Ìstupu k†vzd·lenÈmu serveru zabezpeËen technologiÌ DNSSEC, nejste ochr·nÏni proti podvrûenÌ domÈnovÈho jmÈna."
 
-    IDS_NONE                " "
+    IDS_DNSSEC_ERROR_LABEL  "Stav DNSSEC nezn·m˝"
+	IDS_ERROR_TEXT_DOMAIN   "pomocÌ technologie DNSSEC nelze ove¯it."
+	IDS_DNSSEC_ERROR_FAIL   "P¯i zjiöùov·nÌ stavu zabezpeËenÌ technologiÌ DNSSEC doölo k chybÏ. P¯ÌËinou m˘ûe b˝t buÔ v˝padek spojenÌ ke†vzd·lenÈmu serveru nebo nastaven· IP adresa validujÌcÌho resolveru nenÌ platnou adresou serveru pro p¯eklad domÈnovÈho jmÈna."
+	
+	IDS_NONE                " "
     IDS_ADDON_INIT          "DoplnÏk inicializov·n"
-    IDS_DNSSEC_ERROR_LABEL  "Chyba DNSSEC"
-	IDS_DNSSEC_ERROR_FAIL   "P¯i zjiöùov·nÌ DNSSEC zabezpeËenÌ nastala chyba."
+    	
+	IDS_IP_MATCH_TEXT		"Pozn·mka: IP adresa serveru zÌskan· prohlÌûeËem je odliön· od IP adresy zÌskanÈ DNSSEC doplÚkem, coû m˘ûe znamenat legitimnÌ d˘vod ale takÈ podvrûenÌ domÈnovÈho jmena."
+	IDS_IP_MATCH_TEXT_NO    ""
 
 	IDS_DNSSEC_OK			 "ZabezpeËeno DNSSEC"
     IDS_DNSSEC_FAIL			 "NezabezpeËeno DNSSEC"
@@ -538,25 +596,34 @@ BEGIN
 //
 // Dialog
 //
-IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 158
+IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 170
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "NastavenÌ DNSSEC Valid·toru"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "Nastavit",IDOK,90,136,50,14
-    PUSHBUTTON      "Zruöit",IDCANCEL,150,136,50,14
-	ICON            IDI_ICON_KEY_MIRROR,IDC_STATIC,10,132,20,20
-	GROUPBOX        "Resolver",IDC_STATIC,10,7,190,80
-	LTEXT           "DNS server(y) pouûÌvanÈ pro p¯eklad jmen:", IDC_STATIC,15,21,140,10
-	CONTROL			" NaËÌst ze systÈmu",			 IDC_R1,"Button",BS_AUTORADIOBUTTON, 15, 35, 100, 10  
-	CONTROL			" DNSSEC validujÌcÌ resolver:", IDC_R2,"Button",BS_AUTORADIOBUTTON, 15, 53, 105, 10    
-	CONTROL			" VlastnÌ:",					 IDC_R3,"Button",BS_AUTORADIOBUTTON, 15, 71, 40, 10  
-    EDITTEXT        IDC_EDIT, 55, 69, 80 ,12 ,ES_AUTOHSCROLL
-    COMBOBOX        IDC_COMBO, 122, 52, 70, 120 ,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-	CONTROL			"PouûÌt TCP spojenÌ mÌsto UDP", IDC_TCP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 92 , 150 ,10
-	CONTROL			"Zobrazovat texty za ikonou klÌËku", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 104 , 150 ,10
-	CONTROL			"V˝pis ladicÌch informacÌ na standardnÌ v˝stup", IDC_DEBUG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 116, 155 ,10
+	GROUPBOX        "Resolver",IDC_STATIC,10,7,190,74
+	LTEXT           "DNS server(y) pouûÌvanÈ pro p¯eklad jmen:", IDC_STATIC,15,20,140,10
+	CONTROL			" NaËÌst ze systÈmu",			 IDC_R1,"Button",BS_AUTORADIOBUTTON | WS_GROUP, 15, 35, 100, 10  
+	CONTROL			" DNSSEC validujÌcÌ resolver:", IDC_R2,"Button",BS_AUTORADIOBUTTON, 15, 50, 105, 10    
+	COMBOBOX        IDC_COMBO, 122, 47, 70, 120 ,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+	CONTROL			" VlastnÌ:",					 IDC_R3,"Button",BS_AUTORADIOBUTTON, 15, 65, 40, 10
+	EDITTEXT        IDC_EDIT, 60, 62, 120 ,12 ,ES_AUTOHSCROLL
+    
+	
+	//GROUPBOX        "Validovat",IDC_STATIC,10,74+10,190,50
+	//CONTROL			" Pouze IPv4 (doporuËeno)",	IDC_IPv4,"Button",BS_AUTORADIOBUTTON | WS_GROUP, 15, 74+10+12, 100, 10  
+	//CONTROL			" Pouze IPv6",	IDC_IPv6,"Button",BS_AUTORADIOBUTTON, 15, 74+10+24, 100, 10    
+	//CONTROL			" IPv4 i IPv6",	IDC_IPv46,"Button",BS_AUTORADIOBUTTON, 15, 74+10+36, 100, 10 
+
+	CONTROL			"PouûÌt TCP spojenÌ mÌsto UDP", IDC_TCP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+12 , 150 ,10
+	CONTROL			"Zobrazovat texty za ikonou klÌËku", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+24 , 150 ,10
+	CONTROL			"V˝pis ladicÌch informacÌ na standardnÌ v˝stup", IDC_DEBUG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+36, 155 ,10
+	CONTROL			"Zapnout internÌ cache valid·toru (doporuËeno)", IDC_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+48, 165 ,10
+
+	DEFPUSHBUTTON   "Nastavit",IDOK,90,18+58+48+23,50,14
+    PUSHBUTTON      "Zruöit",IDCANCEL,150,18+58+48+23,50,14
+	ICON            IDI_ICON_KEY_MIRROR,IDC_STATIC,15,18+58+48+18,20,20
 END
 
 
@@ -573,10 +640,25 @@ BEGIN
     LTEXT           "DNSSEC Valid·tor pro Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Z·suvn˝ plugin pro kontrolu DNSSEC",IDC_STATIC,50,30,180,10
     LTEXT           "PodporovanÈ prohlÌûeËe: 32-bit verze IE6, IE7, IE8, IE9",IDC_STATIC,50,40,180,10
-    LTEXT           "Alfa verze 0.1.1", IDC_STATIC,50,50,180,10
+    LTEXT           "Prerelease verze 0.2.1", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
 	LTEXT           "https://labs.nic.cz/page/1031/", IDC_LINK,10,95,120,10
+END
+
+
+
+IDD_DIALOG_DNSSEC DIALOGEX 0, 0, 350, 90
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP  
+FONT 8, "Arial", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON		"X",IDOK,337,3,10,9
+	CONTROL			IDI_ICON_KEY_GREEN2, IDC_ST6,"Static",SS_BITMAP, 10,10,80,40	
+    CONTROL			"DNSSEC hlaviËka",IDC_ST1,"Static",SS_LEFT,110,10,190,20 
+    CONTROL         "DomÈnovÈ jmÈno:",IDC_ST2,"Static",SS_LEFT,110,25,190,10
+	CONTROL         "www.nic.cz",IDC_ST3,"Static",SS_LEFT,110,33,190,10
+    CONTROL         "ZabezpeËeno/NezabezpeËeno",IDC_ST4,"Static",SS_LEFT,110,41,190,10
+	CONTROL         "DopÚujÌcÌ text",IDC_ST5,"Static",SS_LEFT,110,55,230,65
 END
 
 
@@ -611,7 +693,18 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-	
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_DNSSEC, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 211
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+END
+#endif    // APSTUDIO_INVOKED	
 	
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -678,8 +771,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,1,1
- PRODUCTVERSION 0,1,1
+ FILEVERSION 0,2,1
+ PRODUCTVERSION 0,2,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -696,12 +789,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "CZ.NIC Labs"
             VALUE "FileDescription", "DNSSEC Validator f¸r IE\0"
-            VALUE "FileVersion", "0,1,1\0"
+            VALUE "FileVersion", "0,2,1\0"
             VALUE "InternalName", "IEdnssec.dll\0"
             VALUE "LegalCopyright", "Copyright 2012\0"
             VALUE "OriginalFilename", "IEdnssec.dll\0"
             VALUE "ProductName", "DNSSEC Validator f¸r IE\0"
-            VALUE "ProductVersion", "0,1,1\0"
+            VALUE "ProductVersion", "0,2,1\0"
             VALUE "OLESelfRegister", "\0"
         END
     END
@@ -728,33 +821,58 @@ BEGIN
     LTEXT           "DNSSEC Validator f¸r Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Add-on f¸r DNSSEC Validierung",IDC_STATIC,50,30,180,10
     LTEXT           "Unterst¸tzte Versionen: 32-bit Versionen von IE6, IE7, IE8, IE9",IDC_STATIC,50,40,180,10
-    LTEXT           "Version 0.1.1 Alfa", IDC_STATIC,50,50,180,10
+    LTEXT           "Pre-release Version 0.2.1", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
 	LTEXT           "https://labs.nic.cz/page/1031/", IDC_LINK,10,95,120,10
 END
 
 
-IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 158
+
+IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 170
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "DNSSEC Validator-Einstellungen"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "Setzen",IDOK,90,136,50,14
-    PUSHBUTTON      "Stornieren",IDCANCEL,150,136,50,14
-	ICON            IDI_ICON_KEY_MIRROR,IDC_STATIC,10,132,20,20
-	GROUPBOX        "Resolver",IDC_STATIC,10,7,190,80
-	LTEXT           "Zur Namensauflˆsung benutzte DNS-Server:", IDC_STATIC,15,21,140,10
-	CONTROL			" Systemeinstellungen benutzen", IDC_R1,"Button",BS_AUTORADIOBUTTON, 15, 35, 100, 10  
-	CONTROL			" DNSSEC Resolver:", IDC_R2,"Button",BS_AUTORADIOBUTTON, 15, 53, 85, 10    
-	CONTROL			" Eigener:", IDC_R3,"Button",BS_AUTORADIOBUTTON, 15, 71, 40, 10  
-    EDITTEXT        IDC_EDIT, 55, 69, 80 ,12 ,ES_AUTOHSCROLL
-    COMBOBOX        IDC_COMBO, 102, 52, 70, 120 ,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-	CONTROL			"TCP-Verbindung anstelle von UDP vorziehen", IDC_TCP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 92 , 160 ,10
-	CONTROL			"Legende neben dem Schl¸ssel-Symbol zeigen", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 104 , 150 ,10
-	CONTROL			"Die Debug-Informationen an den Standardoutput", IDC_DEBUG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 116, 180 ,10
+	GROUPBOX        "Resolver",IDC_STATIC,10,7,190,74
+	LTEXT           "Zur Namensauflˆsung benutzte DNS-Server:", IDC_STATIC,15,20,140,10
+	CONTROL			" Systemeinstellungen benutzen",			 IDC_R1,"Button",BS_AUTORADIOBUTTON | WS_GROUP, 15, 35, 100, 10  
+	CONTROL			" DNSSEC Resolver:", IDC_R2,"Button",BS_AUTORADIOBUTTON, 15, 50, 80, 10    
+	COMBOBOX        IDC_COMBO, 102, 47, 70, 120 ,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+	CONTROL			" Eigener:",					 IDC_R3,"Button",BS_AUTORADIOBUTTON, 15, 65, 40, 10
+	EDITTEXT        IDC_EDIT, 60, 62, 120 ,12 ,ES_AUTOHSCROLL
+    
+	
+	//GROUPBOX        "Validieren",IDC_STATIC,10,74+10,190,50
+	//CONTROL			" Nur IPv4 verwenden (empfohlen)",	IDC_IPv4,"Button",BS_AUTORADIOBUTTON | WS_GROUP, 15, 74+10+12, 100, 10  
+	//CONTROL			" Nur IPv4 verwenden",	IDC_IPv6,"Button",BS_AUTORADIOBUTTON, 15, 74+10+24, 100, 10    
+	//CONTROL			" IPv4 und IPv6",	IDC_IPv46,"Button",BS_AUTORADIOBUTTON, 15, 74+10+36, 100, 10 
+
+	CONTROL			"TCP-Verbindung anstelle von UDP vorziehen", IDC_TCP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+12 , 150 ,10
+	CONTROL			"Legende neben dem Schl¸ssel-Symbol zeigen", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+24 , 150 ,10
+	CONTROL			"Die Debug-Informationen an den Standardoutput", IDC_DEBUG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+36, 165 ,10
+	CONTROL			"Interne Cache aktivieren (empfohlen)", IDC_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+48, 170 ,10
+
+	DEFPUSHBUTTON   "Setzen",IDOK,90,18+58+48+23,50,14
+    PUSHBUTTON      "Stornieren",IDCANCEL,150,18+58+48+23,50,14
+	ICON            IDI_ICON_KEY_MIRROR,IDC_STATIC,10,18+58+48+18,20,20
 END
+
+
+IDD_DIALOG_DNSSEC DIALOGEX 0, 0, 350, 90
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP  
+FONT 8, "Arial", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON		"X",IDOK,337,3,10,9
+	CONTROL			IDI_ICON_KEY_GREEN2, IDC_ST6,"Static",SS_BITMAP, 10,10,80,40	
+    CONTROL			"DNSSEC-Status",IDC_ST1,"Static",SS_LEFT,110,10,190,20 
+    CONTROL         "Dom‰ne:",IDC_ST2,"Static",SS_LEFT,110,25,190,10
+	CONTROL         "www.nic.cz",IDC_ST3,"Static",SS_LEFT,110,33,190,10
+    CONTROL         "Gesichert/Ungesichert",IDC_ST4,"Static",SS_LEFT,110,41,190,10
+	CONTROL         "Add-on-Text",IDC_ST5,"Static",SS_LEFT,110,55,230,65
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -788,7 +906,18 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_DNSSEC, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 211
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+END
+#endif    // APSTUDIO_INVOKED	
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -817,6 +946,11 @@ IDI_ICON_KEY_GREY_RC    ICON                    "res\\key_grey_rc.ico"
 IDI_ICON_KEY_ORANGE     ICON                    "res\\key_orange.ico"
 IDI_ICON_KEY_RED        ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_GREY_YT    ICON                    "res\\key_grey_yt.ico"
+
+IDI_ICON_KEY_GREEN2      BITMAP  DISCARDABLE                    "res\\key_green2.bmp"
+IDI_ICON_KEY_GREY2       BITMAP  DISCARDABLE                    "res\\key_grey2.bmp"
+IDI_ICON_KEY_ORANGE2     BITMAP  DISCARDABLE                    "res\\key_orange2.bmp"
+IDI_ICON_KEY_RED2        BITMAP  DISCARDABLE                    "res\\key_red2.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -850,6 +984,7 @@ BEGIN
 	IDS_DNSSEC_KEY_TEXT_6 " DNS connection error"
 
 	// Deafult
+	IDS_PRE_TEXT_ERROR  "Die Sicherheit von Domain-Namen"
 	IDS_PRE_TEXT_OK		"Dom‰ne:"	
 	IDS_PRE_TEXT_FAIL	"Nicht existierender Dom‰ne:"
     
@@ -905,8 +1040,14 @@ BEGIN
 
     IDS_NONE                " "
     IDS_ADDON_INIT          "Add-on initialisiert"
-    IDS_DNSSEC_ERROR_LABEL  "DNSSEC-Fehler"
-	IDS_DNSSEC_ERROR_FAIL   "Ein Fehler ist beim Abfragen des DNSSEC-Status aufgetreten."
+    
+	IDS_DNSSEC_ERROR_LABEL  "DNSSEC-Status unbekannt"
+	IDS_ERROR_TEXT_DOMAIN   "mit Hilfe von DNSSEC kann nicht verifiziert werden."
+	IDS_DNSSEC_ERROR_FAIL   "Fehler beim Erwerb des DNSSEC Status. Entweder kam es zu einer Unterbrechung der Kommunikation mit dem validierenden Resolver, oder die von den Benutzer gew‰hlte IP Adresse ist nicht eine Adresse von einen validierenden Resolver."
+
+	IDS_IP_MATCH_TEXT		"Anmerkung: Die IP Adresse, die der Browser benutzt, unterscheidet sich von der Adresse, die der DNSSEC Add-on erhielt. Manche Webseiten benutzen mehrere IP Adressen um den Betrieb besser zu optimieren. In einigen F‰llen kann das aber auf einen Versuch die Adresse zu f‰lschen hindeuten."
+	IDS_IP_MATCH_TEXT_NO    ""
+
 
 	IDS_DNSSEC_OK			 "Gesichert durch DNSSEC"
     IDS_DNSSEC_FAIL			 "Nicht gesichert durch DNSSEC"

@@ -60,6 +60,9 @@
     <ClInclude Include="hyperlink.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="uthash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="KBBar.def">
@@ -117,6 +120,18 @@
     </None>
     <None Include="dnssecStates.gen">
       <Filter>Source Files</Filter>
+    </None>
+    <None Include="res\key_green2.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\key_grey2.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\key_orange2.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\key_red2.bmp">
+      <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

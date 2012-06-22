@@ -29,6 +29,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #include "Winuser.h"
 #include "resource.h"       // main symbols
 #include "hyperlink.h"
+#include "uthash.h"
 #include "dnssecStates.gen"		// DNSSEC state constants
 extern "C" {					// use C language linkage
   #include "ds.h"
@@ -41,8 +42,8 @@ extern "C" {					// use C language linkage
 #include <shlwapi.h>
 #pragma comment(lib,"shlwapi.lib")
 
-#define TB_MIN_SIZE_X   64
-#define TB_MIN_SIZE_Y   26
+#define TB_MIN_SIZE_X   100
+#define TB_MIN_SIZE_Y   22
 #define TB_MAX_SIZE_Y   40
 #define MAX_STR_LEN		1024
 #define IPADDR_MLEN 64
@@ -50,8 +51,6 @@ extern "C" {					// use C language linkage
 #define RESOLVER			0
 #define RESOLVER2			0
 #define IPUSER		TEXT("127.0.0.1")
-//CZ.NIC 217.31.204.130 2001:1488:800:400::130 193.29.206.206 2001:678:1::206
-//OARC 149.20.64.20 2001:4f8:3:2bc:1::64:20 149.20.64.21 2001:4f8:3:2bc:1::64:21
 #define IPNIC		TEXT("217.31.204.130 2001:1488:800:400::130 193.29.206.206 2001:678:1::206")
 #define IPOARC		TEXT("149.20.64.20 2001:4f8:3:2bc:1::64:20 149.20.64.21 2001:4f8:3:2bc:1::64:21")
 #define TCPUDP				0
@@ -62,7 +61,7 @@ extern "C" {					// use C language linkage
 #define IPv6				0
 #define HKU_REG_KEY TEXT(".DEFAULT\\Software\\CZ.NIC\\DNSSEC Validator")
 #define HKCU_REG_KEY TEXT("Software\\CZ.NIC\\DNSSEC Validator")
-#define INI_FILE_PATH _T("\\CZ.NIC\\DNSSEC Validator\\0.2\\dnssec.ini")
+#define INI_FILE_PATH _T("\\CZ.NIC\\DNSSEC Validator\\dnssec.ini")
 const int BUTTON_INDEX = 0;
 extern HINSTANCE GHins;
 // settings
@@ -79,6 +78,14 @@ extern short cache_enable;
 extern short ipv4;
 extern short ipv6;
 extern short ipv46;
+
+extern WORD paneltitle;
+extern WORD panelpredonain;
+extern char* paneldomainname;
+extern WORD panelpostdomain;
+extern WORD paneltext;
+extern short paneltextip;
+extern short keylogo;
 // variable for IE version check
 extern int iRes,iMajor,iMinor;
 //#if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
@@ -136,13 +143,6 @@ BEGIN_COM_MAP(CKBBarBand)
 END_COM_MAP()
 
 	BEGIN_SINK_MAP(CKBBarBand)
-		/*		SINK_ENTRY_EX(0,
-			(__uuidof(DWebBrowserEvents2)),
-			0x000000fa, BeforeNavigate2)
-		SINK_ENTRY_EX(0,
-			(__uuidof(DWebBrowserEvents2)),
-			0x000000fa, WindowStateChanged)
-			*/
 	END_SINK_MAP()
 
 	HRESULT FinalConstruct() {

@@ -28,6 +28,8 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define IDR_KBBARBAND			        1045
 #define ID_BUTTON1                      32768
 #define ID_BUTTON2	                    32769
+
+// Key BMP
 #define IDI_ICON_KEY_ACTION1            300
 #define IDI_ICON_KEY_GREEN1             301
 #define IDI_ICON_KEY_RED1               302
@@ -36,6 +38,13 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define IDI_ICON_KEY_GREY_RC1           305
 #define IDI_ICON_KEY_GREY_YT1           306
 #define IDI_ICON_KEY_MIRROR				307
+
+// key icon for DNSSEC dialog
+#define IDI_ICON_KEY_GREEN2             401
+#define IDI_ICON_KEY_RED2               402
+#define IDI_ICON_KEY_ORANGE2            403
+#define IDI_ICON_KEY_GREY2              404
+
 // status bar key status text
 #define	IDS_DNSSEC_KEY_TEXT_0 11110
 #define	IDS_DNSSEC_KEY_TEXT_1 11111
@@ -45,7 +54,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define	IDS_DNSSEC_KEY_TEXT_5 11115
 #define	IDS_DNSSEC_KEY_TEXT_6 11116
 
-
+//  Key Icon
 #define IDI_ICON_KEY_GREEN              220
 #define IDI_ICON_KEY_ACTION             221
 #define IDI_ICON_KEY_GREY               222
@@ -106,7 +115,12 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 	// init text for toolbar
 #define IDS_DNSSEC_OK			        137
 #define IDS_DNSSEC_FAIL					138
+#define IDS_IP_MATCH_TEXT				139
+#define IDS_IP_MATCH_TEXT_NO			140
+#define IDS_PRE_TEXT_ERROR				141
+#define IDS_ERROR_TEXT_DOMAIN			142
 
+// dialog Settings
 #define IDD_DIALOG_MAIN                 1000
 #define IDC_LIST_BOX                    1001
 #define IDC_ADD_TEXT                    1002
@@ -124,12 +138,20 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define	IDC_TCP							1016
 #define IDC_DEBUG						1017
 #define IDC_CACHE						1018
-
 #define IDC_IPv4						1020
 #define IDC_IPv6						1021
 #define IDC_IPv46						1022
 
+// dialog DNSSEC status
+#define IDD_DIALOG_DNSSEC			    1030
+#define IDC_ST1							1031
+#define IDC_ST2							1032
+#define IDC_ST3							1033
+#define IDC_ST4							1034
+#define IDC_ST5							1035
+#define IDC_ST6							1036
 
+// menu items
 #define ID_MENUPOPUP_OPTION1            32773
 #define ID_MENUPOPUP_OPTION2            32772
 #define ID_MORE_LINK1                   32778

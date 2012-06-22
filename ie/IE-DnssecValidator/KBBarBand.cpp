@@ -49,6 +49,15 @@ short cache_enable = CACHE;
 short ipv4 = IPv4;
 short ipv6 = IPv6;
 short ipv46 = IPv4;
+short ipresult = 0;
+// global state info
+WORD paneltitle  = 0;
+WORD panelpredonain  = 0;
+char* paneldomainname  = 0;
+WORD panelpostdomain  = 0;
+WORD paneltext  = 0;
+short paneltextip  = 1;
+short keylogo  = 0;
 // key state memory
 int state;
 // url address memory
@@ -56,19 +65,19 @@ char * urladdr = " ";
 // variable for IE version check
 int iRes,iMajor=0,iMinor=0;
  // key icon dimension
-int ICON_KEY_WIDTH = 39;
-int ICON_KEY_HEIGHT = 19;
+int ICON_KEY_WIDTH = 16;
+int ICON_KEY_HEIGHT = 16;
 int SBAR_POSITION_LEFT = 47;
 int SBAR_POSITION_TOP = 10;
 int SBAR_POSITION_LENGTH = 620;
 int SBAR_POSITION_HEIGHT = 14;
+short ipcmpresults = -1;
 // ctritical section for resolver
 CRITICAL_SECTION CKBBarBand::cs;
 // for tooltip creation
 bool CKBBarBand::csInitialized = false;
 bool csInitialized = false;
-char DefaultIniData[] = "[DNSSEC]\nkeytext=0\nchoice=0\nchoicedns=0\nuserip=127.0.0.1\ntcpudp=0\ndebugoutput=0\ncache=1\nIPv4=1\nIPv6=0";
-//CIPAddressCtrl m_ip; 
+char DefaultIniData[] = "[DNSSEC]\nkeytext=0\nchoice=0\nchoicedns=0\nuserip=127.0.0.1\ntcpudp=0\ndebugoutput=0\ncache=1\nIPv4=1\nIPv6=0"; 
 /**************************************************************************/
 // IObjectWithSite implementations
 /**************************************************************************/
@@ -290,7 +299,8 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 					bool visible = !!(dwFlags & OLECMDIDF_WINDOWSTATE_USERVISIBLE);
 					//LoadOptionsFromRegistry();
 					LoadOptionsFromFile();
-					RefreshIcon2();					
+					RefreshIcon2();
+					keylogo=ldicon;
 					}
 				}
 			} break;
@@ -308,6 +318,7 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 				{
 				ldicon = GetBitmapIndex(IDI_ICON_KEY_GREY1);						
 				RefreshIcon2();
+				keylogo=ldicon;
 				}
 				else
 				{
@@ -324,6 +335,7 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 					else
 					{*/
 				    ldicon = state;
+					keylogo=ldicon;
 					//ldicon = GetBitmapIndex(IDI_ICON_KEY_ACTION1);				
 					RefreshIcon2();
 					/*}*/
@@ -340,6 +352,7 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 				{
 				ldicon = GetBitmapIndex(IDI_ICON_KEY_GREY1);						
 				RefreshIcon2();
+				keylogo=ldicon;
 				}
 				else
 				{
@@ -356,6 +369,7 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 					DnssecStatus();
 					//urladdr = temp;
 					state = ldicon;
+					keylogo=ldicon;
 					/*}*/
 				}
 			} break;
@@ -426,14 +440,14 @@ bool CKBBarBand::CreateToolWindow()
 	if (!m_wndToolBar.Create(rcClientParent, &m_wndReflectionWnd, this, GHins))
 	return false;
 	// Set toolbar button bitmap size
-	if (!SendMessage(m_wndToolBar, TB_SETBITMAPSIZE, 0, MAKELPARAM(ICON_KEY_WIDTH, ICON_KEY_HEIGHT)))
-	return false;
+	//if (!SendMessage(m_wndToolBar, TB_SETBITMAPSIZE, 0, MAKELPARAM(ICON_KEY_WIDTH, ICON_KEY_HEIGHT)))
+	//return false;
 
 	//CreateStatusBarKey();
 	
 	// Get cuurent version of IE
 	iRes = GetMSIEversion(&iMajor,&iMinor);		
-
+	/*
 	// if IE is 9.xx
 	if (iMajor==9) {
 		CreateIconTooltip(m_wndToolBar);
@@ -444,6 +458,7 @@ bool CKBBarBand::CreateToolWindow()
 		CreateIconTooltip(m_wndToolBar);
 		return true;
 	}
+	*/
 	return true;
 }
 
@@ -745,63 +760,42 @@ void CKBBarBand::SetSecurityStatus()
 		ldiconBar = IDI_ICON_KEY_GREY_YT;
 		tiicon = TTI_ERROR;
 		tiicontitle = IDS_DNSSEC_ERROR_LABEL;
-		tipref = IDS_PRE_TEXT_OK;
-		tistatus = IDS_DNSSEC_ERROR_LABEL;
+		tipref = IDS_PRE_TEXT_ERROR;
+		tistatus = IDS_ERROR_TEXT_DOMAIN;
 		titext = IDS_DNSSEC_ERROR_FAIL;
 		break;
 	}// switch
 	
-	char tmpbuf[STR_BUF_SIZE];
+	paneltitle  = tiicontitle;
+	panelpredonain  = tipref;
+	paneldomainname = domain;
+	panelpostdomain  = tistatus;
+	paneltext  = titext;
+	paneltextip = ipresult;
+	RefreshIcon2();
+
+	/*
+	char tmpbuf[STR_BUF_SIZE] = TEXT("");
 	char tibuf[STR_BUF_SIZE*4] = TEXT(""); // buffer to store tooltip string
 
 	LoadStringA(GHins, tipref, tmpbuf, STR_BUF_SIZE);
 	strncat_s(tibuf, tmpbuf, STR_BUF_SIZE);
 	strncat_s(tibuf, TEXT("\n"), 1);
-	
-	/*char *Pre;
-	Pre = tmpbuf;
-	char * PreText;
-	PreText = (char *)malloc(strlen(Pre));
-	strcpy(PreText,Pre);
-	*/
 	strncat_s(tibuf, domain, STR_BUF_SIZE);
 	strncat_s(tibuf, TEXT("\n"), 1);
 	LoadStringA(GHins, tistatus, tmpbuf, STR_BUF_SIZE);
 	strncat_s(tibuf, tmpbuf, STR_BUF_SIZE);
 	strncat_s(tibuf, TEXT("\n\n"), 2);
-
-	/*
-	char *Post;
-	Post = tmpbuf;
-	char * PostText;
-	PostText = (char *)malloc(strlen(Post));
-	strcpy(PostText,Post);
-	char *Final;
-	Final = (char *)malloc(strlen(PreText) + strlen(" ") + strlen(domain) + strlen(" ") + strlen(PostText));
-	strcpy(Final,PreText);
-	strcat(Final," ");
-	strcat(Final,domain);
-	strcat(Final," ");
-	strcat(Final,PostText);
-	int len = strlen(Final)+1;
-	wchar_t *wText = new wchar_t[len];
-	memset(wText,0,len);
-	::MultiByteToWideChar(  CP_ACP, NULL, Final, -1, wText,len );
-	DNSSECtext2 = wText;
-	*/
-
-
-	//ATLTRACE(DNSSECtext2);
-	//ATLTRACE("\n");
 	LoadStringA(GHins, titext, tmpbuf, STR_BUF_SIZE);
 	strncat_s(tibuf, tmpbuf, STR_BUF_SIZE);
     LoadStringA(GHins, tiicontitle, tmpbuf, STR_BUF_SIZE);
-	
+
 	ti.lpszText = tibuf;
 	RefreshIcon2();
 
 	SendMessage(hwndTT, TTM_SETTITLE, tiicon, (LPARAM) tmpbuf);
 	SendMessage(hwndTT, TTM_UPDATETIPTEXT, 0, (LPARAM) (LPTOOLINFO) &ti);
+	*/
 }//
 
 /**************************************************************************/
@@ -855,6 +849,7 @@ void CKBBarBand::CheckDomainStatus(void)
 	//ATLTRACE("checkdomainstatus() call\n");
     
 	// if IE is version 8.xx, create tooltip	
+	/*
 	if (iMajor==8) {
 		if (!tiInitialized1) {
 			CreateIconTooltip(m_wndToolBar);
@@ -868,9 +863,16 @@ void CKBBarBand::CheckDomainStatus(void)
 			tiInitialized1 = true;
 		}
 	}
-	
+	*/
 	//temporal element that helps to fragment the given URL in a domain
 	char* tmpdomain = NULL;
+	bool resolvipv4 = true;
+	bool resolvipv6 = true;
+	bool cache_en = true;
+	bool cache_flush = false;
+	char* ipbrowser = "";
+	uint16_t options = 0;
+	
 	tmpdomain= (char*)malloc(2083*sizeof(char));
 	tmpdomain=UrlToDomain(predomain);
 	strcpy_s(domain,2048,tmpdomain);	
@@ -881,17 +883,15 @@ void CKBBarBand::CheckDomainStatus(void)
 	else if (choice==1) if (choice2==0) dnsip = nic; else dnsip = oarc;
 	else dnsip = NULL;
 
-	// enable cache
-	bool cache_en = true;
+	// enable cache from settings
 	if (cache_enable==1) cache_en = true;
 	else cache_en = false;
 
-	bool resolvipv4 = true;
-	bool resolvipv6 = false;
-
+	// enable IPv4 resolving from settings
 	if (ipv4==1) resolvipv4 = true;
     else resolvipv4 = false;
 	
+	// enable IPv6 resolving from settings
 	if (ipv6==1) resolvipv6 = true;
     else resolvipv6 = false;
 
@@ -899,10 +899,9 @@ void CKBBarBand::CheckDomainStatus(void)
 	else if ((ipv4==0) && (ipv6==1)) ipv46 = 2;
 	else ipv46 = 3;
 	
-	bool cache_flush = false;
-	bool ipbrowser = false;
-
-	uint16_t options = 0;
+	resolvipv4 = true; 
+	resolvipv6 = true; 
+	
 	if (debugoutput) options |= NPAPI_INPUT_FLAG_DEBUGOUTPUT;
 	if (tcpudp) options |= NPAPI_INPUT_FLAG_USETCP;
 	if (resolvipv4) options |= NPAPI_INPUT_FLAG_RESOLVIPV4;
@@ -913,22 +912,12 @@ void CKBBarBand::CheckDomainStatus(void)
 
 	// Request ownership of the critical section
 	EnterCriticalSection(&cs);
-	//char str[100] = "\0";
 	char *tmpptr = NULL;
-	//uint32_t ttl4, ttl6 = 0;
 	//ATLTRACE("Critical section begin\n");
-	result = dnssec_validate(domain, options, dnsip, &tmpptr);
-/*	
-	ATLTRACE("\n");
-	ATLTRACE(domain);
-	char c1[100];
-	char* strttl4;
-	_itoa_s(result,c1,10);
-	strttl4 = c1;
-	ATLTRACE("\n");
-	ATLTRACE(strttl4);
-	ATLTRACE("\n");
-	*/
+	result = dnssec_validate(domain, options, dnsip, tmpptr, ipbrowser, &ipcmpresults);
+	//ATLTRACE("\n%s : %d : %d\n", domain, result, ipcmpresults);
+	// match IP result
+	ipresult = ipcmpresults; 
 	LeaveCriticalSection(&cs);
 	SetSecurityStatus();
 }
@@ -1146,8 +1135,6 @@ void CKBBarBand::CreateIniFile()
 			PathAppend( szPath, _T("\\CZ.NIC") );
 			CreateDirectory(szPath,NULL);
 			PathAppend( szPath, _T("\\DNSSEC Validator") );
-			CreateDirectory(szPath,NULL);
-			PathAppend( szPath, _T("\\0.2") );
 			CreateDirectory(szPath,NULL);
 			// Generate a temporary file name within this folder.
 	  	  	PathAppend( szPath, _T("\\dnssec.ini") );

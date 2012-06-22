@@ -28,18 +28,16 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #include "KBToolBarCtrl.h"
 #include "KBBar.h"
 #include "KBBarBand.h"
-
+#include "Windowsx.h"
+//#include "Ws2tcpip.h"
+//#include "In6addr.h"
+//#include "Winsock2.h"
 CHyperLink m_link;
 CKBBarBand* m_pBarBand;
 LANGID lang;
-/*
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-*/
 wchar_t* BUTTONTEXT = L"";
+int dx,dy=0;
+short cache_del = 0;
 //-------------------------------------------------------------------
 // Definition of toolbar style
 //-------------------------------------------------------------------
@@ -82,6 +80,7 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* 
 		return false;	
 
 	int res;
+
 	// Generation of Bitmap List Index
 	for (int i=0; i<BITMAP_NUMBER; i++) {
 		res = AddBitmap(1, StatusBitmap[i]);
@@ -116,12 +115,35 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* 
 		tbs.iBitmap = 0;
 		tbs.idCommand = ID_BUTTON1;
 		tbs.iString = 0;
+
 	// add button into toolbar
 	if (!AddButtons(1, &tbs))
 		return false;
 	CToolBarCtrl::SetExtendedStyle(TBSTYLE_EX_DRAWDDARROWS);
 	// set handle on this window
 	m_pBand = pBand;
+
+			// set ICON instead BMP
+	CImageList *pList = CKBToolBarCtrl::GetImageList();
+		HICON hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_ACTION));
+		pList->Replace(0, hIcon); // not 5 as a separate is not an image
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_GREEN));
+		pList->Replace(1, hIcon); // not 5 as a separate is not an image
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_RED));
+		pList->Replace(2, hIcon); // not 5 as a separate is not an image
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_ORANGE));
+		pList->Replace(3, hIcon); // not 5 as a separate is not an image
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_GREY));
+		pList->Replace(4, hIcon); // not 5 as a separate is not an image
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_GREY_RC));
+		pList->Replace(5, hIcon); // not 5 as a separate is not an image
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_GREY_YT));
+		pList->Replace(6, hIcon); // not 5 as a separate is not an image
+	CKBToolBarCtrl::SetImageList(pList);
+	CKBToolBarCtrl::Invalidate();
+	//CWnd* pButton = GetDlgItem(ID_BUTTON2);
+	//::SendMessage(::GetDlgItem(m_pBand->m_wndToolBar, ID_BUTTON2),BM_SETIMAGE,IMAGE_ICON,(LPARAM)hIcon);
+
 	return true;
 }
 
@@ -139,8 +161,7 @@ STDMETHODIMP CKBToolBarCtrl::TranslateAcceleratorIO(LPMSG pMsg)
 void CKBToolBarCtrl::OnTbnDropDown(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMTOOLBAR pNMTB = reinterpret_cast<LPNMTOOLBAR>(pNMHDR);
-
-		_variant_t varEmpty;
+	_variant_t varEmpty;
 	_variant_t varURL;
 	switch (pNMTB->iItem) 	{
 	case ID_BUTTON1:
@@ -148,11 +169,10 @@ void CKBToolBarCtrl::OnTbnDropDown(NMHDR *pNMHDR, LRESULT *pResult)
 		RECT rc;
 		SendMessage(TB_GETRECT, ID_BUTTON1, (LPARAM)&rc);
 		::MapWindowPoints(m_pBand->m_wndToolBar, HWND_DESKTOP, (LPPOINT)&rc, 2);
- 
 		 TPMPARAMS tpm;
-         
          tpm.cbSize    = sizeof(TPMPARAMS);
          tpm.rcExclude = rc;
+		  //ATLTRACE("PWProc: rcClient l: %d; b: %d; r: %d; t: %d\n", rc.left, rc.bottom, rc.right, rc.top);
 			//obtaining the current menu
 			HMENU hMenuStatusBar = GetSubMenu(LoadMenu(GHins,MAKEINTRESOURCE(IDR_MENU_POPUP)), 0);
 			//if available
@@ -177,7 +197,7 @@ void CKBToolBarCtrl::OnTbnDropDown(NMHDR *pNMHDR, LRESULT *pResult)
 					}
 				}
 			}
-			break;
+		break;
 	}
 }
 
@@ -185,53 +205,42 @@ void CKBToolBarCtrl::OnTbnDropDown(NMHDR *pNMHDR, LRESULT *pResult)
 // Command Message for popup menu click (Button)
 /**************************************************************************/
 void CKBToolBarCtrl::OnCommand()
-{	//Save current massage from toolbar
+{	
 	//ATLTRACE("OnCommandButton():\n");
 	const MSG* pMsg = GetCurrentMessage();
 	int nID = LOWORD(pMsg->wParam);
-	_variant_t varEmpty;
-	_variant_t varURL;
-	//Button action - change URL in IE browser 
 	switch (nID)
 	{
-	case ID_BUTTON1:
-		//ATLTRACE("ID_BUTTON1():\n");
-		RECT rc;
-		// get coordinates of Button
-		SendMessage(TB_GETRECT, ID_BUTTON1, (LPARAM)&rc);
-		::MapWindowPoints(m_pBand->m_wndToolBar, HWND_DESKTOP, (LPPOINT)&rc, 2);
-		// set new cooridnate for popupmenu
-		 TPMPARAMS tpm;         
-         tpm.cbSize    = sizeof(TPMPARAMS);
-         tpm.rcExclude = rc;
-			//obtaining the current menu
-			HMENU hMenuStatusBar = GetSubMenu(LoadMenu(GHins,MAKEINTRESOURCE(IDR_MENU_POPUP)), 0);
-			//if available
-			if(hMenuStatusBar) {
-				//obtaining the element that has been chosen 
-				int cmd = TrackPopupMenuEx(hMenuStatusBar, TPM_NONOTIFY|TPM_RETURNCMD|TPM_LEFTBUTTON|TPM_RIGHTALIGN, rc.left+142, rc.bottom, m_pBand->m_wndToolBar,  &tpm);			
-				switch (cmd) {
-					case ID_ENABLED : {
-						break;
-					}
-					case ID_ABOUT : { 
-						// show dialog About
-						DialogBox(GHins, MAKEINTRESOURCE(IDD_DIALOG_MAIN_ABOUT), NULL , (DLGPROC)DialogProcAbout);	
-						break;
-					}
-					case ID_SET : { 
-						// show dialog Settings
-						DialogBox(GHins, MAKEINTRESOURCE(IDD_DIALOG_MAIN), NULL, (DLGPROC)DialogProcSettings);
-						break;
-					}
-					case ID_HOME : { 
-						// navigate to home page
-						m_pBand->webBrowser2->Navigate(L"https://labs.nic.cz/page/1031/", &varEmpty, &varEmpty, &varEmpty, &varEmpty);					
-						break;
-					}
-				}
+		case ID_BUTTON1:
+		{
+			RECT rc;
+			RECT rc2;
+			SendMessage(TB_GETRECT, ID_BUTTON1, (LPARAM)&rc);
+			HWND handle=::FindWindow("IEFrame", NULL);
+			//ATLTRACE("Handle: %d\n", handle);
+			::GetWindowRect(handle,&rc2);
+			//ATLTRACE("PWProc1: rcClient l: %d; b: %d; r: %d; t: %d\n", rc2.left, rc2.bottom, rc2.right, rc2.top);
+			::MapWindowPoints(m_pBand->m_wndToolBar, HWND_DESKTOP, (LPPOINT)&rc, 2);
+			//ATLTRACE("PWProc2: rcClient l: %d; b: %d; r: %d; t: %d\n", rc.left, rc.bottom, rc.right, rc.top);
+			int dialog_size = 530;
+			LONG dei;
+			dei = rc2.right - rc2.left;
+			dei = dei / 2;
+			dei = dei + rc2.left;
+			//ATLTRACE("Handle: %d\n", dei);
+			if (rc.left < dei && (rc.left+dialog_size) < rc2.right) {
+				dx = (int)rc.left;
+				dy = (int)rc.bottom;
 			}
-			break;
+			else {
+				dx = (int)rc.left+TB_MIN_SIZE_X-15-dialog_size;
+				dy = (int)rc.bottom;
+			}
+			//ATLTRACE("PWProc3: rcClient l: %d; b: %d; r: %d; t: %d\n",dx, dy, rc.right, rc.top);
+			if (keylogo==4 || keylogo==0) ;
+			else DialogBox(GHins, MAKEINTRESOURCE(IDD_DIALOG_DNSSEC), NULL, (DLGPROC)DialogProcDnssec);
+		break;
+		}
 	}
 }
 
@@ -302,7 +311,7 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 			::CheckRadioButton(hwndDlg, IDC_R1, IDC_R3, IDC_R1);
 		} // if choice
 
-	
+		/*
 		if (ipv46==1) {
 			::CheckRadioButton(hwndDlg, IDC_IPv4, IDC_IPv46, IDC_IPv4);			
 		}
@@ -312,13 +321,14 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 		else {
 			::CheckRadioButton(hwndDlg, IDC_IPv4, IDC_IPv46, IDC_IPv46);
 		} // if choice
-
+		*/
 
         break;
 		}	
 	
 	case WM_COMMAND:
-			switch ( LOWORD(wParam) )
+		
+		switch ( LOWORD(wParam) )
 			{
 				//ATLTRACE("WM_COMMAND\n");
 				case IDOK:
@@ -378,9 +388,9 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 									
 									if (ValidateIP(szVal)) WritePrivateProfileString("DNSSEC", "userip", szVal, szPath);
 									else
-									{ if (lang==0x0405) msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Neplatná adresa IPv4!\nIPv4 adresa nebude uložena.", (LPCWSTR)L"Neplatná adresa IPv4", MB_OK | MB_ICONERROR);
-										 else if (lang==0x0407) msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Ungültige IPv4-Adresse!\nIPv4-Adresse werden nicht gespeichert.", (LPCWSTR)L"Ungültige IPv4-Adresse", MB_OK | MB_ICONERROR);
-										 else msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Invalid IPv4 format!\nThe IPv4 address will not set.", (LPCWSTR)L"Invalid IPv4 format", MB_OK | MB_ICONERROR);
+									{ if (lang==0x0405) msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Neplatná adresa IPv4 nebo IPv6!\nIP adresa nebude uložena.", (LPCWSTR)L"Neplatná adresa IP", MB_OK | MB_ICONERROR);
+										 else if (lang==0x0407) msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Ungültige IPv4-Adresse oder IPv6-Adresse!\nIP-Adresse werden nicht gespeichert.", (LPCWSTR)L"Ungültige IP-Adresse", MB_OK | MB_ICONERROR);
+										 else msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Invalid IPv4 or IPv6 format!\nThe IP address will not set.", (LPCWSTR)L"Invalid IP format", MB_OK | MB_ICONERROR);
 	
 									} // if 																																																
 								}// id IsDlgButtonChecked
@@ -391,6 +401,7 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 
 								
 								// save setting IPv4 IPv6 resolver
+								/*
 								if (::IsDlgButtonChecked(hwndDlg, IDC_IPv4)) WritePrivateProfileString("DNSSEC", "IPv4", "1", szPath);
 								else WritePrivateProfileString("DNSSEC", "IPv4", "0", szPath);
 								if (::IsDlgButtonChecked(hwndDlg, IDC_IPv6)) WritePrivateProfileString("DNSSEC", "IPv6", "1", szPath);
@@ -399,10 +410,11 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 									{
 									WritePrivateProfileString("DNSSEC", "IPv4", "1", szPath);
 									WritePrivateProfileString("DNSSEC", "IPv6", "1", szPath);
-									}							
+									}
+								*/
 							}
 						/*
-						    // code for register write
+						    // code for windows register write
 							DWORD dwRet;
 							HKEY hKey;
 							DWORD dwVal;
@@ -453,10 +465,11 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 								}
 								RegCloseKey(hKey);	
 
-								*/
-							
-					EndDialog(hwndDlg, LOWORD(wParam));						
-					//if (iMajor==6) m_pBarBand->m_spWebBrowser2->Refresh();
+								*/					
+					EndDialog(hwndDlg, LOWORD(wParam));					
+					// flush all cache items
+					if (cache_del) cache_delete_all2();
+					cache_del = 0;
 					break;
 					}
 				case IDCANCEL:
@@ -465,19 +478,32 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 				case IDC_R2:
 					{
 					::EnableWindow(::GetDlgItem(hwndDlg,IDC_EDIT), FALSE);
-					::EnableWindow(::GetDlgItem(hwndDlg,IDC_COMBO), TRUE);		
+					::EnableWindow(::GetDlgItem(hwndDlg,IDC_COMBO), TRUE);
+					cache_del = 1;
 					}
 					break;
 				case IDC_R3:
 					{
 					::EnableWindow(::GetDlgItem(hwndDlg,IDC_COMBO), FALSE);
 					::EnableWindow(::GetDlgItem(hwndDlg,IDC_EDIT), TRUE);
+					cache_del = 1;
 					}
 					break;
 				case IDC_R1:
 					{					
 					::EnableWindow(::GetDlgItem(hwndDlg,IDC_EDIT), FALSE);
 					::EnableWindow(::GetDlgItem(hwndDlg,IDC_COMBO), FALSE);
+					cache_del = 1;
+					}
+					break;
+				case IDC_TCP:
+					{					
+					cache_del = 1;		
+					}
+					break;
+				case IDC_COMBO:
+					{					
+					cache_del = 1;		
 					}
 					break;
 			}
@@ -498,6 +524,7 @@ LRESULT CKBToolBarCtrl::DialogProcAbout(HWND hwndDlg, UINT uMsg, WPARAM wParam, 
 		
 	case WM_INITDIALOG:
         {		
+			// conver text to hyperlink
 			m_link.ConvertStaticToHyperlink(hwndDlg, IDC_LINK, _T("https://labs.nic.cz/page/1031/"));
         break;
 		}	
@@ -517,17 +544,164 @@ LRESULT CKBToolBarCtrl::DialogProcAbout(HWND hwndDlg, UINT uMsg, WPARAM wParam, 
 }
 
 /**************************************************************************/
-// Validation of IPv4
+// CallBack function for dialog DNSSEC
+/**************************************************************************/
+LRESULT CKBToolBarCtrl::DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	//ATLTRACE("DialogProcAbout\n");
+	switch ( uMsg )
+	{
+		
+	case WM_INITDIALOG:
+        {	
+			const int STR_BUF_S = 512;
+			char strbuf[STR_BUF_S] = TEXT("");
+			char strbuf2[STR_BUF_S*2] = TEXT("");
+
+			// set popup window coordinates
+			::SetWindowPos(hwndDlg,NULL,dx,dy,0,0,SWP_NOSIZE);
+			::SendMessage(::GetDlgItem(hwndDlg, IDOK), BST_UNCHECKED, NULL, NULL);
+
+			// load and print titletext from resources
+			LoadStringA(GHins, paneltitle, strbuf, STR_BUF_S);
+			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST1),strbuf);
+
+			// load and print prefixtext from resources
+			LoadStringA(GHins, panelpredonain, strbuf, STR_BUF_S);
+			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST2),strbuf);
+
+			// print domain name 
+			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST3),paneldomainname);
+			
+			// load and print posttext from resources
+			LoadStringA(GHins, panelpostdomain, strbuf, STR_BUF_S);
+			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST4),strbuf);
+
+			// load and print addtext from resources
+			if (paneltextip==0)
+			{
+				LoadStringA(GHins, paneltext, strbuf, STR_BUF_S);
+				strncat_s(strbuf2, strbuf, STR_BUF_S*2);			
+				LoadStringA(GHins, IDS_IP_MATCH_TEXT, strbuf, STR_BUF_S);
+				strncat_s(strbuf2, TEXT("\n\n"), 2);
+				strncat_s(strbuf2, strbuf, STR_BUF_S*2);
+				::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST5),strbuf2);
+				// resize popup window if IP message was set
+				::SetWindowPos(hwndDlg,NULL,0,0,532,220,SWP_NOMOVE);
+			}
+			else
+			{
+				LoadStringA(GHins, paneltext, strbuf, STR_BUF_S);
+				::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST5),strbuf);
+			}
+
+			// set font for texts
+			HFONT hFont ;
+			LOGFONT lfFont;
+			memset(&lfFont, 0x00, sizeof(lfFont));
+			memcpy(lfFont.lfFaceName, TEXT("Arial"), 24);
+			
+			lfFont.lfHeight   = 20;
+			lfFont.lfWeight   = FW_BOLD;
+			lfFont.lfCharSet  = ANSI_CHARSET;
+			lfFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
+			lfFont.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+			lfFont.lfQuality  = DEFAULT_QUALITY;
+			hFont = CreateFontIndirect (&lfFont);
+			::SendMessage(::GetDlgItem(hwndDlg, IDC_ST1), WM_SETFONT, (int)hFont, MAKELONG( TRUE, 0 ) );
+			
+			lfFont.lfHeight   = 14;
+			lfFont.lfWeight   = FW_BOLD;
+			hFont = CreateFontIndirect (&lfFont);
+			::SendMessage(::GetDlgItem(hwndDlg, IDC_ST3), WM_SETFONT, (int)hFont, MAKELONG( TRUE, 0 ) );
+			// set bold font for button text
+			::SendMessage(::GetDlgItem(hwndDlg, IDOK), WM_SETFONT, (int)hFont, MAKELONG( TRUE, 0 ) );
+			
+			lfFont.lfHeight   = 14;
+			lfFont.lfWeight   = FW_NORMAL;
+			hFont = CreateFontIndirect (&lfFont);
+			::SendMessage(::GetDlgItem(hwndDlg, IDC_ST2), WM_SETFONT, (int)hFont, MAKELONG( TRUE, 0 ) );
+			::SendMessage(::GetDlgItem(hwndDlg, IDC_ST4), WM_SETFONT, (int)hFont, MAKELONG( TRUE, 0 ) );
+			
+			short s = 0;
+
+			// set logo icon from DNSSEC status
+			switch (keylogo) {
+				case 1:
+					s = IDI_ICON_KEY_GREEN2;
+		 			break;
+				case 5:
+					s = IDI_ICON_KEY_GREY2;
+		 			break;
+				case 2:
+					s = IDI_ICON_KEY_RED2;
+		 			break;				
+				case 3:
+					s = IDI_ICON_KEY_ORANGE2;
+		 			break;
+				default:
+					s = IDI_ICON_KEY_GREY2;
+					break;
+			}// switch
+			
+			// load ico bitmap from resources
+			HBITMAP hBitmap = (HBITMAP)LoadImage(GHins,MAKEINTRESOURCE(s), IMAGE_BITMAP,0,0,0);
+			// set icon in popup window
+			::SendMessage(::GetDlgItem(hwndDlg, IDC_ST6), STM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBitmap);
+	
+        break;
+		}	
+	case WM_COMMAND:
+			switch ( LOWORD(wParam) )
+			{
+				case IDOK:
+					EndDialog(hwndDlg, LOWORD(wParam));					
+					break;
+			}
+			break;
+    case WM_LBUTTONDOWN:
+			switch ( LOWORD(wParam) )
+			{
+				case MK_LBUTTON:
+					EndDialog(hwndDlg, LOWORD(wParam));					
+					break;
+			}
+			break;
+	}    
+	return (INT_PTR)FALSE;
+}
+
+/**************************************************************************/
+// Validation of IPv4, Validation of IPv6
 /**************************************************************************/
 bool CKBToolBarCtrl::ValidateIP(char *ipadd)
 {
+	//struct in6_addr serveraddr;
+	//int rc;
+	char tmp[128];
+	char * pch;
+	strcpy_s(tmp, ipadd);
+    if (strcmp(tmp,"")==0) return 0;
+	pch=strchr(tmp,':');
+	if (pch!=NULL){
+		// IPv6
+		if (strlen(tmp) < 3) return 0;
+		if (strlen(tmp) > 40) return 0;
+		return 1;
+	} 
+	
+	else  
+	{
+		// IPv4
+		unsigned b1, b2, b3, b4;
+		unsigned char c;
 
-	unsigned b1, b2, b3, b4;
-	unsigned char c;
+		if (sscanf_s(ipadd, "%3u.%3u.%3u.%3u%c", &b1, &b2, &b3, &b4, &c) != 4) return 0;
+		if ((b1 | b2 | b3 | b4) > 255) return 0;
+		if (strspn(ipadd, "0123456789.") < strlen(ipadd)) return 0;
 
-	if (sscanf_s(ipadd, "%3u.%3u.%3u.%3u%c", &b1, &b2, &b3, &b4, &c) != 4) return 0;
-	if ((b1 | b2 | b3 | b4) > 255) return 0;
-	if (strspn(ipadd, "0123456789.") < strlen(ipadd)) return 0;
+		return 1;
 
-	return 1;
+	}
 }
+

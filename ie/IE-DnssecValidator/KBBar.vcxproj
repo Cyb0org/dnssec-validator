@@ -936,6 +936,7 @@ echo Warning : Cannot register Unicode DLL on Windows 95
     <ClInclude Include="KBToolBarCtrl.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="uthash.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="dnssecStates.gen" />
@@ -943,16 +944,20 @@ echo Warning : Cannot register Unicode DLL on Windows 95
     <None Include="res\key_action.ico" />
     <None Include="res\key_green.bmp" />
     <None Include="res\key_green.ico" />
+    <None Include="res\key_green2.bmp" />
     <None Include="res\key_grey.bmp" />
     <None Include="res\key_grey.ico" />
+    <None Include="res\key_grey2.bmp" />
     <None Include="res\key_grey_rc.bmp" />
     <None Include="res\key_grey_rc.ico" />
     <None Include="res\key_grey_yt.bmp" />
     <None Include="res\key_grey_yt.ico" />
     <None Include="res\key_orange.bmp" />
     <None Include="res\key_orange.ico" />
+    <None Include="res\key_orange2.bmp" />
     <None Include="res\key_red.bmp" />
     <None Include="res\key_red.ico" />
+    <None Include="res\key_red2.bmp" />
     <None Include="res\mirror_key.ico" />
   </ItemGroup>
   <ItemGroup>

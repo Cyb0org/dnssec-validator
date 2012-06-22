@@ -35,18 +35,18 @@ const int StatusBitmap[BITMAP_NUMBER] = {IDI_ICON_KEY_ACTION1 /*0*/, IDI_ICON_KE
 	IDI_ICON_KEY_RED1 /*2*/, IDI_ICON_KEY_ORANGE1 /*3*/,  IDI_ICON_KEY_GREY1 /*4*/, 
 	IDI_ICON_KEY_GREY_RC1 /*5*/, IDI_ICON_KEY_GREY_YT1 /*6*/};
 
-const LPCTSTR stringtextCZ[BITMAP_NUMBER+1] = {_T("& Zjiöùov·nÌ DNSSEC zabezpeËenÌ\0") /*0*/, _T("& ZabezpeËeno DNSSEC\0") /*1*/,
+const LPCTSTR stringtextCZ[BITMAP_NUMBER+1] = {_T("& DNSSEC Valid·tor\0") /*0*/, _T("& ZabezpeËeno DNSSEC\0") /*1*/,
 	_T("& ZabezpeËeno DNSSEC\0") /*2*/, _T("& NezabezpeËeno DNSSEC\0") /*3*/,  _T("& NeaktivnÌ okno Ëi z·loûka\0") /*4*/, 
-	_T("& NezabezpeËeno DNSSEC\0") /*5*/, _T("& P¯i zjiöùov·nÌ DNSSEC zabezpeËenÌ nastala chyba\0") /*6*/, _T("&\0") /*7*/};
+	_T("& NezabezpeËeno DNSSEC\0") /*5*/, _T("& Stav DNSSEC nezn·m˝\0") /*6*/, _T("& DNSSEC\0") /*7*/};
 
-const LPCTSTR stringtextEN[BITMAP_NUMBER+1] = {_T("& Getting the DNSSEC status\0") /*0*/, _T("& Secured by DNSSEC\0") /*1*/,
+const LPCTSTR stringtextEN[BITMAP_NUMBER+1] = {_T("& DNSSEC Validator\0") /*0*/, _T("& Secured by DNSSEC\0") /*1*/,
 	_T("& Secured by DNSSEC\0") /*2*/, _T("& Not secured by DNSSEC\0") /*3*/,  _T("& Inactive window or tab\0") /*4*/, 
-	_T("& Not secured by DNSSEC\0") /*5*/, _T("& An error occurred while getting the DNSSEC status\0") /*6*/, _T("&\0") /*7*/};
+	_T("& Not secured by DNSSEC\0") /*5*/, _T("& DNSSEC status unknown\0") /*6*/, _T("& DNSSEC\0") /*7*/};
 
-const LPCTSTR stringtextDE[BITMAP_NUMBER+1] = {_T("& DNSSEC-Status wird erfragt\0") /*0*/, _T("& Gesichert durch DNSSEC\0") /*1*/,
+const LPCTSTR stringtextDE[BITMAP_NUMBER+1] = {_T("& DNSSEC Validator\0") /*0*/, _T("& Gesichert durch DNSSEC\0") /*1*/,
 	_T("& Gesichert durch DNSSEC\0") /*2*/, _T("& Nicht gesichert durch DNSSEC\0") /*3*/,  _T("& Inaktive Fenster oder Tab\0") /*4*/, 
-	_T("& Nicht gesichert durch DNSSEC\0") /*5*/, _T("& Ein Fehler ist beim Abfragen des DNSSEC-Status aufgetreten\0") /*6*/, _T("&\0") /*7*/};
-
+	_T("& Nicht gesichert durch DNSSEC\0") /*5*/, _T("& DNSSEC-Status unbekannt\0") /*6*/, _T("& DNSSEC\0") /*7*/};
+		// Ein Fehler ist beim Abfragen des DNSSEC-Status aufgetreten
 class CKBBarBand;
 /////////////////////////////////////////////////////////////////////////////
 // CKBToolBarCtrl window
@@ -68,6 +68,7 @@ public:
 	bool Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* pBand, HINSTANCE GHins);
 	bool RepaintButton(int bindex, int iconindex);
 	static LRESULT CALLBACK DialogProcAbout(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	STDMETHOD(TranslateAcceleratorIO)(LPMSG pMsg);
 	static bool CKBToolBarCtrl::ValidateIP(char *ipadd);

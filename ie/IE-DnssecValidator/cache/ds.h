@@ -42,5 +42,18 @@ OpenSSL used as well as that of the covered work.
 #endif
 
 /* main validating function */
-short dnssec_validate(const char *domain, const uint16_t options,
-                  const char *optdnssrv, char **resaddrs);
+
+//short ds_validate(const char *domain, const uint16_t options,
+//                  const char *optdnssrv, char **resaddrs, uint32_t *ttl4,
+//                  uint32_t *ttl6, short *ipv4, short *ipv6, char** stubIP);
+
+/* main validating function */
+short dnssec_validate(char *domain, const uint16_t options,
+                  char *optdnssrv, char *resolvaddrs, char *ipbrowser, short *ipcmpresults);
+
+/* free resolved address buffer */
+void ds_free_resaddrsbuf(void);
+/* free resolved address buffer */
+
+/* Flush cache content */
+void cache_delete_all2();

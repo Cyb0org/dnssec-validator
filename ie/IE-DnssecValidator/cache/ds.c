@@ -53,7 +53,7 @@ OpenSSL used as well as that of the covered work.
 #include "dnssecStates.gen"
 //#include "ds.h"
 #define MAX_CACHE_SIZE 10000   /* max items in cache */
-#define NO_ITEM_IN_CACHE -99   
+#define NO_ITEM_IN_CACHE -99   /* max items in cache */
 #define DEBUG_PREFIX "dnssec: npapi: "
 #define ERROR_PREFIX "dnssec: npapi: error: "
 #define MAX_IPADDRLEN 39             /* max len of IPv4 and IPv6 addr notation */
@@ -121,32 +121,6 @@ uint32_t get_item_ttl6(char *key)
     return ttl6;
 }
 
-short get_item_ipv4(char *key)
-{
-	   short ipv4 = 0;
-    struct CacheEntry *entry;
-    HASH_FIND_STR(cache2, key, entry);
-    if (entry) return entry->ipv4;
-    return ipv4;
-}
-
-short get_item_ipv6(char *key)
-{
-	short ipv6 = 0;
-    struct CacheEntry *entry;
-    HASH_FIND_STR(cache2, key, entry);
-    if (entry) return entry->ipv6;
-    return ipv6;
-}
-
-char * get_item_resaddrs(char *key)
-{
-	   char * ip = "";
-    struct CacheEntry *entry;
-    HASH_FIND_STR(cache2, key, entry);
-    if (entry) return entry->ip;
-    return ip;
-}
 
 // Display all items of cache
 void print_items() {
@@ -185,29 +159,6 @@ void update_item_in_cache(char *key, char *ip, uint32_t ttl4, uint32_t ttl6, sho
 }
 
 
-void update_item_in_cache6(char *key, char *ip, uint32_t ttl6, short ipv6)
-{
-	struct CacheEntry *entry;
-    HASH_FIND_STR(cache2, key, entry);
-    if (entry) {
-		entry->ip = _strdup(ip);
-		entry->ttl6 = ttl6;
-    entry->ipv6 = ipv6;
-    }
-}
-
-void update_item_in_cache4(char *key, char *ip, uint32_t ttl4, short ipv4)
-{
-	struct CacheEntry *entry;
-    HASH_FIND_STR(cache2, key, entry);
-    if (entry) {
-		entry->ip = _strdup(ip);
-		entry->ttl4 = ttl4;
-    entry->ipv4 = ipv4;
-    }
-}
-
-
 void add_to_cache(char *key, char *ip, uint32_t ttl4, uint32_t ttl6, short ipv4, short ipv6, short overall)
 {
     struct CacheEntry *entry, *tmp;
@@ -232,7 +183,6 @@ void add_to_cache(char *key, char *ip, uint32_t ttl4, uint32_t ttl6, short ipv4,
     }
 }
 //==============================================================================
-
 
 
 /* print buffer content */
@@ -584,6 +534,7 @@ short ds_read_resolver(ldns_resolver **res, const char *str) {
 
 /* read input options into a structure */
 void ds_init_opts(const uint16_t options) {
+
   opts.debug = options & NPAPI_INPUT_FLAG_DEBUGOUTPUT;
   opts.usetcp = options & NPAPI_INPUT_FLAG_USETCP;
   opts.resolvipv4 = options & NPAPI_INPUT_FLAG_RESOLVIPV4;
@@ -591,6 +542,7 @@ void ds_init_opts(const uint16_t options) {
   opts.cache_en = options & NPAPI_INPUT_FLAG_CACHE_ENABLE;
   opts.cache_flush = options & NPAPI_INPUT_FLAG_CACHE_FLUSH;
   opts.ipbrowser = options & NPAPI_INPUT_FLAG_IP_BROWSER_CHECK;
+  
 }
 
 
@@ -1224,25 +1176,36 @@ short ds_init_resolver(ldns_resolver **res, const char *optdnssrv) {
 /* main validating function */
 short ds_validate(const char *domain, const uint16_t options,
                   const char *optdnssrv, char **resaddrs, uint32_t *ttl4,
-                  uint32_t *ttl6, short *ipv4, short *ipv6) {
-
+                  uint32_t *ttl6) {
+  short result;
   short retval;
   short retval_ipv4;
   short retval_ipv6;
   ldns_rdf *dn;                      /* domain name */
   ldns_resolver *res;                /* resolver address(es) */
+
 #ifdef RES_WIN
   WSADATA wsaData;
 #endif
 
+  result = 0;
   retval = NPAPI_EXIT_FAILED;
   retval_ipv4 = NPAPI_EXIT_FAILED;
   retval_ipv6 = NPAPI_EXIT_FAILED;
   dn = NULL;
   res = NULL;
   *ttl4 = *ttl6 = 0;                 /* IPv4 and IPv6 addresses TTL */
-  *ipv4 = *ipv6 = 0;
 
+  /* check input args */
+  if (!domain) {
+    return retval;
+  }
+
+  /* options init */
+  ds_init_opts(options);
+
+  
+  
   /* disable stdout buffering if debug info desired */
   if (opts.debug) {
     setbuf(stdout, NULL);
@@ -1259,6 +1222,129 @@ short ds_validate(const char *domain, const uint16_t options,
     return retval;
   }
 #endif
+
+
+
+  // Cache enable
+  if (opts.cache_en)
+  {
+      // flush content when TCPUDP was changed
+      if (opts.cache_flush) delete_all();
+     
+      uint32_t ttl4tmp, ttl4, ttl6, ttl6tmp, ttlnowout = 0;
+      time_t seconds;
+		  seconds = time (NULL);
+		  unsigned int ttlnow   =  (unsigned int)(seconds);
+		  // for debug
+		  ttlnowout = ttlnow;
+		  printf("TIME: %i\n", ttlnowout);	
+		
+      // Is item in cache?
+		  result = find_in_cache(domain);
+		
+      if (result!=NO_ITEM_IN_CACHE)
+		  // item is in cache
+      { 
+    
+          // resolve desired IPv4 and/or IPv6 RRSET 
+          if (!opts.resolvipv4 && opts.resolvipv6) {             /* 0 1 */
+
+          retval_ipv6 = ds_validate_rrsets(res, dn, LDNS_RR_TYPE_AAAA, ttl6);
+          retval = retval_ipv6;
+
+          } else if (opts.resolvipv4 && !opts.resolvipv6) {      /* 1 0 */
+
+          retval_ipv4 = ds_validate_rrsets(res, dn, LDNS_RR_TYPE_A, ttl4);
+          retval = retval_ipv4;
+
+          } else {                                               /* 0 0 or 1 1 */
+
+          retval_ipv4 = ds_validate_rrsets(res, dn, LDNS_RR_TYPE_A, ttl4);
+          retval_ipv6 = ds_validate_rrsets(res, dn, LDNS_RR_TYPE_AAAA, ttl6);
+
+          /* set worse security state according to security priority */
+          retval = ds_get_worse_case(retval_ipv4, retval_ipv6);
+          }
+    
+    
+      }
+      else
+			// item is not in cache
+      {	
+				
+          // resolve desired IPv4 and/or IPv6 RRSET 
+          if (!opts.resolvipv4 && opts.resolvipv6) {             /* 0 1 */
+
+          retval_ipv6 = ds_validate_rrsets(res, dn, LDNS_RR_TYPE_AAAA, ttl6);
+          retval = retval_ipv6;
+          
+
+          } else if (opts.resolvipv4 && !opts.resolvipv6) {      /* 1 0 */
+
+          retval_ipv4 = ds_validate_rrsets(res, dn, LDNS_RR_TYPE_A, ttl4);
+          retval = retval_ipv4;
+
+          } else {                                               /* 0 0 or 1 1 */
+
+          retval_ipv4 = ds_validate_rrsets(res, dn, LDNS_RR_TYPE_A, ttl4);
+          retval_ipv6 = ds_validate_rrsets(res, dn, LDNS_RR_TYPE_AAAA, ttl6);
+          /* set worse security state according to security priority */
+          retval = ds_get_worse_case(retval_ipv4, retval_ipv6);                   
+          }
+          // ADD item into cache
+          if (ttl4!=0) ttl4 = ttl4 + ttlnow;
+			    if (ttl6!=0) ttl6 = ttl6 + ttlnow;
+          add_to_cache(domain, resaddrs, ttl4, ttl6, retval_ipv4, retval_ipv6, retval);
+        
+        			// ADD item into cache
+			result = ds_validate(domain, options, optdnssrv, &resaddrs, &ttl4, &ttl6);			
+			if (ttl4!=0) ttl4 = ttl4 + ttlnow;
+			if (ttl6!=0) ttl6 = ttl6 + ttlnow;			
+			printf("Action: ADD | Domain: %s | TTL4: %i | TTL6: %i | Status: %i\n", domain, ttl4, ttl6, result);
+			add_to_cache(domain, resaddrs, ttl4, ttl6, result);
+			ds_free_resaddrsbuf();
+        
+        
+        
+        
+        
+        printf("Action: RCA | Domain: %s | TTL4: %i | TTL6: %i | Status: %i\n", domain, ttl4tmp, ttl6tmp, result);
+        return result;
+			}// if TTL4 or TTL6 is invalidate
+    
+    
+    
+      				
+			ttl4tmp = get_item_ttl4(domain);
+			ttl6tmp = get_item_ttl6(domain);
+
+			// TTL4 or TTL6 is invalidate
+			if (ttl4tmp<seconds || ttl6tmp<seconds)
+			{
+				// Check and save new dnssec status into cache
+				result = ds_validate(domain, options, optdnssrv, &resaddrs, &ttl4, &ttl6);				
+				if (ttl4!=0) ttl4 = ttl4 + ttlnow;
+				if (ttl6!=0) ttl6 = ttl6 + ttlnow;		
+				printf("Action: UPD | Domain: %s | TTL4: %i | TTL6: %i | Status: %i\n", domain, ttl4, ttl6, result);			
+				update_item_in_cache(domain, resaddrs, ttl4, ttl6, result);   
+				ds_free_resaddrsbuf();
+        return result;
+			}
+			else
+			{	
+				printf("Action: RCA | Domain: %s | TTL4: %i | TTL6: %i | Status: %i\n", domain, ttl4tmp, ttl6tmp, result);
+        return result;
+			}// if TTL4 or TTL6 is invalidate
+		
+  
+  } // cache enable
+  
+  
+  // cache disable
+  else
+  { 
+
+
 
   /* create a rdf from the domain input arg */
   dn = ldns_dname_new_frm_str(domain);
@@ -1307,9 +1393,6 @@ short ds_validate(const char *domain, const uint16_t options,
 
   }
 
-  *ipv4 = retval_ipv4;
-  *ipv6 = retval_ipv6;
-
   /* export resolved addrs buf as static */
   if (resaddrs) {
     *resaddrs = ldns_buffer_export(addrsbuf);
@@ -1322,6 +1405,8 @@ short ds_validate(const char *domain, const uint16_t options,
     printf(DEBUG_PREFIX "Returned value (overall/ipv4/ipv6): \"%d/%d/%d\"\n",
            retval, retval_ipv4, retval_ipv6);
   }
+
+}// cache disable
 
 
 closure:
@@ -1343,122 +1428,61 @@ closure:
 short dnssec_validate(char *domain, const uint16_t options,
                   char *optdnssrv, char *resaddrs, bool cache) {
 	  
-    short ipv4, ipv6, ipv4tmp, ipv6tmp, result = NPAPI_EXIT_FAILED;
+    short result = NPAPI_EXIT_FAILED;
     uint32_t ttl4tmp, ttl4, ttl6, ttl6tmp, ttlnowout = 0;
-    char * resaddrstmp = "";
     
-    
-    /* check input args */
-    if (!domain) return result;
-  
-
-    /* options init */
-    ds_init_opts(options);
-    
-    //print_items();
-    if (opts.cache_en) {
+    if (cache) {
      
 	  time_t seconds;
 		seconds = time (NULL);
 		unsigned int ttlnow   =  (unsigned int)(seconds);
 		// for debug
 		ttlnowout = ttlnow;
-		if (opts.debug) printf("TIME: %i\n", ttlnowout);	
+		printf("TIME: %i\n", ttlnowout);	
 		// Is item in cache?
 		result = find_in_cache(domain);
-		if (result!=NO_ITEM_IN_CACHE)
-		{   
-       if (!opts.resolvipv4 && opts.resolvipv6)
-        {
-       	   ttl6tmp = get_item_ttl6(domain);
-           ipv6tmp = get_item_ipv6(domain);
-           resaddrstmp = get_item_resaddrs(domain);
-           if (ttl6tmp<seconds)
-       			 {
-				      // Check and save new dnssec status into cache
-				      result = ds_validate(domain, options, optdnssrv, &resaddrs, &ttl4, &ttl6, &ipv4, &ipv6);								      
-				      if (ttl6!=0) ttl6 = ttl6 + ttlnow;		
-				      if (opts.debug) printf("Action: UPD | Domain: %s | TTL4: %i | TTL6: %i | IPv4: %i | IPv6: %i | Overall: %i\n", domain, ttl4, ttl6, ipv4, ipv6, result);			
-				      update_item_in_cache6(domain, resaddrs, ttl6, ipv6);   
-				      ds_free_resaddrsbuf();
-              return ipv6; 
-			        }
-			       else
-			       {	
-              if (opts.debug) printf("Action: RCA6 | Domain: %s | TTL6: %i | IPv6: %i | Overall: %i\n", domain, ttl6tmp, ipv6tmp, result);
-              return ipv6tmp; 
-			       }// if TTL6    
-       }//IPv6
-       
-       else if (opts.resolvipv4 && !opts.resolvipv6) 
-       {
-          ttl4tmp = get_item_ttl4(domain);
-          ipv4tmp = get_item_ipv4(domain);
-          resaddrstmp = get_item_resaddrs(domain);
-           if (ttl4tmp<seconds)
-       			 {
-				      // Check and save new dnssec status into cache
-				      result = ds_validate(domain, options, optdnssrv, &resaddrs, &ttl4, &ttl6, &ipv4, &ipv6);								      
-				      if (ttl4!=0) ttl4 = ttl4 + ttlnow;		
-				      if (opts.debug) printf("Action: UPD | Domain: %s | TTL4: %i | TTL6: %i | IPv4: %i | IPv6: %i | Overall: %i\n", domain, ttl4, ttl6, ipv4, ipv6, result);			
-				      update_item_in_cache4(domain, resaddrs, ttl4, ipv4);   
-				      ds_free_resaddrsbuf();
-              return ipv4; 
-			        }
-			       else
-			       {	
-              if (opts.debug) printf("Action: RCA4 | Domain: %s | TTL4: %i | IPv4: %i | Overall: %i\n", domain, ttl4tmp, ipv4tmp, result);
-              return ipv4tmp; 
-			       }// if TTL4  
-        } // IPv4
-       
-       else {
-          ttl4tmp = get_item_ttl4(domain);
- 		      ttl6tmp = get_item_ttl6(domain);
-          ipv4tmp = get_item_ipv4(domain);
-	 	      ipv6tmp = get_item_ipv6(domain);
-          resaddrstmp = get_item_resaddrs(domain);
-          if (ttl4tmp<seconds || ttl6tmp<seconds)
-       			 {
-				      // Check and save new dnssec status into cache
-				      result = ds_validate(domain, options, optdnssrv, &resaddrs, &ttl4, &ttl6, &ipv4, &ipv6);				
-				      if (ttl4!=0) ttl4 = ttl4 + ttlnow;
-				      if (ttl6!=0) ttl6 = ttl6 + ttlnow;		
-				      if (opts.debug) printf("Action: UPD | Domain: %s | TTL4: %i | TTL6: %i | IPv4: %i | IPv6: %i | Overall: %i\n", domain, ttl4, ttl6, ipv4, ipv6, result);			
-				      update_item_in_cache(domain, resaddrs, ttl4, ttl6, ipv4, ipv6, result);   
-				      ds_free_resaddrsbuf();
-              return result; 
-			        }
-			       else
-			       {	
-              if (opts.debug) printf("Action: RCA | Domain: %s | TTL4: %i | TTL6: %i | IPv4: %i | IPv6: %i | Overall: %i\n", domain, ttl4tmp, ttl6tmp, ipv4tmp, ipv6tmp, result);
-              return result; 
-			       }// if TTL4 or TTL6 is invalidate
-           }  // IPv4 IPv6		
-		} // item is in cache
+		if (result!=-2)
+		{   				
+			ttl4tmp = get_item_ttl4(domain);
+			ttl6tmp = get_item_ttl6(domain);
+
+			// TTL4 or TTL6 is invalidate
+			if (ttl4tmp<seconds || ttl6tmp<seconds)
+			{
+				// Check and save new dnssec status into cache
+				result = ds_validate(domain, options, optdnssrv, &resaddrs, &ttl4, &ttl6);				
+				if (ttl4!=0) ttl4 = ttl4 + ttlnow;
+				if (ttl6!=0) ttl6 = ttl6 + ttlnow;		
+				printf("Action: UPD | Domain: %s | TTL4: %i | TTL6: %i | Status: %i\n", domain, ttl4, ttl6, result);			
+				update_item_in_cache(domain, resaddrs, ttl4, ttl6, result);   
+				ds_free_resaddrsbuf();
+        return result;
+			}
+			else
+			{	
+				printf("Action: RCA | Domain: %s | TTL4: %i | TTL6: %i | Status: %i\n", domain, ttl4tmp, ttl6tmp, result);
+        return result;
+			}// if TTL4 or TTL6 is invalidate
+		
+		}
+		
 		else
 		{
 			// ADD item into cache
-			result = ds_validate(domain, options, optdnssrv, &resaddrs, &ttl4, &ttl6, &ipv4, &ipv6);			
+			result = ds_validate(domain, options, optdnssrv, &resaddrs, &ttl4, &ttl6);			
 			if (ttl4!=0) ttl4 = ttl4 + ttlnow;
 			if (ttl6!=0) ttl6 = ttl6 + ttlnow;			
-			if (opts.debug) printf("Action: ADD | Domain: %s | TTL4: %i | TTL6: %i | IPv4: %i | IPv6: %i | Overall: %i\n", domain, ttl4, ttl6, ipv4, ipv6, result);	
-			add_to_cache(domain, resaddrs, ttl4, ttl6, ipv4, ipv6, result);
+			printf("Action: ADD | Domain: %s | TTL4: %i | TTL6: %i | Status: %i\n", domain, ttl4, ttl6, result);
+			add_to_cache(domain, resaddrs, ttl4, ttl6, result);
 			ds_free_resaddrsbuf();
-	    if (!opts.resolvipv4 && opts.resolvipv6) return ipv6; /* 0 1 */               
-      else if (opts.resolvipv4 && !opts.resolvipv6) return ipv4;/* 1 0 */
-      else return result; 
-		} //item is not in cache;                  
-   }//cache enable
+	    return result;
+		} //if FindItemInCache;                  
+   }//cache
    else
-   {   
-      if (!opts.resolvipv4 && opts.resolvipv6) {           
-        result = ds_validate(domain, options, optdnssrv, &resaddrs, &ttl4, &ttl6, &ipv4, &ipv6);
-        return ipv6;
-
-      } else if (opts.resolvipv4 && !opts.resolvipv6) {      
-        result = ds_validate(domain, options, optdnssrv, &resaddrs, &ttl4, &ttl6, &ipv4, &ipv6);
-        return ipv4;
-      } else return ds_validate(domain, options, optdnssrv, &resaddrs, &ttl4, &ttl6, &ipv4, &ipv6);
-   } //cache disable        
+   {
+   result = ds_validate(domain, options, optdnssrv, &resaddrs, &ttl4, &ttl6);
+   ds_free_resaddrsbuf();
+	 return result;
+   }   
+        
 }
