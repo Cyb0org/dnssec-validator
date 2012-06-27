@@ -34,7 +34,7 @@ sys_windows_pre:
 	rm -rf $(PLUGIN_NAME_DLL) $(PLUGIN_ROOT)/build $(PLUGIN_TMP)
 	mkdir $(PLUGIN_NAME_DLL) && mkdir $(PLUGIN_TMP)
 	$(X86_MINGW_CC) -Wall -shared -o $(PLUGIN_TMP)/ds_windows-x86.dll $(PLUGIN_ROOT)/projects/$(PLUGIN_NAME)/cache/ds.c -DRES_WIN -D__USE_MINGW_ANSI_STDIO=1 -I$(PLUGIN_ROOT)/lib/windows/x86 -I$(PLUGIN_ROOT)/lib/ldns -I$(PLUGIN_ROOT)/lib/openssl/include -Wl,--output-def,$(PLUGIN_TMP)/ds_windows-x86.def,-L$(PLUGIN_ROOT)/lib/windows/x86,-Bstatic,-lldns,-Bsymbolic,-lcrypto,-Bdynamic,-lws2_32,-liphlpapi,-lgdi32
-	cp $(PLUGIN_TMP)/ds_windows-x86.dll $(PLUGIN_NAME_DLL)/
-  cp $(PLUGIN_TMP)/ds_windows-x86.def $(PLUGIN_NAME_DLL)/
+	cp $(PLUGIN_TMP)/ds_windows-x86.dll $(PLUGIN_NAME_DLL)
+	cp $(PLUGIN_TMP)/ds_windows-x86.def $(PLUGIN_NAME_DLL)
 	$(X86_MINGW_STRIP) -x -S $(PLUGIN_NAME_DLL)/ds_windows-x86.dll
 	@echo '### Now you can build the plugin on Windows... ###'
