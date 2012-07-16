@@ -202,7 +202,9 @@
             }
 
             var resolver = this.getResolver();
-            var domain = tab.url.match(/^[\w-]+:\/*\[?([\w\.:-]+)\]?(?::\d+)?/)[1]; /**/
+            //Old regular expresion with port number 
+            //var domain = tab.url.match(/^[\w-]+:\/*\[?([\w\.:-]+)\]?(?::\d+)?/)[1]; /**/
+            var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1]; /**/
             var plugin = document.getElementById("dnssec-plugin");
             var result = plugin.Validate(domain, 
                                             this.dnssecExtNPAPIConst.NPAPI_INPUT_FLAG_RESOLVIPV4 | 
