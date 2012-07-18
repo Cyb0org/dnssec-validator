@@ -6,12 +6,12 @@ SetCompressor /solid /final lzma
 !include MUI2.nsh
 !include "FileFunc.nsh"
 
-!define VERSION "0.2.1"
-!define QUADVERSION "0.0.2.1"
+!define VERSION "1.0"
+!define QUADVERSION "1.0.0.0"
 !define guid '{669695BC-A811-4A9D-8CDF-BA8C795F261C}'
 
-outFile "dnssec-validator-IE-pre.${VERSION}-setup.exe"
-Name "DNSSEC Validator plugin for IE"
+outFile "dnssec-validator-IE-${VERSION}-setup.exe"
+Name "DNSSEC Validator plugin for IE 1.0"
 
 # default install directory
 installDir "$PROGRAMFILES\CZ.NIC\DNSSEC Validator"

@@ -77,8 +77,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,2,1
- PRODUCTVERSION 0,2,1
+ FILEVERSION 1,0
+ PRODUCTVERSION 1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -95,12 +95,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "CZ.NIC Labs"
             VALUE "FileDescription", "DNSSEC Validator for IE\0"
-            VALUE "FileVersion", "0,2,1\0"
+            VALUE "FileVersion", "1,0\0"
             VALUE "InternalName", "IEdnssec.dll\0"
             VALUE "LegalCopyright", "Copyright 2012\0"
             VALUE "OriginalFilename", "IEdnssec.dll\0"
             VALUE "ProductName", "DNSSEC Validator for IE\0"
-            VALUE "ProductVersion", "0,2,1\0"
+            VALUE "ProductVersion", "1,0\0"
             VALUE "OLESelfRegister", "\0"
         END
     END
@@ -127,7 +127,7 @@ BEGIN
     LTEXT           "DNSSEC Validator for Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Add-on plugin for DNSSEC checking",IDC_STATIC,50,30,180,10
     LTEXT           "Support browsers: 32-bit version of IE6, IE7, IE8, IE9",IDC_STATIC,50,40,180,10
-    LTEXT           "Prerelease version 0.2.1", IDC_STATIC,50,50,180,10
+    LTEXT           "Release version 1.0", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
 	LTEXT           "https://labs.nic.cz/page/1031/", IDC_LINK,10,95,120,10
@@ -421,8 +421,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,2,1
- PRODUCTVERSION 0,2,1
+ FILEVERSION 1,0
+ PRODUCTVERSION 1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -439,12 +439,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "CZ.NIC Labs"
             VALUE "FileDescription", "DNSSEC Validátor pro IE\0"
-            VALUE "FileVersion", "0,2,1\0"
+            VALUE "FileVersion", "1.0\0"
             VALUE "InternalName", "IEdnssec.dll\0"
             VALUE "LegalCopyright", "Copyright 2012\0"
             VALUE "OriginalFilename", "IEdnssec.dll\0"
             VALUE "ProductName", "DNSSEC Validátor pro IE\0"
-            VALUE "ProductVersion", "0,2,1\0"
+            VALUE "ProductVersion", "1.0\0"
             VALUE "OLESelfRegister", "\0"
         END
     END
@@ -640,7 +640,7 @@ BEGIN
     LTEXT           "DNSSEC Validátor pro Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Zásuvný plugin pro kontrolu DNSSEC",IDC_STATIC,50,30,180,10
     LTEXT           "Podporované prohlížeèe: 32-bit verze IE6, IE7, IE8, IE9",IDC_STATIC,50,40,180,10
-    LTEXT           "Prerelease verze 0.2.1", IDC_STATIC,50,50,180,10
+    LTEXT           "Release verze 1.0", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
 	LTEXT           "https://labs.nic.cz/page/1031/", IDC_LINK,10,95,120,10
@@ -771,8 +771,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,2,1
- PRODUCTVERSION 0,2,1
+ FILEVERSION 1,0
+ PRODUCTVERSION 1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -789,12 +789,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "CZ.NIC Labs"
             VALUE "FileDescription", "DNSSEC Validator für IE\0"
-            VALUE "FileVersion", "0,2,1\0"
+            VALUE "FileVersion", "1,0\0"
             VALUE "InternalName", "IEdnssec.dll\0"
             VALUE "LegalCopyright", "Copyright 2012\0"
             VALUE "OriginalFilename", "IEdnssec.dll\0"
             VALUE "ProductName", "DNSSEC Validator für IE\0"
-            VALUE "ProductVersion", "0,2,1\0"
+            VALUE "ProductVersion", "1,0\0"
             VALUE "OLESelfRegister", "\0"
         END
     END
@@ -821,7 +821,7 @@ BEGIN
     LTEXT           "DNSSEC Validator für Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Add-on für DNSSEC Validierung",IDC_STATIC,50,30,180,10
     LTEXT           "Unterstützte Versionen: 32-bit Versionen von IE6, IE7, IE8, IE9",IDC_STATIC,50,40,180,10
-    LTEXT           "Pre-release Version 0.2.1", IDC_STATIC,50,50,180,10
+    LTEXT           "Release Version 1.0", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
 	LTEXT           "https://labs.nic.cz/page/1031/", IDC_LINK,10,95,120,10
