@@ -386,13 +386,13 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 									::GetDlgItemText(hwndDlg, IDC_EDIT, chText, 100);
 									char* szVal=(char*)chText;
 									
-									if (ValidateIP(szVal)) WritePrivateProfileString("DNSSEC", "userip", szVal, szPath);
-									else
-									{ if (lang==0x0405) msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Neplatná adresa IPv4 nebo IPv6!\nIP adresa nebude uložena.", (LPCWSTR)L"Neplatná adresa IP", MB_OK | MB_ICONERROR);
-										 else if (lang==0x0407) msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Ungültige IPv4-Adresse oder IPv6-Adresse!\nIP-Adresse werden nicht gespeichert.", (LPCWSTR)L"Ungültige IP-Adresse", MB_OK | MB_ICONERROR);
-										 else msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Invalid IPv4 or IPv6 format!\nThe IP address will not set.", (LPCWSTR)L"Invalid IP format", MB_OK | MB_ICONERROR);
+									if (!ValidateIP(szVal)) 									
+									{ if (lang==0x0405) msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Neplatná IPv4 nebo IPv6 adresa!\nNovì zadaná hodnota bude uložena ale nemusí být použita!\nProsím, zadejte znova správnou IP adresu resolveru.", (LPCWSTR)L"Neplatný formát zadané IP adresy", MB_OK | MB_ICONERROR);
+										 else if (lang==0x0407) msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Ungültige IPv4-Adresse oder IPv6-Adresse!\nDie neu angegebene wird gespeichert, muss aber nicht benutzt werden!\nGeben sie bitte eine richtige IP-Adresse eines Resolvers ein...", (LPCWSTR)L"Ungültige IP-Adresse", MB_OK | MB_ICONERROR);
+										 else msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Invalid IPv4 or IPv6 format!\nThe new value will be stored but may not be used!\nPlease, can you set valid IP address of resolver again...", (LPCWSTR)L"Invalid IPv4 or Ipv6 format", MB_OK | MB_ICONERROR);
 	
-									} // if 																																																
+									} // if
+									WritePrivateProfileString("DNSSEC", "userip", szVal, szPath);
 								}// id IsDlgButtonChecked
 								choice = dwVal;
 								if (dwVal==2) WritePrivateProfileString("DNSSEC", "choice", "2", szPath);
@@ -525,7 +525,7 @@ LRESULT CKBToolBarCtrl::DialogProcAbout(HWND hwndDlg, UINT uMsg, WPARAM wParam, 
 	case WM_INITDIALOG:
         {		
 			// conver text to hyperlink
-			m_link.ConvertStaticToHyperlink(hwndDlg, IDC_LINK, _T("https://labs.nic.cz/page/1031/"));
+			m_link.ConvertStaticToHyperlink(hwndDlg, IDC_LINK, _T("http://www.dnssec-validator.cz/ie/"));
         break;
 		}	
 	
@@ -671,37 +671,84 @@ LRESULT CKBToolBarCtrl::DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam,
 	return (INT_PTR)FALSE;
 }
 
+
 /**************************************************************************/
-// Validation of IPv4, Validation of IPv6
+// Test on IPv4 or IPv6 
 /**************************************************************************/
-bool CKBToolBarCtrl::ValidateIP(char *ipadd)
-{
-	//struct in6_addr serveraddr;
-	//int rc;
-	char tmp[128];
+bool CKBToolBarCtrl::isip6(char *ipadd){
+
+	char tmp[50];
 	char * pch;
 	strcpy_s(tmp, ipadd);
     if (strcmp(tmp,"")==0) return 0;
 	pch=strchr(tmp,':');
-	if (pch!=NULL){
-		// IPv6
-		if (strlen(tmp) < 3) return 0;
-		if (strlen(tmp) > 40) return 0;
-		return 1;
-	} 
-	
-	else  
-	{
+	if (pch!=NULL) return 1;
+	else return 0;
+}
+
+/**************************************************************************/
+// Validation of IPv4 
+/**************************************************************************/
+bool CKBToolBarCtrl::ValidateIP4(char *ipadd)
+{
 		// IPv4
 		unsigned b1, b2, b3, b4;
 		unsigned char c;
-
 		if (sscanf_s(ipadd, "%3u.%3u.%3u.%3u%c", &b1, &b2, &b3, &b4, &c) != 4) return 0;
 		if ((b1 | b2 | b3 | b4) > 255) return 0;
 		if (strspn(ipadd, "0123456789.") < strlen(ipadd)) return 0;
-
 		return 1;
-
-	}
 }
 
+/**************************************************************************/
+// Simple validation of IPv6
+/**************************************************************************/
+bool CKBToolBarCtrl::ValidateIP6(char *ipadd)
+{
+	char tmp[50];
+	strcpy_s(tmp, ipadd);
+
+	if (strlen(tmp) < 3) return 0;
+	if (strlen(tmp) > 40) return 0;
+	return 1;
+}
+
+
+/**************************************************************************/
+// Validation of IPv4, Validation of IPv6
+/**************************************************************************/
+// Validate of IPv4 and IPv6 addresses
+// return 1 if all addresses are valid else 0
+bool CKBToolBarCtrl::ValidateIP(char *ip)
+{
+	const char delimiters[] = " ";
+    char *token;
+    bool  is = false;
+	int i;
+	char* context	= NULL;
+	char ipadd[100];
+	int retval = 0;
+	if (ip==NULL) return 0;
+	if ((ip!=NULL) && (*ip=='\0')) return 0;
+	strcpy_s(ipadd, ip);
+    i = 1;
+	if ((strcmp ((const char*)ipadd,"") != 0) || (strcmp ((const char*)ipadd," ") != 0))
+      {
+        token = strtok_s(ipadd, delimiters, &context);
+        if (token==NULL) return 1;
+        if (isip6(token)) is = ValidateIP6(token);
+		else is = ValidateIP4(token);
+        if (!is) return 0;
+        while (token != NULL) {                    
+            i++;
+			token = strtok_s(NULL, delimiters,&context);
+			if (token != NULL) {
+				if (isip6(token)) is = ValidateIP6(token);
+					else is = ValidateIP4(token);			
+			}
+        if (!is) return 0;                 
+        }
+        return 1;        
+     }
+   return 0;
+}

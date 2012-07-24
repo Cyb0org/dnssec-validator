@@ -72,6 +72,9 @@ public:
 	static LRESULT CALLBACK DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	STDMETHOD(TranslateAcceleratorIO)(LPMSG pMsg);
 	static bool CKBToolBarCtrl::ValidateIP(char *ipadd);
+	static bool CKBToolBarCtrl::isip6(char *ipadd);
+	static bool CKBToolBarCtrl::ValidateIP4(char *ipadd);
+	static bool CKBToolBarCtrl::ValidateIP6(char *ipadd);
 	void OnTbnDropDown(NMHDR *pNMHDR, LRESULT *pResult);
 private:             ///< the hyperlink used in the 		 
 		 // Implementation

@@ -130,7 +130,7 @@ BEGIN
     LTEXT           "Release version 1.0", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
-	LTEXT           "https://labs.nic.cz/page/1031/", IDC_LINK,10,95,120,10
+	LTEXT           "http://www.dnssec-validator.cz/ie/", IDC_LINK,10,95,120,10
 END
 
 
@@ -643,7 +643,7 @@ BEGIN
     LTEXT           "Release verze 1.0", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
-	LTEXT           "https://labs.nic.cz/page/1031/", IDC_LINK,10,95,120,10
+	LTEXT           "http://www.dnssec-validator.cz/ie/", IDC_LINK,10,95,120,10
 END
 
 
@@ -824,7 +824,7 @@ BEGIN
     LTEXT           "Release Version 1.0", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
-	LTEXT           "https://labs.nic.cz/page/1031/", IDC_LINK,10,95,120,10
+	LTEXT           "http://www.dnssec-validator.cz/ie/", IDC_LINK,10,95,120,10
 END
 
 

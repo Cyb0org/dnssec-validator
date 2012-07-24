@@ -46,7 +46,7 @@ extern "C" {					// use C language linkage
 #define TB_MIN_SIZE_Y   22
 #define TB_MAX_SIZE_Y   40
 #define MAX_STR_LEN		1024
-#define IPADDR_MLEN 64
+#define IPADDR_MLEN 256
 #define KEYTEXT				0
 #define RESOLVER			0
 #define RESOLVER2			0
