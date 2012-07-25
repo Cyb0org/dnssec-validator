@@ -342,7 +342,7 @@ BEGIN
 	IDS_STATE9_TEXT_MAIN	"Your computer is not secured by DNSSEC for this particular domain, so you are not secured against domain name spoofing."
 
 	IDS_IP_MATCH_TEXT_NO    ""
-	IDS_IP_MATCH_TEXT      "Note: The IP address which the browser is using differs from the address which the DNSSEC add-on has resolved. Several webpages use multiple IP adrresses to optimise their workload. In several cases, however, can such behaviour point at a DNS spoofing attempt."
+	IDS_IP_MATCH_TEXT      "Note: The IP address which the browser is using differs from the address which the DNSSEC add-on has resolved. Several webpages use multiple IP adrresses to optimise their workload. In some cases, however, can such behaviour point at a DNS spoofing attempt."
 	
 	IDS_NONE                " "
     IDS_ADDON_INIT          "Add-on initialized"

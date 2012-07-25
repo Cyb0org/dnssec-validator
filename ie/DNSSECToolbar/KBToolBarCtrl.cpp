@@ -192,7 +192,7 @@ void CKBToolBarCtrl::OnTbnDropDown(NMHDR *pNMHDR, LRESULT *pResult)
 						break;
 					}
 					case ID_HOME : { 
-						m_pBand->webBrowser2->Navigate(L"https://labs.nic.cz/page/1031/", &varEmpty, &varEmpty, &varEmpty, &varEmpty);
+						m_pBand->webBrowser2->Navigate(L"http://www.dnssec-validator.cz/ie/", &varEmpty, &varEmpty, &varEmpty, &varEmpty);
 						break;
 					}
 				}
@@ -387,9 +387,9 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 									char* szVal=(char*)chText;
 									
 									if (!ValidateIP(szVal)) 									
-									{ if (lang==0x0405) msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Neplatná IPv4 nebo IPv6 adresa!\nNovì zadaná hodnota bude uložena ale nemusí být použita!\nProsím, zadejte znova správnou IP adresu resolveru.", (LPCWSTR)L"Neplatný formát zadané IP adresy", MB_OK | MB_ICONERROR);
+									{ if (lang==0x0405) msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Neplatná IPv4 nebo IPv6 adresa!\nNovì zadaná hodnota bude uložena ale nemusí být použita.\nProsím, zadejte znova správnou IP adresu resolveru.", (LPCWSTR)L"Neplatný formát zadané IP adresy", MB_OK | MB_ICONERROR);
 										 else if (lang==0x0407) msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Ungültige IPv4-Adresse oder IPv6-Adresse!\nDie neu angegebene wird gespeichert, muss aber nicht benutzt werden!\nGeben sie bitte eine richtige IP-Adresse eines Resolvers ein...", (LPCWSTR)L"Ungültige IP-Adresse", MB_OK | MB_ICONERROR);
-										 else msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Invalid IPv4 or IPv6 format!\nThe new value will be stored but may not be used!\nPlease, can you set valid IP address of resolver again...", (LPCWSTR)L"Invalid IPv4 or Ipv6 format", MB_OK | MB_ICONERROR);
+										 else msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Invalid IPv4 or IPv6 format!\nYour input will be stored, but invalid values will be skipped during resolving.\nPlease check and fix your input to avoid potential problems...", (LPCWSTR)L"Invalid IPv4 or Ipv6 format", MB_OK | MB_ICONERROR);
 	
 									} // if
 									WritePrivateProfileString("DNSSEC", "userip", szVal, szPath);
@@ -501,6 +501,11 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 					cache_del = 1;		
 					}
 					break;
+				case IDC_EDIT:
+					{					
+					cache_del = 1;		
+					}
+					break;
 				case IDC_COMBO:
 					{					
 					cache_del = 1;		
@@ -578,7 +583,8 @@ LRESULT CKBToolBarCtrl::DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam,
 			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST4),strbuf);
 
 			// load and print addtext from resources
-			if (paneltextip==0)
+			//ATLTRACE("DialogProcAbout %i\n",keylogo);
+			if ((paneltextip==0) && (err!=6))
 			{
 				LoadStringA(GHins, paneltext, strbuf, STR_BUF_S);
 				strncat_s(strbuf2, strbuf, STR_BUF_S*2);			

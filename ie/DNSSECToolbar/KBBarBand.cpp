@@ -58,6 +58,7 @@ WORD panelpostdomain  = 0;
 WORD paneltext  = 0;
 short paneltextip  = 1;
 short keylogo  = 0;
+int err = 0;
 // key state memory
 int state;
 // url address memory
@@ -299,8 +300,36 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 					bool visible = !!(dwFlags & OLECMDIDF_WINDOWSTATE_USERVISIBLE);
 					//LoadOptionsFromRegistry();
 					LoadOptionsFromFile();
-					RefreshIcon2();
+				BSTR BURL2 = L"";
+				HRESULT hrs = webBrowser2->get_LocationURL(&BURL2);
+				char * predomain4 =_com_util::ConvertBSTRToString(BURL2);
+				char * temp= (char*)malloc(2083*sizeof(char));
+				if (strcmp(predomain4,"about:Tabs")==0 || strcmp(predomain4,"about:Blank")==0 || strcmp(predomain4,"about:blank")==0 || strcmp(predomain4,"javascript:false;")==0) 
+				{
+				ldicon = GetBitmapIndex(IDI_ICON_KEY_GREY1);						
+				keylogo=ldicon;
+				RefreshIcon2();
+				
+				}
+				else
+				{
+				/*temp = UrlToDomain(predomain4);
+					if (strcmp(temp,urladdr)==0)
+					{
+						ldicon = state;
+						RefreshIcon2();
+					}
+					else
+					{
+					*/
+				    bstrUrlName = BURL2; 
+					DnssecStatus();
+					//urladdr = temp;
+					state = ldicon;
 					keylogo=ldicon;
+					/*}*/
+				}
+	
 					}
 				}
 			} break;
@@ -351,8 +380,9 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 				if (strcmp(predomain4,"about:Tabs")==0 || strcmp(predomain4,"about:Blank")==0 || strcmp(predomain4,"about:blank")==0 || strcmp(predomain4,"javascript:false;")==0) 
 				{
 				ldicon = GetBitmapIndex(IDI_ICON_KEY_GREY1);						
-				RefreshIcon2();
 				keylogo=ldicon;
+				RefreshIcon2();
+				
 				}
 				else
 				{
@@ -765,7 +795,7 @@ void CKBBarBand::SetSecurityStatus()
 		titext = IDS_DNSSEC_ERROR_FAIL;
 		break;
 	}// switch
-	
+	err = ldicon;
 	paneltitle  = tiicontitle;
 	panelpredonain  = tipref;
 	paneldomainname = domain;

@@ -86,6 +86,7 @@ extern WORD panelpostdomain;
 extern WORD paneltext;
 extern short paneltextip;
 extern short keylogo;
+extern int err;
 // variable for IE version check
 extern int iRes,iMajor,iMinor;
 //#if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
