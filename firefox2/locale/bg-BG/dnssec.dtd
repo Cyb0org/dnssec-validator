@@ -1,0 +1,35 @@
+<!-- ***** BEGIN LICENSE BLOCK *****
+Copyright 2011 CZ.NIC, z.s.p.o.
+
+Translators: Iliya Bazlyankov <iliya.bazlyankov@uninet.bg>
+
+This file is part of DNSSEC Validator Add-on.
+
+DNSSEC Validator Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC Validator Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** -->
+
+<!ENTITY dnssec.securedLabel "Защитен от DNSSEC">
+<!ENTITY dnssec.unsecuredLabel "Незащитен от DNSSEC">
+<!ENTITY dnssec.bogusLabel "Неверный подписи DNSSEC">
+<!ENTITY dnssec.errorLabel "ошибка DNSSEC">
+<!ENTITY dnssec.preferences.label "о плагине...">
+<!ENTITY dnssec.preferences.accesskey "о">
+<!ENTITY dnssec.home.label "домашняя страница...">
+<!ENTITY dnssec.home.accesskey "д">
+<!ENTITY dnssec.preferences.label "Настройки...">
+<!ENTITY dnssec.preferences.accesskey "Н">
+<!ENTITY dnssec.button "подробнее info">
+<!ENTITY dnssec.button.accesskey "i">
+<!ENTITY dnssec.homepage "Перейти на главную страницу для получения дополнительной информации добавить">
+<!ENTITY dnssec.fwdLabel "Примечание: текущая настройка браузер не поддерживает технологию DNSSEC арбитр...">

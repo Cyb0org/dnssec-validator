@@ -1,0 +1,38 @@
+// kbbar.idl : IDL source for kbbar.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (kbbar.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+	[
+		object,
+		uuid(38493F7F-2922-4C6C-9A9A-8DA2C940D0EE),
+		dual,
+		helpstring("IkbbarBand Interface"),
+		pointer_default(unique)
+	]
+	interface IKBBarBand : IDispatch
+	{
+	};
+
+[
+	uuid(3277CD27-4001-4EF8-9D96-C6CA745AC2F9),
+	version(1.0),
+	helpstring("kbbar 1.0 Type Library")
+]
+library KBBarLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(669695BC-A811-4A9D-8CDF-BA8C795F261C),
+		helpstring("KBBarBand Class")
+	]
+	coclass KBBarBand
+	{
+		[default] interface IKBBarBand;
+	};
+};

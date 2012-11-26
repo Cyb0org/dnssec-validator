@@ -1,0 +1,33 @@
+{
+   "background": {
+     "scripts": [ "background.js" ]
+   },
+   "default_locale": "en",
+   "description": "Shows DNSSEC status",
+   "icons": {
+      "128": "icon.png",
+      "32": "icon.png",
+      "48": "icon.png"
+   },
+   "name": "DNSSEC Validator",
+   "options_page": "options.html?4,0,8.8.8.8",
+   "page_action": {
+      "default_icon": "icon_action.gif",
+      "default_title": "DNSSEC Validator",
+      "popup": "popup.html"
+   },
+   "manifest_version": 2,
+   "minimum_chrome_version": "18",
+   "permissions": [ "tabs", "webRequest", "*://*/*" ],
+   "plugins": [ {
+      "path": "npDNSSECValidatorPlugin_x86.so"
+    }, {
+      "path": "npDNSSECValidatorPlugin_x64.so"
+     }, {
+      "path": "DNSSECValidatorPlugin.plugin"
+    }, {
+      "path": "npDNSSECValidatorPlugin.dll"
+   } ],
+   "update_url": "http://clients2.google.com/service/update2/crx",
+   "version": "2.0"
+}

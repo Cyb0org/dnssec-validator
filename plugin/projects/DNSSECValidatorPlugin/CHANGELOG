@@ -1,9 +1,0 @@
-v1.0.2 / 19.05.2011
-- Plugin project has been renamed
-- Added GPL license file
-
-v1.0.1 / 16.02.2011
-- Plugin is accessible in privileged (chrome) mode only
-
-v1.0.0 / 21.01.2011
-- Added x86_64 arch support on Mac OS X; removed support for ppc

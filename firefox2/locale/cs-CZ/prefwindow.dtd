@@ -1,0 +1,35 @@
+<!-- ***** BEGIN LICENSE BLOCK *****
+Copyright 2010 CZ.NIC, z.s.p.o.
+
+Translators: Zbynek Michl <zbynek.michl@nic.cz>
+
+This file is part of DNSSEC Validator Add-on.
+
+DNSSEC Validator Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC Validator Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** -->
+
+<!ENTITY prefwindow.title "Nastavení validátoru">
+<!ENTITY groupboxdnsserver.label "Nastavení resolveru">
+<!ENTITY radiogroupdnsserver.label "DNS resolver(y) používané pro překlad jmen:">
+<!ENTITY radiodnsserversystem.label "Načíst ze systému">
+<!ENTITY radiodnsserversystem.accesskey "N">
+<!ENTITY radiodnsserverpreset.label "DNSSEC validující resolvery:">
+<!ENTITY radiodnsserverpreset.accesskey "D">
+<!ENTITY menuitemdnsservercznic.label "CZ.NICu">
+<!ENTITY menuitemdnsserveroarc.label "OARCu">
+<!ENTITY radiodnsserveropt.label "Vlastní:">
+<!ENTITY radiodnsserveropt.accesskey "V">
+<!ENTITY radiodnsserverunbound.label "Samovalidace - bez použití resolveru">
+<!ENTITY radiodnsserverunbound.accesskey "S">
+<!ENTITY dnssecbutton.label "Test na podporu DNSSEC">

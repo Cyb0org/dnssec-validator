@@ -1,0 +1,35 @@
+<!-- ***** BEGIN LICENSE BLOCK *****
+Copyright 2012 CZ.NIC, z.s.p.o.
+
+Translators: Martin Straka <martin.straka@nic.cz>
+
+This file is part of DNSSEC Validator Add-on.
+
+DNSSEC Validator Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC Validator Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** -->
+
+<!ENTITY dnssec.securedLabel "Gesichert durch DNSSEC">
+<!ENTITY dnssec.unsecuredLabel "Nicht gesichert durch DNSSEC">
+<!ENTITY dnssec.bogusLabel "Bogus DNSSEC Signatur">
+<!ENTITY dnssec.errorLabel "DNSSEC Status unbekannt">
+<!ENTITY dnssec.about.label "Über...">
+<!ENTITY dnssec.about.accesskey "U">
+<!ENTITY dnssec.home.label "Startseite...">
+<!ENTITY dnssec.home.accesskey "S">
+<!ENTITY dnssec.preferences.label "Einstellungen...">
+<!ENTITY dnssec.preferences.accesskey "E">
+<!ENTITY dnssec.button "Mehr info">
+<!ENTITY dnssec.button.accesskey "M">
+<!ENTITY dnssec.homepage "Zum Plugin Homepage für weitere Informationen">
+<!ENTITY dnssec.fwdLabel "Hinweis: Aktuelle DNS-Server oder Resolver nicht unterstützt DNSSEC-Technologie...">

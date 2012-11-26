@@ -1,0 +1,12 @@
+  const short DNSSEC_EXIT_FAILED                           = 0; /* domain name resolution failed */
+  const short DNSSEC_EXIT_DOMAIN_UNSECURED                 = 1; /* domain is not secured */
+  const short DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP     = 2; /* both domain and connection are secured and IPs matche */
+  const short DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP   = 3; /* both domain and connection are secured and IPs are differ */  
+  const short DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS          = 4; /* domain signature is not valid or COT is not established */
+  const short DNSSEC_EXIT_NODOMAIN_UNSECURED              =  5; /* non-existent domain is not secured */
+  const short DNSSEC_EXIT_NODOMAIN_SIGNATURE_VALID         = 6; /* domain name does not exist and connection are secured */
+  const short DNSSEC_EXIT_NODOMAIN_SIGNATURE_INVALID       = 7; /* domain name does not exist and NSEC/NSEC3 is not valid */
+  const unsigned short DNSSEC_INPUT_FLAG_DEBUGOUTPUT       = 1; /* debug output */
+  const unsigned short DNSSEC_INPUT_FLAG_USEFWD            = 2;
+  const unsigned short  DNSSEC_INPUT_FLAG_RESOLVIPV4       = 4;
+  const unsigned short  DNSSEC_INPUT_FLAG_RESOLVIPV6       = 8;

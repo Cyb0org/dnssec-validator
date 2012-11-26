@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+
+<head>
+    <style>
+        body {
+        font: 0.9em Verdana, Arial, Helvetica; max-width: 43em;
+        min-width:350px;
+        overflow-x:hidden;
+        }
+	td {vertical-align: top; padding-right: 8px; padding-bottom: 10px}
+	.divright {text-align: right}
+	p {font-size: 90%;}
+    </style>
+</head>
+
+<body>	
+    <table>
+    	<tr>
+	  <td><img onclick='DNSSECicon2()' id='dnssec-icon2' src='icon.png' /></td>
+	 <td><strong id="domain-name-title"></strong><br/><strong id="dnssec-title"></strong></td>
+    	</tr>
+    </table>
+    <span id="long-text-domain"></span><span id="domain-name-text"></span><span id="long-text"></span>
+    <p id="dnssec-info"></p>
+    <p><a href="http://www.dnssec-validator.cz" target="blank" id='homepage'></a></p>
+    <script src="popup2.js"></script>
+</body>
+
+</html>
