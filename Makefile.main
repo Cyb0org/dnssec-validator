@@ -1,6 +1,6 @@
-.PHONY: all submodules libs-build plugin prepmake addon-build addon-clean test test-run
+.PHONY: all submodules libs-build
 
-all: libs-build plugin addon-build
+all: libs-build
 
 CFLAGS=-fPIC
 export CFLAGS
@@ -27,46 +27,6 @@ PLUGIN_SOURCE_DIR := $(BASEDIR)/ub_plugin/projects/DNSSECValidatorPlugin
 PLUGIN_BUILD_DIR := $(FIREBREATH_DIR)/build
 # PLUGIN_JSAPI_IDL_DIR := $(PLUGIN_SOURCE_DIR)/JSAPI_IDL
 
-# Few variables to control XPI filename based on platform and version
-ADDON_DIR := addon
-OS_LOWERCASE := $(shell echo $(TARGET_OS) | tr '[:upper:]' '[:lower:]')
-VERSION := $(shell ./extract_version.py $(ADDON_DIR)/install.rdf)
-VERSION_OS_ARCH := $(VERSION)-$(OS_LOWERCASE)_$(XPI_ARCH)
-
-# Different NPAPI plugin names based on OS
-# PLUGIN_BINARY_TREE is necessary because Mac has dirtree structure instead of
-# a single file.
-ifeq ($(TARGET_OS),LINUX)
-    PLUGIN_BINARY := $(PLUGIN_BUILD_DIR)/bin/TLSAfetcher/npTLSAfetcher.so
-    PLUGIN_BINARY_DEBUG := $(PLUGIN_BUILD_DIR)/bin/TLSAfetcher/npTLSAfetcher.so.debug
-    PLUGIN_BINARY_TREE := $(PLUGIN_BINARY)
-    # FireBreath/cmake has no equivalent to autoconf's --target=... except for
-    # CMAKE_OSX_ARCHITECTURES (which works obviously only on Mac).
-    # So, yay! Another workaround.
-    # Note in case it ever becomes necessary: linker has --format flag to
-    # explicitly specify library format, e.g. when passed through gcc:
-    # gcc ... -Wl,--format=elf32-i386 ...
-    # There are also two undocumented CMake variables:
-    # CMAKE_MODULE_LINKER_FLAGS and CMAKE_SHARED_LINKER_FLAGS
-    FIREBREATH_CMAKE_FLAGS := -DCMAKE_CXX_FLAGS="$(LIB_CFLAGS)"
-endif
-ifeq ($(TARGET_OS),MAC)
-    # there is one more FireBreath's prepmake param that might be useful for
-    # compatibility:
-    # -D CMAKE_OSX_DEPLOYMENT_TARGET=10.6 - Set the desired target version of
-    #  Mac OS X
-    PLUGIN_BINARY := $(PLUGIN_BUILD_DIR)/projects/TLSAfetcher/TLSAfetcher.plugin/Contents/MacOS/TLSAfetcher
-    PLUGIN_BINARY_DEBUG := $(PLUGIN_BUILD_DIR)/projects/TLSAfetcher/TLSAfetcher.dSYM
-    PLUGIN_BINARY_TREE := $(PLUGIN_BUILD_DIR)/projects/TLSAfetcher/TLSAfetcher.plugin
-endif
-ifeq ($(TARGET_OS),WINDOWS)
-    PLUGIN_BINARY := $(PLUGIN_BUILD_DIR)/bin/TLSAfetcher/npTLSAfetcher.dll
-    PLUGIN_BINARY_DEBUG := $(PLUGIN_BUILD_DIR)/bin/TLSAfetcher/npTLSAfetcher.dll.debug
-    PLUGIN_BINARY_TREE := $(PLUGIN_BINARY)
-endif
-
-PLUGIN_IDL_COMPILER := $(PLUGIN_JSAPI_IDL_DIR)/JSAPI_IDL_compiler.py
-
 ## uncomment to make plugin build verbose - shows gcc invocations etc.
 #PLUGIN_VERBOSE_BUILD = VERBOSE=1
 
@@ -77,18 +37,21 @@ PLUGIN_CONFIGURATION ?= RelWithDebInfo
 libs-build: submodules libs $(OPENSSL_LIB) $(LDNS_LIB) $(UNBOUND_LIB)
 
 submodules:
+	git clone git://git.nic.cz/dane-libs $(LIBS_SOURCE)
+	git clone https://github.com/firebreath/FireBreath.git ub_plugin/FireBreath
 	git submodule update --init --recursive
 	(cd $(FIREBREATH_DIR) && git checkout $(FIREBREATH_TAG))
 
 libs:
-	mkdir libs
+
+	mkdir ub_plugin/lib
 
 ## openssl
 $(OPENSSL_LIB): $(OPENSSL_DIR)
 	(cd $< && ./Configure no-shared no-krb5 --prefix=$@ $(OPENSSL_ARGS) && make -j1 && make -j1 install)
 
 $(OPENSSL_DIR): $(OPENSSL_TARBALL)
-	tar xzf $< -C libs
+	tar xzf $< -C ub_plugin/lib
 
 ## ldns
 $(LDNS_LIB): $(LDNS_DIR) $(OPENSSL_LIB)
@@ -99,7 +62,7 @@ $(LDNS_LIB): $(LDNS_DIR) $(OPENSSL_LIB)
 	    make install)
 
 $(LDNS_DIR): $(LDNS_TARBALL)
-	tar xzf $< -C libs
+	tar xzf $< -C ub_plugin/lib
 
 ## unbound
 $(UNBOUND_LIB): $(UNBOUND_DIR) $(LDNS_LIB) $(OPENSSL_LIB)
@@ -111,53 +74,7 @@ $(UNBOUND_LIB): $(UNBOUND_DIR) $(LDNS_LIB) $(OPENSSL_LIB)
 	    make install)
 
 $(UNBOUND_DIR): $(UNBOUND_TARBALL)
-	tar xzf $< -C libs
-
-## plugin
-
-# Makefile would complain about circular dependency here
-ifeq ($(TARGET_OS),MAC)
-$(PLUGIN_BINARY_TREE): $(PLUGIN_BINARY)
-	touch $@
-endif
-
-$(PLUGIN_BINARY): plugin
-
-plugin: $(PLUGIN_BUILD_DIR) $(UNBOUND_LIB) $(PLUGIN_JSAPI_IDL_DIR)/TLSAfetcherStructures.cpp $(PLUGIN_JSAPI_IDL_DIR)/TLSAfetcherStructures.h
-	make $(PLUGIN_VERBOSE_BUILD) -C $<
-
-prepmake: $(PLUGIN_JSAPI_IDL_DIR)/TLSAfetcherStructures.cpp $(PLUGIN_JSAPI_IDL_DIR)/TLSAfetcherStructures.h
-	$(FIREBREATH_DIR)/prepmake.sh $(PLUGIN_SOURCE_DIR) -D CMAKE_BUILD_TYPE=$(PLUGIN_CONFIGURATION) $(FIREBREATH_CMAKE_FLAGS) -D XPI_VERSION=$(VERSION)
-
-$(PLUGIN_BUILD_DIR): $(PLUGIN_SOURCE_DIR)/CMakeLists.txt $(PLUGIN_SOURCE_DIR)/PluginConfig.cmake \
-		$(PLUGIN_SOURCE_DIR)/X11/projectDef.cmake $(PLUGIN_SOURCE_DIR)/Mac/projectDef.cmake $(PLUGIN_SOURCE_DIR)/Win/projectDef.cmake \
-		#dependencies end
-		CMAKE_OSX_ARCHITECTURES="$(CMAKE_OSX_ARCHITECTURES)" make -f Makefile.main prepmake
-
-# final 'touch' is to keep Makefile time depedencies
-$(PLUGIN_BINARY_DEBUG): $(PLUGIN_BINARY_TREE)
-ifeq ($(TARGET_OS),LINUX)
-	objcopy --only-keep-debug $(PLUGIN_BINARY) $@
-	strip $<
-	objcopy --add-gnu-debuglink=$@ $(PLUGIN_BINARY)
-endif
-ifeq ($(TARGET_OS),MAC)
-	dsymutil $(PLUGIN_BINARY) -o $@
-	strip -S $(PLUGIN_BINARY)
-endif
-	touch $@
-
-# auto-generated cpp and h for JSAPI structures passed between JS <-> C++
-$(PLUGIN_JSAPI_IDL_DIR)/TLSAfetcherStructures.cpp $(PLUGIN_JSAPI_IDL_DIR)/TLSAfetcherStructures.h: $(PLUGIN_JSAPI_IDL_DIR)/TLSAfetcherStructures.yaml $(PLUGIN_IDL_COMPILER)
-	(cd "$(PLUGIN_JSAPI_IDL_DIR)" && python $(PLUGIN_IDL_COMPILER) $<)
-
-## tests
-# depend on 'plugin' target, not adding explicitly
-test: 
-	make -C tests
-
-test-run: test
-	make -C tests run-tests
+	tar xzf $< -C ub_plugin/lib
 
 ## cleaning
 clean:
@@ -168,8 +85,3 @@ distclean:
 	rm -rf $(PLUGIN_BUILD_DIR)
 	rm -f $(PLUGIN_JSAPI_IDL_DIR)/TLSAfetcherStructures.h $(PLUGIN_JSAPI_IDL_DIR)/TLSAfetcherStructures.cpp
 	rm -rf CMakeCache.txt CMakeFiles/ cmake_install.cmake
-
-README.html: README.md
-	redcarpet $< > $@
-## XPI build rules from separate makefile
-include Makefile.addon
