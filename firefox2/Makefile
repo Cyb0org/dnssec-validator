@@ -33,30 +33,33 @@ X86_MINGW_STRIP = i586-mingw32msvc-strip
 sys_linux:
 	@echo '### Creating package for Linux... ###'
 	rm -rf plugins
+	rm -rf xpi
 	mkdir plugins
+	mkdir xpi
 	cp ../plugins/npDNSSECValidatorPlugin_x64.so plugins
 	cp ../plugins/npDNSSECValidatorPlugin_x86.so plugins
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86_64-gcc3<\/em:targetPlatform><em:targetPlatform>Linux_x86-gcc3<\/em:targetPlatform>/g' install.rdf.template > install.rdf
-	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-linux.xpi
+	./build.sh && mv dnssec.xpi xpi/FF-dnssec_validator-$(EXTENSION_VERSION)-linux.xpi
 	@echo '### Creating package for Windows... ###'
 	rm -rf plugins
 	mkdir plugins
 	cp ../plugins/ub_ds_windows-x86.dll plugins
 	cp ../plugins/npDNSSECValidatorPlugin.dll plugins
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>WINNT_x86-msvc<\/em:targetPlatform>/g' install.rdf.template > install.rdf
-	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-windows.xpi
+	./build.sh && mv dnssec.xpi xpi/FF-dnssec_validator-$(EXTENSION_VERSION)-windows.xpi
 	@echo '### Creating package for MAC OS X... ###'
 	rm -rf plugins
 	mkdir plugins
-	cp -r ../plugins/DNSSECValidatorPlug-in.plugin plugins
+	cp -r ../plugins/DNSSECValidatorPlugin.plugin plugins
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform><em:targetPlatform>Darwin_x86_64-gcc3<\/em:targetPlatform>/g' install.rdf.template > install.rdf
-	./build.sh && mv dnssec.xpi dnssec_validator-$(EXTENSION_VERSION)-macosx.xpi
+	./build.sh && mv dnssec.xpi xpi/FF-dnssec_validator-$(EXTENSION_VERSION)-macosx.xpi
 	rm -rf plugins
 	@echo '### Creating packages ... Done ###'
 
 clean:
 	rm -rf plugins
 	rm -f install.rdf
+	rm -rf xpi
 
 clean_pkg:
 	rm -f ub_dnssec_validator-$(EXTENSION_VERSION)-*.xpi
