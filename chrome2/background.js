@@ -124,7 +124,7 @@ document.write("<script>");
               break;
             // Domain and also connection are secured but browser's IP address is invalid
             case this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED:
-              icon = "icon_green_ip.png";
+              icon = "icon_red.png";
      	      title = "dnssecok";
 	      domainpre = "domain";
               break;
