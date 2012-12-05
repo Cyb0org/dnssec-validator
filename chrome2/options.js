@@ -179,8 +179,8 @@ function testdnssec() {
          		nameserver = "";
 			chioce=0;
             	        break;
-		    case 3: // Custom
-			chioce=3;
+		    case 1: // Custom
+			chioce=1;
          		tmp = document.dnssecSettings.customResolver.value;
 			if (!checkOptdnsserveraddr(tmp)) { 
 			   ip=true;
@@ -190,8 +190,8 @@ function testdnssec() {
 			nameserver = tmp;
 			}
             	        break;
-		    case 4: // NOFWD
-			chioce=4;
+		    case 2: // NOFWD
+			chioce=2;
          		nameserver = "nofwd";
 			options = 5; ;
             	    	break;
