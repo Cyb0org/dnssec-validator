@@ -1,3 +1,6 @@
-[submodule "plugin/lib"]
-	path = plugin/lib
-	url = git://git.nic.cz/dnssec-validator-lib
+[submodule "libs-source"]
+	path = libs-source
+	url = git://git.nic.cz/dane-libs
+[submodule "FireBreath"]
+	path = ub_plugin/FireBreath
+	url = https://github.com/firebreath/FireBreath.git
