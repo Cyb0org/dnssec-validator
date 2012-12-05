@@ -1,9 +1,9 @@
 This file contains the list of people involved in the development
-of DNSSEC Validator plugin along its history.
-The development of the DNSSEC Validator plugin project was started at the CZ.NIC labs.
+of DNSSEC Validator 2.0 plugin along its history.
+The development of the DNSSEC Validator 2.0 plugin project was started at the CZ.NIC Labs.
 
 ==========================================================
-PROJECT: DNSSEC Validator plugin for Internet Browsers
+PROJECT: DNSSEC Validator 2.0 plugin for Internet Browsers
 ==========================================================
 
 AUTHORS AND MAINTAINERS:
@@ -15,8 +15,6 @@ AUTHORS AND MAINTAINERS:
 
 *PLUGIN DEVELOPERS:
 --------------------
-- Zbynek Michl		<zbynek.michl@nic.cz>
-- Ondrej Mikle		<ondej.mikle@nic.cz>	
 - Martin Straka		<martin.straka@nic.cz>
 
 *PLUGINS MAINTAINERS
@@ -29,16 +27,7 @@ AUTHORS AND MAINTAINERS:
 Work packages
 ==========================================================
 
-*Zbynek Michl (2009-2010)
-- core of dnssec validator (Linux,Win)
-- plugin for Mozilla Firefox (GUI)
-- plugin for Google Crome (GUI)
-- update
-
-*Ondrej Mikle (since 2011)
-- update 
-
 *Martin Straka (since 2012)
-- plugin for Internet Explorer (GUI as toolbar)
-- shared internal cache of dnssec plugin
-- libunbound
+- plugin core in C (based on libunbound)
+- new GUI for IE, FF and Chrome (HTML, CSS, Javascript)
+- CZ, EN and DE localization

@@ -1,9 +1,9 @@
-DNSSEC Validator extension for Mozilla Firefox <http://www.dnssec-validator.cz>
+DNSSEC Validator 2.0 extension for Mozilla Firefox <http://www.dnssec-validator.cz>
 -------------------------------------------------------------------------------
 
 INSTALLATION
 ---------------
-Select "dnssec_validator-*.xpi" in File -> Open dialog and follow wizard instructions
+Select "dnssec_validator-2.0-*.xpi" in File -> Open dialog and follow wizard instructions
 
 
 CONFIGURATION
@@ -15,11 +15,6 @@ these parameters:
    -> print debug information to standard output (see section DEBUGGING)
  - extensions.dnssec.asyncresolve [boolean]
    -> enable asynchronous resolving
- - extensions.dnssec.usetcp [boolean]
-   -> use TCP instead of default UDP for resolving
- - extensions.dnssec.cacheflushinterval [integer]
-   -> interval of flushing expired cache records
-      (in seconds, "0" stands for disabled cache)
  - extensions.dnssec.popupfgcolor [string]
  - extensions.dnssec.popupbgcolor [string]
    -> popup-window text and background color
