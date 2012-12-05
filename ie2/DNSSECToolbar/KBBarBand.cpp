@@ -783,8 +783,8 @@ void CKBBarBand::SetSecurityStatus()
 
 	// state 3
 	case DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP:
-		ldicon = GetBitmapIndex(IDI_ICON_KEY_GREEN_IP1);
-		ldiconBar = IDI_ICON_KEY_GREEN_IP;
+		ldicon = GetBitmapIndex(IDI_ICON_KEY_RED1);
+		ldiconBar = IDI_ICON_KEY_RED;
 		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE3_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
