@@ -50,6 +50,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
       <radiogroup id="dnssec-pref-dnsserverchoose" preference="dnsserverchoose" oncommand="dnssecExtPrefs.dnsserverchooseCommand();">
         <description value="&radiogroupdnsserver.label;"/>
         <radio id="dnssec-pref-usesysdnsserver" label="&radiodnsserversystem.label;" accesskey="&radiodnsserversystem.accesskey;" value="0"/>
+<!--
         <hbox>
           <radio id="dnssec-pref-usepresetdnsserver" label="&radiodnsserverpreset.label;" accesskey="&radiodnsserverpreset.accesskey;" value="1"/>
           <menulist id="dnssec-pref-dnsserverpresetchoose" preference="dnsserverpresetchoose" oncommand="dnssecExtPrefs.dnsserverpresetchooseCommand();">
@@ -61,6 +62,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
         </hbox>
         <textbox id="dnssec-pref-cznicdnsserveraddr" value="217.31.204.130 2001:1488:800:400::130 193.29.206.206 2001:678:1::206" disabled="true" hidden="true"/>
         <textbox id="dnssec-pref-oarcdnsserveraddr" value="149.20.64.20 2001:4f8:3:2bc:1::64:20 149.20.64.21 2001:4f8:3:2bc:1::64:21" disabled="true" hidden="true"/>
+-->
         <hbox>
           <radio id="dnssec-pref-useoptdnsserver" label="&radiodnsserveropt.label;" accesskey="&radiodnsserveropt.accesskey;" value="2"/>
           <textbox id="dnssec-pref-optdnsserveraddr" preference="optdnsserveraddr" oninput="dnssecExtPrefs.optdnsserveraddrInput();"/>

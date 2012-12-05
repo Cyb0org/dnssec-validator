@@ -125,6 +125,7 @@ var dnssecExtPrefs = {
 
   savePrefs : function() {  
   switch (document.getElementById("dnssec-pref-dnsserverchoose").value) {
+/*
     case '1': // Preset resolvers
       switch (document.getElementById("dnssec-pref-dnsserverpresetchoose").value) {
       case '1': // OARC's ODVR
@@ -136,6 +137,7 @@ var dnssecExtPrefs = {
         break;
       }
       break;
+*/
     case '2': // Custom resolver
       if (this.checkOptdnsserveraddr()) {
         this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-optdnsserveraddr").value);
@@ -174,8 +176,8 @@ var dnssecExtPrefs = {
 	}
 */
     // enable preset DNS resolvers menulist only if appropriate radio button is selected
-    tmpCheck = document.getElementById("dnssec-pref-usepresetdnsserver").selected;
-    document.getElementById("dnssec-pref-dnsserverpresetchoose").disabled = !tmpCheck;
+    //tmpCheck = document.getElementById("dnssec-pref-usepresetdnsserver").selected;
+    //document.getElementById("dnssec-pref-dnsserverpresetchoose").disabled = !tmpCheck;
     
     // enable optional DNS address textbox only if appropriate radio button is selected
     tmpCheck = document.getElementById("dnssec-pref-useoptdnsserver").selected;
@@ -248,6 +250,7 @@ var dnssecExtPrefs = {
 	    case '0': // System setting
          	nameserver = "";
             	break;
+/*              
 	    case '1': // Preset
 	      switch (document.getElementById("dnssec-pref-dnsserverpresetchoose").value) {
 	        case '1': // OARC's ODVR
@@ -259,6 +262,7 @@ var dnssecExtPrefs = {
 	        break;
 	        }
               break;
+*/              
 	    case '2': // Custom
          	nameserver = document.getElementById("dnssec-pref-optdnsserveraddr").value;
 		if (!this.checkOptdnsserveraddr()) { 
