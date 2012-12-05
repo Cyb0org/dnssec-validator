@@ -20,17 +20,10 @@
 #***** END LICENSE BLOCK ***** */
 
 EXTENSION_VERSION = $(shell cat install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p')
-PLUGIN_ROOT = ../ub_plugin
-PLUGIN_TMP = ../ub_tmp_build
-PLUGIN_NAME = DNSSECValidatorPlugin
-PLUGIN_NAME_DLL = components
 
-X86_MINGW_CC = i586-mingw32msvc-gcc
-X86_MINGW_STRIP = i586-mingw32msvc-strip
+#all: xpi
 
-#all: sys_linux sys_macosx sys_windows
-
-sys_linux:
+xpi:
 	@echo '### Creating package for Linux... ###'
 	rm -rf plugins
 	rm -rf xpi
