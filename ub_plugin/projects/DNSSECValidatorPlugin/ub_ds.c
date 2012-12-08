@@ -411,6 +411,7 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv, char *i
   return retval;
 } // ds_validate
 
+/*
 int main(void){
 	short i;
 	char *tmp = NULL;	
@@ -419,3 +420,4 @@ int main(void){
 	printf(DEBUG_PREFIX "Returned value: \"%d\" %s\n", i, tmp);		
 	return 1;
 }
+*/
