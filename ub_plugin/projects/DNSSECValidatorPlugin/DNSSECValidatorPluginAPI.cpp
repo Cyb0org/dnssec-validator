@@ -79,12 +79,14 @@ DNSSECValidatorPluginPtr DNSSECValidatorPluginAPI::getPlugin()
 
 FB::VariantList DNSSECValidatorPluginAPI::Validate(const std::string& domain, const uint16_t options,
                                              const std::string& optdnssrv, const std::string& ipbrowser)
-{
+{    
     FB::VariantList reslist;
     short rv;
-    rv = ds_validate(domain.c_str(), options, optdnssrv.c_str(), ipbrowser.c_str());
+    char *ipvalidator = NULL;
+    rv = ds_validate(domain.c_str(), options, optdnssrv.c_str(), ipbrowser.c_str(), &ipvalidator);    
     reslist.push_back(rv);
-  
+    reslist.push_back(ipvalidator ? (std::string)ipvalidator : "");    
+
     return reslist;
 }
 

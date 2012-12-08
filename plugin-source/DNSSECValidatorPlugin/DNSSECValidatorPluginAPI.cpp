@@ -82,8 +82,10 @@ FB::VariantList DNSSECValidatorPluginAPI::Validate(const std::string& domain, co
 {
     FB::VariantList reslist;
     short rv;
-    rv = ds_validate(domain.c_str(), options, optdnssrv.c_str(), ipbrowser.c_str());
+    char *ipvalidator = NULL;
+    rv = ds_validate(domain.c_str(), options, optdnssrv.c_str(), ipbrowser.c_str(), &ipvalidator);    
     reslist.push_back(rv);
+    reslist.push_back(ipvalidator ? (std::string)ipvalidator : "");  
   
     return reslist;
 }
