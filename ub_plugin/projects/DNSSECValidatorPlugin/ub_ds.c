@@ -3,20 +3,20 @@ Copyright 2012 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz> 
 
-This file is part of DNSSEC Validator Add-on.
+This file is part of DNSSEC Validator 2.0 Add-on.
 
-DNSSEC Validator Add-on is free software: you can redistribute it and/or
+DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or (at your
 option) any later version.
 
-DNSSEC Validator Add-on is distributed in the hope that it will be useful,
+DNSSEC Validator 2.0 Add-on is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 more details.
 
 You should have received a copy of the GNU General Public License along with
-DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
+DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 Additional permission under GNU GPL version 3 section 7
 
@@ -30,9 +30,8 @@ OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
 //----------------------------------------------------------------------------
-#include "ldns/config.h"
 #include "ldns/ldns.h"
-#include "libunbound/unbound.h"
+#include "unbound.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -55,6 +54,7 @@ OpenSSL used as well as that of the covered work.
 
 //----------------------------------------------------------------------------
 #define TA ". IN DS 19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32F24E8FB5"    // DS record of root domain
+#define DLV "dlv.isc.org. IN DNSKEY 257 3 5 BEAAAAPHMu/5onzrEE7z1egmhg/WPO0+juoZrW3euWEn4MxDCE1+lLy2 brhQv5rN32RKtMzX6Mj70jdzeND4XknW58dnJNPCxn8+jAGl2FZLK8t+ 1uq4W+nnA3qO2+DL+k6BD4mewMLbIYFwe0PG73Te9fZ2kJb56dhgMde5 ymX4BI/oQ+ cAK50/xvJv00Frf8kw6ucMTwFlgPe+jnGxPPEmHAte/URk Y62ZfkLoBAADLHQ9IrS2tryAe7mbBZVcOwIeU/Rw/mRx/vwwMCTgNboM QKtUdvNXDrYJDSHZws3xiRXF1Rf+al9UmZfSav/4NWLKjHzpT59k/VSt TDN0YUuWrBNh" //DNSKEY DLV register
 #define DEBUG_PREFIX "DNSSEC: "
 #define ERROR_PREFIX "DNSSEC error: "
 #define MAX_IPADDRLEN 40              /* max len of IPv4 and IPv6 addr notation */
@@ -75,7 +75,8 @@ bool ws = false;		       /* write debug info into output file */
 bool ds = false;   		     /* load root DS key from file */
 bool context = false;		   /* for ub_ctx initialization */
 FILE *dfout;			         /* FILE - for debug information*/
-struct ub_ctx* ctx;        // ub context structure
+struct ub_ctx* ctx;        	// ub context structure
+char ip_validator[256];		// return IP address(es) of validator
 
 
 //*****************************************************************************
@@ -123,7 +124,8 @@ short ipmatches(char *ipbrowser, char *ipvalidator)
 
     if (opts.debug) printf(DEBUG_PREFIX "IPmatches: -%s- -%s-\n", ipbrowser, ipvalidator);
     if (ws) fprintf(dfout, DEBUG_PREFIX "IPmatches: -%s- -%s-\n", ipbrowser, ipvalidator);
-    
+    strcpy( ip_validator, ipvalidator );
+
     if ((ipbrowser != NULL) &&  (ipvalidator != NULL))
       {
         token = strtok (ipvalidator, delimiters);
@@ -203,9 +205,9 @@ short examine_result(struct ub_result *result, char* ipbrowser) {
                      	if (opts.debug) printf(DEBUG_PREFIX "IPv6 address of validator: %s\n", ipvalidator);
                       if (ws) fprintf(dfout, DEBUG_PREFIX "IPv6 address of validator: %s\n", ipvalidator);
                     } // result->qtype
-                    retval = ipmatches(ipbrowser,ipvalidator);
+		    retval = ipmatches(ipbrowser,ipvalidator);
+		    free(ipvalidator);
  	                  // free malloc ipvalidator
-                    free(ipvalidator);      
               }
               else { 
                  if (opts.debug) printf(DEBUG_PREFIX "Why bogus?: %s\n", result->why_bogus);
@@ -259,15 +261,17 @@ void ub_context_free(){
     }
 } //ub_context_free
 
+
 //*****************************************************************************
 /* main validating function */
 // return status DNSSEC security
 // Input: *domain - domain name 
 //        options - options of validator, IPv4, IPv6, usefwd, etc..
 //        *optdnssrv - IP address of resolver/forvarder
-//        *ipbrowser - is IP address of browser which browser used fo connection of the server
+//        *ipbrowser - is IP address of browser which browser used to connection on the server
+// Out:	  **ipvalidator - is IP address(es) of validator
 // ----------------------------------------------------------------------------
-short ds_validate(char *domain, const uint16_t options, char *optdnssrv, char *ipbrowser) {
+short ds_validate(char *domain, const uint16_t options, char *optdnssrv, char *ipbrowser, char **ipvalidator) {
 
   struct ub_result* result;
   int ub_retval;
@@ -341,6 +345,10 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv, char *i
      	if ((ub_retval=ub_ctx_add_ta(ctx, TA)) != 0) {
         if (opts.debug)	printf(DEBUG_PREFIX "Error adding keys: %s\n", ub_strerror(ub_retval));
         if (ws) fprintf(dfout, DEBUG_PREFIX "Error adding keys: %s\n", ub_strerror(ub_retval));
+	     }
+        if ((ub_retval=ub_ctx_set_option(ctx, "dlv-anchor:", DLV))) {
+    		if (opts.debug)	printf(DEBUG_PREFIX "Error adding DLV keys: %s\n", ub_strerror(ub_retval));
+        if (ws) fprintf(dfout, DEBUG_PREFIX "Error adding DLV keys: %s\n", ub_strerror(ub_retval));
       }
     } // if (ds)   
  }
@@ -391,7 +399,23 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv, char *i
   if (opts.debug) printf(DEBUG_PREFIX "Returned value (overall/ipv4/ipv6): \"%d/%d/%d\"\n", retval, retval_ipv4, retval_ipv6);
   if (ws) fprintf(dfout, DEBUG_PREFIX "Returned value (overall/ipv4/ipv6): \"%d/%d/%d\"\n", retval, retval_ipv4, retval_ipv6);
 
+  /* export resolved addrs buf as static */
+  if (ipvalidator) {
+    *ipvalidator = ip_validator;
+  } else {
+    *ipvalidator = "n/a";
+  }
+
   // free resolve context
   ub_resolve_free(result);
   return retval;
 } // ds_validate
+
+int main(void){
+	short i;
+	char *tmp = NULL;	
+	i = ds_validate("www.nic.cz", 9, "nofwd", "1.1.1.1", &tmp);
+	printf(DEBUG_PREFIX "Returned value: \"%d\" %s\n", i, tmp);		
+	printf(DEBUG_PREFIX "Returned value: \"%d\" %s\n", i, tmp);		
+	return 1;
+}
