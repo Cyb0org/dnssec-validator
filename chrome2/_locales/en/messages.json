@@ -1,6 +1,6 @@
-{
+﻿{
 	"preftitle": {
-		"message": "Validator Preferences"
+		"message": "Validator settings"
 		},
 	"prefresolver": {
 		"message": "DNS resolver(s) used for name resolution:"
@@ -18,22 +18,22 @@
 		"message": "Public resolvers OARC"
 		},
 	"resolver3": {
-		"message": " Custom "
+		"message": " Custom: "
 		},
 	"resolver4": {
-		"message": "Self-validation - without resolver"
+		"message": "Without resolver"
 		},
 	"savebutton": {
 		"message": "Save settings"
 		},
 	"testbutton": {
-		"message": "Test DNSSEC support"
+		"message": "Test current settings"
 		},
 	"cancelbutton": {
 		"message": "Cancel"
 		},
 	"messageok": {
-		"message": "Success - DNSSEC test passed."
+		"message": "Success - current settings allows DNSSEC validation."
 		},
 	"messagebogus": {
 		"message": "Failure - bogus DNSSEC reply, DNSSEC validation not possible with current settings."
@@ -57,7 +57,7 @@
 		"message": "Secured by DNSSEC"
 		},
 	"dnssecaction": {
-		"message": "DNSSEC action..."
+		"message": "Retrieving DNSSEC status"
 		},
 	"dnssecbogus": {
 		"message": "Bogus DNSSEC signature"
@@ -69,57 +69,58 @@
 		"message": "Domain name "
 		},
 	 "nodomain": {
-		"message": "Non-existent domain name "
+		"message": "Nonexistence of the domain name "
 		},
          "0dnssecError": {
 		"message": " can not be verified by DNSSEC."
 		},
          "0dnssecErrorInfo": {
-		"message": "An error occurred while getting the DNSSEC status. This may be caused by loss of connection to the DNS server or the user-chosen validating resolver IP address is not an address of a validating resolver."
+		"message": "An error occurred while getting the DNSSEC status of this domain name. This may be caused by loss of connection to the DNS server or the user-chosen validating resolver IP address is not an address of a validating resolver."
 		},
          "1unsecuredDomain": {
 		"message": " is not secured by DNSSEC."
 		},
          "1unsecuredDomainInfo": {
-		"message": "Your computer is not secured by DNSSEC for this particular domain, so you are not secured against domain name spoofing."
+		"message": "This domain name is not secured by DNSSEC, so it is not possible to verify validity of obtained data and you are not secured against domain name spoofing."
 		},
          "2securedConnectionDomain": {
 		"message": " is correctly secured by DNSSEC."
 		},
          "2securedConnectionDomainInfo": {
-		"message": "Your computer and also connection are secured by DNSSEC for this particular domain, so you are secured against domain name spoofing."
+		"message": "Information about the IP address of this domain name was validated using DNSSEC. Because this domain name is secured by DNSSEC, you are protected against domain name spoofing."
 		},
          "3securedConnectionDomainInvIPaddr": {
-		"message": " is correctly secured by DNSSEC but browser's IP address is invalid!"
+		"message": " is secured by DNSSEC but browser's IP address is invalid."
 		},
 	 "3securedConnectionDomainInvIPaddrInfo": {
-		"message": "Your computer and also connection are secured by DNSSEC for this particular domain, so you are secured against domain name spoofing. The IP address which the browser is using differs from the address which the DNSSEC add-on has resolved. Several webpages use multiple IP adrresses to optimise their workload. In some cases, however, can such behaviour point at a DNS spoofing attempt." 
+		"message": "This domain name is secured by DNSSEC but the IP address which the browser is using differs from the address obtained by the DNSSEC add-on. This may have a legitimate reason but can also point at a DNS spoofing attempt!" 
 		},
           "4invalidDomainSignature": {
 		"message": " is secured by DNSSEC but invalid domain name signature has been detected!"
 		},
           "4invalidDomainSignatureInfo": {
-		"message": "Your computer is secured by DNSSEC for this particular domain, but invalid domain name signature has been detected. It could indicate spoofed domain name!"
+		"message": "This domain name is secured by DNSSEC but invalid domain name signature has been detected. It could indicate spoofed domain name!"
 		},
           "5unsecuredNoDomain": {
-		"message": " is not secured by DNSSEC."
+		"message": " an not be verified with DNSSEC."
 		},
           "5unsecuredNoDomainInfo": {
-		"message": "Your computer is not secured by DNSSEC for this non-existent domain name, so you are not secured against non-existent domain name spoofing."
+		"message": "The parent domain is not secured by DNSSEC, thus it was not possible to verify nonexistence of this domain name."
 		},
           "6securedConnectionNoDomain": {
-		"message": " is correctly secured by DNSSEC."
+		"message": " was validated by DNSSEC."
 		},
           "6securedConnectionNoDomainInfo": {
-		"message": "Your computer is also secured by DNSSEC for this particular domain, so you are secured against non-existent domain name spoofing."
+		"message": "The parent domain is secured by DNSSEC, thus it was possible to successfully verify nonexistence of this domain name."
 		},
            "7invalidNoDomainSignature": {
-		"message": " is secured by DNSSEC but invalid signature has been detected!"
+		"message": " was not correctly validated by DNSSEC because invalid signature has been detected!"
 		},
            "7invalidNoDomainSignatureInfo": {
-		"message": "Your computer is secured by DNSSEC but the proof of domain name non-existence is not valid, so it probably indicates that domain name actually exists!"
+		"message": "The parent domain is secured by DNSSEC but the received domain name nonexistence response does not contain a valid signature. This may signalise a domain name spoofing attempt in order to deny the access to the domain."
 		},
-           "actionDnssec": {"message": "Retrieving DNSSEC status..."},
-           "inactionDnssec": {"message": "Idle."},
-           "errorDnssec": {"message": "Error verifying DNSSEC status of domain."}
+           "actionDnssec": {"message": "Retrieving DNSSEC status"},
+           "inactionDnssec": {"message": "Idle"},
+           "errorDnssec": {"message": "DNSSEC status unknown"}
 }
+

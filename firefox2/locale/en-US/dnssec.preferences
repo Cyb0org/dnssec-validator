@@ -19,7 +19,7 @@
 #DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #***** END LICENSE BLOCK ***** */
 
-dnssecok=Success - DNSSEC test passed.
+dnssecok=Success – current settings allows DNSSEC validation.
 dnssecbogus=Failure - bogus DNSSEC reply, DNSSEC validation not possible with current settings.
 dnssecerror=Failure - no DNS reply, possible network error or wrong server address.
 wrongip=Error - string contains no valid IP address.

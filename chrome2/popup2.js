@@ -32,19 +32,32 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 	    pic.src = icon;
 	}
 
-        resultRegexp = /\?([^?,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)$/;
+        resultRegexp = /\?([^?,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)$/;
         matches = resultRegexp.exec(document.location.href);
 	domain = matches[1];
         statusString = matches[2];
         icon = matches[3];
 	status = matches[4];
 	statuspre = matches[5];
-	info = matches[6];    
-        addText("domain-name-title", domain);
+	info = matches[6];
+    ipbrowser = matches[7];
+  ipvalidator = matches[8];    
+  addText("domain-name-title", domain);
 	addText("domain-name-text", domain);
-        addText("long-text", chrome.i18n.getMessage(statusString));
+  addText("long-text", chrome.i18n.getMessage(statusString));
 	addText("long-text-domain", chrome.i18n.getMessage(statuspre));
 	addText("dnssec-title", chrome.i18n.getMessage(status));
 	addText("dnssec-info", chrome.i18n.getMessage(info));
+  if (statusString == "3securedConnectionDomainInvIPaddr")  
+  {
+    addText("ip-info-b", ipbrowser);
+    if (ipvalidator == "none")  ipvalidator = "";
+    addText("ip-info-v", ipvalidator);
+  }
+  else
+  {
+    addText("ip-info-b", "");
+    addText("ip-info-v", "");  
+  }   
 	addText("homepage", chrome.i18n.getMessage("homepage"));	
 	DNSSECicon2(icon);

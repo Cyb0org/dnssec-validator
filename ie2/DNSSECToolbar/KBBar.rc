@@ -136,7 +136,7 @@ END
 IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 170
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
-CAPTION "Validator Preferences"
+CAPTION "Validator settings"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
 	GROUPBOX        "Resolver settings",IDC_STATIC,10,7,190,75
@@ -146,11 +146,11 @@ BEGIN
 	//COMBOBOX        IDC_COMBO, 122, 47, 70, 120 ,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 	CONTROL			" Custom:",					 IDC_R3,"Button",BS_AUTORADIOBUTTON, 15, 50, 40, 10
 	EDITTEXT        IDC_EDIT, 60, 50, 120 ,12 ,ES_AUTOHSCROLL
-	CONTROL			" Self-validation - without resolver", IDC_R4,"Button",BS_AUTORADIOBUTTON, 15, 65, 180, 10
-	PUSHBUTTON      "Test DNSSEC support",IDC_IDDNSSEC,10, 75+10 ,190,14
+	CONTROL			" Without resolver", IDC_R4,"Button",BS_AUTORADIOBUTTON, 15, 65, 180, 10
+	PUSHBUTTON      "Test current settings",IDC_IDDNSSEC,10, 75+10 ,190,14
 	LTEXT           " ", IDC_DNSSEC_R,10,75+10+14+5,180,20
 	CONTROL			"Display text status besides the key icon", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+48+5, 165 ,10
-	DEFPUSHBUTTON   "Save",IDOK,90,18+58+48+23,50,14
+	DEFPUSHBUTTON   "Save settings",IDOK,90,18+58+48+23,80,14
     PUSHBUTTON      "Cancel",IDCANCEL,150,18+58+48+23,50,14
 END
 
@@ -274,49 +274,49 @@ BEGIN
 	IDS_DNSSEC_KEY_TEXT_6 " DNS connection error"
 
 	// Deafult
-	IDS_PRE_TEXT_ERROR		"The security of domain name"
+	IDS_PRE_TEXT_ERROR		"Security of the domain name"
 	IDS_PRE_TEXT_DOMAIN		"Domain name"	
-	IDS_PRE_TEXT_NODOMAIN	"Non-existent domain name"
+	IDS_PRE_TEXT_NODOMAIN	"Nonexistence of the domain name"
     
 	// state 0 - GREY ? 
 	IDS_STATE0_TEXT_TOOLTIP "DNSSEC status unknown"
 	IDS_STATE0_TEXT_DOMAIN  "can not be verified by DNSSEC."
-	IDS_STATE0_TEXT_MAIN	"An error occurred while getting the DNSSEC status. This may be caused by loss of connection to the DNS server or the user-chosen validating resolver IP address is not an address of a validating resolver."	
+	IDS_STATE0_TEXT_MAIN	"An error occurred while getting the DNSSEC status of this domain name. This may be caused by loss of connection to the DNS server or the user-chosen validating resolver IP address is not an address of a validating resolver."	
 
 	//state 1 - GREY	
 	IDS_STATE1_TEXT_TOOLTIP "Not secured by DNSSEC"
 	IDS_STATE1_TEXT_DOMAIN  "is not secured by DNSSEC."
-	IDS_STATE1_TEXT_MAIN	"Your computer is not secured by DNSSEC for this particular domain, so you are not secured against domain name spoofing."
+	IDS_STATE1_TEXT_MAIN	"This domain name is not secured by DNSSEC, so it is not possible to verify validity of obtained data and you are not secured against domain name spoofing."
 
 	//state 2 - GREEN
 	IDS_STATE2_TEXT_TOOLTIP "Secured by DNSSEC"
 	IDS_STATE2_TEXT_DOMAIN  "is correctly secured by DNSSEC."
-	IDS_STATE2_TEXT_MAIN	"Your computer and also connection are secured by DNSSEC for this particular domain, so you are secured against domain name spoofing."
+	IDS_STATE2_TEXT_MAIN	"Information about the IP address of this domain name was validated using DNSSEC. Because this domain name is secured by DNSSEC, you are protected against domain name spoofing."
 
-	//state 3 - GREEN IP
+	//state 3 - RED IP
 	IDS_STATE3_TEXT_TOOLTIP "Secured by DNSSEC"
-	IDS_STATE3_TEXT_DOMAIN  "is correctly secured by DNSSEC but browser's IP address is invalid!"
-	IDS_STATE3_TEXT_MAIN	"Your computer and also connection are secured by DNSSEC for this particular domain, so you are secured against domain name spoofing. The IP address which the browser is using differs from the address which the DNSSEC add-on has resolved. Several webpages use multiple IP adrresses to optimise their workload. In some cases, however, can such behaviour point at a DNS spoofing attempt."
+	IDS_STATE3_TEXT_DOMAIN  "is correctly secured by DNSSEC but browser's IP address is invalid."
+	IDS_STATE3_TEXT_MAIN	"This domain name is secured by DNSSEC but the IP address which the browser is using differs from the address obtained by the DNSSEC add-on. This may have a legitimate reason but can also point at a DNS spoofing attempt!"
 
 	//state 4 - RED
 	IDS_STATE4_TEXT_TOOLTIP "Bogus DNSSEC signature"
 	IDS_STATE4_TEXT_DOMAIN  "is secured by DNSSEC but invalid domain name signature has been detected!"
-	IDS_STATE4_TEXT_MAIN	"Your computer is secured by DNSSEC for this particular domain, but invalid domain name signature has been detected. It could indicate spoofed domain name!"
+	IDS_STATE4_TEXT_MAIN	"This domain name is secured by DNSSEC but invalid domain name signature has been detected. It could indicate spoofed domain name!"
 
 	//state 5 - GREY
 	IDS_STATE5_TEXT_TOOLTIP "Not secured by DNSSEC"
-	IDS_STATE5_TEXT_DOMAIN  "is not secured by DNSSEC."
-	IDS_STATE5_TEXT_MAIN	"Your computer is not secured by DNSSEC for this non-existent domain name, so you are not secured against non-existent domain name spoofing."
+	IDS_STATE5_TEXT_DOMAIN  "can not be verified with DNSSEC."
+	IDS_STATE5_TEXT_MAIN	"The parent domain is not secured by DNSSEC, thus it was not possible to verify nonexistence of this domain name."
 
 	//state 6 - GREEN
 	IDS_STATE6_TEXT_TOOLTIP "Secured by DNSSEC"
-	IDS_STATE6_TEXT_DOMAIN  "is correctly secured by DNSSEC."
-	IDS_STATE6_TEXT_MAIN	"Your computer is also secured by DNSSEC for this particular domain, so you are secured against non-existent domain name spoofing."
+	IDS_STATE6_TEXT_DOMAIN  "was validated by DNSSEC."
+	IDS_STATE6_TEXT_MAIN	"The parent domain is secured by DNSSEC, thus it was possible to successfully verify nonexistence of this domain name."
 
 	//state 7 - RED
 	IDS_STATE7_TEXT_TOOLTIP "Bogus DNSSEC signature"
-	IDS_STATE7_TEXT_DOMAIN  "is secured by DNSSEC but invalid signature has been detected!"
-	IDS_STATE7_TEXT_MAIN	"Your computer is secured by DNSSEC but the proof of domain name non-existence is not valid, so it probably indicates that domain name actually exists!"
+	IDS_STATE7_TEXT_DOMAIN  "was not correctly validated by DNSSEC because invalid signature has been detected!"
+	IDS_STATE7_TEXT_MAIN	"The parent domain is secured by DNSSEC but the received domain name nonexistence response does not contain a valid signature. This may signalise a domain name spoofing attempt in order to deny the access to the domain."
 
 	IDS_NONE                " "
     IDS_ADDON_INIT          "Add-on initialized"
@@ -326,7 +326,7 @@ BEGIN
 
 	// DNSSEC TEST messages in settings dialog
 	IDS_DNSSECTEST_IP		"Error - string contains no valid IP address."
-	IDS_DNSSECTEST_OK		"Success - DNSSEC test passed."
+	IDS_DNSSECTEST_OK		"Success - current settings allows DNSSEC validation."
 	IDS_DNSSECTEST_BOGUS	"Failure - bogus DNSSEC reply, DNSSEC validation not possible with current settings."
 	IDS_DNSSECTEST_ERROR	"Failure - no DNS reply, possible network error or wrong server address."
 	IDS_DNSSECTEST_RUN      "Testing..."
@@ -495,60 +495,60 @@ BEGIN
 	IDS_DNSSEC_KEY_TEXT_6 " Pøi zjišování DNSSEC zabezpeèení nastala chyba"
 
 	// Deafult
-	IDS_PRE_TEXT_ERROR		"Zabezpeèení domény"
+	IDS_PRE_TEXT_ERROR		"Zabezpeèení doménového jména"
 	IDS_PRE_TEXT_DOMAIN		"Doménové jméno"	
-	IDS_PRE_TEXT_NODOMAIN	"Neexistující doménové jméno"
+	IDS_PRE_TEXT_NODOMAIN	"Neexistence doménového jména"
     
 	// state 0 - GREY ? 
 	IDS_STATE0_TEXT_TOOLTIP "Stav DNSSEC neznámı"
 	IDS_STATE0_TEXT_DOMAIN  "nelze ovìøit pomocí DNSSEC technologie."
-	IDS_STATE0_TEXT_MAIN	"Pøi zjišování stavu zabezpeèení technologií DNSSEC došlo k chybì. Pøíèinou mùe bıt buï vıpadek spojení ke vzdálenému serveru nebo aktuálnì nastavená IP adresa validujícího resolveru není platnou adresou serveru pro pøeklad doménového jména."	
+	IDS_STATE0_TEXT_MAIN	"Pøi zjišování stavu zabezpeèení doménového jména technologií DNSSEC došlo k chybì. Pøíèinou mùe bıt buï vıpadek spojení ke vzdálenému serveru nebo aktuálnì nastavená IP adresa DNS serveru není platnou adresou serveru pro pøeklad doménového jména."	
 
 	//state 1 - GREY	
 	IDS_STATE1_TEXT_TOOLTIP "Nezabezpeèeno DNSSEC"
 	IDS_STATE1_TEXT_DOMAIN  "není zabezpeèeno DNSSEC technologií."
-	IDS_STATE1_TEXT_MAIN	"Jeliko Váš poèítaè není pøi pøístupu k vzdálenému serveru zabezpeèen technologií DNSSEC, nejste ochránìni proti podvrení doménového jména."
+	IDS_STATE1_TEXT_MAIN	"Jeliko toto doménové jméno není zabezpeèeno technologií DNSSEC, neexistuje monost ovìøení platnosti získanıch údajù a nejste tedy chránìni proti podvrení doménového jména."
 
 	//state 2 - GREEN
 	IDS_STATE2_TEXT_TOOLTIP "Zabezpeèeno DNSSEC"
 	IDS_STATE2_TEXT_DOMAIN  "je korektnì zabezpeèeno DNSSEC technologií."
-	IDS_STATE2_TEXT_MAIN	"Jeliko je Váš poèítaè i doménové jméno korektnì zabezpeèeno technologií DNSSEC, jste ochránìní proti podvrení doménového jména."
+	IDS_STATE2_TEXT_MAIN	"Informace o IP adrese pro toto doménové jméno byla ovìøena technologií DNSSEC. Jeliko je doménové jméno touto technologií korektnì zabezpeèeno, jste ochránìní proti podvrení doménového jména."
 
-	//state 3 - GREEN IP
+	//state 3 - RED IP
 	IDS_STATE3_TEXT_TOOLTIP "Zabezpeèeno DNSSEC"
-	IDS_STATE3_TEXT_DOMAIN  "je korektnì zabezpeèeno DNSSEC technologií, ale IP adresa prohlíeèe je odlišná."
-	IDS_STATE3_TEXT_MAIN	"Jeliko je Váš poèítaè i doménové jméno korektnì zabezpeèeno technologií DNSSEC, jste ochránìní proti podvrení doménového jména. Avšak IP adresa serveru získaná prohlíeèem je odlišná od IP adresy získané DNSSEC doplòkem, co mùe znamenat legitimní dùvod ale také podvrení doménového jmena!"
+	IDS_STATE3_TEXT_DOMAIN  "je zabezpeèeno DNSSEC technologií, ale IP adresa prohlíeèe je odlišná."
+	IDS_STATE3_TEXT_MAIN	"Toto doménové jméno je zabezpeèeno technologií DNSSEC, avšak IP adresa serveru získaná prohlíeèem je odlišná od IP adresy získané DNSSEC doplòkem. To mùe mít legitimní dùvod, ale mùe se také jednat o podvrení doménového jména!"
 
 	//state 4 - RED
 	IDS_STATE4_TEXT_TOOLTIP "Neplatnı DNSSEC podpis"
 	IDS_STATE4_TEXT_DOMAIN  "je zabezpeèeno DNSSEC technologií, byl však odhalen neplatnı podpis!"
-	IDS_STATE4_TEXT_MAIN	"Váš poèítaè i doménové jméno je zabezpeèeno technologií DNSSEC, nebylo však moné vytvoøit øetìzec dùvìry a oveøit tak platnost podpisu nebo podpis záznamù je neplatnı, co mùe signalizovat podvrení doménového jména útoèníkem!"
+	IDS_STATE4_TEXT_MAIN	"Toto doménové jméno je zabezpeèeno technologií DNSSEC, nebylo však moné vytvoøit øetìzec dùvìry a ovìøit tak platnost podpisu nebo podpis záznamù je neplatnı. To mùe signalizovat podvrení doménového jména útoèníkem!"
 
 	//state 5 - GREY
 	IDS_STATE5_TEXT_TOOLTIP "Nezabezpeèeno DNSSEC"
-	IDS_STATE5_TEXT_DOMAIN  "není zabezpeèeno DNSSEC technologií."
-	IDS_STATE5_TEXT_MAIN	"Váš poèítaè pro tuto doménu není zabezpeèen technologií DNSSEC. Proto nelze vytvoøit øetìzec dùvìry a mùe se stát, e doménové jméno ve skuteènosti mùe existovat!"
+	IDS_STATE5_TEXT_DOMAIN  "nemohla bıt ovìøena pomocí technologie DNSSEC."
+	IDS_STATE5_TEXT_MAIN	"Nadøazená doména není zabezpeèena technologií DNSSEC. Není tedy moné ovìøit, zdali toto doménové jméno skuteènì neexistuje."
 
 	//state 6 - GREEN
 	IDS_STATE6_TEXT_TOOLTIP "Zabezpeèeno DNSSEC"
-	IDS_STATE6_TEXT_DOMAIN  "je korektnì zabezpeèeno DNSSEC technologií."
-	IDS_STATE6_TEXT_MAIN	"Jeliko je Váš poèítaè pøi pøístupu k vzdálenému serveru zabezpeèen technologií DNSSEC, jste ochránìni proti podvrení neexistujícího doménového jména."
+	IDS_STATE6_TEXT_DOMAIN  "byla korektnì ovìøena technologií DNSSEC."
+	IDS_STATE6_TEXT_MAIN	"Nadøazená doména je zabezpeèena technologií DNSSEC. Bylo tedy mono úspìšnì ovìøit neexistenci tohoto doménového jména."
 
 	//state 7 - RED
 	IDS_STATE7_TEXT_TOOLTIP "Neplatnı DNSSEC podpis"
-	IDS_STATE7_TEXT_DOMAIN  "je zabezpeèeno DNSSEC technologií, byl však odhalen neplatnı podpis záznamù!"
-	IDS_STATE7_TEXT_MAIN	"Váš poèítaè je sice zabezpeèen technologií DNSSEC, nebylo však moné vytvoøit øetìzec dùvìry a oveøit tak platnost podpisu pro toto neexistující doménové jméno nebo získanı podpis záznamù je neplatnı."
+	IDS_STATE7_TEXT_DOMAIN  "nebyla korektnì ovìøena technologií DNSSEC, protoe byl odhalen neplatnı podpis záznamù!"
+	IDS_STATE7_TEXT_MAIN	"Nadøazená doména je zabezpeèena technologií DNSSEC, ale získaná odpovìï dokazující neexistenci domény neobsahuje platnı podpis. Mùe se jednat o podvrení doménového jména za úèelem odepøení pøístupu k doménì."
 
 	IDS_NONE                " "
     IDS_ADDON_INIT          "Doplnìk inicializován"
     
 	IDS_DNSSEC_OK			 "Zabezpeèeno DNSSEC"
-    IDS_DNSSEC_FAIL			 "Nezabezpeèeno DNSSEC"
+  IDS_DNSSEC_FAIL			 "Nezabezpeèeno DNSSEC"
 
 	// DNSSEC TEST messages in settings dialog
 	IDS_DNSSECTEST_IP		"Chyba - špatnı formát nastavené IP adresy."
-	IDS_DNSSECTEST_OK		"Úspìch - DNSSEC test prošel, nastavení je v poøádku."
-	IDS_DNSSECTEST_BOGUS	"Selhání - špatná DNSSEC odpovìï, DNSSEC validace není moná s aktualním nastavením."
+	IDS_DNSSECTEST_OK		"Úspìch – souèasné nastavení umoòuje DNSSEC validaci."
+	IDS_DNSSECTEST_BOGUS	"Selhání - špatná DNSSEC odpovìï, DNSSEC validace není moná s aktuálním nastavením."
 	IDS_DNSSECTEST_ERROR	"Selhání - není DNS odpovìï, IP adresa resolveru je buï špatná nebo selhalo pøipojení k síti."
 	IDS_DNSSECTEST_RUN      "Testuji..."
 
@@ -562,21 +562,21 @@ BEGIN
 IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 170
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
-CAPTION "Nastavení Validátoru"
+CAPTION "Nastavení validátoru"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-	GROUPBOX        "Nastavení Resolveru",IDC_STATIC,10,7,190,75
-	LTEXT           "DNS resplver(y) pouívané pro pøeklad jmen:", IDC_STATIC,15,20,180,10
+	GROUPBOX        "Nastavení resolveru",IDC_STATIC,10,7,190,75
+	LTEXT           "DNS resolver(y) pouívané pro pøeklad jmen:", IDC_STATIC,15,20,180,10
 	CONTROL			" Naèíst ze systému",			 IDC_R1,"Button",BS_AUTORADIOBUTTON | WS_GROUP, 15, 35, 100, 10  
 	//CONTROL			" DNSSEC validující resolver:", IDC_R2,"Button",BS_AUTORADIOBUTTON, 15, 50, 105, 10    
 	//COMBOBOX        IDC_COMBO, 122, 47, 70, 120 ,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 	CONTROL			" Vlastní:",					 IDC_R3,"Button",BS_AUTORADIOBUTTON, 15, 50, 40, 10
 	EDITTEXT        IDC_EDIT, 60, 50, 120 ,12 ,ES_AUTOHSCROLL
-	CONTROL			" Samovalidace - bez pouití resolveru", IDC_R4,"Button",BS_AUTORADIOBUTTON, 15, 65, 180, 10
-	PUSHBUTTON      "Test na podporu DNSSEC",IDC_IDDNSSEC,10, 75+10 ,190,14
+	CONTROL			" Bez resolveru", IDC_R4,"Button",BS_AUTORADIOBUTTON, 15, 65, 180, 10
+	PUSHBUTTON      "Test souèasného nastavení",IDC_IDDNSSEC,10, 75+10 ,190,14
 	LTEXT           ".", IDC_DNSSEC_R,10,75+10+14+5,180,20
 	CONTROL			"Zobrazovat texty za ikonou klíèku", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+48+5, 165 ,10
-	DEFPUSHBUTTON   "Nastavit",IDOK,90,18+58+48+23,50,14
+	DEFPUSHBUTTON   "Uloit nastavení",IDOK,90,18+58+48+23,80,14
     PUSHBUTTON      "Zrušit",IDCANCEL,150,18+58+48+23,50,14
 END
 

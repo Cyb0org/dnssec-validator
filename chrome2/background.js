@@ -123,7 +123,7 @@ document.write("<script>");
             
         };
 
-        function setMode(newMode, tabId, domain, status) {
+        function setMode(newMode, tabId, domain, status,  addr, ipval) {
             var icon;
 	    var title;
 	    var domainpre;
@@ -199,7 +199,7 @@ document.write("<script>");
             
             // This is extremely fucking annoying, but chrome.extension.getViews() won't work
             // unless popup is opened, so we set the validation result like GET parameters.
-            chrome.pageAction.setPopup({tabId: tabId, popup: "popup.html?" + domain + "," + newMode + "," + icon + "," + title + "," + domainpre});
+            chrome.pageAction.setPopup({tabId: tabId, popup: "popup.html?" + domain + "," + newMode + "," + icon + "," + title + "," + domainpre + "," + addr + "," + ipval});
         };
 
         function getResolver() {
@@ -296,37 +296,38 @@ document.write("<script>");
 	    // Call of Validation function
       var plugin = document.getElementById("dnssec-plugin");	 	
 	    var result = plugin.Validate(domain, options, resolver, addr);
-            console.log("RESULT: " + domain + "; " + result[0]);
+            console.log("RESULT: " + domain + "; " + result[0] + "; " + result[1]);
 	
   	   icon = ""; 
-	   var status = result[0]; 
+	   var status = result[0];
+     var ipval = result[1];
      //status = 7;
        
      	switch (status) {
 	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP: 
-		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED, tabId, domain, status);
+		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED, tabId, domain, status, addr, ipval );
     		break;
 	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP: 
-		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED, tabId, domain, status);
+		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED, tabId, domain, status, addr,  ipval);
 	        break;
 	    case c.DNSSEC_EXIT_NODOMAIN_SIGNATURE_VALID: 
-		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED, tabId, domain, status);
+		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED, tabId, domain, status, addr,  ipval);
 	        break;
 	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID, tabId, domain, status);
+	        this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID, tabId, domain, status, addr,  ipval);
 	        break;
 	    case c.DNSSEC_EXIT_NODOMAIN_SIGNATURE_INVALID:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID, tabId, domain, status);
+	        this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID, tabId, domain, status, addr,  ipval);
 	        break;
 	    case c.DNSSEC_EXIT_DOMAIN_UNSECURED:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_UNSECURED, tabId, domain, status);
+	        this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_UNSECURED, tabId, domain, status,  addr, ipval);
                 break;
 	    case c.DNSSEC_EXIT_NODOMAIN_UNSECURED:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED, tabId, domain, status);
+	        this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED, tabId, domain, status,  addr, ipval);
 	        break;
 	    case c.DNSSEC_EXIT_FAILED:
 	    default:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_ERROR, tabId, domain, status);
+	        this.setMode(this.dnssecModes.DNSSEC_MODE_ERROR, tabId, domain, status, addr,  ipval);
                 break;
 	    }
         };

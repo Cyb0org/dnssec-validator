@@ -38,14 +38,16 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 	    pic.href = "detail-info.html?"+overal;
 	}
 
-        resultRegexp = /\?([^?,]+),([^,]+),([^,]+),([^,]+),([^,]+)$/;
+        resultRegexp = /\?([^?,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)$/;
         matches = resultRegexp.exec(document.location.href);
 	domain = matches[1];
         statusString = matches[2];
         icon = matches[3];
 	status = matches[4];
 	statuspre = matches[5];
-	overal = domain + "," + statusString + "," + icon + "," + status + "," + statuspre + "," + statusString + "Info";      
+  ipbrowser = matches[6];
+  ipvalidator = matches[7];
+	overal = domain + "," + statusString + "," + icon + "," + status + "," + statuspre + "," + statusString + "Info" + "," + ipbrowser + "," + ipvalidator;      
         addText("domain-name-title", domain);
 	addText("domain-name-text", domain);
         addText("long-text", chrome.i18n.getMessage(statusString));
