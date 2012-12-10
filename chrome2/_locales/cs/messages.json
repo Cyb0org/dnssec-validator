@@ -119,6 +119,8 @@
            "7invalidNoDomainSignatureInfo": {
 		"message": "Nadřazená doména je zabezpečena technologií DNSSEC, ale získaná odpověď dokazující neexistenci domény neobsahuje platný podpis. Může se jednat o podvržení doménového jména za účelem odepření přístupu k doméně."
 		},
+           "ipbrowsertext": {"message": "IP adresy použité prohlížečem:"},
+           "ipvalidatortext": {"message": "IP adresy ověřené doplňkem:"},
            "actionDnssec": {"message": "Zjišťování DNSSEC zabezpečení"},
            "inactionDnssec": {"message": "Nečinný"},
            "errorDnssec": {"message": "Stav DNSSEC neznámý"}

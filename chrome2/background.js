@@ -116,10 +116,11 @@ document.write("<script>");
 	  DNSSEC_MODE_ERROR_INFO : "0dnssecErrorInfo",
 
           // Tooltips
-          DNSSEC_TOOLTIP_SECURED   : "securedTooltip",
-          DNSSEC_TOOLTIP_UNSECURED : "unsecuredTooltip",
-          DNSSEC_TOOLTIP_ACTION    : "actionTooltip",
-          DNSSEC_TOOLTIP_ERROR     : "errorTooltip",
+          DNSSEC_TOOLTIP_SECURED   : "dnssecok",
+          DNSSEC_TOOLTIP_UNSECURED : "dnssecnone",
+          DNSSEC_TOOLTIP_ACTION    : "dnssecaction",
+          DNSSEC_TOOLTIP_ERROR     : "dnssecfail",
+          DNSSEC_TOOLTIP_BOGUS     : "dnssecbogus",
             
         };
 
@@ -127,6 +128,7 @@ document.write("<script>");
             var icon;
 	    var title;
 	    var domainpre;
+      var tooltiptitle;
 		console.log("SET MODE: " + newMode + "; TabId: " + tabId + "; Doamin: " + domain + "; Status: " + status);
             
 	switch (newMode) {
@@ -136,18 +138,21 @@ document.write("<script>");
               icon = "icon_green.png";
 	      title = "dnssecok";
 	      domainpre = "domain";
+        tooltiptitle = chrome.i18n.getMessage("dnssecok");
               break;
             // Both non-existent domain and connection are secured
             case this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED:
               icon = "icon_green.png";
 	      title = "dnssecok";
 	      domainpre = "nodomain";
+        tooltiptitle = chrome.i18n.getMessage("dnssecok");
               break;
             // Domain and also connection are secured but browser's IP address is invalid
             case this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED:
               icon = "icon_red.png";
      	      title = "dnssecok";
 	      domainpre = "domain";
+        tooltiptitle = chrome.i18n.getMessage("dnssecok");
               break;
             /* grey icon */
 
@@ -156,11 +161,13 @@ document.write("<script>");
               icon = "icon_grey2.png";
 	      title = "dnssecnone";
 	      domainpre = "domain";
+        tooltiptitle = chrome.i18n.getMessage("dnssecnone");
               break; 
             case this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED:
               icon = "icon_grey2.png";
 	      title = "dnssecnone";
 	      domainpre = "nodomain";
+        tooltiptitle = chrome.i18n.getMessage("dnssecnone");
               break;
 
             /* red icon */
@@ -169,17 +176,20 @@ document.write("<script>");
               icon = "icon_red.png";
 	      title = "dnssecbogus";
 	      domainpre = "domain";
+        tooltiptitle = chrome.i18n.getMessage("dnssecbogus");
               break;
             // Non-existent domain signature is invalid
             case this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID:
               icon = "icon_red.png";
 	      title = "dnssecbogus";
 	      domainpre = "nodomain";
+        tooltiptitle = chrome.i18n.getMessage("dnssecbogus");
               break;
             // Getting security status
             case this.dnssecModes.DNSSEC_MODE_ACTION:
               icon = "icon_action.gif";
 	      title = "dnssecaction";
+        tooltiptitle = chrome.i18n.getMessage("dnssecaction");
               break;
             // An error occured
             case this.dnssecModes.DNSSEC_MODE_ERROR:
@@ -188,7 +198,11 @@ document.write("<script>");
               icon = "icon_unknown.png";
 	      title = "dnssecfail";
 	      domainpre = "domain";	
+        tooltiptitle = chrome.i18n.getMessage("dnssecfail");
             }
+
+
+            chrome.pageAction.setTitle({tabId: tabId, title: tooltiptitle}); 
 
             //console.log("icon: " + icon);
             chrome.pageAction.setIcon({path: icon,
@@ -301,6 +315,7 @@ document.write("<script>");
   	   icon = ""; 
 	   var status = result[0];
      var ipval = result[1];
+     if (ipval == "")  ipval = "x";
      //status = 7;
        
      	switch (status) {

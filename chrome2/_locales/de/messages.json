@@ -119,6 +119,8 @@
            "7invalidNoDomainSignatureInfo": {
 		"message": "Ihr Computer ist durch DNSSEC gesichert, aber der Beweis für Domain-Namen Nichtexistenz nicht gültig ist, so ist es wahrscheinlich bedeutet, dass Domain-Namen tatsächlich existiert!"
 		},
+               "ipbrowsertext": {"message": "mit browser erhaltene IP-Adresse:"},
+           "ipvalidatortext": {"message": "mit Add-on erhaltene IP-Adresse:"},
            "actionDnssec": {"message": "DNSSEC-Status wird erfragt..."},
            "inactionDnssec": {"message": "Idle."},
            "errorDnssec": {"message": "DNSSEC Status unbekannt."}

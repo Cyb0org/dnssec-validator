@@ -50,14 +50,22 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 	addText("dnssec-info", chrome.i18n.getMessage(info));
   if (statusString == "3securedConnectionDomainInvIPaddr")  
   {
+ 		document.getElementById("ip-info-b").style.display = 'block';
+		document.getElementById("ip-info-v").style.display = 'block';
+  	document.getElementById("ip-info-bh").style.display = 'block';
+		document.getElementById("ip-info-vh").style.display = 'block'; 
     addText("ip-info-b", ipbrowser);
-    if (ipvalidator == "none")  ipvalidator = "";
+    if (ipvalidator == "x")  ipvalidator = "";
     addText("ip-info-v", ipvalidator);
+    addText("ip-info-bh", chrome.i18n.getMessage("ipbrowsertext"));
+	  addText("ip-info-vh", chrome.i18n.getMessage("ipvalidatortext"));
   }
   else
   {
-    addText("ip-info-b", "");
-    addText("ip-info-v", "");  
+		document.getElementById("ip-info-b").style.display = 'none';
+		document.getElementById("ip-info-v").style.display = 'none';
+		document.getElementById("ip-info-bh").style.display = 'none';
+		document.getElementById("ip-info-vh").style.display = 'none';
   }   
 	addText("homepage", chrome.i18n.getMessage("homepage"));	
 	DNSSECicon2(icon);

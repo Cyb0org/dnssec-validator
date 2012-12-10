@@ -166,9 +166,9 @@ BEGIN
     CONTROL         "",IDC_ST5,"Static",SS_LEFT,10,58,200,65
 	PUSHBUTTON      "More info",IDC_ST4, 10,58,50,12
 	LTEXT           "Go to plugin homepage for additional information", IDC_LINK,10,80,200,10
-	CONTROL         "IP obtained by browser:",IDC_STIPBH,"Static",SS_LEFT,10,100,200,10
+	CONTROL         "IP addresses obtained by browser:",IDC_STIPBH,"Static",SS_LEFT,10,100,200,10
 	CONTROL         "",IDC_STIPB,"Static",SS_LEFT,10,110,200,10
-	CONTROL         "IP obtained by add-on:",IDC_STIPVH,"Static",SS_LEFT,10,120,200,10
+	CONTROL         "IP addresses obtained by add-on:",IDC_STIPVH,"Static",SS_LEFT,10,120,200,10
     CONTROL         "",IDC_STIPV,"Static",SS_LEFT,10,130,200,18
 END
 

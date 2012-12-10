@@ -1,4 +1,4 @@
-﻿{
+{
 	"preftitle": {
 		"message": "Validator settings"
 		},
@@ -119,6 +119,8 @@
            "7invalidNoDomainSignatureInfo": {
 		"message": "The parent domain is secured by DNSSEC but the received domain name nonexistence response does not contain a valid signature. This may signalise a domain name spoofing attempt in order to deny the access to the domain."
 		},
+           "ipbrowsertext": {"message": "IP addresses obtained by browser:"},
+           "ipvalidatortext": {"message": "IP addresses obtained by add-on:"},
            "actionDnssec": {"message": "Retrieving DNSSEC status"},
            "inactionDnssec": {"message": "Idle"},
            "errorDnssec": {"message": "DNSSEC status unknown"}
