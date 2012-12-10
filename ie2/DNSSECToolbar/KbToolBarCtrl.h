@@ -32,7 +32,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #pragma once
 const int BITMAP_NUMBER = 7;
 const int StatusBitmap[BITMAP_NUMBER] = {IDI_ICON_KEY_ACTION1 /*0*/, IDI_ICON_KEY_GREEN1 /*1*/,
-	IDI_ICON_KEY_RED1 /*2*/, IDI_ICON_KEY_GREEN_IP1 /*3*/,  IDI_ICON_KEY_GREY1 /*4*/, 
+	IDI_ICON_KEY_RED1 /*2*/, IDI_ICON_KEY_RED_IP1 /*3*/,  IDI_ICON_KEY_GREY1 /*4*/, 
 	IDI_ICON_KEY_GREY_RC1 /*5*/, IDI_ICON_KEY_GREY_YT1 /*6*/};
 
 const LPCTSTR stringtextCZ[BITMAP_NUMBER+1] = {_T("& DNSSEC Validátor\0") /*0*/, _T("& Zabezpeèeno DNSSEC\0") /*1*/,

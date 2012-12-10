@@ -131,7 +131,7 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* 
 		pList->Replace(1, hIcon); // not 5 as a separate is not an image
 		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_RED));
 		pList->Replace(2, hIcon); // not 5 as a separate is not an image
-		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_GREEN_IP));
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_REDIP));
 		pList->Replace(3, hIcon); // not 5 as a separate is not an image
 		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_GREY));
 		pList->Replace(4, hIcon); // not 5 as a separate is not an image
@@ -250,7 +250,7 @@ void CKBToolBarCtrl::OnCommand()
 // Redraw of button bitmap when DNSSEC status was changed
 /**************************************************************************/
 bool CKBToolBarCtrl::RepaintButton(int bindex, int iconindex){
-	//ATLTRACE("RepaintButton(%d):\n",iconindex);
+	ATLTRACE("RepaintButton(%d):\n",iconindex);
 	//delete of last button from toolbar
 	if (!DeleteButton(bindex))
 	return false;
@@ -498,24 +498,22 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 					}
 					break;
 				case IDC_IDDNSSEC:
-					{
+					{					
 					const int STR_BUF_S = 512;
 					char strbuf[STR_BUF_S] = TEXT("");
 					char* dnsip = "8.8.8.8";
 					uint16_t options = 0;
 					bool wrongip = false;
+					char* ipvalidator;
 					short resultipv4 = 0; //the DNSSEC validation result
 					::EnableWindow(::GetDlgItem(hwndDlg,IDC_IDDNSSEC), FALSE);
 					LoadStringA(GHins, IDS_DNSSECTEST_RUN, strbuf, STR_BUF_S);
-					::SetWindowText(::GetDlgItem(hwndDlg,IDC_DNSSEC_R),strbuf);
-				    ub_context_free();
+					::SetWindowText(::GetDlgItem(hwndDlg,IDC_DNSSEC_R),strbuf);					
+				    ub_context_free();					
 					options |= DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
 					if (::IsDlgButtonChecked(hwndDlg, IDC_R4)) dnsip = "nofwd";
 					else { options |= DNSSEC_INPUT_FLAG_USEFWD;
 						if (::IsDlgButtonChecked(hwndDlg, IDC_R1)) dnsip = "";
-						else if (::IsDlgButtonChecked(hwndDlg, IDC_R2)) {
-								(::SendDlgItemMessage(hwndDlg, IDC_COMBO, CB_GETCURSEL, 0, 0)) ? dnsip = oarc : dnsip = nic;
-								}
 						else if (::IsDlgButtonChecked(hwndDlg, IDC_R3)) {
 							TCHAR chText[100];
 							::GetDlgItemText(hwndDlg, IDC_EDIT, chText, 100);
@@ -524,12 +522,12 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 							else wrongip=true;
 						}
 					}
-					options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;
+					options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;					
 					//EnterCriticalSection(&cs);
 					if (!wrongip) {
 						//ATLTRACE("\nTEST: www.nic.cz : %d : %s : 217.31.205.50\n", options, dnsip);
-						resultipv4 = ds_validate("www.nic.cz", options, dnsip,  "217.31.205.50");
-						//ATLTRACE("TEST: www.nic.cz : %d\n", resultipv4);
+						resultipv4 = ds_validate("www.nic.cz", options, dnsip,  "217.31.205.50", &ipvalidator);
+						//ATLTRACE("TEST: www.nic.cz : %d : %s\n", resultipv4, ipvalidator);
 						if (resultipv4==0) LoadStringA(GHins, IDS_DNSSECTEST_ERROR, strbuf, STR_BUF_S);
 						else if ((resultipv4==4)) LoadStringA(GHins, IDS_DNSSECTEST_BOGUS, strbuf, STR_BUF_S);
 						else LoadStringA(GHins, IDS_DNSSECTEST_OK, strbuf, STR_BUF_S);
@@ -612,7 +610,7 @@ LRESULT CKBToolBarCtrl::DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam,
 			strncat_s(strbuf2, TEXT(" "), 1);
 			LoadStringA(GHins, panelpostdomain, strbuf, STR_BUF_S);
 			strncat_s(strbuf2, strbuf, STR_BUF_S*2);
-			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST3),strbuf2);
+			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST3),strbuf2);			
 
 			// load and print posttext from resources
 			//LoadStringA(GHins, panelpostdomain, strbuf, STR_BUF_S);
@@ -672,16 +670,50 @@ LRESULT CKBToolBarCtrl::DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam,
 				LoadStringA(GHins, paneltext, strbuf, STR_BUF_S);
 				mlength = strlen(strbuf); 
 				//ATLTRACE("\n%d\n",mlength);
-				if (mlength < 200) popupheight = 180;
-				else if (mlength < 250) popupheight = 197;
-				else popupheight = 225;
-				::SetWindowPos(::GetDlgItem(hwndDlg,IDC_ST5),NULL,0,0,300,popupheight-125,SWP_NOMOVE);
+
+			if (res == 3) {
+				if (mlength < 240) popupheight = 200;
+				else if (mlength < 270) popupheight = 220;
+				else popupheight = 250;
+				::SetWindowPos(::GetDlgItem(hwndDlg,IDC_ST5),NULL,0,0,300,popupheight-130,SWP_NOMOVE);
+				::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST5),strbuf);
+				m_link.ConvertStaticToHyperlink(hwndDlg, IDC_LINK, _T("http://www.dnssec-validator.cz/ie/"));
+				// resize popup window if IP message was set				
+				
+				popupheight=popupheight+70;
+				const int STR_BUF_S = 512;
+				char strbufb[STR_BUF_S] = TEXT("");
+				char strbufv[STR_BUF_S] = TEXT("");
+				strcpy_s(strbufb, ipbrowser4);
+				strncat_s(strbufb, TEXT(" "), 1);
+				strncat_s(strbufb, ipbrowser6, strlen(ipbrowser6));
+				strcpy_s(strbufv, ipvalidator4);
+				strncat_s(strbufv, ipvalidator6, strlen(ipvalidator6));		
+				::SetWindowPos(::GetDlgItem(hwndDlg,IDC_STIPBH),NULL,15,popupheight-85,0,0,SWP_NOSIZE);
+				::SetWindowText(::GetDlgItem(hwndDlg,IDC_STIPB),strbufb);				
+				::SetWindowPos(::GetDlgItem(hwndDlg,IDC_STIPB),NULL,15,popupheight-70,0,0,SWP_NOSIZE);
+				::SetWindowPos(::GetDlgItem(hwndDlg,IDC_STIPVH),NULL,15,popupheight-50,0,0,SWP_NOSIZE);
+				::SetWindowText(::GetDlgItem(hwndDlg,IDC_STIPV),strbufv);
+				::SetWindowPos(::GetDlgItem(hwndDlg,IDC_STIPV),NULL,15,popupheight-35,0,0,SWP_NOSIZE);
+				::SetWindowPos(::GetDlgItem(hwndDlg,IDC_LINK),NULL,15,popupheight-5,0,0,SWP_NOSIZE);
+				::SetWindowPos(hwndDlg,NULL,0,0,336,popupheight+25,SWP_NOMOVE);
+			}
+			else
+			{
+			::ShowWindow(::GetDlgItem(hwndDlg, IDC_STIPB), SW_HIDE);
+			::ShowWindow(::GetDlgItem(hwndDlg, IDC_STIPV), SW_HIDE);
+			::ShowWindow(::GetDlgItem(hwndDlg, IDC_STIPBH), SW_HIDE);
+			::ShowWindow(::GetDlgItem(hwndDlg, IDC_STIPVH), SW_HIDE);
+				if (mlength < 240) popupheight = 200;
+				else if (mlength < 270) popupheight = 220;
+				else popupheight = 250;
+				::SetWindowPos(::GetDlgItem(hwndDlg,IDC_ST5),NULL,0,0,300,popupheight-130,SWP_NOMOVE);
 				::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST5),strbuf);
 				m_link.ConvertStaticToHyperlink(hwndDlg, IDC_LINK, _T("http://www.dnssec-validator.cz/ie/"));
 				// resize popup window if IP message was set
 				::SetWindowPos(::GetDlgItem(hwndDlg,IDC_LINK),NULL,15,popupheight-30,0,0,SWP_NOSIZE);
 				::SetWindowPos(hwndDlg,NULL,0,0,336,popupheight,SWP_NOMOVE);
-
+			}
 					break;
 			}
 			break;

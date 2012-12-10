@@ -130,7 +130,7 @@ BEGIN
     LTEXT           "Version 2.0-beta1", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
-	LTEXT           "Go to plugin homepage for additional information", IDC_LINK,10,95,200,10
+	LTEXT           "http://www.dnssec-validator.cz/ie/", IDC_LINK,10,95,120,10
 END
 
 IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 170
@@ -150,11 +150,11 @@ BEGIN
 	PUSHBUTTON      "Test current settings",IDC_IDDNSSEC,10, 75+10 ,190,14
 	LTEXT           " ", IDC_DNSSEC_R,10,75+10+14+5,180,20
 	CONTROL			"Display text status besides the key icon", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+48+5, 165 ,10
-	DEFPUSHBUTTON   "Save settings",IDOK,90,18+58+48+23,80,14
+	DEFPUSHBUTTON   "Save settings",IDOK,60,18+58+48+23,80,14
     PUSHBUTTON      "Cancel",IDCANCEL,150,18+58+48+23,50,14
 END
 
-IDD_DIALOG_DNSSEC DIALOGEX 0, 0, 220, 70
+IDD_DIALOG_DNSSEC DIALOGEX 0, 0, 220, 75
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP  
 FONT 8, "Arial", 400, 0, 0x1
 BEGIN
@@ -163,9 +163,13 @@ BEGIN
 	CONTROL         "www.nic.cz",IDC_ST1,"Static",SS_LEFT,40,5,160,10
     CONTROL			"DNSSEC header",IDC_ST2,"Static",SS_LEFT,40,13,160,20
     CONTROL         "Text1",IDC_ST3,"Static",SS_LEFT,10,30,200,25
-    CONTROL         "Additional text",IDC_ST5,"Static",SS_LEFT,10,55,200,65
-	PUSHBUTTON      "More info",IDC_ST4, 10,55,50,12
-	LTEXT           "http://www.dnssec-validator.cz/ie/", IDC_LINK,10,80,120,10
+    CONTROL         "",IDC_ST5,"Static",SS_LEFT,10,58,200,65
+	PUSHBUTTON      "More info",IDC_ST4, 10,58,50,12
+	LTEXT           "Go to plugin homepage for additional information", IDC_LINK,10,80,200,10
+	CONTROL         "IP obtained by browser:",IDC_STIPBH,"Static",SS_LEFT,10,100,200,10
+	CONTROL         "",IDC_STIPB,"Static",SS_LEFT,10,110,200,10
+	CONTROL         "IP obtained by add-on:",IDC_STIPVH,"Static",SS_LEFT,10,120,200,10
+    CONTROL         "",IDC_STIPV,"Static",SS_LEFT,10,130,200,18
 END
 
 /////////////////////////////////////////////////////////////////////////////
@@ -229,7 +233,7 @@ IDI_ICON_KEY_GREEN1      BITMAP  DISCARDABLE                    "res\\key_green.
 IDI_ICON_KEY_ACTION1     BITMAP  DISCARDABLE                    "res\\key_action.bmp"
 IDI_ICON_KEY_GREY1       BITMAP  DISCARDABLE                    "res\\key_grey.bmp"
 IDI_ICON_KEY_GREY_RC1    BITMAP  DISCARDABLE                    "res\\key_grey_rc.bmp"
-IDI_ICON_KEY_GREEN_IP1   BITMAP  DISCARDABLE                    "res\\key_green_ip.bmp"
+IDI_ICON_KEY_RED_IP1     BITMAP  DISCARDABLE                    "res\\key_red.bmp"
 IDI_ICON_KEY_RED1        BITMAP  DISCARDABLE                    "res\\key_red.bmp"
 IDI_ICON_KEY_GREY_YT1    BITMAP  DISCARDABLE                    "res\\key_grey_yt.bmp"
 
@@ -237,7 +241,7 @@ IDI_ICON_KEY_GREEN      ICON                    "res\\key_green.ico"
 IDI_ICON_KEY_ACTION     ICON                    "res\\key_action.ico"
 IDI_ICON_KEY_GREY       ICON                    "res\\key_grey.ico"
 IDI_ICON_KEY_GREY_RC    ICON                    "res\\key_grey_rc.ico"
-IDI_ICON_KEY_GREEN_IP   ICON                    "res\\key_green_ip.ico"
+IDI_ICON_KEY_REDIP		ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_RED        ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_GREY_YT    ICON                    "res\\key_grey_yt.ico"
 
@@ -447,19 +451,17 @@ IDI_ICON_KEY_GREEN1      BITMAP  DISCARDABLE                    "res\\key_green.
 IDI_ICON_KEY_ACTION1     BITMAP  DISCARDABLE                    "res\\key_action.bmp"
 IDI_ICON_KEY_GREY1       BITMAP  DISCARDABLE                    "res\\key_grey.bmp"
 IDI_ICON_KEY_GREY_RC1    BITMAP  DISCARDABLE                    "res\\key_grey_rc.bmp"
-IDI_ICON_KEY_ORANGE1     BITMAP  DISCARDABLE                    "res\\key_orange.bmp"
+IDI_ICON_KEY_RED_IP1     BITMAP  DISCARDABLE                    "res\\key_red.bmp"
 IDI_ICON_KEY_RED1        BITMAP  DISCARDABLE                    "res\\key_red.bmp"
 IDI_ICON_KEY_GREY_YT1    BITMAP  DISCARDABLE                    "res\\key_grey_yt.bmp"
-
 
 IDI_ICON_KEY_GREEN      ICON                    "res\\key_green.ico"
 IDI_ICON_KEY_ACTION     ICON                    "res\\key_action.ico"
 IDI_ICON_KEY_GREY       ICON                    "res\\key_grey.ico"
 IDI_ICON_KEY_GREY_RC    ICON                    "res\\key_grey_rc.ico"
-IDI_ICON_KEY_ORANGE     ICON                    "res\\key_orange.ico"
+IDI_ICON_KEY_REDIP		ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_RED        ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_GREY_YT    ICON                    "res\\key_grey_yt.ico"
-IDI_ICON_KEY_MIRROR     ICON                    "res\\mirror_key.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -576,7 +578,7 @@ BEGIN
 	PUSHBUTTON      "Test souèasného nastavení",IDC_IDDNSSEC,10, 75+10 ,190,14
 	LTEXT           ".", IDC_DNSSEC_R,10,75+10+14+5,180,20
 	CONTROL			"Zobrazovat texty za ikonou klíèku", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+48+5, 165 ,10
-	DEFPUSHBUTTON   "Uložit nastavení",IDOK,90,18+58+48+23,80,14
+	DEFPUSHBUTTON   "Uložit nastavení",IDOK,60,18+58+48+23,80,14
     PUSHBUTTON      "Zrušit",IDCANCEL,150,18+58+48+23,50,14
 END
 
@@ -598,7 +600,7 @@ BEGIN
 	LTEXT           "http://www.dnssec-validator.cz/ie/", IDC_LINK,10,95,120,10
 END
 
-IDD_DIALOG_DNSSEC DIALOGEX 0, 0, 220, 70
+IDD_DIALOG_DNSSEC DIALOGEX 0, 0, 220, 75
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP  
 FONT 8, "Arial", 400, 0, 0x1
 BEGIN
@@ -607,9 +609,13 @@ BEGIN
 	CONTROL         "www.nic.cz",IDC_ST1,"Static",SS_LEFT,40,5,160,10
     CONTROL			"DNSSEC hlavièka",IDC_ST2,"Static",SS_LEFT,40,13,160,20
     CONTROL         "Text1",IDC_ST3,"Static",SS_LEFT,10,30,200,25
-    CONTROL         "Dopòující text",IDC_ST5,"Static",SS_LEFT,10,55,200,65
-	PUSHBUTTON      "Více info",IDC_ST4, 10,55,50,12
+    CONTROL         "",IDC_ST5,"Static",SS_LEFT,10,58,200,65
+	PUSHBUTTON      "Více info",IDC_ST4, 10,58,50,12
 	LTEXT           "Jít na domovskou stránku doplòku pro další informace", IDC_LINK,10,80,200,10
+	CONTROL         "IP adresy použité prohlížeèem:",IDC_STIPBH,"Static",SS_LEFT,10,100,200,10
+	CONTROL         "",IDC_STIPB,"Static",SS_LEFT,10,110,200,10
+	CONTROL         "IP adresy ovìøené doplòkem:",IDC_STIPVH,"Static",SS_LEFT,10,120,200,10
+    CONTROL         "",IDC_STIPV,"Static",SS_LEFT,10,130,200,18
 END
 
 
@@ -797,11 +803,11 @@ BEGIN
 	PUSHBUTTON      "Test DNSSEC-Unterstützung",IDC_IDDNSSEC,10, 75+10 ,190,14
 	LTEXT           "", IDC_DNSSEC_R,10,75+10+14+5,180,20
 	CONTROL			"Legende neben dem Schlüssel-Symbol zeigen", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+48+5, 165 ,10
-	DEFPUSHBUTTON   "Setzen",IDOK,90,18+58+48+23,50,14
+	DEFPUSHBUTTON   "Setzen",IDOK,60,18+58+48+23,80,14
     PUSHBUTTON      "Stornieren",IDCANCEL,150,18+58+48+23,50,14
 END
 
-IDD_DIALOG_DNSSEC DIALOGEX 0, 0, 220, 70
+IDD_DIALOG_DNSSEC DIALOGEX 0, 0, 220, 75
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP  
 FONT 8, "Arial", 400, 0, 0x1
 BEGIN
@@ -810,10 +816,15 @@ BEGIN
 	CONTROL         "www.nic.cz",IDC_ST1,"Static",SS_LEFT,40,5,160,10
     CONTROL			"DNSSEC header",IDC_ST2,"Static",SS_LEFT,40,13,160,20
     CONTROL         "Text1",IDC_ST3,"Static",SS_LEFT,10,30,200,25
-    CONTROL         "Dopòující text",IDC_ST5,"Static",SS_LEFT,10,55,200,65
-	PUSHBUTTON      "Mehr info",IDC_ST4, 10,55,50,12
+    CONTROL         "",IDC_ST5,"Static",SS_LEFT,10,58,200,65
+	PUSHBUTTON      "Mehr info",IDC_ST4, 10,58,50,12
 	LTEXT           "Für mehr Informationen gehe zur Plugin Homepage", IDC_LINK,10,80,200,10
+	CONTROL         "mit browser erhaltene IP-Adresse:",IDC_STIPBH,"Static",SS_LEFT,10,100,200,10
+	CONTROL         "",IDC_STIPB,"Static",SS_LEFT,10,110,200,10
+	CONTROL         "mit Add-on erhaltene IP-Adresse:",IDC_STIPVH,"Static",SS_LEFT,10,120,200,10
+    CONTROL         "",IDC_STIPV,"Static",SS_LEFT,10,130,200,18
 END
+
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -877,7 +888,7 @@ IDI_ICON_KEY_GREEN1      BITMAP  DISCARDABLE                    "res\\key_green.
 IDI_ICON_KEY_ACTION1     BITMAP  DISCARDABLE                    "res\\key_action.bmp"
 IDI_ICON_KEY_GREY1       BITMAP  DISCARDABLE                    "res\\key_grey.bmp"
 IDI_ICON_KEY_GREY_RC1    BITMAP  DISCARDABLE                    "res\\key_grey_rc.bmp"
-IDI_ICON_KEY_ORANGE1     BITMAP  DISCARDABLE                    "res\\key_orange.bmp"
+IDI_ICON_KEY_RED_IP1     BITMAP  DISCARDABLE                    "res\\key_red.bmp"
 IDI_ICON_KEY_RED1        BITMAP  DISCARDABLE                    "res\\key_red.bmp"
 IDI_ICON_KEY_GREY_YT1    BITMAP  DISCARDABLE                    "res\\key_grey_yt.bmp"
 
@@ -885,7 +896,7 @@ IDI_ICON_KEY_GREEN      ICON                    "res\\key_green.ico"
 IDI_ICON_KEY_ACTION     ICON                    "res\\key_action.ico"
 IDI_ICON_KEY_GREY       ICON                    "res\\key_grey.ico"
 IDI_ICON_KEY_GREY_RC    ICON                    "res\\key_grey_rc.ico"
-IDI_ICON_KEY_ORANGE     ICON                    "res\\key_orange.ico"
+IDI_ICON_KEY_REDIP		ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_RED        ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_GREY_YT    ICON                    "res\\key_grey_yt.ico"
 

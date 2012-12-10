@@ -78,7 +78,10 @@ extern short cache_enable;
 extern short ipv4;
 extern short ipv6;
 extern short ipv46;
-
+extern char ipvalidator4[256];
+extern char* ipbrowser4;
+extern char* ipvalidator6;
+extern char* ipbrowser6;
 extern WORD paneltitle;
 extern WORD panelpredonain;
 extern char* paneldomainname;
@@ -88,6 +91,7 @@ extern short paneltextip;
 extern WORD keylogo;
 extern WORD keylogo2;
 extern int err;
+extern short res;
 // variable for IE version check
 extern int iRes,iMajor,iMinor;
 //#if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)

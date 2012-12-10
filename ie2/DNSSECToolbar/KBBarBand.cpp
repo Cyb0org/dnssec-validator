@@ -57,6 +57,11 @@ short ipv4 = IPv4;
 short ipv6 = IPv6;
 short ipv46 = IPv4;
 short ipresult = 0;
+short res;
+char*  ipbrowser4;
+char*  ipbrowser6;
+char ipvalidator4[256];
+char*  ipvalidator6;
 // global state info
 WORD paneltitle  = 0;
 WORD panelpredonain  = 0;
@@ -783,8 +788,8 @@ void CKBBarBand::SetSecurityStatus()
 
 	// state 3
 	case DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP:
-		ldicon = GetBitmapIndex(IDI_ICON_KEY_RED1);
-		ldiconBar = IDI_ICON_KEY_RED;
+		ldicon = GetBitmapIndex(IDI_ICON_KEY_RED_IP1);
+		ldiconBar = IDI_ICON_KEY_REDIP;
 		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE3_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
@@ -857,7 +862,7 @@ void CKBBarBand::SetSecurityStatus()
 	paneltext  = titext;
 	paneltextip = ipresult;
 	RefreshIcon2();
-
+	res=result;
 	/*
 	char tmpbuf[STR_BUF_SIZE] = TEXT("");
 	char tibuf[STR_BUF_SIZE*4] = TEXT(""); // buffer to store tooltip string
@@ -954,12 +959,10 @@ void CKBBarBand::CheckDomainStatus(short change)
 	bool resolvipv6 = true;
 	bool cache_en = true;
 	bool cache_flush = false;
-	char* ipbrowser = "";
 	uint16_t options = 0;
 	debugoutput = true; 
 	short resultipv4 = 0; //the DNSSEC validation result
-	short resultipv6 = 0; //the DNSSEC validation result
-
+	short resultipv6 = 0; //the DNSSEC validation result	
 	tmpdomain= (char*)malloc(2083*sizeof(char));
 	tmpdomain=UrlToDomain(predomain);
 	strcpy_s(domain,2048,tmpdomain);	
@@ -980,7 +983,7 @@ void CKBBarBand::CheckDomainStatus(short change)
 	ip64struct ipv64;
 	ipv64=stub_resolve(domain);
 
-	ipbrowser=ipv64.ipv4;
+	ipbrowser4=ipv64.ipv4;
 	resolvipv4 = true; 
 	resolvipv6 = false; 
 	if (debugoutput) options |= DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
@@ -988,14 +991,17 @@ void CKBBarBand::CheckDomainStatus(short change)
 	if (resolvipv4) options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;
 	if (resolvipv6) options |= DNSSEC_INPUT_FLAG_RESOLVIPV6;
 	if (change==1) {
+	char* ipvalidator4tmp;
 	EnterCriticalSection(&cs);
 	//ATLTRACE("Critical section begin\n");
-	ATLTRACE("\nIPv4: %s : %d : %s : %s\n", domain, options, dnsip, ipbrowser);
-	resultipv4 = ds_validate(domain, options, dnsip, ipbrowser);
-	ATLTRACE("IPv4: %s : %d\n", domain, resultipv4);
+	ATLTRACE("\nIPv4: %s : %d : %s : %s\n", domain, options, dnsip, ipbrowser4);
+	resultipv4 = ds_validate(domain, options, dnsip, ipbrowser4, &ipvalidator4tmp);
+	ATLTRACE("IPv4: %s : %d : %s\n", domain, resultipv4, ipvalidator4); 
 	LeaveCriticalSection(&cs);
+	strcpy_s(ipvalidator4, ipvalidator4tmp);
 	}
-	ipbrowser=ipv64.ipv6;
+
+	ipbrowser6=ipv64.ipv6;
 	resolvipv4 = false; 
 	resolvipv6 = true;
 	options = 0;
@@ -1007,14 +1013,12 @@ void CKBBarBand::CheckDomainStatus(short change)
 	if (change==1) {
 	EnterCriticalSection(&cs);
 	//ATLTRACE("Critical section begin\n");
-	ATLTRACE("\nIPv6: %s : %d : %s : %s\n", domain, options, dnsip, ipbrowser);
-	resultipv6 = ds_validate(domain, options, dnsip, ipbrowser);
-	ATLTRACE("IPv6: %s : %d\n", domain, resultipv6); 
+	ATLTRACE("\nIPv6: %s : %d : %s : %s\n", domain, options, dnsip, ipbrowser6);
+	resultipv6 = ds_validate(domain, options, dnsip, ipbrowser6, &ipvalidator6);
+	ATLTRACE("IPv6: %s : %d : %s\n", domain, resultipv6, ipvalidator6); 
 	LeaveCriticalSection(&cs);
-	}
-	(resultipv4 <= resultipv6 ?  result = resultipv6 : result = resultipv4);
-	//}
-	//result = 7;
+	}		
+	(resultipv4 <= resultipv6 ?  result = resultipv6 : result = resultipv4);	
 	SetSecurityStatus();
 	}
 }

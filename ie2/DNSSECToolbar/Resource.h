@@ -33,7 +33,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define IDI_ICON_KEY_ACTION1            300
 #define IDI_ICON_KEY_GREEN1             301
 #define IDI_ICON_KEY_RED1               302
-#define IDI_ICON_KEY_GREEN_IP1          303
+#define IDI_ICON_KEY_RED_IP1			303
 #define IDI_ICON_KEY_GREY1              304
 #define IDI_ICON_KEY_GREY_RC1           305
 #define IDI_ICON_KEY_GREY_YT1           306
@@ -59,7 +59,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define IDI_ICON_KEY_ACTION             221
 #define IDI_ICON_KEY_GREY               222
 #define IDI_ICON_KEY_GREY_RC            223
-#define IDI_ICON_KEY_GREEN_IP           224
+#define IDI_ICON_KEY_REDIP				224
 #define IDI_ICON_KEY_RED                225
 #define IDI_ICON_KEY_GREY_YT            226
 #define IDR_MENU_POPUP		            1000
@@ -161,6 +161,10 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define IDC_ST4							1034
 #define IDC_ST5							1035
 #define IDC_ST6							1036
+#define IDC_STIPB						1037
+#define IDC_STIPV						1038
+#define IDC_STIPBH						1039
+#define IDC_STIPVH						1040
 
 // menu items
 #define ID_MENUPOPUP_OPTION1            32773
