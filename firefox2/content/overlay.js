@@ -157,6 +157,7 @@ var dnssecExtension = {
       var dsp = document.getElementById("dnssec-plugin");
       //dump('INIT parameters: \"'+ dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
       testnic = dsp.Validate(dn, options, nameserver, addr);
+      testnic = testnic[0];
       if ((testnic==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) || (testnic==c.DNSSEC_EXIT_FAILED)) {
         dnssecExtHandler.showDnssecFwdInfo();	 		
     }

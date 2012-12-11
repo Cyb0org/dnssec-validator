@@ -208,8 +208,7 @@ function testdnssec() {
       var plugin = document.getElementById("dnssec-plugin");
       plugin.CacheFree();
       testnic = plugin.Validate(dn, options, nameserver, addr);
-      console.log('REsult: \"'+ testnic + '\"\n');
-      document.write("<span>"+testnic+"dfggdfgfg</span>");
+      testnic = testnic[0];
       if (testnic==0) {
         window.open('options.html?1,'+chioce+','+tmp, "_top");
       }

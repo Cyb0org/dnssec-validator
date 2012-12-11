@@ -287,6 +287,7 @@ var dnssecExtPrefs = {
       dsp.CacheFree(); 
       //dump('TEST parameters: \"'+ dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
       testnic = dsp.Validate(dn, options, nameserver, addr);
+      testnic = testnic[0];
       //dump('TEST Return: ' + testnic + '\n');
       //this.setLoading(false);
       if (testnic==0) {
