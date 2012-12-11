@@ -23,6 +23,8 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY dnssec.unsecuredLabel "Nezabezpečeno DNSSEC">
 <!ENTITY dnssec.bogusLabel "Neplatný DNSSEC podpis">
 <!ENTITY dnssec.errorLabel "Stav DNSSEC neznámý">
+<!ENTITY dnssec.ipbrowser "IP adresy použité prohlížečem:">
+<!ENTITY dnssec.ipvalidator "IP adresy ověřené doplňkem:">
 <!ENTITY dnssec.about.label "O pluginu...">
 <!ENTITY dnssec.about.accesskey "O">
 <!ENTITY dnssec.home.label "Domovská stánka...">

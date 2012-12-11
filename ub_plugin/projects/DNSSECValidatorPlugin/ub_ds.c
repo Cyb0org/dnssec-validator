@@ -30,8 +30,9 @@ OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
 //----------------------------------------------------------------------------
+#include "ldns/config.h"
 #include "ldns/ldns.h"
-#include "unbound.h"
+#include "libunbound/unbound.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -284,7 +285,10 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv, char *i
   retval = DNSSEC_EXIT_FAILED;
   retval_ipv4 = DNSSEC_EXIT_FAILED;
   retval_ipv6 = DNSSEC_EXIT_FAILED;
-  ub_retval = 0;  
+  ub_retval = 0;
+
+  char* x = "";
+  strcpy( ip_validator, x );  
 
   /* options init - get integer values send from browser */
   ds_init_opts(options);

@@ -65,6 +65,10 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 		<!--<label href="#" onclick="showAddInfo('dnssec-popup-security-detail'); return false;" id="link" class="text-link" value="&dnssec.links;" style="display: block; padding-left: 270px;"/>-->
         <vbox id="dnssec-popup-content-box4">	
 		<description id="dnssec-popup-security-detail" style="display: none;"/>
+		<description id="dnssec-popup-ipbrowser-title" value="&dnssec.ipbrowser;" style="display: none;"/>
+		<description id="dnssec-popup-ipbrowser-ip" style="display: none;"/>
+		<description id="dnssec-popup-ipvalidator-title" value="&dnssec.ipvalidator;" style="display: none;"/>
+		<description id="dnssec-popup-ipvalidator-ip" style="display: none;"/>
 		<label id="dnssec-popup-homepage" class="text-link" value="&dnssec.homepage;" onclick="var win = Components.classes['@mozilla.org/appshell/window-mediator;1']
       .getService(Components.interfaces.nsIWindowMediator)
       .getMostRecentWindow('navigator:browser');

@@ -26,18 +26,42 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 window.addEventListener("load", function() { dnssecExtension.init(); }, false);
 window.addEventListener("unload", function() { dnssecExtension.uninit(); }, false);
 
+var ipvalidator = "";
+var ipbrowser = "";
+var valstate = 0;
+
+function showAddInfoIP() {
+		document.getElementById("dnssec-popup-ipbrowser-title").style.display = 'block';
+		document.getElementById("dnssec-popup-ipbrowser-ip").style.display = 'block';
+		document.getElementById("dnssec-popup-ipvalidator-title").style.display = 'block';
+		document.getElementById("dnssec-popup-ipvalidator-ip").style.display = 'block';
+}
+
+function hideAddInfoIP() {
+		document.getElementById("dnssec-popup-ipbrowser-title").style.display = 'none';
+		document.getElementById("dnssec-popup-ipbrowser-ip").style.display = 'none';
+		document.getElementById("dnssec-popup-ipvalidator-title").style.display = 'none';
+		document.getElementById("dnssec-popup-ipvalidator-ip").style.display = 'none';
+}
 
 function showAddInfo(id) {
 		document.getElementById(id).style.display = 'block';
 		document.getElementById("link").style.display = 'none';
 		document.getElementById("dnssec-popup-homepage").style.display = 'block';
+		if (valstate==3) {showAddInfoIP();}
+		//showAddInfoIP();
 }
 
 function hideAddInfo() {
 		document.getElementById("dnssec-popup-security-detail").style.display = 'none';
 		document.getElementById("link").style.display = 'block';
 		document.getElementById("dnssec-popup-homepage").style.display = 'none';
+		if (valstate==3) {hideAddInfoIP();}
+		//hideAddInfoIP();
 }
+
+
+
 
 var dnssecExtUrlBarListener = {
   onLocationChange: function(aWebProgress, aRequest, aLocationURI)
@@ -343,7 +367,7 @@ var dnssecExtResolver = {
     if (addr == null) {
 	addr = "0.0.0.0";
     } 
-
+    ipbrowser = addr;
     if (dnssecExtension.debugOutput)
       dump(dnssecExtension.debugPrefix + 'Validation parameters: \"'
            + dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
@@ -385,11 +409,12 @@ var dnssecExtResolver = {
     // Get validated data from cache or by NPAPI call
     var resaddrs = '';
     var res = -1;
+    
     //resaddrs = resArr[0];
     res = resArr[0];
-
-
-
+    valstate = res;
+    ipvalidator = resArr[1];
+	
     if (res==0) {
        if (dnssecExtPrefs.getInt("dnsserverchoose") == 0) {
          var dsp = document.getElementById("dnssec-plugin");
@@ -674,6 +699,16 @@ var dnssecExtHandler = {
     return this._dnssecPopupfwdDetail =
       document.getElementById("dnssec-popup-fwd-text");
   },
+  get _dnssecPopupIpBrowser () {
+    delete this._dnssecPopupIpBrowser;
+    return this._dnssecPopupIpBrowser =
+      document.getElementById("dnssec-popup-ipbrowser-ip");
+  },
+  get _dnssecPopupIpValidator () {
+    delete this._dnssecPopupIpValidator;
+    return this._dnssecPopupIpValidator =
+      document.getElementById("dnssec-popup-ipvalidator-ip");
+  },
   // Build out a cache of the elements that we need frequently
   _cacheElements : function() {
     delete this._dnssecBox;
@@ -896,6 +931,15 @@ var dnssecExtHandler = {
     // Set the static strings up front
     this._dnssecPopupSecLabel.textContent = this._domainPreText[newMode] + " " + this._utf8HostName + " " + this._securityText[newMode];
     this._dnssecPopupSecDetail.textContent = this._securityDetail[newMode];
+    
+
+
+    if (valstate==3) {
+    this._dnssecPopupIpBrowser.textContent = ipbrowser;
+    if (ipvalidator=="") ipvalidator="n/a";	
+    this._dnssecPopupIpValidator.textContent = ipvalidator;
+     }
+
     //dump(this._dnssecPopupSecDetail.textContent);
     // Push the appropriate strings out to the UI
     this._dnssecPopupContentHost.textContent = this._utf8HostName;

@@ -272,6 +272,28 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
   font-size: 90%;
 }
 
+
+#dnssec-popup-ipbrowser-title {
+  padding-top: 8px;
+  font-size: 90%;
+}
+
+#dnssec-popup-ipvalidator-title {
+  padding-top: 5px;
+  font-size: 90%;
+}
+
+#dnssec-popup-ipbrowser-ip {
+  font-weight: bold;
+  font-size: 90%;
+}
+
+#dnssec-popup-ipvalidator-ip {
+  font-weight: bold;
+  font-size: 90%;
+}
+
+
 /* DNSSEC popup UI */
 #dnssec-popup-content-box > #dnssec-popup-content-box2.errorDnssec > #dnssec-popup-errorLabel,
 #dnssec-popup-content-box > #dnssec-popup-content-box2.securedConnectionDomain > #dnssec-popup-securedLabel,

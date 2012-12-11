@@ -23,6 +23,8 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY dnssec.unsecuredLabel "Not secured by DNSSEC">
 <!ENTITY dnssec.bogusLabel "Bogus DNSSEC signature">
 <!ENTITY dnssec.errorLabel "DNSSEC status unknown">
+<!ENTITY dnssec.ipbrowser "IP addresses obtained by browser:">
+<!ENTITY dnssec.ipvalidator "IP addresses obtained by add-on:">
 <!ENTITY dnssec.about.label "About plugin...">
 <!ENTITY dnssec.about.accesskey "A">
 <!ENTITY dnssec.home.label "Homepage...">
