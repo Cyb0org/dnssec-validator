@@ -118,6 +118,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
   padding: 10px 10px;
   background-color: -moz-dialog;
   color: -moz-dialogtext;
+  font: -moz-dialog;
 }
 
 #about-title {
