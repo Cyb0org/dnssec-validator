@@ -21,7 +21,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 <!ENTITY prefwindow.title "Validator-Einstellungen">
 <!ENTITY groupboxdnsserver.label "Resolver">
-<!ENTITY radiogroupdnsserver.label "Zur Namensauflösung benutzte DNS-Server:">
+<!ENTITY radiogroupdnsserver.label "Zur NamensauflÃ¶sung benutzte DNS-Server:">
 <!ENTITY radiodnsserversystem.label "Systemeinstellungen benutzen">
 <!ENTITY radiodnsserversystem.accesskey "S">
 <!ENTITY radiodnsserverpreset.label "DNSSEC validierende Resolver:">
@@ -32,4 +32,4 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY radiodnsserveropt.accesskey "E">
 <!ENTITY radiodnsserverunbound.label "Self-Validierung - ohne Resolver">
 <!ENTITY radiodnsserverunbound.accesskey "V">
-<!ENTITY dnssecbutton.label "Test DNSSEC-Unterstützung">
+<!ENTITY dnssecbutton.label "Test DNSSEC-UnterstÃ¼tzung">

@@ -20,10 +20,10 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** -->
 
 <!ENTITY aboutwindow.title "DNSSEC Validator">
-<!ENTITY aboutwindow.grouplabel "Über plugin">
-<!ENTITY aboutwindow.label "DNSSEC Validator für Mozilla Firefox">
-<!ENTITY aboutwindow.description1 "Add-on für DNSSEC Validierung">
-<!ENTITY aboutwindow.description2 "Unterstützte Versionen: 32bit und 64bit">
+<!ENTITY aboutwindow.grouplabel "Ãœber plugin">
+<!ENTITY aboutwindow.label "DNSSEC Validator fÃ¼r Mozilla Firefox">
+<!ENTITY aboutwindow.description1 "Add-on fÃ¼r DNSSEC Validierung">
+<!ENTITY aboutwindow.description2 "UnterstÃ¼tzte Versionen: 32bit und 64bit">
 <!ENTITY aboutwindow.version "Version 2.0-beta1">
 <!ENTITY aboutwindow.company "CZ.NIC Labs">
 <!ENTITY aboutwindow.year "2012">

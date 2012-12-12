@@ -20,6 +20,6 @@
 #***** END LICENSE BLOCK ***** */
 
 dnssecok=Success - DNSSEC-Test bestanden.
-dnssecbogus=Failure - bogus DNSSEC Antwort DNSSEC-Validierung nicht möglich mit den aktuellen Einstellungen.
-dnssecerror=Failure - kein DNS-Antwort, mögliche Netzwerk-Fehler oder falsche Server-Adresse.
-wrongip=Fehler - Zeichenfolge enthält keine gültige IP-Adresse.
+dnssecbogus=Failure - bogus DNSSEC Antwort DNSSEC-Validierung nicht mÃ¶glich mit den aktuellen Einstellungen.
+dnssecerror=Failure - kein DNS-Antwort, mÃ¶gliche Netzwerk-Fehler oder falsche Server-Adresse.
+wrongip=Fehler - Zeichenfolge enthÃ¤lt keine gÃ¼ltige IP-Adresse.
