@@ -244,6 +244,7 @@ IDI_ICON_KEY_GREY_RC    ICON                    "res\\key_grey_rc.ico"
 IDI_ICON_KEY_REDIP		ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_RED        ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_GREY_YT    ICON                    "res\\key_grey_yt.ico"
+IDI_ICON_KEY_MIRROR     ICON					"res\\key_green.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -462,7 +463,7 @@ IDI_ICON_KEY_GREY_RC    ICON                    "res\\key_grey_rc.ico"
 IDI_ICON_KEY_REDIP		ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_RED        ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_GREY_YT    ICON                    "res\\key_grey_yt.ico"
-
+IDI_ICON_KEY_MIRROR     ICON					"res\\key_green.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -899,6 +900,7 @@ IDI_ICON_KEY_GREY_RC    ICON                    "res\\key_grey_rc.ico"
 IDI_ICON_KEY_REDIP		ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_RED        ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_GREY_YT    ICON                    "res\\key_grey_yt.ico"
+IDI_ICON_KEY_MIRROR     ICON					"res\\key_green.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
