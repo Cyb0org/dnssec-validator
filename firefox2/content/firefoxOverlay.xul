@@ -72,7 +72,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 		<label id="dnssec-popup-homepage" class="text-link" value="&dnssec.homepage;" onclick="var win = Components.classes['@mozilla.org/appshell/window-mediator;1']
       .getService(Components.interfaces.nsIWindowMediator)
       .getMostRecentWindow('navigator:browser');
-    win.openUILinkIn('http://www.dnssec-validator.cz', 'tab');" style="display: none;"/>	
+    win.openUILinkIn('https://labs.nic.cz/page/1253/dnssec-validator-2.0-pro-webove-prohlizece/', 'tab');" style="display: none;"/>	
         </vbox>
      </vbox>
     </panel>
@@ -83,7 +83,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
                 oncommand="var win = Components.classes['@mozilla.org/appshell/window-mediator;1']
       .getService(Components.interfaces.nsIWindowMediator)
       .getMostRecentWindow('navigator:browser');
-    win.openUILinkIn('http://www.dnssec-validator.cz', 'tab');" style="display: block;"/>
+    win.openUILinkIn('https://labs.nic.cz/page/1253/dnssec-validator-2.0-pro-webove-prohlizece/', 'tab');" style="display: block;"/>
       <menuseparator/>
       <menuitem label="&dnssec.preferences.label;" accesskey="&dnssec.preferences.accesskey;"
                 oncommand="dnssecExtPrefs.showPrefWindow();"/>
