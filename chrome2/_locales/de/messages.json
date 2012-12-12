@@ -1,0 +1,127 @@
+{
+	"preftitle": {
+		"message": "Validator-Einstellungen"
+		},
+	"prefresolver": {
+		"message": "Zur Namensauflösung benutzte DNS-Server:"
+		},
+	"legend": {
+		"message": "Resolver-Einstellungen"
+		},
+	"resolver0": {
+		"message": "Systemeinstellungen benutzen"
+		},
+	"resolver1": {
+		"message": "Öffentliche validierende Resolver CZ.NIC"
+		},
+	"resolver2": {
+		"message": "Öffentliche validierende Resolver OARC"
+		},
+	"resolver3": {
+		"message": " Eigener "
+		},
+	"resolver4": {
+		"message": "Self-Validierung - ohne Resolver"
+		},
+	"savebutton": {
+		"message": "Einstellungen speichern"
+		},
+	"testbutton": {
+		"message": "Test DNSSEC-Unterstützung"
+		},
+	"cancelbutton": {
+		"message": "Stornieren"
+		},
+	"messageok": {
+		"message": "Success - DNSSEC-Test bestanden."
+		},
+	"messagebogus": {
+		"message": "Failure - bogus DNSSEC Antwort DNSSEC-Validierung nicht möglich mit den aktuellen Einstellungen."
+		},
+	"messageerror": {
+		"message": "Failure - kein DNS-Antwort, mögliche Netzwerk-Fehler oder falsche Server-Adresse."
+		},
+	"messageip": {
+		"message": "Fehler - Zeichenfolge enthält keine gültige IP-Adresse."
+		},
+	"moreinfo": {
+		"message": "Mehr info"
+		},
+	"homepage": {
+		"message": "Für mehr Informationen gehe zur Plugin Homepage"
+		},
+	"dnssecfail": {
+		"message": "DNSSEC Status unbekannt"
+		},
+	"dnssecok": {
+		"message": "Gesichert durch DNSSEC"
+		},
+	"dnssecaction": {
+		"message": "DNSSEC-Status wird erfragt..."
+		},
+	"dnssecbogus": {
+		"message": "Bogus DNSSEC Signatur"
+		},
+ 	"dnssecnone": {
+		"message": "Nicht gesichert durch DNSSEC"
+		},
+	"domain": {
+		"message": "Domäne "
+		},
+	 "nodomain": {
+		"message": "Nicht existierender Domäne "
+		},
+         "0dnssecError": {
+		"message": " kann nicht durch DNSSEC überprüft werden."
+		},
+         "0dnssecErrorInfo": {
+		"message": "Fehler beim Erwerb des DNSSEC Status. Entweder kam es zu einer Unterbrechung der Kommunikation mit dem validierenden Resolver, oder die von den Benutzer gewählte IP Adresse ist nicht eine Adresse von einen validierenden Resolver."
+		},
+         "1unsecuredDomain": {
+		"message": " wird nicht gesichert durch DNSSEC."
+		},
+         "1unsecuredDomainInfo": {
+		"message": "Ihr Computer ist nicht durch DNSSEC für diese Domäne geschützt, so dass sie nicht gegen eine Fälschung dieser Domäne geschützt sind."
+		},
+         "2securedConnectionDomain": {
+		"message": " wird gesichert durch DNSSEC."
+		},
+         "2securedConnectionDomainInfo": {
+		"message": "Ihr Computer ist auch durch DNSSEC für diese Domain geschützt, so dass sie gegen Fälschungen der Domain-Namen geschützt sind."
+		},
+         "3securedConnectionDomainInvIPaddr": {
+		"message": " wird gesichert durch DNSSEC aber Browser die IP-Adresse ist ungültig!"
+		},
+	 "3securedConnectionDomainInvIPaddrInfo": {
+		"message": "Ihr Computer ist auch durch DNSSEC für diese Domain geschützt, so dass sie gegen Fälschungen der Domain-Namen geschützt sind. Anmerkung: Die IP Adresse, die der Browser benutzt, unterscheidet sich von der Adresse, die der DNSSEC Add-on erhielt. Manche Webseiten benutzen mehrere IP Adressen um den Betrieb besser zu optimieren. In einigen Fällen kann das aber auf einen Versuch die Adresse zu fälschen hindeuten." 
+		},
+          "4invalidDomainSignature": {
+		"message": " wird gesichert durch DNSSEC aber ungültigen Domain-Namen Signatur wurde entdeckt!"
+		},
+          "4invalidDomainSignatureInfo": {
+		"message": "Ihr Computer ist auch durch DNSSEC für diese Domain geschützt, aber eine ungültige Signatur für diese Domäne wurde entdeckt. Dass heißt dass die Domäne gefälscht sein könnte!"
+		},
+          "5unsecuredNoDomain": {
+		"message": " wird nicht gesichert durch DNSSEC."
+		},
+          "5unsecuredNoDomainInfo": {
+		"message": "Ihr Computer ist auch durch DNSSEC für diese Domäne geschützt, so dass sie gegen den unterschieben einer nicht existierender Domäne geschützt sind."
+		},
+          "6securedConnectionNoDomain": {
+		"message": " wird gesichert durch DNSSEC."
+		},
+          "6securedConnectionNoDomainInfo": {
+		"message": "Ihr Computer ist nicht durch DNSSEC für diese Domäne geschützt, so dass sie nicht gegen eine Fälschung dieser nicht existierender Domäne geschützt sind."
+		},
+           "7invalidNoDomainSignature": {
+		"message": " wird gesichert durch DNSSEC aber ungültigen Signatur wurde entdeckt!"
+		},
+           "7invalidNoDomainSignatureInfo": {
+		"message": "Ihr Computer ist durch DNSSEC gesichert, aber der Beweis für Domain-Namen Nichtexistenz nicht gültig ist, so ist es wahrscheinlich bedeutet, dass Domain-Namen tatsächlich existiert!"
+		},
+               "ipbrowsertext": {"message": "mit browser erhaltene IP-Adresse:"},
+           "ipvalidatortext": {"message": "mit Add-on erhaltene IP-Adresse:"},
+           "actionDnssec": {"message": "DNSSEC-Status wird erfragt..."},
+           "inactionDnssec": {"message": "Idle."},
+           "errorDnssec": {"message": "DNSSEC Status unbekannt."}
+}
