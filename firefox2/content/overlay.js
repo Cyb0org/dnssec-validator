@@ -454,7 +454,7 @@ var dnssecExtResolver = {
     if (dnssecExtension.debugOutput)
       dump(dnssecExtension.debugPrefix + dnssecExtension.debugStartNotice);
 
-    while (aRecord && aRecord.hasMore()) {   // Address list is not empty
+    if (aRecord && aRecord.hasMore()) {   // Address list is not empty
 
       addr = aRecord.getNextAddrAsString();
 
@@ -468,7 +468,7 @@ var dnssecExtResolver = {
       }
 
       // No need to check more addresses
-      if (resolvipv4 && resolvipv6) break;
+      //if (resolvipv4 && resolvipv6) break;
     }
 
     if (dnssecExtension.debugOutput)
