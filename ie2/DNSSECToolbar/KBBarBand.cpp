@@ -157,7 +157,7 @@ ip64struct stub_resolve(const char *domain)
     // Setup the hints address info structure
     // which is passed to the getaddrinfo() function
     ZeroMemory( &hints, sizeof(hints) );
-    hints.ai_family = AF_UNSPEC;
+    hints.ai_family = AF_INET6;
     hints.ai_protocol = IPPROTO_UDP;
     hints.ai_socktype = SOCK_DGRAM;
 
@@ -185,6 +185,37 @@ ip64struct stub_resolve(const char *domain)
             default: break;
         }
     }
+
+    ZeroMemory( &hints, sizeof(hints) );
+    hints.ai_family = AF_INET;
+    hints.ai_protocol = IPPROTO_UDP;
+    hints.ai_socktype = SOCK_DGRAM;
+
+    // Call getaddrinfo(). If the call succeeds,
+    // the result variable will hold a linked list
+    // of addrinfo structures containing response
+    // information
+    dwRetval = getaddrinfo(domain, NULL, &hints, &result);
+       
+    // Retrieve each address and print out the hex bytes
+    for(ptr=result; ptr != NULL ;ptr=ptr->ai_next) {
+        switch (ptr->ai_family) {
+            case AF_INET:
+                sockaddr_ipv4 = (struct sockaddr_in *) ptr->ai_addr;
+                IPv4x = inet_ntoa(sockaddr_ipv4->sin_addr);
+                //retval4 = strcat_s(retval4,1024,IPv4x);
+                //retval4 = strcat_s(retval4,"|");                                
+                break;
+            case AF_INET6:
+        		sockaddr_ipv6 = (struct sockaddr_in6 *) ptr->ai_addr;
+				IPv6x = inet_ntop(AF_INET6, &sockaddr_ipv6->sin6_addr,str, INET6_ADDRSTRLEN);                              
+                //retval6 = strcat_s (retval6,str);
+                //retval6 = strcat_s (retval6,"|");
+                break;
+            default: break;
+        }
+    }
+
     ip64buf.ipv4 = IPv4x;
     ip64buf.ipv6 = str;
     freeaddrinfo(result);
