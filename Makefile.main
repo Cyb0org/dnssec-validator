@@ -109,19 +109,12 @@ $(UNBOUND_DIR): $(UNBOUND_TARBALL)
 	tar xzf $< -C libs
 
 libsource:
-  rm -rf $(LIBS_SOURCE)
+	rm -rf $(LIBS_SOURCE)
 
 ## plugin
-plugin: 
-ifeq ($(TARGET_OS),LINUX)
-  make -f Makefile.lin
-endif
-ifeq ($(TARGET_OS),MAC)
-  make -f Makefile.mac
-endif
-ifeq ($(TARGET_OS),WINDOWS)
-  make -f Makefile.win
-endif
+plugin:
+	make 
+
 
 clean:
 	rm -rf libs
