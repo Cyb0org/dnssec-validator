@@ -32,6 +32,7 @@ PLUGIN_BUILD_DIR := $(FIREBREATH_DIR)/build
 # PLUGIN_BINARY_TREE is necessary because Mac has dirtree structure instead of
 # a single file.
 ifeq ($(TARGET_OS),LINUX)
+    MAKE_OS := Makefile.lin
     PLUGIN_BINARY := $(PLUGIN_BUILD_DIR)/bin/DNSSECValidatorPlugin/npDNSSECValidatorPlugin.so
     PLUGIN_BINARY_DEBUG := $(PLUGIN_BUILD_DIR)/bin/DNSSECValidatorPlugin/npDNSSECValidatorPlugin.so.debug
     PLUGIN_BINARY_TREE := $(PLUGIN_BINARY)
@@ -50,11 +51,13 @@ ifeq ($(TARGET_OS),MAC)
     # compatibility:
     # -D CMAKE_OSX_DEPLOYMENT_TARGET=10.6 - Set the desired target version of
     #  Mac OS X
+    MAKE_OS := Makefile.mac
     PLUGIN_BINARY := $(PLUGIN_BUILD_DIR)/projects/DNSSECValidatorPlugin/DNSSECValidatorPlugin.plugin/Contents/MacOS/DNSSECValidatorPlugin
     PLUGIN_BINARY_DEBUG := $(PLUGIN_BUILD_DIR)/projects/DNSSECValidatorPlugin/DNSSECValidatorPlugin.dSYM
     PLUGIN_BINARY_TREE := $(PLUGIN_BUILD_DIR)/projects/DNSSECValidatorPlugin/DNSSECValidatorPlugin.plugin
 endif
 ifeq ($(TARGET_OS),WINDOWS)
+    MAKE_OS := Makefile.win
     PLUGIN_BINARY := $(PLUGIN_BUILD_DIR)/bin/DNSSECValidatorPlugin/npDNSSECValidatorPlugin.dll
     PLUGIN_BINARY_DEBUG := $(PLUGIN_BUILD_DIR)/bin/DNSSECValidatorPlugin/npDNSSECValidatorPlugin.dll.debug
     PLUGIN_BINARY_TREE := $(PLUGIN_BINARY)
@@ -113,7 +116,7 @@ libsource:
 
 ## plugin
 plugin:
-	make 
+	make -f $(MAKE_OS) 
 
 
 clean:
