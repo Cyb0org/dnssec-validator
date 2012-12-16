@@ -49,31 +49,32 @@ set(LOCALIZED "Mac/bundle_template/Localized.r")
 add_mac_plugin(${PROJNAME} ${PLIST} ${STRINGS} ${LOCALIZED} SOURCES)
 
 # set header file directories
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/openssl/include
-                    ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/ldns/include
-                    ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/unbound/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/openssl/include
+                    ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/ldns/include
+                    ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/unbound/include)
 
 # set static library paths
 add_library(unbound STATIC IMPORTED)
 set_property(TARGET unbound PROPERTY IMPORTED_LOCATION
-             ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/unbound/lib/libunbound.a)
+             ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/unbound/lib/libunbound.a)
 
 add_library(ldns STATIC IMPORTED)
 set_property(TARGET ldns PROPERTY IMPORTED_LOCATION
-             ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/ldns/lib/libldns.a)
+             ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/ldns/lib/libldns.a)
 
 add_library(ssl STATIC IMPORTED)
 set_property(TARGET ssl PROPERTY IMPORTED_LOCATION
-             ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/openssl/lib/libssl.a)
+             ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/openssl/lib/libssl.a)
 
 add_library(crypto STATIC IMPORTED)
 set_property(TARGET crypto PROPERTY IMPORTED_LOCATION
-             ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/openssl/lib/libcrypto.a)
+             ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/openssl/lib/libcrypto.a)
 
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
 target_link_libraries(${PROJNAME}
     ${PLUGIN_INTERNAL_DEPS}
-    ldns
-    crypto
     unbound
+    ldns
+    ssl
+    crypto
     )

@@ -1,29 +1,14 @@
-# ***** BEGIN LICENSE BLOCK *****
-# Copyright 2012 CZ.NIC, z.s.p.o.
+#/**********************************************************\ 
+# 
+# Auto-generated CMakeLists.txt for the DNSSECValidatorPlugin project
 #
-# Authors: Martin Straka <martin.straka@nic.cz> 
-#
-# This file is part of DNSSEC Validator 2.0 Add-on.
-#
-# DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# DNSSEC Validator 2.0 Add-on is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-# more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
-# ***** END LICENSE BLOCK *****
+#\**********************************************************/
 
 # Written to work with cmake 2.6
 cmake_minimum_required (VERSION 2.6)
 set (CMAKE_BACKWARDS_COMPATIBILITY 2.6)
-set (PROJNAME ${PLUGIN_NAME})
-browserplugin_project(${PROJNAME})
+
+Project(${PLUGIN_NAME})
 
 # add validating library to build on UNIX
 if (NOT WIN32)
@@ -36,6 +21,8 @@ file (GLOB GENERAL RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     [^.]*.cmake
     ${DSLIB}
     )
+
+include_directories(${PLUGIN_INCLUDE_DIRS})
 
 # Generated files are stored in ${GENERATED} by the project configuration
 SET_SOURCE_FILES_PROPERTIES(
@@ -53,5 +40,23 @@ SET( SOURCES
     ${GENERATED}
     )
 
-# This will include Win/projectDef.cmake, Linux/projectDef.cmake, etc
+# This will include Win/projectDef.cmake, X11/projectDef.cmake, Mac/projectDef 
+# depending on the platform
 include_platform()
+
+#this will build a Chrome package
+#add_chrome_package(${PLUGIN_NAME}
+#	${FB_BIN_DIR}/${PLUGIN_NAME}/${CMAKE_CFG_INTDIR}/ 
+#	"${FB_BIN_DIR}/${PLUGIN_NAME}/${CMAKE_CFG_INTDIR}/${FBSTRING_PluginFileName}.dll"
+#	"${CMAKE_CURRENT_SOURCE_DIR}/sign/package_key.pem"
+#	${PROJECT_NAME})
+
+#this will build a XPI package using XPISigner (see http://code.google.com/p/xpisigner/ )
+# add_signed_xpi_installer(${PLUGIN_NAME}
+# 	${FB_BIN_DIR}/${PLUGIN_NAME}/${CMAKE_CFG_INTDIR}/ 
+#   "${FB_BIN_DIR}/${PLUGIN_NAME}/${CMAKE_CFG_INTDIR}/${FBSTRING_PluginFileName}.dll"
+# 	$ENV{XPI_PATH} 
+# 	"${CMAKE_CURRENT_SOURCE_DIR}/sign/certificate.pfx" 
+# 	"${CMAKE_CURRENT_SOURCE_DIR}/sign/passphrase.txt"
+# 	${PROJECT_NAME})
+

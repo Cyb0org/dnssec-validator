@@ -88,7 +88,7 @@ void DNSSECValidatorPlugin::onPluginReady()
 FB::JSAPIPtr DNSSECValidatorPlugin::createJSAPI()
 {
     // m_host is the BrowserHost
-    return FB::JSAPIPtr(new DNSSECValidatorPluginAPI(FB::ptr_cast<DNSSECValidatorPlugin>(shared_ptr()), m_host));
+    return FB::JSAPIPtr(new DNSSECValidatorPluginAPI(FB::ptr_cast<DNSSECValidatorPlugin>(shared_from_this()), m_host));
 }
 
 bool DNSSECValidatorPlugin::onMouseDown(FB::MouseDownEvent *evt, FB::PluginWindow *)

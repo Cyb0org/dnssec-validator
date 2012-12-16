@@ -30,6 +30,7 @@ OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
 //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #include "ldns/ldns.h"
 #include "unbound.h"
 #include <stdio.h>
@@ -51,6 +52,7 @@ OpenSSL used as well as that of the covered work.
 /* Linux */
  #include <arpa/inet.h>
 #endif
+
 
 //----------------------------------------------------------------------------
 #define TA ". IN DS 19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32F24E8FB5"    // DS record of root domain
@@ -284,7 +286,10 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv, char *i
   retval = DNSSEC_EXIT_FAILED;
   retval_ipv4 = DNSSEC_EXIT_FAILED;
   retval_ipv6 = DNSSEC_EXIT_FAILED;
-  ub_retval = 0;  
+  ub_retval = 0;
+
+  char* x = "";
+  strcpy( ip_validator, x );  
 
   /* options init - get integer values send from browser */
   ds_init_opts(options);

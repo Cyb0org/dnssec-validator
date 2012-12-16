@@ -28,16 +28,17 @@ PLUGIN_NAME_DLL = plugins
 
 sys_linux:
 	@echo '### Creating plugin package for Linux... ###'
-	#rm -rf plugins $(PLUGIN_ROOT)/build $(PLUGIN_TMP)
-	./$(PLUGIN_ROOT)/FireBreath/prepmake.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m64 -DCMAKE_CXX_FLAGS=-m64 -DCMAKE_BUILD_TYPE=MinSizeRel
-	make -C $(PLUGIN_ROOT)/build
-  cp $(PLUGIN_ROOT)/build/bin/$(PLUGIN_NAME)/np$(PLUGIN_NAME).so $(PLUGIN_NAME_DLL)/np$(PLUGIN_NAME)_x64.so
-	rm -rf $(PLUGIN_ROOT)/build
-	./$(PLUGIN_ROOT)/FireBreath/prepmake.sh $(PLUGIN_ROOT)/projects $(PLUGIN_ROOT)/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32 -DCMAKE_BUILD_TYPE=MinSizeRel
-	make -C $(PLUGIN_ROOT)/build
-	cp $(PLUGIN_ROOT)/build/bin/$(PLUGIN_NAME)/np$(PLUGIN_NAME).so $(PLUGIN_NAME_DLL)/np$(PLUGIN_NAME)_x86.so
-	strip plugins/np$(PLUGIN_NAME)_x64.so plugins/np$(PLUGIN_NAME)_x86.so
-  @echo '### Done... ###'
+	rm -rf plugins FireBreath/projects
+	mkdir plugins
+	cd FireBreath && mkdir projects && cd ..
+	cp -r plugin-source/* FireBreath/projects	
+	./FireBreath/prepmake.sh FireBreath/projects FireBreath/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m32  -DCMAKE_CXX_FLAGS=-m32  -DCMAKE_BUILD_TYPE=MinSizeRel
+	make -C FireBreath/build
+	cp FireBreath/build/bin/$(PLUGIN_NAME)/np$(PLUGIN_NAME).so $(PLUGIN_NAME_DLL)/np$(PLUGIN_NAME)_x86.so
+	rm -rf FireBreath/build
+	rm -rf FireBreath/projects
+	strip plugins/np$(PLUGIN_NAME)_x86.so
+	@echo '### Done... ###'
   
 clean:
 

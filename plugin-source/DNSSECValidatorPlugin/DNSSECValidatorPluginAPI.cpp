@@ -79,14 +79,14 @@ DNSSECValidatorPluginPtr DNSSECValidatorPluginAPI::getPlugin()
 
 FB::VariantList DNSSECValidatorPluginAPI::Validate(const std::string& domain, const uint16_t options,
                                              const std::string& optdnssrv, const std::string& ipbrowser)
-{
+{    
     FB::VariantList reslist;
     short rv;
     char *ipvalidator = NULL;
     rv = ds_validate(domain.c_str(), options, optdnssrv.c_str(), ipbrowser.c_str(), &ipvalidator);    
     reslist.push_back(rv);
-    reslist.push_back(ipvalidator ? (std::string)ipvalidator : "");  
-  
+    reslist.push_back(ipvalidator ? (std::string)ipvalidator : "");    
+
     return reslist;
 }
 
@@ -99,12 +99,12 @@ bool DNSSECValidatorPluginAPI::ValidateAsync(const std::string& domain, const ui
                                        const std::string& optdnssrv, const std::string& ipbrowser, const FB::JSObjectPtr &callback)
 {
     boost::thread t(boost::bind(&DNSSECValidatorPluginAPI::ValidateAsync_thread,
-         FB::ptr_cast<DNSSECValidatorPluginAPI>(shared_ptr()), domain, options, optdnssrv, ipbrowser, callback));
+         FB::ptr_cast<DNSSECValidatorPluginAPI>(shared_from_this()), domain, options, optdnssrv, ipbrowser, callback));
     return true; // the thread is started
 }
 
 void DNSSECValidatorPluginAPI::ValidateAsync_thread(const std::string& domain, const uint16_t options,
                                               const std::string& optdnssrv, const std::string& ipbrowser, const FB::JSObjectPtr &callback)
 {
-    callback->InvokeAsync("", FB::variant_list_of(shared_ptr())(Validate(domain, options, optdnssrv, ipbrowser)));
+    callback->InvokeAsync("", FB::variant_list_of(shared_from_this())(Validate(domain, options, optdnssrv, ipbrowser)));
 }

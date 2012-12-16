@@ -1,16 +1,16 @@
 # ***** BEGIN LICENSE BLOCK *****
-# Copyright 2012 CZ.NIC, z.s.p.o.
+# Copyright 2010, 2011 CZ.NIC, z.s.p.o.
 #
-# Authors: Martin Straka <martin.straka@nic.cz>
+# Authors: Zbynek Michl <zbynek.michl@nic.cz>
 #
-# This file is part of DNSSEC Validator 2.0 Add-on.
+# This file is part of DNSSEC Validator Add-on.
 #
-# DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
+# DNSSEC Validator Add-on is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or (at your
 # option) any later version.
 #
-# DNSSEC Validator 2.0 Add-on is distributed in the hope that it will be useful,
+# DNSSEC Validator Add-on is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 # more details.
@@ -48,12 +48,12 @@ set(MOZILLA_PLUGINID "nic.cz/DNSSECValidatorPlugin")
 # strings
 set(FBSTRING_CompanyName "CZ.NIC Labs")
 set(FBSTRING_FileDescription "Plug-in used by DNSSEC Validator extension")
-set(FBSTRING_PLUGIN_VERSION "1.0.2")
-set(FBSTRING_LegalCopyright "Copyright 2012 CZ.NIC Labs")
-set(FBSTRING_PluginFileName "np${PLUGIN_NAME}.dll")
-set(FBSTRING_ProductName "DNSSEC Validator Plug-in")
+set(FBSTRING_PLUGIN_VERSION "2.0")
+set(FBSTRING_LegalCopyright "Copyright 2012, 2012 CZ.NIC Labs")
+set(FBSTRING_PluginFileName "ub_np${PLUGIN_NAME}.dll")
+set(FBSTRING_ProductName "DNSSECValidatorPlugin")
 set(FBSTRING_FileExtents "")
-set(FBSTRING_PluginName "DNSSEC Validator Plug-in")
+set(FBSTRING_PluginName "DNSSECValidatorPlugin")
 set(FBSTRING_MIMEType "application/x-dnssecvalidator")
 
 # Mac plugin settings
@@ -62,7 +62,6 @@ set(FBMAC_USE_CARBON 0)
 set(FBMAC_USE_COCOA 0)
 set(FBMAC_USE_COREGRAPHICS 0)
 set(FBMAC_USE_COREANIMATION 0)
-set(FBMAC_USE_INVALIDATINGCOREANIMATION 0)
 
 # If you want to register per-machine on Windows, uncomment this line
 #set (FB_ATLREG_MACHINEWIDE 1)
