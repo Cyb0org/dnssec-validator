@@ -20,14 +20,8 @@
    "minimum_chrome_version": "18",
    "permissions": [ "tabs", "webRequest", "*://*/*" ],
    "plugins": [ {
-      "path": "npDNSSECValidatorPlugin_x86.so"
-    }, {
-      "path": "npDNSSECValidatorPlugin_x64.so"
-     }, {
-      "path": "DNSSECValidatorPlugin.plugin"
-    }, {
-      "path": "npDNSSECValidatorPlugin.dll"
-   } ],
+      "path": "xxxxxxxxxx"
+    } ],
    "update_url": "http://clients2.google.com/service/update2/crx",
    "version": "2.0"
 }
