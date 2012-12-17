@@ -33,23 +33,23 @@ PLUGIN_BUILD_DIR := $(FIREBREATH_DIR)/build
 # a single file.
 ifeq ($(TARGET_OS),LINUX)
     MAKE_OS := Makefile.lin
-    ifeq(BUILD_64BIT,1)
-      SET(ARCH "sys_linux_x64")
+    ifeq ($(BUILD_64BIT),1)
+      ARCH := sys_linux_x64
     else
-      SET(ARCH "sys_linux_x86")
+      ARCH := sys_linux_x86
     endif 
 endif
 ifeq ($(TARGET_OS),MAC)
     MAKE_OS := Makefile.mac
-    ifeq(BUILD_64BIT,1)
-      SET(ARCH "sys_macosx_x64")
+    ifeq ($(BUILD_64BIT),1)
+      ARCH := sys_macosx_x64
     else
-      SET(ARCH "sys_macosx_x86")
+      ARCH := sys_macosx_x86
     endif 
 endif
 ifeq ($(TARGET_OS),WINDOWS)
     MAKE_OS := Makefile.win
-    SET(ARCH "sys_windows_x86")
+    ARCH := sys_windows_x86
 endif
 
 ## uncomment to make plugin build verbose - shows gcc invocations etc.
