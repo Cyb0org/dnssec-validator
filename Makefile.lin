@@ -1,45 +1,57 @@
 # ***** BEGIN LICENSE BLOCK *****
-# Copyright 2010, 2011 CZ.NIC, z.s.p.o.
+# Copyright 2011, 2012 CZ.NIC, z.s.p.o.
 #
-# Authors: Zbynek Michl <zbynek.michl@nic.cz>
+# Authors: Martin Straka <martin.straka@nic.cz>
 #
-# This file is part of DNSSEC Validator Add-on.
+# This file is part of DNSSEC Validator 2.0 Add-on.
 #
-# DNSSEC Validator Add-on is free software: you can redistribute it and/or
+# DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or (at your
 # option) any later version.
 #
-# DNSSEC Validator Add-on is distributed in the hope that it will be useful,
+# DNSSEC Validator 2.0 Add-on is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 # more details.
 #
 # You should have received a copy of the GNU General Public License along with
-# DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
+# DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 # ***** END LICENSE BLOCK *****
 
-PLUGIN_ROOT = ub_plugin
-PLUGIN_TMP = ub_tmp_build
 PLUGIN_NAME = DNSSECValidatorPlugin
-PLUGIN_NAME_DLL = plugins
+PLUGIN_FB_S = FireBreath/projects
+PLUGIN_FB_B = FireBreath/build
 
-#all: sys_linux
 
-sys_linux:
-	@echo '### Creating plugin package for Linux... ###'
-	rm -rf plugins FireBreath/projects
+#all: sys_linux_x86 sys_linux_x64
+
+sys_linux_x86:
+	@echo '### ...Creating plugin library for Linux x86... ###'
+	rm -rf plugins $(PLUGIN_FB_S)
 	mkdir plugins
 	cd FireBreath && mkdir projects && cd ..
-	cp -r plugin-source/* FireBreath/projects	
-	./FireBreath/prepmake.sh FireBreath/projects FireBreath/build -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m32  -DCMAKE_CXX_FLAGS=-m32  -DCMAKE_BUILD_TYPE=MinSizeRel
-	make -C FireBreath/build
-	cp FireBreath/build/bin/$(PLUGIN_NAME)/np$(PLUGIN_NAME).so $(PLUGIN_NAME_DLL)/np$(PLUGIN_NAME)_x86.so
-	rm -rf FireBreath/build
-	rm -rf FireBreath/projects
+	cp -r plugin-source/* $(PLUGIN_FB_S)	
+	./FireBreath/prepmake.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m32  -DCMAKE_CXX_FLAGS=-m32  -DCMAKE_BUILD_TYPE=MinSizeRel
+	make -C $(PLUGIN_FB_B)
+	cp F$(PLUGIN_FB_B)/bin/$(PLUGIN_NAME)/np$(PLUGIN_NAME).so $(PLUGIN_NAME_DLL)/np$(PLUGIN_NAME)_x86.so
+	rm -rf $(PLUGIN_FB_B)
+	rm -rf $(PLUGIN_FB_S)
 	strip plugins/np$(PLUGIN_NAME)_x86.so
-	@echo '### Done... ###'
+	@echo '### ...Plugin x86 Linux ... Done. ###'
+
+sys_linux_x64:
+	@echo '### ...Creating plugin library for Linux x64... ###'
+	rm -rf plugins $(PLUGIN_FB_S)
+	mkdir plugins
+	cd FireBreath && mkdir projects && cd ..
+	cp -r plugin-source/* $(PLUGIN_FB_S)	
+	./FireBreath/prepmake.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m64  -DCMAKE_CXX_FLAGS=-m64  -DCMAKE_BUILD_TYPE=MinSizeRel
+	make -C $(PLUGIN_FB_B)
+	cp F$(PLUGIN_FB_B)/bin/$(PLUGIN_NAME)/np$(PLUGIN_NAME).so $(PLUGIN_NAME_DLL)/np$(PLUGIN_NAME)_x64.so
+	rm -rf $(PLUGIN_FB_B)
+	rm -rf $(PLUGIN_FB_S)
+	strip plugins/np$(PLUGIN_NAME)_x64.so
+	@echo '### ...Plugin x64 Linux ... Done. ###'
   
 clean:
-
-clean_pkg:

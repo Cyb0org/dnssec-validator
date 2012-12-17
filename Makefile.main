@@ -33,34 +33,23 @@ PLUGIN_BUILD_DIR := $(FIREBREATH_DIR)/build
 # a single file.
 ifeq ($(TARGET_OS),LINUX)
     MAKE_OS := Makefile.lin
-    PLUGIN_BINARY := $(PLUGIN_BUILD_DIR)/bin/DNSSECValidatorPlugin/npDNSSECValidatorPlugin.so
-    PLUGIN_BINARY_DEBUG := $(PLUGIN_BUILD_DIR)/bin/DNSSECValidatorPlugin/npDNSSECValidatorPlugin.so.debug
-    PLUGIN_BINARY_TREE := $(PLUGIN_BINARY)
-    # FireBreath/cmake has no equivalent to autoconf's --target=... except for
-    # CMAKE_OSX_ARCHITECTURES (which works obviously only on Mac).
-    # So, yay! Another workaround.
-    # Note in case it ever becomes necessary: linker has --format flag to
-    # explicitly specify library format, e.g. when passed through gcc:
-    # gcc ... -Wl,--format=elf32-i386 ...
-    # There are also two undocumented CMake variables:
-    # CMAKE_MODULE_LINKER_FLAGS and CMAKE_SHARED_LINKER_FLAGS
-    FIREBREATH_CMAKE_FLAGS := -DCMAKE_CXX_FLAGS="$(LIB_CFLAGS)"
+    ifeq(BUILD_64BIT,1)
+      SET(ARCH "sys_linux_x64")
+    else
+      SET(ARCH "sys_linux_x86")
+    endif 
 endif
 ifeq ($(TARGET_OS),MAC)
-    # there is one more FireBreath's prepmake param that might be useful for
-    # compatibility:
-    # -D CMAKE_OSX_DEPLOYMENT_TARGET=10.6 - Set the desired target version of
-    #  Mac OS X
     MAKE_OS := Makefile.mac
-    PLUGIN_BINARY := $(PLUGIN_BUILD_DIR)/projects/DNSSECValidatorPlugin/DNSSECValidatorPlugin.plugin/Contents/MacOS/DNSSECValidatorPlugin
-    PLUGIN_BINARY_DEBUG := $(PLUGIN_BUILD_DIR)/projects/DNSSECValidatorPlugin/DNSSECValidatorPlugin.dSYM
-    PLUGIN_BINARY_TREE := $(PLUGIN_BUILD_DIR)/projects/DNSSECValidatorPlugin/DNSSECValidatorPlugin.plugin
+    ifeq(BUILD_64BIT,1)
+      SET(ARCH "sys_macosx_x64")
+    else
+      SET(ARCH "sys_macosx_x86")
+    endif 
 endif
 ifeq ($(TARGET_OS),WINDOWS)
     MAKE_OS := Makefile.win
-    PLUGIN_BINARY := $(PLUGIN_BUILD_DIR)/bin/DNSSECValidatorPlugin/npDNSSECValidatorPlugin.dll
-    PLUGIN_BINARY_DEBUG := $(PLUGIN_BUILD_DIR)/bin/DNSSECValidatorPlugin/npDNSSECValidatorPlugin.dll.debug
-    PLUGIN_BINARY_TREE := $(PLUGIN_BINARY)
+    SET(ARCH "sys_windows_x86")
 endif
 
 ## uncomment to make plugin build verbose - shows gcc invocations etc.
@@ -68,7 +57,7 @@ endif
 
 ## Configuration is one of Debug, Release, MinSizeRel and RelWithDebInfo.
 ## You need to run 'make prepmake' after changing.
-PLUGIN_CONFIGURATION ?= RelWithDebInfo
+PLUGIN_CONFIGURATION ?= MinSizeRel
 
 libs-build: submodules libs $(OPENSSL_LIB) $(LDNS_LIB) $(UNBOUND_LIB) libsource
 
@@ -116,7 +105,7 @@ libsource:
 
 ## plugin
 plugin:
-	make -f $(MAKE_OS) 
+	make -f $(MAKE_OS) $(ARCH)
 
 
 clean:
@@ -124,3 +113,4 @@ clean:
 	rm -rf FireBreath
 	rm -rf $(LIBS_SOURCE)
 	rm -rf CMakeCache.txt CMakeFiles/ cmake_install.cmake
+

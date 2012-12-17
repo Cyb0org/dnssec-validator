@@ -19,21 +19,21 @@
 # DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 # ***** END LICENSE BLOCK *****
 
-PLUGIN_ROOT = ub_plugin
 PLUGIN_TMP = ub_tmp_build
 PLUGIN_NAME = DNSSECValidatorPlugin
 PLUGIN_NAME_DLL = plugins
 X86_MINGW_CC = i586-mingw32msvc-gcc
 X86_MINGW_STRIP = i586-mingw32msvc-strip
 
-#all: sys_windows
+#all: sys_windows_x86
 
-sys_windows:
-	@echo '###  Creating plugin package for Windows... ###'
+sys_windows_x86:
+	@echo '###  Creating plugin dll for Windows x86... ###'
 	rm -rf $(PLUGIN_TMP)
 	mkdir $(PLUGIN_TMP)
-	$(X86_MINGW_CC) -Wall -shared -o $(PLUGIN_TMP)/ub_ds_windows-x86.dll $(PLUGIN_ROOT)/projects/$(PLUGIN_NAME)/ub_ds.c $(PLUGIN_ROOT)/lib/windows/x86/libunbound.a $(PLUGIN_ROOT)/lib/windows/x86/libldns.a $(PLUGIN_ROOT)/lib/windows/x86/libssl.a $(PLUGIN_ROOT)/lib/windows/x86/libcrypto.a -DRES_WIN -D__USE_MINGW_ANSI_STDIO=1 -I$(PLUGIN_ROOT)/lib/windows/x86 -I$(PLUGIN_ROOT)/lib/ldns -I$(PLUGIN_ROOT)/lib/unbound -I$(PLUGIN_ROOT)/lib/openssl/include -Wl,--output-def,$(PLUGIN_TMP)/ub_ds_windows-x86.def,-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32
+	$(X86_MINGW_CC) -Wall -shared -o $(PLUGIN_TMP)/ub_ds_windows-x86.dll plugin-source/$(PLUGIN_NAME)/ub_ds.c libs/unbound/lib/libunbound.a libs/ldns/lib/libldns.a libs/openssl/lib/libssl.a libs/openssl/lib/libcrypto.a -DRES_WIN -D__USE_MINGW_ANSI_STDIO=1 -Ilibs/ldns/include -Ilibs/unbound/include -Ilibs/openssl/include -Wl,--output-def,$(PLUGIN_TMP)/ub_ds_windows-x86.def,-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32
 	cp $(PLUGIN_TMP)/ub_ds_windows-x86.dll $(PLUGIN_NAME_DLL)
 	cp $(PLUGIN_TMP)/ub_ds_windows-x86.def $(PLUGIN_NAME_DLL)
 	$(X86_MINGW_STRIP) -x -S $(PLUGIN_NAME_DLL)/ub_ds_windows-x86.dll
 	@echo '### Done... ###'
+
