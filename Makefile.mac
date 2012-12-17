@@ -22,33 +22,34 @@
 PLUGIN_NAME = DNSSECValidatorPlugin
 PLUGIN_FB_S = FireBreath/projects
 PLUGIN_FB_B = FireBreath/build
+PLUGIN_NAME_LIB = plugins
 
 #all: sys_macosx_x86 sys_macosx_x64
 
 sys_macosx_x86:
 	@echo '### ...Creating plugin library for MACOSX x86... ###'
-	rm -rf plugins $(PLUGIN_FB_S)
-	mkdir plugins
+	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)
+	mkdir $(PLUGIN_NAME_LIB)
 	cd FireBreath && mkdir projects && cd ..
 	cp -r plugin-source/* $(PLUGIN_FB_S)	
 	./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386" -DCMAKE_BUILD_TYPE=MinSizeRel
 	cd $(PLUGIN_FB_B) && xcodebuild && cd ../..
-	cp -R $(PLUGIN_FB_B)d/projects/$(PLUGIN_NAME)/Debug/$(PLUGIN_NAME).plugin plugins/
-	strip -x -S plugins/$(PLUGIN_NAME).plugin/Contents/MacOS/$(PLUGIN_NAME)
+	cp -R $(PLUGIN_FB_B)d/projects/$(PLUGIN_NAME)/Debug/$(PLUGIN_NAME).plugin $(PLUGIN_NAME_LIB)/
+	strip -x -S $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME).plugin/Contents/MacOS/$(PLUGIN_NAME)
 	rm -rf $(PLUGIN_FB_B)
 	rm -rf $(PLUGIN_FB_S)
 	@echo '### ...Plugin x86 MACOSX ... Done. ###'
 
 sys_macosx_x64:
 	@echo '### ...Creating plugin library for MACOSX x64... ###'
-	rm -rf plugins $(PLUGIN_FB_S)
-	mkdir plugins
+	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)
+	mkdir $(PLUGIN_NAME_LIB)
 	cd FireBreath && mkdir projects && cd ..
 	cp -r plugin-source/* $(PLUGIN_FB_S)	
 	./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="x86_64"  -DCMAKE_BUILD_TYPE=MinSizeRel
 	cd $(PLUGIN_FB_B) && xcodebuild && cd ../..
-	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME)/Debug/$(PLUGIN_NAME).plugin plugins/
-	strip -x -S plugins/$(PLUGIN_NAME).plugin/Contents/MacOS/$(PLUGIN_NAME)
+	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME)/Debug/$(PLUGIN_NAME).plugin $(PLUGIN_NAME_LIB)/
+	strip -x -S $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME).plugin/Contents/MacOS/$(PLUGIN_NAME)
 	rm -rf $(PLUGIN_FB_B)
 	rm -rf $(PLUGIN_FB_S)
 	@echo '### ...Plugin x64 MACOSX ... Done. ###'
