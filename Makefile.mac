@@ -22,9 +22,15 @@
 PLUGIN_NAME = DNSSECValidatorPlugin
 PLUGIN_FB_S = FireBreath/projects
 PLUGIN_FB_B = FireBreath/build
-PLUGIN_NAME_LIB = plugins
+PLUGIN_NAME_LIB = plugins-lib
+PLUGIN_ADD_ON = packages
+ADDON_PATH_FF = add-on/firefox2
+ADDON_PATH_CR = add-on/chrome2
+EXTENSION_VERSION = $(shell cat add-on/firefox2/install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p')
 
-#all: sys_macosx_x86 sys_macosx_x64
+
+
+#all: sys_macosx_x86 sys_macosx_x64 xpi_x86 xpi_x64
 
 sys_macosx_x86:
 	@echo '### ...Creating plugin library for MACOSX x86... ###'
@@ -40,6 +46,24 @@ sys_macosx_x86:
 	rm -rf $(PLUGIN_FB_S)
 	@echo '### ...Plugin x86 MACOSX ... Done. ###'
 
+xpi_x86:
+	@echo '### Creating package for Firefox MACOSX x86... ###'
+	rm -rf $(ADDON_PATH_FF)/plugins
+	mkdir $(ADDON_PATH_FF)/plugins
+	chmod 777 $(ADDON_PATH_FF)/build.sh
+	cp -R $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME).plugin $(ADDON_PATH_FF)/plugins
+	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
+	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
+	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec_validator-$(EXTENSION_VERSION)-macosx-x86.xpi
+	@echo '### Creating package for Firefox MACOSX x86... ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating package for Chrome MACOSX x86... ###'
+	cp -R $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME).plugin $(ADDON_PATH_CR)
+	sed 's/xxxxxxxxxx/DNSSECValidatorPlugin.plugin/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
+	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-macosx-x86.tar.gz chrome2 && mv CR-dnssec_validator-$(EXTENSION_VERSION)-macosx-x86.tar.gz ../$(PLUGIN_ADD_ON)
+	cd $(ADDON_PATH_CR) && rm -rf $(PLUGIN_NAME).plugin manifest.json
+	@echo '### Creating package for Chrome MACOSX x86... ###'
+
 sys_macosx_x64:
 	@echo '### ...Creating plugin library for MACOSX x64... ###'
 	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)
@@ -53,6 +77,24 @@ sys_macosx_x64:
 	rm -rf $(PLUGIN_FB_B)
 	rm -rf $(PLUGIN_FB_S)
 	@echo '### ...Plugin x64 MACOSX ... Done. ###'
+
+xpi_x64:
+	@echo '### Creating package for Firefox MACOSX x64... ###'
+	rm -rf $(ADDON_PATH_FF)/plugins
+	mkdir $(ADDON_PATH_FF)/plugins
+	chmod 777 $(ADDON_PATH_FF)/build.sh
+	cp -R $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME).plugin $(ADDON_PATH_FF)/plugins
+	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86_64-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
+	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
+	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec_validator-$(EXTENSION_VERSION)-macosx-x64.xpi
+	@echo '### Creating package for Firefox MACOSX x64... ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating package for Chrome MACOSX x64... ###'
+	cp -R $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME).plugin $(ADDON_PATH_CR)
+	sed 's/xxxxxxxxxx/DNSSECValidatorPlugin.plugin/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
+	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-macosx-x64.tar.gz chrome2 && mv CR-dnssec_validator-$(EXTENSION_VERSION)-macosx-x64.tar.gz ../$(PLUGIN_ADD_ON)
+	cd $(ADDON_PATH_CR) && rm -rf $(PLUGIN_NAME).plugin manifest.json
+	@echo '### Creating package for Chrome MACOSX x64... ###' 
 
 
 clean:

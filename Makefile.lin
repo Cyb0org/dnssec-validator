@@ -28,7 +28,7 @@ ADDON_PATH_FF = add-on/firefox2
 ADDON_PATH_CR = add-on/chrome2
 EXTENSION_VERSION = $(shell cat add-on/firefox2/install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p')
 
-#all: sys_linux_x86 sys_linux_x64 xpi_x86 xpi_64
+#all: sys_linux_x86 sys_linux_x64 xpi_x86 xpi_x64
 
 sys_linux_x86:
 	@echo '### ...Creating plugin library for Linux x86... ###'
@@ -48,14 +48,14 @@ xpi_x86:
 	rm -rf $(ADDON_PATH_FF)/plugins
 	mkdir $(ADDON_PATH_FF)/plugins
 	chmod 777 $(ADDON_PATH_FF)/build.sh
-	cp plugins/npDNSSECValidatorPlugin_x86.so $(ADDON_PATH_FF)/plugins
+	cp $(PLUGIN_NAME_LIB)/npDNSSECValidatorPlugin_x86.so $(ADDON_PATH_FF)/plugins
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
 	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec_validator-$(EXTENSION_VERSION)-linux-x86.xpi
 	@echo '### Creating package for Firefox Linux x86... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Chrome Linux x86... ###'
-	cp plugins/npDNSSECValidatorPlugin_x86.so $(ADDON_PATH_CR)
+	cp $(PLUGIN_NAME_LIB)/npDNSSECValidatorPlugin_x86.so $(ADDON_PATH_CR)
 	sed 's/xxxxxxxxxx/npDNSSECValidatorPlugin_x86.so/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
 	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz chrome2 && mv CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz ../$(PLUGIN_ADD_ON)
 	cd $(ADDON_PATH_CR) && rm -rf npDNSSECValidatorPlugin_x86.so manifest.json
@@ -82,14 +82,14 @@ xpi_x64:
 	rm -rf $(ADDON_PATH_FF)/plugins
 	mkdir $(ADDON_PATH_FF)/plugins
 	chmod 777 $(ADDON_PATH_FF)/build.sh
-	cp plugins/npDNSSECValidatorPlugin_x64.so $(ADDON_PATH_FF)/plugins
+	cp $(PLUGIN_NAME_LIB)/npDNSSECValidatorPlugin_x64.so $(ADDON_PATH_FF)/plugins
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86_64-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
 	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec_validator-$(EXTENSION_VERSION)-linux-x64.xpi
 	@echo '### Creating package for Firefox Linux x64... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Chrome Linux x64... ###'
-	cp plugins/npDNSSECValidatorPlugin_x64.so $(ADDON_PATH_CR)
+	cp $(PLUGIN_NAME_LIB)/npDNSSECValidatorPlugin_x64.so $(ADDON_PATH_CR)
 	sed 's/xxxxxxxxxx/npDNSSECValidatorPlugin_x64.so/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
 	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x64.tar.gz chrome2 && mv CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x64.tar.gz ../$(PLUGIN_ADD_ON)
 	cd $(ADDON_PATH_CR) && rm -rf npDNSSECValidatorPlugin_x64.so manifest.json
