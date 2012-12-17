@@ -30,6 +30,6 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY menuitemdnsserveroarc.label "OARC">
 <!ENTITY radiodnsserveropt.label "Eigener:">
 <!ENTITY radiodnsserveropt.accesskey "E">
-<!ENTITY radiodnsserverunbound.label "Self-Validierung - ohne Resolver">
-<!ENTITY radiodnsserverunbound.accesskey "V">
-<!ENTITY dnssecbutton.label "Test DNSSEC-Unterstützung">
+<!ENTITY radiodnsserverunbound.label "Ohne Resolver">
+<!ENTITY radiodnsserverunbound.accesskey "O">
+<!ENTITY dnssecbutton.label "Bestehende Einstellungen testen">

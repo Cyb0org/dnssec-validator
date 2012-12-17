@@ -20,11 +20,11 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** -->
 
 <!ENTITY dnssec.securedLabel "Gesichert durch DNSSEC">
-<!ENTITY dnssec.unsecuredLabel "Nicht gesichert durch DNSSEC">
-<!ENTITY dnssec.bogusLabel "Bogus DNSSEC Signatur">
-<!ENTITY dnssec.errorLabel "DNSSEC Status unbekannt">
-<!ENTITY dnssec.ipbrowser "mit browser erhaltene IP-Adresse:">
-<!ENTITY dnssec.ipvalidator "mit Add-on erhaltene IP-Adresse:">
+<!ENTITY dnssec.unsecuredLabel "Nicht durch DNSSEC gesichert">
+<!ENTITY dnssec.bogusLabel "Ungültige DNSSEC-Signatur">
+<!ENTITY dnssec.errorLabel "DNSSEC-Zustand unbekannt">
+<!ENTITY dnssec.ipbrowser "Von Webbrowser benutzte IP-Adresse:">
+<!ENTITY dnssec.ipvalidator "Von Add-on erworbene IP-Adresse:">
 <!ENTITY dnssec.about.label "Über...">
 <!ENTITY dnssec.about.accesskey "U">
 <!ENTITY dnssec.home.label "Startseite...">

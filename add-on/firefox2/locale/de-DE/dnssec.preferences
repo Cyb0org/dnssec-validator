@@ -19,7 +19,7 @@
 #DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #***** END LICENSE BLOCK ***** */
 
-dnssecok=Success - DNSSEC-Test bestanden.
-dnssecbogus=Failure - bogus DNSSEC Antwort DNSSEC-Validierung nicht möglich mit den aktuellen Einstellungen.
-dnssecerror=Failure - kein DNS-Antwort, mögliche Netzwerk-Fehler oder falsche Server-Adresse.
-wrongip=Fehler - Zeichenfolge enthält keine gültige IP-Adresse.
+dnssecok=Erfolg – Die bestehenden Einstellungen ermöglichen Validierung durch DNSSEC.
+dnssecbogus=Versagen – ungültige DNSSEC Antwort, die DNSSEC-Validierung ist nicht mit bestehenden Einstellungen möglich.
+dnssecerror=Versagen – keine DNSSEC Antwort, die eingegebene IP-Adesse des Resolvers ist ungültig, oder es gibt einen Netzwerkfehler.
+wrongip=Fehler – Zeichenkette enthält keine gültige IP-Adresse.

@@ -800,8 +800,8 @@ BEGIN
 	//COMBOBOX        IDC_COMBO, 122, 47, 70, 120 ,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 	CONTROL			" Eigener:",					 IDC_R3,"Button",BS_AUTORADIOBUTTON, 15, 50, 40, 10
 	EDITTEXT        IDC_EDIT, 60, 50, 120 ,12 ,ES_AUTOHSCROLL
-	CONTROL			" Self-Validierung - ohne Resolver", IDC_R4,"Button",BS_AUTORADIOBUTTON, 15, 65, 180, 10
-	PUSHBUTTON      "Test DNSSEC-Unterstützung",IDC_IDDNSSEC,10, 75+10 ,190,14
+	CONTROL			" Ohne Resolver", IDC_R4,"Button",BS_AUTORADIOBUTTON, 15, 65, 180, 10
+	PUSHBUTTON      "Bestehende Einstellungen testen",IDC_IDDNSSEC,10, 75+10 ,190,14
 	LTEXT           "", IDC_DNSSEC_R,10,75+10+14+5,180,20
 	CONTROL			"Legende neben dem Schlüssel-Symbol zeigen", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+48+5, 165 ,10
 	DEFPUSHBUTTON   "Setzen",IDOK,60,18+58+48+23,80,14
@@ -820,9 +820,9 @@ BEGIN
     CONTROL         "",IDC_ST5,"Static",SS_LEFT,10,58,200,65
 	PUSHBUTTON      "Mehr info",IDC_ST4, 10,58,50,12
 	LTEXT           "Für mehr Informationen gehe zur Plugin Homepage", IDC_LINK,10,80,200,10
-	CONTROL         "mit browser erhaltene IP-Adresse:",IDC_STIPBH,"Static",SS_LEFT,10,100,200,10
+	CONTROL         "Von Webbrowser benutzte IP-Adresse:",IDC_STIPBH,"Static",SS_LEFT,10,100,200,10
 	CONTROL         "",IDC_STIPB,"Static",SS_LEFT,10,110,200,10
-	CONTROL         "mit Add-on erhaltene IP-Adresse:",IDC_STIPVH,"Static",SS_LEFT,10,120,200,10
+	CONTROL         "Von Add-on erworbene IP-Adresse:",IDC_STIPVH,"Static",SS_LEFT,10,120,200,10
     CONTROL         "",IDC_STIPV,"Static",SS_LEFT,10,130,200,18
 END
 
@@ -933,57 +933,63 @@ BEGIN
 	IDS_DNSSEC_KEY_TEXT_5 " Not secured by DNSSEC technology"
 	IDS_DNSSEC_KEY_TEXT_6 " DNS connection error"
 
+		// Deafult
+	IDS_PRE_TEXT_ERROR		"Der Domänenname"
+	IDS_PRE_TEXT_DOMAIN		"Der Domänenname"	
+	IDS_PRE_TEXT_NODOMAIN	"Die Nichtexistenz des Domänennamen"
+
+
 	// state 0 - GREY ? 
-	IDS_STATE0_TEXT_TOOLTIP "DNSSEC Status unbekannt"
-	IDS_STATE0_TEXT_DOMAIN  "kann nicht durch DNSSEC überprüft werden."
-	IDS_STATE0_TEXT_MAIN	"Fehler beim Erwerb des DNSSEC Status. Entweder kam es zu einer Unterbrechung der Kommunikation mit dem validierenden Resolver, oder die von den Benutzer gewählte IP Adresse ist nicht eine Adresse von einen validierenden Resolver."	
+	IDS_STATE0_TEXT_TOOLTIP "DNSSEC-Zustand unbekannt"
+	IDS_STATE0_TEXT_DOMAIN  "kann nicht mit DNSSEC überprüft werden."
+	IDS_STATE0_TEXT_MAIN	"Während der Ermittlung des DNSSEC-Zustandes kam es zu einem Fehler. Dieser kann durch einen Anschlussausfall zum DNS-Server oder eine falsch angegebene IP-Adresse eines validierenden Resolvers verursacht sein."	
 
 	//state 1 - GREY	
-	IDS_STATE1_TEXT_TOOLTIP "Nicht gesichert durch DNSSEC"
-	IDS_STATE1_TEXT_DOMAIN  "wird nicht gesichert durch DNSSEC."
-	IDS_STATE1_TEXT_MAIN	"Ihr Computer ist nicht durch DNSSEC für diese Domäne geschützt, so dass sie nicht gegen eine Fälschung dieser Domäne geschützt sind."
+	IDS_STATE1_TEXT_TOOLTIP "Nicht durch DNSSEC gesichert"
+	IDS_STATE1_TEXT_DOMAIN  "ist nicht durch DNSSEC gesichert."
+	IDS_STATE1_TEXT_MAIN	"Weil der Domänenname nicht durch DNSSEC gesichert ist, gibt es keinen Weg die Gültigkeit der gewonnenen IP-Adressdaten zu gewährleisten. Sie sind somit nicht gegen DNS-Spoofing gesichert."
 
 	//state 2 - GREEN
 	IDS_STATE2_TEXT_TOOLTIP "Gesichert durch DNSSEC"
-	IDS_STATE2_TEXT_DOMAIN  "wird gesichert durch DNSSEC."
-	IDS_STATE2_TEXT_MAIN	"Ihr Computer ist auch durch DNSSEC für diese Domain geschützt, so dass sie gegen Fälschungen der Domain-Namen geschützt sind."
+	IDS_STATE2_TEXT_DOMAIN  "ist korrekt durch DNSSEC gesichert."
+	IDS_STATE2_TEXT_MAIN	"Die zu diesem Domänennamen angehörige IP-Adresse war mit DNSSEC überprüft und bestätigt. Diese Domäne ist durch DNSSEC gesichert, sie sind somit gegen DNS-Spoofing gesichert."
 
-	//state 3 - GREEN IP
+	//state 3 - RED IP
 	IDS_STATE3_TEXT_TOOLTIP "Gesichert durch DNSSEC"
-	IDS_STATE3_TEXT_DOMAIN  "wird gesichert durch DNSSEC aber Browser die IP-Adresse ist ungültig!"
-	IDS_STATE3_TEXT_MAIN	"Ihr Computer ist auch durch DNSSEC für diese Domain geschützt, so dass sie gegen Fälschungen der Domain-Namen geschützt sind. Anmerkung: Die IP Adresse, die der Browser benutzt, unterscheidet sich von der Adresse, die der DNSSEC Add-on erhielt. Manche Webseiten benutzen mehrere IP Adressen um den Betrieb besser zu optimieren. In einigen Fällen kann das aber auf einen Versuch die Adresse zu fälschen hindeuten."
+	IDS_STATE3_TEXT_DOMAIN  "ist durch DNSSEC gesichert, aber die vom Webbrowser benutzte IP-Adresse ist ungültig."
+	IDS_STATE3_TEXT_MAIN	"Die zu diesem Domänennamen angehörige IP-Adresse war mit DNSSEC überprüft und nicht bestätigt. Es mag einen legitimen Grund für die Verwendung einer anderen IP-Adresse geben, es kann sich auch allerdings um DNS-Spoofing handeln."
 
 	//state 4 - RED
-	IDS_STATE4_TEXT_TOOLTIP "Bogus DNSSEC Signatur"
-	IDS_STATE4_TEXT_DOMAIN  "wird gesichert durch DNSSEC aber ungültigen Domain-Namen Signatur wurde entdeckt!"
-	IDS_STATE4_TEXT_MAIN	"Ihr Computer ist auch durch DNSSEC für diese Domain geschützt, aber eine ungültige Signatur für diese Domäne wurde entdeckt. Dass heißt dass die Domäne gefälscht sein könnte!"
+	IDS_STATE4_TEXT_TOOLTIP "Ungültige DNSSEC-Signatur"
+	IDS_STATE4_TEXT_DOMAIN  "ist durch DNSSEC gesichert, allerdings ist die DNSSEC-Signatur inkorrekt."
+	IDS_STATE4_TEXT_MAIN	"Dieser Domänenname ist durch DNSSEC gesichert, aber keine gültige Vertrauenskette konnte zusammengestellt werden. Dies kann auf DNS-Spoofing hindeuten."
 
 	//state 5 - GREY
-	IDS_STATE5_TEXT_TOOLTIP "Nicht gesichert durch DNSSEC"
-	IDS_STATE5_TEXT_DOMAIN  "wird nicht gesichert durch DNSSEC."
-	IDS_STATE5_TEXT_MAIN	"Ihr Computer ist auch durch DNSSEC für diese Domäne geschützt, so dass sie gegen den unterschieben einer nicht existierender Domäne geschützt sind."
+	IDS_STATE5_TEXT_TOOLTIP "Nicht durch DNSSEC gesichert"
+	IDS_STATE5_TEXT_DOMAIN  "kann nicht mit DNSSEC überprüft werden."
+	IDS_STATE5_TEXT_MAIN	"Die übergeordnete Domäne ist nicht durch DNSSEC gesichert, deswegen kann dieser Domänenname nicht überprüft werden."
 
 	//state 6 - GREEN
 	IDS_STATE6_TEXT_TOOLTIP "Gesichert durch DNSSEC"
-	IDS_STATE6_TEXT_DOMAIN  "wird gesichert durch DNSSEC."
-	IDS_STATE6_TEXT_MAIN	"Ihr Computer ist nicht durch DNSSEC für diese Domäne geschützt, so dass sie nicht gegen eine Fälschung dieser nicht existierender Domäne geschützt sind."
+	IDS_STATE6_TEXT_DOMAIN  "war mit DNSSEC überprüft und bestätigt."
+	IDS_STATE6_TEXT_MAIN	"Die übergeordnete Domäne ist durch DNSSEC gesichert, darum ist es möglich die Nichtexistenz des Domänennamen zu bestätigen."
 
 	//state 7 - RED
-	IDS_STATE7_TEXT_TOOLTIP "Bogus DNSSEC Signatur"
-	IDS_STATE7_TEXT_DOMAIN  "wird gesichert durch DNSSEC aber ungültigen Domain-Namen Signatur wurde entdeckt!"
-	IDS_STATE7_TEXT_MAIN	"Ihr Computer ist durch DNSSEC gesichert, aber der Beweis für Domain-Namen Nichtexistenz nicht gültig ist, so ist es wahrscheinlich bedeutet, dass Domain-Namen tatsächlich existiert!"
+	IDS_STATE7_TEXT_TOOLTIP "Ungültige DNSSEC-Signatur"
+	IDS_STATE7_TEXT_DOMAIN  "war mit DNSSEC überprüft, konnte aber wegen einer ungültigen Signatur nicht bestätigt werden."
+	IDS_STATE7_TEXT_MAIN	"Die übergeordnete Domäne ist durch DNSSEC gesichert. Die erworbene Antwort, welche die Nichtexistenz der Domäne bestätigen soll, enthält eine ungültige Signatur. Dies deutet auf einen DNS-Spoofing Versuch zur Anschlussverweigerung hin."
 
     IDS_NONE                " "
     IDS_ADDON_INIT          "Add-on initialisiert"
     
 	IDS_DNSSEC_OK			 "Gesichert durch DNSSEC"
-    IDS_DNSSEC_FAIL			 "Nicht gesichert durch DNSSEC"
+    IDS_DNSSEC_FAIL			 "Nicht durch DNSSEC gesichert"
 
 	// DNSSEC TEST messages in settings dialog
-	IDS_DNSSECTEST_IP		"Fehler - Zeichenfolge enthält keine gültige IP-Adresse."
-	IDS_DNSSECTEST_OK		"Success - DNSSEC-Test bestanden."
-	IDS_DNSSECTEST_BOGUS	"Failure - bogus DNSSEC Antwort DNSSEC-Validierung nicht möglich mit den aktuellen Einstellungen."
-	IDS_DNSSECTEST_ERROR	"Failure - kein DNS-Antwort, mögliche Netzwerk-Fehler oder falsche Server-Adresse."
+	IDS_DNSSECTEST_IP		"Fehler – Zeichenkette enthält keine gültige IP-Adresse."
+	IDS_DNSSECTEST_OK		"Erfolg – Die bestehenden Einstellungen ermöglichen Validierung durch DNSSEC."
+	IDS_DNSSECTEST_BOGUS	"Versagen – ungültige DNSSEC Antwort, die DNSSEC-Validierung ist nicht mit bestehenden Einstellungen möglich."
+	IDS_DNSSECTEST_ERROR	"Versagen – keine DNSSEC Antwort, die eingegebene IP-Adesse des Resolvers ist ungültig, oder es gibt einen Netzwerkfehler."
 	IDS_DNSSECTEST_RUN      "Testen..."
 
 END
