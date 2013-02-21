@@ -54,6 +54,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
           	<description id="dnssec-popup-securedLabel" value="&dnssec.securedLabel;"/>
           	<description id="dnssec-popup-unsecuredLabel" value="&dnssec.unsecuredLabel;"/>
 		<description id="dnssec-popup-errorLabel" value="&dnssec.errorLabel;"/>
+		<description id="dnssec-popup-dnssecOffLabel" value="&dnssec.offLabel;"/>
 		<description id="dnssec-popup-bogusLabel" value="&dnssec.bogusLabel;"/>			 	
 	  </vbox>	
 	</hbox>

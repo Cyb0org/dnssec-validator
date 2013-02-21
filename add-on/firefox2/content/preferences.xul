@@ -40,6 +40,8 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
       <preference id="dnsserverpresetchoose" name="extensions.dnssec.dnsserverpresetchoose" type="int"/>
       <preference id="dnsserveraddr" name="extensions.dnssec.dnsserveraddr" type="string"/>
       <preference id="optdnsserveraddr" name="extensions.dnssec.optdnsserveraddr" type="string"/>
+      <preference id="domainfilteron" name="extensions.dnssec.domainfilteron" type="bool"/>
+      <preference id="domainlist" name="extensions.dnssec.domainlist" type="string"/>
       <preference id="version" name="extensions.dnssec.version" type="string"/>
       <preference id="resolvingactive" name="extensions.dnssec.resolvingactive" type="bool"/>
       <preference id="popupfgcolor" name="extensions.dnssec.popupfgcolor" type="string"/>
@@ -72,12 +74,18 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
       </radiogroup>
     </groupbox>
     <button id="dnssec-pref-testbutton" label="&dnssecbutton.label;" oncommand="dnssecExtPrefs.testdnssec();"/>
-    <progressmeter id="identifier" mode="determined" value="50" style="display: none;"/>
-    <description id="dnssecok" style="display: none;"/>
-    <description id="dnssecbogus" style="display: none;"/>
-    <description id="dnssecerror" style="display: none;"/>
-    <description id="wrongip" style="display: none;"/>
-    <description id="space" value="  " style="display: block;"/>
-    <description id="space1" value="  " style="display: block;"/>
-  </prefpane>
+    <description id="dnssecok" style="display: none; min-height: 40px;"/>
+    <description id="dnssecbogus" style="display: none; min-height: 40px;"/>
+    <description id="dnssecerror" style="display: none; min-height: 40px;"/>
+    <description id="wrongip" style="display: none; min-height: 40px;"/>
+    <description id="space" value="  " style="display: block; min-height: 40px;"/>
+<groupbox>
+      <caption label="&groupboxfilter.label;"/>
+      <checkbox id="dnssec-pref-usefilter" label="&usefilter.label;" preference="domainfilteron" accesskey="&usefilter.accesskey;" checked="false" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
+      <description value="&filtertext.label;"/>       
+      <textbox id="dnssec-pref-domains" rows="3" multiline="true" disabled="true" preference="domainlist" oninput="dnssecExtPrefs.optdnsserveraddrInput();"/>               
+</groupbox>
+<separator class="groove-thin"/>
+
+</prefpane>
 </prefwindow>

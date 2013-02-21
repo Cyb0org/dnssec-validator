@@ -5,6 +5,15 @@
 	"prefresolver": {
 		"message": "DNS resolver(y) používané pro překlad jmen:"
 		},
+	"groupboxfilter": {
+		"message": "Doménový filtr"
+		},
+	"usefilter": {
+		"message": "Použít doménový filtr"
+		},
+	"filtertext": {
+		"message": "Seznam domén nebo TLD oddělených čárkou"
+		},
 	"legend": {
 		"message": "Nastavení resolveru"
 		},
@@ -65,11 +74,20 @@
  	"dnssecnone": {
 		"message": "Nezabezpečeno DNSSEC"
 		},
+ 	"validatoroff": {
+		"message": "Neověřeno DNSSEC"
+		},
 	"domain": {
 		"message": "Doménové jméno "
 		},
 	 "nodomain": {
 		"message": "Neexistence doménového jména "
+		},
+         "dnsseOff": {
+		"message": " nebylo ověřeno pomocí technologie DNSSEC."
+		},
+         "dnsseOffInfo": {
+		"message": "Jelikož máte povolen doménový filtr a toto doménové jméno nebo jeho TLD je v seznamu uvedeno, nebyla DNSSEC validace pro tuto doménu provedena."
 		},
          "0dnssecError": {
 		"message": " nelze ověřit pomocí DNSSEC technologie."

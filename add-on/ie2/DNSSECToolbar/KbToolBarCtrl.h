@@ -30,22 +30,22 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #endif // _MSC_VER > 1000
 */
 #pragma once
-const int BITMAP_NUMBER = 7;
+const int BITMAP_NUMBER = 8;
 const int StatusBitmap[BITMAP_NUMBER] = {IDI_ICON_KEY_ACTION1 /*0*/, IDI_ICON_KEY_GREEN1 /*1*/,
 	IDI_ICON_KEY_RED1 /*2*/, IDI_ICON_KEY_RED_IP1 /*3*/,  IDI_ICON_KEY_GREY1 /*4*/, 
-	IDI_ICON_KEY_GREY_RC1 /*5*/, IDI_ICON_KEY_GREY_YT1 /*6*/};
+	IDI_ICON_KEY_GREY_RC1 /*5*/, IDI_ICON_KEY_GREY_YT1 /*6*/, IDI_ICON_KEY_WHITE1 /*7*/};
 
 const LPCTSTR stringtextCZ[BITMAP_NUMBER+1] = {_T("& DNSSEC Validátor\0") /*0*/, _T("& Zabezpeèeno DNSSEC\0") /*1*/,
 	_T("& Neplatný DNSSEC podpis\0") /*2*/, _T("& Zabezpeèeno DNSSEC\0") /*3*/,  _T("& Neaktivní okno èi záložka\0") /*4*/, 
-	_T("& Nezabezpeèeno DNSSEC\0") /*5*/, _T("& Stav DNSSEC neznámý\0") /*6*/, _T("& DNSSEC\0") /*7*/};
+	_T("& Nezabezpeèeno DNSSEC\0") /*5*/, _T("& Stav DNSSEC neznámý\0") /*6*/, _T("& Neovìøeno DNSSEC\0") /*7*/, _T("& DNSSEC\0") /*8*/};
 
 const LPCTSTR stringtextEN[BITMAP_NUMBER+1] = {_T("& DNSSEC Validator\0") /*0*/, _T("& Secured by DNSSEC\0") /*1*/,
 	_T("& Bogus DNSSEC signature\0") /*2*/, _T("& Secured by DNSSEC\0") /*3*/,  _T("& Inactive window or tab\0") /*4*/, 
-	_T("& Not secured by DNSSEC\0") /*5*/, _T("& DNSSEC status unknown\0") /*6*/, _T("& DNSSEC\0") /*7*/};
+	_T("& Not secured by DNSSEC\0") /*5*/, _T("& DNSSEC status unknown\0") /*6*/, _T("& Not verified by DNSSEC\0") /*7*/, _T("& DNSSEC\0") /*8*/};
 
 const LPCTSTR stringtextDE[BITMAP_NUMBER+1] = {_T("& DNSSEC Validator\0") /*0*/, _T("& Gesichert durch DNSSEC\0") /*1*/,
 	_T("& Bogus DNSSEC Signatur\0") /*2*/, _T("& Gesichert durch DNSSEC\0") /*3*/,  _T("& Inaktive Fenster oder Tab\0") /*4*/, 
-	_T("& Nicht gesichert durch DNSSEC\0") /*5*/, _T("& DNSSEC-Status unbekannt\0") /*6*/, _T("& DNSSEC\0") /*7*/};
+	_T("& Nicht gesichert durch DNSSEC\0") /*5*/, _T("& DNSSEC-Status unbekannt\0") /*6*/, _T("& Nicht durch DNSSEC geprüft\0") /*7*/, _T("& DNSSEC\0") /*8*/};
 		// Ein Fehler ist beim Abfragen des DNSSEC-Status aufgetreten
 class CKBBarBand;
 /////////////////////////////////////////////////////////////////////////////

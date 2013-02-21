@@ -38,6 +38,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define IDI_ICON_KEY_GREY_RC1           305
 #define IDI_ICON_KEY_GREY_YT1           306
 #define IDI_ICON_KEY_MIRROR				307
+#define IDI_ICON_KEY_WHITE1				308
 
 // key icon for DNSSEC dialog
 #define IDI_ICON_KEY_GREEN2             401
@@ -62,6 +63,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define IDI_ICON_KEY_REDIP				224
 #define IDI_ICON_KEY_RED                225
 #define IDI_ICON_KEY_GREY_YT            226
+#define IDI_ICON_KEY_WHITE				227
 #define IDR_MENU_POPUP		            1000
 
 	// Deafult
@@ -99,14 +101,15 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define IDS_STATE7_TEXT_TOOLTIP 124
 #define IDS_STATE7_TEXT_DOMAIN  125
 #define	IDS_STATE7_TEXT_MAIN	126
-	//state 8 - RED
-#define	IDS_STATE8_TEXT_TOOLTIP 127
-#define	IDS_STATE8_TEXT_DOMAIN  128
-#define	IDS_STATE8_TEXT_MAIN	129
-	//state 9 - RED
+	//state -1 - RED
+#define	IDS_STATE01_TEXT_TOOLTIP 127
+#define	IDS_STATE01_TEXT_DOMAIN  128
+#define	IDS_STATE01_TEXT_MAIN	129
+	// not used
 #define IDS_STATE9_TEXT_TOOLTIP 130
 #define	IDS_STATE9_TEXT_DOMAIN  131
 #define	IDS_STATE9_TEXT_MAIN	132
+
 	// init text for tooltip
 #define IDS_NONE                        133
 #define IDS_ADDON_INIT                  134
@@ -144,7 +147,8 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define IDC_R4							1023
 #define IDC_IDDNSSEC					1024
 #define IDC_DNSSEC_R					1025
-
+#define IDC_DOM_ENABLE					1026
+#define IDT_DOM_LIST					1027
 
 // DNSSEC TEST messages in settings dialog
 #define IDS_DNSSECTEST_IP				1050

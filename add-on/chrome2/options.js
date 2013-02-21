@@ -129,6 +129,11 @@ function checkOptdnsserveraddr(str) {
     else return true;
 }
 
+function checkdomainlist() {
+    var str=document.getElementById("domainlist").value;
+    var match = str.match(/^[a-z0-9.-]+(, [a-z0-9.-]+)*$/);
+    return match != null;
+}
 
 function cancelOptions() {
         console.log("CLOSE:");
@@ -150,6 +155,8 @@ function saveOptions() {
 	localStorage["dnssecResolver"] = resolver;
 	localStorage["dnssecCustomResolver"] = document.dnssecSettings.customResolver.value;
         localStorage["dnssecDebugOutput"] = document.dnssecSettings.debugOutput.checked;
+	localStorage["domainfilteron"] = document.dnssecSettings.domainfilteron.checked;
+	localStorage["domainlist"] = document.dnssecSettings.domainlist.value;
 	document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidator\" width=\"0\" height=\"0\"></object>");
         var plugin = document.getElementById("dnssec-plugin");
 	plugin.CacheFree();
@@ -169,6 +176,8 @@ function testdnssec() {
       var addr = "217.31.205.50";
       var chioce = 0;
       var tmp = document.dnssecSettings.customResolver.value;
+      var vvvv = unescape(tmp);
+      console.log(vvvv);
       var radiogroup = document.dnssecSettings.resolver;
 	for (var i = 0; i < radiogroup.length; i++) {
 		var child = radiogroup[i];
@@ -181,7 +190,7 @@ function testdnssec() {
             	        break;
 		    case 1: // Custom
 			chioce=1;
-         		tmp = document.dnssecSettings.customResolver.value;
+         		//tmp = document.dnssecSettings.customResolver.value;
 			if (!checkOptdnsserveraddr(tmp)) { 
 			   ip=true;
  		        }
@@ -199,7 +208,7 @@ function testdnssec() {
 	         } // if
 	} // for
    if (ip) {
-        window.open('options.html?0,'+chioce+','+tmp, "_top");
+        window.open('options.html?0,'+chioce+','+unescape(tmp), "_top");
    }
    else {
      try {
@@ -210,13 +219,13 @@ function testdnssec() {
       testnic = plugin.Validate(dn, options, nameserver, addr);
       testnic = testnic[0];
       if (testnic==0) {
-        window.open('options.html?1,'+chioce+','+tmp, "_top");
+        window.open('options.html?1,'+chioce+','+unescape(tmp), "_top");
       }
       else if (testnic==4) {
-        window.open('options.html?2,'+chioce+','+tmp, "_top");
+        window.open('options.html?2,'+chioce+','+unescape(tmp), "_top");
       }
       else { 
-        window.open('options.html?3,'+chioce+','+tmp, "_top");
+        window.open('options.html?3,'+chioce+','+unescape(tmp), "_top");
       }       
     } catch (ex) {
        console.log('Error: Plugin call failed!\n');
@@ -282,6 +291,7 @@ window.addEventListener('load',function(){
 	state = matches[1];
         choice = matches[2];
         resolver = matches[3];
+	unescape(resolver);
 	console.log(state);
 	console.log(choice);
 	console.log(resolver);
@@ -302,6 +312,9 @@ window.addEventListener('load',function(){
 	addText("messagebogus", chrome.i18n.getMessage("messagebogus"));
 	addText("messageerror", chrome.i18n.getMessage("messageerror"));
 	addText("messageip", chrome.i18n.getMessage("messageip"));
+	addText("groupboxfilter", chrome.i18n.getMessage("groupboxfilter"));
+	addText("usefilter", chrome.i18n.getMessage("usefilter"));
+	addText("filtertext", chrome.i18n.getMessage("filtertext"));
 	document.getElementById("testbutton").value=chrome.i18n.getMessage("testbutton");
 	document.getElementById("savebutton").value=chrome.i18n.getMessage("savebutton");
 	document.getElementById("cancelbutton").value=chrome.i18n.getMessage("cancelbutton");
@@ -312,6 +325,9 @@ window.addEventListener('load',function(){
         	var dnssecCustomResolver = localStorage["dnssecCustomResolver"];
         	// debug output of resolving to stderr
         	var debugOutput = localStorage["dnssecDebugOutput"];
+
+		var domainfilteron = localStorage["domainfilteron"];
+		var domainlist = localStorage["domainlist"];
 
 		if (dnssecResolver == undefined) {
 			dnssecResolver = defaultResolver;
@@ -324,6 +340,9 @@ window.addEventListener('load',function(){
 
 	        document.dnssecSettings.customResolver.value = dnssecCustomResolver;
 	        document.dnssecSettings.debugOutput.checked = debugOutput;
+	        document.dnssecSettings.domainlist.value = domainlist;
+		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;
+	        document.dnssecSettings.domainfilteron.checked = domainfilteron;
 
 		var radiogroup = document.dnssecSettings.resolver;
 		for (var i = 0; i < radiogroup.length; i++) {
@@ -336,10 +355,15 @@ window.addEventListener('load',function(){
 	  }
 	else
 	 {
-	        document.dnssecSettings.customResolver.value = resolver;
+	        document.dnssecSettings.customResolver.value = unescape(resolver);
 		var radiogroup = document.dnssecSettings.resolver;
 		var child = radiogroup[choice];
 		child.checked = "true";
+		var domainfilteron = localStorage["domainfilteron"];
+		var domainlist = localStorage["domainlist"];
+	        document.dnssecSettings.domainlist.value = domainlist;
+		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;
+	        document.dnssecSettings.domainfilteron.checked = domainfilteron;
 			
 	}  //state
 });

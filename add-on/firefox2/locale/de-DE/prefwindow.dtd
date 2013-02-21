@@ -33,3 +33,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY radiodnsserverunbound.label "Ohne Resolver">
 <!ENTITY radiodnsserverunbound.accesskey "O">
 <!ENTITY dnssecbutton.label "Bestehende Einstellungen testen">
+<!ENTITY groupboxfilter.label "Domain-Namen-Filter">
+<!ENTITY usefilter.label "Aktivieren Sie die Domain-Filter">
+<!ENTITY usefilter.accesskey "A">
+<!ENTITY filtertext.label "Liste der Domänen oder TLD durch Komma getrennt">

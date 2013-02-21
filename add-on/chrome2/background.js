@@ -27,11 +27,13 @@ document.write("<body>");
 document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidator\" width=\"0\" height=\"0\"></object>");
 document.write("<script>");
 
-	// Save all IP addresses by URLs in a temporary object
-	var currentIPList= new Array();
+	// some variables for chrome IP API
+	var currentIPList= new Array(); // Save all IP addresses by URLs in a temporary object
 	var addr = "0.0.0.0";  // set default IP address
-	var init = true;
+	var addrbackup = "0.0.0.0";  // set default IP address for backup
+	var init = true; // init test of DNSSEC
 
+	// States of DNSSEC validator
 	var dnssecExtNPAPIConst = {
   		DNSSEC_EXIT_FAILED                         : 0, /* state is unknown or fail*/
 		DNSSEC_EXIT_DOMAIN_UNSECURED 		   : 1, /* domain is not secured */
@@ -47,10 +49,11 @@ document.write("<script>");
   		DNSSEC_INPUT_FLAG_RESOLVIPV6               : 8, /* resolve IPv6 address (AAAA record) */
 	};
 
-
-/* connection is secured, but domain has invalid signature */
-
+	//connection is secured, but domain has invalid signature
         var dnssecModes = {
+          // No DNSSEC signature
+          DNSSEC_MODE_OFF                    : "dnsseOff",
+	  DNSSEC_MODE_OFF_INFO               : "dnsseOffInfo",
           // No DNSSEC signature
           DNSSEC_MODE_DOMAIN_UNSECURED                    : "1unsecuredDomain",
           DNSSEC_MODE_DOMAIN_UNSECURED_INFO               : "1unsecuredDomainInfo",
@@ -80,39 +83,12 @@ document.write("<script>");
           DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID          : "7invalidNoDomainSignature",
           DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID_INFO     : "7invalidNoDomainSignatureInfo",
 
-/*
-          // Non-existent domain and also connection are secured but browser's IP address is invalid
-          DNSSEC_MODE_CONNECTION_NODOMAIN_INVIPADDR_SECURED : "securedConnectionNoDomainInvIPaddr",
-          // Connection is secured, but domain name signature is invalid
-          DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_SECURED     : "securedConnectionInvSigDomain",
-          // Connection is secured, but domain name signature and browser's IP address are invalid
-          DNSSEC_MODE_CONNECTION_INVSIGDOMAIN_INVIPADDR_SECURED : "securedConnectionInvSigDomainInvIPaddr",
-          // Domain is secured and has a valid signature, but no chain of trust
-          DNSSEC_MODE_DOMAIN_SIGNATURE_VALID              : "validDomainSignature",
-          // Authoritative domain is secured and has a valid signature, but no chain of trust
-          DNSSEC_MODE_AUTH_DOMAIN_SIGNATURE_VALID         : "validAuthDomainSignature",
-          // Domain is secured and has a valid signature, but browser's IP address is invalid
-          DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_VALID    : "validDomainSignatureInvIPaddr",
-          // Domain is secured, but it has an invalid signature
-          DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID            : "invalidDomainSignature",
-          // Domain is secured, but signature and browser's IP address are invalid
-          DNSSEC_MODE_INVIPADDR_DOMAIN_SIGNATURE_INVALID  : "invalidDomainSignatureInvIPaddr",
-          // Non-existent domain is secured and has a valid signature, but no chain of trust
-          DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID            : "validNoDomainSignature",
-          // Authoritative non-existent domain is secured and has a valid signature, but no chain of trust
-          DNSSEC_MODE_AUTH_NODOMAIN_SIGNATURE_VALID       : "validAuthNoDomainSignature",
-          // Non-existent domain is secured and has a valid signature, but browser's IP address is invalid
-          DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_VALID  : "validNoDomainSignatureInvIPaddr",
-
-          // Non-existent domain is secured, but signature and browser's IP address are invalid
-          DNSSEC_MODE_INVIPADDR_NODOMAIN_SIGNATURE_INVALID : "invalidNoDomainSignatureInvIPaddr",
-*/
           // Getting security status
-          DNSSEC_MODE_ACTION : "actionDnssec",
+          DNSSEC_MODE_ACTION     : "actionDnssec",
           // Inaction status
-          DNSSEC_MODE_INACTION : "inactionDnssec",
+          DNSSEC_MODE_INACTION   : "inactionDnssec",
           // Error or unknown state occured
-          DNSSEC_MODE_ERROR : "0dnssecError",
+          DNSSEC_MODE_ERROR 	 : "0dnssecError",
 	  DNSSEC_MODE_ERROR_INFO : "0dnssecErrorInfo",
 
           // Tooltips
@@ -124,99 +100,109 @@ document.write("<script>");
             
         };
 
-        function setMode(newMode, tabId, domain, status,  addr, ipval) {
+	// this function sets DNSSEC mode. status ICON and popup text
+   function setMode(newMode, tabId, domain, status,  addr, ipval) {
             var icon;
 	    var title;
 	    var domainpre;
-      var tooltiptitle;
-		console.log("SET MODE: " + newMode + "; TabId: " + tabId + "; Doamin: " + domain + "; Status: " + status);
+      	    var tooltiptitle;
+	    
+	    console.log("Set mode: " + newMode + "; TabId: " + tabId + "; Doamin: " + domain + "; Status: " + status);
             
 	switch (newMode) {
             /* green icon */
             // Both domain and connection are secured
             case this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED:
-              icon = "icon_green.png";
-	      title = "dnssecok";
-	      domainpre = "domain";
-        tooltiptitle = chrome.i18n.getMessage("dnssecok");
+              	icon = "icon_green.png";
+	      	title = "dnssecok";
+	      	domainpre = "domain";
+        	tooltiptitle = chrome.i18n.getMessage("dnssecok");
               break;
             // Both non-existent domain and connection are secured
             case this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED:
-              icon = "icon_green.png";
-	      title = "dnssecok";
-	      domainpre = "nodomain";
-        tooltiptitle = chrome.i18n.getMessage("dnssecok");
+              	icon = "icon_green.png";
+	      	title = "dnssecok";
+	      	domainpre = "nodomain";
+	        tooltiptitle = chrome.i18n.getMessage("dnssecok");
               break;
             // Domain and also connection are secured but browser's IP address is invalid
             case this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED:
-              icon = "icon_red.png";
-     	      title = "dnssecok";
-	      domainpre = "domain";
-        tooltiptitle = chrome.i18n.getMessage("dnssecok");
+	        icon = "icon_red.png";
+ 	 	title = "dnssecok";
+		domainpre = "domain";
+	        tooltiptitle = chrome.i18n.getMessage("dnssecok");
               break;
             /* grey icon */
 
             // No DNSSEC signature
             case this.dnssecModes.DNSSEC_MODE_DOMAIN_UNSECURED:
-              icon = "icon_grey2.png";
-	      title = "dnssecnone";
-	      domainpre = "domain";
-        tooltiptitle = chrome.i18n.getMessage("dnssecnone");
+	        icon = "icon_grey2.png";
+		title = "dnssecnone";
+	        domainpre = "domain";
+	        tooltiptitle = chrome.i18n.getMessage("dnssecnone");
               break; 
             case this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED:
-              icon = "icon_grey2.png";
-	      title = "dnssecnone";
-	      domainpre = "nodomain";
-        tooltiptitle = chrome.i18n.getMessage("dnssecnone");
+                icon = "icon_grey2.png";
+	        title = "dnssecnone";
+	        domainpre = "nodomain";
+	        tooltiptitle = chrome.i18n.getMessage("dnssecnone");
               break;
 
             /* red icon */
             // Domain signature is invalid
             case this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID:
-              icon = "icon_red.png";
-	      title = "dnssecbogus";
-	      domainpre = "domain";
-        tooltiptitle = chrome.i18n.getMessage("dnssecbogus");
+                 icon = "icon_red.png";
+	        title = "dnssecbogus";
+	        domainpre = "domain";
+	        tooltiptitle = chrome.i18n.getMessage("dnssecbogus");
               break;
             // Non-existent domain signature is invalid
             case this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID:
-              icon = "icon_red.png";
-	      title = "dnssecbogus";
-	      domainpre = "nodomain";
-        tooltiptitle = chrome.i18n.getMessage("dnssecbogus");
+                icon = "icon_red.png";
+	        title = "dnssecbogus";
+	        domainpre = "nodomain";
+	        tooltiptitle = chrome.i18n.getMessage("dnssecbogus");
               break;
             // Getting security status
             case this.dnssecModes.DNSSEC_MODE_ACTION:
-              icon = "icon_action.gif";
-	      title = "dnssecaction";
-        tooltiptitle = chrome.i18n.getMessage("dnssecaction");
+                icon = "icon_action.gif";
+	        title = "dnssecaction";
+	        tooltiptitle = chrome.i18n.getMessage("dnssecaction");
+              break;
+            case this.dnssecModes.DNSSEC_MODE_OFF:
+                icon = "icon_white.png";
+		domainpre = "domain";
+  	        title = "validatoroff";
+                tooltiptitle = chrome.i18n.getMessage("validatoroff");
               break;
             // An error occured
             case this.dnssecModes.DNSSEC_MODE_ERROR:
             // Unknown
             default:
-              icon = "icon_unknown.png";
-	      title = "dnssecfail";
-	      domainpre = "domain";	
-        tooltiptitle = chrome.i18n.getMessage("dnssecfail");
-            }
+               icon = "icon_unknown.png";
+	       title = "dnssecfail";
+	       domainpre = "domain";	
+               tooltiptitle = chrome.i18n.getMessage("dnssecfail");
+     	} // switch
 
 
             chrome.pageAction.setTitle({tabId: tabId, title: tooltiptitle}); 
 
             //console.log("icon: " + icon);
-            chrome.pageAction.setIcon({path: icon,
-                                           tabId: tabId});
+            chrome.pageAction.setIcon({path: icon, tabId: tabId});
+
             chrome.pageAction.show(tabId);
             //chrome.pageAction.setTitle({tabId: tabId, 
             //                            title: "DNSSEC status for " + domain + ": " + newMode});
             
             // This is extremely fucking annoying, but chrome.extension.getViews() won't work
             // unless popup is opened, so we set the validation result like GET parameters.
-            chrome.pageAction.setPopup({tabId: tabId, popup: "popup.html?" + domain + "," + newMode + "," + icon + "," + title + "," + domainpre + "," + addr + "," + ipval});
-        };
+            chrome.pageAction.setPopup({tabId: tabId, popup: "popup.html?" + domain + "," 
+		+ newMode + "," + icon + "," + title + "," + domainpre + "," + addr + "," + ipval});
+     }; // setMode
 
-        function getResolver() {
+     // get information about custom resolver
+     function getResolver() {
             var resolver = "";
             var dnssecResolver = localStorage["dnssecResolver"];
             if (dnssecResolver != undefined) {
@@ -236,54 +222,72 @@ document.write("<script>");
             }
 
             return resolver;
-        };
+        }; // getResolver
         
-	// Called when the url of a tab changes.
-        function onUrlChange(tabId, changeInfo, tab) {
-	    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");         
-            // reset any old popup
-            chrome.pageAction.setPopup({tabId: tabId, popup: ""});
 
-            // hide icon for chrome:// and chrome-extension:// urls
-            if (tab.url.match(/^chrome(?:-extension)?:\/\//)) {
+   // Called when the url of a tab changes.
+   function onUrlChange(tabId, changeInfo, tab) {                  
+	// reset any old popup
+        chrome.pageAction.setPopup({tabId: tabId, popup: ""});
+
+        // hide icon for chrome:// and chrome-extension:// urls
+        if (tab.url.match(/^chrome(?:-extension)?:\/\//)) {
+              chrome.pageAction.hide(tabId);
+              return;
+        }
+
+	// deactive other tabs
+        if (tab.url.match(/^chrome(?:-devtools)?:\/\//)) {
                 chrome.pageAction.hide(tabId);
                 return;
-            }
+         }
+       
+	 // set custom resolver
+         var resolver = this.getResolver();
+	 // get domain name from URL
+         var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
 
-            if (tab.url.match(/^chrome(?:-devtools)?:\/\//)) {
-                chrome.pageAction.hide(tabId);
-                return;
-            }
-	             
-	   var resolver = this.getResolver();
-            //Old regular expresion with port number 
-            //var domain = tab.url.match(/^[\w-]+:\/*\[?([\w\.:-]+)\]?(?::\d+)?/)[1]; /**/
-            var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1]; /**/
+  	console.log("------ Start of DNSSEC Validation ("+ domain +") ------");
        
+	// get filter status
+	var filteron = localStorage["domainfilteron"];
+	var validate = true;
+
+    	if (filteron == "true") {
+		console.log( 'Domain filter: on');
+		var urldomainsepar=/[.]+/;
+		var urldomainarray=domain.split(urldomainsepar);
+	
+		var domainlist = localStorage["domainlist"];
+		var domainlistsepar=/[ ,;]+/;
+		var domainarraylist=domainlist.split(domainlistsepar);
+
+		// first TLD
+	        for (j=0;j<domainarraylist.length;j++) { 
+	            if (urldomainarray[urldomainarray.length-1] == domainarraylist[j]) {validate=false; break;}
+	             //dump(dnssecExtension.debugPrefix + 'URL1? ' + urldomainarray[urldomainarray.length-1] + ' LIST1? ' + domainarraylist[j] +';\n');
+        	} // for
+		// domain in format xxx.yy
+ 		if (validate) for (j=0;j<domainarraylist.length;j++) {
+		   if (domainarraylist[j].indexOf(urldomainarray[urldomainarray.length-2]) !=-1) {validate=false; break}
+       		   //dump(dnssecExtension.debugPrefix + 'URL2? ' + urldomainarray[urldomainarray.length-2] + ' LIST2? ' + domainarraylist[j] +';\n');
+       	        } // if        
+    	} // literon
+	else console.log( 'Domain filter: off');
+	
+	console.log( 'Validate this domain: ' + validate );
        
-       
-    
-                	   
+     	if (validate) {  
+                    	   
     	    var currentURL = tab.url;
-	        console.log("URL: " + currentURL + ";");	  
-	    /*
-      chrome.webRequest.onResponseStarted.addListener(
-		  function(info) {
-			currentIPList[ info.url ] = info.ip;
-      console.log("IPs: " + currentURL + " -- " + info.ip + ";");                       		  
-		  return;},{ urls: [], types: [] },  []
-	    );
-	   
-     for (var i = 0, l = currentIPList.length; i < l; ++i) {
-        console.log(currentIPList[i] + " ");
-     }
-    console.log(currentIPList.length);
-        */
-	    addr = currentIPList[ currentURL ]; 		
-	    console.log("IP Browser: " + addr + ";");
+	    console.log("URL: " + currentURL);	  	     
+	    addr = currentIPList[ currentURL ];
+	    if (addr == undefined) addr = addrbackup;
+	    else addrbackup=addr; 		
+	    console.log("Browser IP: " + addr);
+
 	    var resolvipv4 = false; // No IPv4 resolving as default
 	    var resolvipv6 = false; // No IPv6 resolving as default
-	    if (addr == undefined) addr = "0.0.0.0";
 	     // Check IP version
 	      if (addr.indexOf(":") != -1) {
 	        // ipv6
@@ -295,8 +299,7 @@ document.write("<script>");
    
 	    var options = 0;
 	    var c = this.dnssecExtNPAPIConst;
-            console.log("resolver: " + resolver);
-	    if (true) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+	    if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
 	    if (resolver != "nofwd") options |= c.DNSSEC_INPUT_FLAG_USEFWD;
 	    if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
 	    if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
@@ -306,18 +309,26 @@ document.write("<script>");
 	   chrome.pageAction.setIcon({path: icon, tabId: tabId});
  	   chrome.pageAction.show(tabId);
 
-	    console.log("INPUT: " + domain + "; Options; " + options  + "; Res: " + resolver  + "; IP: " + addr);
+	    console.log("Validator Input: " + domain + "; " + options  + "; " + resolver  + "; " + addr);
 	    // Call of Validation function
-      var plugin = document.getElementById("dnssec-plugin");	 	
+      	    var plugin = document.getElementById("dnssec-plugin");	 	
 	    var result = plugin.Validate(domain, options, resolver, addr);
-            console.log("RESULT: " + domain + "; " + result[0] + "; " + result[1]);
-	
-  	   icon = ""; 
-	   var status = result[0];
-     var ipval = result[1];
-     if (ipval == "")  ipval = "x";
-     //status = 7;
-       
+            console.log("Validator Result: " + result[0] + "; " + result[1]);
+
+	    if (addr == "0.0.0.0") addr = "n/a"; 
+  	    icon = ""; 
+	    var status = result[0];
+     	    var ipval = result[1];
+            if (ipval == "")  ipval = "n/a";
+ 
+     	}
+      else {
+
+	   status=-1;
+	   var c = this.dnssecExtNPAPIConst;
+
+      } // if validate
+ 
      	switch (status) {
 	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP: 
 		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED, tabId, domain, status, addr, ipval );
@@ -340,12 +351,18 @@ document.write("<script>");
 	    case c.DNSSEC_EXIT_NODOMAIN_UNSECURED:
 	        this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED, tabId, domain, status,  addr, ipval);
 	        break;
+	    case -1:
+	        this.setMode(this.dnssecModes.DNSSEC_MODE_OFF, tabId, domain, status, addr, ipval);
+	        break;
 	    case c.DNSSEC_EXIT_FAILED:
 	    default:
 	        this.setMode(this.dnssecModes.DNSSEC_MODE_ERROR, tabId, domain, status, addr,  ipval);
                 break;
 	    }
-        };
+
+	console.log("------ End of DNSSEC Validation ("+ domain +") ------\n");
+
+     }; // onUrlChange
 
   function testdnssec() {
       var nameserver = this.getResolver();
@@ -363,21 +380,23 @@ document.write("<script>");
       if ((testnic==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) || (testnic==c.DNSSEC_EXIT_FAILED)) {
         //dnssecExtHandler.showDnssecFwdInfo();	 		
     }
-  };
+  }; // testdnssec
 
-
-	if (init) {
-		testdnssec();
-		init = false;
+    // first start of browser = test on DNSSEC validation
+   if (init) {
+      testdnssec();
+      init = false;
     } 
-        // Listen for any changes to the URL of any tab.
-  chrome.tabs.onUpdated.addListener(onUrlChange);
-        
+
+  // get IP address of URL      
   chrome.webRequest.onResponseStarted.addListener(function(info) {
 			currentIPList[ info.url ] = info.ip;
-      console.log("IPs: " + info.url + " -- " + info.ip + ";");                       		  
+      			//console.log("IPsonResponseStarted: " + info.url + " -- " + info.ip + ";");                       		  
 		  return;},{ urls: [], types: [] },  []
 	    );
+
+  // Listen for any changes to the URL of any tab.
+  chrome.tabs.onUpdated.addListener(onUrlChange);
 	                          
 document.write("</script>");
 document.write("</body>");

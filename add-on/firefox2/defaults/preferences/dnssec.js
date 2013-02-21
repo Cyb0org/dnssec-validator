@@ -24,6 +24,8 @@ pref("extensions.dnssec@nic.cz.name", "chrome://dnssec/locale/dnssec.properties"
 pref("extensions.dnssec@nic.cz.description", "chrome://dnssec/locale/dnssec.properties");
 pref("extensions.dnssec.asyncresolve", true);
 pref("extensions.dnssec.debugoutput", false);
+pref("extensions.dnssec.domainfilteron", false);
+pref("extensions.dnssec.domainlist", "");
 pref("extensions.dnssec.dnsserverchoose", 0);
 pref("extensions.dnssec.dnsserverpresetchoose", 0);
 pref("extensions.dnssec.dnsserveraddr", "");

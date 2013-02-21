@@ -5,6 +5,15 @@
 	"prefresolver": {
 		"message": "Zur Namensauflösung benutzte DNS-Server:"
 		},
+	"groupboxfilter": {
+		"message": "Domain-Namen-Filter"
+		},
+	"usefilter": {
+		"message": "Aktivieren Sie die Domain-Filter"
+		},
+	"filtertext": {
+		"message": "Liste der Domänen oder TLD durch Komma getrennt"
+		},
 	"legend": {
 		"message": "Resolver-Einstellungen"
 		},
@@ -65,11 +74,20 @@
  	"dnssecnone": {
 		"message": "Nicht durch DNSSEC gesichert"
 		},
+ 	"validatoroff": {
+		"message": "Nicht durch DNSSEC geprüft"
+		},
 	"domain": {
 		"message": "Der Domänenname "
 		},
 	 "nodomain": {
 		"message": "Die Nichtexistenz des Domänennamen "
+		},
+         "dnsseOff": {
+		"message": " wurde nicht durch DNSSEC überprüft."
+		},
+         "dnsseOffInfo": {
+		"message": "Da haben Sie die Domain-Filter aktiviert, und das Domain-Namen oder TLD aufgeführt ist, nicht DNSSEC-Validierung für diese Domäne durchgeführt."
 		},
          "0dnssecError": {
 		"message": " kann nicht mit DNSSEC überprüft werden."

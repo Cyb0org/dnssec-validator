@@ -1,3 +1,4 @@
+  const short DNSSEC_EXIT_VALIDATOR_OFF					   =-1; // validator off
   const short DNSSEC_EXIT_FAILED                           = 0; /* domain name resolution failed */
   const short DNSSEC_EXIT_DOMAIN_UNSECURED                 = 1; /* domain is not secured */
   const short DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP     = 2; /* both domain and connection are secured and IPs matche */

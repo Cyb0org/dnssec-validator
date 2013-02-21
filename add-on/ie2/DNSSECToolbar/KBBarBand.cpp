@@ -72,6 +72,8 @@ short paneltextip  = 1;
 WORD keylogo  = 0;
 WORD keylogo2  = 0;
 int err = 0;
+short fitleron;
+char listtld[TLD_LIST_MLEN] = "";
 // key state memory
 int state;
 // url address memory
@@ -91,7 +93,7 @@ CRITICAL_SECTION CKBBarBand::cs;
 // for tooltip creation
 bool CKBBarBand::csInitialized = false;
 bool csInitialized = false;
-char DefaultIniData[] = "[DNSSEC]\nkeytext=0\nchoice=0\nchoicedns=0\nuserip=8.8.8.8"; 
+char DefaultIniData[] = "[DNSSEC]\nkeytext=0\nchoice=0\nchoicedns=0\nuserip=8.8.8.8\nfilteron=0\nlisttld="; 
 char str[INET6_ADDRSTRLEN];
 
 typedef struct {   /* structure to save IPv4/IPv6 address from stub resolver */
@@ -871,7 +873,18 @@ void CKBBarBand::SetSecurityStatus()
 		tistatus = IDS_STATE7_TEXT_DOMAIN;
 		titext = IDS_STATE7_TEXT_MAIN;
  		break;
-   
+  
+    // state -1
+	case DNSSEC_EXIT_VALIDATOR_OFF:
+		ldicon = GetBitmapIndex(IDI_ICON_KEY_WHITE1);
+		ldiconBar = IDI_ICON_KEY_WHITE;
+		tiicon = TTI_INFO;
+		tiicontitle = IDS_STATE01_TEXT_TOOLTIP;
+		tipref = IDS_PRE_TEXT_DOMAIN;
+		tistatus = IDS_STATE01_TEXT_DOMAIN;
+		titext = IDS_STATE01_TEXT_MAIN;
+ 		break;
+
 	// other states
     case DNSSEC_EXIT_FAILED:
     default:
@@ -883,6 +896,7 @@ void CKBBarBand::SetSecurityStatus()
 		tistatus = IDS_STATE0_TEXT_DOMAIN;
 		titext = IDS_STATE0_TEXT_MAIN;
 		break;
+
 	}// switch
 	err = ldicon;
 	keylogo2 = ldiconBar;
@@ -1005,52 +1019,135 @@ void CKBBarBand::CheckDomainStatus(short change)
 
 	char* dnsip; 
 	LoadOptionsFromFile();
-	usedfwd = true;
-	if (choice==2) dnsip = dnssecseradr;
-	else if (choice==1) if (choice2==0) dnsip = nic; else dnsip = oarc;
-	else if (choice==3) {dnsip = "nofwd"; usedfwd = false;}
-	else dnsip = "";
+	bool validated = true;
 
-	ip64struct ipv64;
-	ipv64=stub_resolve(domain);
+	if (fitleron) {
+		char str2[TLD_LIST_MLEN] = "";
+		char str1[TLD_LIST_MLEN] = "";
+		//ATLTRACE("Domain: %s \n", domain);
+		//ATLTRACE("ListTLD: %s \n", listtld);
+		strncpy_s (str1, sizeof(str1), domain, sizeof(str1));
+		strncpy_s (str2, sizeof(str2), listtld, sizeof(str2));
+		char* pch1; 
+		char* pch2;
+		char* context	= NULL;
+		//ATLTRACE("%s\n",str1);
+		pch1 = strtok_s (str1,". ", &context);
+		char xxx[10] = "";
+		// ---- tld first --------------------------------
+		while (pch1 != NULL) {
+			//ATLTRACE("%s\n",pch1);
+			strncpy_s (xxx, sizeof(xxx), pch1, sizeof(xxx));
+			pch1 = strtok_s (NULL, ". ", &context);		
+		} //while
+		//ATLTRACE("-----------%s\n",xxx);
+		
+		pch2 = strtok_s (str2," ,", &context);
+		while (pch2 != NULL) {
+				//ATLTRACE("%s\n",pch2);
+				if (strcmp (pch2,xxx) == 0) {
+					validated = false;
+					//ATLTRACE("Find tld\n");
+					break;
+				}
+				pch2 = strtok_s (NULL, " ,", &context);
+		} // while
+		//---------------------------------------------------
+		// now xxx.yy format
+		if (validated) {
+		   strncpy_s (str1, sizeof(str1), domain, sizeof(str1));
+		   strncpy_s (str2, sizeof(str2), listtld, sizeof(str2));
+		   //ATLTRACE("%s\n",str1);
+		   char* newcontext	= NULL;
+		   char *pch = strstr (str1,"www.");
+		   if (pch != NULL) {
+				pch = strtok_s (str1," .", &newcontext);
+				//ATLTRACE("......%s\n",newcontext);		   		   
+				pch2 = strtok_s (str2," ,", &context);	
+				while (pch2 != NULL) {
+					//ATLTRACE("1. %s==%s\n",pch2,newcontext);
+					if (strcmp (pch2,newcontext) == 0) {
+						validated = false;
+						//ATLTRACE("Find domain\n");
+						break;
+					} // if
+					strncpy_s (str1, sizeof(str1), domain, sizeof(str1));
+					//ATLTRACE("2. %s==%s\n",pch2,str1);
+					if (strcmp (pch2,str1) == 0) {
+						validated = false;
+						//ATLTRACE("Find domain\n");
+						break;
+					} // if
+					pch2 = strtok_s (NULL, " ,", &context);
+				} //while
+		   }
+		   else {
+				pch2 = strtok_s (str2," ,", &context);	
+				while (pch2 != NULL) {
+					//ATLTRACE("%s\n",pch2);
+					if (strcmp (pch2,str1) == 0) {
+						validated = false;
+						//ATLTRACE("Find domain\n");
+						break;
+					} // if
+					pch2 = strtok_s (NULL, " ,", &context);
+				} //while
+			} // if
+		}//  now xxx.yy format
 
-	ipbrowser4=ipv64.ipv4;
-	resolvipv4 = true; 
-	resolvipv6 = false; 
-	if (debugoutput) options |= DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-	if (usedfwd) options |= DNSSEC_INPUT_FLAG_USEFWD;
-	if (resolvipv4) options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;
-	if (resolvipv6) options |= DNSSEC_INPUT_FLAG_RESOLVIPV6;
-	if (change==1) {
-	char* ipvalidator4tmp;
-	EnterCriticalSection(&cs);
-	//ATLTRACE("Critical section begin\n");
-	ATLTRACE("\nIPv4: %s : %d : %s : %s\n", domain, options, dnsip, ipbrowser4);
-	resultipv4 = ds_validate(domain, options, dnsip, ipbrowser4, &ipvalidator4tmp);
-	ATLTRACE("IPv4: %s : %d : %s\n", domain, resultipv4, ipvalidator4); 
-	LeaveCriticalSection(&cs);
-	strcpy_s(ipvalidator4, ipvalidator4tmp);
+
+	} // filteron
+
+	if (validated) {
+
+		usedfwd = true;
+		if (choice==2) dnsip = dnssecseradr;
+			else if (choice==1) if (choice2==0) dnsip = nic; else dnsip = oarc;
+			else if (choice==3) {dnsip = "nofwd"; usedfwd = false;}
+			else dnsip = "";
+		ip64struct ipv64;
+		ipv64=stub_resolve(domain);
+		ipbrowser4=ipv64.ipv4;
+		resolvipv4 = true; 
+		resolvipv6 = false; 
+		if (debugoutput) options |= DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+		if (usedfwd) options |= DNSSEC_INPUT_FLAG_USEFWD;
+		if (resolvipv4) options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;
+		if (resolvipv6) options |= DNSSEC_INPUT_FLAG_RESOLVIPV6;
+		if (change==1) {
+			char* ipvalidator4tmp;
+			EnterCriticalSection(&cs);
+			//ATLTRACE("Critical section begin\n");
+			ATLTRACE("\nIPv4: %s : %d : %s : %s\n", domain, options, dnsip, ipbrowser4);
+			resultipv4 = ds_validate(domain, options, dnsip, ipbrowser4, &ipvalidator4tmp);
+			ATLTRACE("IPv4: %s : %d : %s\n", domain, resultipv4, ipvalidator4); 
+			LeaveCriticalSection(&cs);
+			strcpy_s(ipvalidator4, ipvalidator4tmp);
+		}
+
+		ipbrowser6=ipv64.ipv6;
+		resolvipv4 = false; 
+		resolvipv6 = true;
+		options = 0;
+		if (debugoutput) options |= DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+		if (usedfwd) options |= DNSSEC_INPUT_FLAG_USEFWD;
+		if (resolvipv4) options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;
+		if (resolvipv6) options |= DNSSEC_INPUT_FLAG_RESOLVIPV6;
+		// Request ownership of the critical section
+		if (change==1) {
+			EnterCriticalSection(&cs);
+			//ATLTRACE("Critical section begin\n");
+			ATLTRACE("\nIPv6: %s : %d : %s : %s\n", domain, options, dnsip, ipbrowser6);
+			resultipv6 = ds_validate(domain, options, dnsip, ipbrowser6, &ipvalidator6);
+			ATLTRACE("IPv6: %s : %d : %s\n", domain, resultipv6, ipvalidator6); 
+			LeaveCriticalSection(&cs);
+		}		
+		(resultipv4 <= resultipv6 ?  result = resultipv6 : result = resultipv4);
 	}
-
-	ipbrowser6=ipv64.ipv6;
-	resolvipv4 = false; 
-	resolvipv6 = true;
-	options = 0;
-	if (debugoutput) options |= DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-	if (usedfwd) options |= DNSSEC_INPUT_FLAG_USEFWD;
-	if (resolvipv4) options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;
-	if (resolvipv6) options |= DNSSEC_INPUT_FLAG_RESOLVIPV6;
-	// Request ownership of the critical section
-	if (change==1) {
-	EnterCriticalSection(&cs);
-	//ATLTRACE("Critical section begin\n");
-	ATLTRACE("\nIPv6: %s : %d : %s : %s\n", domain, options, dnsip, ipbrowser6);
-	resultipv6 = ds_validate(domain, options, dnsip, ipbrowser6, &ipvalidator6);
-	ATLTRACE("IPv6: %s : %d : %s\n", domain, resultipv6, ipvalidator6); 
-	LeaveCriticalSection(&cs);
-	}		
-	(resultipv4 <= resultipv6 ?  result = resultipv6 : result = resultipv4);	
+	else result = DNSSEC_EXIT_VALIDATOR_OFF;
+	
 	SetSecurityStatus();
+	
 	}
 }
 
@@ -1219,6 +1316,7 @@ void CKBBarBand::LoadOptionsFromFile(void) {
 	//ATLTRACE("\nLoadOptionsFromFile\n");
 	TCHAR szPath[MAX_PATH];
 	char dbserver[IPADDR_MLEN];
+	char list[TLD_LIST_MLEN];
 	dbserver[0]='\0';
 	if (SUCCEEDED( SHGetFolderPath( NULL, CSIDL_LOCAL_APPDATA, NULL, SHGFP_TYPE_CURRENT, szPath ))){
 		PathAppend( szPath, INI_FILE_PATH);
@@ -1235,6 +1333,11 @@ void CKBBarBand::LoadOptionsFromFile(void) {
 		//if (choice2) ATLTRACE("\n1\n"); else ATLTRACE("\n0\n");
 	
 		debugoutput = GetPrivateProfileInt("DNSSEC", "debugoutput", 0 , szPath);
+
+		fitleron = GetPrivateProfileInt("DNSSEC", "fitleron", 0 , szPath);
+
+		GetPrivateProfileString("DNSSEC", "listtld", "", list, TLD_LIST_MLEN, szPath);
+		memcpy(listtld, list, TLD_LIST_MLEN);
 	}// if SHGetFolderPath
 }
 

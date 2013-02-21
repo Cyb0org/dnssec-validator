@@ -133,7 +133,7 @@ BEGIN
 	LTEXT           "http://www.dnssec-validator.cz/ie/", IDC_LINK,10,95,120,10
 END
 
-IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 170
+IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 250
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "Validator settings"
@@ -149,9 +149,16 @@ BEGIN
 	CONTROL			" Without resolver", IDC_R4,"Button",BS_AUTORADIOBUTTON, 15, 65, 180, 10
 	PUSHBUTTON      "Test current settings",IDC_IDDNSSEC,10, 75+10 ,190,14
 	LTEXT           " ", IDC_DNSSEC_R,10,75+10+14+5,180,20
-	CONTROL			"Display text status besides the key icon", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+48+5, 165 ,10
-	DEFPUSHBUTTON   "Save settings",IDOK,60,18+58+48+23,80,14
-    PUSHBUTTON      "Cancel",IDCANCEL,150,18+58+48+23,50,14
+
+	GROUPBOX        "Domain name filter",IDC_STATIC,10,125,190,78
+	CONTROL			"Enable the domain filter", IDC_DOM_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 15, 125+12, 165 ,10
+	LTEXT           "List of domains or TLDs separated by commas", IDC_STATIC,15,125+12+13,182,10
+	EDITTEXT		IDT_DOM_LIST, 15, 160, 180, 36, ES_LEFT | ES_AUTOVSCROLL | ES_MULTILINE | WS_VSCROLL, WS_EX_CLIENTEDGE
+
+	CONTROL			"Display text status besides the key icon", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 125+75+10, 165 ,10
+
+	DEFPUSHBUTTON   "Save settings",IDOK,60,125+75+30,80,14
+    PUSHBUTTON      "Cancel",IDCANCEL,150,125+75+30,50,14
 END
 
 IDD_DIALOG_DNSSEC DIALOGEX 0, 0, 220, 75
@@ -236,6 +243,7 @@ IDI_ICON_KEY_GREY_RC1    BITMAP  DISCARDABLE                    "res\\key_grey_r
 IDI_ICON_KEY_RED_IP1     BITMAP  DISCARDABLE                    "res\\key_red.bmp"
 IDI_ICON_KEY_RED1        BITMAP  DISCARDABLE                    "res\\key_red.bmp"
 IDI_ICON_KEY_GREY_YT1    BITMAP  DISCARDABLE                    "res\\key_grey_yt.bmp"
+IDI_ICON_KEY_WHITE1    BITMAP  DISCARDABLE						"res\\key_action.bmp"
 
 IDI_ICON_KEY_GREEN      ICON                    "res\\key_green.ico"
 IDI_ICON_KEY_ACTION     ICON                    "res\\key_action.ico"
@@ -245,6 +253,7 @@ IDI_ICON_KEY_REDIP		ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_RED        ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_GREY_YT    ICON                    "res\\key_grey_yt.ico"
 IDI_ICON_KEY_MIRROR     ICON					"res\\key_green.ico"
+IDI_ICON_KEY_WHITE		ICON					"res\\key_action.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -322,6 +331,14 @@ BEGIN
 	IDS_STATE7_TEXT_TOOLTIP "Bogus DNSSEC signature"
 	IDS_STATE7_TEXT_DOMAIN  "was not correctly validated by DNSSEC because invalid signature has been detected!"
 	IDS_STATE7_TEXT_MAIN	"The parent domain is secured by DNSSEC but the received domain name nonexistence response does not contain a valid signature. This may signalise a domain name spoofing attempt in order to deny the access to the domain."
+
+		//state -1 - WHITE
+	IDS_STATE01_TEXT_TOOLTIP "Not verified by DNSSEC"
+	IDS_STATE01_TEXT_DOMAIN  "was not verified by DNSSEC."
+	IDS_STATE01_TEXT_MAIN	"Because you have enable the domain filter and this domain name or his TLD was found in the list, the DNSSEC validation was not performed for this domain."
+
+
+
 
 	IDS_NONE                " "
     IDS_ADDON_INIT          "Add-on initialized"
@@ -455,6 +472,7 @@ IDI_ICON_KEY_GREY_RC1    BITMAP  DISCARDABLE                    "res\\key_grey_r
 IDI_ICON_KEY_RED_IP1     BITMAP  DISCARDABLE                    "res\\key_red.bmp"
 IDI_ICON_KEY_RED1        BITMAP  DISCARDABLE                    "res\\key_red.bmp"
 IDI_ICON_KEY_GREY_YT1    BITMAP  DISCARDABLE                    "res\\key_grey_yt.bmp"
+IDI_ICON_KEY_WHITE1    BITMAP  DISCARDABLE						"res\\key_action.bmp"
 
 IDI_ICON_KEY_GREEN      ICON                    "res\\key_green.ico"
 IDI_ICON_KEY_ACTION     ICON                    "res\\key_action.ico"
@@ -464,6 +482,7 @@ IDI_ICON_KEY_REDIP		ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_RED        ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_GREY_YT    ICON                    "res\\key_grey_yt.ico"
 IDI_ICON_KEY_MIRROR     ICON					"res\\key_green.ico"
+IDI_ICON_KEY_WHITE		ICON					"res\\key_action.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -542,6 +561,12 @@ BEGIN
 	IDS_STATE7_TEXT_DOMAIN  "nebyla korektnì ovìøena technologií DNSSEC, protože byl odhalen neplatný podpis záznamù!"
 	IDS_STATE7_TEXT_MAIN	"Nadøazená doména je zabezpeèena technologií DNSSEC, ale získaná odpovìï dokazující neexistenci domény neobsahuje platný podpis. Mùže se jednat o podvržení doménového jména za úèelem odepøení pøístupu k doménì."
 
+	//state -1 - WHITE
+	IDS_STATE01_TEXT_TOOLTIP "Neovìøeno DNSSEC"
+	IDS_STATE01_TEXT_DOMAIN  "nebylo ovìøeno pomocí technologie DNSSEC."
+	IDS_STATE01_TEXT_MAIN	"Jelikož máte povolen doménový filtr a toto doménové jméno nebo jeho TLD je v seznamu uvedeno, nebyla DNSSEC validace pro tuto doménu provedena."
+
+
 	IDS_NONE                " "
     IDS_ADDON_INIT          "Doplnìk inicializován"
     
@@ -562,7 +587,7 @@ BEGIN
 //
 // Dialog
 //
-IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 170
+IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 250
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "Nastavení validátoru"
@@ -578,9 +603,16 @@ BEGIN
 	CONTROL			" Bez resolveru", IDC_R4,"Button",BS_AUTORADIOBUTTON, 15, 65, 180, 10
 	PUSHBUTTON      "Test souèasného nastavení",IDC_IDDNSSEC,10, 75+10 ,190,14
 	LTEXT           ".", IDC_DNSSEC_R,10,75+10+14+5,180,20
-	CONTROL			"Zobrazovat texty za ikonou klíèku", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+48+5, 165 ,10
-	DEFPUSHBUTTON   "Uložit nastavení",IDOK,60,18+58+48+23,80,14
-    PUSHBUTTON      "Zrušit",IDCANCEL,150,18+58+48+23,50,14
+
+	GROUPBOX        "Doménový filtr",IDC_STATIC,10,125,190,78
+	CONTROL			"Povolit fitrování doménových jmen", IDC_DOM_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 15, 125+12, 165 ,10
+	LTEXT           "Seznam doménových jmen nebo TLD oddìlených èárkou", IDC_STATIC,15,125+12+13,182,10
+	EDITTEXT		IDT_DOM_LIST, 15, 160, 180, 36, ES_LEFT | ES_AUTOVSCROLL | ES_MULTILINE | WS_VSCROLL, WS_EX_CLIENTEDGE
+
+	CONTROL			"Zobrazovat texty za ikonou klíèku", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 125+75+10, 165 ,10
+
+	DEFPUSHBUTTON   "Uložit nastavení",IDOK,60,125+75+30,80,14
+    PUSHBUTTON      "Zrušit",IDCANCEL,150,125+75+30,50,14
 END
 
 IDD_DIALOG_MAIN_ABOUT DIALOGEX 0, 0, 250, 110
@@ -787,7 +819,7 @@ END
 
 
 
-IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 170
+IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 250
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "Validator-Einstellungen"
@@ -803,9 +835,16 @@ BEGIN
 	CONTROL			" Ohne Resolver", IDC_R4,"Button",BS_AUTORADIOBUTTON, 15, 65, 180, 10
 	PUSHBUTTON      "Bestehende Einstellungen testen",IDC_IDDNSSEC,10, 75+10 ,190,14
 	LTEXT           "", IDC_DNSSEC_R,10,75+10+14+5,180,20
-	CONTROL			"Legende neben dem Schlüssel-Symbol zeigen", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 18+58+48+5, 165 ,10
-	DEFPUSHBUTTON   "Setzen",IDOK,60,18+58+48+23,80,14
-    PUSHBUTTON      "Stornieren",IDCANCEL,150,18+58+48+23,50,14
+
+	GROUPBOX        "Domain-Namen-Filter",IDC_STATIC,10,125,190,78
+	CONTROL			"Aktivieren Sie die Domain-Filter", IDC_DOM_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 15, 125+12, 165 ,10
+	LTEXT           "Liste der Domänen oder TLD durch Komma getrennt", IDC_STATIC,15,125+12+13,182,10
+	EDITTEXT		IDT_DOM_LIST, 15, 160, 180, 36, ES_LEFT | ES_AUTOVSCROLL | ES_MULTILINE | WS_VSCROLL, WS_EX_CLIENTEDGE
+
+	CONTROL			"Legende neben dem Schlüssel-Symbol zeigen", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 125+75+10, 165 ,10
+
+	DEFPUSHBUTTON   "Setzen",IDOK,60,125+75+30,80,14
+    PUSHBUTTON      "Stornieren",IDCANCEL,150,125+75+30,50,14
 END
 
 IDD_DIALOG_DNSSEC DIALOGEX 0, 0, 220, 75
@@ -892,6 +931,7 @@ IDI_ICON_KEY_GREY_RC1    BITMAP  DISCARDABLE                    "res\\key_grey_r
 IDI_ICON_KEY_RED_IP1     BITMAP  DISCARDABLE                    "res\\key_red.bmp"
 IDI_ICON_KEY_RED1        BITMAP  DISCARDABLE                    "res\\key_red.bmp"
 IDI_ICON_KEY_GREY_YT1    BITMAP  DISCARDABLE                    "res\\key_grey_yt.bmp"
+IDI_ICON_KEY_WHITE1    BITMAP  DISCARDABLE						"res\\key_action.bmp"
 
 IDI_ICON_KEY_GREEN      ICON                    "res\\key_green.ico"
 IDI_ICON_KEY_ACTION     ICON                    "res\\key_action.ico"
@@ -901,6 +941,7 @@ IDI_ICON_KEY_REDIP		ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_RED        ICON                    "res\\key_red.ico"
 IDI_ICON_KEY_GREY_YT    ICON                    "res\\key_grey_yt.ico"
 IDI_ICON_KEY_MIRROR     ICON					"res\\key_green.ico"
+IDI_ICON_KEY_WHITE		ICON					"res\\key_action.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -978,6 +1019,12 @@ BEGIN
 	IDS_STATE7_TEXT_TOOLTIP "Ungültige DNSSEC-Signatur"
 	IDS_STATE7_TEXT_DOMAIN  "war mit DNSSEC überprüft, konnte aber wegen einer ungültigen Signatur nicht bestätigt werden."
 	IDS_STATE7_TEXT_MAIN	"Die übergeordnete Domäne ist durch DNSSEC gesichert. Die erworbene Antwort, welche die Nichtexistenz der Domäne bestätigen soll, enthält eine ungültige Signatur. Dies deutet auf einen DNS-Spoofing Versuch zur Anschlussverweigerung hin."
+
+	//state -1 - WHITE
+	IDS_STATE01_TEXT_TOOLTIP "Nicht durch DNSSEC geprüft"
+	IDS_STATE01_TEXT_DOMAIN  "wurde nicht durch DNSSEC überprüft."
+	IDS_STATE01_TEXT_MAIN	"Da haben Sie die Domain-Filter aktiviert, und das Domain-Namen oder TLD aufgeführt ist, nicht DNSSEC-Validierung für diese Domäne durchgeführt."
+
 
     IDS_NONE                " "
     IDS_ADDON_INIT          "Add-on initialisiert"

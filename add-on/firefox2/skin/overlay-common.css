@@ -42,6 +42,12 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 
+#dnssec-box.dnssecOff > #dnssec-icon {
+  width: 19px;
+  height: 19px;
+  list-style-image: url("chrome://dnssec/skin/icon_white.png"); /* 35x16 */
+}
+
 #dnssec-box.actionDnssec > #dnssec-icon {
   width: 19px;
   height: 19px;
@@ -195,6 +201,12 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
   list-style-image: url("chrome://dnssec/skin/icon_unknown.png"); 
 }
 
+
+/* grey with error */
+#dnssec-popup.dnssecOff > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon {
+  list-style-image: url("chrome://dnssec/skin/icon_white.png"); 
+}
+
 /* DNSSEC popup body text - title */
 #dnssec-popup-content-box > label,
 #dnssec-popup-content-box > description {
@@ -236,7 +248,8 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-popup-securedLabel,
 #dnssec-popup-errorLabel,
 #dnssec-popup-bogusLabel,
-#dnssec-popup-unsecuredLabel {
+#dnssec-popup-unsecuredLabel,
+#dnssec-popup-dnssecOffLabel {
   font-weight: bold;
   max-width: 335px;
   font-size: 120%;
@@ -296,6 +309,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /* DNSSEC popup UI */
+#dnssec-popup-content-box > #dnssec-popup-content-box2.dnssecOff > #dnssec-popup-dnssecOffLabel,
 #dnssec-popup-content-box > #dnssec-popup-content-box2.errorDnssec > #dnssec-popup-errorLabel,
 #dnssec-popup-content-box > #dnssec-popup-content-box2.securedConnectionDomain > #dnssec-popup-securedLabel,
 #dnssec-popup-content-box3.securedConnectionDomain > #dnssec-popup-domainLabel,

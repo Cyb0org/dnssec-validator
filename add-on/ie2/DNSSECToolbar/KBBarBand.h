@@ -47,6 +47,7 @@ extern "C" {					// use C language linkage
 #define TB_MAX_SIZE_Y   40
 #define MAX_STR_LEN		1024
 #define IPADDR_MLEN 256
+#define TLD_LIST_MLEN 1024
 #define KEYTEXT				0
 #define RESOLVER			0
 #define RESOLVER2			0
@@ -92,6 +93,8 @@ extern WORD keylogo;
 extern WORD keylogo2;
 extern int err;
 extern short res;
+extern short fitleron;
+extern char listtld[TLD_LIST_MLEN];
 // variable for IE version check
 extern int iRes,iMajor,iMinor;
 //#if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)

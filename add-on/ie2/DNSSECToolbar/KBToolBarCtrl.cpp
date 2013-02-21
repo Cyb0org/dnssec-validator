@@ -139,6 +139,8 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* 
 		pList->Replace(5, hIcon); // not 5 as a separate is not an image
 		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_GREY_YT));
 		pList->Replace(6, hIcon); // not 5 as a separate is not an image
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_WHITE));
+		pList->Replace(7, hIcon); // not 5 as a separate is not an image
 	CKBToolBarCtrl::SetImageList(pList);
 	CKBToolBarCtrl::Invalidate();
 	//CWnd* pButton = GetDlgItem(ID_BUTTON2);
@@ -263,7 +265,7 @@ bool CKBToolBarCtrl::RepaintButton(int bindex, int iconindex){
 		tbs.idCommand = ID_BUTTON1;
 		if (textkey) tbs.iString = iconindex;
 		else {
-			tbs.iString = 7;
+			tbs.iString = 8;
 			tbs.fsStyle = BTNS_AUTOSIZE | BTNS_DROPDOWN;
 		}// if textkey
 	//insert of new button into toolbar
@@ -294,7 +296,7 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 		//ATLTRACE("%d", textkey);		
 		::SetWindowText(::GetDlgItem(hwndDlg,IDC_EDIT),dnssecseradr);
 		::EnableWindow(::GetDlgItem(hwndDlg,IDC_EDIT), FALSE);			
-		::EnableWindow(::GetDlgItem(hwndDlg,IDC_COMBO), FALSE);
+		::EnableWindow(::GetDlgItem(hwndDlg,IDC_COMBO), FALSE);		
 		//ATLTRACE("%d", choice);
 		if (choice==2) {
 			::CheckRadioButton(hwndDlg, IDC_R1, IDC_R4, IDC_R3);
@@ -310,6 +312,10 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 		else {
 			::CheckRadioButton(hwndDlg, IDC_R1, IDC_R4, IDC_R1);
 		} // if choice
+		::SendMessage(::GetDlgItem(hwndDlg, IDC_DOM_ENABLE), BM_SETCHECK,  fitleron ? BST_CHECKED : BST_UNCHECKED, 0);
+		::SetWindowText(::GetDlgItem(hwndDlg,IDT_DOM_LIST),listtld);
+		::EnableWindow(::GetDlgItem(hwndDlg,IDT_DOM_LIST), FALSE);
+		if (fitleron) ::EnableWindow(::GetDlgItem(hwndDlg,IDT_DOM_LIST), TRUE);
 		::SendMessage(::GetDlgItem(hwndDlg, IDC_SHOWTEXT), BM_SETCHECK,  textkey ? BST_CHECKED : BST_UNCHECKED, 0);
         break;
 		}	
@@ -329,11 +335,15 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 								short dwVal;
 								int msgboxID;
 								// save keytext setting into Register
+								dwVal = (short)::SendMessage(::GetDlgItem(hwndDlg, IDC_DOM_ENABLE), BM_GETCHECK, 0, 0);
+								fitleron = dwVal;
+								if (dwVal) WritePrivateProfileString("DNSSEC", "fitleron", "1", szPath);
+								else WritePrivateProfileString("DNSSEC", "fitleron", "0", szPath);
+
 								dwVal = (short)::SendMessage(::GetDlgItem(hwndDlg, IDC_SHOWTEXT), BM_GETCHECK, 0, 0);
 								textkey = dwVal;
 								if (dwVal) WritePrivateProfileString("DNSSEC", "keytext", "1", szPath);
 								else WritePrivateProfileString("DNSSEC", "keytext", "0", szPath);
-
 
 								// save debugoutput DWORD into Register
 								if (debugoutput_enable!=0) {
@@ -342,6 +352,10 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 									if (dwVal) WritePrivateProfileString("DNSSEC", "debugoutput", "1", szPath);
 									else WritePrivateProfileString("DNSSEC", "debugoutput", "0", szPath);									
 								}
+
+
+
+
 
 								// save choice setting resolver into Register
 								if (::IsDlgButtonChecked(hwndDlg, IDC_R1))
@@ -358,8 +372,8 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 								else if (::IsDlgButtonChecked(hwndDlg, IDC_R3))
 								{
 									dwVal = 2;									
-									TCHAR chText[100];
-									::GetDlgItemText(hwndDlg, IDC_EDIT, chText, 100);
+									TCHAR chText[IPADDR_MLEN];
+									::GetDlgItemText(hwndDlg, IDC_EDIT, chText, IPADDR_MLEN);
 									char* szVal=(char*)chText;
 									
 									if (!ValidateIP(szVal)) 									
@@ -378,6 +392,14 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 								else WritePrivateProfileString("DNSSEC", "choice", "0", szPath);
 
 								
+
+								
+								TCHAR chTexttld[TLD_LIST_MLEN];
+									::GetDlgItemText(hwndDlg, IDT_DOM_LIST, chTexttld, TLD_LIST_MLEN);
+									char* szVal=(char*)chTexttld;
+									WritePrivateProfileString("DNSSEC", "listtld", szVal, szPath);
+
+
 								// save setting IPv4 IPv6 resolver
 								/*
 								if (::IsDlgButtonChecked(hwndDlg, IDC_IPv4)) WritePrivateProfileString("DNSSEC", "IPv4", "1", szPath);
@@ -489,6 +511,20 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 					{
 					::SetWindowText(::GetDlgItem(hwndDlg,IDC_DNSSEC_R),"");
 					cache_del = 1;		
+					}
+					break;
+				case IDT_DOM_LIST:
+					{
+					//::SetWindowText(::GetDlgItem(hwndDlg,IDC_DNSSEC_R),"");
+					//cache_del = 1;		
+					}
+					break;
+				case IDC_DOM_ENABLE:
+					{
+						if(::SendMessage(::GetDlgItem(hwndDlg, IDC_DOM_ENABLE),BM_GETCHECK,0,0)==BST_CHECKED)
+						::EnableWindow(::GetDlgItem(hwndDlg,IDT_DOM_LIST), TRUE);
+						else ::EnableWindow(::GetDlgItem(hwndDlg,IDT_DOM_LIST), FALSE);
+					//cache_del = 1;		
 					}
 					break;
 				case IDC_COMBO:

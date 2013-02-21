@@ -447,6 +447,31 @@ var dnssecExtResolver = {
   // Called when browser async host lookup completes
   onBrowserLookupComplete: function(dn, aRecord) {
 
+    var filteron = dnssecExtPrefs.getBool("domainfilteron");
+    var validate = true;
+    if (filteron) {
+	var urldomainsepar=/[.]+/;
+	var urldomainarray=dn.split(urldomainsepar);
+        //if (dnssecExtension.debugOutput) for(i=0;i<urldomainarray.length;i++) dump(dnssecExtension.debugPrefix + ' ' + urldomainarray[i] + ';\n');
+	var domainlist = dnssecExtPrefs.getChar("domainlist");
+	var domainlistsepar=/[ ,;]+/;
+	var domainarraylist=domainlist.split(domainlistsepar);
+
+	// TLD
+        for (j=0;j<domainarraylist.length;j++) { 
+            if (urldomainarray[urldomainarray.length-1] == domainarraylist[j]) {validate=false; break;}
+             //dump(dnssecExtension.debugPrefix + 'URL1? ' + urldomainarray[urldomainarray.length-1] + ' LIST1? ' + domainarraylist[j] +';\n');
+             }
+	// xxx.yy
+ 	if (validate) for (j=0;j<domainarraylist.length;j++) {
+	   if (domainarraylist[j].indexOf(urldomainarray[urldomainarray.length-2]) !=-1) {validate=false; break}
+       	   //dump(dnssecExtension.debugPrefix + 'URL2? ' + urldomainarray[urldomainarray.length-2] + ' LIST2? ' + domainarraylist[j] +';\n');
+            }
+        if (dnssecExtension.debugOutput) dump(dnssecExtension.debugPrefix + 'Validate this domain? ' + validate + ';\n');
+    }
+
+  if (validate) {
+
     var resolvipv4 = false; // No IPv4 resolving as default
     var resolvipv6 = false; // No IPv6 resolving as default
     var addr = null;
@@ -479,7 +504,19 @@ var dnssecExtResolver = {
     if (!resolvipv4 && !resolvipv6) resolvipv4 = true;
 
     this.doNPAPIvalidation(dn, resolvipv4, resolvipv6, aRecord);
-
+}
+else
+{
+     dnssecExtHandler.setSecurityState(-1);
+      // Reset resolving flag
+    if (dnssecExtension.debugOutput) {
+      dump(dnssecExtension.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
+      dump(dnssecExtension.debugPrefix + 'Unlocking section...\n');
+    }
+    dnssecExtPrefs.setBool("resolvingactive", false);
+    if (dnssecExtension.debugOutput)
+      dump(dnssecExtension.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
+}
   },
 };
 
@@ -510,14 +547,14 @@ var dnssecExtHandler = {
   DNSSEC_MODE_INACTION : "inactionDnssec",
   // Error or unknown state occured
   DNSSEC_MODE_ERROR : "errorDnssec",
-
+  DNSSEC_MODE_OFF   : "dnssecOff",
   // Tooltips
   DNSSEC_TOOLTIP_SECURED   : "securedTooltip",
   DNSSEC_TOOLTIP_UNSECURED : "unsecuredTooltip",
   DNSSEC_TOOLTIP_ACTION    : "actionTooltip",
   DNSSEC_TOOLTIP_ERROR     : "errorTooltip",
   DNSSEC_TOOLTIP_BOGUS     : "bogusTooltip",
-
+  DNSSEC_TOOLTIP_OFF       : "offTooltip",
   // Cache the most recent hostname seen in checkSecurity
   _asciiHostName : null,
   _utf8HostName : null,
@@ -553,6 +590,9 @@ var dnssecExtHandler = {
   	// 7. Non-existent domain is secured, but it has an invalid signature
     this._domainPreText[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID] =
       this._stringBundle.getString("nodomain");
+  	// -1. Validator OFF
+    this._domainPreText[this.DNSSEC_MODE_OFF] =
+      this._stringBundle.getString("domain");
 
     return this._domainPreText;
   },
@@ -589,6 +629,9 @@ var dnssecExtHandler = {
   	// 7. Non-existent domain is secured, but it has an invalid signature
     this._securityText[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID] =
       this._stringBundle.getString("7invalidNoDomainSignature");
+  	// -1. Validator OFF
+    this._securityText[this.DNSSEC_MODE_OFF] =
+      this._stringBundle.getString("dnsseOff");
 
     return this._securityText;
   },
@@ -624,7 +667,9 @@ var dnssecExtHandler = {
   	// 7. Non-existent domain is secured, but it has an invalid signature
     this._securityDetail[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID] =
       this._stringBundle.getString("7invalidNoDomainSignatureInfo");
-
+  	// -1. Validator OFF
+    this._securityDetail[this.DNSSEC_MODE_OFF] =
+      this._stringBundle.getString("dnsseOffInfo");
     return this._securityDetail;
   },
 
@@ -645,7 +690,8 @@ var dnssecExtHandler = {
       this._stringBundle.getString("dnssec.tooltip.error");
     this._tooltipLabel[this.DNSSEC_TOOLTIP_BOGUS] =
       this._stringBundle.getString("dnssec.tooltip.bogus");
-
+    this._tooltipLabel[this.DNSSEC_TOOLTIP_OFF] =
+      this._stringBundle.getString("dnssec.tooltip.off");
     return this._tooltipLabel;
   },
   get _dnssecPopup () {
@@ -754,6 +800,10 @@ var dnssecExtHandler = {
     case c.DNSSEC_EXIT_NODOMAIN_SIGNATURE_INVALID:
       this.setMode(this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID);
       break;
+	// -1
+    case -1:
+      this.setMode(this.DNSSEC_MODE_OFF);
+      break;
 	// 0
     case c.DNSSEC_EXIT_FAILED:
     default:
@@ -860,9 +910,11 @@ var dnssecExtHandler = {
       // No DNSSEC box means the DNSSEC box is not visible, in which
       // case there's nothing to do.
       return;
-    } else if (newMode == this.DNSSEC_MODE_ACTION) {  // Close window for these states
+    } 
+    else if (newMode == this.DNSSEC_MODE_ACTION) {  // Close window for these states
       this.hideDnssecPopup();
     }
+
 
     this._dnssecBox.className = newMode;
     this.setSecurityMessages(newMode);
@@ -906,6 +958,9 @@ var dnssecExtHandler = {
     // An error occured
     case this.DNSSEC_MODE_ERROR:
       tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_ERROR];
+      break;
+    case this.DNSSEC_MODE_OFF:
+      tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_OFF];
       break;
     // Unknown
     default:
@@ -1006,10 +1061,8 @@ var dnssecExtHandler = {
       return; // Left click, space or enter only
 
     // No popup window while...
-    if (this._dnssecBox &&
-       (this._dnssecBox.className == this.DNSSEC_MODE_ACTION )) // getting security status
+    if (this._dnssecBox && (this._dnssecBox.className == this.DNSSEC_MODE_ACTION )) // getting security status
       return;
-
     // Revert the contents of the location bar, see bug 406779
 //    handleURLBarRevert(); // firefox 3.5 fixed
     

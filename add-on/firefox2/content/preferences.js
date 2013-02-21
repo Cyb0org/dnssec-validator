@@ -123,6 +123,13 @@ var dnssecExtPrefs = {
     else return true;
   },
 
+
+  checkdomainlist : function() {
+    var str=document.getElementById("dnssec-pref-domains").value;
+    var match = str.match(/^[a-z0-9.-]+(, [a-z0-9.-]+)*$/);
+    return match != null;
+  },
+
   savePrefs : function() {  
   switch (document.getElementById("dnssec-pref-dnsserverchoose").value) {
 /*
@@ -154,6 +161,15 @@ var dnssecExtPrefs = {
       this.setChar("dnsserveraddr", ""); // empty string for using system resolver conf
       break;
     }
+  if (!document.getElementById("dnssec-pref-domains").disabled)
+   {
+   if (this.checkdomainlist()) {
+        this.setChar("domainlist", document.getElementById("dnssec-pref-domains").value);
+        document.getElementById("dnssec-pref-domains").setAttribute("style", "color: black");
+      } else {
+        document.getElementById("dnssec-pref-domains").setAttribute("style", "color: red");
+      }
+    }
   },
 
   setElementsattributes : function() {
@@ -164,6 +180,7 @@ var dnssecExtPrefs = {
 	document.getElementById("dnssecbogus").style.display = 'none';
         document.getElementById("dnssecerror").style.display = 'none';
 	document.getElementById("wrongip").style.display = 'none';
+	document.getElementById("space").style.display = 'block';
 /*     tmpCheck = document.getElementById("dnssec-pref-usesysdnsserver").selected;
     tmpCheck2 = document.getElementById("dnssec-pref-useoptdnsserver").selected;
    if (tmpCheck) {
@@ -182,6 +199,9 @@ var dnssecExtPrefs = {
     // enable optional DNS address textbox only if appropriate radio button is selected
     tmpCheck = document.getElementById("dnssec-pref-useoptdnsserver").selected;
     document.getElementById("dnssec-pref-optdnsserveraddr").disabled = !tmpCheck;
+
+    tmpCheck = document.getElementById("dnssec-pref-usefilter").checked;
+    document.getElementById("dnssec-pref-domains").disabled = !tmpCheck;
   },
 
   get _dnssecok () {
@@ -279,6 +299,7 @@ var dnssecExtPrefs = {
  	} //switch
    if (ip) {
 	document.getElementById("wrongip").style.display = 'block';
+	document.getElementById("space").style.display = 'none';
    }
    else {
      try {
@@ -295,18 +316,24 @@ var dnssecExtPrefs = {
 	document.getElementById("dnssecbogus").style.display = 'none';
 	document.getElementById("dnssecerror").style.display = 'block';
         document.getElementById("wrongip").style.display = 'none';
+	document.getElementById("space").style.display = 'none';
+
       }
       else if (testnic==4) {
 	document.getElementById("dnssecok").style.display = 'none';
 	document.getElementById("dnssecbogus").style.display = 'block';
 	document.getElementById("dnssecerror").style.display = 'none';
 	document.getElementById("wrongip").style.display = 'none';
+	document.getElementById("space").style.display = 'none';
+
       }
       else { 
 	document.getElementById("dnssecok").style.display = 'block';
 	document.getElementById("dnssecbogus").style.display = 'none';
 	document.getElementById("dnssecerror").style.display = 'none';
         document.getElementById("wrongip").style.display = 'none';
+	document.getElementById("space").style.display = 'none';
+
 	this.savePrefs();
       }
     } catch (ex) {

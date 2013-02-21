@@ -19,19 +19,22 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-        function addText(id, str){
-            if (document.createTextNode){
-                var tn = document.createTextNode(str);
-                document.getElementById(id).appendChild(tn);
-            }
-        }
+// set text on the html element on the popup window
+function addText(id, str){
+      if (document.createTextNode){
+         var tn = document.createTextNode(str);
+         document.getElementById(id).appendChild(tn);
+       } // if
+}
 
-	function DNSSECicon2(icon){
-	    var pic = document.getElementById("dnssec-icon2"); 
-	    if (pic == typeof('undefined')) return;
-	    pic.src = icon;
-	}
+// set icon in popup window
+function DNSSECicon2(icon){
+       var pic = document.getElementById("dnssec-icon2"); 
+       if (pic == typeof('undefined')) return;
+       pic.src = icon;
+}
 
+	// this code set text into popup window
         resultRegexp = /\?([^?,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)$/;
         matches = resultRegexp.exec(document.location.href);
 	domain = matches[1];
@@ -40,32 +43,30 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 	status = matches[4];
 	statuspre = matches[5];
 	info = matches[6];
-    ipbrowser = matches[7];
-  ipvalidator = matches[8];    
-  addText("domain-name-title", domain);
+	ipbrowser = matches[7];
+	ipvalidator = matches[8];    
+	addText("domain-name-title", domain);
 	addText("domain-name-text", domain);
-  addText("long-text", chrome.i18n.getMessage(statusString));
+	addText("long-text", chrome.i18n.getMessage(statusString));
 	addText("long-text-domain", chrome.i18n.getMessage(statuspre));
 	addText("dnssec-title", chrome.i18n.getMessage(status));
 	addText("dnssec-info", chrome.i18n.getMessage(info));
-  if (statusString == "3securedConnectionDomainInvIPaddr")  
-  {
- 		document.getElementById("ip-info-b").style.display = 'block';
+	
+	if (statusString == "3securedConnectionDomainInvIPaddr")  {
+		document.getElementById("ip-info-b").style.display = 'block';
 		document.getElementById("ip-info-v").style.display = 'block';
-  	document.getElementById("ip-info-bh").style.display = 'block';
+	  	document.getElementById("ip-info-bh").style.display = 'block';
 		document.getElementById("ip-info-vh").style.display = 'block'; 
-    addText("ip-info-b", ipbrowser);
-    if (ipvalidator == "x")  ipvalidator = "";
-    addText("ip-info-v", ipvalidator);
-    addText("ip-info-bh", chrome.i18n.getMessage("ipbrowsertext"));
-	  addText("ip-info-vh", chrome.i18n.getMessage("ipvalidatortext"));
-  }
-  else
-  {
+	    	addText("ip-info-b", ipbrowser);
+		addText("ip-info-v", ipvalidator);
+		addText("ip-info-bh", chrome.i18n.getMessage("ipbrowsertext"));
+		addText("ip-info-vh", chrome.i18n.getMessage("ipvalidatortext"));
+  	}
+	else {
 		document.getElementById("ip-info-b").style.display = 'none';
 		document.getElementById("ip-info-v").style.display = 'none';
 		document.getElementById("ip-info-bh").style.display = 'none';
 		document.getElementById("ip-info-vh").style.display = 'none';
-  }   
+	}   
 	addText("homepage", chrome.i18n.getMessage("homepage"));	
 	DNSSECicon2(icon);

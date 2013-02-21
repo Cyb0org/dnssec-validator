@@ -19,24 +19,27 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-        function addText(id, str){
-            if (document.createTextNode){
-                var tn = document.createTextNode(str);
-                document.getElementById(id).appendChild(tn);
-            }
-        }
+// set text of html elements
+function addText(id, str){
+      if (document.createTextNode){
+        var tn = document.createTextNode(str);
+        document.getElementById(id).appendChild(tn);
+      } // if
+} 
 
-	function DNSSECicon(icon){
-	    var pic = document.getElementById("dnssec-icon"); 
-	    if (pic == typeof('undefined')) return;
-	    pic.src = icon;
-	}
+// set icon into popup
+function DNSSECicon(icon){
+	var pic = document.getElementById("dnssec-icon"); 
+	if (pic == typeof('undefined')) return;
+	pic.src = icon;
+}
 
-	function NextLevel(overal){
-	    var pic = document.getElementById("moreinfo"); 
-	    if (pic == typeof('undefined')) return;
-	    pic.href = "detail-info.html?"+overal;
-	}
+// send parameters into detail popup
+function NextLevel(overal){
+	 var pic = document.getElementById("moreinfo"); 
+	 if (pic == typeof('undefined')) return;
+	 pic.href = "detail-info.html?"+overal;
+}
 
         resultRegexp = /\?([^?,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)$/;
         matches = resultRegexp.exec(document.location.href);
@@ -45,8 +48,8 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
         icon = matches[3];
 	status = matches[4];
 	statuspre = matches[5];
-  ipbrowser = matches[6];
-  ipvalidator = matches[7];
+  	ipbrowser = matches[6];
+	ipvalidator = matches[7];
 	overal = domain + "," + statusString + "," + icon + "," + status + "," + statuspre + "," + statusString + "Info" + "," + ipbrowser + "," + ipvalidator;      
         addText("domain-name-title", domain);
 	addText("domain-name-text", domain);
