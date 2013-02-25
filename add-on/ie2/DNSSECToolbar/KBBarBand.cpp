@@ -1108,41 +1108,47 @@ void CKBBarBand::CheckDomainStatus(short change)
 		ip64struct ipv64;
 		ipv64=stub_resolve(domain);
 		ipbrowser4=ipv64.ipv4;
-		resolvipv4 = true; 
-		resolvipv6 = false; 
-		if (debugoutput) options |= DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-		if (usedfwd) options |= DNSSEC_INPUT_FLAG_USEFWD;
-		if (resolvipv4) options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;
-		if (resolvipv6) options |= DNSSEC_INPUT_FLAG_RESOLVIPV6;
-		if (change==1) {
-			char* ipvalidator4tmp;
-			EnterCriticalSection(&cs);
-			//ATLTRACE("Critical section begin\n");
-			ATLTRACE("\nIPv4: %s : %d : %s : %s\n", domain, options, dnsip, ipbrowser4);
-			resultipv4 = ds_validate(domain, options, dnsip, ipbrowser4, &ipvalidator4tmp);
-			ATLTRACE("IPv4: %s : %d : %s\n", domain, resultipv4, ipvalidator4); 
-			LeaveCriticalSection(&cs);
-			strcpy_s(ipvalidator4, ipvalidator4tmp);
+
+		if (strcmp (ipbrowser4,"") != 0) {
+			resolvipv4 = true; 
+			resolvipv6 = false; 
+			if (debugoutput) options |= DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+			if (usedfwd) options |= DNSSEC_INPUT_FLAG_USEFWD;
+			if (resolvipv4) options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;
+			if (resolvipv6) options |= DNSSEC_INPUT_FLAG_RESOLVIPV6;
+			if (change==1) {
+				char* ipvalidator4tmp;
+				EnterCriticalSection(&cs);
+				//ATLTRACE("Critical section begin\n");
+				ATLTRACE("\nIPv4: %s : %d : %s : %s\n", domain, options, dnsip, ipbrowser4);
+				resultipv4 = ds_validate(domain, options, dnsip, ipbrowser4, &ipvalidator4tmp);
+				ATLTRACE("IPv4: %s : %d : %s\n", domain, resultipv4, ipvalidator4); 
+				LeaveCriticalSection(&cs);
+				strcpy_s(ipvalidator4, ipvalidator4tmp);
+			}
+		}
+		ipbrowser6=ipv64.ipv6;
+		if (strcmp (ipbrowser6,"") != 0) {
+			resolvipv4 = false; 
+			resolvipv6 = true;
+			options = 0;
+			if (debugoutput) options |= DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+			if (usedfwd) options |= DNSSEC_INPUT_FLAG_USEFWD;
+			if (resolvipv4) options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;
+			if (resolvipv6) options |= DNSSEC_INPUT_FLAG_RESOLVIPV6;
+			// Request ownership of the critical section
+			if (change==1) {
+				EnterCriticalSection(&cs);
+				//ATLTRACE("Critical section begin\n");
+				ATLTRACE("\nIPv6: %s : %d : %s : %s\n", domain, options, dnsip, ipbrowser6);
+				resultipv6 = ds_validate(domain, options, dnsip, ipbrowser6, &ipvalidator6);
+				ATLTRACE("IPv6: %s : %d : %s\n", domain, resultipv6, ipvalidator6); 
+				LeaveCriticalSection(&cs);
+			}
 		}
 
-		ipbrowser6=ipv64.ipv6;
-		resolvipv4 = false; 
-		resolvipv6 = true;
-		options = 0;
-		if (debugoutput) options |= DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-		if (usedfwd) options |= DNSSEC_INPUT_FLAG_USEFWD;
-		if (resolvipv4) options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;
-		if (resolvipv6) options |= DNSSEC_INPUT_FLAG_RESOLVIPV6;
-		// Request ownership of the critical section
-		if (change==1) {
-			EnterCriticalSection(&cs);
-			//ATLTRACE("Critical section begin\n");
-			ATLTRACE("\nIPv6: %s : %d : %s : %s\n", domain, options, dnsip, ipbrowser6);
-			resultipv6 = ds_validate(domain, options, dnsip, ipbrowser6, &ipvalidator6);
-			ATLTRACE("IPv6: %s : %d : %s\n", domain, resultipv6, ipvalidator6); 
-			LeaveCriticalSection(&cs);
-		}		
-		(resultipv4 <= resultipv6 ?  result = resultipv6 : result = resultipv4);
+		(resultipv4 <= resultipv6 ?  result = resultipv6 : result = resultipv4);    
+  
 	}
 	else result = DNSSEC_EXIT_VALIDATOR_OFF;
 	
