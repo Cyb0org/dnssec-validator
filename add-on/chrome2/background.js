@@ -226,7 +226,7 @@ document.write("<script>");
         
 
    // Called when the url of a tab changes.
-   function onUrlChange(tabId, changeInfo, tab) {                  
+   function onUrlChange(tabId, changeInfo, tab) {                  	
 	// reset any old popup
         chrome.pageAction.setPopup({tabId: tabId, popup: ""});
 
@@ -248,7 +248,7 @@ document.write("<script>");
          var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
 
   	console.log("------ Start of DNSSEC Validation ("+ domain +") ------");
-       
+        console.log("onUrlChange("+ tabId +", "+ changeInfo.status +", "+ changeInfo.url +")");
 	// get filter status
 	var filteron = localStorage["domainfilteron"];
 	var validate = true;
@@ -314,6 +314,27 @@ document.write("<script>");
       	    var plugin = document.getElementById("dnssec-plugin");	 	
 	    var result = plugin.Validate(domain, options, resolver, addr);
             console.log("Validator Result: " + result[0] + "; " + result[1]);
+	    if ((result[0]==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) || (result[0]==c.DNSSEC_EXIT_FAILED)) {
+		plugin.CacheFree();
+		options = 0;
+	    	if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+   	    	if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
+	    	if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
+	    	console.log("NOFWD Input: " + domain + "; " + options  + "; " + "nofwd"  + "; " + addr);
+	    	var resultnofwd = plugin.Validate(domain, options, "nofwd", addr);
+	    	console.log("NOFWD Result: " + resultnofwd[0] + "; " + resultnofwd[1]);
+		if ((resultnofwd[0]==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) || (resultnofwd[0]==c.DNSSEC_EXIT_FAILED)) {
+			result[0]=resultnofwd[0];
+		} 
+		else
+		{
+			console.log("Resolver is wrong! FWD: " + result[0] + "; NOFWD: " + resultnofwd[0]);
+			result[0]=resultnofwd[0];
+			
+			// Resolver is error	
+		}//if
+		
+	    } //if
 
 	    if (addr == "0.0.0.0") addr = "n/a"; 
   	    icon = ""; 
@@ -375,12 +396,16 @@ document.write("<script>");
       if (nameserver != "nofwd") options |= c.DNSSEC_INPUT_FLAG_USEFWD;
       options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
       var plugin = document.getElementById("dnssec-plugin");
-      //dump('INIT parameters: \"'+ dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
+      console.log('INIT parameters: \"'+ dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
       testnic = plugin.Validate(dn, options, nameserver, addr);
+      console.log('INIT result: \"'+ testnic + '\"\n');
       if ((testnic==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) || (testnic==c.DNSSEC_EXIT_FAILED)) {
-        //dnssecExtHandler.showDnssecFwdInfo();	 		
+        //dnssecExtHandler.showDnssecFwdInfo();
+      return 1;	 		
     }
+    return 0;
   }; // testdnssec
+
 
     // first start of browser = test on DNSSEC validation
    if (init) {

@@ -27,7 +27,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY dnssec.ipbrowser "Von Webbrowser benutzte IP-Adresse:">
 <!ENTITY dnssec.ipvalidator "Von Add-on erworbene IP-Adresse:">
 <!ENTITY dnssec.about.label "Über...">
-<!ENTITY dnssec.about.accesskey "U">
+<!ENTITY dnssec.about.accesskey "Ü">
 <!ENTITY dnssec.home.label "Startseite...">
 <!ENTITY dnssec.home.accesskey "S">
 <!ENTITY dnssec.preferences.label "Einstellungen...">

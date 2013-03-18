@@ -33,7 +33,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY radiodnsserverunbound.label "Bez resolveru">
 <!ENTITY radiodnsserverunbound.accesskey "B">
 <!ENTITY dnssecbutton.label "Test současného nastavení">
-<!ENTITY groupboxfilter.label "Doménový filtr">
-<!ENTITY usefilter.label "Povolit filtrování doménových jmen">
-<!ENTITY usefilter.accesskey "P">
-<!ENTITY filtertext.label "Seznam doménových jmen nebo TLD oddělených čárkami">
+<!ENTITY groupboxfilter.label "Domény vyřazené z validace">
+<!ENTITY usefilter.label "Nevalidovat domény uvedené v seznamu">
+<!ENTITY usefilter.accesskey "e">
+<!ENTITY filtertext.label "Seznam vyřazených domén a TLD (oddělené čárkami)">

@@ -6,13 +6,13 @@
 		"message": "Zur Namensauflösung benutzte DNS-Server:"
 		},
 	"groupboxfilter": {
-		"message": "Domain-Namen-Filter"
+		"message": "Ausgeschlossene Domänen"
 		},
 	"usefilter": {
-		"message": "Aktivieren Sie die Domain-Filter"
+		"message": "Schliesse Domänen aus dieser Liste aus"
 		},
 	"filtertext": {
-		"message": "Liste der Domänen oder TLD durch Komma getrennt"
+		"message": "Liste ausgeschlossener Domänen und TLDs (mit Komma abgetrennt)"
 		},
 	"legend": {
 		"message": "Resolver-Einstellungen"
@@ -87,7 +87,7 @@
 		"message": " wurde nicht durch DNSSEC überprüft."
 		},
          "dnsseOffInfo": {
-		"message": "Da haben Sie die Domain-Filter aktiviert, und das Domain-Namen oder TLD aufgeführt ist, nicht DNSSEC-Validierung für diese Domäne durchgeführt."
+		"message": "Die DNSSEC-Validierung wurde nicht ausgeführt, weil diese Domäne oder ihre übergeordnete Domäne in der Liste der ausgeschlossenen Domänen erwähnt ist."
 		},
          "0dnssecError": {
 		"message": " kann nicht mit DNSSEC überprüft werden."

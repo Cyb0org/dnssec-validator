@@ -6,13 +6,13 @@
 		"message": "DNS resolver(y) používané pro překlad jmen:"
 		},
 	"groupboxfilter": {
-		"message": "Doménový filtr"
+		"message": "Domény vyřazené z validace"
 		},
 	"usefilter": {
-		"message": "Použít doménový filtr"
+		"message": "Nevalidovat domény uvedené v seznamu"
 		},
 	"filtertext": {
-		"message": "Seznam domén nebo TLD oddělených čárkou"
+		"message": "Seznam vyřazených domén a TLD (oddělené čárkami)"
 		},
 	"legend": {
 		"message": "Nastavení resolveru"
@@ -87,7 +87,7 @@
 		"message": " nebylo ověřeno pomocí technologie DNSSEC."
 		},
          "dnsseOffInfo": {
-		"message": "Jelikož máte povolen doménový filtr a toto doménové jméno nebo jeho TLD je v seznamu uvedeno, nebyla DNSSEC validace pro tuto doménu provedena."
+		"message": "DNSSEC validace nebyla provedena, protože tato doména nebo její nadřazená doména je uvedena v seznamu vyloučených doménových jmen."
 		},
          "0dnssecError": {
 		"message": " nelze ověřit pomocí DNSSEC technologie."
