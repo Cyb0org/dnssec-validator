@@ -24,6 +24,6 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY aboutwindow.label "DNSSEC Validátor pro Mozilla Firefox">
 <!ENTITY aboutwindow.description1 "Zásuvný plugin pro kontrolu DNSSEC">
 <!ENTITY aboutwindow.description2 "Podporuje 32-bit a 64-bit verze">
-<!ENTITY aboutwindow.version "Verze 2.0-beta1">
+<!ENTITY aboutwindow.version "Verze 2.0-rc1">
 <!ENTITY aboutwindow.company "CZ.NIC Labs">
 <!ENTITY aboutwindow.year "2012">
