@@ -334,7 +334,7 @@ var dnssecExtResolver = {
     // Plugin callback
     function NPAPIcallback(plug, resArr) {
 
-      dnssecExtResolver.setValidatedData(dn, resArr, aRecord);
+      dnssecExtResolver.setValidatedData(dn, resArr, aRecord, addr);
 
     }
 
@@ -397,8 +397,97 @@ var dnssecExtResolver = {
   },
 
 
+
+
+
+  // Called when unbound return bogus
+  revalidate: function(dn, addr, res) {
+
+    // Plugin callback
+    function NPAPIcallback(plug, resArr) {
+
+      dnssecExtResolver.setValidatedDataTemp(dn, resArr, res);
+
+    }
+	var c = dnssecExtNPAPIConst;
+	var resolvipv4 = true;
+        var resolvipv6 = false;
+	var dsp = document.getElementById("dnssec-plugin");
+	dsp.CacheFree();
+	options = 0;
+	if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+   	if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
+	if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
+	 if (dnssecExtension.debugOutput)
+          dump(dnssecExtension.debugPrefix + "NOFWD input: " + dn + "; options: " + options  + "; resolver: nofwd; IP-br: " + addr + ';\n');
+
+   // Call NPAPI validation
+    try {
+      if (!dnssecExtension.asyncResolve) {   // Synchronous NPAPI validation
+        
+      } else {   // Asynchronous NPAPI validation
+        dsp.ValidateAsync(dn, options, "nofwd", addr, NPAPIcallback);
+      }
+    } catch (ex) {
+      dump(dnssecExtension.debugPrefix + 'Error: Plugin call failed!\n');
+
+      // Set error mode
+      dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
+
+      // Reset resolving flag
+      dnssecExtPrefs.setBool("resolvingactive", false);
+
+      return;
+    }
+
+  },
+
+ setValidatedDataTemp: function(dn, resArr, res) {
+    var ext = dnssecExtension;
+    var c = dnssecExtNPAPIConst;
+    
+   if (ext.debugOutput) {
+      dump(ext.debugPrefix + 'NOFWD result: ' + resArr[0] + '; ' + resArr[1] +' ;\n');
+    }	    	
+    
+    var restmp = resArr[0];
+    var ipvalidator = resArr[1];
+    
+    if (restmp==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+	dump(ext.debugPrefix + 'Yes, domain name has bogus\n');
+	res=restmp;
+    } 
+    else
+    {
+	dump(ext.debugPrefix + "Current resolver does not support DNSSEC!\n");
+	dump(ext.debugPrefix + "Results: FWD: " + res + "; NOFWD: " + restmp +"\n");
+	res=restmp;	
+    }//if
+		
+    // Set appropriate state if host name does not changed
+    // during resolving process (tab has not been switched)
+    if (dn == gBrowser.currentURI.asciiHost)
+      dnssecExtHandler.setSecurityState(res);
+
+    if (ext.debugOutput)
+      dump(ext.debugPrefix + ext.debugEndNotice);
+
+    // Resolving has finished
+    if (ext.debugOutput) {
+      dump(ext.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
+      dump(ext.debugPrefix + 'Unlocking section...\n');
+    }
+    dnssecExtPrefs.setBool("resolvingactive", false);
+    if (ext.debugOutput)
+      dump(ext.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
+
+
+
+
+  },
+
   // Set appropriate security state
-  setValidatedData: function(dn, resArr, aRecord) {
+  setValidatedData: function(dn, resArr, aRecord, addr) {
 
     var ext = dnssecExtension;
 
@@ -415,7 +504,7 @@ var dnssecExtResolver = {
     res = resArr[0];
     valstate = res;
     ipvalidator = resArr[1];
-	
+/*	
     if (res==0) {
        if (dnssecExtPrefs.getInt("dnsserverchoose") == 0) {
          var dsp = document.getElementById("dnssec-plugin");
@@ -424,6 +513,16 @@ var dnssecExtResolver = {
 	 dnssecExtension.inittest();
        }  
     }
+*/
+    var c = dnssecExtNPAPIConst;
+    if (res==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+      	dump(ext.debugPrefix + "Unbound return bogus state: Testing why?\n");
+	this.revalidate(dn,addr,res);
+	return;
+    }// if
+
+
+
 
     // Set appropriate state if host name does not changed
     // during resolving process (tab has not been switched)

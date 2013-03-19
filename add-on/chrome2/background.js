@@ -26,9 +26,12 @@ document.write("</head>");
 document.write("<body>");
 document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidator\" width=\"0\" height=\"0\"></object>");
 document.write("<script>");
-
+	// debug
+	var DNSSEC = "DNSSEC: ";
 	// some variables for chrome IP API
-	var currentIPList= new Array(); // Save all IP addresses by URLs in a temporary object
+	var currentIPList= new Array();
+	var currentIPListDomain= new Array();
+ // Save all IP addresses by URLs in a temporary object
 	var addr = "0.0.0.0";  // set default IP address
 	var addrbackup = "0.0.0.0";  // set default IP address for backup
 	var init = true; // init test of DNSSEC
@@ -107,7 +110,7 @@ document.write("<script>");
 	    var domainpre;
       	    var tooltiptitle;
 	    
-	    console.log("Set mode: " + newMode + "; TabId: " + tabId + "; Doamin: " + domain + "; Status: " + status);
+	    console.log(DNSSEC + "Set mode: " + newMode + "; TabId: " + tabId + "; Doamin: " + domain + "; Status: " + status);
             
 	switch (newMode) {
             /* green icon */
@@ -247,14 +250,15 @@ document.write("<script>");
 	 // get domain name from URL
          var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
 
-  	console.log("------ Start of DNSSEC Validation ("+ domain +") ------");
-        console.log("onUrlChange("+ tabId +", "+ changeInfo.status +", "+ changeInfo.url +")");
+  	console.log(DNSSEC + "--------- Start of DNSSEC Validation ("+ domain +") ---------");
+        console.log(DNSSEC + "onUrlChange(TabID: " + tabId + ", Action: " + changeInfo.status + ", Info: " + changeInfo.url + ");");
 	// get filter status
+
 	var filteron = localStorage["domainfilteron"];
 	var validate = true;
 
     	if (filteron == "true") {
-		console.log( 'Domain filter: on');
+		console.log(DNSSEC + 'Domain filter: ON');
 		var urldomainsepar=/[.]+/;
 		var urldomainarray=domain.split(urldomainsepar);
 	
@@ -273,18 +277,27 @@ document.write("<script>");
        		   //dump(dnssecExtension.debugPrefix + 'URL2? ' + urldomainarray[urldomainarray.length-2] + ' LIST2? ' + domainarraylist[j] +';\n');
        	        } // if        
     	} // literon
-	else console.log( 'Domain filter: off');
+	else console.log(DNSSEC + 'Domain filter: OFF');
 	
-	console.log( 'Validate this domain: ' + validate );
+	console.log(DNSSEC + 'Validate this domain: ' + validate );
        
      	if (validate) {  
-                    	   
+            var debug = localStorage["dnssecDebugOutput"];
+	    debug = (debug == "false") ? false : true;        	   
     	    var currentURL = tab.url;
-	    console.log("URL: " + currentURL);	  	     
+	    console.log(DNSSEC + "URL: " + currentURL);	  	     
 	    addr = currentIPList[ currentURL ];
-	    if (addr == undefined) addr = addrbackup;
-	    else addrbackup=addr; 		
-	    console.log("Browser IP: " + addr);
+	    console.log(DNSSEC + "Browser URL IP: " + addr);
+	    if (addr == undefined) {
+		addr = currentIPListDomain[ domain ];
+	        console.log(DNSSEC + "Browser Domain IP: " + addr);
+	    } // if
+	    
+	    if (addr == undefined) {
+		addr = addrbackup;
+	        console.log(DNSSEC + "NO IP: " + addr);
+	    } // if
+	    //console.log(DNSSEC + "addrbackup IP: " + addrbackup);
 
 	    var resolvipv4 = false; // No IPv4 resolving as default
 	    var resolvipv6 = false; // No IPv6 resolving as default
@@ -299,7 +312,7 @@ document.write("<script>");
    
 	    var options = 0;
 	    var c = this.dnssecExtNPAPIConst;
-	    if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+	    if (debug) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
 	    if (resolver != "nofwd") options |= c.DNSSEC_INPUT_FLAG_USEFWD;
 	    if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
 	    if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
@@ -308,32 +321,32 @@ document.write("<script>");
 	   icon = "icon_action.gif";
 	   chrome.pageAction.setIcon({path: icon, tabId: tabId});
  	   chrome.pageAction.show(tabId);
-
-	    console.log("Validator Input: " + domain + "; " + options  + "; " + resolver  + "; " + addr);
+	    if (resolver!="") console.log(DNSSEC + "Validator input: " + domain + "; options: " + options  + "; resolver: " + resolver  + "; IP-br: " + addr);	    
+	    else console.log(DNSSEC + "Validator input: " + domain + "; options: " + options  + "; resolver: system; IP-br: " + addr);
 	    // Call of Validation function
       	    var plugin = document.getElementById("dnssec-plugin");	 	
 	    var result = plugin.Validate(domain, options, resolver, addr);
-            console.log("Validator Result: " + result[0] + "; " + result[1]);
-	    if ((result[0]==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) || (result[0]==c.DNSSEC_EXIT_FAILED)) {
+            console.log(DNSSEC + "Validator result: " + result[0] + "; " + result[1]);
+	    if (result[0]==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+	        console.log(DNSSEC + "Unbound return bogus state: Testing why?");
 		plugin.CacheFree();
 		options = 0;
-	    	if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+	    	if (debug) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
    	    	if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
 	    	if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
-	    	console.log("NOFWD Input: " + domain + "; " + options  + "; " + "nofwd"  + "; " + addr);
+	    	console.log(DNSSEC + "NOFWD input: " + domain + "; options: " + options  + "; resolver: nofwd; IP-br: " + addr);
 	    	var resultnofwd = plugin.Validate(domain, options, "nofwd", addr);
-	    	console.log("NOFWD Result: " + resultnofwd[0] + "; " + resultnofwd[1]);
-		if ((resultnofwd[0]==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) || (resultnofwd[0]==c.DNSSEC_EXIT_FAILED)) {
+	    	console.log(DNSSEC + "NOFWD result: " + resultnofwd[0] + "; " + resultnofwd[1]);
+		if (resultnofwd[0]==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
 			result[0]=resultnofwd[0];
+			console.log(DNSSEC + "Yes, domain name has bogus");
 		} 
 		else
-		{
-			console.log("Resolver is wrong! FWD: " + result[0] + "; NOFWD: " + resultnofwd[0]);
+		{		   
+			console.log(DNSSEC + "Current resolver does not support DNSSEC!");
+			console.log(DNSSEC + "Results: FWD: " + result[0] + "; NOFWD: " + resultnofwd[0]);
 			result[0]=resultnofwd[0];
-			
-			// Resolver is error	
-		}//if
-		
+		}//if		
 	    } //if
 
 	    if (addr == "0.0.0.0") addr = "n/a"; 
@@ -381,29 +394,36 @@ document.write("<script>");
                 break;
 	    }
 
-	console.log("------ End of DNSSEC Validation ("+ domain +") ------\n");
+	console.log(DNSSEC + "--------- End of DNSSEC Validation ("+ domain +") ---------\n");
 
      }; // onUrlChange
 
   function testdnssec() {
+      console.log(DNSSEC + "------- Start of INIT resolver DNSSEC test (www.nic.cz) ------");
       var nameserver = this.getResolver();
       var c = this.dnssecExtNPAPIConst;
       var options = 0;
       var testnic = 0;
       var dn = "www.nic.cz";
       var addr = "217.31.205.50";
-      options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+      var debug = localStorage["dnssecDebugOutput"];
+      debug = (debug == "false") ? false : true;
+
+      if (debug) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
       if (nameserver != "nofwd") options |= c.DNSSEC_INPUT_FLAG_USEFWD;
       options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
       var plugin = document.getElementById("dnssec-plugin");
-      console.log('INIT parameters: \"'+ dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
+      console.log(DNSSEC + 'INIT resolver test: '+ dn + '; ' + options + '; ' + nameserver + '; ' + addr);
       testnic = plugin.Validate(dn, options, nameserver, addr);
-      console.log('INIT result: \"'+ testnic + '\"\n');
-      if ((testnic==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) || (testnic==c.DNSSEC_EXIT_FAILED)) {
-        //dnssecExtHandler.showDnssecFwdInfo();
-      return 1;	 		
-    }
-    return 0;
+      console.log(DNSSEC + 'INIT result: '+ testnic[0]);
+      if ((testnic[0]==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) || (testnic[0]==c.DNSSEC_EXIT_FAILED)) {
+	console.log(DNSSEC + "Current resolver does not support DNSSEC...");
+        //dnssecExtHandler.showDnssecFwdInfo()	 		
+      } else {
+        console.log(DNSSEC + "Current resolver supports DNSSEC...");
+      } // if
+
+      console.log(DNSSEC + "------- End of INIT resolver DNSSEC test (www.nic.cz) ------\n");
   }; // testdnssec
 
 
@@ -416,7 +436,10 @@ document.write("<script>");
   // get IP address of URL      
   chrome.webRequest.onResponseStarted.addListener(function(info) {
 			currentIPList[ info.url ] = info.ip;
-      			//console.log("IPsonResponseStarted: " + info.url + " -- " + info.ip + ";");                       		  
+         		var urldomain = info.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
+			currentIPListDomain[ urldomain ] = info.ip;
+      			//console.log("currentIPList: " + info.url + " -- " + info.ip + ";");
+      			//console.log("currentIPListDomain: " + urldomain + " -- " + info.ip + ";");                        		  
 		  return;},{ urls: [], types: [] },  []
 	    );
 
