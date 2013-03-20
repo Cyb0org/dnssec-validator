@@ -461,6 +461,9 @@ var dnssecExtResolver = {
     {
 	dump(ext.debugPrefix + "Current resolver does not support DNSSEC!\n");
 	dump(ext.debugPrefix + "Results: FWD: " + res + "; NOFWD: " + restmp +"\n");
+	var dsp = document.getElementById("dnssec-plugin");
+	dsp.CacheFree();
+	dnssecExtHandler.showDnssecFwdInfo();	
 	res=restmp;	
     }//if
 		
@@ -521,7 +524,10 @@ var dnssecExtResolver = {
 	return;
     }// if
 
-
+    if (res==c.DNSSEC_EXIT_FAILED) {
+      	dump(ext.debugPrefix + "Unbound return error state: Testing why?\n");
+	dnssecExtHandler.showDnssecFwdInfo();	
+    }// if
 
 
     // Set appropriate state if host name does not changed

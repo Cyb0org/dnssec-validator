@@ -340,12 +340,14 @@ document.write("<script>");
 		if (resultnofwd[0]==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
 			result[0]=resultnofwd[0];
 			console.log(DNSSEC + "Yes, domain name has bogus");
+			plugin.CacheFree();
 		} 
 		else
 		{		   
 			console.log(DNSSEC + "Current resolver does not support DNSSEC!");
 			console.log(DNSSEC + "Results: FWD: " + result[0] + "; NOFWD: " + resultnofwd[0]);
 			result[0]=resultnofwd[0];
+			plugin.CacheFree();
 		}//if		
 	    } //if
 
