@@ -141,6 +141,7 @@
            "ipvalidatortext": {"message": "IP addresses obtained by add-on:"},
            "actionDnssec": {"message": "Retrieving DNSSEC status"},
            "inactionDnssec": {"message": "Idle"},
-           "errorDnssec": {"message": "DNSSEC status unknown"}
+           "errorDnssec": {"message": "DNSSEC status unknown"},
+	    "fwdinfo" : {"message": "Note: Current DNS server or resolver does not support DNSSEC technology. Please, change the validator settings.\n\nDo you want to proceed to settings?"}
 }
 

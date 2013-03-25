@@ -35,7 +35,7 @@ document.write("<script>");
 	var addr = "0.0.0.0";  // set default IP address
 	var addrbackup = "0.0.0.0";  // set default IP address for backup
 	var init = true; // init test of DNSSEC
-	var xxx = 0;
+	var fwdinfo = false;
 	// States of DNSSEC validator
 	var dnssecExtNPAPIConst = {
   		DNSSEC_EXIT_FAILED                         : 0, /* state is unknown or fail*/
@@ -103,15 +103,14 @@ document.write("<script>");
             
         };
 
-	// this function sets DNSSEC mode. status ICON and popup text
+	// this function show comfirm window when resolver does not support DNSSEC
     function showresolverinfo(tabId) {
-
-      alert("To ses ale lekl!");
-
-     }; // setMode
+	var choice = confirm(chrome.i18n.getMessage("fwdinfo"));
+	if (choice) chrome.tabs.create({url: "options.html?4,0,8.8.8.8"});
+     }; // showresolverinfo
 
 	// this function sets DNSSEC mode. status ICON and popup text
-   function setMode(newMode, tabId, domain, status,  addr, ipval) {
+   function setMode(newMode, tabId, domain, status,  addr, ipval, changeInfo) {
             var icon;
 	    var title;
 	    var domainpre;
@@ -209,9 +208,8 @@ document.write("<script>");
             // unless popup is opened, so we set the validation result like GET parameters.
             chrome.pageAction.setPopup({tabId: tabId, popup: "popup.html?" + domain + "," 
 		+ newMode + "," + icon + "," + title + "," + domainpre + "," + addr + "," + ipval});
-
-
-	   showresolverinfo(tabId);
+	    
+	    if (fwdinfo) if (changeInfo == "complete") showresolverinfo(tabId);	   
      }; // setMode
 
      // get information about custom resolver
@@ -326,8 +324,8 @@ document.write("<script>");
 	    if (resolver != "nofwd") options |= c.DNSSEC_INPUT_FLAG_USEFWD;
 	    if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
 	    if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
-
-	   var icon = "";
+	    fwdinfo=false;
+  	   var icon = "";
 	   icon = "icon_action.gif";
 	   chrome.pageAction.setIcon({path: icon, tabId: tabId});
  	   chrome.pageAction.show(tabId);
@@ -351,6 +349,7 @@ document.write("<script>");
 			result[0]=resultnofwd[0];
 			console.log(DNSSEC + "Yes, domain name has bogus");
 			plugin.CacheFree();
+			fwdinfo=false;
 		} 
 		else
 		{		   
@@ -358,7 +357,7 @@ document.write("<script>");
 			console.log(DNSSEC + "Results: FWD: " + result[0] + "; NOFWD: " + resultnofwd[0]);
 			result[0]=resultnofwd[0];
 			plugin.CacheFree();
-			xxx=1;
+			fwdinfo=true;
 		}//if		
 	    } //if
 
@@ -378,32 +377,32 @@ document.write("<script>");
  
      	switch (status) {
 	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP: 
-		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED, tabId, domain, status, addr, ipval );
+		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED, tabId, domain, status, addr, ipval, changeInfo.status );
     		break;
 	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP: 
-		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED, tabId, domain, status, addr,  ipval);
+		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED, tabId, domain, status, addr,  ipval, changeInfo.status);
 	        break;
 	    case c.DNSSEC_EXIT_NODOMAIN_SIGNATURE_VALID: 
-		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED, tabId, domain, status, addr,  ipval);
+		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED, tabId, domain, status, addr,  ipval, changeInfo.status);
 	        break;
 	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID, tabId, domain, status, addr,  ipval);
+	        this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID, tabId, domain, status, addr,  ipval, changeInfo.status);
 	        break;
 	    case c.DNSSEC_EXIT_NODOMAIN_SIGNATURE_INVALID:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID, tabId, domain, status, addr,  ipval);
+	        this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID, tabId, domain, status, addr,  ipval, changeInfo.status);
 	        break;
 	    case c.DNSSEC_EXIT_DOMAIN_UNSECURED:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_UNSECURED, tabId, domain, status,  addr, ipval);
+	        this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_UNSECURED, tabId, domain, status,  addr, ipval, changeInfo.status);
                 break;
 	    case c.DNSSEC_EXIT_NODOMAIN_UNSECURED:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED, tabId, domain, status,  addr, ipval);
+	        this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED, tabId, domain, status,  addr, ipval, changeInfo.status);
 	        break;
 	    case -1:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_OFF, tabId, domain, status, addr, ipval);
+	        this.setMode(this.dnssecModes.DNSSEC_MODE_OFF, tabId, domain, status, addr, ipval, changeInfo.status);
 	        break;
 	    case c.DNSSEC_EXIT_FAILED:
 	    default:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_ERROR, tabId, domain, status, addr,  ipval);
+	        this.setMode(this.dnssecModes.DNSSEC_MODE_ERROR, tabId, domain, status, addr,  ipval, changeInfo.status);
                 break;
 	    }
 
@@ -442,7 +441,7 @@ document.write("<script>");
 
     // first start of browser = test on DNSSEC validation
    if (init) {
-      testdnssec();
+      //testdnssec();
       init = false;
     } 
 

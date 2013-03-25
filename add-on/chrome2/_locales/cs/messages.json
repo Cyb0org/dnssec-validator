@@ -141,5 +141,6 @@
            "ipvalidatortext": {"message": "IP adresy ověřené doplňkem:"},
            "actionDnssec": {"message": "Zjišťování DNSSEC zabezpečení"},
            "inactionDnssec": {"message": "Nečinný"},
-           "errorDnssec": {"message": "Stav DNSSEC neznámý"}
+           "errorDnssec": {"message": "Stav DNSSEC neznámý"},
+	   "fwdinfo" : {"message": "Upozornění: Aktuálně nastavený resolver nepodporuje DNSSEC technologii. Prosím, změňte nastavení validátoru.\n\nChcete přejít do nastavení?"}
 }

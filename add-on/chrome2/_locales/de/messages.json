@@ -141,5 +141,6 @@
            "ipvalidatortext": {"message": "Von Add-on erworbene IP-Adresse:"},
            "actionDnssec": {"message": "Erwerbung des DNSSEC-Zustandes"},
            "inactionDnssec": {"message": "Idle."},
-           "errorDnssec": {"message": "DNSSEC-Zustand unbekannt"}
+           "errorDnssec": {"message": "DNSSEC-Zustand unbekannt"},
+	   "fwdinfo" : {"message": "Warnung: Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht. Ändern Sie bitte die Einstellungen des Resolvers.\n\nWollen Sie zu den Einstellungen weitergehen?"}
 }
