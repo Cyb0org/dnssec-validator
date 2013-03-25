@@ -27,7 +27,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
     <em:id>dnssec@nic.cz</em:id>
     <em:name>DNSSEC Validator</em:name>
     <em:description>Checks whether domain names in the address bar are secured by DNSSEC.</em:description>
-    <em:version>2.0-beta1</em:version>
+    <em:version>2.0-rc1</em:version>
     <em:creator>CZ.NIC Labs</em:creator>
     <em:developer>Martin Straka</em:developer> <!-- martin.straka(AT)nic.cz -->
     <em:contributor>Bedrich Kosata</em:contributor> <!-- bedrich.kosata(AT)nic.cz -->
