@@ -222,7 +222,8 @@ public:
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam);
 	bool FileExists(const TCHAR *fileName);
 	void CreateIniFile();
-
+	short TestResolver(char *domain, char *ipbrowser, char IPv);
+	void ShowFwdTooltip(void);
 
 	static int position; //main position of the icon
 	bool m_bFocus;			

@@ -127,10 +127,10 @@ BEGIN
     LTEXT           "DNSSEC Validator for Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Add-on plugin for DNSSEC checking",IDC_STATIC,50,30,180,10
     LTEXT           "Support browsers: 32-bit version of IE6 - IE10",IDC_STATIC,50,40,180,10
-    LTEXT           "Version 2.0-beta1", IDC_STATIC,50,50,180,10
+    LTEXT           "Version 2.0-rc1", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
-	LTEXT           "http://www.dnssec-validator.cz/ie/", IDC_LINK,10,95,120,10
+	LTEXT           "http://www.dnssec-validator.cz/", IDC_LINK,10,95,120,10
 END
 
 IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 250
@@ -150,9 +150,9 @@ BEGIN
 	PUSHBUTTON      "Test current settings",IDC_IDDNSSEC,10, 75+10 ,190,14
 	LTEXT           " ", IDC_DNSSEC_R,10,75+10+14+5,180,20
 
-	GROUPBOX        "Domain name filter",IDC_STATIC,10,125,190,78
-	CONTROL			"Enable the domain filter", IDC_DOM_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 15, 125+12, 165 ,10
-	LTEXT           "List of domains or TLDs separated by commas", IDC_STATIC,15,125+12+13,182,10
+	GROUPBOX        "List of excluded domains and TLDs",IDC_STATIC,10,125,190,78
+	CONTROL			"Exclude domains in list", IDC_DOM_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 15, 125+12, 165 ,10
+	LTEXT           "List of domains or TLDs (separated by commas)", IDC_STATIC,15,125+12+13,182,10
 	EDITTEXT		IDT_DOM_LIST, 15, 160, 180, 36, ES_LEFT | ES_AUTOVSCROLL | ES_MULTILINE | WS_VSCROLL, WS_EX_CLIENTEDGE
 
 	CONTROL			"Display text status besides the key icon", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 125+75+10, 165 ,10
@@ -335,7 +335,7 @@ BEGIN
 		//state -1 - WHITE
 	IDS_STATE01_TEXT_TOOLTIP "Not verified by DNSSEC"
 	IDS_STATE01_TEXT_DOMAIN  "was not verified by DNSSEC."
-	IDS_STATE01_TEXT_MAIN	"Because you have enable the domain filter and this domain name or his TLD was found in the list, the DNSSEC validation was not performed for this domain."
+	IDS_STATE01_TEXT_MAIN	"DNSSEC validation was not performed because this domain or its parent domain is mentioned in the list of excluded domains."
 
 
 
@@ -564,7 +564,7 @@ BEGIN
 	//state -1 - WHITE
 	IDS_STATE01_TEXT_TOOLTIP "Neovìøeno DNSSEC"
 	IDS_STATE01_TEXT_DOMAIN  "nebylo ovìøeno pomocí technologie DNSSEC."
-	IDS_STATE01_TEXT_MAIN	"Jelikož máte povolen doménový filtr a toto doménové jméno nebo jeho TLD je v seznamu uvedeno, nebyla DNSSEC validace pro tuto doménu provedena."
+	IDS_STATE01_TEXT_MAIN	"DNSSEC validace nebyla provedena, protože tato doména nebo její nadøazená doména je uvedena v seznamu vylouèených doménových jmen."
 
 
 	IDS_NONE                " "
@@ -604,9 +604,9 @@ BEGIN
 	PUSHBUTTON      "Test souèasného nastavení",IDC_IDDNSSEC,10, 75+10 ,190,14
 	LTEXT           ".", IDC_DNSSEC_R,10,75+10+14+5,180,20
 
-	GROUPBOX        "Doménový filtr",IDC_STATIC,10,125,190,78
-	CONTROL			"Povolit fitrování doménových jmen", IDC_DOM_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 15, 125+12, 165 ,10
-	LTEXT           "Seznam doménových jmen nebo TLD oddìlených èárkou", IDC_STATIC,15,125+12+13,182,10
+	GROUPBOX        "Domény vyøazené z validace",IDC_STATIC,10,125,190,78
+	CONTROL			"Nevalidovat domény uvedené v seznamu", IDC_DOM_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 15, 125+12, 165 ,10
+	LTEXT           "Seznam vyøazených domén a TLD (oddìlené èárkami)", IDC_STATIC,15,125+12+13,182,10
 	EDITTEXT		IDT_DOM_LIST, 15, 160, 180, 36, ES_LEFT | ES_AUTOVSCROLL | ES_MULTILINE | WS_VSCROLL, WS_EX_CLIENTEDGE
 
 	CONTROL			"Zobrazovat texty za ikonou klíèku", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 125+75+10, 165 ,10
@@ -627,10 +627,10 @@ BEGIN
     LTEXT           "DNSSEC Validátor pro Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Zásuvný plugin pro kontrolu DNSSEC",IDC_STATIC,50,30,180,10
     LTEXT           "Podporované prohlížeèe: 32-bit verze IE6 - IE10",IDC_STATIC,50,40,180,10
-    LTEXT           "Verze 2.0-beta1", IDC_STATIC,50,50,180,10
+    LTEXT           "Verze 2.0-rc1", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
-	LTEXT           "http://www.dnssec-validator.cz/ie/", IDC_LINK,10,95,120,10
+	LTEXT           "http://www.dnssec-validator.cz/", IDC_LINK,10,95,120,10
 END
 
 IDD_DIALOG_DNSSEC DIALOGEX 0, 0, 220, 75
@@ -811,10 +811,10 @@ BEGIN
     LTEXT           "DNSSEC Validator für Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Add-on für DNSSEC Validierung",IDC_STATIC,50,30,180,10
     LTEXT           "Unterstützte Versionen: 32-bit Versionen von IE6 - IE10",IDC_STATIC,50,40,180,10
-    LTEXT           "Version 2.0-beta1", IDC_STATIC,50,50,180,10
+    LTEXT           "Version 2.0-rc1", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2012", IDC_STATIC,50,70,100,10
-	LTEXT           "http://www.dnssec-validator.cz/ie/", IDC_LINK,10,95,120,10
+	LTEXT           "http://www.dnssec-validator.cz/", IDC_LINK,10,95,120,10
 END
 
 
@@ -836,9 +836,9 @@ BEGIN
 	PUSHBUTTON      "Bestehende Einstellungen testen",IDC_IDDNSSEC,10, 75+10 ,190,14
 	LTEXT           "", IDC_DNSSEC_R,10,75+10+14+5,180,20
 
-	GROUPBOX        "Domain-Namen-Filter",IDC_STATIC,10,125,190,78
-	CONTROL			"Aktivieren Sie die Domain-Filter", IDC_DOM_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 15, 125+12, 165 ,10
-	LTEXT           "Liste der Domänen oder TLD durch Komma getrennt", IDC_STATIC,15,125+12+13,182,10
+	GROUPBOX        "Ausgeschlossene Domänen",IDC_STATIC,10,125,190,78
+	CONTROL			"Schliesse Domänen aus dieser Liste aus", IDC_DOM_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 15, 125+12, 165 ,10
+	LTEXT           "Liste ausgeschlossener Domänen, TLDs (mit Komma abgetrennt)", IDC_STATIC,15,125+12+13,182,10
 	EDITTEXT		IDT_DOM_LIST, 15, 160, 180, 36, ES_LEFT | ES_AUTOVSCROLL | ES_MULTILINE | WS_VSCROLL, WS_EX_CLIENTEDGE
 
 	CONTROL			"Legende neben dem Schlüssel-Symbol zeigen", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 125+75+10, 165 ,10
@@ -1023,7 +1023,7 @@ BEGIN
 	//state -1 - WHITE
 	IDS_STATE01_TEXT_TOOLTIP "Nicht durch DNSSEC geprüft"
 	IDS_STATE01_TEXT_DOMAIN  "wurde nicht durch DNSSEC überprüft."
-	IDS_STATE01_TEXT_MAIN	"Da haben Sie die Domain-Filter aktiviert, und das Domain-Namen oder TLD aufgeführt ist, nicht DNSSEC-Validierung für diese Domäne durchgeführt."
+	IDS_STATE01_TEXT_MAIN	"Die DNSSEC-Validierung wurde nicht ausgeführt, weil diese Domäne oder ihre übergeordnete Domäne in der Liste der ausgeschlossenen Domänen erwähnt ist."
 
 
     IDS_NONE                " "

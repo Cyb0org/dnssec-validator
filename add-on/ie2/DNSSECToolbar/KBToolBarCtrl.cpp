@@ -196,7 +196,7 @@ void CKBToolBarCtrl::OnTbnDropDown(NMHDR *pNMHDR, LRESULT *pResult)
 						break;
 					}
 					case ID_HOME : { 
-						m_pBand->webBrowser2->Navigate(L"https://labs.nic.cz/page/1253/dnssec-validator-2.0-pro-webove-prohlizece/", &varEmpty, &vWindow , &varEmpty, &varEmpty);						
+						m_pBand->webBrowser2->Navigate(L"http://www.dnssec-validator.cz", &varEmpty, &vWindow , &varEmpty, &varEmpty);						
 						break;
 					}
 				}
@@ -595,7 +595,7 @@ LRESULT CKBToolBarCtrl::DialogProcAbout(HWND hwndDlg, UINT uMsg, WPARAM wParam, 
 	case WM_INITDIALOG:
         {		
 			// conver text to hyperlink
-			m_link.ConvertStaticToHyperlink(hwndDlg, IDC_LINK, _T("https://labs.nic.cz/page/1253/dnssec-validator-2.0-pro-webove-prohlizece/"));
+			m_link.ConvertStaticToHyperlink(hwndDlg, IDC_LINK, _T("http://www.dnssec-validator.cz"));
         break;
 		}	
 	
@@ -713,7 +713,7 @@ LRESULT CKBToolBarCtrl::DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam,
 				else popupheight = 250;
 				::SetWindowPos(::GetDlgItem(hwndDlg,IDC_ST5),NULL,0,0,300,popupheight-130,SWP_NOMOVE);
 				::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST5),strbuf);
-				m_link.ConvertStaticToHyperlink(hwndDlg, IDC_LINK, _T("https://labs.nic.cz/page/1253/dnssec-validator-2.0-pro-webove-prohlizece/"));
+				m_link.ConvertStaticToHyperlink(hwndDlg, IDC_LINK, _T("http://www.dnssec-validator.cz"));
 				// resize popup window if IP message was set				
 				
 				popupheight=popupheight+70;
@@ -745,7 +745,7 @@ LRESULT CKBToolBarCtrl::DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam,
 				else popupheight = 250;
 				::SetWindowPos(::GetDlgItem(hwndDlg,IDC_ST5),NULL,0,0,300,popupheight-130,SWP_NOMOVE);
 				::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST5),strbuf);
-				m_link.ConvertStaticToHyperlink(hwndDlg, IDC_LINK, _T("https://labs.nic.cz/page/1253/dnssec-validator-2.0-pro-webove-prohlizece/"));
+				m_link.ConvertStaticToHyperlink(hwndDlg, IDC_LINK, _T("http://www.dnssec-validator.cz"));
 				// resize popup window if IP message was set
 				::SetWindowPos(::GetDlgItem(hwndDlg,IDC_LINK),NULL,15,popupheight-30,0,0,SWP_NOSIZE);
 				::SetWindowPos(hwndDlg,NULL,0,0,336,popupheight,SWP_NOMOVE);

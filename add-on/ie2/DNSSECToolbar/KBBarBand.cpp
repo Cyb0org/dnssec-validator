@@ -612,7 +612,7 @@ bool CKBBarBand::CreateToolWindow()
 	
 	// Get cuurent version of IE
 	iRes = GetMSIEversion(&iMajor,&iMinor);		
-	/*
+	
 	// if IE is 9.xx
 	if (iMajor==9) {
 		CreateIconTooltip(m_wndToolBar);
@@ -623,7 +623,7 @@ bool CKBBarBand::CreateToolWindow()
 		CreateIconTooltip(m_wndToolBar);
 		return true;
 	}
-	*/
+	
 	return true;
 }
 
@@ -983,21 +983,7 @@ void CKBBarBand::CheckDomainStatus(short change)
 	//ATLTRACE("checkdomainstatus() call\n");
     
 	// if IE is version 8.xx, create tooltip	
-	/*
-	if (iMajor==8) {
-		if (!tiInitialized1) {
-			CreateIconTooltip(m_wndToolBar);
-			tiInitialized1 = true;
-		}
-	}
-	// if IE is version 6.xx, create tooltip	
-	if (iMajor==6) {
-		if (!tiInitialized1) {
-			CreateIconTooltip(m_wndToolBar);
-			tiInitialized1 = true;
-		}
-	}
-	*/
+
 	//temporal element that helps to fragment the given URL in a domain
 	char* tmpdomain = NULL;
 	bool resolvipv4 = true;
@@ -1107,8 +1093,9 @@ void CKBBarBand::CheckDomainStatus(short change)
 			else dnsip = "";
 		ip64struct ipv64;
 		ipv64=stub_resolve(domain);
+		
+		// validation IPv4
 		ipbrowser4=ipv64.ipv4;
-
 		if (strcmp (ipbrowser4,"") != 0) {
 			resolvipv4 = true; 
 			resolvipv6 = false; 
@@ -1125,8 +1112,29 @@ void CKBBarBand::CheckDomainStatus(short change)
 				ATLTRACE("IPv4: %s : %d : %s\n", domain, resultipv4, ipvalidator4); 
 				LeaveCriticalSection(&cs);
 				strcpy_s(ipvalidator4, ipvalidator4tmp);
+				if (resultipv4==DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+				  ATLTRACE("Unbound return bogus state: Testing why?\n");
+				  ub_context_free();
+				  short res = 0 ;
+				  res = TestResolver(domain, ipbrowser4, '4');
+				  if (res==DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+					  resultipv4 = 	res;
+					  ATLTRACE("Yes, domain name has bogus\n");
+					  ub_context_free();
+				  }
+				  else 
+				  {					
+					ATLTRACE("Current resolver does not support DNSSEC!\n");
+					ATLTRACE("Results: FWD: %d NOFWD: %d\n", resultipv4, res);
+					resultipv4 = res;
+					ub_context_free();
+				  } // if bogus
+				
+				} // if bogus
 			}
 		}
+
+		// validation IPv6
 		ipbrowser6=ipv64.ipv6;
 		if (strcmp (ipbrowser6,"") != 0) {
 			resolvipv4 = false; 
@@ -1144,17 +1152,84 @@ void CKBBarBand::CheckDomainStatus(short change)
 				resultipv6 = ds_validate(domain, options, dnsip, ipbrowser6, &ipvalidator6);
 				ATLTRACE("IPv6: %s : %d : %s\n", domain, resultipv6, ipvalidator6); 
 				LeaveCriticalSection(&cs);
+				if (resultipv6==DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+				  ATLTRACE("Unbound return bogus state: Testing why?\n");
+				  ub_context_free();
+				  short res = 0 ;
+				  res = TestResolver(domain, ipbrowser6, '6');
+				  if (res==DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+					  resultipv6 = 	res;
+					  ATLTRACE("Yes, domain name has bogus\n");
+					  ub_context_free();
+				  }
+				  else 
+				  {					
+					ATLTRACE("Current resolver does not support DNSSEC!\n");
+					ATLTRACE("Results: FWD: %d NOFWD: %d\n", resultipv6, res);
+					//set tooltip
+					ShowFwdTooltip();
+					resultipv6 = res;
+					ub_context_free();
+				  } // if bogus
+				
+				} // if bogus
 			}
 		}
 
-		(resultipv4 <= resultipv6 ?  result = resultipv6 : result = resultipv4);    
-  
+		(resultipv4 <= resultipv6 ?  result = resultipv6 : result = resultipv4);      
 	}
 	else result = DNSSEC_EXIT_VALIDATOR_OFF;
 	
 	SetSecurityStatus();
 	
 	}
+}
+
+
+/**************************************************************************/
+//to convert URL string on domain name, removed http:\\ 
+/**************************************************************************/
+short CKBBarBand::TestResolver(char *domain, char *ipbrowser, char IPv) 
+{
+	short res = 0;
+	uint16_t options = 0;
+	char* ipvalidator;
+	if (debugoutput) options |= DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+	if (IPv == '4') options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;
+	if (IPv == '6') options |= DNSSEC_INPUT_FLAG_RESOLVIPV6;
+	
+	EnterCriticalSection(&cs);
+	//ATLTRACE("Critical section begin\n");
+	ATLTRACE("NOFWD input: %s : %d : %s : %s\n", domain, options, "nowfd", ipbrowser);
+	res = ds_validate(domain, options, "nowfd", ipbrowser, &ipvalidator);
+	ATLTRACE("NOFWD result: %d : %s\n", res, ipvalidator); 
+	LeaveCriticalSection(&cs);
+	return res;
+}
+
+void CKBBarBand::ShowFwdTooltip() 
+{
+	if (iMajor==8) {
+		if (!tiInitialized1) {
+			CreateIconTooltip(m_wndToolBar);
+			tiInitialized1 = true;
+		}
+	}
+	// if IE is version 6.xx, create tooltip	
+	if (iMajor==6) {
+		if (!tiInitialized1) {
+			CreateIconTooltip(m_wndToolBar);
+			tiInitialized1 = true;
+		}
+	}
+	
+
+	char tibuf[STR_BUF_SIZE] = TEXT("DNSSEC Upozornìní"); // buffer to store tooltip string
+	char tibuf2[STR_BUF_SIZE] = TEXT("Aktuálnì nastavený resolver nepodporuje DNSSEC technologii. Prosím, zmìòte nastavení validátoru."); // buffer to store tooltip string
+	ti.lpszText = tibuf2;
+	SendMessage(hwndTT, TTM_SETTITLE, TTI_WARNING, (LPARAM) tibuf);
+	SendMessage(hwndTT, TTM_UPDATETIPTEXT, 0, (LPARAM) (LPTOOLINFO) &ti);
+	SendMessage(hwndTT, TTM_ACTIVATE, TRUE, 0);
 }
 
 /**************************************************************************/
