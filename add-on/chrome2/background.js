@@ -35,7 +35,7 @@ document.write("<script>");
 	var addr = "0.0.0.0";  // set default IP address
 	var addrbackup = "0.0.0.0";  // set default IP address for backup
 	var init = true; // init test of DNSSEC
-
+	var xxx = 0;
 	// States of DNSSEC validator
 	var dnssecExtNPAPIConst = {
   		DNSSEC_EXIT_FAILED                         : 0, /* state is unknown or fail*/
@@ -102,6 +102,13 @@ document.write("<script>");
           DNSSEC_TOOLTIP_BOGUS     : "dnssecbogus",
             
         };
+
+	// this function sets DNSSEC mode. status ICON and popup text
+    function showresolverinfo(tabId) {
+
+      alert("To ses ale lekl!");
+
+     }; // setMode
 
 	// this function sets DNSSEC mode. status ICON and popup text
    function setMode(newMode, tabId, domain, status,  addr, ipval) {
@@ -202,6 +209,9 @@ document.write("<script>");
             // unless popup is opened, so we set the validation result like GET parameters.
             chrome.pageAction.setPopup({tabId: tabId, popup: "popup.html?" + domain + "," 
 		+ newMode + "," + icon + "," + title + "," + domainpre + "," + addr + "," + ipval});
+
+
+	   showresolverinfo(tabId);
      }; // setMode
 
      // get information about custom resolver
@@ -348,6 +358,7 @@ document.write("<script>");
 			console.log(DNSSEC + "Results: FWD: " + result[0] + "; NOFWD: " + resultnofwd[0]);
 			result[0]=resultnofwd[0];
 			plugin.CacheFree();
+			xxx=1;
 		}//if		
 	    } //if
 

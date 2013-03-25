@@ -92,10 +92,15 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
     <!-- Popup for DNSSEC information -->
     <panel id="dnssec-popup-fwd" type="arrow" position="after_start" hidden="true" noautofocus="true"
-           onpopuphidden="focusAndSelectUrlBar();" norestorefocus="true" fade="slow" noautohide="true"
+           onpopuphidden="focusAndSelectUrlBar();" norestorefocus="true" close="true"
            onblur="dnssecExtHandler.hideDnssecPopupfwd();">
       <vbox id="dnssec-popup-fwd-container">
         <description id="dnssec-popup-fwd-text"/>
+<separator class="groove-thin"/>
+	<hbox>
+	<button label="&dnssec.buttoncancel;" id="fwdnotif" accesskey="&dnssec.buttoncancel.accesskey;" oncommand="dnssecExtHandler.hideDnssecFwdInfo(); return false;"/>
+	<button label="&dnssec.buttonset;" id="fwdset" accesskey="&dnssec.buttonset.accesskey;" oncommand="dnssecExtPrefs.showPrefWindow(); return false;"/>
+	</hbox>
      </vbox>
     </panel>
 

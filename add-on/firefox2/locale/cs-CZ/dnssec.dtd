@@ -35,4 +35,8 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY dnssec.button "Více info">
 <!ENTITY dnssec.button.accesskey "V">
 <!ENTITY dnssec.homepage "Jít na domovskou stránku doplňku pro další informace">
-<!ENTITY dnssec.fwdLabel "Upozornění: Aktuálně nastavený resolver nepodporuje DNSSEC technologii...">
+<!ENTITY dnssec.fwdLabel "Upozornění: Aktuálně nastavený resolver nepodporuje DNSSEC technologii. Prosím, změňte nastavení validátoru.">
+<!ENTITY dnssec.buttoncancel "Zavřít">
+<!ENTITY dnssec.buttoncancel.accesskey "Z">
+<!ENTITY dnssec.buttonset "Nastavení">
+<!ENTITY dnssec.buttonset.accesskey "N">

@@ -35,4 +35,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY dnssec.button "Mehr info">
 <!ENTITY dnssec.button.accesskey "M">
 <!ENTITY dnssec.homepage "Zum Plugin Homepage für weitere Informationen">
-<!ENTITY dnssec.fwdLabel "Hinweis: Aktuelle DNS-Server oder Resolver nicht unterstützt DNSSEC-Technologie...">
+<!ENTITY dnssec.fwdLabel "Warnung: Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht. Ändern Sie bitte die Einstellungen des Resolvers.">
+<!ENTITY dnssec.buttoncancel "Schliessen">
+<!ENTITY dnssec.buttoncancel.accesskey "S">
+<!ENTITY dnssec.buttonset "Einstellungen">
+<!ENTITY dnssec.buttonset.accesskey "E">

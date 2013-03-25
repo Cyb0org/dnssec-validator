@@ -185,7 +185,7 @@ var dnssecExtension = {
     // Register preferences observer
     dnssecExtPrefObserver.register();
 
-    this.inittest();
+    //this.inittest();
      
     // Create the timer
     this.timer = Components.classes["@mozilla.org/timer;1"]
@@ -1152,6 +1152,9 @@ var dnssecExtHandler = {
     this._dnssecPopupfwd.openPopup(this._dnssecBox, 'after_end', -10, 0);
   },
 
+    hideDnssecFwdInfo: function() {
+    this._dnssecPopupfwd.hidden = true;
+  },
 
   /**
    * Click handler for the dnssec-box element in primary chrome.
