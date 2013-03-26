@@ -95,6 +95,7 @@ extern int err;
 extern short res;
 extern short fitleron;
 extern char listtld[TLD_LIST_MLEN];
+extern bool wrong;
 // variable for IE version check
 extern int iRes,iMajor,iMinor;
 //#if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)

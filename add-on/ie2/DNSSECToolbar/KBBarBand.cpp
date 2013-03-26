@@ -43,6 +43,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 WORD statldicon=IDI_ICON_KEY_GREY;
 // for ICON KEY status - not used
 WORD ldiconBar;
+char * temp = "";
 short textkey = KEYTEXT;
 short choice = RESOLVER;
 short choice2 = RESOLVER2;
@@ -62,6 +63,7 @@ char*  ipbrowser4;
 char*  ipbrowser6;
 char ipvalidator4[256];
 char*  ipvalidator6;
+bool wrong = false;
 // global state info
 WORD paneltitle  = 0;
 WORD panelpredonain  = 0;
@@ -436,7 +438,12 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 	//succeed?
 	if (SUCCEEDED(hr)) {
 		switch(dispidMember) {
-		case DISPID_WINDOWCLOSING : { ATLTRACE("Invoke(): DISPID_WINDOWCLOSING\n");} break;
+			case DISPID_DOCUMENTCOMPLETE : { 
+				ATLTRACE("Invoke(): DISPID_DOCUMENTCOMPLETE\n");
+				if (wrong) m_wndToolBar.WrongResolver();
+			} break;
+			
+
 
 			case DISPID_WINDOWSTATECHANGED : {
 				ATLTRACE("Invoke(): DISPID_WINDOWSTATECHANGED\n");
@@ -452,7 +459,7 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 				BSTR BURL2 = L"";
 				HRESULT hrs = webBrowser2->get_LocationURL(&BURL2);
 				char * predomain4 =_com_util::ConvertBSTRToString(BURL2);
-				char * temp= (char*)malloc(2083*sizeof(char));
+				
 				if (strcmp(predomain4,"about:Tabs")==0 || strcmp(predomain4,"about:Blank")==0 || strcmp(predomain4,"about:blank")==0 || strcmp(predomain4,"javascript:false;")==0) 
 				{
 				ldicon = GetBitmapIndex(IDI_ICON_KEY_GREY1);						
@@ -463,8 +470,18 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 				else
 				{
 	
-				    bstrUrlName = BURL2; 
-					DnssecStatus(1);					
+				    bstrUrlName = BURL2; 					
+				ATLTRACE("\n");
+				ATLTRACE(temp);
+				ATLTRACE(" ----- ");
+				ATLTRACE(predomain4);
+				ATLTRACE("\n");
+					if (!strcmp(predomain4,temp)==0) {
+						temp = predomain4;
+						DnssecStatus(1);
+					
+					
+					}					
 					state = ldicon;
 					keylogo=ldicon;
 				}
@@ -480,7 +497,6 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 				HRESULT hrs = webBrowser2->get_LocationURL(&BURL);
 				bstrUrlName2 = ((*pDispParams).rgvarg)[5].pvarVal->bstrVal;
 				char * predomain2 =_com_util::ConvertBSTRToString(BURL);
-				char * temp2= (char*)malloc(2083*sizeof(char));
 				//ATLTRACE(predomain2);
 				if (strcmp(predomain2,"about:Tabs")==0 || strcmp(predomain2,"about:Blank")==0 || strcmp(predomain2,"about:blank")==0 || strcmp(predomain2,"javascript:false;")==0) 
 				{
@@ -514,8 +530,7 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 				ATLTRACE("Invoke(): DISPID_NAVIGATECOMPLETE2\n");				
 				BSTR BURL2 = L"";
 				HRESULT hrs = webBrowser2->get_LocationURL(&BURL2);
-				char * predomain4 =_com_util::ConvertBSTRToString(BURL2);
-				char * temp= (char*)malloc(2083*sizeof(char));
+				char * predomain4 =_com_util::ConvertBSTRToString(BURL2);				
 				if (strcmp(predomain4,"about:Tabs")==0 || strcmp(predomain4,"about:Blank")==0 || strcmp(predomain4,"about:blank")==0 || strcmp(predomain4,"javascript:false;")==0) 
 				{
 				ldicon = GetBitmapIndex(IDI_ICON_KEY_GREY1);						
@@ -534,11 +549,12 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 					else
 					{
 					*/
-				    bstrUrlName = BURL2; 
+				    bstrUrlName = BURL2;
+					temp = predomain4;
 					DnssecStatus(1);
 					//urladdr = temp;
 					state = ldicon;
-					keylogo=ldicon;
+					keylogo=ldicon;					
 					/*}*/
 				}
 			} break;
@@ -609,7 +625,7 @@ bool CKBBarBand::CreateToolWindow()
 	//return false;
 
 	//CreateStatusBarKey();
-	
+	/*
 	// Get cuurent version of IE
 	iRes = GetMSIEversion(&iMajor,&iMinor);		
 	
@@ -623,7 +639,7 @@ bool CKBBarBand::CreateToolWindow()
 		CreateIconTooltip(m_wndToolBar);
 		return true;
 	}
-	
+	*/
 	return true;
 }
 
@@ -989,7 +1005,7 @@ void CKBBarBand::CheckDomainStatus(short change)
 	bool resolvipv4 = true;
 	bool resolvipv6 = true;
 	bool cache_en = true;
-	bool cache_flush = false;
+	bool cache_flush = false;	
 	uint16_t options = 0;
 	debugoutput = true; 
 	short resultipv4 = 0; //the DNSSEC validation result
@@ -1125,6 +1141,7 @@ void CKBBarBand::CheckDomainStatus(short change)
 				  else 
 				  {					
 					ATLTRACE("Current resolver does not support DNSSEC!\n");
+					wrong = true;
 					ATLTRACE("Results: FWD: %d NOFWD: %d\n", resultipv4, res);
 					resultipv4 = res;
 					ub_context_free();
@@ -1167,7 +1184,8 @@ void CKBBarBand::CheckDomainStatus(short change)
 					ATLTRACE("Current resolver does not support DNSSEC!\n");
 					ATLTRACE("Results: FWD: %d NOFWD: %d\n", resultipv6, res);
 					//set tooltip
-					ShowFwdTooltip();
+					//ShowFwdTooltip();
+					wrong = true;
 					resultipv6 = res;
 					ub_context_free();
 				  } // if bogus
@@ -1176,7 +1194,7 @@ void CKBBarBand::CheckDomainStatus(short change)
 			}
 		}
 
-		(resultipv4 <= resultipv6 ?  result = resultipv6 : result = resultipv4);      
+		(resultipv4 <= resultipv6 ?  result = resultipv6 : result = resultipv4); 		
 	}
 	else result = DNSSEC_EXIT_VALIDATOR_OFF;
 	
@@ -1229,7 +1247,6 @@ void CKBBarBand::ShowFwdTooltip()
 	ti.lpszText = tibuf2;
 	SendMessage(hwndTT, TTM_SETTITLE, TTI_WARNING, (LPARAM) tibuf);
 	SendMessage(hwndTT, TTM_UPDATETIPTEXT, 0, (LPARAM) (LPTOOLINFO) &ti);
-	SendMessage(hwndTT, TTM_ACTIVATE, TRUE, 0);
 }
 
 /**************************************************************************/

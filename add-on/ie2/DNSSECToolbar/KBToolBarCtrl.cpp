@@ -91,7 +91,9 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* 
 		}//if
 	}
 	
-	lang = GetSystemDefaultLangID();
+	//lang = GetSystemDefaultLangID();
+	lang = GetUserDefaultLangID();
+	
 	if (lang==0x0405){
 	// 0x0405 CZ
 	// Generation of String List Index CZ
@@ -144,8 +146,7 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* 
 	CKBToolBarCtrl::SetImageList(pList);
 	CKBToolBarCtrl::Invalidate();
 	//CWnd* pButton = GetDlgItem(ID_BUTTON2);
-	//::SendMessage(::GetDlgItem(m_pBand->m_wndToolBar, ID_BUTTON2),BM_SETIMAGE,IMAGE_ICON,(LPARAM)hIcon);
-
+	//::SendMessage(::GetDlgItem(m_pBand->m_wndToolBar, ID_BUTTON2),BM_SETIMAGE,IMAGE_ICON,(LPARAM)hIcon);	
 	return true;
 }
 
@@ -203,6 +204,32 @@ void CKBToolBarCtrl::OnTbnDropDown(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 		break;
 	}
+}
+
+
+/**************************************************************************/
+// Wrong resolver
+/**************************************************************************/
+int CKBToolBarCtrl::WrongResolver()
+{
+		//HWND hwnd;
+		int msgboxID;
+		lang = GetUserDefaultLangID();
+		if (lang==0x0405) msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Aktuálnì nastavený resolver nepodporuje DNSSEC technologii. Prosím, zmìòte nastavení validátoru.\n\nChcete pøejít do nastavení?", (LPCWSTR)L"Upozornìní DNSSEC Validátoru", MB_YESNO |  MB_ICONWARNING);
+		else if (lang==0x0407) msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht. Ändern Sie bitte die Einstellungen des Resolvers.\n\nWollen Sie zu den Einstellungen weitergehen?", (LPCWSTR)L"Warnung DNSSEC Valiator", MB_YESNO |  MB_ICONWARNING);
+		else msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Current DNS server or resolver does not support DNSSEC technology. Please, change the validator settings.\n\nDo you want to proceed to settings?", (LPCWSTR)L"DNSSEC Valiadtor warning", MB_YESNO |  MB_ICONWARNING);
+		
+		wrong = false;
+		switch (msgboxID) {
+
+					case IDYES : {
+						//::PostMessage(NULL, WM_CLOSE, 0, 0);
+						DialogBox(GHins, MAKEINTRESOURCE(IDD_DIALOG_MAIN), NULL, (DLGPROC)DialogProcSettings);
+						break;
+					}
+		
+		}
+	return msgboxID;
 }
 
 /**************************************************************************/
@@ -612,6 +639,7 @@ LRESULT CKBToolBarCtrl::DialogProcAbout(HWND hwndDlg, UINT uMsg, WPARAM wParam, 
     
 	return (INT_PTR)FALSE;
 }
+
 
 /**************************************************************************/
 // CallBack function for dialog DNSSEC

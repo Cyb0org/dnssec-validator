@@ -67,10 +67,11 @@ public:
 public:
 	bool Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* pBand, HINSTANCE GHins);
 	bool RepaintButton(int bindex, int iconindex);
+	int WrongResolver(void);
 	static LRESULT CALLBACK DialogProcAbout(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	STDMETHOD(TranslateAcceleratorIO)(LPMSG pMsg);
+    STDMETHOD(TranslateAcceleratorIO)(LPMSG pMsg);
 	static bool CKBToolBarCtrl::ValidateIP(char *ipadd);
 	static bool CKBToolBarCtrl::isip6(char *ipadd);
 	static bool CKBToolBarCtrl::ValidateIP4(char *ipadd);
