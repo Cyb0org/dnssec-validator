@@ -10,7 +10,7 @@ SetCompressor /solid /final lzma
 !define QUADVERSION "2.0.0.0"
 !define guid '{669695BC-A811-4A9D-8CDF-BA8C795F261C}'
 
-outFile "IE-dnssec-validator-${VERSION}-beta1-windows.exe"
+outFile "IE-dnssec_validator-${VERSION}-rc1-windows.exe"
 Name "DNSSEC Validator plugin for IE 2.0"
 
 # default install directory
