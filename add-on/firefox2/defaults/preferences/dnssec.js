@@ -26,7 +26,7 @@ pref("extensions.dnssec.asyncresolve", true);
 pref("extensions.dnssec.debugoutput", false);
 pref("extensions.dnssec.domainfilteron", false);
 pref("extensions.dnssec.domainlist", "");
-pref("extensions.dnssec.dnsserverchoose", 0);
+pref("extensions.dnssec.dnsserverchoose", 2);
 pref("extensions.dnssec.dnsserverpresetchoose", 0);
 pref("extensions.dnssec.dnsserveraddr", "");
 pref("extensions.dnssec.optdnsserveraddr", "8.8.8.8");

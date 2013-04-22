@@ -20,7 +20,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
 
-var defaultResolver = ""; // LDNS will use system resolver if empty string is passed
+var defaultResolver = "nofwd"; // LDNS will use system resolver if empty string is passed
 var defaultCustomResolver = "8.8.8.8";
 
 var dnssecExtNPAPIConst = {

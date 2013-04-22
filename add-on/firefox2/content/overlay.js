@@ -524,12 +524,6 @@ var dnssecExtResolver = {
 	return;
     }// if
 
-    if (res==c.DNSSEC_EXIT_FAILED) {
-      	dump(ext.debugPrefix + "Unbound return error state: Testing why?\n");
-	dnssecExtHandler.showDnssecFwdInfo();	
-    }// if
-
-
     // Set appropriate state if host name does not changed
     // during resolving process (tab has not been switched)
     if (dn == gBrowser.currentURI.asciiHost)
