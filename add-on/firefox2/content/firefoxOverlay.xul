@@ -61,9 +61,9 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
         <vbox id="dnssec-popup-content-box3">      
 	  <description id="dnssec-popup-security-text"/>
         </vbox>
-<button label="&dnssec.button;" id="link" accesskey="&dnssec.button.accesskey;" oncommand="showAddInfo('dnssec-popup-security-detail'); return false;" style="display: block;"/>
+<button label="&dnssec.button;" id="link" accesskey="&dnssec.button.accesskey;" oncommand="dnssecExtHandler.showAddInfo('dnssec-popup-security-detail'); return false;" style="display: block;"/>
 
-		<!--<label href="#" onclick="showAddInfo('dnssec-popup-security-detail'); return false;" id="link" class="text-link" value="&dnssec.links;" style="display: block; padding-left: 270px;"/>-->
+		<!--<label href="#" onclick="dnssecExtHandler.showAddInfo('dnssec-popup-security-detail'); return false;" id="link" class="text-link" value="&dnssec.links;" style="display: block; padding-left: 270px;"/>-->
         <vbox id="dnssec-popup-content-box4">	
 		<description id="dnssec-popup-security-detail" style="display: none;"/>
 		<description id="dnssec-popup-ipbrowser-title" value="&dnssec.ipbrowser;" style="display: none;"/>

@@ -40,8 +40,8 @@ DNSSECValidatorPluginAPI::DNSSECValidatorPluginAPI(DNSSECValidatorPluginPtr plug
 {
     // Allow privileged access only
     // This works only for firefox, disabled for chrome
-    // if (m_host->getDOMWindow()->getLocation() != "chrome://browser/content/browser.xul")
-    //     return;
+    if (m_host->getDOMWindow()->getLocation() != "chrome://browser/content/browser.xul")
+       return;
     registerMethod("CacheFree", make_method(this, &DNSSECValidatorPluginAPI::CacheFree));
     registerMethod("Validate", make_method(this, &DNSSECValidatorPluginAPI::Validate));
     registerMethod("ValidateAsync", make_method(this, &DNSSECValidatorPluginAPI::ValidateAsync));
