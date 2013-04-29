@@ -180,7 +180,9 @@ var dnssecExtension = {
     // Display initialisation page if appropriate
     if (dnssecExt.version != dnssecExtOldVersion) {
       dnssecExtPrefs.setChar("version", dnssecExt.version);  // Save new version
-
+      dnssecExtPrefs.setChar("dnsserveraddr", "nofwd");  // Save default settings of resolver
+      dnssecExtPrefs.setBool("usefwd", true);  // Save default settings of resolver
+      dnssecExtPrefs.setInt("dnsserverchoose", 3);  // Save default settings of resolver
       // Define timer callback
       this.timer.initWithCallback(
         function() {
