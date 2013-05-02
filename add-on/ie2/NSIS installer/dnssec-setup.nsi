@@ -6,22 +6,22 @@ SetCompressor /solid /final lzma
 !include MUI2.nsh
 !include "FileFunc.nsh"
 
-!define VERSION "2.0"
-!define QUADVERSION "2.0.0.0"
+!define VERSION "2.0.1"
+!define QUADVERSION "2.0.1.0"
 !define guid '{669695BC-A811-4A9D-8CDF-BA8C795F261C}'
 
-outFile "IE-dnssec_validator-${VERSION}-rc1-windows.exe"
-Name "DNSSEC Validator plugin for IE 2.0"
+outFile "IE-dnssec_validator-${VERSION}-windows.exe"
+Name "DNSSEC Validator plugin for IE 2.0.1"
 
 # default install directory
 installDir "$PROGRAMFILES\CZ.NIC\DNSSEC Validator 2.0"
 installDirRegKey HKLM "Software\DNSSECValidator 2.0" "InstallLocation"
 RequestExecutionLevel admin
 #give credits to Nullsoft: BrandingText ""
-VIAddVersionKey "ProductName" "DNSSEC Validator 2.0"
+VIAddVersionKey "ProductName" "DNSSEC Validator 2.0.1"
 VIAddVersionKey "CompanyName" "CZ.NIC Labs"
-VIAddVersionKey "FileDescription" "(un)install the DNSSEC Validator for IE 2.0"
-VIAddVersionKey "LegalCopyright" "Copyright 2012, CZ.NIC Labs"
+VIAddVersionKey "FileDescription" "(un)install the DNSSEC Validator for IE 2.0.1"
+VIAddVersionKey "LegalCopyright" "Copyright 2013, CZ.NIC Labs"
 VIAddVersionKey "FileVersion" "${QUADVERSION}"
 VIAddVersionKey "ProductVersion" "${QUADVERSION}"
 VIProductVersion "${QUADVERSION}"
@@ -43,7 +43,7 @@ Var StartMenuFolder
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "setup_left.bmp"
 !define MUI_ABORTWARNING
 
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of DNSSEC Validator 2.0 plugin for Internet Explorer on your computer.$\r$\n$\nNote: If the Internet Explorer browser is running on your computer, it is recommended close him before starting installation of plugin.$\r$\n$\r$\nClick Next to continue."
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of DNSSEC Validator plugin for Internet Explorer on your computer.$\r$\n$\nNote: If the Internet Explorer browser is running on your computer, it is recommended close him before starting installation of plugin.$\r$\n$\r$\nClick Next to continue."
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_DIRECTORY
 
@@ -56,7 +56,7 @@ Var StartMenuFolder
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the uninstallation of DNSSEC Validator 2.0 plugin for Internet Explorer from your computer.$\r$\n$\nNote: If the Internet Explorer browser is running on your computer, it is recommended close him before uninstallation of plugin.$\r$\n$\r$\nClick Next to continue."
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the uninstallation of DNSSEC Validator plugin for Internet Explorer from your computer.$\r$\n$\nNote: If the Internet Explorer browser is running on your computer, it is recommended close him before uninstallation of plugin.$\r$\n$\r$\nClick Next to continue."
 !insertmacro MUI_UNPAGE_WELCOME
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
@@ -75,7 +75,7 @@ section "-hidden.postinstall"
   
 	# store installation folder
 	WriteRegStr HKLM "Software\DNSSEC Validator 2.0" "InstallLocation" "$INSTDIR"
-
+  Delete "$LOCALAPPDATA\CZ.NIC\DNSSEC Validator 2.0\dnssec.ini"
 	# register uninstaller
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\DNSSECValidator 2.0" "DisplayName" "DNSSEC Validator plugin 2.0"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\DNSSECValidator 2.0" "UninstallString" "$\"$INSTDIR\uninst.exe$\""

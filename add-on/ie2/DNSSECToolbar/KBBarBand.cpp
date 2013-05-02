@@ -95,7 +95,7 @@ CRITICAL_SECTION CKBBarBand::cs;
 // for tooltip creation
 bool CKBBarBand::csInitialized = false;
 bool csInitialized = false;
-char DefaultIniData[] = "[DNSSEC]\nkeytext=0\nchoice=0\nchoicedns=0\nuserip=8.8.8.8\nfilteron=0\nlisttld="; 
+char DefaultIniData[] = "[DNSSEC]\nkeytext=0\nchoice=3\nchoicedns=0\nuserip=8.8.8.8\nfilteron=0\nlisttld="; 
 char str[INET6_ADDRSTRLEN];
 
 typedef struct {   /* structure to save IPv4/IPv6 address from stub resolver */
