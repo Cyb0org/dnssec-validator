@@ -22,7 +22,6 @@
 PLUGIN_ROOT = ./
 PLUGIN_TMP = tlsa_tmp_build
 PLUGIN_NAME = TLSAValidatorPlugin
-PLUGIN_NAME_DLL = xxx
 
 X86_MINGW_CC = i586-mingw32msvc-gcc
 X86_MINGW_STRIP = i586-mingw32msvc-strip
@@ -33,8 +32,8 @@ sys_windows_pre:
 	@echo '###  Creating plugin dll for Windows x86... ###'
 	rm -rf $(PLUGIN_TMP)
 	mkdir $(PLUGIN_TMP)
-	$(X86_MINGW_CC) -o $(PLUGIN_TMP)/DANEcore-windows-x86.exe $(PLUGIN_ROOT)/plugin-source/$(PLUGIN_NAME)/dane-plug.c $(PLUGIN_ROOT)/libs/windows/x86/libunbound.a $(PLUGIN_ROOT)/libs/windows/x86/libldns.a $(PLUGIN_ROOT)/libs/windows/x86/libssl.a $(PLUGIN_ROOT)/libs/windows/x86/libcrypto.a -DRES_WIN -D__USE_MINGW_ANSI_STDIO=1 -I$(PLUGIN_ROOT)/libs/windows/x86 -I$(PLUGIN_ROOT)/libs/ldns -I$(PLUGIN_ROOT)/libs/unbound -I$(PLUGIN_ROOT)/libs/openssl/include -Wl,--output-def,$(PLUGIN_TMP)/ub_ds_windows-x86.def,-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32
+	$(X86_MINGW_CC) -o $(PLUGIN_TMP)/DANEcore-windows-x86.exe $(PLUGIN_ROOT)/plugin-source/$(PLUGIN_NAME)/dane-plug.c $(PLUGIN_ROOT)/libs/windows/x86/libunbound.a $(PLUGIN_ROOT)/libs/windows/x86/libldns.a $(PLUGIN_ROOT)/libs/windows/x86/libssl.a $(PLUGIN_ROOT)/libs/windows/x86/libcrypto.a -DRES_WIN -D__USE_MINGW_ANSI_STDIO=1 -I$(PLUGIN_ROOT)/libs/windows/x86 -I$(PLUGIN_ROOT)/libs/ldns -I$(PLUGIN_ROOT)/libs/unbound -I$(PLUGIN_ROOT)/libs/openssl/include -Wl,--output-def,$(PLUGIN_TMP)/DANEcore-windows-x86.def,-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32
 	$(X86_MINGW_STRIP) -x -S $(PLUGIN_TMP)/DANEcore-windows-x86.exe
-	$(X86_MINGW_CC) -Wall -shared -o $(PLUGIN_TMP)/DANEcore-windows-x86.dll $(PLUGIN_ROOT)/plugin-source/$(PLUGIN_NAME)/dane-plug.c $(PLUGIN_ROOT)/libs/windows/x86/libunbound.a $(PLUGIN_ROOT)/libs/windows/x86/libldns.a $(PLUGIN_ROOT)/libs/windows/x86/libssl.a $(PLUGIN_ROOT)/libs/windows/x86/libcrypto.a -DRES_WIN -D__USE_MINGW_ANSI_STDIO=1 -I$(PLUGIN_ROOT)/libs/windows/x86 -I$(PLUGIN_ROOT)/libs/ldns -I$(PLUGIN_ROOT)/libs/unbound -I$(PLUGIN_ROOT)/libs/openssl/include -Wl,--output-def,$(PLUGIN_TMP)/ub_ds_windows-x86.def,-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32
+	$(X86_MINGW_CC) -Wall -shared -o $(PLUGIN_TMP)/DANEcore-windows-x86.dll $(PLUGIN_ROOT)/plugin-source/$(PLUGIN_NAME)/dane-plug.c $(PLUGIN_ROOT)/libs/windows/x86/libunbound.a $(PLUGIN_ROOT)/libs/windows/x86/libldns.a $(PLUGIN_ROOT)/libs/windows/x86/libssl.a $(PLUGIN_ROOT)/libs/windows/x86/libcrypto.a -DRES_WIN -D__USE_MINGW_ANSI_STDIO=1 -I$(PLUGIN_ROOT)/libs/windows/x86 -I$(PLUGIN_ROOT)/libs/ldns -I$(PLUGIN_ROOT)/libs/unbound -I$(PLUGIN_ROOT)/libs/openssl/include -Wl,--output-def,$(PLUGIN_TMP)/DANEcore-windows-x86.def,-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32
 	$(X86_MINGW_STRIP) -x -S $(PLUGIN_TMP)/DANEcore-windows-x86.dll
 	@echo '### Done... ###'

@@ -1052,6 +1052,7 @@ char* get_tlsa_query(char* domain, char* port, char* protocol) {
 //	char* protocol - "tcp" only 
 //	int policy - certificate policy from browser
 // Return: DANE/TLSA validation status (x<0=valfail or error, x>0 = success)
+//	   return values: dane-state.gen file
 // ----------------------------------------------------------------------------
 short CheckDane(char* certchain[], int certcount, const uint16_t options, char *optdnssrv, char* domain,  char* port, char* protocol, int policy) {
 

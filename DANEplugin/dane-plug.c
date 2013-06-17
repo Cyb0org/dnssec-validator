@@ -1065,6 +1065,6 @@ int main(int argc, char **argv) {
 
 
 
- CheckDane(st, 3, 5, "8.8.8.8", argv[1], "443", "tcp", 1);
+ CheckDane(st, 0, 5, "8.8.8.8", argv[1], "443", "tcp", 1);
 }
 

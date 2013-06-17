@@ -276,11 +276,26 @@ int TLSAresolve(char* domain)
 		printf("error: could not create unbound context\n");
 		return 1;
 	}
+
+
+	if((retval=ub_ctx_set_option(ctx, (char*)"do-udp:", (char*)"no")) != 0) {
+		printf("Set port: %s\n", ub_strerror(retval));
+		return 1;
+	}
+
+	if((retval=ub_ctx_set_option(ctx, (char*)"do-tcp:", (char*)"yes")) != 0) {
+		printf("Set port: %s\n", ub_strerror(retval));
+		return 1;
+	}
+
+
+
 	/* read public keys for DNSSEC verification */
 	if( (retval=ub_ctx_add_ta(ctx, ".   IN DS   19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32F24E8FB5")) != 0) {
 		printf("error adding keys: %s\n", ub_strerror(retval));
 		return 1;
 	}
+
         if( (retval=ub_ctx_set_option(ctx, "dlv-anchor:", "dlv.isc.org. IN DNSKEY 257 3 5 BEAAAAPHMu/5onzrEE7z1egmhg/WPO0+juoZrW3euWEn4MxDCE1+lLy2 brhQv5rN32RKtMzX6Mj70jdzeND4XknW58dnJNPCxn8+jAGl2FZLK8t+ 1uq4W+nnA3qO2+DL+k6BD4mewMLbIYFwe0PG73Te9fZ2kJb56dhgMde5 ymX4BI/oQ+ cAK50/xvJv00Frf8kw6ucMTwFlgPe+jnGxPPEmHAte/URk Y62ZfkLoBAADLHQ9IrS2tryAe7mbBZVcOwIeU/Rw/mRx/vwwMCTgNboM QKtUdvNXDrYJDSHZws3xiRXF1Rf+al9UmZfSav/4NWLKjHzpT59k/VSt TDN0YUuWrBNh"))) {
 		printf("error adding DLV keys: %s\n", ub_strerror(retval));
 		return 1;
