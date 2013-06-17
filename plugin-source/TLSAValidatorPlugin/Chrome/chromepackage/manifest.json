@@ -1,0 +1,9 @@
+{
+  "name": "TLSAValidatorPlugin",
+  "version": "${FBSTRING_PLUGIN_VERSION}",
+  "description": "DANE/TLSA Validation",
+
+	"plugins": [
+    { "path": "npTLSAValidatorPlugin.dll", "public": true }
+  ]
+}
