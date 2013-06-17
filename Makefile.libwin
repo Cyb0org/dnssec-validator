@@ -1,0 +1,49 @@
+# ***** BEGIN LICENSE BLOCK *****
+# Copyright 2011, 2012 CZ.NIC, z.s.p.o.
+#
+# Authors: Martin Straka <martin.straka@nic.cz>
+#
+# This file is part of DNSSEC Validator Add-on.
+#
+# DNSSEC Validator Add-on is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# DNSSEC Validator Add-on is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
+# ***** END LICENSE BLOCK *****
+
+OPENSSL = openssl-1.0.1c
+LDNS = ldns-1.6.15
+UNBOUND = unbound-1.4.18
+
+X86_MINGW_CC = i586-mingw32msvc-gcc
+X86_MINGW_STRIP = i586-mingw32msvc-strip
+X86_MINGW_RANLIB = i586-mingw32msvc-ranlib
+
+#all: sys_windows_openssl sys_windows_ldns_pre sys_windows_ldns_post sys_windows_unbound_pre sys_windows_unbound_post
+
+sys_windows_openssl:
+	@echo '### Compiling library for Windows... ###'
+	cd libs	
+	mkdir windows && cd windows && mkdir x86 && cd x86 && mkdir ldns && cd .. && cd ..
+	cd $(OPENSSL) && ./Configure --cross-compile-prefix=i586-mingw32msvc- mingw enable-static-engine && make && ln -s . lib && cd .. && ln -s $(OPENSSL) openssl && cp $(OPENSSL)/libssl.a windows/x86 && cp $(OPENSSL)/libcrypto.a windows/x86
+
+sys_windows_ldns_pre:
+	cd $(LDNS) && export CC="i586-mingw32msvc-gcc" && ./configure --disable-shared --with-ssl=../$(OPENSSL) --host=mingw32  && make
+
+sys_windows_ldns_post:
+	ln -s $(LDNS) ldns && cd $(LDNS) && $(X86_MINGW_RANLIB) .libs/libldns.a && cp .libs/libldns.a ../windows/x86 && cp ldns/config.h ../windows/x86/ldns && cp ldns/net.h ../windows/x86/ldns && cd ..
+
+sys_windows_unbound_pre:
+	cd $(UNBOUND) && export CC="i586-mingw32msvc-gcc" && ./configure --disable-shared --with-ssl=../$(OPENSSL) --with-ldns=../$(LDNS) --host=mingw32  && make
+
+sys_windows_unbound_post:
+	ln -s $(UNBOUND) unbound && cd $(UNBOUND) && $(X86_MINGW_RANLIB) .libs/libunbound.a && cp .libs/libunbound.a ../windows/x86 && cd ..
+	@echo '### Now you can build the library for Windows... ###'
