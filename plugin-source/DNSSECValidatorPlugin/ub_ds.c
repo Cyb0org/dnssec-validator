@@ -31,8 +31,6 @@ OpenSSL used as well as that of the covered work.
 
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-#include "ldns/ldns.h"
-#include "unbound.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -42,7 +40,10 @@ OpenSSL used as well as that of the covered work.
 #include "ub_dnssec_states.gen"
 
 /* Windows */
-#ifdef RES_WIN
+  #ifdef RES_WIN
+  #include "ldns/config.h"
+  #include "ldns/ldns.h"
+  #include "libunbound/unbound.h"
   #include <winsock2.h>
   #include <ws2tcpip.h>
   #include <iphlpapi.h> /* for IP Helper API */
@@ -50,9 +51,15 @@ OpenSSL used as well as that of the covered work.
   #define DWORD_MAX 0xFFFFFFFF
 #else
 /* Linux */
- #include <arpa/inet.h>
+  #include "unbound.h"
+  #include "ldns/ldns.h"
+  #include "ldns/packet.h"
+  #include <arpa/inet.h>
+  #include <netinet/in.h>
+  #include <netdb.h>
+  #include <sys/types.h>
+  #include <sys/socket.h>
 #endif
-
 
 //----------------------------------------------------------------------------
 #define TA ". IN DS 19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32F24E8FB5"    // DS record of root domain
@@ -416,7 +423,7 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv, char *i
   return retval;
 } // ds_validate
 
-/*
+
 int main(void){
 	short i;
 	char *tmp = NULL;	
@@ -425,4 +432,4 @@ int main(void){
 	printf(DEBUG_PREFIX "Returned value: \"%d\" %s\n", i, tmp);		
 	return 1;
 }
-*/
+
