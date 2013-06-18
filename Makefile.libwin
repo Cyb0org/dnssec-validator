@@ -19,17 +19,55 @@
 # DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 # ***** END LICENSE BLOCK *****
 
-.PHONY: all sys_windows_openssl sys_windows_ldns_pre sys_windows_ldns_post sys_windows_unbound_pre sys_windows_unbound_post
+.PHONY: all libs-build sys_windows_openssl sys_windows_ldns_pre sys_windows_ldns_post sys_windows_unbound_pre sys_windows_unbound_post
 
-OPENSSL = openssl-1.0.1c
-LDNS = ldns-1.6.15
-UNBOUND = unbound-1.4.18
+OPENSSL = openssl-1.0.1e
+LDNS = ldns-1.6.16
+UNBOUND = unbound-1.4.20
+
+LIBS_SOURCE = libs-source
+OPENSSL_TARBALL = $(LIBS_SOURCE)/openssl-1.0.1e.tar.gz
+LDNS_TARBALL = $(LIBS_SOURCE)/ldns-1.6.16.tar.gz
+UNBOUND_TARBALL = $(LIBS_SOURCE)/unbound-1.4.20.tar.gz
+
+BASEDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+
+OPENSSL_DIR := $(BASEDIR)/libs/openssl-1.0.1e
+LDNS_DIR := $(BASEDIR)/libs/ldns-1.6.16
+UNBOUND_DIR := $(BASEDIR)/libs/unbound-1.4.20
+
+OPENSSL_LIB := $(BASEDIR)/libs/openssl
+LDNS_LIB := $(BASEDIR)/libs/ldns
+UNBOUND_LIB := $(BASEDIR)/libs/unbound
 
 X86_MINGW_CC = i586-mingw32msvc-gcc
 X86_MINGW_STRIP = i586-mingw32msvc-strip
 X86_MINGW_RANLIB = i586-mingw32msvc-ranlib
 
-all: sys_windows_openssl sys_windows_ldns_pre sys_windows_ldns_post sys_windows_unbound_pre sys_windows_unbound_post
+all: libs-build sys_windows_openssl sys_windows_ldns_pre sys_windows_ldns_post sys_windows_unbound_pre sys_windows_unbound_post
+
+libs-build: submodules libs $(OPENSSL_DIR) $(LDNS_DIR) $(UNBOUND_DIR) libsource
+
+submodules:
+	git clone git@gitlab.labs.nic.cz:mstraka/dnssec-libs.git $(LIBS_SOURCE)
+
+libs:
+	mkdir libs
+
+## openssl
+$(OPENSSL_DIR): $(OPENSSL_TARBALL)
+	tar xzf $< -C libs
+
+## ldns
+$(LDNS_DIR): $(LDNS_TARBALL)
+	tar xzf $< -C libs
+
+## unbound
+$(UNBOUND_DIR): $(UNBOUND_TARBALL)
+	tar xzf $< -C libs
+
+libsource:
+	rm -rf $(LIBS_SOURCE)
 
 sys_windows_openssl:
 	@echo '### Compiling library for Windows... ###'

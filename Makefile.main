@@ -6,15 +6,15 @@ CFLAGS=-fPIC
 export CFLAGS
 
 LIBS_SOURCE = libs-source
-OPENSSL_TARBALL = $(LIBS_SOURCE)/openssl-1.0.1c.tar.gz
-LDNS_TARBALL = $(LIBS_SOURCE)/ldns-1.6.15.tar.gz
-UNBOUND_TARBALL = $(LIBS_SOURCE)/unbound-1.4.18.tar.gz
+OPENSSL_TARBALL = $(LIBS_SOURCE)/openssl-1.0.1e.tar.gz
+LDNS_TARBALL = $(LIBS_SOURCE)/ldns-1.6.16.tar.gz
+UNBOUND_TARBALL = $(LIBS_SOURCE)/unbound-1.4.20.tar.gz
 
 BASEDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
-OPENSSL_DIR := $(BASEDIR)/libs/openssl-1.0.1c
-LDNS_DIR := $(BASEDIR)/libs/ldns-1.6.15
-UNBOUND_DIR := $(BASEDIR)/libs/unbound-1.4.18
+OPENSSL_DIR := $(BASEDIR)/libs/openssl-1.0.1e
+LDNS_DIR := $(BASEDIR)/libs/ldns-1.6.16
+UNBOUND_DIR := $(BASEDIR)/libs/unbound-1.4.20
 
 OPENSSL_LIB := $(BASEDIR)/libs/openssl
 LDNS_LIB := $(BASEDIR)/libs/ldns
@@ -65,7 +65,7 @@ PLUGIN_CONFIGURATION ?= MinSizeRel
 libs-build: submodules libs $(OPENSSL_LIB) $(LDNS_LIB) $(UNBOUND_LIB) libsource
 
 submodules:
-	git clone git://git.nic.cz/dane-libs $(LIBS_SOURCE)
+	git clone git@gitlab.labs.nic.cz:mstraka/dnssec-libs.git $(LIBS_SOURCE)
 	git clone https://github.com/firebreath/FireBreath.git FireBreath
 	git submodule update --init --recursive
 	#(cd $(FIREBREATH_DIR) && git checkout $(FIREBREATH_TAG))
