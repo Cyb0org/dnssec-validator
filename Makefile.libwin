@@ -72,7 +72,7 @@ libsource:
 sys_windows_openssl:
 	@echo '### Compiling library for Windows... ###'
 	cd libs && mkdir windows && cd windows && mkdir x86 && cd x86 && mkdir ldns && cd .. && cd ..
-	cd $(OPENSSL) && ./Configure --cross-compile-prefix=i586-mingw32msvc- mingw enable-static-engine && make && ln -s . lib && cd .. && ln -s $(OPENSSL) openssl && cp $(OPENSSL)/libssl.a windows/x86 && cp $(OPENSSL)/libcrypto.a windows/x86
+	cd libs && cd $(OPENSSL) && ./Configure --cross-compile-prefix=i586-mingw32msvc- mingw enable-static-engine && make && ln -s . lib && cd .. && ln -s $(OPENSSL) openssl && cp $(OPENSSL)/libssl.a windows/x86 && cp $(OPENSSL)/libcrypto.a windows/x86
 
 sys_windows_ldns_pre:
 	cd libs && cd $(LDNS) && export CC="i586-mingw32msvc-gcc" && ./configure --disable-shared --with-ssl=../$(OPENSSL) --host=mingw32  && make
