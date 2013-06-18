@@ -463,6 +463,21 @@ var dnssecExtResolver = {
 	return;
     }// if
 
+	
+    // tlsa	
+    if (res==c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP || res==c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP) {
+	var uri = gBrowser.currentURI;
+	var port = "443";
+	//dump(ext.debugPrefix + uri.asciiHost + '\n');
+        if (uri.schemeIs("https")) { 
+		if (ext.debugOutput) dump(ext.debugPrefix + 'Connection is https...\n');
+		tlsaValidator.check_tlsa(uri,port);
+	}
+	else if (ext.debugOutput) dump(ext.debugPrefix + 'Connection is NOT https...\n');
+    }
+
+
+
     // Set appropriate state if host name does not changed
     // during resolving process (tab has not been switched)
     if (dn == gBrowser.currentURI.asciiHost)
@@ -750,6 +765,10 @@ var dnssecExtHandler = {
     delete this._dnssecBox;
     return this._dnssecBox = document.getElementById("dnssec-box");
   },
+ // get _tlsaBox () {
+  //  delete this._tlsaBox;
+  //  return this._tlsaBox = document.getElementById("tlsa-box");
+  //},
   get _dnssecPopupContentBox () {
     delete this._dnssecPopupContentBox;
     return this._dnssecPopupContentBox =
@@ -804,6 +823,8 @@ var dnssecExtHandler = {
   _cacheElements : function() {
     delete this._dnssecBox;
     this._dnssecBox = document.getElementById("dnssec-box");
+    //delete this._tlsaBox;
+    //this._tlsaBox = document.getElementById("tlsa-box");
   },
 
   // Set appropriate security state
@@ -962,7 +983,7 @@ var dnssecExtHandler = {
       this.hideDnssecPopup();
     }
 
-
+    //this._tlsaBox.className = newMode;
     this._dnssecBox.className = newMode;
     this.setSecurityMessages(newMode);
 
@@ -1016,6 +1037,7 @@ var dnssecExtHandler = {
 
     // Push the appropriate strings out to the UI
     this._dnssecBox.tooltipText = tooltip;
+    //this._tlsaBox.tooltipText = tooltip;
   },
 
   showAddInfoIP : function() {

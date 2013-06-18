@@ -1,0 +1,105 @@
+/* ***** BEGIN LICENSE BLOCK *****
+Copyright 2012 CZ.NIC, z.s.p.o.
+
+Authors: Martin Straka <martin.straka@nic.cz>
+
+This file is part of DNSSEC Validator 2.0 Add-on.
+
+DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC Validator 2.0 Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** */
+
+                                                                     /* Key icon */
+#tlsa-box.securedConnectionDomain > #tlsa-icon,
+#tlsa-box.securedConnectionNoDomain > #tlsa-icon {
+  width: 19px;
+  height: 19px;
+  list-style-image: url("chrome://dnssec/skin/icon_unknown.png"); /* 35x16 */
+}
+
+#tlsa-box.errorDnssec > #tlsa-icon {
+  width: 19px;
+  height: 19px;
+  list-style-image: url("chrome://dnssec/skin/icon_unknown.png"); /* 35x16 */
+}
+
+
+#tlsa-box.unsecuredDomain > #tlsa-icon,
+#tlsa-box.unsecuredNoDomain > #tlsa-icon {
+  width: 19px;
+  height: 19px;
+  list-style-image: url("chrome://dnssec/skin/icon_grey2.png"); /* 35x16 */
+}
+
+
+#tlsa-box.dnssecOff > #tlsa-icon {
+  width: 19px;
+  height: 19px;
+  list-style-image: url("chrome://dnssec/skin/icon_white.png"); /* 35x16 */
+}
+
+#tlsa-box.actionDnssec > #tlsa-icon {
+  width: 19px;
+  height: 19px;
+  list-style-image: url("chrome://dnssec/skin/icon_action.gif"); /* 35x16 */
+}
+
+
+#tlsa-box.securedConnectionDomainInvIPaddr > #tlsa-icon,
+#tlsa-box.securedConnectionNoDomainInvIPaddr > #tlsa-icon,
+#tlsa-box.validDomainSignatureInvIPaddr > #tlsa-icon,
+#tlsa-box.validNoDomainSignatureInvIPaddr > #tlsa-icon,
+#tlsa-box.securedConnectionInvSigDomain > #tlsa-icon,
+#tlsa-box.securedConnectionInvSigDomainInvIPaddr > #tlsa-icon,
+#tlsa-box.invalidDomainSignature > #tlsa-icon,
+#tlsa-box.invalidDomainSignatureInvIPaddr > #tlsa-icon,
+#tlsa-box.invalidNoDomainSignature > #tlsa-icon,
+#tlsa-box.invalidNoDomainSignatureInvIPaddr > #tlsa-icon {
+  width: 19px;
+  height: 19px;
+  list-style-image: url("chrome://dnssec/skin/icon_red.png"); /* 35x16 */
+}
+
+#tlsa-box.validDomainSignature > #tlsa-icon,
+#tlsa-box.validAuthDomainSignature > #tlsa-icon,
+#tlsa-box.validNoDomainSignature > #tlsa-icon,
+#tlsa-box.validAuthNoDomainSignature > #tlsa-icon {
+  width: 19px;
+  height: 19px;
+  list-style-image: url("chrome://dnssec/skin/icon_orange.png"); /* 35x16 */
+}
+
+#tlsa-box.inactionDnssec {
+  display: none;
+}
+
+/* tlsa indicator */
+#tlsa-outerbox {
+  -moz-box-align: center;
+}
+
+#tlsa-box {
+  width: 19px;
+  height: 19px;
+  padding: 0px 2px;
+/*  background-color: rgba(221, 221, 221, 1.0);   grey */
+/*  background-color: -moz-dialog; */
+/*  color: -moz-dialogtext; */
+/*  -moz-border-end: 1px solid ThreeDShadow; */
+}
+
+
+#tlsa-box:focus {
+  outline: 1px dotted -moz-DialogText;
+}
+

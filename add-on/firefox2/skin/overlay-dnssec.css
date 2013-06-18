@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
+
 /* Key icon */
 #dnssec-box.securedConnectionDomain > #dnssec-icon,
 #dnssec-box.securedConnectionNoDomain > #dnssec-icon {
@@ -91,7 +92,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-box {
   width: 19px;
   height: 19px;
-  padding: 0px 0px;
+  padding: 0px 2px;
 /*  background-color: rgba(221, 221, 221, 1.0);   grey */
 /*  background-color: -moz-dialog; */
 /*  color: -moz-dialogtext; */

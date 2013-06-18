@@ -27,6 +27,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script src="overlay.js"/>
+  <script src="tlsa.js"/>
   <script src="about.js"/>
   <script src="npapi_const.js"/>
   <script src="preferences.js"/>
@@ -111,10 +112,15 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
     onfocus="document.getElementById('dnssec-box').style.MozUserFocus= 'normal'"
     onblur="document.getElementById('dnssec-box').style.MozUserFocus = 'ignore';" -->
 
-    <!-- DNSSEC plugin -->
+    <!-- DNSSEC NPAPI plugin -->
     <html:div>
       <html:object id="dnssec-plugin" type="application/x-dnssecvalidator" width="0" height="0"></html:object>
     </html:div>
+
+  <!-- TLSA NPAPI plugin -->
+  <html:div>
+    <html:object id="dane-tlsa-plugin" type="application/x-tlsavalidatorplugin" width="0" height="0"></html:object>
+  </html:div>
 
     <box id="urlbar-icons">
       <!-- DNSSEC button in urlbar -->
@@ -126,6 +132,15 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!--           chromedir="&locale.dir;" -->
         <!-- stack id="dnssec-icons-stack" -->
           <image id="dnssec-icon" validate="never"/>
+        <!-- /stack -->
+      </hbox>
+      <!-- TLSA button in urlbar -->
+      <hbox id="tlsa-box" role="button"
+           context="dnssec-context-menu">
+<!--           hidden="true" -->
+<!--           chromedir="&locale.dir;" -->
+        <!-- stack id="dnssec-icons-stack" -->
+          <image id="tlsa-icon" validate="never"/>
         <!-- /stack -->
       </hbox>
   </box>
