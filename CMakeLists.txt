@@ -66,7 +66,7 @@ ADD_CUSTOM_TARGET(RecursiveBuild ALL)
 # Calling Makefile.main passing the set variables on command line
 ADD_CUSTOM_COMMAND(TARGET RecursiveBuild 
     COMMAND make 
-    ARGS -f Makefile.main1 
+    ARGS -f Makefile.main 
         LIB_CFLAGS=${LIB_CFLAGS}
         OPENSSL_ARGS=${OPENSSL_ARGS} 
         CONFIGURE_ARGS=${CONFIGURE_ARGS} 

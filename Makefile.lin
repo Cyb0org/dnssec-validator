@@ -19,7 +19,8 @@
 # DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 # ***** END LICENSE BLOCK *****
 
-PLUGIN_NAME = DNSSECValidatorPlugin
+PLUGIN_NAME_DNSSEC = DNSSECValidatorPlugin
+PLUGIN_NAME_TLSA = TLSAValidatorPlugin
 PLUGIN_FB_S = FireBreath/projects
 PLUGIN_FB_B = FireBreath/build
 PLUGIN_NAME_LIB = plugins-lib
@@ -31,68 +32,76 @@ EXTENSION_VERSION = $(shell cat add-on/firefox2/install.rdf.template | sed -n 's
 #all: sys_linux_x86 sys_linux_x64 xpi_x86 xpi_x64
 
 sys_linux_x86:
-	@echo '### ...Creating plugin library for Linux x86... ###'
+	@echo '### ...Creating plugins library for Linux x86... ###'
 	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)
 	mkdir $(PLUGIN_NAME_LIB)
 	cd FireBreath && mkdir projects && cd ..
 	cp -r plugin-source/* $(PLUGIN_FB_S)	
 	./FireBreath/prepmake.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m32  -DCMAKE_CXX_FLAGS=-m32  -DCMAKE_BUILD_TYPE=MinSizeRel
 	make -C $(PLUGIN_FB_B)
-	cp $(PLUGIN_FB_B)/bin/$(PLUGIN_NAME)/np$(PLUGIN_NAME).so $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME)_x86.so
+	cp $(PLUGIN_FB_B)/bin/$(PLUGIN_NAME_DNSSEC)/np$(PLUGIN_NAME_DNSSEC).so $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x86.so
+	cp $(PLUGIN_FB_B)/bin/$(PLUGIN_NAME_TLSA)/np$(PLUGIN_NAME_TLSA).so $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x86.so
+	strip $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x86.so
+	strip $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x86.so
 	rm -rf $(PLUGIN_FB_B)
-	rm -rf $(PLUGIN_FB_S)
-	strip $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME)_x86.so
+	rm -rf $(PLUGIN_FB_S)	
 	@echo '### ...Plugin x86 Linux ... Done. ###'
 xpi_x86:
-	@echo '### Creating package for Firefox Linux x86... ###'
+	@echo '### Creating packages for Firefox Linux x86... ###'
 	rm -rf $(ADDON_PATH_FF)/plugins
 	mkdir $(ADDON_PATH_FF)/plugins
 	chmod 777 $(ADDON_PATH_FF)/build.sh
-	cp $(PLUGIN_NAME_LIB)/npDNSSECValidatorPlugin_x86.so $(ADDON_PATH_FF)/plugins
+	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x86.so $(ADDON_PATH_FF)/plugins
+	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x86.so $(ADDON_PATH_FF)/plugins
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
 	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec_validator-$(EXTENSION_VERSION)-linux-x86.xpi
-	@echo '### Creating package for Firefox Linux x86... ###'
+	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Chrome Linux x86... ###'
-	cp $(PLUGIN_NAME_LIB)/npDNSSECValidatorPlugin_x86.so $(ADDON_PATH_CR)
-	sed 's/xxxxxxxxxx/npDNSSECValidatorPlugin_x86.so/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
+	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x86.so $(ADDON_PATH_CR)
+	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x86.so $(ADDON_PATH_CR)
+	sed 's/xxxxxxxxxx/np$(PLUGIN_NAME_DNSSEC)_x86.so/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
 	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz chrome2 && mv CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz ../$(PLUGIN_ADD_ON)
-	cd $(ADDON_PATH_CR) && rm -rf npDNSSECValidatorPlugin_x86.so manifest.json
-	@echo '### Creating package for Chrome Linux x86... ###'  
+	cd $(ADDON_PATH_CR) && rm -rf np$(PLUGIN_NAME_DNSSEC)_x86.so manifest.json np$(PLUGIN_NAME_TLSA)_x86.so
+	@echo '### DONE... ###'  
 
 
 
 
 sys_linux_x64:
-	@echo '### ...Creating plugin library for Linux x64... ###'
+	@echo '### ...Creating plugins library for Linux x64... ###'
 	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)
 	mkdir $(PLUGIN_NAME_LIB)
 	cd FireBreath && mkdir projects && cd ..
 	cp -r plugin-source/* $(PLUGIN_FB_S)	
 	./FireBreath/prepmake.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m64  -DCMAKE_CXX_FLAGS=-m64  -DCMAKE_BUILD_TYPE=MinSizeRel
 	make -C $(PLUGIN_FB_B)
-	cp $(PLUGIN_FB_B)/bin/$(PLUGIN_NAME)/np$(PLUGIN_NAME).so $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME)_x64.so
+	cp $(PLUGIN_FB_B)/bin/$(PLUGIN_NAME_DNSSEC)/np$(PLUGIN_NAME_DNSSEC).so $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x64.so
+	cp $(PLUGIN_FB_B)/bin/$(PLUGIN_NAME_TLSA)/np$(PLUGIN_NAME_TLSA).so $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x64.so
+	strip $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x64.so
+	strip $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x64.so
 	rm -rf $(PLUGIN_FB_B)
-	rm -rf $(PLUGIN_FB_S)
-	strip $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME)_x64.so
+	rm -rf $(PLUGIN_FB_S)	
 	@echo '### ...Plugin x64 Linux ... Done. ###'
 xpi_x64:
 	@echo '### Creating package for Firefox Linux x64... ###'
 	rm -rf $(ADDON_PATH_FF)/plugins
 	mkdir $(ADDON_PATH_FF)/plugins
 	chmod 777 $(ADDON_PATH_FF)/build.sh
-	cp $(PLUGIN_NAME_LIB)/npDNSSECValidatorPlugin_x64.so $(ADDON_PATH_FF)/plugins
+	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x64.so $(ADDON_PATH_FF)/plugins
+	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x64.so $(ADDON_PATH_FF)/plugins
 	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86_64-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
 	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec_validator-$(EXTENSION_VERSION)-linux-x64.xpi
-	@echo '### Creating package for Firefox Linux x64... ###'
+	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Chrome Linux x64... ###'
-	cp $(PLUGIN_NAME_LIB)/npDNSSECValidatorPlugin_x64.so $(ADDON_PATH_CR)
+	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x64.so $(ADDON_PATH_CR)
+	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x64.so $(ADDON_PATH_CR)
 	sed 's/xxxxxxxxxx/npDNSSECValidatorPlugin_x64.so/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
 	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x64.tar.gz chrome2 && mv CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x64.tar.gz ../$(PLUGIN_ADD_ON)
-	cd $(ADDON_PATH_CR) && rm -rf npDNSSECValidatorPlugin_x64.so manifest.json
-	@echo '### Creating package for Chrome Linux x64... ###'   
+	cd $(ADDON_PATH_CR) && rm -rf np$(PLUGIN_NAME_DNSSEC)_x64.so manifest.json np$(PLUGIN_NAME_TLSA)_x64.so
+	@echo '### DONE... ###'   
   
 clean:

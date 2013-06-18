@@ -23,10 +23,7 @@ UNBOUND_LIB := $(BASEDIR)/libs/unbound
 FIREBREATH_DIR := $(BASEDIR)/FireBreath
 FIREBREATH_TAG := firebreath-1.6.0
 
-PLUGIN_SOURCE_DIR := $(BASEDIR)/plugin-source/DNSSECValidatorPlugin
 PLUGIN_BUILD_DIR := $(FIREBREATH_DIR)/build
-# PLUGIN_JSAPI_IDL_DIR := $(PLUGIN_SOURCE_DIR)/JSAPI_IDL
-
 
 # Different NPAPI plugin names based on OS
 # PLUGIN_BINARY_TREE is necessary because Mac has dirtree structure instead of
@@ -43,6 +40,7 @@ ifeq ($(TARGET_OS),LINUX)
 endif
 ifeq ($(TARGET_OS),MAC)
     MAKE_OS := Makefile.mac
+
     ifeq ($(BUILD_64BIT),1)
       ARCH := sys_macosx_x64
       XPI := xpi_x64
