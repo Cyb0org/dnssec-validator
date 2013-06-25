@@ -63,8 +63,6 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 	  <description id="dnssec-popup-security-text"/>
         </vbox>
 <button label="&dnssec.button;" id="link" accesskey="&dnssec.button.accesskey;" oncommand="dnssecExtHandler.showAddInfo('dnssec-popup-security-detail'); return false;" style="display: block;"/>
-
-		<!--<label href="#" onclick="dnssecExtHandler.showAddInfo('dnssec-popup-security-detail'); return false;" id="link" class="text-link" value="&dnssec.links;" style="display: block; padding-left: 270px;"/>-->
         <vbox id="dnssec-popup-content-box4">	
 		<description id="dnssec-popup-security-detail" style="display: none;"/>
 		<description id="dnssec-popup-ipbrowser-title" value="&dnssec.ipbrowser;" style="display: none;"/>
@@ -78,6 +76,42 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
         </vbox>
      </vbox>
     </panel>
+
+    <!-- Popup for TLSA information -->
+    <panel id="tlsa-popup" type="arrow" position="after_start" hidden="true" noautofocus="true"
+           onpopuphidden="focusAndSelectUrlBar();" norestorefocus="true"
+           onblur="tlsaExtHandler.hidetlsaPopup();">
+      <vbox id="tlsa-popup-container" align="top">
+        <hbox id="tlsa-popup-content-box" align="top">
+          <image id="tlsa-popup-icon"/>
+	  <vbox id="tlsa-popup-content-box2" align="top">
+		<description id="tlsa-popup-content-host"/>
+          	<description id="tlsa-popup-securedLabel" value="&dnssec.securedLabel;"/>
+          	<description id="tlsa-popup-unsecuredLabel" value="&dnssec.unsecuredLabel;"/>
+		<description id="tlsa-popup-errorLabel" value="&dnssec.errorLabel;"/>
+		<description id="tlsa-popup-tlsaOffLabel" value="&dnssec.offLabel;"/>
+		<description id="tlsa-popup-bogusLabel" value="&dnssec.bogusLabel;"/>			 	
+	  </vbox>	
+	</hbox>
+        <vbox id="tlsa-popup-content-box3">      
+	  <description id="tlsa-popup-security-text"/>
+        </vbox>
+<button label="&dnssec.button;" id="link" accesskey="&dnssec.button.accesskey;" oncommand="tlsaExtHandler.showAddInfo('tlsa-popup-security-detail'); return false;" style="display: block;"/>
+        <vbox id="tlsa-popup-content-box4">	
+		<description id="tlsa-popup-security-detail" style="display: none;"/>
+		<description id="tlsa-popup-ipbrowser-title" value="&dnssec.ipbrowser;" style="display: none;"/>
+		<description id="tlsa-popup-ipbrowser-ip" style="display: none;"/>
+		<description id="tlsa-popup-ipvalidator-title" value="&dnssec.ipvalidator;" style="display: none;"/>
+		<description id="tlsa-popup-ipvalidator-ip" style="display: none;"/>
+		<label id="tlsa-popup-homepage" class="text-link" value="&dnssec.homepage;" onclick="var win = Components.classes['@mozilla.org/appshell/window-mediator;1']
+      .getService(Components.interfaces.nsIWindowMediator)
+      .getMostRecentWindow('navigator:browser');
+    win.openUILinkIn('http://www.dnssec-validator.cz', 'tab');" style="display: block;"/>	
+        </vbox>
+     </vbox>
+    </panel>
+
+    <!-- Popup for contex menu -->
     <menupopup id="dnssec-context-menu">
       <menuitem label="&dnssec.about.label;" accesskey="&dnssec.about.accesskey;"
                 oncommand="dnssecExtAbout.showAboutWindow();"/>
@@ -91,7 +125,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
                 oncommand="dnssecExtPrefs.showPrefWindow();"/>
     </menupopup>
 
-    <!-- Popup for DNSSEC information -->
+    <!-- Popup for forwarder information -->
     <panel id="dnssec-popup-fwd" type="arrow" position="after_start" hidden="true" noautofocus="true"
            onpopuphidden="focusAndSelectUrlBar();" norestorefocus="true" close="true"
            onblur="dnssecExtHandler.hideDnssecPopupfwd();">
@@ -104,14 +138,9 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 	</hbox>
      </vbox>
     </panel>
-
   </popupset>
 
   <textbox id="urlbar">
-<!--
-    onfocus="document.getElementById('dnssec-box').style.MozUserFocus= 'normal'"
-    onblur="document.getElementById('dnssec-box').style.MozUserFocus = 'ignore';" -->
-
     <!-- DNSSEC NPAPI plugin -->
     <html:div>
       <html:object id="dnssec-plugin" type="application/x-dnssecvalidator" width="0" height="0"></html:object>
@@ -128,18 +157,14 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
            onclick="dnssecExtHandler.handleDnssecButtonEvent(event);"
            onkeypress="dnssecExtHandler.handleDnssecButtonEvent(event);"
            context="dnssec-context-menu">
-<!--           hidden="true" -->
-<!--           chromedir="&locale.dir;" -->
-        <!-- stack id="dnssec-icons-stack" -->
           <image id="dnssec-icon" validate="never"/>
         <!-- /stack -->
       </hbox>
       <!-- TLSA button in urlbar -->
       <hbox id="tlsa-box" role="button"
+	    onclick="tlsaExtHandler.handleTlsaButtonEvent(event);"
+	   onkeypress="tlsaExtHandler.handleTlsaButtonEvent(event);"
            context="dnssec-context-menu">
-<!--           hidden="true" -->
-<!--           chromedir="&locale.dir;" -->
-        <!-- stack id="dnssec-icons-stack" -->
           <image id="tlsa-icon" validate="never"/>
         <!-- /stack -->
       </hbox>

@@ -20,63 +20,42 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
                                                                      /* Key icon */
-#tlsa-box.securedConnectionDomain > #tlsa-icon,
-#tlsa-box.securedConnectionNoDomain > #tlsa-icon {
+#tlsa-box.dmvs > #tlsa-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/icon_unknown.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/tlsagreen.png"); /* 35x16 */
 }
 
-#tlsa-box.errorDnssec > #tlsa-icon {
+#tlsa-box.dme > #tlsa-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/icon_unknown.png"); /* 35x16 */
-}
-
-
-#tlsa-box.unsecuredDomain > #tlsa-icon,
-#tlsa-box.unsecuredNoDomain > #tlsa-icon {
-  width: 19px;
-  height: 19px;
-  list-style-image: url("chrome://dnssec/skin/icon_grey2.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/tlsaerr.png"); /* 35x16 */
 }
 
 
-#tlsa-box.dnssecOff > #tlsa-icon {
+#tlsa-box.dmvf > #tlsa-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/icon_white.png"); /* 35x16 */
-}
-
-#tlsa-box.actionDnssec > #tlsa-icon {
-  width: 19px;
-  height: 19px;
-  list-style-image: url("chrome://dnssec/skin/icon_action.gif"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/tlsared.png"); /* 35x16 */
 }
 
 
-#tlsa-box.securedConnectionDomainInvIPaddr > #tlsa-icon,
-#tlsa-box.securedConnectionNoDomainInvIPaddr > #tlsa-icon,
-#tlsa-box.validDomainSignatureInvIPaddr > #tlsa-icon,
-#tlsa-box.validNoDomainSignatureInvIPaddr > #tlsa-icon,
-#tlsa-box.securedConnectionInvSigDomain > #tlsa-icon,
-#tlsa-box.securedConnectionInvSigDomainInvIPaddr > #tlsa-icon,
-#tlsa-box.invalidDomainSignature > #tlsa-icon,
-#tlsa-box.invalidDomainSignatureInvIPaddr > #tlsa-icon,
-#tlsa-box.invalidNoDomainSignature > #tlsa-icon,
-#tlsa-box.invalidNoDomainSignatureInvIPaddr > #tlsa-icon {
+#tlsa-box.dmo > #tlsa-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/icon_red.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/tlsaoff.png"); /* 35x16 */
 }
 
-#tlsa-box.validDomainSignature > #tlsa-icon,
-#tlsa-box.validAuthDomainSignature > #tlsa-icon,
-#tlsa-box.validNoDomainSignature > #tlsa-icon,
-#tlsa-box.validAuthNoDomainSignature > #tlsa-icon {
+#tlsa-box.dma > #tlsa-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/icon_orange.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/tlsaactive.png"); /* 35x16 */
+}
+
+#tlsa-box.dmntr > #tlsa-icon {
+  width: 19px;
+  height: 19px;
+  list-style-image: url("chrome://dnssec/skin/tlsaorange.png"); /* 35x16 */
 }
 
 #tlsa-box.inactionDnssec {
@@ -102,4 +81,211 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #tlsa-box:focus {
   outline: 1px dotted -moz-DialogText;
 }
+
+
+/*-----------------------------------------------------*/
+/*----------------------POPUP--------------------------*/
+
+/* tlsa popup images */
+#tlsa-popup-icon {
+  padding: 0;
+}
+
+/* tlsa popup bounding box - title */
+#tlsa-popup-container {
+  min-width: 280px;
+  padding: 10px;
+  max-width: 400px;
+}
+
+/* green */
+#tlsa-popup.dmvs > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
+  list-style-image: url("chrome://dnssec/skin/tlsagreen.png"); 
+}
+
+/* error */
+#tlsa-popup.dme > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
+  list-style-image: url("chrome://dnssec/skin/tlsaerr.png");
+}
+
+/* red */
+#tlsa-popup.dmvf > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
+  list-style-image: url("chrome://dnssec/skin/tlsagred.png"); 
+}
+
+/* off */
+#tlsa-popup.dmo > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
+  list-style-image: url("chrome://dnssec/skin/tlsaoff.png"); 
+}
+
+/* grey with error */
+#tlsa-popup.dmntr > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
+  list-style-image: url("chrome://dnssec/skin/tlsaorange.png"); 
+}
+
+
+/* tlsa popup body text - title */
+#tlsa-popup-content-box > label,
+#tlsa-popup-content-box > description {
+  white-space: pre-wrap;
+  padding-left: 0px;
+  margin: 0px;
+  max-width: 335px;
+}
+
+/* tlsa popup body text - title */
+#tlsa-popup-content-box2 > label,
+#tlsa-popup-content-box2 > description {
+  white-space: pre-wrap;
+  padding-left: 10px;
+  margin: 0px;
+  max-width: 335px;
+}
+
+/* tlsa popup body text - title */
+#tlsa-popup-content-box3 > label,
+#tlsa-popup-content-box3 > description {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  margin: 0px;
+  min-width: 280px;
+  max-width: 335px;
+}
+
+/* tlsa popup body text - title */
+#tlsa-popup-content-box4 > label,
+#tlsa-popup-content-box4 > description {
+  margin: 0px;
+  min-width: 280px;
+  max-width: 335px;
+}
+
+
+/* label text style */
+#tlsa-popup-securedLabel,
+#tlsa-popup-errorLabel,
+#tlsa-popup-bogusLabel,
+#tlsa-popup-unsecuredLabel,
+#tlsa-popup-tlsaOffLabel {
+  font-weight: bold;
+  max-width: 335px;
+  font-size: 120%;
+  display: none;
+}
+
+/* message text style */
+#tlsa-popup-domainLabel,
+#tlsa-popup-nodomainLabel,
+#tlsa-popup-securedDomainLabel,
+#tlsa-popup-unsecuredDomainLabel {
+  display: none;
+}
+
+/* domain name text style */
+#tlsa-popup-content-host {
+  font-weight: bold;
+  max-width: 335px;
+}
+
+/* domain name text style */
+#tlsa-popup-content-host-text {
+}
+
+/* tlsa popup bounding box - title */
+#tlsa-popup-container {
+  min-width: 280px;
+  padding: 0px;
+  max-width: 335px;
+}
+
+#tlsa-popup-homepage {
+  padding-top: 8px;
+  font-size: 90%;
+}
+
+
+#tlsa-popup-ipbrowser-title {
+  padding-top: 8px;
+  font-size: 90%;
+}
+
+#tlsa-popup-ipvalidator-title {
+  padding-top: 5px;
+  font-size: 90%;
+}
+
+#tlsa-popup-ipbrowser-ip {
+  font-weight: bold;
+  font-size: 90%;
+}
+
+#tlsa-popup-ipvalidator-ip {
+  font-weight: bold;
+  font-size: 90%;
+}
+
+
+/* tlsa popup UI */
+#tlsa-popup-content-box > #tlsa-popup-content-box2.tlsaOff > #tlsa-popup-tlsaOffLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.errortlsa > #tlsa-popup-errorLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.securedConnectionDomain > #tlsa-popup-securedLabel,
+#tlsa-popup-content-box3.securedConnectionDomain > #tlsa-popup-domainLabel,
+#tlsa-popup-content-box3.securedConnectionDomain > #tlsa-popup-securedDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.securedConnectionDomainInvIPaddr > #tlsa-popup-securedLabel,
+#tlsa-popup-content-box3.securedConnectionDomainInvIPaddr > #tlsa-popup-domainLabel,
+#tlsa-popup-content-box3.securedConnectionDomainInvIPaddr > #tlsa-popup-securedDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.securedConnectionNoDomainInvIPaddr > #tlsa-popup-securedLabel,
+#tlsa-popup-content-box3.securedConnectionNoDomainInvIPaddr > #tlsa-popup-nodomainLabel,
+#tlsa-popup-content-box3.securedConnectionNoDomainInvIPaddr > #tlsa-popup-securedDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.securedConnectionNoDomain > #tlsa-popup-securedLabel,
+#tlsa-popup-content-box3.securedConnectionNoDomain > #tlsa-popup-nodomainLabel,
+#tlsa-popup-content-box3.securedConnectionNoDomain > #tlsa-popup-securedDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.securedConnectionInvSigDomain > #tlsa-popup-securedLabel,
+#tlsa-popup-content-box3.securedConnectionInvSigDomain > #tlsa-popup-domainLabel,
+#tlsa-popup-content-box3.securedConnectionInvSigDomain > #tlsa-popup-securedDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.securedConnectionInvSigDomainInvIPaddr > #tlsa-popup-securedLabel,
+#tlsa-popup-content-box3.securedConnectionInvSigDomainInvIPaddr > #tlsa-popup-domainLabel,
+#tlsa-popup-content-box3.securedConnectionInvSigDomainInvIPaddr > #tlsa-popup-securedDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.validDomainSignature > #tlsa-popup-unsecuredLabel,
+#tlsa-popup-content-box3.validDomainSignature > #tlsa-popup-domainLabel,
+#tlsa-popup-content-box3.validDomainSignature > #tlsa-popup-securedDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.validAuthDomainSignature > #tlsa-popup-unsecuredLabel,
+#tlsa-popup-content-box3.validAuthDomainSignature > #tlsa-popup-domainLabel,
+#tlsa-popup-content-box3.validAuthDomainSignature > #tlsa-popup-securedDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.validDomainSignatureInvIPaddr > #tlsa-popup-unsecuredLabel,
+#tlsa-popup-content-box3.validDomainSignatureInvIPaddr > #tlsa-popup-domainLabel,
+#tlsa-popup-content-box3.validDomainSignatureInvIPaddr > #tlsa-popup-securedDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.invalidDomainSignature > #tlsa-popup-bogusLabel,
+#tlsa-popup-content-box3.invalidDomainSignature > #tlsa-popup-domainLabel,
+#tlsa-popup-content-box3.invalidDomainSignature > #tlsa-popup-securedDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.invalidDomainSignatureInvIPaddr > #tlsa-popup-unsecuredLabel,
+#tlsa-popup-content-box3.invalidDomainSignatureInvIPaddr > #tlsa-popup-domainLabel,
+#tlsa-popup-content-box3.invalidDomainSignatureInvIPaddr > #tlsa-popup-securedDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.validNoDomainSignature > #tlsa-popup-unsecuredLabel,
+#tlsa-popup-content-box3.validNoDomainSignature > #tlsa-popup-nodomainLabel,
+#tlsa-popup-content-box3.validNoDomainSignature > #tlsa-popup-securedDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.validAuthNoDomainSignature > #tlsa-popup-unsecuredLabel,
+#tlsa-popup-content-box3.validAuthNoDomainSignature > #tlsa-popup-nodomainLabel,
+#tlsa-popup-content-box3.validAuthNoDomainSignature > #tlsa-popup-securedDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.validNoDomainSignatureInvIPaddr > #tlsa-popup-unsecuredLabel,
+#tlsa-popup-content-box3.validNoDomainSignatureInvIPaddr > #tlsa-popup-nodomainLabel,
+#tlsa-popup-content-box3.validNoDomainSignatureInvIPaddr > #tlsa-popup-securedDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.invalidNoDomainSignature > #tlsa-popup-bogusLabel,
+#tlsa-popup-content-box3.invalidNoDomainSignature > #tlsa-popup-nodomainLabel,
+#tlsa-popup-content-box3.invalidNoDomainSignature > #tlsa-popup-securedDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.invalidNoDomainSignatureInvIPaddr > #tlsa-popup-unsecuredLabel,
+#tlsa-popup-content-box3.invalidNoDomainSignatureInvIPaddr > #tlsa-popup-nodomainLabel,
+#tlsa-popup-content-box3.invalidNoDomainSignatureInvIPaddr > #tlsa-popup-securedDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.unsecuredDomain > #tlsa-popup-unsecuredLabel,
+#tlsa-popup-content-box3.unsecuredDomain > #tlsa-popup-domainLabel,
+#tlsa-popup-content-box4.links > #tlsa-popup-links,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.unsecuredDomain > #tlsa-popup-unsecuredDomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.unsecuredNoDomain > #tlsa-popup-unsecuredLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.unsecuredNoDomain > #tlsa-popup-nodomainLabel,
+#tlsa-popup-content-box > #tlsa-popup-content-box2.unsecuredNoDomain > #tlsa-popup-unsecuredDomainLabel {
+  display: inline;
+}
+
+
+
 

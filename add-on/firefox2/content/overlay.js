@@ -260,7 +260,7 @@ var dnssecExtension = {
 
       // Set inaction mode (no icon)
       dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_INACTION);
-
+      tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_INACTION);
       return;
 
     // Eliminate duplicated queries
@@ -468,10 +468,11 @@ var dnssecExtResolver = {
     if (res==c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP || res==c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP) {
 	var uri = gBrowser.currentURI;
 	var port = "443";
+	var tlsa = 1;
 	//dump(ext.debugPrefix + uri.asciiHost + '\n');
         if (uri.schemeIs("https")) { 
 		if (ext.debugOutput) dump(ext.debugPrefix + 'Connection is https...\n');
-		tlsaValidator.check_tlsa(uri,port);
+		tlsa = tlsaValidator.check_tlsa(uri,port);
 	}
 	else if (ext.debugOutput) dump(ext.debugPrefix + 'Connection is NOT https...\n');
     }
@@ -480,8 +481,10 @@ var dnssecExtResolver = {
 
     // Set appropriate state if host name does not changed
     // during resolving process (tab has not been switched)
-    if (dn == gBrowser.currentURI.asciiHost)
-      dnssecExtHandler.setSecurityState(res,addr,ipvalidator);
+    if (dn == gBrowser.currentURI.asciiHost){
+ 	 tlsaExtHandler.setSecurityState(tlsa);    
+	 dnssecExtHandler.setSecurityState(res, addr, ipvalidator);
+    }
 
     if (ext.debugOutput)
       dump(ext.debugPrefix + ext.debugEndNotice);
@@ -983,7 +986,6 @@ var dnssecExtHandler = {
       this.hideDnssecPopup();
     }
 
-    //this._tlsaBox.className = newMode;
     this._dnssecBox.className = newMode;
     this.setSecurityMessages(newMode);
 
@@ -1037,7 +1039,6 @@ var dnssecExtHandler = {
 
     // Push the appropriate strings out to the UI
     this._dnssecBox.tooltipText = tooltip;
-    //this._tlsaBox.tooltipText = tooltip;
   },
 
   showAddInfoIP : function() {
@@ -1183,3 +1184,316 @@ var dnssecExtHandler = {
     this._dnssecPopup.openPopup(this._dnssecBox, 'after_end', -10, 0);
   }
 }
+
+//*****************************************************************************
+//*****************************************************************************
+/* Utility class to handle manipulations of the TLSA indicators in the UI */
+//*****************************************************************************
+//*****************************************************************************
+var tlsaExtHandler = {
+  // -1
+  DANE_MODE_FAILED_RESOLVER     : "dmfs",
+  // -2
+  DANE_MODE_NO_TLSA_RECORD	: "dmntr",		
+  // -3	 
+  DANE_MODE_NO_CERT_CHAIN	: "dmncc",
+  // -4
+  DANE_MODE_TLSA_PARAM_ERR	: "dmtpe",
+  // 0
+  DANE_MODE_VALIDATION_FALSE	: "dmvf",
+  // 1
+  DANE_MODE_VALIDATION_SUCCESS	: "dmvs",
+  DANE_MODE_ERROR : "dme",
+  DANE_MODE_OFF   : "dmo",
+  DANE_MODE_ACTION   : "dma",
+  // Inaction status
+  DANE_MODE_INACTION : "inactionDnssec",
+
+  DANE_TOOLTIP_VALIDATION_SUCCESS : "dmvsTooltip",
+  DANE_TOOLTIP_VALIDATION_FALSE : "dmvfTooltip",
+  DANE_TOOLTIP_ACTION          	: "dmaTooltip",
+  DANE_TOOLTIP_FAILED_RESOLVER  : "dmfsTooltip",
+  DANE_TOOLTIP_NO_TLSA_RECORD   : "dmntrTooltip",
+  DANE_TOOLTIP_NO_CERT_CHAIN    : "dmnccTooltip",
+  DANE_TOOLTIP_OFF	        : "dmoffTooltip",
+  // Cache the most recent hostname seen in checkSecurity
+  _asciiHostName : null,
+  _utf8HostName : null,
+
+  valstate : -1,
+
+  get _tooltipLabel () {
+    delete this._stringBundle;
+    this._stringBundle = document.getElementById("dnssec-strings");
+
+    delete this._tooltipLabel;
+    this._tooltipLabel = {};
+
+    this._tooltipLabel[this.DANE_TOOLTIP_VALIDATION_SUCCESS] =
+      this._stringBundle.getString("tlsa.tooltip.success");
+    this._tooltipLabel[this.DANE_TOOLTIP_VALIDATION_FALSE] =
+      this._stringBundle.getString("tlsa.tooltip.false");
+    this._tooltipLabel[this.DANE_TOOLTIP_ACTION] =
+      this._stringBundle.getString("tlsa.tooltip.action");
+    this._tooltipLabel[this.DANE_TOOLTIP_FAILED_RESOLVER] =
+      this._stringBundle.getString("tlsa.tooltip.error");
+    this._tooltipLabel[this.DANE_TOOLTIP_NO_TLSA_RECORD] =
+      this._stringBundle.getString("tlsa.tooltip.notlsa");
+    this._tooltipLabel[this.DANE_TOOLTIP_NO_CERT_CHAIN ] =
+      this._stringBundle.getString("tlsa.tooltip.chain");
+    this._tooltipLabel[this.DANE_TOOLTIP_OFF] =
+      this._stringBundle.getString("tlsa.tooltip.off");
+    return this._tooltipLabel;
+  },
+
+  get _tlsaPopup () {
+    delete this._tlsaPopup;
+    return this._tlsaPopup = document.getElementById("tlsa-popup");
+  },
+  get _tlsaPopupfwd () {
+    delete this._tlsaPopupfwd;
+    return this._tlsaPopupfwd = document.getElementById("tlsa-popup-fwd");
+  },
+  get _tlsaBox () {
+    delete this._tlsaBox;
+    return this._tlsaBox = document.getElementById("tlsa-box");
+  },
+  get _tlsaPopupContentBox () {
+    delete this._tlsaPopupContentBox;
+    return this._tlsaPopupContentBox =
+      document.getElementById("tlsa-popup-content-box");
+  },
+  get _tlsaPopupContentBox2 () {
+    delete this._tlsaPopupContentBox2;
+    return this._tlsaPopupContentBox2 =
+      document.getElementById("tlsa-popup-content-box2");
+  },
+  get _tlsaPopupContentBox3 () {
+    delete this._tlsaPopupContentBox3;
+    return this._tlsaPopupContentBox3 =
+      document.getElementById("tlsa-popup-content-box3");
+  },
+  get _tlsaPopupContentBox4 () {
+    delete this._tlsaPopupContentBox4;
+    return this._tlsaPopupContentBox4 =
+      document.getElementById("tlsa-popup-content-box4");
+  },
+  get _tlsaPopupContentHost () {
+    delete this._tlsaPopupContentHost;
+    return this._tlsaPopupContentHost =
+      document.getElementById("tlsa-popup-content-host");
+  },
+  get _tlsaPopupSecLabel () {
+    delete this._tlsaPopupSecLabel;
+    return this._tlsaPopupSecLabel =
+      document.getElementById("tlsa-popup-security-text");
+  },
+  get _tlsaPopupSecDetail () {
+    delete this._tlsaPopupSecDetail;
+    return this._tlsaPopupSecDetail =
+      document.getElementById("tlsa-popup-security-detail");
+  },
+  get _tlsaPopupfwdDetail () {
+    delete this._tlsaPopupfwdDetail;
+    return this._tlsaPopupfwdDetail =
+      document.getElementById("tlsa-popup-fwd-text");
+  },
+  get _tlsaPopupIpBrowser () {
+    delete this._tlsaPopupIpBrowser;
+    return this._tlsaPopupIpBrowser =
+      document.getElementById("tlsa-popup-ipbrowser-ip");
+  },
+  get _tlsaPopupIpValidator () {
+    delete this._tlsaPopupIpValidator;
+    return this._tlsaPopupIpValidator =
+      document.getElementById("tlsa-popup-ipvalidator-ip");
+  },
+  // Build out a cache of the elements that we need frequently
+  _cacheElements : function() {
+    delete this._tlsaBox;
+    this._tlsaBox = document.getElementById("tlsa-box");
+  },
+
+  // Set appropriate security state
+  setSecurityState : function(state) {
+    var c = tlsaExtNPAPIConst;
+
+    switch (state) {
+	// resolver failed
+    case c.DANE_EXIT_RESOLVER_FAILED:
+      this.setMode(this.DANE_MODE_FAILED_RESOLVER);
+      break;
+	// no tlsa record
+    case c.DANE_EXIT_NO_TLSA_RECORD: 
+	this.setMode(this.DANE_MODE_NO_TLSA_RECORD);
+    	break;
+	// no certificate chain
+    case c.DANE_EXIT_NO_CERT_CHAIN: 
+	this.setMode(this.DANE_MODE_NO_CERT_CHAIN);
+        break;
+	// tlsa paramerters wrong
+    case c.DANE_EXIT_TLSA_PARAM_ERR:
+        this.setMode(this.DANE_MODE_TLSA_PARAM_ERR);
+      break;
+	// false
+    case c.DANE_EXIT_VALIDATION_FALSE:
+    case c.DANE_EXIT_VALIDATION_FALSE_TYPE0:
+    case c.DANE_EXIT_VALIDATION_FALSE_TYPE1:
+    case c.DANE_EXIT_VALIDATION_FALSE_TYPE2:
+    case c.DANE_EXIT_VALIDATION_FALSE_TYPE3:
+      this.setMode(this.DANE_MODE_VALIDATION_FALSE);
+      break;
+	// success	
+    case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE0: 
+    case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE1:
+    case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE2:
+    case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE3:  
+	this.setMode(this.DANE_MODE_VALIDATION_SUCCESS);
+      break;
+	// validation off
+    case c.DANE_EXIT_VALIDATION_OFF:
+      this.setMode(this.DANE_MODE_OFF);
+      break;
+	// others
+    default:
+      this.setMode(this.DANE_MODE_ERROR);
+      break;
+    }
+  },
+
+  /**
+   * Update the UI to reflect the specified mode, which should be one of the
+   * TLSA_MODE_* constants.
+   */
+  setMode : function(newMode) {
+    if (!this._tlsaBox) {
+      // No TLSA box means the TLSA box is not visible, in which
+      // case there's nothing to do.
+      return;
+    } 
+    else if (newMode == this.DANE_MODE_ACTION) {  // Close window for these states
+      this.hideTlsaPopup();
+    }
+
+    this._tlsaBox.className = newMode;
+    this.setSecurityMessages(newMode);
+
+    // Update the popup too, if it's open
+    if (this._tlsaPopup.state == "open")
+      this.setPopupMessages(newMode);
+  },
+
+  /**
+   * Set up the messages for the primary security UI based on the specified mode,
+   *
+   * @param newMode The newly set security mode. Should be one of the TLSA_MODE_* constants.
+   */
+  setSecurityMessages : function(newMode) {
+
+    var tooltip;
+
+    switch (newMode) {
+    case this.DANE_MODE_FAILED_RESOLVER:
+      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_FAILED_RESOLVER];
+      break;
+    case this.DANE_MODE_VALIDATION_SUCCESS:
+      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_VALIDATION_SUCCESS];
+      break;
+    case this.DANE_MODE_VALIDATION_FALSE:
+      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_VALIDATION_FALSE];
+      break;
+    case this.DANE_MODE_NO_TLSA_RECORD:
+      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_NO_TLSA_RECORD];
+      break;
+    case this. DANE_MODE_ERROR:
+      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_FAILED_RESOLVER];
+      break;
+    case this.DANE_MODE_OFF:
+      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_OFF];
+      break;
+    // Unknown
+    default:
+      tooltip = "";
+    }
+
+    // Push the appropriate strings out to the UI
+    this._tlsaBox.tooltipText = tooltip;
+  },
+
+  /**
+   * Set up the title and content messages for the security message popup,
+   * based on the specified mode
+   *
+   * @param newMode The newly set security mode. Should be one of the tlsa_MODE_* constants.
+   */
+  setPopupMessages : function(newMode) {
+
+    this._tlsaPopup.className = newMode;
+    this._tlsaPopupContentBox.className = newMode;
+    this._tlsaPopupContentBox2.className = newMode;
+    this._tlsaPopupContentBox3.className = newMode;
+    this._tlsaPopupContentBox4.className = newMode;
+    // Set the static strings up front
+    //this._tlsaPopupSecLabel.textContent = " " + this._securityText[newMode];
+    //this._tlsaPopupSecDetail.textContent = this._securityDetail[newMode];
+    
+
+    //dump(this._tlsaPopupSecDetail.textContent);
+    // Push the appropriate strings out to the UI
+    //this._tlsaPopupContentHost.textContent = this._utf8HostName;
+
+    var idnService = Components.classes["@mozilla.org/network/idn-service;1"]
+                     .getService(Components.interfaces.nsIIDNService);
+
+    var tooltipName;
+
+    if (idnService.isACE(this._utf8HostName)) {
+      // Encode to UTF-8 if IDN domain name is not in browser's whitelist
+      // See "network.IDN.whitelist.*"
+      tooltipName = idnService.convertACEtoUTF8(this._utf8HostName);
+    } else if (idnService.isACE(this._asciiHostName)) {
+      // Use punycoded name
+      tooltipName = this._asciiHostName;
+    } else {
+      tooltipName = "";
+    }
+
+    //this._tlsaPopupContentHost.tooltipText = tooltipName;
+  },
+
+  hideTlsaPopup : function() {
+    this._tlsaPopup.hidePopup();
+  },
+
+  /**
+   * Click handler for the tlsa-box element in primary chrome.
+   */
+  handleTlsaButtonEvent : function(event) {
+
+    event.stopPropagation();
+
+    if ((event.type == "click" && event.button != 0) ||
+        (event.type == "keypress" && event.charCode != KeyEvent.DOM_VK_SPACE &&
+         event.keyCode != KeyEvent.DOM_VK_RETURN))
+      return; // Left click, space or enter only
+
+    // No popup window while...
+    if (this._tlsaBox && (this._tlsaBox.className == this.DANE_MODE_ACTION )) // getting security status
+      return;
+	
+    // Make sure that the display:none style we set in xul is removed now that
+    // the popup is actually needed
+    this._tlsaPopup.hidden = false;
+
+    // Tell the popup to consume dismiss clicks, to avoid bug 395314
+    this._tlsaPopup.popupBoxObject
+        .setConsumeRollupEvent(Ci.nsIPopupBoxObject.ROLLUP_CONSUME);
+
+    // Update the popup strings
+    this.setPopupMessages(this._tlsaBox.className);
+ 	//dump('Open popopu...\n');
+    // Now open the popup, anchored off the primary chrome element
+    this._tlsaPopup.openPopup(this._tlsaBox, 'after_end', -10, 0);
+  }
+}
+
