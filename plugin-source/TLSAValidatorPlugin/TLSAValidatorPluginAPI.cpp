@@ -20,8 +20,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 FB::variant TLSAValidatorPluginAPI::echo(const FB::variant& msg)
 {
-    static int n(0);
-    fire_echo("So far, you clicked this many times: ", n++);
+    //static int n(0);
+    //fire_echo("So far, you clicked this many times: ", n++);
 
     // return "foobar";
     return msg;
@@ -63,7 +63,7 @@ std::string TLSAValidatorPluginAPI::get_version()
 
 void TLSAValidatorPluginAPI::testEvent()
 {
-    fire_test();
+    //fire_test();
 }
 
 char *convert(const std::string & s)
@@ -78,8 +78,9 @@ FB::VariantList TLSAValidatorPluginAPI::TLSAValidate(const std::vector<std::stri
 			      const std::string& protocol, const int policy)
 {    
 //    std::vector<char*>  vc;
-    const char *vc[certcount];
+    //const char *vc[certcount];
 //    std::transform(certchain.begin(), certchain.end(), std::back_inserter(vc), convert);  
+    const char **vc = (const char **) malloc(sizeof(char *) * certcount);
     for (int i = 0; i < certcount; ++i) {
       vc[i] = certchain[i].c_str();
     }
@@ -91,6 +92,7 @@ FB::VariantList TLSAValidatorPluginAPI::TLSAValidate(const std::vector<std::stri
     short rv;
     rv = CheckDane(vc, certcount, options, optdnssrv.c_str(), domain.c_str(), port.c_str(), protocol.c_str(), policy);    
     reslist.push_back(rv);
+    free(vc);
     return reslist;
 }
 

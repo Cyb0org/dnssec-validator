@@ -20,7 +20,8 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 /* This CSS file redefines default icon box size in FF 4.0 on Windows */
 
-@import url("chrome://dnssec/skin/overlay-common.css");
+@import url("chrome://dnssec/skin/overlay-dnssec.css");
+@import url("chrome://dnssec/skin/overlay-tlsa.css");
 
 #dnssec-box {
   height: 18px;

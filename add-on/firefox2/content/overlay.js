@@ -1246,6 +1246,85 @@ var tlsaExtHandler = {
     return this._tooltipLabel;
   },
 
+  // Smart getters
+  get _securityText () {
+    delete this._stringBundle;
+    this._stringBundle = document.getElementById("dnssec-strings");
+
+    delete this._securityText;
+    this._securityText = {};
+
+	// 0. DNSSEC error
+    this._securityText[this.DANE_MODE_ERROR] =
+      this._stringBundle.getString("0dnssecError");
+	// 1. No DNSSEC signature    
+    this._securityText[this.DNSSEC_MODE_DOMAIN_UNSECURED] =
+      this._stringBundle.getString("1unsecuredDomain");
+	// 2. Domain and also connection are secured
+    this._securityText[this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED] =
+      this._stringBundle.getString("2securedConnectionDomain");
+  	// 3. Domain and also connection are secured but browser's IP address is invalid
+    this._securityText[this.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED] =
+      this._stringBundle.getString("3securedConnectionDomainInvIPaddr");
+	// 4. Domain is secured, but it has an invalid signature
+    this._securityText[this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID] =
+      this._stringBundle.getString("4invalidDomainSignature");
+  	// 5. No NSEC/NSEC3 for non-existent domain name
+    this._securityText[this.DNSSEC_MODE_NODOMAIN_UNSECURED] =
+      this._stringBundle.getString("5unsecuredNoDomain");
+  	// 6. Connection is secured, but domain name does not exist
+    this._securityText[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID] =
+      this._stringBundle.getString("6securedConnectionNoDomain");
+  	// 7. Non-existent domain is secured, but it has an invalid signature
+    this._securityText[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID] =
+      this._stringBundle.getString("7invalidNoDomainSignature");
+  	// -1. Validator OFF
+    this._securityText[this.DNSSEC_MODE_OFF] =
+      this._stringBundle.getString("dnsseOff");
+
+    return this._securityText;
+  },
+
+  get _securityDetail () {
+    delete this._stringBundle;
+    this._stringBundle = document.getElementById("dnssec-strings");
+
+    delete this._securityDetail;
+    this._securityDetail = {};
+
+	// 0. DNSSEC error
+    this._securityDetail[this.DANE_MODE_ERROR] =
+      this._stringBundle.getString("0dnssecErrorInfo");
+	// 1. No DNSSEC signature    
+    this._securityDetail[this.DNSSEC_MODE_DOMAIN_UNSECURED] =
+      this._stringBundle.getString("1unsecuredDomainInfo");
+	// 2. Domain and also connection are secured
+    this._securityDetail[this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED] =
+      this._stringBundle.getString("2securedConnectionDomainInfo");
+  	// 3. Domain and also connection are secured but browser's IP address is invalid
+    this._securityDetail[this.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED] =
+      this._stringBundle.getString("3securedConnectionDomainInvIPaddrInfo");
+	// 4. Domain is secured, but it has an invalid signature
+    this._securityDetail[this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID] =
+      this._stringBundle.getString("4invalidDomainSignatureInfo");
+  	// 5. No NSEC/NSEC3 for non-existent domain name
+    this._securityDetail[this.DNSSEC_MODE_NODOMAIN_UNSECURED] =
+      this._stringBundle.getString("5unsecuredNoDomainInfo");
+  	// 6. Connection is secured, but domain name does not exist
+    this._securityDetail[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID] =
+      this._stringBundle.getString("6securedConnectionNoDomainInfo");
+  	// 7. Non-existent domain is secured, but it has an invalid signature
+    this._securityDetail[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID] =
+      this._stringBundle.getString("7invalidNoDomainSignatureInfo");
+  	// -1. Validator OFF
+    this._securityDetail[this.DNSSEC_MODE_OFF] =
+      this._stringBundle.getString("dnsseOffInfo");
+    return this._securityDetail;
+  },
+
+
+
+
   get _tlsaPopup () {
     delete this._tlsaPopup;
     return this._tlsaPopup = document.getElementById("tlsa-popup");
@@ -1436,11 +1515,12 @@ var tlsaExtHandler = {
     // Set the static strings up front
     //this._tlsaPopupSecLabel.textContent = " " + this._securityText[newMode];
     //this._tlsaPopupSecDetail.textContent = this._securityDetail[newMode];
-    
+    this._tlsaPopupSecLabel.textContent = " xycyxcyxc ";
+    this._tlsaPopupSecDetail.textContent = "yxcyxcyxcy" ;
 
-    //dump(this._tlsaPopupSecDetail.textContent);
-    // Push the appropriate strings out to the UI
-    //this._tlsaPopupContentHost.textContent = this._utf8HostName;
+    dump(this._tlsaPopupSecDetail.textContent);
+     //Push the appropriate strings out to the UI
+    this._tlsaPopupContentHost.textContent = this._utf8HostName + "sdfgdfgfdg";
 
     var idnService = Components.classes["@mozilla.org/network/idn-service;1"]
                      .getService(Components.interfaces.nsIIDNService);
@@ -1458,7 +1538,7 @@ var tlsaExtHandler = {
       tooltipName = "";
     }
 
-    //this._tlsaPopupContentHost.tooltipText = tooltipName;
+    this._tlsaPopupContentHost.tooltipText = tooltipName;
   },
 
   hideTlsaPopup : function() {

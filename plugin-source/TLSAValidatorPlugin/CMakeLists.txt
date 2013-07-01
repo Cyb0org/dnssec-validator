@@ -10,6 +10,10 @@ set (CMAKE_BACKWARDS_COMPATIBILITY 2.6)
 
 Project(${PLUGIN_NAME})
 
+#include(${CMAKE_DIR}/common.cmake)
+#set (PROJNAME ${PLUGIN_NAME})
+#browserplugin_project(${PROJNAME})
+
 # add validating library to build on UNIX
 if (NOT WIN32)
     set(DSLIB dane-plug.c)
