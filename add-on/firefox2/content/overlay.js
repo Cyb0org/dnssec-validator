@@ -457,24 +457,27 @@ var dnssecExtResolver = {
     var ipvalidator = resArr[1];
 
     var c = dnssecExtNPAPIConst;
+    var d = tlsaExtNPAPIConst;
     if (res==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
       	if (ext.debugOutput) dump(ext.debugPrefix + "Unbound return bogus state: Testing why?\n");
 	this.revalidate(dn,addr,res);
 	return;
     }// if
 
-	
+    var tlsa = d.DANE_EXIT_VALIDATION_OFF;	
     // tlsa	
     if (res==c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP || res==c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP) {
 	var uri = gBrowser.currentURI;
 	var port = "443";
-	var tlsa = 1;
 	//dump(ext.debugPrefix + uri.asciiHost + '\n');
         if (uri.schemeIs("https")) { 
 		if (ext.debugOutput) dump(ext.debugPrefix + 'Connection is https...\n');
 		tlsa = tlsaValidator.check_tlsa(uri,port);
 	}
-	else if (ext.debugOutput) dump(ext.debugPrefix + 'Connection is NOT https...\n');
+	else { if (ext.debugOutput) dump(ext.debugPrefix + 'Connection is NOT https...\n');
+	     tlsa = d.DANE_EXIT_NO_HTTPS;
+        }
+	dump("TLSA>>> " + tlsa + '\n');
     }
 
 
@@ -889,7 +892,7 @@ var dnssecExtHandler = {
 
     // Set action state
     this.setMode(this.DNSSEC_MODE_ACTION);
-
+    tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_ACTION);
     // Detect if any resolving is already running...
     if (dnssecExtPrefs.getBool("resolvingactive")) {
 
@@ -1191,24 +1194,29 @@ var dnssecExtHandler = {
 //*****************************************************************************
 //*****************************************************************************
 var tlsaExtHandler = {
-  // -1
-  DANE_MODE_FAILED_RESOLVER     : "dmfs",
-  // -2
-  DANE_MODE_NO_TLSA_RECORD	: "dmntr",		
-  // -3	 
-  DANE_MODE_NO_CERT_CHAIN	: "dmncc",
-  // -4
-  DANE_MODE_TLSA_PARAM_ERR	: "dmtpe",
-  // 0
-  DANE_MODE_VALIDATION_FALSE	: "dmvf",
-  // 1
-  DANE_MODE_VALIDATION_SUCCESS	: "dmvs",
-  DANE_MODE_ERROR : "dme",
-  DANE_MODE_OFF   : "dmo",
-  DANE_MODE_ACTION   : "dma",
-  // Inaction status
-  DANE_MODE_INACTION : "inactionDnssec",
+  // DANE/TLSA MODE
+  DANE_MODE_INACTION 		: "dm_inaction",
+  DANE_MODE_VALIDATION_OFF   	: "dm_validationoff",
+  DANE_MODE_ACTION   		: "dm_action",
+  DANE_MODE_ERROR 		: "dm_error",
+  DANE_MODE_RESOLVER_FAILED     : "dm_rfesolverfailed",
+  DANE_MODE_DNSSEC_BOGUS	: "dm_dnssecbogus",
+  DANE_MODE_DNSSEC_UNSECURED	: "dm_dnssecunsecured",
+  DANE_MODE_NO_TLSA_RECORD	: "dm_notlsarecord",		
+  DANE_MODE_NO_CERT_CHAIN	: "dm_certchain",
+  DANE_MODE_TLSA_PARAM_WRONG	: "dm_tlsapramwrong",
+  DANE_MODE_NO_HTTPS		: "dm_nohttps",
+  DANE_MODE_VALIDATION_FALSE		: "dm_vf",
+  DANE_MODE_VALIDATION_FALSE_TYPE0	: "dm_vf0",
+  DANE_MODE_VALIDATION_FALSE_TYPE1	: "dm_vf1",
+  DANE_MODE_VALIDATION_FALSE_TYPE2	: "dm_vf2",
+  DANE_MODE_VALIDATION_FALSE_TYPE3	: "dm_vf3",
+  DANE_MODE_VALIDATION_SUCCESS_TYPE0	: "dm_vs0",
+  DANE_MODE_VALIDATION_SUCCESS_TYPE1	: "dm_vs1",
+  DANE_MODE_VALIDATION_SUCCESS_TYPE2	: "dm_vs2",
+  DANE_MODE_VALIDATION_SUCCESS_TYPE3	: "dm_vs3",
 
+  //DANE/TLSA tooltip	
   DANE_TOOLTIP_VALIDATION_SUCCESS : "dmvsTooltip",
   DANE_TOOLTIP_VALIDATION_FALSE : "dmvfTooltip",
   DANE_TOOLTIP_ACTION          	: "dmaTooltip",
@@ -1216,6 +1224,7 @@ var tlsaExtHandler = {
   DANE_TOOLTIP_NO_TLSA_RECORD   : "dmntrTooltip",
   DANE_TOOLTIP_NO_CERT_CHAIN    : "dmnccTooltip",
   DANE_TOOLTIP_OFF	        : "dmoffTooltip",
+  DANE_TOOLTIP_NO_HTTPS	        : "dmnohttpsTooltip",
   // Cache the most recent hostname seen in checkSecurity
   _asciiHostName : null,
   _utf8HostName : null,
@@ -1228,25 +1237,26 @@ var tlsaExtHandler = {
 
     delete this._tooltipLabel;
     this._tooltipLabel = {};
-
+    this._tooltipLabel[this.DANE_TOOLTIP_NO_HTTPS] =
+      this._stringBundle.getString("dane.tooltip.nohttps");
     this._tooltipLabel[this.DANE_TOOLTIP_VALIDATION_SUCCESS] =
-      this._stringBundle.getString("tlsa.tooltip.success");
+      this._stringBundle.getString("dane.tooltip.success");
     this._tooltipLabel[this.DANE_TOOLTIP_VALIDATION_FALSE] =
-      this._stringBundle.getString("tlsa.tooltip.false");
+      this._stringBundle.getString("dane.tooltip.false");
     this._tooltipLabel[this.DANE_TOOLTIP_ACTION] =
-      this._stringBundle.getString("tlsa.tooltip.action");
+      this._stringBundle.getString("dane.tooltip.action");
     this._tooltipLabel[this.DANE_TOOLTIP_FAILED_RESOLVER] =
-      this._stringBundle.getString("tlsa.tooltip.error");
+      this._stringBundle.getString("dane.tooltip.error");
     this._tooltipLabel[this.DANE_TOOLTIP_NO_TLSA_RECORD] =
-      this._stringBundle.getString("tlsa.tooltip.notlsa");
+      this._stringBundle.getString("dane.tooltip.notlsa");
     this._tooltipLabel[this.DANE_TOOLTIP_NO_CERT_CHAIN ] =
-      this._stringBundle.getString("tlsa.tooltip.chain");
+      this._stringBundle.getString("dane.tooltip.chain");
     this._tooltipLabel[this.DANE_TOOLTIP_OFF] =
-      this._stringBundle.getString("tlsa.tooltip.off");
+      this._stringBundle.getString("dane.tooltip.off");
     return this._tooltipLabel;
   },
 
-  // Smart getters
+  //set DANE security text
   get _securityText () {
     delete this._stringBundle;
     this._stringBundle = document.getElementById("dnssec-strings");
@@ -1254,37 +1264,46 @@ var tlsaExtHandler = {
     delete this._securityText;
     this._securityText = {};
 
-	// 0. DNSSEC error
     this._securityText[this.DANE_MODE_ERROR] =
-      this._stringBundle.getString("0dnssecError");
-	// 1. No DNSSEC signature    
-    this._securityText[this.DNSSEC_MODE_DOMAIN_UNSECURED] =
-      this._stringBundle.getString("1unsecuredDomain");
-	// 2. Domain and also connection are secured
-    this._securityText[this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED] =
-      this._stringBundle.getString("2securedConnectionDomain");
-  	// 3. Domain and also connection are secured but browser's IP address is invalid
-    this._securityText[this.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED] =
-      this._stringBundle.getString("3securedConnectionDomainInvIPaddr");
-	// 4. Domain is secured, but it has an invalid signature
-    this._securityText[this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID] =
-      this._stringBundle.getString("4invalidDomainSignature");
-  	// 5. No NSEC/NSEC3 for non-existent domain name
-    this._securityText[this.DNSSEC_MODE_NODOMAIN_UNSECURED] =
-      this._stringBundle.getString("5unsecuredNoDomain");
-  	// 6. Connection is secured, but domain name does not exist
-    this._securityText[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID] =
-      this._stringBundle.getString("6securedConnectionNoDomain");
-  	// 7. Non-existent domain is secured, but it has an invalid signature
-    this._securityText[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID] =
-      this._stringBundle.getString("7invalidNoDomainSignature");
-  	// -1. Validator OFF
-    this._securityText[this.DNSSEC_MODE_OFF] =
-      this._stringBundle.getString("dnsseOff");
-
+      this._stringBundle.getString("dane.mode.error");
+    this._securityText[this.DANE_MODE_RESOLVER_FAILED] =
+      this._stringBundle.getString("dane.mode.resolver.failed");
+    this._securityText[this.DANE_MODE_DNSSEC_BOGUS] =
+      this._stringBundle.getString("dane.mode.dnssec.bogus");
+    this._securityText[this.DANE_MODE_DNSSEC_UNSECURED] =
+      this._stringBundle.getString("dane.mode.dnssec.unsecured");
+    this._securityText[this.DANE_MODE_NO_TLSA_RECORD] =
+      this._stringBundle.getString("dane.mode.no.tlsa.record");
+    this._securityText[this.DANE_MODE_NO_CERT_CHAIN] =
+      this._stringBundle.getString("dane.mode.no.cert.chain");
+    this._securityText[this.DANE_MODE_TLSA_PARAM_WRONG] =
+      this._stringBundle.getString("dane.mode.tlsa.param.wrong");
+    this._securityText[this.DANE_MODE_NO_HTTPS] =
+      this._stringBundle.getString("dane.mode.no.https");
+    this._securityText[this.DANE_MODE_VALIDATION_FALSE] =
+      this._stringBundle.getString("dane.mode.validation.false");
+    this._securityText[this.DANE_MODE_VALIDATION_FALSE_TYPE0] =
+      this._stringBundle.getString("dane.mode.validation.false.type0");
+    this._securityText[this.DANE_MODE_VALIDATION_FALSE_TYPE1] =
+      this._stringBundle.getString("dane.mode.validation.false.type1");
+    this._securityText[this.DANE_MODE_VALIDATION_FALSE_TYPE2] =
+      this._stringBundle.getString("dane.mode.validation.false.type2");
+    this._securityText[this.DANE_MODE_VALIDATION_FALSE_TYPE3] =
+      this._stringBundle.getString("dane.mode.validation.false.type3");
+    this._securityText[this.DANE_MODE_VALIDATION_SUCCESS_TYPE0] =
+      this._stringBundle.getString("dane.mode.validation.success.type0");
+    this._securityText[this.DANE_MODE_VALIDATION_SUCCESS_TYPE1] =
+      this._stringBundle.getString("dane.mode.validation.success.type1");
+    this._securityText[this.DANE_MODE_VALIDATION_SUCCESS_TYPE2] =
+      this._stringBundle.getString("dane.mode.validation.success.type2");
+    this._securityText[this.DANE_MODE_VALIDATION_SUCCESS_TYPE3] =
+      this._stringBundle.getString("dane.mode.validation.success.type3");
+    this._securityText[this.DANE_MODE_VALIDATION_OFF] =
+      this._stringBundle.getString("dane.mode.validation.off");
     return this._securityText;
   },
 
+  //set DANE security message detail
   get _securityDetail () {
     delete this._stringBundle;
     this._stringBundle = document.getElementById("dnssec-strings");
@@ -1292,38 +1311,44 @@ var tlsaExtHandler = {
     delete this._securityDetail;
     this._securityDetail = {};
 
-	// 0. DNSSEC error
     this._securityDetail[this.DANE_MODE_ERROR] =
-      this._stringBundle.getString("0dnssecErrorInfo");
-	// 1. No DNSSEC signature    
-    this._securityDetail[this.DNSSEC_MODE_DOMAIN_UNSECURED] =
-      this._stringBundle.getString("1unsecuredDomainInfo");
-	// 2. Domain and also connection are secured
-    this._securityDetail[this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED] =
-      this._stringBundle.getString("2securedConnectionDomainInfo");
-  	// 3. Domain and also connection are secured but browser's IP address is invalid
-    this._securityDetail[this.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED] =
-      this._stringBundle.getString("3securedConnectionDomainInvIPaddrInfo");
-	// 4. Domain is secured, but it has an invalid signature
-    this._securityDetail[this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID] =
-      this._stringBundle.getString("4invalidDomainSignatureInfo");
-  	// 5. No NSEC/NSEC3 for non-existent domain name
-    this._securityDetail[this.DNSSEC_MODE_NODOMAIN_UNSECURED] =
-      this._stringBundle.getString("5unsecuredNoDomainInfo");
-  	// 6. Connection is secured, but domain name does not exist
-    this._securityDetail[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID] =
-      this._stringBundle.getString("6securedConnectionNoDomainInfo");
-  	// 7. Non-existent domain is secured, but it has an invalid signature
-    this._securityDetail[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID] =
-      this._stringBundle.getString("7invalidNoDomainSignatureInfo");
-  	// -1. Validator OFF
-    this._securityDetail[this.DNSSEC_MODE_OFF] =
-      this._stringBundle.getString("dnsseOffInfo");
+      this._stringBundle.getString("dane.mode.error.detail");
+    this._securityDetail[this.DANE_MODE_RESOLVER_FAILED] =
+      this._stringBundle.getString("dane.mode.resolver.failed.detail");
+    this._securityDetail[this.DANE_MODE_DNSSEC_BOGUS] =
+      this._stringBundle.getString("dane.mode.dnssec.bogus.detail");
+    this._securityDetail[this.DANE_MODE_DNSSEC_UNSECURED] =
+      this._stringBundle.getString("dane.mode.dnssec.unsecured.detail");
+    this._securityDetail[this.DANE_MODE_NO_TLSA_RECORD] =
+      this._stringBundle.getString("dane.mode.no.tlsa.record.detail");
+    this._securityDetail[this.DANE_MODE_NO_CERT_CHAIN] =
+      this._stringBundle.getString("dane.mode.no.cert.chain.detail");
+    this._securityDetail[this.DANE_MODE_TLSA_PARAM_WRONG] =
+      this._stringBundle.getString("dane.mode.tlsa.param.wrong.detail");
+    this._securityDetail[this.DANE_MODE_NO_HTTPS] =
+      this._stringBundle.getString("dane.mode.no.https.detail");
+    this._securityDetail[this.DANE_MODE_VALIDATION_FALSE] =
+      this._stringBundle.getString("dane.mode.validation.false.detail");
+    this._securityDetail[this.DANE_MODE_VALIDATION_FALSE_TYPE0] =
+      this._stringBundle.getString("dane.mode.validation.false.type0.detail");
+    this._securityDetail[this.DANE_MODE_VALIDATION_FALSE_TYPE1] =
+      this._stringBundle.getString("dane.mode.validation.false.type1.detail");
+    this._securityDetail[this.DANE_MODE_VALIDATION_FALSE_TYPE2] =
+      this._stringBundle.getString("dane.mode.validation.false.type2.detail");
+    this._securityDetail[this.DANE_MODE_VALIDATION_FALSE_TYPE3] =
+      this._stringBundle.getString("dane.mode.validation.false.type3.detail");
+    this._securityDetail[this.DANE_MODE_VALIDATION_SUCCESS_TYPE0] =
+      this._stringBundle.getString("dane.mode.validation.success.type0.detail");
+    this._securityDetail[this.DANE_MODE_VALIDATION_SUCCESS_TYPE1] =
+      this._stringBundle.getString("dane.mode.validation.success.type1.detail");
+    this._securityDetail[this.DANE_MODE_VALIDATION_SUCCESS_TYPE2] =
+      this._stringBundle.getString("dane.mode.validation.success.type2.detail");
+    this._securityDetail[this.DANE_MODE_VALIDATION_SUCCESS_TYPE3] =
+      this._stringBundle.getString("dane.mode.validation.success.type3.detail");
+    this._securityDetail[this.DANE_MODE_VALIDATION_OFF] =
+      this._stringBundle.getString("dane.mode.validation.off.detail");
     return this._securityDetail;
   },
-
-
-
 
   get _tlsaPopup () {
     delete this._tlsaPopup;
@@ -1367,6 +1392,11 @@ var tlsaExtHandler = {
     return this._tlsaPopupSecLabel =
       document.getElementById("tlsa-popup-security-text");
   },
+  get _tlsaPopupSecLabel2 () {
+    delete this._tlsaPopupSecLabel2;
+    return this._tlsaPopupSecLabel2 =
+      document.getElementById("tlsa-popup-security-label");
+  },
   get _tlsaPopupSecDetail () {
     delete this._tlsaPopupSecDetail;
     return this._tlsaPopupSecDetail =
@@ -1393,50 +1423,64 @@ var tlsaExtHandler = {
     this._tlsaBox = document.getElementById("tlsa-box");
   },
 
-  // Set appropriate security state
+  // Set appropriate DANE security state
   setSecurityState : function(state) {
     var c = tlsaExtNPAPIConst;
 
     switch (state) {
-	// resolver failed
-    case c.DANE_EXIT_RESOLVER_FAILED:
-      this.setMode(this.DANE_MODE_FAILED_RESOLVER);
-      break;
-	// no tlsa record
-    case c.DANE_EXIT_NO_TLSA_RECORD: 
-	this.setMode(this.DANE_MODE_NO_TLSA_RECORD);
-    	break;
-	// no certificate chain
-    case c.DANE_EXIT_NO_CERT_CHAIN: 
-	this.setMode(this.DANE_MODE_NO_CERT_CHAIN);
-        break;
-	// tlsa paramerters wrong
-    case c.DANE_EXIT_TLSA_PARAM_ERR:
-        this.setMode(this.DANE_MODE_TLSA_PARAM_ERR);
-      break;
-	// false
-    case c.DANE_EXIT_VALIDATION_FALSE:
-    case c.DANE_EXIT_VALIDATION_FALSE_TYPE0:
-    case c.DANE_EXIT_VALIDATION_FALSE_TYPE1:
-    case c.DANE_EXIT_VALIDATION_FALSE_TYPE2:
-    case c.DANE_EXIT_VALIDATION_FALSE_TYPE3:
-      this.setMode(this.DANE_MODE_VALIDATION_FALSE);
-      break;
-	// success	
-    case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE0: 
-    case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE1:
-    case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE2:
-    case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE3:  
-	this.setMode(this.DANE_MODE_VALIDATION_SUCCESS);
-      break;
-	// validation off
-    case c.DANE_EXIT_VALIDATION_OFF:
-      this.setMode(this.DANE_MODE_OFF);
-      break;
-	// others
-    default:
-      this.setMode(this.DANE_MODE_ERROR);
-      break;
+	case c.DANE_EXIT_VALIDATION_OFF:
+		this.setMode(this.DANE_MODE_VALIDATION_OFF);
+		break;
+ 	case c.DANE_EXIT_NO_TLSA_RECORD:
+		this.setMode(this.DANE_MODE_NO_TLSA_RECORD);
+		break;
+	case c.DANE_EXIT_RESOLVER_FAILED:
+		this.setMode(this.DANE_MODE_RESOLVER_FAILED);
+		break;
+	case c.DANE_EXIT_DNSSEC_BOGUS:
+		this.setMode(this.DANE_MODE_DNSSEC_BOGUS);
+		break;
+	case c.DANE_EXIT_DNSSEC_UNSECURED:
+		this.setMode(this.DANE_MODE_DNSSEC_UNSECURED);
+		break;
+	case c.DANE_EXIT_NO_HTTPS:
+		this.setMode(this.DANE_MODE_NO_HTTPS);
+		break;
+	case c.DANE_EXIT_TLSA_PARAM_ERR:
+		this.setMode(this.DANE_MODE_TLSA_PARAM_WRONG);
+		break;
+	case c.DANE_EXIT_NO_CERT_CHAIN:
+		this.setMode(this.DANE_MODE_NO_CERT_CHAIN);
+		break;
+	case c.DANE_EXIT_VALIDATION_FALSE:
+		this.setMode(this.DANE_MODE_VALIDATION_FALSE);
+		break;
+	case c.DANE_EXIT_VALIDATION_FALSE_TYPE0:
+		this.setMode(this.DANE_MODE_VALIDATION_FALSE_TYPE0);
+		break;
+	case c.DANE_EXIT_VALIDATION_FALSE_TYPE1:
+		this.setMode(this.DANE_MODE_VALIDATION_FALSE_TYPE1);
+		break;
+	case c.DANE_EXIT_VALIDATION_FALSE_TYPE2:
+		this.setMode(this.DANE_MODE_VALIDATION_FALSE_TYPE2);
+		break;
+	case c.DANE_EXIT_VALIDATION_FALSE_TYPE3:
+		this.setMode(this.DANE_MODE_VALIDATION_FALSE_TYPE3);
+		break;
+	case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE0:
+		this.setMode(this.DANE_MODE_VALIDATION_SUCCESS_TYPE0);
+		break;
+	case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE1:
+		this.setMode(this.DANE_MODE_VALIDATION_SUCCESS_TYPE1);
+		break;
+	case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE2:
+		this.setMode(this.DANE_MODE_VALIDATION_SUCCESS_TYPE2);
+		break;
+	case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE3:
+		this.setMode(this.DANE_MODE_VALIDATION_SUCCESS_TYPE3);
+		break;
+      default: this.setMode(this.DANE_MODE_ERROR);
+      		break;
     }
   },
 
@@ -1469,34 +1513,50 @@ var tlsaExtHandler = {
    */
   setSecurityMessages : function(newMode) {
 
-    var tooltip;
+   var tooltip;
 
-    switch (newMode) {
-    case this.DANE_MODE_FAILED_RESOLVER:
-      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_FAILED_RESOLVER];
-      break;
-    case this.DANE_MODE_VALIDATION_SUCCESS:
-      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_VALIDATION_SUCCESS];
-      break;
-    case this.DANE_MODE_VALIDATION_FALSE:
-      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_VALIDATION_FALSE];
-      break;
-    case this.DANE_MODE_NO_TLSA_RECORD:
-      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_NO_TLSA_RECORD];
-      break;
-    case this. DANE_MODE_ERROR:
-      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_FAILED_RESOLVER];
-      break;
-    case this.DANE_MODE_OFF:
-      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_OFF];
-      break;
+   switch (newMode) {
+	case this.DANE_MODE_NO_HTTPS:
+	      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_NO_HTTPS];
+	      break;
+	case this.DANE_MODE_ACTION:
+	      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_ACTION];
+	      break;
+	case this.DANE_MODE_DNSSEC_BOGUS:
+	      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_FAILED_RESOLVER];
+	      break;
+	case this.DANE_MODE_VALIDATION_SUCCESS_TYPE0:
+	case this.DANE_MODE_VALIDATION_SUCCESS_TYPE1:
+	case this.DANE_MODE_VALIDATION_SUCCESS_TYPE2:
+	case this.DANE_MODE_VALIDATION_SUCCESS_TYPE3:
+	      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_VALIDATION_SUCCESS];
+	      break;
+	case this.DANE_MODE_VALIDATION_FALSE:
+	case this.DANE_MODE_VALIDATION_FALSE_TYPE0:
+	case this.DANE_MODE_VALIDATION_FALSE_TYPE1:
+	case this.DANE_MODE_VALIDATION_FALSE_TYPE2:
+	case this.DANE_MODE_VALIDATION_FALSE_TYPE3:
+	      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_VALIDATION_FALSE];
+	      break;
+	case this.DANE_MODE_NO_TLSA_RECORD:
+	      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_NO_TLSA_RECORD];
+	      break;
+	case this.DANE_MODE_ERROR:
+	case this.DANE_MODE_RESOLVER_FAILED:
+	case this.DANE_MODE_TLSA_PARAM_WRONG:
+	case this.DANE_MODE_NO_CERT_CHAIN:
+	      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_FAILED_RESOLVER];
+	      break;
+	case this.DANE_MODE_VALIDATION_OFF:
+	case this.DANE_MODE_DNSSEC_UNSECURED:
+	     tooltip = this._tooltipLabel[this.DANE_TOOLTIP_OFF];
+	     break;
     // Unknown
-    default:
-      tooltip = "";
+       default: tooltip = "";
     }
-
     // Push the appropriate strings out to the UI
     this._tlsaBox.tooltipText = tooltip;
+    return tooltip;
   },
 
   /**
@@ -1513,14 +1573,14 @@ var tlsaExtHandler = {
     this._tlsaPopupContentBox3.className = newMode;
     this._tlsaPopupContentBox4.className = newMode;
     // Set the static strings up front
-    //this._tlsaPopupSecLabel.textContent = " " + this._securityText[newMode];
-    //this._tlsaPopupSecDetail.textContent = this._securityDetail[newMode];
-    this._tlsaPopupSecLabel.textContent = " xycyxcyxc ";
-    this._tlsaPopupSecDetail.textContent = "yxcyxcyxcy" ;
+    this._tlsaPopupSecLabel.textContent = " " + this._securityText[newMode];
+    this._tlsaPopupSecDetail.textContent = this._securityDetail[newMode];
+    this._tlsaPopupSecLabel2.textContent =  this.setSecurityMessages(newMode);
+ 
 
-    dump(this._tlsaPopupSecDetail.textContent);
+    //dump(this._tlsaPopupSecDetail.textContent);
      //Push the appropriate strings out to the UI
-    this._tlsaPopupContentHost.textContent = this._utf8HostName + "sdfgdfgfdg";
+    this._tlsaPopupContentHost.textContent = this._utf8HostName;
 
     var idnService = Components.classes["@mozilla.org/network/idn-service;1"]
                      .getService(Components.interfaces.nsIIDNService);
@@ -1537,13 +1597,39 @@ var tlsaExtHandler = {
     } else {
       tooltipName = "";
     }
-
     this._tlsaPopupContentHost.tooltipText = tooltipName;
   },
 
   hideTlsaPopup : function() {
     this._tlsaPopup.hidePopup();
   },
+
+  showAddInfoIP : function() {
+		document.getElementById("tlsa-popup-ipbrowser-title").style.display = 'block';
+		document.getElementById("tlsa-popup-ipbrowser-ip").style.display = 'block';
+		document.getElementById("tlsa-popup-ipvalidator-title").style.display = 'block';
+		document.getElementById("tlsa-popup-ipvalidator-ip").style.display = 'block';
+  },
+
+  hideAddInfoIP : function() {
+		document.getElementById("tlsa-popup-ipbrowser-title").style.display = 'none';
+		document.getElementById("tlsa-popup-ipbrowser-ip").style.display = 'none';
+		document.getElementById("tlsa-popup-ipvalidator-title").style.display = 'none';
+		document.getElementById("tlsa-popup-ipvalidator-ip").style.display = 'none';
+  },
+
+  showAddInfo : function(id) {
+		document.getElementById(id).style.display = 'block';
+		document.getElementById("linkt").style.display = 'none';
+		document.getElementById("tlsa-popup-homepage").style.display = 'block';
+  },
+
+  hideAddInfo : function() {
+		document.getElementById("tlsa-popup-security-detail").style.display = 'none';
+		document.getElementById("linkt").style.display = 'block';
+		document.getElementById("tlsa-popup-homepage").style.display = 'none';
+  },
+
 
   /**
    * Click handler for the tlsa-box element in primary chrome.
@@ -1565,6 +1651,7 @@ var tlsaExtHandler = {
     // the popup is actually needed
     this._tlsaPopup.hidden = false;
 
+    this.hideAddInfo();
     // Tell the popup to consume dismiss clicks, to avoid bug 395314
     this._tlsaPopup.popupBoxObject
         .setConsumeRollupEvent(Ci.nsIPopupBoxObject.ROLLUP_CONSUME);

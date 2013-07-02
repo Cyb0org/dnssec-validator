@@ -86,17 +86,13 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
           <image id="tlsa-popup-icon"/>
 	  <vbox id="tlsa-popup-content-box2" align="top">
 		<description id="tlsa-popup-content-host"/>
-          	<description id="tlsa-popup-securedLabel" value="&dnssec.securedLabel;"/>
-          	<description id="tlsa-popup-unsecuredLabel" value="&dnssec.unsecuredLabel;"/>
-		<description id="tlsa-popup-errorLabel" value="&dnssec.errorLabel;"/>
-		<description id="tlsa-popup-tlsaOffLabel" value="&dnssec.offLabel;"/>
-		<description id="tlsa-popup-bogusLabel" value="&dnssec.bogusLabel;"/>			 	
+		<description id="tlsa-popup-security-label"/>			 	
 	  </vbox>	
 	</hbox>
         <vbox id="tlsa-popup-content-box3">      
 	  <description id="tlsa-popup-security-text"/>
         </vbox>
-<button label="&dnssec.button;" id="link" accesskey="&dnssec.button.accesskey;" oncommand="tlsaExtHandler.showAddInfo('tlsa-popup-security-detail'); return false;" style="display: block;"/>
+<button label="&dnssec.button;" id="linkt" accesskey="&dnssec.button.accesskey;" oncommand="tlsaExtHandler.showAddInfo('tlsa-popup-security-detail'); return false;" style="display: block;"/>
         <vbox id="tlsa-popup-content-box4">	
 		<description id="tlsa-popup-security-detail" style="display: none;"/>
 		<description id="tlsa-popup-ipbrowser-title" value="&dnssec.ipbrowser;" style="display: none;"/>

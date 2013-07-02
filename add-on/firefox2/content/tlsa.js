@@ -149,20 +149,20 @@ check_tlsa: function (uri,port){
 	dump("DANE: State is\n" + state +"\n");
 	var derCerts = new Array();
 	var chain = cert.getChain();
-	dump("DANE: chain is\n" + chain +"\n");
+	//dump("DANE: chain is\n" + chain +"\n");
         var len = chain.length;
         for (var i = 0; i < chain.length; i++) {
-		dump(i + "\n");   
+		//dump(i + "\n");   
                 var cert = chain.queryElementAt(i, Components.interfaces.nsIX509Cert);
-		dump("DANE: Cert is\n" + cert +"\n");
+		//dump("DANE: Cert is\n" + cert +"\n");
                 var derData = cert.getRawDER({});
-		dump("DANE: derData is\n" + derData +"\n");
+		//dump("DANE: derData is\n" + derData +"\n");
                 // derData is Blob, can't pass it as Blob, can't pass it as
                 // string because of Unicode.
                 // Fairly sure the next line tops ugliness of visualbasic
                 var derHex = derData.map(function(x) {return ("0"+x.toString(16)).substr(-2);}).join("");
                 derCerts.push(derHex);
-		dump("derHex:\n" + derHex + "\n");
+		//dump("derHex:\n" + derHex + "\n");
         } //for
 	var tlsa = document.getElementById("dane-tlsa-plugin");
 	var policy = this.ALLOW_TYPE_01 | this.ALLOW_TYPE_23;
