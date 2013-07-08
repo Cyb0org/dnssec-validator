@@ -48,3 +48,6 @@ OpenSSL used as well as that of the covered work.
   const short DANE_EXIT_VALIDATION_SUCCESS_TYPE2	 = 12;
   const short DANE_EXIT_VALIDATION_SUCCESS_TYPE3	 = 13;
 
+  const unsigned short DANE_INPUT_FLAG_DEBUGOUTPUT       = 1; /* debug output */
+  const unsigned short DANE_INPUT_FLAG_USEFWD            = 2; /* use forvarder/resolver */
+

@@ -477,7 +477,7 @@ var dnssecExtResolver = {
 	else { if (ext.debugOutput) dump(ext.debugPrefix + 'Connection is NOT https...\n');
 	     tlsa = d.DANE_EXIT_NO_HTTPS;
         }
-	dump("TLSA>>> " + tlsa + '\n');
+	dump("DANE: Return >>> " + tlsa + '\n');
     }
 
 

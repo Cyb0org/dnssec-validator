@@ -82,6 +82,12 @@ OpenSSL used as well as that of the covered work.
 #define SPKI 1
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
+typedef struct {                     /* structure to save input options */
+  bool debug;                        // debug output enable
+  bool usefwd;                       // use of resolver
+} ds_options;
+ds_options opts;
+//----------------------------------------------------------------------------
 struct ub_ctx* ctx;
 bool ws = false;		         /* write debug info into output file */
 bool ds = false;   		/* load root DS key from file */
@@ -134,6 +140,16 @@ typedef struct cert_tmp_st {
 } cert_tmp_ctx; 
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
+
+
+//*****************************************************************************
+// read input options into a structure
+// ----------------------------------------------------------------------------
+void ds_init_opts(const uint16_t options) {
+  opts.debug = options & DANE_INPUT_FLAG_DEBUGOUTPUT;
+  opts.usefwd = options & DANE_INPUT_FLAG_USEFWD;
+}
+
 
 //*****************************************************************************
 // Helper function (SSL conection)
@@ -1095,6 +1111,10 @@ short CheckDane(char* certchain[], int certcount, const uint16_t options, char *
    bool usefwd = false;
    ub_retval = 0;
    short exitcode = DANE_EXIT_RESOLVER_FAILED;
+
+   ds_init_opts(options);
+   debug = opts.debug;
+   usefwd = opts.usefwd;
 
   //-----------------------------------------------
   // Unbound resolver initialization, set forwarder 

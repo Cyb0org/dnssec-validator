@@ -146,7 +146,6 @@ check_tlsa: function (uri,port){
       	  return;
         }
 	var state = window.gBrowser.securityUI.state;
-	dump("DANE: State is\n" + state +"\n");
 	var derCerts = new Array();
 	var chain = cert.getChain();
 	//dump("DANE: chain is\n" + chain +"\n");
@@ -167,8 +166,11 @@ check_tlsa: function (uri,port){
 	var tlsa = document.getElementById("dane-tlsa-plugin");
 	var policy = this.ALLOW_TYPE_01 | this.ALLOW_TYPE_23;
         var protocol = "tcp";
-        var daneMatch = tlsa.TLSAValidate(derCerts, len, 5, "",  uri.asciiHost, port, protocol, policy);
-        dump("DANE: host " + uri.asciiHost + " : " + daneMatch[0] +"\n");
+	var c = dnssecExtNPAPIConst;
+	options = 0;
+	if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+        var daneMatch = tlsa.TLSAValidate(derCerts, len, options, "",  uri.asciiHost, port, protocol, policy);
+        dump("DANE: https://" + uri.asciiHost + " : " + daneMatch[0] +"\n");
 //        if (uri.asciiHost == gBrowser.currentURI.asciiHost) 
 	tlsaExtHandler.setSecurityState(daneMatch[0]);
 	//tlsa.TLSACacheFree();
