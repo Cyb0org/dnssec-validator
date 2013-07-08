@@ -33,6 +33,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #tlsa-box.dm_vf0 > #tlsa-icon,
 #tlsa-box.dm_vf1 > #tlsa-icon,
 #tlsa-box.dm_vf2 > #tlsa-icon,
+#tlsa-box.dm_tlsapramwrong > #tlsa-icon,
 #tlsa-box.dm_vf3 > #tlsa-icon {
   width: 19px;
   height: 19px;
@@ -41,7 +42,6 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 #tlsa-box.dm_error > #tlsa-icon,
 #tlsa-box.dm_rfesolverfailed > #tlsa-icon,
-#tlsa-box.dm_tlsapramwrong > #tlsa-icon,
 #tlsa-box.dm_certchain > #tlsa-icon {
   width: 19px;
   height: 19px;
@@ -120,7 +120,6 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 /* error */
 #tlsa-popup.dm_error  > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
 #tlsa-popup.dm_rfesolverfailed  > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
-#tlsa-popup.dm_tlsapramwrong > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
 #tlsa-popup.dm_certchain > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
   list-style-image: url("chrome://dnssec/skin/tlsaerr.png");
 }
@@ -130,8 +129,9 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #tlsa-popup.dm_vf0 > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
 #tlsa-popup.dm_vf1 > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
 #tlsa-popup.dm_vf2 > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
+#tlsa-popup.dm_tlsapramwrong > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
 #tlsa-popup.dm_vf3 > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/tlsagred.png"); 
+  list-style-image: url("chrome://dnssec/skin/tlsared.png"); 
 }
 
 /* off */

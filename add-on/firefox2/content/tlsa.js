@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
-Copyright 2012 CZ.NIC, z.s.p.o.
+Copyright 2013 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz>
 
@@ -63,7 +63,6 @@ var tlsaValidator = {
       return ui.SSLStatus.serverCert; 
     }
     catch (e) {
-      org.os3sec.Extval.Extension.logMsg('get_valid_cert: ' + e);
       return null;
     }
   },
@@ -97,9 +96,7 @@ var tlsaValidator = {
   //Override the certificate as trusted
   do_override: function(browser, cert) { 
     var uri = browser.currentURI;
-    
-    org.os3sec.Extval.Extension.logMsg('Overriding certificate trust ');
-    
+        
     //Get SSL status (untrusted flags)
     var gSSLStatus = this.get_invalid_cert_SSLStatus(uri);
     if(gSSLStatus == null) { 
@@ -137,7 +134,6 @@ getInvalidCertStatus: function (uri){
 },
 
 
-
 check_tlsa: function (uri,port){
 	dump("DANE: --- TLSA validation start ---\n");
 	var cert = this.getCertificate(window.gBrowser);
@@ -166,18 +162,19 @@ check_tlsa: function (uri,port){
 	var tlsa = document.getElementById("dane-tlsa-plugin");
 	var policy = this.ALLOW_TYPE_01 | this.ALLOW_TYPE_23;
         var protocol = "tcp";
-	var c = dnssecExtNPAPIConst;
-	options = 0;
-	if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+    	// Create variable to pass options
+	    var c = dnssecExtNPAPIConst;
+	    var options = 0;
+	    if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
         var daneMatch = tlsa.TLSAValidate(derCerts, len, options, "",  uri.asciiHost, port, protocol, policy);
-        dump("DANE: https://" + uri.asciiHost + " : " + daneMatch[0] +"\n");
-//        if (uri.asciiHost == gBrowser.currentURI.asciiHost) 
+        dump("DANE: https://" + uri.asciiHost + " : " + daneMatch[0] +"\n"); 
 	tlsaExtHandler.setSecurityState(daneMatch[0]);
+	//aSubject.cancel(Components.results.NS_BINDING_ABORTED);
 	//tlsa.TLSACacheFree();
         //dump("dercer " + daneMatch.derCert + ", pemCert " + daneMatch.pemCert + "\n");
         //dump("tlsa " + daneMatch.tlsa + "\n");
 	dump("DANE: --- TLSA validation end ---\n");
 	return daneMatch[0];
-}
+  }
 }
 

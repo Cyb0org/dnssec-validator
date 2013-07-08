@@ -75,6 +75,7 @@ var dnssecExtPrefObserver = {
   },
 
   observe: function(aSubject, aTopic, aData) {
+
     if (aTopic != "nsPref:changed") return;
     // aSubject is the nsIPrefBranch we're observing (after appropriate QI)
     // aData is the name of the pref that's been changed (relative to aSubject)
@@ -398,7 +399,7 @@ var dnssecExtResolver = {
 
      var ext = dnssecExtension;
      var c = dnssecExtNPAPIConst;
-    
+     var d = tlsaExtNPAPIConst;
     if (ext.debugOutput) {
        dump(ext.debugPrefix + 'NOFWD result: ' + resArr[0] + '; ' + resArr[1] +' ;\n');
     }	    	
@@ -406,9 +407,12 @@ var dnssecExtResolver = {
     var restmp = resArr[0];
     var ipvalidator = resArr[1];
     
+    var tlsa = d.DANE_EXIT_VALIDATION_OFF;	
+
     if (restmp==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
 	if (ext.debugOutput) dump(ext.debugPrefix + 'Yes, domain name has bogus\n');
 	res=restmp;
+	tlsa = d.DANE_EXIT_DNSSEC_BOGUS
     } 
     else
     {
@@ -416,13 +420,28 @@ var dnssecExtResolver = {
 	if (ext.debugOutput) dump(ext.debugPrefix + "Results: FWD: " + res + "; NOFWD: " + restmp +"\n");
 	var dsp = document.getElementById("dnssec-plugin");
 	dsp.CacheFree();
-	dnssecExtHandler.showDnssecFwdInfo();	
+	//dnssecExtHandler.showDnssecFwdInfo();
+    // tlsa	
+    if (restmp==c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP || restmp==c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP) {
+	var uri = gBrowser.currentURI;
+	var port = "443";
+	//dump(ext.debugPrefix + uri.asciiHost + '\n');
+        if (uri.schemeIs("https")) { 
+		if (ext.debugOutput) dump(ext.debugPrefix + 'Connection is https...\n');
+		tlsa = tlsaValidator.check_tlsa(uri,port);
+	}
+	else { if (ext.debugOutput) dump(ext.debugPrefix + 'Connection is NOT https...\n');
+	     tlsa = d.DANE_EXIT_NO_HTTPS;
+        }
+	dump("DANE: Return >>> " + tlsa + '\n');
+    }	
 	res=restmp;	
     }//if
 		
     // Set appropriate state if host name does not changed
     // during resolving process (tab has not been switched)
     if (dn == gBrowser.currentURI.asciiHost)
+	tlsaExtHandler.setSecurityState(tlsa); 
       dnssecExtHandler.setSecurityState(res,addr,ipvalidator);
 
     if (ext.debugOutput)
@@ -478,6 +497,7 @@ var dnssecExtResolver = {
 	     tlsa = d.DANE_EXIT_NO_HTTPS;
         }
 	dump("DANE: Return >>> " + tlsa + '\n');
+       
     }
 
 
@@ -1536,6 +1556,7 @@ var tlsaExtHandler = {
 	case this.DANE_MODE_VALIDATION_FALSE_TYPE1:
 	case this.DANE_MODE_VALIDATION_FALSE_TYPE2:
 	case this.DANE_MODE_VALIDATION_FALSE_TYPE3:
+	case this.DANE_MODE_TLSA_PARAM_WRONG:
 	      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_VALIDATION_FALSE];
 	      break;
 	case this.DANE_MODE_NO_TLSA_RECORD:
@@ -1543,7 +1564,6 @@ var tlsaExtHandler = {
 	      break;
 	case this.DANE_MODE_ERROR:
 	case this.DANE_MODE_RESOLVER_FAILED:
-	case this.DANE_MODE_TLSA_PARAM_WRONG:
 	case this.DANE_MODE_NO_CERT_CHAIN:
 	      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_FAILED_RESOLVER];
 	      break;
@@ -1580,7 +1600,7 @@ var tlsaExtHandler = {
 
     //dump(this._tlsaPopupSecDetail.textContent);
      //Push the appropriate strings out to the UI
-    this._tlsaPopupContentHost.textContent = this._utf8HostName;
+    this._tlsaPopupContentHost.textContent = gBrowser.currentURI.asciiHost;
 
     var idnService = Components.classes["@mozilla.org/network/idn-service;1"]
                      .getService(Components.interfaces.nsIIDNService);
