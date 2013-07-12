@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
-Copyright 2012 CZ.NIC, z.s.p.o.
+Copyright 2013 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz>
 
@@ -34,8 +34,21 @@ var tlsaValidator = {
   },
 
 
+
     ALLOW_TYPE_01: 1,
     ALLOW_TYPE_23: 2,
+
+
+observe : function(aSubject, aTopic, aData) {
+dump("ccccccccccccccccccc");  
+
+    aSubject.QueryInterface(Components.interfaces.nsIHttpChannel);
+      aSubject.cancel(Components.results.NS_BINDING_ABORTED);
+},
+
+
+
+
 
   
   //gets valid or invalid certificate used by the browser
@@ -63,7 +76,6 @@ var tlsaValidator = {
       return ui.SSLStatus.serverCert; 
     }
     catch (e) {
-      org.os3sec.Extval.Extension.logMsg('get_valid_cert: ' + e);
       return null;
     }
   },
@@ -97,9 +109,7 @@ var tlsaValidator = {
   //Override the certificate as trusted
   do_override: function(browser, cert) { 
     var uri = browser.currentURI;
-    
-    org.os3sec.Extval.Extension.logMsg('Overriding certificate trust ');
-    
+        
     //Get SSL status (untrusted flags)
     var gSSLStatus = this.get_invalid_cert_SSLStatus(uri);
     if(gSSLStatus == null) { 
@@ -137,7 +147,6 @@ getInvalidCertStatus: function (uri){
 },
 
 
-
 check_tlsa: function (uri,port){
 	dump("DANE: --- TLSA validation start ---\n");
 	var cert = this.getCertificate(window.gBrowser);
@@ -146,32 +155,81 @@ check_tlsa: function (uri,port){
       	  return;
         }
 	var state = window.gBrowser.securityUI.state;
-	dump("DANE: State is\n" + state +"\n");
 	var derCerts = new Array();
 	var chain = cert.getChain();
-	dump("DANE: chain is\n" + chain +"\n");
+	//dump("DANE: chain is\n" + chain +"\n");
+        var len = chain.length;
         for (var i = 0; i < chain.length; i++) {
-		dump(i + "\n");   
+		//dump(i + "\n");   
                 var cert = chain.queryElementAt(i, Components.interfaces.nsIX509Cert);
-		dump("DANE: Cert is\n" + cert +"\n");
+		//dump("DANE: Cert is\n" + cert +"\n");
                 var derData = cert.getRawDER({});
-		dump("DANE: derData is\n" + derData +"\n");
+		//dump("DANE: derData is\n" + derData +"\n");
                 // derData is Blob, can't pass it as Blob, can't pass it as
                 // string because of Unicode.
                 // Fairly sure the next line tops ugliness of visualbasic
                 var derHex = derData.map(function(x) {return ("0"+x.toString(16)).substr(-2);}).join("");
                 derCerts.push(derHex);
-		dump("derHex:\n" + derHex + "\n");
+		//dump("derHex:\n" + derHex + "\n");
         } //for
 	var tlsa = document.getElementById("dane-tlsa-plugin");
 	var policy = this.ALLOW_TYPE_01 | this.ALLOW_TYPE_23;
-        var daneMatch = tlsa.checkDANE(uri.asciiHost, port, derCerts, policy);
-        dump("DANE: host " + uri.asciiHost + " : " + port + ", successful " + daneMatch.successful + ", abort " + daneMatch.abort + "\n");
-        dump("dercer " + daneMatch.derCert + ", pemCert " + daneMatch.pemCert + "\n");
-        dump("tlsa " + daneMatch.tlsa + "\n");
+        var protocol = "tcp";
+    	// Create variable to pass options
+	    var c = dnssecExtNPAPIConst;
+	    var options = 0;
+	    if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+        var daneMatch = tlsa.TLSAValidate(derCerts, len, options, "",  uri.asciiHost, port, protocol, policy);
+        dump("DANE: https://" + uri.asciiHost + " : " + daneMatch[0] +"\n"); 
+	tlsaExtHandler.setSecurityState(daneMatch[0]);
+
+	//tlsa.TLSACacheFree();
+        //dump("dercer " + daneMatch.derCert + ", pemCert " + daneMatch.pemCert + "\n");
+        //dump("tlsa " + daneMatch.tlsa + "\n");
 	dump("DANE: --- TLSA validation end ---\n");
+	return daneMatch[0];
+  },
+check_tlsa2: function (uri,port){
+	dump("DANE: --- TLSA validation start ---\n");
+	var cert = this.getCertificate(window.gBrowser);
+    	if(!cert) {
+	  dump("DANE: No certificate!!!\n");
+      	  return;
+        }
+	var state = window.gBrowser.securityUI.state;
+	var derCerts = new Array();
+	var chain = cert.getChain();
+	//dump("DANE: chain is\n" + chain +"\n");
+        var len = chain.length;
+        for (var i = 0; i < chain.length; i++) {
+		//dump(i + "\n");   
+                var cert = chain.queryElementAt(i, Components.interfaces.nsIX509Cert);
+		//dump("DANE: Cert is\n" + cert +"\n");
+                var derData = cert.getRawDER({});
+		//dump("DANE: derData is\n" + derData +"\n");
+                // derData is Blob, can't pass it as Blob, can't pass it as
+                // string because of Unicode.
+                // Fairly sure the next line tops ugliness of visualbasic
+                var derHex = derData.map(function(x) {return ("0"+x.toString(16)).substr(-2);}).join("");
+                derCerts.push(derHex);
+		//dump("derHex:\n" + derHex + "\n");
+        } //for
+	var tlsa = document.getElementById("dane-tlsa-plugin");
+	var policy = this.ALLOW_TYPE_01 | this.ALLOW_TYPE_23;
+        var protocol = "tcp";
+    	// Create variable to pass options
+	    var c = dnssecExtNPAPIConst;
+	    var options = 0;
+	    if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+        var daneMatch = tlsa.TLSAValidate(derCerts, len, options, "",  uri, port, protocol, policy);
+        dump("DANE: https://" + uri + " : " + daneMatch[0] +"\n"); 
+	tlsaExtHandler.setSecurityState(daneMatch[0]);
 
+	//tlsa.TLSACacheFree();
+        //dump("dercer " + daneMatch.derCert + ", pemCert " + daneMatch.pemCert + "\n");
+        //dump("tlsa " + daneMatch.tlsa + "\n");
+	dump("DANE: --- TLSA validation end ---\n");
+	return daneMatch[0];
+  }
 }
 
-
-}
