@@ -18,7 +18,7 @@ more details.
 You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
-
+/*
 var tlsaValidator = {
 
  overrideService: Components.classes["@mozilla.org/security/certoverride;1"]
@@ -194,7 +194,6 @@ check_tlsa2: function (uri,port){
 	var cert = this.getCertificate(window.gBrowser);
     	if(!cert) {
 	  dump("DANE: No certificate!!!\n");
-      	  return;
         }
 	var state = window.gBrowser.securityUI.state;
 	var derCerts = new Array();
@@ -221,6 +220,7 @@ check_tlsa2: function (uri,port){
 	    var c = dnssecExtNPAPIConst;
 	    var options = 0;
 	    if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+	dump("DANE: https://" + uri + " : " + len +"\n"); 
         var daneMatch = tlsa.TLSAValidate(derCerts, len, options, "",  uri, port, protocol, policy);
         dump("DANE: https://" + uri + " : " + daneMatch[0] +"\n"); 
 	tlsaExtHandler.setSecurityState(daneMatch[0]);
@@ -232,4 +232,4 @@ check_tlsa2: function (uri,port){
 	return daneMatch[0];
   }
 }
-
+*/

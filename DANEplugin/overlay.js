@@ -26,6 +26,240 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 window.addEventListener("load", function() { dnssecExtension.init(); }, false);
 window.addEventListener("unload", function() { dnssecExtension.uninit(); }, false);
 
+var tlsaValidator = {
+
+ overrideService: Components.classes["@mozilla.org/security/certoverride;1"]
+					.getService(Components.interfaces.nsICertOverrideService),
+          
+  state : {
+      STATE_IS_BROKEN : 
+	      Components.interfaces.nsIWebProgressListener.STATE_IS_BROKEN,
+      STATE_IS_INSECURE :
+	      Components.interfaces.nsIWebProgressListener.STATE_IS_INSECURE,
+      STATE_IS_SECURE :
+	      Components.interfaces.nsIWebProgressListener.STATE_IS_SECURE
+  },
+
+
+
+    ALLOW_TYPE_01: 1,
+    ALLOW_TYPE_23: 2,
+
+
+observe : function(aSubject, aTopic, aData) {
+dump("ccccccccccccccccccc");  
+
+    aSubject.QueryInterface(Components.interfaces.nsIHttpChannel);
+      aSubject.cancel(Components.results.NS_BINDING_ABORTED);
+},
+
+
+
+
+
+  
+  //gets valid or invalid certificate used by the browser
+  getCertificate: function(browser) {
+
+    var uri = browser.currentURI;
+    var ui = browser.securityUI;
+    var cert = this.get_valid_cert(ui);
+    if(!cert){
+      cert = this.get_invalid_cert(uri);
+    }
+
+    if(!cert) {
+      return null;
+    }
+    return cert;
+  },
+
+
+  // gets current certificate, if it PASSED the browser check 
+  get_valid_cert: function(ui) {
+    try { 
+      ui.QueryInterface(Components.interfaces.nsISSLStatusProvider); 
+ 	dump("dffffffffffffff" + ui.SSLStatus + "\n");
+
+      if(!ui.SSLStatus) 
+	      return null; 
+	dump("dffffffffffffff" + ui.SSLStatus.serverCert + "\n");
+      return ui.SSLStatus.serverCert; 
+    }
+    catch (e) {
+      return null;
+    }
+  },
+  
+  // gets current certificate, if it FAILED the security check
+  get_invalid_cert: function(uri) {
+    var gSSLStatus = this.get_invalid_cert_SSLStatus(uri);
+		if(!gSSLStatus){
+			return null;
+		}
+		return gSSLStatus.QueryInterface(Components.interfaces.nsISSLStatus)
+				.serverCert;
+  },
+  
+  get_invalid_cert_SSLStatus: function(uri) {
+    var recentCertsSvc = 
+		Components.classes["@mozilla.org/security/recentbadcerts;1"]
+			.getService(Components.interfaces.nsIRecentBadCertsService);
+		if (!recentCertsSvc)
+			return null;
+
+		var port = (uri.port == -1) ? 443 : uri.port;  
+
+		var hostWithPort = uri.host + ":" + port;
+		var gSSLStatus = recentCertsSvc.getRecentBadCert(hostWithPort);
+		if (!gSSLStatus)
+			return null;
+		return gSSLStatus;
+  },
+  
+  //Override the certificate as trusted
+  do_override: function(browser, cert) { 
+    var uri = browser.currentURI;
+        
+    //Get SSL status (untrusted flags)
+    var gSSLStatus = this.get_invalid_cert_SSLStatus(uri);
+    if(gSSLStatus == null) { 
+	    return false; 
+    } 
+    var flags = 0;
+    if(gSSLStatus.isUntrusted)
+	    flags |= this.overrideService.ERROR_UNTRUSTED;
+    if(gSSLStatus.isDomainMismatch)
+	    flags |= this.overrideService.ERROR_MISMATCH;
+    if(gSSLStatus.isNotValidAtThisTime)
+	    flags |= this.overrideService.ERROR_TIME;
+    //override the certificate trust
+    this.overrideService.clearValidityOverride(uri.asciiHost, uri.port);
+    this.overrideService.rememberValidityOverride(uri.asciiHost, uri.port, cert, flags, true);
+
+    setTimeout(function (){ browser.loadURIWithFlags(uri.spec, flags);}, 25);
+  },
+
+     // check if URI had an untrusted cert and return the status
+getInvalidCertStatus: function (uri){
+            var recentCertsSvc = 
+            Components.classes["@mozilla.org/security/recentbadcerts;1"]
+                .getService(Components.interfaces.nsIRecentBadCertsService);
+            if (!recentCertsSvc)
+                return null;
+
+            var port = (uri.port == -1) ? 443 : uri.port;  
+
+            var hostWithPort = uri.host + ":" + port;
+            var gSSLStatus = recentCertsSvc.getRecentBadCert(hostWithPort);
+            if (!gSSLStatus)
+                return null;
+            return gSSLStatus;
+},
+
+
+check_tlsa: function (uri,port){
+	dump("DANE: --- TLSA validation start ---\n");	
+	var cert = this.getCertificate(window.gBrowser);
+    	if(!cert) {
+	  dump("DANE: No certificate!!!\n");
+      	  return;
+        }
+	var state = window.gBrowser.securityUI.state;
+	var derCerts = new Array();
+	var chain = cert.getChain();
+	//dump("DANE: chain is\n" + chain +"\n");
+        var len = chain.length;
+        for (var i = 0; i < chain.length; i++) {
+		//dump(i + "\n");   
+                var cert = chain.queryElementAt(i, Components.interfaces.nsIX509Cert);
+		//dump("DANE: Cert is\n" + cert +"\n");
+                var derData = cert.getRawDER({});
+		//dump("DANE: derData is\n" + derData +"\n");
+                // derData is Blob, can't pass it as Blob, can't pass it as
+                // string because of Unicode.
+                // Fairly sure the next line tops ugliness of visualbasic
+                var derHex = derData.map(function(x) {return ("0"+x.toString(16)).substr(-2);}).join("");
+                derCerts.push(derHex);
+		//dump("derHex:\n" + derHex + "\n");
+        } //for
+	var tlsa = document.getElementById("dane-tlsa-plugin");
+	var policy = this.ALLOW_TYPE_01 | this.ALLOW_TYPE_23;
+        var protocol = "tcp";
+    	// Create variable to pass options
+	    var c = dnssecExtNPAPIConst;
+	    var options = 0;
+	    if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+        var daneMatch = tlsa.TLSAValidate(derCerts, len, options, "",  uri.asciiHost, port, protocol, policy);
+        dump("DANE: https://" + uri.asciiHost + " : " + daneMatch[0] +"\n"); 
+	tlsaExtHandler.setSecurityState(daneMatch[0]);
+
+	//tlsa.TLSACacheFree();
+        //dump("dercer " + daneMatch.derCert + ", pemCert " + daneMatch.pemCert + "\n");
+        //dump("tlsa " + daneMatch.tlsa + "\n");
+	dump("DANE: --- TLSA validation end ---\n");
+	return daneMatch[0];
+  },
+
+check_tlsa2: function (aRequest,uri,port){
+	dump("DANE: --- TLSA validation start ---\n");
+	var state = window.gBrowser.securityUI.state;
+		
+	dump("DANE: STATE is ::" + state +"\n");
+	
+	var len;
+	var derCerts = new Array();
+	var cert = this.getCertificate(window.gBrowser);
+    	if(!cert) {
+	  dump("DANE: No certificate!!!\n");
+	  len = 0;
+          derCerts.push("XXX");
+ 	
+        }
+	else {
+	var state = window.gBrowser.securityUI.state;
+	var chain = cert.getChain();
+	//dump("DANE: chain is\n" + chain +"\n");
+        len = chain.length;
+        for (var i = 0; i < chain.length; i++) {
+		//dump(i + "\n");   
+                var cert = chain.queryElementAt(i, Components.interfaces.nsIX509Cert);
+		//dump("DANE: Cert is\n" + cert +"\n");
+                var derData = cert.getRawDER({});
+		//dump("DANE: derData is\n" + derData +"\n");
+                // derData is Blob, can't pass it as Blob, can't pass it as
+                // string because of Unicode.
+                // Fairly sure the next line tops ugliness of visualbasic
+                var derHex = derData.map(function(x) {return ("0"+x.toString(16)).substr(-2);}).join("");
+                derCerts.push(derHex);
+		//dump("derHex:\n" + derHex + "\n");
+        } //for
+	}
+
+	var tlsa = document.getElementById("dane-tlsa-plugin");
+	var policy = this.ALLOW_TYPE_01 | this.ALLOW_TYPE_23;
+        var protocol = "tcp";
+    	// Create variable to pass options
+	    var c = dnssecExtNPAPIConst;
+	    var options = 0;
+	    if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+	dump("DANE: https://" + uri + " : " + len +"\n"); 
+        var daneMatch = tlsa.TLSAValidate(derCerts, len, options, "",  uri, port, protocol, policy);
+        dump("DANE: https://" + uri + " : " + daneMatch[0] +"\n"); 
+	tlsaExtHandler.setSecurityState(daneMatch[0]);
+
+	//tlsa.TLSACacheFree();
+        //dump("dercer " + daneMatch.derCert + ", pemCert " + daneMatch.pemCert + "\n");
+        //dump("tlsa " + daneMatch.tlsa + "\n");
+	dump("DANE: --- TLSA validation end ---\n");
+	return daneMatch[0];
+    
+  }
+};
+
+
+
+
 var httpRequestObserver =
 {
   observe: function(subject, topic, data)
@@ -40,7 +274,7 @@ var httpRequestObserver =
       //httpChannel.setRequestHeader("X-Hello", "World", false);
    //var tlsa = tlsaValidator.check_tlsa("www.nic.cz","443");
    //dump(tlsa + "++++++++++++++\n");
-   //dump("++ " + url + " ++ " + topic + " ++ " + data + " ++\n");
+   dump("++ " + subject + " ++ " + topic + " ++ " + data + " ++\n");
    //subject.cancel(Components.results.NS_BINDING_ABORTED);
   //alert("x"); 
 
@@ -67,34 +301,54 @@ var httpRequestObserver =
 var dnssecExtUrlBarListener = {
   onLocationChange: function(aWebProgress, aRequest, aLocationURI)
   {
-    //dump('Event: onLocationChange\n');
+
     var host = dnssecExtension.processNewURL(aLocationURI);
+
+    var scheme = aLocationURI.scheme;             // Get URI scheme
+    var  asciiHost = aLocationURI.asciiHost;       // Get punycoded hostname
+    //var  utf8Host = aLocationURI.host;             // Get UTF-8 encoded hostname
+
+
     dump("+++ " + host + " +++\n");
-    if (host != undefined) {
-    var tlsa = tlsaValidator.check_tlsa2(host,"443");
-    tlsaExtHandler.setSecurityState(tlsa);    
-    if (tlsa <= -6) aRequest.cancel(Components.results.NS_BINDING_ABORTED);
-    }
- 
+    var tlsa = -4;
+    if (host != undefined) {  
+	if (scheme=="https") { 
+		dump('Connection is https...\n');
+		tlsa = tlsaValidator.check_tlsa2(aRequest,host,"443");
+	}
+	else { 
+	    dump('Connection is NOT https...\n');
+	     tlsa = -5;
+        }
+	dump("DANE: Return >>> " + tlsa + '\n');
+    tlsaExtHandler.setSecurityState(tlsa);
+	
+    dump(" ----------------------------- "+ tlsa +"\n");
+    if (tlsa <= -8 || tlsa == -6 ) if (aRequest) aRequest.cancel(Components.results.NS_BINDING_ABORTED);
+   }
+
     //aRequest.cancel(NS_BINDING_ABORTED);
   },
   onSecurityChange: function(aWebProgress, aRequest, aState)
   {
-    //dump('Event: onSecurityChange\n');
+    dump('Event: onSecurityChange\n');
+    dump(aState + '\n');
+	
+
   },
   onStateChange: function(aWebProgress, aRequest, aStateFlags, aStatus)
   {
-    //dump('Event: onStateChange\n');
+    dump('Event: onStateChange\n');
   },
   onProgressChange: function(aWebProgress, aRequest,
                              aCurSelfProgress, aMaxSelfProgress,
                              aCurTotalProgress, aMaxTotalProgress)
   {
-    //dump('Event: onProgressChange\n');
+    dump('Event: onProgressChange\n');
   },
   onStatusChange: function(aWebProgress, aRequest, aStatus, aMessage)
   {
-    //dump('Event: onStatusChange\n');
+    dump('Event: onStatusChange\n');
   }
 };
 
@@ -483,7 +737,9 @@ var dnssecExtResolver = {
     }	
 	res=restmp;	
     }//if
-		
+
+
+
     // Set appropriate state if host name does not changed
     // during resolving process (tab has not been switched)
     if (dn == gBrowser.currentURI.asciiHost)
@@ -565,6 +821,7 @@ var dnssecExtResolver = {
     dnssecExtPrefs.setBool("resolvingactive", false);
     if (ext.debugOutput)
       dump(ext.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
+    
   },
 
   //*****************************************************
