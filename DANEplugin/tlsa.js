@@ -18,7 +18,7 @@ more details.
 You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
-/*
+
 var tlsaValidator = {
 
  overrideService: Components.classes["@mozilla.org/security/certoverride;1"]
@@ -33,23 +33,56 @@ var tlsaValidator = {
 	      Components.interfaces.nsIWebProgressListener.STATE_IS_SECURE
   },
 
-
-
     ALLOW_TYPE_01: 1,
     ALLOW_TYPE_23: 2,
+    DANE_DEBUG_PRE: "DANE: ",
+    DANE_DEBUG_POST: "\n",
 
+  processNewURL: function(aRequest, aLocationURI) {
+    var scheme = null;
+    var asciiHost = null;
 
-observe : function(aSubject, aTopic, aData) {
-dump("ccccccccccccccccccc");  
+    scheme = aLocationURI.scheme;             // Get URI scheme
+    asciiHost = aLocationURI.asciiHost;       // Get punycoded hostname
 
-    aSubject.QueryInterface(Components.interfaces.nsIHttpChannel);
-      aSubject.cancel(Components.results.NS_BINDING_ABORTED);
-},
+    dump(this.DANE_DEBUG_PRE + 'Scheme: "' + scheme + '"; ' + 'ASCII domain name: "' + asciiHost + '"'); 
 
+    if (scheme == 'chrome' ||                   // Eliminate chrome scheme
+        asciiHost == null ||
+	asciiHost == 'about' ||
+        asciiHost == '' ||                      // Empty string
+        asciiHost.indexOf("\\") != -1 ||        // Eliminate addr containing '\'
+        asciiHost.indexOf(":") != -1 ||         // Eliminate IPv6 addr notation
+        asciiHost.search(/[A-Za-z]/) == -1) {   // Eliminate IPv4 addr notation
 
+     dump(' ...invalid\n');
 
+      // Set inaction mode (no icon)
+      tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_INACTION);
+      return;
 
+    // Eliminate duplicated queries
+    } else if (asciiHost == this.oldAsciiHost) {
+      dump(' ...duplicated\n');
+      return;
+    }
 
+  
+    dump(' ...valid\n');
+               
+    if (!aLocationURI || scheme.toLowerCase() != "https") {
+     dump(this.DANE_DEBUG_PRE + "Connection is NOT secured, validation stop" + this.DANE_DEBUG_POST);
+     tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_NO_HTTPS);
+     return -5;
+    } 
+    else {
+	var tlsa = -4;
+        dump(this.DANE_DEBUG_PRE + "Connection is secured (https)" + this.DANE_DEBUG_POST);
+	tlsa = this.check_tlsa(asciiHost,"443");
+	return tlsa;
+    }
+	
+  },
   
   //gets valid or invalid certificate used by the browser
   getCertificate: function(browser) {
@@ -146,54 +179,16 @@ getInvalidCertStatus: function (uri){
             return gSSLStatus;
 },
 
-
 check_tlsa: function (uri,port){
-	dump("DANE: --- TLSA validation start ---\n");
-	var cert = this.getCertificate(window.gBrowser);
-    	if(!cert) {
-	  dump("DANE: No certificate!!!\n");
-      	  return;
-        }
-	var state = window.gBrowser.securityUI.state;
-	var derCerts = new Array();
-	var chain = cert.getChain();
-	//dump("DANE: chain is\n" + chain +"\n");
-        var len = chain.length;
-        for (var i = 0; i < chain.length; i++) {
-		//dump(i + "\n");   
-                var cert = chain.queryElementAt(i, Components.interfaces.nsIX509Cert);
-		//dump("DANE: Cert is\n" + cert +"\n");
-                var derData = cert.getRawDER({});
-		//dump("DANE: derData is\n" + derData +"\n");
-                // derData is Blob, can't pass it as Blob, can't pass it as
-                // string because of Unicode.
-                // Fairly sure the next line tops ugliness of visualbasic
-                var derHex = derData.map(function(x) {return ("0"+x.toString(16)).substr(-2);}).join("");
-                derCerts.push(derHex);
-		//dump("derHex:\n" + derHex + "\n");
-        } //for
-	var tlsa = document.getElementById("dane-tlsa-plugin");
-	var policy = this.ALLOW_TYPE_01 | this.ALLOW_TYPE_23;
-        var protocol = "tcp";
-    	// Create variable to pass options
-	    var c = dnssecExtNPAPIConst;
-	    var options = 0;
-	    if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-        var daneMatch = tlsa.TLSAValidate(derCerts, len, options, "",  uri.asciiHost, port, protocol, policy);
-        dump("DANE: https://" + uri.asciiHost + " : " + daneMatch[0] +"\n"); 
-	tlsaExtHandler.setSecurityState(daneMatch[0]);
 
-	//tlsa.TLSACacheFree();
-        //dump("dercer " + daneMatch.derCert + ", pemCert " + daneMatch.pemCert + "\n");
-        //dump("tlsa " + daneMatch.tlsa + "\n");
-	dump("DANE: --- TLSA validation end ---\n");
-	return daneMatch[0];
-  },
-check_tlsa2: function (uri,port){
-	dump("DANE: --- TLSA validation start ---\n");
+	dump(this.DANE_DEBUG_PRE + "--- TLSA validation start ---" + this.DANE_DEBUG_POST); 
+         var c = dnssecExtNPAPIConst;
 	var cert = this.getCertificate(window.gBrowser);
     	if(!cert) {
-	  dump("DANE: No certificate!!!\n");
+	  dump(this.DANE_DEBUG_PRE + "No certificate!" + this.DANE_DEBUG_POST);
+	  tlsaExtHandler.setSecurityState(c.DANE_EXIT_NO_CERTCHAIN);
+  	  dump(this.DANE_DEBUG_PRE + "--- TLSA validation end ---" + this.DANE_DEBUG_POST); 
+	  return c.DANE_EXIT_NO_CERTCHAIN;
         }
 	var state = window.gBrowser.securityUI.state;
 	var derCerts = new Array();
@@ -217,19 +212,22 @@ check_tlsa2: function (uri,port){
 	var policy = this.ALLOW_TYPE_01 | this.ALLOW_TYPE_23;
         var protocol = "tcp";
     	// Create variable to pass options
-	    var c = dnssecExtNPAPIConst;
-	    var options = 0;
-	    if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-	dump("DANE: https://" + uri + " : " + len +"\n"); 
+
+        var options = 0;
+	//if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+	if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+        dump(this.DANE_DEBUG_PRE + "https://" + uri + "; certchain lenght: " + len + this.DANE_DEBUG_POST); 
         var daneMatch = tlsa.TLSAValidate(derCerts, len, options, "",  uri, port, protocol, policy);
-        dump("DANE: https://" + uri + " : " + daneMatch[0] +"\n"); 
+	dump(this.DANE_DEBUG_PRE + "For https://" + uri + " DANE return: " + daneMatch[0] + this.DANE_DEBUG_POST); 
+	
+    	if (daneMatch[0] <= -6) {
+ 	dump('DANE: https request for (' +aLocationURI.asciiHost+ ') was canceled!\n');
+	aRequest.cancel(Components.results.NS_BINDING_ABORTED);    
+    	}
+  	
 	tlsaExtHandler.setSecurityState(daneMatch[0]);
-
-	//tlsa.TLSACacheFree();
-        //dump("dercer " + daneMatch.derCert + ", pemCert " + daneMatch.pemCert + "\n");
-        //dump("tlsa " + daneMatch.tlsa + "\n");
-	dump("DANE: --- TLSA validation end ---\n");
+	dump(this.DANE_DEBUG_PRE + "--- TLSA validation end ---" + this.DANE_DEBUG_POST);
 	return daneMatch[0];
   }
 }
-*/
+
