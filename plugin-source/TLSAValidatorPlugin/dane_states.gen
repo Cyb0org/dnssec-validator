@@ -29,24 +29,25 @@ such a combination shall include the source code for the parts of
 OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
-  const short DANE_EXIT_NO_TLSA_RECORD			 = -1;
-  const short DANE_EXIT_RESOLVER_FAILED                  = -2; 
-  const short DANE_EXIT_DNSSEC_BOGUS			 = -3;
-  const short DANE_EXIT_DNSSEC_UNSECURED		 = -4;
-  const short DANE_EXIT_NO_HTTPS			 = -5;
-  const short DANE_EXIT_TLSA_PARAM_ERR			 = -6;
-  const short DANE_EXIT_NO_CERT_CHAIN			 = -7;
-
-  const short DANE_EXIT_VALIDATION_FALSE		 = 0;
-  const short DANE_EXIT_VALIDATION_FALSE_TYPE0		 = -10;
-  const short DANE_EXIT_VALIDATION_FALSE_TYPE1		 = -11;
-  const short DANE_EXIT_VALIDATION_FALSE_TYPE2		 = -12;
-  const short DANE_EXIT_VALIDATION_FALSE_TYPE3		 = -13;
-
   const short DANE_EXIT_VALIDATION_SUCCESS_TYPE0	 = 10;
   const short DANE_EXIT_VALIDATION_SUCCESS_TYPE1	 = 11;
   const short DANE_EXIT_VALIDATION_SUCCESS_TYPE2	 = 12;
   const short DANE_EXIT_VALIDATION_SUCCESS_TYPE3	 = 13;
+  const short DANE_EXIT_DNSSEC_SECURED			 = 1;
+  const short DANE_EXIT_VALIDATION_OFF 			 = 0;
+  const short DANE_EXIT_RESOLVER_FAILED      		 = -1;             
+  const short DANE_EXIT_NO_HTTPS			 = -2;
+  const short DANE_EXIT_NO_TLSA_RECORD			 = -3;
+  const short DANE_EXIT_DNSSEC_UNSECURED		 = -4;
+  const short DANE_EXIT_DNSSEC_BOGUS			 = -5; 
+  const short DANE_EXIT_NO_CERT_CHAIN			 = -6;
+  const short DANE_EXIT_CERT_ERROR			 = -7;
+  const short DANE_EXIT_TLSA_PARAM_ERR			 = -8;
+  const short DANE_EXIT_VALIDATION_FALSE		 = -9;
+  const short DANE_EXIT_VALIDATION_FALSE_TYPE0		 = -10;
+  const short DANE_EXIT_VALIDATION_FALSE_TYPE1		 = -11;
+  const short DANE_EXIT_VALIDATION_FALSE_TYPE2		 = -12;
+  const short DANE_EXIT_VALIDATION_FALSE_TYPE3		 = -13;
 
   const unsigned short DANE_INPUT_FLAG_DEBUGOUTPUT       = 1; /* debug output */
   const unsigned short DANE_INPUT_FLAG_USEFWD            = 2; /* use forvarder/resolver */

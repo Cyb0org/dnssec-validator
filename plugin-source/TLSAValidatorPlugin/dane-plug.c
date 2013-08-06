@@ -912,28 +912,26 @@ int TLSAValidate(struct tlsa_store_head *tlsa_list, struct cert_store_head *cert
 // ----------------------------------------------------------------------------
 int get_tlsa_record(struct tlsa_store_head *tlsa_list, struct ub_result *result, char* domain)
 {	
-	int i;
-        int exitcode = 0;
-	uint8_t sec_status = 0;
+   int i;
+   int exitcode = DANE_EXIT_RESOLVER_FAILED;
+   uint8_t sec_status = 0;
 
+
+   /* show security status */
+   if(result->secure) {
+     sec_status = 1;
 	/* show tlsa_first result */
 	if(result->havedata) {
 
-		/* show security status */
-		if(result->secure) {
-			sec_status = 1;
-		} else if(result->bogus) {
-			sec_status = 2;
-		} else 	{
-    			sec_status = 0;
-	        }
+		if (debug) printf(DEBUG_PREFIX " Domain is secure...check tlsa record...\n");
 
                 ldns_pkt *packet;
                 ldns_status parse_status = ldns_wire2pkt(&packet, (uint8_t*)(result->answer_packet), result->answer_len);
                 
                 if (parse_status != LDNS_STATUS_OK) {
                        if (debug) printf(DEBUG_PREFIX "Failed to parse response packet\n");
-                        return exitcode;
+			ub_resolve_free(result);
+                        return DANE_EXIT_RESOLVER_FAILED;
                 }
                 
                 ldns_rr_list *rrs = ldns_pkt_rr_list_by_type(packet, LDNS_RR_TYPE_TLSA, LDNS_SECTION_ANSWER);		
@@ -945,7 +943,8 @@ int get_tlsa_record(struct tlsa_store_head *tlsa_list, struct ub_result *result,
                         // instead of 1 RDF in ldns 1.6.13.
                         if (ldns_rr_rd_count(rr) < 4) {
                                if (debug) printf(DEBUG_PREFIX "RR %d hasn't enough fields\n", i);
-                                return exitcode;
+				ub_resolve_free(result);
+                                return DANE_EXIT_RESOLVER_FAILED;
                         }
 
                         ldns_rdf *rdf_cert_usage    = ldns_rr_rdf(rr, 0),
@@ -959,7 +958,8 @@ int get_tlsa_record(struct tlsa_store_head *tlsa_list, struct ub_result *result,
                             ldns_rdf_size(rdf_association)      < 0
                             ) {
                                 if (debug) printf(DEBUG_PREFIX "Improperly formatted TLSA RR %d\n", i);
-                                return exitcode;
+				ub_resolve_free(result);
+                                return DANE_EXIT_RESOLVER_FAILED;
                         }
 
                         uint8_t cert_usage, selector, matching_type;
@@ -981,10 +981,21 @@ int get_tlsa_record(struct tlsa_store_head *tlsa_list, struct ub_result *result,
                 if (rrs) ldns_rr_list_free(rrs);
         } else {
                 if (debug) printf(DEBUG_PREFIX "Unbound haven't received any data for %s. ", domain);
+		exitcode = DANE_EXIT_NO_TLSA_RECORD;
         }
-	//print_tlsalist(tlsa_first);
-	ub_resolve_free(result);
-	return exitcode;
+    } else if(result->bogus) {
+	sec_status = 2;
+	exitcode = DANE_EXIT_DNSSEC_BOGUS;
+	if (debug) printf(DEBUG_PREFIX "Domain is bogus: %s \n", result->why_bogus);
+    } else {
+    	sec_status = 0;
+	exitcode = DANE_EXIT_DNSSEC_UNSECURED;
+	if (debug) printf(DEBUG_PREFIX " Domain is insecure...\n");
+    }
+
+   //print_tlsalist(tlsa_first);
+   ub_resolve_free(result);
+   return exitcode;
 }
 
 
@@ -1187,7 +1198,10 @@ short CheckDane(char* certchain[], int certcount, const uint16_t options, char *
 
      // get TLSA records from response
      tlsa_ret = get_tlsa_record(&tlsa_list, result, domain);
-     if (tlsa_ret==0) return DANE_EXIT_NO_TLSA_RECORD;
+     if (tlsa_ret==DANE_EXIT_DNSSEC_UNSECURED) return DANE_EXIT_DNSSEC_UNSECURED;
+     else if (tlsa_ret==DANE_EXIT_DNSSEC_BOGUS) return DANE_EXIT_DNSSEC_BOGUS;
+     else if (tlsa_ret==DANE_EXIT_NO_TLSA_RECORD) return DANE_EXIT_NO_TLSA_RECORD;
+     else if (tlsa_ret==DANE_EXIT_RESOLVER_FAILED) return DANE_EXIT_RESOLVER_FAILED;
 
      if (debug) print_tlsalist(&tlsa_list);
 

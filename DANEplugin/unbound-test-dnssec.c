@@ -277,7 +277,7 @@ int TLSAresolve(char* domain)
 		return 1;
 	}
 
-
+/*
 	if((retval=ub_ctx_set_option(ctx, (char*)"do-udp:", (char*)"no")) != 0) {
 		printf("Set port: %s\n", ub_strerror(retval));
 		return 1;
@@ -288,7 +288,7 @@ int TLSAresolve(char* domain)
 		return 1;
 	}
 
-
+*/
 
 	/* read public keys for DNSSEC verification */
 	if( (retval=ub_ctx_add_ta(ctx, ".   IN DS   19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32F24E8FB5")) != 0) {
@@ -322,12 +322,7 @@ int TLSAresolve(char* domain)
 		/* show security status */
 		if(result->secure) {
 			sec_status = 1;
-		} else if(result->bogus) {
-			sec_status = 2;
-		} else 	{
-    			sec_status = 0;
-	        }
-
+	
                 ldns_pkt *packet;
                 ldns_status parse_status = ldns_wire2pkt(&packet, (uint8_t*)(result->answer_packet), result->answer_len);
                 
@@ -386,6 +381,13 @@ int TLSAresolve(char* domain)
                 printf("%s: we haven't received any data. ", domain);
                 //return 1;
         }
+	} else if(result->bogus) {
+			sec_status = 2;
+			exitcode = -1000;
+		} else 	{
+    			sec_status = 0;
+			exitcode = 1000;
+	        }
 
 	ub_resolve_free(result);
 	ub_ctx_delete(ctx);
@@ -402,7 +404,7 @@ int main(int argc, char **argv)
 	for (i=1; i<=argc; i++) {	
 	x=TLSAresolve(argv[i]);	
 	} // for
-
+	printf("result: %i \n",x);
 	
 	print_tlsalist(first);
 	TLSAValidate(first);

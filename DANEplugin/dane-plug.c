@@ -835,17 +835,15 @@ int get_tlsa_record(struct tlsa_store_head *tlsa_list, struct ub_result *result,
         int exitcode = 0;
 	uint8_t sec_status = 0;
 
+
+	if(result->secure) {
+			sec_status = 1;
+
 	/* show tlsa_first result */
 	if(result->havedata) {
 
 		/* show security status */
-		if(result->secure) {
-			sec_status = 1;
-		} else if(result->bogus) {
-			sec_status = 2;
-		} else 	{
-    			sec_status = 0;
-	        }
+
 
                 ldns_pkt *packet;
                 ldns_status parse_status = ldns_wire2pkt(&packet, (uint8_t*)(result->answer_packet), result->answer_len);
@@ -903,6 +901,12 @@ int get_tlsa_record(struct tlsa_store_head *tlsa_list, struct ub_result *result,
                 //return 1;
         }
 	//print_tlsalist(tlsa_first);
+
+	} else if(result->bogus) {
+			sec_status = 2;
+		} else 	{
+    			sec_status = 0;
+	        }
 	ub_resolve_free(result);
 	return exitcode;
 }

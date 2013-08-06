@@ -26,40 +26,40 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 window.addEventListener("load", function() { dnssecExtension.init(); }, false);
 window.addEventListener("unload", function() { dnssecExtension.uninit(); }, false);
 
+
 var dnssecExtUrlBarListener = {
 
   onLocationChange: function(aWebProgress, aRequest, aLocationURI)
   {
-    dump('Browser: onLocationChange()\n');
+    //dump('Browser: onLocationChange()\n');
     var host = dnssecExtension.processNewURL(aLocationURI);
-    var tlsares = tlsaValidator.processNewURL(aRequest, aLocationURI);     	
+    //var tlsares = tlsaValidator.processNewURL(aRequest, aLocationURI);     	
   },
 
   onSecurityChange: function(aWebProgress, aRequest, aState)
   {
-    dump('Browser: onSecurityChange(): ' +aState + '\n');
-    var uri = null;
-    uri = window.gBrowser.currentURI;
-    var tlsares = tlsaValidator.processNewURL(aRequest, uri);
+    //dump('Browser: onSecurityChange(): ' +aState + '\n');
+    //var uri = null;
+    //uri = window.gBrowser.currentURI;
+    //var tlsares = tlsaValidator.processNewURL(aRequest, uri);
   },
 
   onStateChange: function(aWebProgress, aRequest, aStateFlags, aStatus)
   {
-    //dump('Event: onStateChange\n');
+    //dump('Browser: onStateChange\n');
   },
 
   onProgressChange: function(aWebProgress, aRequest,
                              aCurSelfProgress, aMaxSelfProgress,
                              aCurTotalProgress, aMaxTotalProgress)
   {
-    //dump('Event: onProgressChange\n');
+    //dump('Browser: onProgressChange()\n');
   },
   onStatusChange: function(aWebProgress, aRequest, aStatus, aMessage)
   {
-    //dump('Event: onStatusChange\n');
+    //dump('Browser: onStatusChange()\n');
   }
 };
-
 
 /* Observe preference changes */
 var dnssecExtPrefObserver = {
@@ -115,6 +115,7 @@ var dnssecExtension = {
   asyncResolve: false,
   timer: null,
   oldAsciiHost: null,
+  //oldAsciiHost2: null,
 
   init: function() {
 
@@ -138,6 +139,9 @@ var dnssecExtension = {
     //httpRequestObserver.register();
     //this.inittest();
      
+    //this.registerObserver("http-on-examine-response");
+   //this.registerObserver("http-on-modify-request");
+   //this.registerObserver("http-on-examine-cached-response");
     // Create the timer
     this.timer = Components.classes["@mozilla.org/timer;1"]
                  .createInstance(Components.interfaces.nsITimer);
@@ -155,6 +159,8 @@ var dnssecExtension = {
 
     // Listen for webpage events
     gBrowser.addProgressListener(dnssecExtUrlBarListener);
+    //gBrowser.addTabsProgressListener(dnssecExtUrlBarListener2);
+    //gBrowser.addEventListener("load", examplePageLoad, true);
 
     if (this.debugOutput)
       dump(this.debugPrefix + 'End of add-on init\n');
@@ -202,10 +208,16 @@ var dnssecExtension = {
       dump(this.debugPrefix + 'Start of add-on uninit\n');
 
     gBrowser.removeProgressListener(dnssecExtUrlBarListener);
+    //gBrowser.removeTabsProgressListener(dnssecExtUrlBarListener2);
+//gBrowser.removeEventListener("load", examplePageLoad, true);
+
 
     // Unregister preferences observer
     dnssecExtPrefObserver.unregister();
-    
+
+    //this.unregisterObserver("http-on-modify-request");
+ //this.unregisterObserver("http-on-examine-response");
+ //this.unregisterObserver("http-on-examine-cached-response");
     //httpRequestObserver.unregister();
     // Reset resolving flag
     dnssecExtPrefs.setBool("resolvingactive", false);
@@ -219,6 +231,82 @@ var dnssecExtension = {
     if (this.debugOutput)
       dump(this.debugPrefix + 'End of add-on uninit\n');
   },
+
+    registerObserver: function(topic) {
+	var observerService = Components.classes["@mozilla.org/observer-service;1"]
+	  .getService(Components.interfaces.nsIObserverService);
+	observerService.addObserver(this, topic, false);
+    },
+
+    unregisterObserver: function(topic) {
+	var observerService = Components.classes["@mozilla.org/observer-service;1"]
+	  .getService(Components.interfaces.nsIObserverService);
+	observerService.removeObserver(this, topic);
+    },
+/*
+    observe: function(channel, topic, data) {
+
+
+
+     if (topic == "http-on-examine-response") {
+	
+	var Cc = Components.classes, Ci = Components.interfaces;
+	channel.QueryInterface(Ci.nsIHttpChannel);
+	var host = channel.URI.hostPort;
+	var url = channel.URI.spec;
+	var currentURL = gBrowser.currentURI.hostPort;
+	dump('---observe: function('+url+', '+topic+', '+host+', '+data+')\n');
+	
+
+	var si = channel.securityInfo;
+	if (!si) return;
+	
+	var nc = channel.notificationCallbacks;
+	if (!nc && channel.loadGroup)
+	  nc = channel.loadGroup.notificationCallbacks;
+	if (!nc) return;
+
+	try {
+	    var win = nc.getInterface(Ci.nsIDOMWindow);
+	} catch (e) {
+	    return; // no window for e.g. favicons
+	}
+	if (!win.document) return;
+
+	var browser;
+	// thunderbird has no gBrowser
+	if (typeof gBrowser != "undefined") {
+	    browser = gBrowser.getBrowserForDocument(win.top.document);
+	    // We get notifications for a request in all of the open windows
+	    // but browser is set only in the window the request is originated from,
+	    // browser is null for favicons too.
+	    if (!browser) return;
+	}
+
+	dump('---'+this.oldAsciiHost2+'-----'+host+'-----\n');
+ 	if (this.oldAsciiHost2 != host) {
+		this.oldAsciiHost2 = host;
+	   	si.QueryInterface(Ci.nsISSLStatusProvider);
+		var st = si.SSLStatus;
+		if (!st) return;
+		dump('---'+currentURL+'-----'+host+'-----\n');
+		//if (host == currentURL) {
+			st.QueryInterface(Ci.nsISSLStatus);
+			var cert = st.serverCert;
+			if (!cert) return;
+		var tlsares = tlsaValidator.check_tlsa2(channel, cert, browser, host, "443");
+		////this.certCheck(browser, cert, channel);
+		//}
+	}
+	dump('---observe: end\n');
+      }
+    },
+
+*/
+
+
+
+
 
   processNewURL: function(aLocationURI) {
     var scheme = null;
@@ -245,7 +333,7 @@ var dnssecExtension = {
         asciiHost.search(/[A-Za-z]/) == -1) {   // Eliminate IPv4 addr notation
 
       if (this.debugOutput) dump(' ...invalid\n');
-
+      this.oldAsciiHost = null;
       // Set inaction mode (no icon)
       dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_INACTION);
       //tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_INACTION);
@@ -901,7 +989,7 @@ var dnssecExtHandler = {
 
     // Set action state
     this.setMode(this.DNSSEC_MODE_ACTION);
-    tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_ACTION);
+    //tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_ACTION);
     // Detect if any resolving is already running...
     if (dnssecExtPrefs.getBool("resolvingactive")) {
 
@@ -941,7 +1029,7 @@ var dnssecExtHandler = {
 //    this.setMode(this.DNSSEC_MODE_ACTION);
 
     // Remember last host name to eliminate duplicated queries
-//    dnssecExtension.oldAsciiHost = asciiHost;
+    dnssecExtension.oldAsciiHost = asciiHost;
 
     this._asciiHostName = asciiHost;
     this._utf8HostName = utf8Host;
@@ -1197,479 +1285,5 @@ var dnssecExtHandler = {
   }
 }
 
-//*****************************************************************************
-//*****************************************************************************
-/* Utility class to handle manipulations of the TLSA indicators in the UI */
-//*****************************************************************************
-//*****************************************************************************
-var tlsaExtHandler = {
-  // DANE/TLSA MODE
-  DANE_MODE_INACTION 		: "dm_inaction",
-  DANE_MODE_VALIDATION_OFF   	: "dm_validationoff",
-  DANE_MODE_ACTION   		: "dm_action",
-  DANE_MODE_ERROR 		: "dm_error",
-  DANE_MODE_RESOLVER_FAILED     : "dm_rfesolverfailed",
-  DANE_MODE_DNSSEC_BOGUS	: "dm_dnssecbogus",
-  DANE_MODE_DNSSEC_UNSECURED	: "dm_dnssecunsecured",
-  DANE_MODE_NO_TLSA_RECORD	: "dm_notlsarecord",		
-  DANE_MODE_NO_CERT_CHAIN	: "dm_certchain",
-  DANE_MODE_TLSA_PARAM_WRONG	: "dm_tlsapramwrong",
-  DANE_MODE_NO_HTTPS		: "dm_nohttps",
-  DANE_MODE_VALIDATION_FALSE		: "dm_vf",
-  DANE_MODE_VALIDATION_FALSE_TYPE0	: "dm_vf0",
-  DANE_MODE_VALIDATION_FALSE_TYPE1	: "dm_vf1",
-  DANE_MODE_VALIDATION_FALSE_TYPE2	: "dm_vf2",
-  DANE_MODE_VALIDATION_FALSE_TYPE3	: "dm_vf3",
-  DANE_MODE_VALIDATION_SUCCESS_TYPE0	: "dm_vs0",
-  DANE_MODE_VALIDATION_SUCCESS_TYPE1	: "dm_vs1",
-  DANE_MODE_VALIDATION_SUCCESS_TYPE2	: "dm_vs2",
-  DANE_MODE_VALIDATION_SUCCESS_TYPE3	: "dm_vs3",
 
-  //DANE/TLSA tooltip	
-  DANE_TOOLTIP_VALIDATION_SUCCESS : "dmvsTooltip",
-  DANE_TOOLTIP_VALIDATION_FALSE : "dmvfTooltip",
-  DANE_TOOLTIP_ACTION          	: "dmaTooltip",
-  DANE_TOOLTIP_FAILED_RESOLVER  : "dmfsTooltip",
-  DANE_TOOLTIP_NO_TLSA_RECORD   : "dmntrTooltip",
-  DANE_TOOLTIP_NO_CERT_CHAIN    : "dmnccTooltip",
-  DANE_TOOLTIP_OFF	        : "dmoffTooltip",
-  DANE_TOOLTIP_NO_HTTPS	        : "dmnohttpsTooltip",
-  // Cache the most recent hostname seen in checkSecurity
-  _asciiHostName : null,
-  _utf8HostName : null,
-
-  valstate : -1,
-
-  get _tooltipLabel () {
-    delete this._stringBundle;
-    this._stringBundle = document.getElementById("dnssec-strings");
-
-    delete this._tooltipLabel;
-    this._tooltipLabel = {};
-    this._tooltipLabel[this.DANE_TOOLTIP_NO_HTTPS] =
-      this._stringBundle.getString("dane.tooltip.nohttps");
-    this._tooltipLabel[this.DANE_TOOLTIP_VALIDATION_SUCCESS] =
-      this._stringBundle.getString("dane.tooltip.success");
-    this._tooltipLabel[this.DANE_TOOLTIP_VALIDATION_FALSE] =
-      this._stringBundle.getString("dane.tooltip.false");
-    this._tooltipLabel[this.DANE_TOOLTIP_ACTION] =
-      this._stringBundle.getString("dane.tooltip.action");
-    this._tooltipLabel[this.DANE_TOOLTIP_FAILED_RESOLVER] =
-      this._stringBundle.getString("dane.tooltip.error");
-    this._tooltipLabel[this.DANE_TOOLTIP_NO_TLSA_RECORD] =
-      this._stringBundle.getString("dane.tooltip.notlsa");
-    this._tooltipLabel[this.DANE_TOOLTIP_NO_CERT_CHAIN ] =
-      this._stringBundle.getString("dane.tooltip.chain");
-    this._tooltipLabel[this.DANE_TOOLTIP_OFF] =
-      this._stringBundle.getString("dane.tooltip.off");
-    return this._tooltipLabel;
-  },
-
-  //set DANE security text
-  get _securityText () {
-    delete this._stringBundle;
-    this._stringBundle = document.getElementById("dnssec-strings");
-
-    delete this._securityText;
-    this._securityText = {};
-
-    this._securityText[this.DANE_MODE_ERROR] =
-      this._stringBundle.getString("dane.mode.error");
-    this._securityText[this.DANE_MODE_RESOLVER_FAILED] =
-      this._stringBundle.getString("dane.mode.resolver.failed");
-    this._securityText[this.DANE_MODE_DNSSEC_BOGUS] =
-      this._stringBundle.getString("dane.mode.dnssec.bogus");
-    this._securityText[this.DANE_MODE_DNSSEC_UNSECURED] =
-      this._stringBundle.getString("dane.mode.dnssec.unsecured");
-    this._securityText[this.DANE_MODE_NO_TLSA_RECORD] =
-      this._stringBundle.getString("dane.mode.no.tlsa.record");
-    this._securityText[this.DANE_MODE_NO_CERT_CHAIN] =
-      this._stringBundle.getString("dane.mode.no.cert.chain");
-    this._securityText[this.DANE_MODE_TLSA_PARAM_WRONG] =
-      this._stringBundle.getString("dane.mode.tlsa.param.wrong");
-    this._securityText[this.DANE_MODE_NO_HTTPS] =
-      this._stringBundle.getString("dane.mode.no.https");
-    this._securityText[this.DANE_MODE_VALIDATION_FALSE] =
-      this._stringBundle.getString("dane.mode.validation.false");
-    this._securityText[this.DANE_MODE_VALIDATION_FALSE_TYPE0] =
-      this._stringBundle.getString("dane.mode.validation.false.type0");
-    this._securityText[this.DANE_MODE_VALIDATION_FALSE_TYPE1] =
-      this._stringBundle.getString("dane.mode.validation.false.type1");
-    this._securityText[this.DANE_MODE_VALIDATION_FALSE_TYPE2] =
-      this._stringBundle.getString("dane.mode.validation.false.type2");
-    this._securityText[this.DANE_MODE_VALIDATION_FALSE_TYPE3] =
-      this._stringBundle.getString("dane.mode.validation.false.type3");
-    this._securityText[this.DANE_MODE_VALIDATION_SUCCESS_TYPE0] =
-      this._stringBundle.getString("dane.mode.validation.success.type0");
-    this._securityText[this.DANE_MODE_VALIDATION_SUCCESS_TYPE1] =
-      this._stringBundle.getString("dane.mode.validation.success.type1");
-    this._securityText[this.DANE_MODE_VALIDATION_SUCCESS_TYPE2] =
-      this._stringBundle.getString("dane.mode.validation.success.type2");
-    this._securityText[this.DANE_MODE_VALIDATION_SUCCESS_TYPE3] =
-      this._stringBundle.getString("dane.mode.validation.success.type3");
-    this._securityText[this.DANE_MODE_VALIDATION_OFF] =
-      this._stringBundle.getString("dane.mode.validation.off");
-    return this._securityText;
-  },
-
-  //set DANE security message detail
-  get _securityDetail () {
-    delete this._stringBundle;
-    this._stringBundle = document.getElementById("dnssec-strings");
-
-    delete this._securityDetail;
-    this._securityDetail = {};
-
-    this._securityDetail[this.DANE_MODE_ERROR] =
-      this._stringBundle.getString("dane.mode.error.detail");
-    this._securityDetail[this.DANE_MODE_RESOLVER_FAILED] =
-      this._stringBundle.getString("dane.mode.resolver.failed.detail");
-    this._securityDetail[this.DANE_MODE_DNSSEC_BOGUS] =
-      this._stringBundle.getString("dane.mode.dnssec.bogus.detail");
-    this._securityDetail[this.DANE_MODE_DNSSEC_UNSECURED] =
-      this._stringBundle.getString("dane.mode.dnssec.unsecured.detail");
-    this._securityDetail[this.DANE_MODE_NO_TLSA_RECORD] =
-      this._stringBundle.getString("dane.mode.no.tlsa.record.detail");
-    this._securityDetail[this.DANE_MODE_NO_CERT_CHAIN] =
-      this._stringBundle.getString("dane.mode.no.cert.chain.detail");
-    this._securityDetail[this.DANE_MODE_TLSA_PARAM_WRONG] =
-      this._stringBundle.getString("dane.mode.tlsa.param.wrong.detail");
-    this._securityDetail[this.DANE_MODE_NO_HTTPS] =
-      this._stringBundle.getString("dane.mode.no.https.detail");
-    this._securityDetail[this.DANE_MODE_VALIDATION_FALSE] =
-      this._stringBundle.getString("dane.mode.validation.false.detail");
-    this._securityDetail[this.DANE_MODE_VALIDATION_FALSE_TYPE0] =
-      this._stringBundle.getString("dane.mode.validation.false.type0.detail");
-    this._securityDetail[this.DANE_MODE_VALIDATION_FALSE_TYPE1] =
-      this._stringBundle.getString("dane.mode.validation.false.type1.detail");
-    this._securityDetail[this.DANE_MODE_VALIDATION_FALSE_TYPE2] =
-      this._stringBundle.getString("dane.mode.validation.false.type2.detail");
-    this._securityDetail[this.DANE_MODE_VALIDATION_FALSE_TYPE3] =
-      this._stringBundle.getString("dane.mode.validation.false.type3.detail");
-    this._securityDetail[this.DANE_MODE_VALIDATION_SUCCESS_TYPE0] =
-      this._stringBundle.getString("dane.mode.validation.success.type0.detail");
-    this._securityDetail[this.DANE_MODE_VALIDATION_SUCCESS_TYPE1] =
-      this._stringBundle.getString("dane.mode.validation.success.type1.detail");
-    this._securityDetail[this.DANE_MODE_VALIDATION_SUCCESS_TYPE2] =
-      this._stringBundle.getString("dane.mode.validation.success.type2.detail");
-    this._securityDetail[this.DANE_MODE_VALIDATION_SUCCESS_TYPE3] =
-      this._stringBundle.getString("dane.mode.validation.success.type3.detail");
-    this._securityDetail[this.DANE_MODE_VALIDATION_OFF] =
-      this._stringBundle.getString("dane.mode.validation.off.detail");
-    return this._securityDetail;
-  },
-
-  get _tlsaPopup () {
-    delete this._tlsaPopup;
-    return this._tlsaPopup = document.getElementById("tlsa-popup");
-  },
-  get _tlsaPopupfwd () {
-    delete this._tlsaPopupfwd;
-    return this._tlsaPopupfwd = document.getElementById("tlsa-popup-fwd");
-  },
-  get _tlsaBox () {
-    delete this._tlsaBox;
-    return this._tlsaBox = document.getElementById("tlsa-box");
-  },
-  get _tlsaPopupContentBox () {
-    delete this._tlsaPopupContentBox;
-    return this._tlsaPopupContentBox =
-      document.getElementById("tlsa-popup-content-box");
-  },
-  get _tlsaPopupContentBox2 () {
-    delete this._tlsaPopupContentBox2;
-    return this._tlsaPopupContentBox2 =
-      document.getElementById("tlsa-popup-content-box2");
-  },
-  get _tlsaPopupContentBox3 () {
-    delete this._tlsaPopupContentBox3;
-    return this._tlsaPopupContentBox3 =
-      document.getElementById("tlsa-popup-content-box3");
-  },
-  get _tlsaPopupContentBox4 () {
-    delete this._tlsaPopupContentBox4;
-    return this._tlsaPopupContentBox4 =
-      document.getElementById("tlsa-popup-content-box4");
-  },
-  get _tlsaPopupContentHost () {
-    delete this._tlsaPopupContentHost;
-    return this._tlsaPopupContentHost =
-      document.getElementById("tlsa-popup-content-host");
-  },
-  get _tlsaPopupSecLabel () {
-    delete this._tlsaPopupSecLabel;
-    return this._tlsaPopupSecLabel =
-      document.getElementById("tlsa-popup-security-text");
-  },
-  get _tlsaPopupSecLabel2 () {
-    delete this._tlsaPopupSecLabel2;
-    return this._tlsaPopupSecLabel2 =
-      document.getElementById("tlsa-popup-security-label");
-  },
-  get _tlsaPopupSecDetail () {
-    delete this._tlsaPopupSecDetail;
-    return this._tlsaPopupSecDetail =
-      document.getElementById("tlsa-popup-security-detail");
-  },
-  get _tlsaPopupfwdDetail () {
-    delete this._tlsaPopupfwdDetail;
-    return this._tlsaPopupfwdDetail =
-      document.getElementById("tlsa-popup-fwd-text");
-  },
-  get _tlsaPopupIpBrowser () {
-    delete this._tlsaPopupIpBrowser;
-    return this._tlsaPopupIpBrowser =
-      document.getElementById("tlsa-popup-ipbrowser-ip");
-  },
-  get _tlsaPopupIpValidator () {
-    delete this._tlsaPopupIpValidator;
-    return this._tlsaPopupIpValidator =
-      document.getElementById("tlsa-popup-ipvalidator-ip");
-  },
-  // Build out a cache of the elements that we need frequently
-  _cacheElements : function() {
-    delete this._tlsaBox;
-    this._tlsaBox = document.getElementById("tlsa-box");
-  },
-
-  // Set appropriate DANE security state
-  setSecurityState : function(state) {
-    var c = tlsaExtNPAPIConst;
-
-    switch (state) {
-	case c.DANE_EXIT_VALIDATION_OFF:
-		this.setMode(this.DANE_MODE_VALIDATION_OFF);
-		break;
- 	case c.DANE_EXIT_NO_TLSA_RECORD:
-		this.setMode(this.DANE_MODE_NO_TLSA_RECORD);
-		break;
-	case c.DANE_EXIT_RESOLVER_FAILED:
-		this.setMode(this.DANE_MODE_RESOLVER_FAILED);
-		break;
-	case c.DANE_EXIT_DNSSEC_BOGUS:
-		this.setMode(this.DANE_MODE_DNSSEC_BOGUS);
-		break;
-	case c.DANE_EXIT_DNSSEC_UNSECURED:
-		this.setMode(this.DANE_MODE_DNSSEC_UNSECURED);
-		break;
-	case c.DANE_EXIT_NO_HTTPS:
-		this.setMode(this.DANE_MODE_NO_HTTPS);
-		break;
-	case c.DANE_EXIT_TLSA_PARAM_ERR:
-		this.setMode(this.DANE_MODE_TLSA_PARAM_WRONG);
-		break;
-	case c.DANE_EXIT_NO_CERT_CHAIN:
-		this.setMode(this.DANE_MODE_NO_CERT_CHAIN);
-		break;
-	case c.DANE_EXIT_VALIDATION_FALSE:
-		this.setMode(this.DANE_MODE_VALIDATION_FALSE);
-		break;
-	case c.DANE_EXIT_VALIDATION_FALSE_TYPE0:
-		this.setMode(this.DANE_MODE_VALIDATION_FALSE_TYPE0);
-		break;
-	case c.DANE_EXIT_VALIDATION_FALSE_TYPE1:
-		this.setMode(this.DANE_MODE_VALIDATION_FALSE_TYPE1);
-		break;
-	case c.DANE_EXIT_VALIDATION_FALSE_TYPE2:
-		this.setMode(this.DANE_MODE_VALIDATION_FALSE_TYPE2);
-		break;
-	case c.DANE_EXIT_VALIDATION_FALSE_TYPE3:
-		this.setMode(this.DANE_MODE_VALIDATION_FALSE_TYPE3);
-		break;
-	case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE0:
-		this.setMode(this.DANE_MODE_VALIDATION_SUCCESS_TYPE0);
-		break;
-	case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE1:
-		this.setMode(this.DANE_MODE_VALIDATION_SUCCESS_TYPE1);
-		break;
-	case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE2:
-		this.setMode(this.DANE_MODE_VALIDATION_SUCCESS_TYPE2);
-		break;
-	case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE3:
-		this.setMode(this.DANE_MODE_VALIDATION_SUCCESS_TYPE3);
-		break;
-      default: this.setMode(this.DANE_MODE_ERROR);
-      		break;
-    }
-  },
-
-  /**
-   * Update the UI to reflect the specified mode, which should be one of the
-   * TLSA_MODE_* constants.
-   */
-  setMode : function(newMode) {
-    if (!this._tlsaBox) {
-      // No TLSA box means the TLSA box is not visible, in which
-      // case there's nothing to do.
-      return;
-    } 
-    else if (newMode == this.DANE_MODE_ACTION) {  // Close window for these states
-      this.hideTlsaPopup();
-    }
-
-    this._tlsaBox.className = newMode;
-    this.setSecurityMessages(newMode);
-
-    // Update the popup too, if it's open
-    if (this._tlsaPopup.state == "open")
-      this.setPopupMessages(newMode);
-  },
-
-  /**
-   * Set up the messages for the primary security UI based on the specified mode,
-   *
-   * @param newMode The newly set security mode. Should be one of the TLSA_MODE_* constants.
-   */
-  setSecurityMessages : function(newMode) {
-
-   var tooltip;
-
-   switch (newMode) {
-	case this.DANE_MODE_NO_HTTPS:
-	      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_NO_HTTPS];
-	      break;
-	case this.DANE_MODE_ACTION:
-	      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_ACTION];
-	      break;
-	case this.DANE_MODE_DNSSEC_BOGUS:
-	      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_FAILED_RESOLVER];
-	      break;
-	case this.DANE_MODE_VALIDATION_SUCCESS_TYPE0:
-	case this.DANE_MODE_VALIDATION_SUCCESS_TYPE1:
-	case this.DANE_MODE_VALIDATION_SUCCESS_TYPE2:
-	case this.DANE_MODE_VALIDATION_SUCCESS_TYPE3:
-	      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_VALIDATION_SUCCESS];
-	      break;
-	case this.DANE_MODE_VALIDATION_FALSE:
-	case this.DANE_MODE_VALIDATION_FALSE_TYPE0:
-	case this.DANE_MODE_VALIDATION_FALSE_TYPE1:
-	case this.DANE_MODE_VALIDATION_FALSE_TYPE2:
-	case this.DANE_MODE_VALIDATION_FALSE_TYPE3:
-	case this.DANE_MODE_TLSA_PARAM_WRONG:
-	      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_VALIDATION_FALSE];
-	      break;
-	case this.DANE_MODE_NO_TLSA_RECORD:
-	      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_NO_TLSA_RECORD];
-	      break;
-	case this.DANE_MODE_ERROR:
-	case this.DANE_MODE_RESOLVER_FAILED:
-	case this.DANE_MODE_NO_CERT_CHAIN:
-	      tooltip = this._tooltipLabel[this.DANE_TOOLTIP_FAILED_RESOLVER];
-	      break;
-	case this.DANE_MODE_VALIDATION_OFF:
-	case this.DANE_MODE_DNSSEC_UNSECURED:
-	     tooltip = this._tooltipLabel[this.DANE_TOOLTIP_OFF];
-	     break;
-    // Unknown
-       default: tooltip = "";
-    }
-    // Push the appropriate strings out to the UI
-    this._tlsaBox.tooltipText = tooltip;
-    return tooltip;
-  },
-
-  /**
-   * Set up the title and content messages for the security message popup,
-   * based on the specified mode
-   *
-   * @param newMode The newly set security mode. Should be one of the tlsa_MODE_* constants.
-   */
-  setPopupMessages : function(newMode) {
-
-    this._tlsaPopup.className = newMode;
-    this._tlsaPopupContentBox.className = newMode;
-    this._tlsaPopupContentBox2.className = newMode;
-    this._tlsaPopupContentBox3.className = newMode;
-    this._tlsaPopupContentBox4.className = newMode;
-    // Set the static strings up front
-    this._tlsaPopupSecLabel.textContent = " " + this._securityText[newMode];
-    this._tlsaPopupSecDetail.textContent = this._securityDetail[newMode];
-    this._tlsaPopupSecLabel2.textContent =  this.setSecurityMessages(newMode);
- 
-
-    //dump(this._tlsaPopupSecDetail.textContent);
-     //Push the appropriate strings out to the UI
-    this._tlsaPopupContentHost.textContent = gBrowser.currentURI.asciiHost;
-
-    var idnService = Components.classes["@mozilla.org/network/idn-service;1"]
-                     .getService(Components.interfaces.nsIIDNService);
-
-    var tooltipName;
-
-    if (idnService.isACE(this._utf8HostName)) {
-      // Encode to UTF-8 if IDN domain name is not in browser's whitelist
-      // See "network.IDN.whitelist.*"
-      tooltipName = idnService.convertACEtoUTF8(this._utf8HostName);
-    } else if (idnService.isACE(this._asciiHostName)) {
-      // Use punycoded name
-      tooltipName = this._asciiHostName;
-    } else {
-      tooltipName = "";
-    }
-    this._tlsaPopupContentHost.tooltipText = tooltipName;
-  },
-
-  hideTlsaPopup : function() {
-    this._tlsaPopup.hidePopup();
-  },
-
-  showAddInfoIP : function() {
-		document.getElementById("tlsa-popup-ipbrowser-title").style.display = 'block';
-		document.getElementById("tlsa-popup-ipbrowser-ip").style.display = 'block';
-		document.getElementById("tlsa-popup-ipvalidator-title").style.display = 'block';
-		document.getElementById("tlsa-popup-ipvalidator-ip").style.display = 'block';
-  },
-
-  hideAddInfoIP : function() {
-		document.getElementById("tlsa-popup-ipbrowser-title").style.display = 'none';
-		document.getElementById("tlsa-popup-ipbrowser-ip").style.display = 'none';
-		document.getElementById("tlsa-popup-ipvalidator-title").style.display = 'none';
-		document.getElementById("tlsa-popup-ipvalidator-ip").style.display = 'none';
-  },
-
-  showAddInfo : function(id) {
-		document.getElementById(id).style.display = 'block';
-		document.getElementById("linkt").style.display = 'none';
-		document.getElementById("tlsa-popup-homepage").style.display = 'block';
-  },
-
-  hideAddInfo : function() {
-		document.getElementById("tlsa-popup-security-detail").style.display = 'none';
-		document.getElementById("linkt").style.display = 'block';
-		document.getElementById("tlsa-popup-homepage").style.display = 'none';
-  },
-
-
-  /**
-   * Click handler for the tlsa-box element in primary chrome.
-   */
-  handleTlsaButtonEvent : function(event) {
-
-    event.stopPropagation();
-
-    if ((event.type == "click" && event.button != 0) ||
-        (event.type == "keypress" && event.charCode != KeyEvent.DOM_VK_SPACE &&
-         event.keyCode != KeyEvent.DOM_VK_RETURN))
-      return; // Left click, space or enter only
-
-    // No popup window while...
-    if (this._tlsaBox && (this._tlsaBox.className == this.DANE_MODE_ACTION )) // getting security status
-      return;
-	
-    // Make sure that the display:none style we set in xul is removed now that
-    // the popup is actually needed
-    this._tlsaPopup.hidden = false;
-
-    this.hideAddInfo();
-    // Tell the popup to consume dismiss clicks, to avoid bug 395314
-    this._tlsaPopup.popupBoxObject
-        .setConsumeRollupEvent(Ci.nsIPopupBoxObject.ROLLUP_CONSUME);
-
-    // Update the popup strings
-    this.setPopupMessages(this._tlsaBox.className);
- 	//dump('Open popopu...\n');
-    // Now open the popup, anchored off the primary chrome element
-    this._tlsaPopup.openPopup(this._tlsaBox, 'after_end', -10, 0);
-  }
-}
 
