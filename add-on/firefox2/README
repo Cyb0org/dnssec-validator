@@ -1,9 +1,9 @@
-DNSSEC Validator 2.0 extension for Mozilla Firefox <http://www.dnssec-validator.cz>
+DNSSEC Validator 2.x extension for Mozilla Firefox <http://www.dnssec-validator.cz>
 -------------------------------------------------------------------------------
 
 INSTALLATION
 ---------------
-Select "dnssec_validator-2.0-*.xpi" in File -> Open dialog and follow wizard instructions
+Select "dnssec_validator-2.x-*.xpi" in File -> Open dialog and follow wizard instructions
 
 
 CONFIGURATION

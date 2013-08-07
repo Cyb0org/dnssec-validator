@@ -27,7 +27,8 @@ PLUGIN_NAME_LIB = plugins-lib
 PLUGIN_ADD_ON = packages
 ADDON_PATH_FF = add-on/firefox2
 ADDON_PATH_CR = add-on/chrome2
-EXTENSION_VERSION = $(shell cat add-on/firefox2/install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p')
+#EXTENSION_VERSION = $(shell cat add-on/firefox2/install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p')
+EXTENSION_VERSION = $(shell cat add-on/firefox2/VERSION)
 
 #all: sys_linux_x86 sys_linux_x64 xpi_x86 xpi_x64
 
@@ -53,7 +54,7 @@ xpi_x86:
 	chmod 777 $(ADDON_PATH_FF)/build.sh
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x86.so $(ADDON_PATH_FF)/plugins
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x86.so $(ADDON_PATH_FF)/plugins
-	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
+	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
 	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec_validator-$(EXTENSION_VERSION)-linux-x86.xpi
 	@echo '### DONE... ###'
@@ -61,7 +62,7 @@ xpi_x86:
 	@echo '### Creating package for Chrome Linux x86... ###'
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x86.so $(ADDON_PATH_CR)
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x86.so $(ADDON_PATH_CR)
-	sed 's/xxxxxxxxxx/np$(PLUGIN_NAME_DNSSEC)_x86.so/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
+	sed -e 's/dnssecplugin/np$(PLUGIN_NAME_DNSSEC)_x86.so/g' -e 's/tlsaplugin/np$(PLUGIN_NAME_TLSA)_x86.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
 	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz chrome2 && mv CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz ../$(PLUGIN_ADD_ON)
 	cd $(ADDON_PATH_CR) && rm -rf np$(PLUGIN_NAME_DNSSEC)_x86.so manifest.json np$(PLUGIN_NAME_TLSA)_x86.so
 	@echo '### DONE... ###'  
@@ -91,7 +92,7 @@ xpi_x64:
 	chmod 777 $(ADDON_PATH_FF)/build.sh
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x64.so $(ADDON_PATH_FF)/plugins
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x64.so $(ADDON_PATH_FF)/plugins
-	sed 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86_64-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
+	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86_64-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
 	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec_validator-$(EXTENSION_VERSION)-linux-x64.xpi
 	@echo '### DONE... ###'
@@ -99,7 +100,7 @@ xpi_x64:
 	@echo '### Creating package for Chrome Linux x64... ###'
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x64.so $(ADDON_PATH_CR)
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x64.so $(ADDON_PATH_CR)
-	sed 's/xxxxxxxxxx/npDNSSECValidatorPlugin_x64.so/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
+	sed -e 's/dnssecplugin/np$(PLUGIN_NAME_DNSSEC)_x64.so/g' -e 's/tlsaplugin/np$(PLUGIN_NAME_TLSA)_x64.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
 	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x64.tar.gz chrome2 && mv CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x64.tar.gz ../$(PLUGIN_ADD_ON)
 	cd $(ADDON_PATH_CR) && rm -rf np$(PLUGIN_NAME_DNSSEC)_x64.so manifest.json np$(PLUGIN_NAME_TLSA)_x64.so
 	@echo '### DONE... ###'   

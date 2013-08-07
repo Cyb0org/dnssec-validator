@@ -25,18 +25,18 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
      xmlns:em="http://www.mozilla.org/2004/em-rdf#">
   <Description about="urn:mozilla:install-manifest">
     <em:id>dnssec@nic.cz</em:id>
-    <em:name>DNSSEC Validator</em:name>
-    <em:description>Checks whether domain names in the address bar are secured by DNSSEC.</em:description>
-    <em:version>2.0</em:version>
+    <em:name>DNSSEC/TLSA Validator</em:name>
+    <em:description>Checks whether domain names in the address bar are secured by DNSSEC and checks certificate with TLSA record if exists.</em:description>
+    <em:version></em:version>
     <em:creator>CZ.NIC Labs</em:creator>
     <em:developer>Martin Straka</em:developer> <!-- martin.straka(AT)nic.cz -->
-    <em:contributor>Bedrich Kosata</em:contributor> <!-- bedrich.kosata(AT)nic.cz -->
-    <em:contributor>Ondřej Filip</em:contributor> <!-- ondrej.filip(AT)nic.cz -->
-    <em:contributor>Tomasz Hatlapa</em:contributor> <!-- tomasz.hatlapa(AT)nic.cz -->
+    <em:contributor>Ondřej Filip</em:contributor> <!-- ondrej.filip(AT)nic.cz -->    
     <em:contributor>Ondřej Surý</em:contributor> <!-- ondrej.sury(AT)nic.cz -->
+    <em:contributor>Martin Sojka</em:contributor> <!-- martin.sojka(AT)nic.cz -->
+    <em:contributor>Bedrich Kosata</em:contributor> <!-- bedrich.kosata(AT)nic.cz -->
     <em:contributor>Pavel Tůma</em:contributor> <!-- pavel.tuma(AT)nic.cz -->
-    <em:translator>Karel Slaný (de-DE)</em:translator> <!-- karel.slany(AT)nic.cz -->
-    <em:homepageURL>https://labs.nic.cz/page/1253/dnssec-validator-2.0-pro-webove-prohlizece/</em:homepageURL>
+    <em:translator>Karel Slaný</em:translator> <!-- karel.slany(AT)nic.cz -->
+    <em:homepageURL>http://www.dnssec-validator.cz/</em:homepageURL>
     <em:iconURL>chrome://dnssec/skin/icon.png</em:iconURL>
     <em:optionsURL>chrome://dnssec/content/preferences.xul</em:optionsURL>
     <em:targetPlatform></em:targetPlatform>
@@ -58,21 +58,11 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
  
     <em:targetApplication>
       <Description>
- <em:id>{3550f703-e582-4d05-9a08-453d09bdfdc6}</em:id> <!-- Thunderbird -->
- <em:minVersion>3.0</em:minVersion>
- <em:maxVersion>18.*</em:maxVersion>
+ 	<em:id>{3550f703-e582-4d05-9a08-453d09bdfdc6}</em:id> <!-- Thunderbird -->
+ 	<em:minVersion>3.0</em:minVersion>
+ 	<em:maxVersion>18.*</em:maxVersion>
       </Description>
     </em:targetApplication>
- 
- <!-- Mobile (formerly known as Fennec)
-    <em:targetApplication>
-      <Description>
-        <em:id>{a23983c0-fd0e-11dc-95ff-0800200c9a66}</em:id>
-        <em:minVersion>0.1</em:minVersion>
-        <em:maxVersion>7.0a1</em:maxVersion>
-      </Description>
-    </em:targetApplication>
- -->
  
     <em:targetApplication>
       <Description>
