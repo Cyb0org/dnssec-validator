@@ -24,13 +24,24 @@ PLUGIN_ROOT = ./
 PLUGIN_TMP = dll_build
 PLUGIN_NAME_DNSSEC = DNSSECValidatorPlugin
 PLUGIN_NAME_TLSA = TLSAValidatorPlugin
-
+PLUGIN_NAME_DNSSEC_LIB = ub_ds_windows-x86.dll
+PLUGIN_NAME_TLSA_LIB = DANEcore-windows-x86.dll
 X86_MINGW_CC = i586-mingw32msvc-gcc
 X86_MINGW_STRIP = i586-mingw32msvc-strip
+PLUGIN_NAME_DNSSEC = DNSSECValidatorPlugin
+PLUGIN_NAME_TLSA = TLSAValidatorPlugin
+PLUGIN_NAME_LIB = libwin
+PLUGIN_ADD_ON = packages
+ADDON_PATH_FF = add-on/firefox2
+ADDON_PATH_CR = add-on/chrome2
+#EXTENSION_VERSION = $(shell cat add-on/firefox2/install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p')
 EXTENSION_VERSION = $(shell cat add-on/firefox2/VERSION)
 
 
-#all: sys_windows_pre
+
+
+
+#all: sys_windows_pre xpi_x86
 
 sys_windows_pre:
 	@echo '###  Creating plugin dll for Windows x86... ###'
@@ -45,3 +56,28 @@ sys_windows_pre:
 	$(X86_MINGW_CC) -Wall -shared -o $(PLUGIN_TMP)/DANEcore-windows-x86.dll $(PLUGIN_ROOT)/plugin-source/$(PLUGIN_NAME_TLSA)/dane-plug.c $(PLUGIN_ROOT)/libs/windows/x86/libunbound.a $(PLUGIN_ROOT)/libs/windows/x86/libldns.a $(PLUGIN_ROOT)/libs/windows/x86/libssl.a $(PLUGIN_ROOT)/libs/windows/x86/libcrypto.a -DRES_WIN -D__USE_MINGW_ANSI_STDIO=1 -I$(PLUGIN_ROOT)/libs/windows/x86 -I$(PLUGIN_ROOT)/libs/ldns -I$(PLUGIN_ROOT)/libs/unbound -I$(PLUGIN_ROOT)/libs/openssl/include -Wl,--output-def,$(PLUGIN_TMP)/DANEcore-windows-x86.def,-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32
 	$(X86_MINGW_STRIP) -x -S $(PLUGIN_TMP)/DANEcore-windows-x86.dll
 	@echo '### Done... ###'
+
+
+xpi_x86:
+	@echo '### Creating packages for Firefox windows x86... ###'
+	rm -rf $(ADDON_PATH_FF)/plugins
+	mkdir $(ADDON_PATH_FF)/plugins
+	chmod 777 $(ADDON_PATH_FF)/build.sh
+	cp $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_DNSSEC_LIB) $(ADDON_PATH_FF)/plugins
+	cp $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_TLSA_LIB) $(ADDON_PATH_FF)/plugins
+	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC).dll $(ADDON_PATH_FF)/plugins
+	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA).dll $(ADDON_PATH_FF)/plugins
+	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>WINNT_x86-msvc<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
+	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
+	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec_validator-$(EXTENSION_VERSION)-windows-x86.xpi
+	@echo '### DONE... ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating package for Chrome Linux x86... ###'
+	cp $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_DNSSEC_LIB) $(ADDON_PATH_CR)
+	cp $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_TLSA_LIB) $(ADDON_PATH_CR)
+	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC).dll $(ADDON_PATH_CR)
+	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA).dll $(ADDON_PATH_CR)
+	sed -e 's/dnssecplugin/np$(PLUGIN_NAME_DNSSEC).dll/g' -e 's/tlsaplugin/np$(PLUGIN_NAME_TLSA).dll/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
+	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz chrome2 && mv CR-dnssec_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz ../$(PLUGIN_ADD_ON)
+	cd $(ADDON_PATH_CR) && rm -rf $(PLUGIN_NAME_DNSSEC_LIB) manifest.json $(PLUGIN_NAME_TLSA_LIB) np$(PLUGIN_NAME_DNSSEC).dll np$(PLUGIN_NAME_TLSA).dll
+	@echo '### DONE... #
