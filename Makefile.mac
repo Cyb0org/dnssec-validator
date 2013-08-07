@@ -40,8 +40,8 @@ sys_macosx_x86:
 	cp -r plugin-source/* $(PLUGIN_FB_S)	
 	./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386" -DCMAKE_BUILD_TYPE=MinSizeRel
 	cd $(PLUGIN_FB_B) && xcodebuild && cd ../..
-	cp -R $(PLUGIN_FB_B)d/projects/$(PLUGIN_NAME_DNSSEC)/Debug/$(PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/
-	cp -R $(PLUGIN_FB_B)d/projects/$(PLUGIN_NAME_TLSA)/Debug/$(PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/
+	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_DNSSEC)/Debug/$(PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/
+	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_TLSA)/Debug/$(PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/
 	strip -x -S $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_DNSSEC).plugin/Contents/MacOS/$(PLUGIN_NAME_DNSSEC)
 	strip -x -S $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_TLSA).plugin/Contents/MacOS/$(PLUGIN_NAME_TLSA)
 	rm -rf $(PLUGIN_FB_B)

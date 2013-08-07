@@ -65,7 +65,7 @@ PLUGIN_CONFIGURATION ?= MinSizeRel
 libs-build: submodules libs $(OPENSSL_LIB) $(LDNS_LIB) $(UNBOUND_LIB) libsource
 
 submodules:
-	git clone git@gitlab.labs.nic.cz:mstraka/dnssec-libs.git $(LIBS_SOURCE)
+	git clone https://gitlab.labs.nic.cz/mstraka/dnssec-libs.git $(LIBS_SOURCE)
 	git clone https://github.com/firebreath/FireBreath.git FireBreath
 	git submodule update --init --recursive
 	#(cd $(FIREBREATH_DIR) && git checkout $(FIREBREATH_TAG))
