@@ -1,3 +1,4 @@
+	// DNSSEC NPAPI constant returned by binary plugin	
 	var dnssecExtNPAPIConst = {
   		DNSSEC_EXIT_FAILED                         : 0, /* state is unknown or fail*/
 		DNSSEC_EXIT_DOMAIN_UNSECURED 		   : 1, /* domain is not secured */
@@ -14,24 +15,25 @@
 	};
 
 
+	// DANE NPAPI constant returned by binary plugin
 	var tlsaExtNPAPIConst = {
-  		DANE_EXIT_VALIDATION_SUCCESS_TYPE0	 : 10,
- 		DANE_EXIT_VALIDATION_SUCCESS_TYPE1	 : 11,
-		DANE_EXIT_VALIDATION_SUCCESS_TYPE2	 : 12,
-		DANE_EXIT_VALIDATION_SUCCESS_TYPE3	 : 13,
-		DANE_EXIT_DNSSEC_SECURED		 : 1,
-		DANE_EXIT_VALIDATION_OFF 		 : 0,
-		DANE_EXIT_RESOLVER_FAILED      		 : -1,             
-		DANE_EXIT_NO_HTTPS			 : -2,
-		DANE_EXIT_NO_TLSA_RECORD		 : -3,
-		DANE_EXIT_DNSSEC_UNSECURED		 : -4,
-		DANE_EXIT_DNSSEC_BOGUS			 : -5, 
-		DANE_EXIT_NO_CERT_CHAIN			 : -6,
-		DANE_EXIT_CERT_ERROR			 : -7,
-		DANE_EXIT_TLSA_PARAM_ERR		 : -8,
-		DANE_EXIT_VALIDATION_FALSE		 : -9,
-		DANE_EXIT_VALIDATION_FALSE_TYPE0	 : -10,
-		DANE_EXIT_VALIDATION_FALSE_TYPE1	 : -11,
-		DANE_EXIT_VALIDATION_FALSE_TYPE2	 : -12,
-		DANE_EXIT_VALIDATION_FALSE_TYPE3	 : -13,
+  		DANE_EXIT_VALIDATION_SUCCESS_TYPE0	 : 10, /* Validation of TLSA record (type0) is success */
+ 		DANE_EXIT_VALIDATION_SUCCESS_TYPE1	 : 11, /* Validation of TLSA record (type1) is success */
+		DANE_EXIT_VALIDATION_SUCCESS_TYPE2	 : 12, /* Validation of TLSA record (type2) is success */
+		DANE_EXIT_VALIDATION_SUCCESS_TYPE3	 : 13, /* Validation of TLSA record (type3) is success */
+		DANE_EXIT_DNSSEC_SECURED		 : 1,  /* DANE: dnssec is secured - no used now */
+		DANE_EXIT_VALIDATION_OFF 		 : 0,  /* Validation of TLSA record is off for this domain */
+		DANE_EXIT_RESOLVER_FAILED      		 : -1, /* state is unknown or fail */            
+		DANE_EXIT_NO_HTTPS			 : -2, /* current url is not https */
+		DANE_EXIT_NO_TLSA_RECORD		 : -3, /* TLSA record for this domain does not exists */
+		DANE_EXIT_DNSSEC_UNSECURED		 : -4, /* Dnssec is insecured, TLSA will not starts */
+		DANE_EXIT_DNSSEC_BOGUS			 : -5, /* Dnssec signature is bogus, TLSA validation is stop */
+		DANE_EXIT_NO_CERT_CHAIN			 : -6, /* No certificate chain for this server */
+		DANE_EXIT_CERT_ERROR			 : -7,  /* Certificate error */
+		DANE_EXIT_TLSA_PARAM_ERR		 : -8,  /* Wrong parameters of TLSA record */
+		DANE_EXIT_VALIDATION_FALSE		 : -9,  /* Validation of TLSA record is false */
+		DANE_EXIT_VALIDATION_FALSE_TYPE0	 : -10, /* Validation of TLSA record (type0) is false */
+		DANE_EXIT_VALIDATION_FALSE_TYPE1	 : -11, /* Validation of TLSA record (type1) is false */
+		DANE_EXIT_VALIDATION_FALSE_TYPE2	 : -12, /* Validation of TLSA record (type2) is false */
+		DANE_EXIT_VALIDATION_FALSE_TYPE3	 : -13, /* Validation of TLSA record (type3) is false */
 	};

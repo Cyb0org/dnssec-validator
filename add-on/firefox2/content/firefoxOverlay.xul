@@ -55,6 +55,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
           	<description id="dnssec-popup-securedLabel" value="&dnssec.securedLabel;"/>
           	<description id="dnssec-popup-unsecuredLabel" value="&dnssec.unsecuredLabel;"/>
 		<description id="dnssec-popup-errorLabel" value="&dnssec.errorLabel;"/>
+		<description id="dnssec-popup-wrongresLabel" value="&dnssec.wrongresLabel;"/>
 		<description id="dnssec-popup-dnssecOffLabel" value="&dnssec.offLabel;"/>
 		<description id="dnssec-popup-bogusLabel" value="&dnssec.bogusLabel;"/>			 	
 	  </vbox>	
@@ -72,7 +73,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 		<label id="dnssec-popup-homepage" class="text-link" value="&dnssec.homepage;" onclick="var win = Components.classes['@mozilla.org/appshell/window-mediator;1']
       .getService(Components.interfaces.nsIWindowMediator)
       .getMostRecentWindow('navigator:browser');
-    win.openUILinkIn('http://www.dnssec-validator.cz', 'tab');" style="display: none;"/>	
+    win.openUILinkIn('http://www.dnssec-validator.cz', 'tab'); dnssecExtHandler.hideDnssecPopup();" style="display: none;"/>	
         </vbox>
      </vbox>
     </panel>
@@ -80,7 +81,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
     <!-- Popup for TLSA information -->
     <panel id="tlsa-popup" type="arrow" position="after_start" hidden="true" noautofocus="true"
            onpopuphidden="focusAndSelectUrlBar();" norestorefocus="true"
-           onblur="tlsaExtHandler.hidetlsaPopup();">
+           onblur="tlsaExtHandler.hideTlsaPopup();">
       <vbox id="tlsa-popup-container" align="top">
         <hbox id="tlsa-popup-content-box" align="top">
           <image id="tlsa-popup-icon"/>
@@ -102,7 +103,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 		<label id="tlsa-popup-homepage" class="text-link" value="&dnssec.homepage;" onclick="var win = Components.classes['@mozilla.org/appshell/window-mediator;1']
       .getService(Components.interfaces.nsIWindowMediator)
       .getMostRecentWindow('navigator:browser');
-    win.openUILinkIn('http://www.dnssec-validator.cz', 'tab');" style="display: block;"/>	
+    win.openUILinkIn('http://www.dnssec-validator.cz', 'tab'); tlsaExtHandler.hideTlsaPopup();" style="display: none;"/>	
         </vbox>
      </vbox>
     </panel>

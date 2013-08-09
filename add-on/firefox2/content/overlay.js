@@ -39,9 +39,6 @@ var dnssecExtUrlBarListener = {
   onSecurityChange: function(aWebProgress, aRequest, aState)
   {
     //dump('Browser: onSecurityChange(): ' +aState + '\n');
-    //var uri = null;
-    //uri = window.gBrowser.currentURI;
-    //var tlsares = tlsaValidator.processNewURL(aRequest, uri);
   },
 
   onStateChange: function(aWebProgress, aRequest, aStateFlags, aStatus)
@@ -136,12 +133,7 @@ var dnssecExtension = {
 
     // Register preferences observer
     dnssecExtPrefObserver.register();
-    //httpRequestObserver.register();
-    //this.inittest();
-     
-    //this.registerObserver("http-on-examine-response");
-   //this.registerObserver("http-on-modify-request");
-   //this.registerObserver("http-on-examine-cached-response");
+
     // Create the timer
     this.timer = Components.classes["@mozilla.org/timer;1"]
                  .createInstance(Components.interfaces.nsITimer);
@@ -159,8 +151,6 @@ var dnssecExtension = {
 
     // Listen for webpage events
     gBrowser.addProgressListener(dnssecExtUrlBarListener);
-    //gBrowser.addTabsProgressListener(dnssecExtUrlBarListener2);
-    //gBrowser.addEventListener("load", examplePageLoad, true);
 
     if (this.debugOutput)
       dump(this.debugPrefix + 'End of add-on init\n');
@@ -208,17 +198,10 @@ var dnssecExtension = {
       dump(this.debugPrefix + 'Start of add-on uninit\n');
 
     gBrowser.removeProgressListener(dnssecExtUrlBarListener);
-    //gBrowser.removeTabsProgressListener(dnssecExtUrlBarListener2);
-//gBrowser.removeEventListener("load", examplePageLoad, true);
-
 
     // Unregister preferences observer
     dnssecExtPrefObserver.unregister();
 
-    //this.unregisterObserver("http-on-modify-request");
- //this.unregisterObserver("http-on-examine-response");
- //this.unregisterObserver("http-on-examine-cached-response");
-    //httpRequestObserver.unregister();
     // Reset resolving flag
     dnssecExtPrefs.setBool("resolvingactive", false);
 
@@ -226,7 +209,7 @@ var dnssecExtension = {
     var dsp = document.getElementById("dnssec-plugin");
     dsp.CacheFree();
     if (this.debugOutput) 
-	dump('...Clear Cache...\n');
+	dump('add-on: ...Clear Cache...\n');
 
     if (this.debugOutput)
       dump(this.debugPrefix + 'End of add-on uninit\n');
@@ -243,70 +226,6 @@ var dnssecExtension = {
 	  .getService(Components.interfaces.nsIObserverService);
 	observerService.removeObserver(this, topic);
     },
-/*
-    observe: function(channel, topic, data) {
-
-
-
-     if (topic == "http-on-examine-response") {
-	
-	var Cc = Components.classes, Ci = Components.interfaces;
-	channel.QueryInterface(Ci.nsIHttpChannel);
-	var host = channel.URI.hostPort;
-	var url = channel.URI.spec;
-	var currentURL = gBrowser.currentURI.hostPort;
-	dump('---observe: function('+url+', '+topic+', '+host+', '+data+')\n');
-	
-
-	var si = channel.securityInfo;
-	if (!si) return;
-	
-	var nc = channel.notificationCallbacks;
-	if (!nc && channel.loadGroup)
-	  nc = channel.loadGroup.notificationCallbacks;
-	if (!nc) return;
-
-	try {
-	    var win = nc.getInterface(Ci.nsIDOMWindow);
-	} catch (e) {
-	    return; // no window for e.g. favicons
-	}
-	if (!win.document) return;
-
-	var browser;
-	// thunderbird has no gBrowser
-	if (typeof gBrowser != "undefined") {
-	    browser = gBrowser.getBrowserForDocument(win.top.document);
-	    // We get notifications for a request in all of the open windows
-	    // but browser is set only in the window the request is originated from,
-	    // browser is null for favicons too.
-	    if (!browser) return;
-	}
-
-	dump('---'+this.oldAsciiHost2+'-----'+host+'-----\n');
- 	if (this.oldAsciiHost2 != host) {
-		this.oldAsciiHost2 = host;
-	   	si.QueryInterface(Ci.nsISSLStatusProvider);
-		var st = si.SSLStatus;
-		if (!st) return;
-		dump('---'+currentURL+'-----'+host+'-----\n');
-		//if (host == currentURL) {
-			st.QueryInterface(Ci.nsISSLStatus);
-			var cert = st.serverCert;
-			if (!cert) return;
-		var tlsares = tlsaValidator.check_tlsa2(channel, cert, browser, host, "443");
-		////this.certCheck(browser, cert, channel);
-		//}
-	}
-	dump('---observe: end\n');
-      }
-    },
-
-*/
-
-
-
-
 
   processNewURL: function(aLocationURI) {
     var scheme = null;
@@ -334,9 +253,10 @@ var dnssecExtension = {
 
       if (this.debugOutput) dump(' ...invalid\n');
       this.oldAsciiHost = null;
-      // Set inaction mode (no icon)
+ 
+     // Set inaction mode (no icon)
       dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_INACTION);
-      //tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_INACTION);
+
       return;
 
     // Eliminate duplicated queries
@@ -344,7 +264,6 @@ var dnssecExtension = {
       if (this.debugOutput) dump(' ...duplicated\n');
       return;
     }
-
   
     if (this.debugOutput) dump(' ...valid\n');
 
@@ -440,7 +359,7 @@ var dnssecExtResolver = {
         var resolvipv6 = false;
 	var dsp = document.getElementById("dnssec-plugin");
 	dsp.CacheFree();
-	options = 0;
+	var options = 0;
 	if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
    	if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
 	if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
@@ -475,7 +394,6 @@ var dnssecExtResolver = {
 
      var ext = dnssecExtension;
      var c = dnssecExtNPAPIConst;
-     var d = tlsaExtNPAPIConst;
     if (ext.debugOutput) {
        dump(ext.debugPrefix + 'NOFWD result: ' + resArr[0] + '; ' + resArr[1] +' ;\n');
     }	    	
@@ -483,12 +401,9 @@ var dnssecExtResolver = {
     var restmp = resArr[0];
     var ipvalidator = resArr[1];
     
-    var tlsa = d.DANE_EXIT_VALIDATION_OFF;	
-
     if (restmp==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
 	if (ext.debugOutput) dump(ext.debugPrefix + 'Yes, domain name has bogus\n');
 	res=restmp;
-	tlsa = d.DANE_EXIT_DNSSEC_BOGUS
     } 
     else
     {
@@ -496,30 +411,13 @@ var dnssecExtResolver = {
 	if (ext.debugOutput) dump(ext.debugPrefix + "Results: FWD: " + res + "; NOFWD: " + restmp +"\n");
 	var dsp = document.getElementById("dnssec-plugin");
 	dsp.CacheFree();
-	//dnssecExtHandler.showDnssecFwdInfo();
-    // tlsa	
- /*   if (restmp==c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP || restmp==c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP) {
-	var uri = gBrowser.currentURI;
-	var port = "443";
-	//dump(ext.debugPrefix + uri.asciiHost + '\n');
-        if (uri.schemeIs("https")) { 
-		if (ext.debugOutput) dump(ext.debugPrefix + 'Connection is https...\n');
-		//tlsa = tlsaValidator.check_tlsa(uri,port);
-	}
-	else { if (ext.debugOutput) dump(ext.debugPrefix + 'Connection is NOT https...\n');
-	     tlsa = d.DANE_EXIT_NO_HTTPS;
-        }
-	dump("DANE: Return >>> " + tlsa + '\n');
-    }	
-
-*/
-	res=restmp;	
+	res=-2;
+	
     }//if
 		
     // Set appropriate state if host name does not changed
     // during resolving process (tab has not been switched)
     if (dn == gBrowser.currentURI.asciiHost)
-	//tlsaExtHandler.setSecurityState(tlsa); 
       dnssecExtHandler.setSecurityState(res,addr,ipvalidator);
 
     if (ext.debugOutput)
@@ -560,29 +458,10 @@ var dnssecExtResolver = {
 	this.revalidate(dn,addr,res);
 	return;
     }// if
-/*
-    var tlsa = d.DANE_EXIT_VALIDATION_OFF;	
-    // tlsa	
-    if (res==c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP || res==c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP) {
-	var uri = gBrowser.currentURI;
-	var port = "443";
-	//dump(ext.debugPrefix + uri.asciiHost + '\n');
-        if (uri.schemeIs("https")) { 
-		if (ext.debugOutput) dump(ext.debugPrefix + 'Connection is https...\n');
-		//tlsa = tlsaValidator.check_tlsa(uri,port);
-	}
-	else { if (ext.debugOutput) dump(ext.debugPrefix + 'Connection is NOT https...\n');
-	     tlsa = d.DANE_EXIT_NO_HTTPS;
-        }
-	dump("DANE: Return >>> " + tlsa + '\n');   
-    }
-
-*/
 
     // Set appropriate state if host name does not changed
     // during resolving process (tab has not been switched)
-    if (dn == gBrowser.currentURI.asciiHost){
- 	 //tlsaExtHandler.setSecurityState(tlsa);    
+    if (dn == gBrowser.currentURI.asciiHost){   
 	 dnssecExtHandler.setSecurityState(res, addr, ipvalidator);
     }
 
@@ -681,7 +560,8 @@ var dnssecExtResolver = {
 var dnssecExtHandler = {
 
   // Mode strings used to control CSS display
-
+  // -2 .Current resolver does not support DNSSEC
+  DNSSEC_MODE_WRONG_RESOLVER                    : "wrongresolver",
   // 1. No DNSSEC signature
   DNSSEC_MODE_DOMAIN_UNSECURED                    : "unsecuredDomain",
   // 2. Domain and also connection are secured
@@ -702,6 +582,7 @@ var dnssecExtHandler = {
   DNSSEC_MODE_INACTION : "inactionDnssec",
   // Error or unknown state occured
   DNSSEC_MODE_ERROR : "errorDnssec",
+  // -1. DNSSEC OFF
   DNSSEC_MODE_OFF   : "dnssecOff",
   // Tooltips
   DNSSEC_TOOLTIP_SECURED   : "securedTooltip",
@@ -710,6 +591,7 @@ var dnssecExtHandler = {
   DNSSEC_TOOLTIP_ERROR     : "errorTooltip",
   DNSSEC_TOOLTIP_BOGUS     : "bogusTooltip",
   DNSSEC_TOOLTIP_OFF       : "offTooltip",
+  DNSSEC_TOOLTIP_WRONG_RES : "wrongresTooltip",
   // Cache the most recent hostname seen in checkSecurity
   _asciiHostName : null,
   _utf8HostName : null,
@@ -717,9 +599,6 @@ var dnssecExtHandler = {
   ipvalidator : "",
   ipbrowser : "",
   valstate : 0,
-
-
-
 
   get _domainPreText () {
     delete this._stringBundle;
@@ -755,7 +634,8 @@ var dnssecExtHandler = {
   	// -1. Validator OFF
     this._domainPreText[this.DNSSEC_MODE_OFF] =
       this._stringBundle.getString("domain");
-
+    this._domainPreText[this.DNSSEC_MODE_WRONG_RESOLVER] =
+      this._stringBundle.getString("domain");
     return this._domainPreText;
   },
 
@@ -794,7 +674,8 @@ var dnssecExtHandler = {
   	// -1. Validator OFF
     this._securityText[this.DNSSEC_MODE_OFF] =
       this._stringBundle.getString("dnsseOff");
-
+    this._securityText[this.DNSSEC_MODE_WRONG_RESOLVER] =
+      this._stringBundle.getString("wrongres");
     return this._securityText;
   },
 
@@ -832,6 +713,9 @@ var dnssecExtHandler = {
   	// -1. Validator OFF
     this._securityDetail[this.DNSSEC_MODE_OFF] =
       this._stringBundle.getString("dnsseOffInfo");
+	// -2 .Current resolver does not support DNSSEC
+    this._securityDetail[this.DNSSEC_MODE_WRONG_RESOLVER] =
+      this._stringBundle.getString("wrongresInfo");
     return this._securityDetail;
   },
 
@@ -854,6 +738,8 @@ var dnssecExtHandler = {
       this._stringBundle.getString("dnssec.tooltip.bogus");
     this._tooltipLabel[this.DNSSEC_TOOLTIP_OFF] =
       this._stringBundle.getString("dnssec.tooltip.off");
+    this._tooltipLabel[this.DNSSEC_TOOLTIP_WRONG_RES] =
+      this._stringBundle.getString("dnssec.tooltip.wrongres");
     return this._tooltipLabel;
   },
   get _dnssecPopup () {
@@ -868,10 +754,6 @@ var dnssecExtHandler = {
     delete this._dnssecBox;
     return this._dnssecBox = document.getElementById("dnssec-box");
   },
- // get _tlsaBox () {
-  //  delete this._tlsaBox;
-  //  return this._tlsaBox = document.getElementById("tlsa-box");
-  //},
   get _dnssecPopupContentBox () {
     delete this._dnssecPopupContentBox;
     return this._dnssecPopupContentBox =
@@ -926,8 +808,6 @@ var dnssecExtHandler = {
   _cacheElements : function() {
     delete this._dnssecBox;
     this._dnssecBox = document.getElementById("dnssec-box");
-    //delete this._tlsaBox;
-    //this._tlsaBox = document.getElementById("tlsa-box");
   },
 
   // Set appropriate security state
@@ -975,6 +855,9 @@ var dnssecExtHandler = {
     case -1:
       this.setMode(this.DNSSEC_MODE_OFF);
       break;
+    case -2:
+      this.setMode(this.DNSSEC_MODE_WRONG_RESOLVER);
+      break;
 	// 0
     case c.DNSSEC_EXIT_FAILED:
     default:
@@ -989,7 +872,7 @@ var dnssecExtHandler = {
 
     // Set action state
     this.setMode(this.DNSSEC_MODE_ACTION);
-    //tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_ACTION);
+
     // Detect if any resolving is already running...
     if (dnssecExtPrefs.getBool("resolvingactive")) {
 
@@ -1029,7 +912,7 @@ var dnssecExtHandler = {
 //    this.setMode(this.DNSSEC_MODE_ACTION);
 
     // Remember last host name to eliminate duplicated queries
-    dnssecExtension.oldAsciiHost = asciiHost;
+    //dnssecExtension.oldAsciiHost = asciiHost;
 
     this._asciiHostName = asciiHost;
     this._utf8HostName = utf8Host;
@@ -1132,6 +1015,9 @@ var dnssecExtHandler = {
     case this.DNSSEC_MODE_OFF:
       tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_OFF];
       break;
+    case this.DNSSEC_MODE_WRONG_RESOLVER:
+      tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_WRONG_RES];
+      break;
     // Unknown
     default:
       tooltip = "";
@@ -1186,8 +1072,6 @@ var dnssecExtHandler = {
     this._dnssecPopupSecLabel.textContent = this._domainPreText[newMode] + " " + this._utf8HostName + " " + this._securityText[newMode];
     this._dnssecPopupSecDetail.textContent = this._securityDetail[newMode];
     
-
-
     if (this.valstate==3) {
     this._dnssecPopupIpBrowser.textContent = this.ipbrowser;
     if (this.ipvalidator=="") this.ipvalidator="n/a";	
@@ -1232,11 +1116,6 @@ var dnssecExtHandler = {
     // Make sure that the display:none style we set in xul is removed now that
     // the popup is actually needed
     this._dnssecPopupfwd.hidden = false;
-
-    // Tell the popup to consume dismiss clicks, to avoid bug 395314
-    //this._dnssecPopupfwd.popupBoxObject
-    //    .setConsumeRollupEvent(Ci.nsIPopupBoxObject.ROLLUP_CONSUME);
-     //dump('Open popup FWD...\n');
 
      delete this._stringBundle;
      this._stringBundle = document.getElementById("dnssec-strings");

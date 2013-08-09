@@ -3,7 +3,7 @@ Copyright 2013 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz>
 
-This file is part of DNSSEC Validator 2.0 Add-on.
+This file is part of DNSSEC/TLSA Validator 2.0 Add-on.
 
 DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by
@@ -19,45 +19,38 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-
-//Components.utils.import("resource://gre/modules/ctypes.jsm");
-//Components.utils.import("resource://gre/modules/AddonManager.jsm"); 
-
 window.addEventListener("load", function() { daneExtension.init(); }, false);
 window.addEventListener("unload", function() { daneExtension.uninit(); }, false);
 
-
+// **********************************************************************
+/* onPageLoad: observe that page is completed in any tabs or window    */
+// **********************************************************************
 function onPageLoad(event) {
 
-
-  dump(tlsaValidator.DANE_DEBUG_PRE + "+++++++PAGE WAS LOADED++++++++++++" + tlsaValidator.DANE_DEBUG_POST); 
-  //daneExtension.oldAsciiHost = null;
+  if (daneExtension.debugOutput)
+    dump(tlsaValidator.DANE_DEBUG_PRE + "+++++++PAGE WAS LOADED++++++++++++" + tlsaValidator.DANE_DEBUG_POST); 
   daneExtension.oldAsciiHost2 = null;
   if (event.originalTarget instanceof HTMLDocument) {
     var win = event.originalTarget.defaultView;
     if (win.frameElement) {
-      // Frame within a tab was loaded. win should be the top window of
-      // the frameset. If you don't want do anything when frames/iframes
-      // are loaded in this web page, uncomment the following line:
-      // return;
-      // Find the root document:
       win = win.top;
     }
   }
 };
 
-
+// **********************************************************************
+/* daneExtUrlBarListener: observe the browser events a securtiy changes*/
+// **********************************************************************
 var daneExtUrlBarListener = {
 
   onLocationChange: function(aWebProgress, aRequest, aLocationURI)
   {
-    //dump('dane: onLocationChange()\n');
-    //var tlsares = tlsaValidator.processNewURL(aRequest, aLocationURI);     	
+    //dump('Browser: onLocationChange()\n');  	
   },
 
   onSecurityChange: function(aWebProgress, aRequest, aState)
   {
-    dump('browser: onSecurityChange(' +aState + ')\n');
+    //dump('Browser: onSecurityChange(' +aState + ')\n');
     var uri = null;
     uri = window.gBrowser.currentURI;
     var tlsares = tlsaValidator.processNewURL(aRequest, uri);
@@ -121,17 +114,6 @@ var daneExtension = {
     this.timer = Components.classes["@mozilla.org/timer;1"]
                  .createInstance(Components.interfaces.nsITimer);
 
-    // Get DNSSEC Validator extension object
-    if (Application.extensions) {   // Firefox < 3.7, sync
-      var dnssecExt = Application.extensions.get(this.dnssecExtID);
-      this.showHomepage(dnssecExt);
-    } else {   // Firefox >= 3.7, async
-      Application.getExtensions(function(extensions) {
-        var dnssecExt = extensions.get(dnssecExtension.dnssecExtID);
-        dnssecExtension.showHomepage(dnssecExt);
-      });
-    }
-
     // Listen for webpage events
     gBrowser.addProgressListener(daneExtUrlBarListener);
     gBrowser.addEventListener("load", onPageLoad, true);
@@ -183,9 +165,8 @@ var daneExtension = {
 	observerService.removeObserver(this, topic);
     },
 
+    // catch http/https request	
     observe: function(channel, topic, data) {
-
-
 
      if (topic == "http-on-examine-response") {
 	
@@ -193,14 +174,15 @@ var daneExtension = {
 	channel.QueryInterface(Ci.nsIHttpChannel);
 	var host = channel.URI.hostPort;
 	var url = channel.URI.spec;
-
-	dump(tlsaValidator.DANE_DEBUG_PRE + this.oldAsciiHost2 + " == " + host);      
+	
+	if (this.debugOutput)
+  	  dump(tlsaValidator.DANE_DEBUG_PRE + this.oldAsciiHost2 + " == " + host);      
     	// Eliminate duplicated queries
     	if (host == this.oldAsciiHost2) {
-		dump(" ... TRUE" + tlsaValidator.DANE_DEBUG_POST);    
+		if (this.debugOutput) dump(" ... TRUE" + tlsaValidator.DANE_DEBUG_POST);    
      	 return;
     	}
-	dump(" ... FALSE" + tlsaValidator.DANE_DEBUG_POST);
+	if (this.debugOutput) dump(" ... FALSE" + tlsaValidator.DANE_DEBUG_POST);
 
 	var si = channel.securityInfo;
 	if (!si) return;
@@ -235,72 +217,23 @@ var daneExtension = {
 		st.QueryInterface(Ci.nsISSLStatus);
 			var cert = st.serverCert;
 			if (!cert) return;
-		var ccancel = tlsaValidator.check_tlsa2(channel, cert, browser, host, "443");
+		var ccancel = tlsaValidator.check_tlsa_https(channel, cert, browser, host, "443");
 		if (ccancel) this.oldAsciiHost2 = null;
 		else this.oldAsciiHost2 = host;
 		
       }
 
      if (topic == "http-on-examine-cached-response") {
-/*
-	var Cc = Components.classes, Ci = Components.interfaces;
-	channel.QueryInterface(Ci.nsIHttpChannel);
-	var host = channel.URI.hostPort;
-	var url = channel.URI.spec;
-	//var currentURL = gBrowser.currentURI.hostPort;
-	dump('---observe: function('+url+', '+topic+', '+host+', '+data+')\n');
-	
-
-	var si = channel.securityInfo;
-	if (!si) return;
-	
-	var nc = channel.notificationCallbacks;
-	if (!nc && channel.loadGroup)
-	  nc = channel.loadGroup.notificationCallbacks;
-	if (!nc) return;
-
-	try {
-	    var win = nc.getInterface(Ci.nsIDOMWindow);
-	} catch (e) {
-	    return; // no window for e.g. favicons
-	}
-	if (!win.document) return;
-
-	var browser;
-	// thunderbird has no gBrowser
-	if (typeof gBrowser != "undefined") {
-	    browser = gBrowser.getBrowserForDocument(win.top.document);
-	    // We get notifications for a request in all of the open windows
-	    // but browser is set only in the window the request is originated from,
-	    // browser is null for favicons too.
-	    if (!browser) return;
-	}
-dump('---observe: function('+browser+')\n'); 
-	//dump('---'+this.oldAsciiHost2+'-----'+host+'-----\n');
- 	//if (this.oldAsciiHost2 != host) {
-		//this.oldAsciiHost2 = host;
-	   	si.QueryInterface(Ci.nsISSLStatusProvider);
-		var st = si.SSLStatus;
-		if (!st) return;
-		
-		//if (host == currentURL) {
-			st.QueryInterface(Ci.nsISSLStatus);
-			var cert = st.serverCert;
-			if (!cert) return;
-		var tlsares = tlsaValidator.check_tlsa2(channel, cert, browser, host, "443");
-		////this.certCheck(browser, cert, channel);
-		//}
-	//}
-	dump('---observe: end\n');
-
-*/
+	//if (this.debugOutput) dump(tlsaValidator.DANE_DEBUG_PRE + "http-on-examine-cached-response" + tlsaValidator.DANE_DEBUG_POST); 
       }
-
-
     },
 
 };//class
 
+
+// **************************************************************
+/* tlsaValidator class					       */
+// **************************************************************
 var tlsaValidator = {
 
  overrideService: Components.classes["@mozilla.org/security/certoverride;1"]
@@ -320,6 +253,7 @@ var tlsaValidator = {
     DANE_DEBUG_PRE: "dane: ",
     DANE_DEBUG_POST: "\n",
 
+  // it is call when url was changed
   processNewURL: function(aRequest, aLocationURI) {
     var scheme = null;
     var asciiHost = null;
@@ -328,7 +262,8 @@ var tlsaValidator = {
     scheme = aLocationURI.scheme;             // Get URI scheme
     asciiHost = aLocationURI.asciiHost;       // Get punycoded hostname
 
-    dump(this.DANE_DEBUG_PRE + 'Scheme: "' + scheme + '"; ' + 'ASCII domain name: "' + asciiHost + '"'); 
+    if (daneExtension.debugOutput)
+	dump(this.DANE_DEBUG_PRE + 'Scheme: "' + scheme + '"; ' + 'ASCII domain name: "' + asciiHost + '"'); 
 
     if (scheme == 'chrome' ||                   // Eliminate chrome scheme
         asciiHost == null ||
@@ -338,7 +273,7 @@ var tlsaValidator = {
         asciiHost.indexOf(":") != -1 ||         // Eliminate IPv6 addr notation
         asciiHost.search(/[A-Za-z]/) == -1) {   // Eliminate IPv4 addr notation
 
-     dump(' ...invalid\n');
+       if (daneExtension.debugOutput) dump(' ...invalid\n');
       this.oldAsciiHost = null;
       // Set inaction mode (no icon)
       tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_INACTION);
@@ -346,27 +281,27 @@ var tlsaValidator = {
 
     // Eliminate duplicated queries
     } else if (asciiHost == this.oldAsciiHost) {
-      dump(' ...duplicated\n');
+      if (daneExtension.debugOutput) dump(' ...duplicated\n');
       return;
     }
 
-  
     dump(' ...valid\n');
                
     if (!aLocationURI || scheme.toLowerCase() != "https") {
-     dump(this.DANE_DEBUG_PRE + "Connection is NOT secured (http)" + this.DANE_DEBUG_POST);
+     if (daneExtension.debugOutput) 
+	 dump(this.DANE_DEBUG_PRE + "Connection is NOT secured (http)" + this.DANE_DEBUG_POST);
      tlsaExtHandler.setSecurityState(c.DANE_EXIT_NO_HTTPS);
      this.oldAsciiHost = asciiHost;
      return c.DANE_EXIT_NO_HTTPS;
     } 
     else {
 	var tlsa = c.DANE_EXIT_VALIDATION_OFF;
-        dump(this.DANE_DEBUG_PRE + "Connection is secured (https)" + this.DANE_DEBUG_POST);
-	tlsa = this.check_tlsa(aRequest,asciiHost,"443");
+	if (daneExtension.debugOutput)
+           dump(this.DANE_DEBUG_PRE + "Connection is secured (https)" + this.DANE_DEBUG_POST);
+	tlsa = this.check_tlsa_tab_change(aRequest, asciiHost, "443");
 	this.oldAsciiHost = asciiHost;
 	return tlsa;
-    }
-	
+    }	
   },
   
   //gets valid or invalid certificate used by the browser
@@ -464,16 +399,22 @@ getInvalidCertStatus: function (uri){
             return gSSLStatus;
 },
 
-check_tlsa: function (channel,uri,port){
 
-	dump(this.DANE_DEBUG_PRE + "--- TLSA validation start ---" + this.DANE_DEBUG_POST); 
-         var c = tlsaExtNPAPIConst;
+// check TLSA when tab is change
+check_tlsa_tab_change: function (channel, uri, port){
+
+	if (daneExtension.debugOutput)
+	    dump(this.DANE_DEBUG_PRE + "--- TLSA validation start ---" + this.DANE_DEBUG_POST); 
+
+        var c = tlsaExtNPAPIConst;
 	var cert = this.getCertificate(window.gBrowser);
     	if(!cert) {
-	  dump(this.DANE_DEBUG_PRE + "No certificate!" + this.DANE_DEBUG_POST);
-	  tlsaExtHandler.setSecurityState(c.DANE_EXIT_NO_CERTCHAIN);
+	  if (daneExtension.debugOutput)
+	      dump(this.DANE_DEBUG_PRE + "No certificate!" + this.DANE_DEBUG_POST);
+	  tlsaExtHandler.setSecurityState(c.DANE_EXIT_NO_CERT_CHAIN);
 	  this.oldAsciiHost = null;
-  	  dump(this.DANE_DEBUG_PRE + "--- TLSA validation end ---" + this.DANE_DEBUG_POST); 
+  	  if (daneExtension.debugOutput)
+	      dump(this.DANE_DEBUG_PRE + "--- TLSA validation end ---" + this.DANE_DEBUG_POST); 
 	  return c.DANE_EXIT_NO_CERTCHAIN;
         }
 	var state = window.gBrowser.securityUI.state;
@@ -502,17 +443,21 @@ check_tlsa: function (channel,uri,port){
         var options = 0;
 	//if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
 	if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-        dump(this.DANE_DEBUG_PRE + "https://" + uri + "; certchain lenght: " + len + this.DANE_DEBUG_POST); 
+        if (daneExtension.debugOutput)
+	    dump(this.DANE_DEBUG_PRE + "https://" + uri + "; certchain lenght: " + len + this.DANE_DEBUG_POST); 
         var daneMatch = tlsa.TLSAValidate(derCerts, len, options, "",  uri, port, protocol, policy);
-	dump(this.DANE_DEBUG_PRE + "For https://" + uri + " DANE return: " + daneMatch[0] + this.DANE_DEBUG_POST); 
+	if (daneExtension.debugOutput)
+	    dump(this.DANE_DEBUG_PRE + "For https://" + uri + " DANE return: " + daneMatch[0] + this.DANE_DEBUG_POST); 
 
     	if (daneMatch[0] <= c.DANE_EXIT_NO_CERT_CHAIN) { 	   	
 	   if (channel) {
 	      if (this.oldAsciiHost == uri) {  
-	        dump(this.DANE_DEBUG_PRE + this.oldAsciiHost + " == " + uri + this.DANE_DEBUG_POST); 
+	        if (daneExtension.debugOutput)
+	    		dump(this.DANE_DEBUG_PRE + this.oldAsciiHost + " == " + uri + this.DANE_DEBUG_POST); 
 	      }	
 	      else { 
-	        dump(this.DANE_DEBUG_PRE + this.oldAsciiHost + " <> " + uri + this.DANE_DEBUG_POST); 
+		if (daneExtension.debugOutput)	    
+		        dump(this.DANE_DEBUG_PRE + this.oldAsciiHost + " <> " + uri + this.DANE_DEBUG_POST); 
 	
                 var stringbundle = document.getElementById("dnssec-strings");
    	        var pre = stringbundle.getString("warning.dialog.pre");
@@ -524,26 +469,30 @@ check_tlsa: function (channel,uri,port){
 		   dump(this.DANE_DEBUG_PRE + "https request for (" +uri+ ") was canceled!" + this.DANE_DEBUG_POST);
 		   this.oldAsciiHost = null;  
 		}
-
 	      }
 	   }
     	}
 
 	tlsaExtHandler.setSecurityState(daneMatch[0]);
-	dump(this.DANE_DEBUG_PRE + "--- TLSA validation end ---" + this.DANE_DEBUG_POST);
+	if (daneExtension.debugOutput)
+	    dump(this.DANE_DEBUG_PRE + "--- TLSA validation end ---" + this.DANE_DEBUG_POST);
 	this.oldAsciiHost = null;
 	return daneMatch[0];
   },
 
-check_tlsa2: function (channel, cert, browser, uri, port){
+// check TLSA when new https request is create
+check_tlsa_https: function (channel, cert, browser, uri, port){
 
-	dump(this.DANE_DEBUG_PRE + "--- TLSA VALIDATION START ---" + this.DANE_DEBUG_POST); 
+	if (daneExtension.debugOutput)
+	    dump(this.DANE_DEBUG_PRE + "--- TLSA VALIDATION START ---" + this.DANE_DEBUG_POST); 
          var c = tlsaExtNPAPIConst;
     	if(!cert) {
-	  dump(this.DANE_DEBUG_PRE + "No certificate!" + this.DANE_DEBUG_POST);
-	  tlsaExtHandler.setSecurityState(c.DANE_EXIT_NO_CERTCHAIN);
+	  if (daneExtension.debugOutput)
+	    dump(this.DANE_DEBUG_PRE + "No certificate!" + this.DANE_DEBUG_POST);
+	  tlsaExtHandler.setSecurityState(c.DANE_EXIT_NO_CERT_CHAIN);
 	  //this.oldAsciiHost2 = null;
-  	  dump(this.DANE_DEBUG_PRE + "--- TLSA VALIDATION END ---" + this.DANE_DEBUG_POST); 
+  	  if (daneExtension.debugOutput)
+	    dump(this.DANE_DEBUG_PRE + "--- TLSA VALIDATION END ---" + this.DANE_DEBUG_POST); 
 	  return true;
         }
 	var state = window.gBrowser.securityUI.state;
@@ -572,9 +521,11 @@ check_tlsa2: function (channel, cert, browser, uri, port){
         var options = 0;
 	//if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
 	if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-        dump(this.DANE_DEBUG_PRE + "https://" + uri + "; certchain lenght: " + len + this.DANE_DEBUG_POST); 
+        if (daneExtension.debugOutput)
+	    dump(this.DANE_DEBUG_PRE + "https://" + uri + "; certchain lenght: " + len + this.DANE_DEBUG_POST); 
         var daneMatch = tlsa.TLSAValidate(derCerts, len, options, "",  uri, port, protocol, policy);
-	dump(this.DANE_DEBUG_PRE + "For https://" + uri + " DANE return: " + daneMatch[0] + this.DANE_DEBUG_POST); 
+	if (daneExtension.debugOutput)
+	    dump(this.DANE_DEBUG_PRE + "For https://" + uri + " DANE return: " + daneMatch[0] + this.DANE_DEBUG_POST); 
 	var ccancel = false;
     	if (daneMatch[0] <= c.DANE_EXIT_NO_CERT_CHAIN) { 	   	
 	   if (channel) {
@@ -586,13 +537,15 @@ check_tlsa2: function (channel, cert, browser, uri, port){
 		if (confirm(pre + uri + " "+post))
 		{
 		   channel.cancel(Components.results.NS_BINDING_ABORTED);
-		   dump(this.DANE_DEBUG_PRE + "https request for (" +uri+ ") was canceled!" + this.DANE_DEBUG_POST); 
+		   if (daneExtension.debugOutput)
+	    		dump(this.DANE_DEBUG_PRE + "https request for (" +uri+ ") was canceled!" + this.DANE_DEBUG_POST); 
 		   ccancel = true;
 		} else ccancel = false;
 	   }
     	}
 	//tlsaExtHandler.setSecurityState(daneMatch[0]);
-	dump(this.DANE_DEBUG_PRE + "--- TLSA TLSA VALIDATION END ---" + this.DANE_DEBUG_POST);
+	if (daneExtension.debugOutput)
+	    dump(this.DANE_DEBUG_PRE + "--- TLSA TLSA VALIDATION END ---" + this.DANE_DEBUG_POST);
 	return ccancel;
   }
 };
@@ -1043,6 +996,7 @@ var tlsaExtHandler = {
   },
 
   hideTlsaPopup : function() {
+    this.hideAddInfo();
     this._tlsaPopup.hidePopup();
   },
 
@@ -1088,12 +1042,12 @@ var tlsaExtHandler = {
     // No popup window while...
     if (this._tlsaBox && (this._tlsaBox.className == this.DANE_MODE_ACTION )) // getting security status
       return;
-	
+
+    this.hideAddInfo();	
     // Make sure that the display:none style we set in xul is removed now that
     // the popup is actually needed
     this._tlsaPopup.hidden = false;
 
-    this.hideAddInfo();
     // Tell the popup to consume dismiss clicks, to avoid bug 395314
     this._tlsaPopup.popupBoxObject
         .setConsumeRollupEvent(Ci.nsIPopupBoxObject.ROLLUP_CONSUME);

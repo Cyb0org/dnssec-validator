@@ -23,6 +23,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY dnssec.unsecuredLabel "Nezabezpečeno DNSSEC">
 <!ENTITY dnssec.bogusLabel "Neplatný DNSSEC podpis">
 <!ENTITY dnssec.errorLabel "Stav DNSSEC neznámý">
+<!ENTITY dnssec.wrongresLabel "Resolver nepodporuje DNSSEC">
 <!ENTITY dnssec.offLabel "Neověřeno DNSSEC">
 <!ENTITY dnssec.ipbrowser "IP adresy použité prohlížečem:">
 <!ENTITY dnssec.ipvalidator "IP adresy ověřené doplňkem:">

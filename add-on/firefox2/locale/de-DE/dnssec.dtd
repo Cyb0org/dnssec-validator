@@ -23,6 +23,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY dnssec.unsecuredLabel "Nicht durch DNSSEC gesichert">
 <!ENTITY dnssec.bogusLabel "Ungültige DNSSEC-Signatur">
 <!ENTITY dnssec.errorLabel "DNSSEC-Zustand unbekannt">
+<!ENTITY dnssec.wrongresLabel "Resolver unterstützt DNSSEC nicht">
 <!ENTITY dnssec.offLabel "Nicht durch DNSSEC geprüft">
 <!ENTITY dnssec.ipbrowser "Von Webbrowser benutzte IP-Adresse:">
 <!ENTITY dnssec.ipvalidator "Von Add-on erworbene IP-Adresse:">

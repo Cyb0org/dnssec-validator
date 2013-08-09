@@ -43,7 +43,8 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 
-#dnssec-box.dnssecOff > #dnssec-icon {
+#dnssec-box.dnssecOff > #dnssec-icon,
+#dnssec-box.wrongresolver > #dnssec-icon {
   width: 19px;
   height: 19px;
   list-style-image: url("chrome://dnssec/skin/icon_white.png"); /* 35x16 */
@@ -204,7 +205,8 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /* grey with error */
-#dnssec-popup.dnssecOff > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon {
+#dnssec-popup.dnssecOff > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
+#dnssec-popup.wrongresolver > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon {
   list-style-image: url("chrome://dnssec/skin/icon_white.png"); 
 }
 
@@ -250,7 +252,8 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-popup-errorLabel,
 #dnssec-popup-bogusLabel,
 #dnssec-popup-unsecuredLabel,
-#dnssec-popup-dnssecOffLabel {
+#dnssec-popup-dnssecOffLabel,
+#dnssec-popup-wrongresLabel {
   font-weight: bold;
   max-width: 335px;
   font-size: 120%;
@@ -311,6 +314,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 /* DNSSEC popup UI */
 #dnssec-popup-content-box > #dnssec-popup-content-box2.dnssecOff > #dnssec-popup-dnssecOffLabel,
+#dnssec-popup-content-box > #dnssec-popup-content-box2.wrongresolver > #dnssec-popup-wrongresLabel,
 #dnssec-popup-content-box > #dnssec-popup-content-box2.errorDnssec > #dnssec-popup-errorLabel,
 #dnssec-popup-content-box > #dnssec-popup-content-box2.securedConnectionDomain > #dnssec-popup-securedLabel,
 #dnssec-popup-content-box3.securedConnectionDomain > #dnssec-popup-domainLabel,

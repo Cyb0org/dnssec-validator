@@ -19,12 +19,12 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** -->
 
-<!ENTITY aboutwindow.title "DNSSEC Validator">
+<!ENTITY aboutwindow.title "DNSSEC/TSLA Validator">
 <!ENTITY aboutwindow.grouplabel "About plugin">
-<!ENTITY aboutwindow.label "DNSSEC Validator for Mozilla Firefox">
-<!ENTITY aboutwindow.description1 "Add-on plugin for DNSSEC checking">
+<!ENTITY aboutwindow.label "DNSSEC/TLSA Validator for Mozilla Firefox">
+<!ENTITY aboutwindow.description1 "Add-on plugin for DNSSEC and TLSA checking">
 <!ENTITY aboutwindow.description2 "Support for 32-bit and 64-bit versions">
-<!ENTITY aboutwindow.version "Version 2.0">
+<!ENTITY aboutwindow.version "Version 2.2.0">
 <!ENTITY aboutwindow.company "CZ.NIC Labs">
 <!ENTITY aboutwindow.year "2013">
 
