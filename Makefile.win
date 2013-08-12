@@ -69,7 +69,7 @@ xpi_x86:
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA).dll $(ADDON_PATH_FF)/plugins
 	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>WINNT_x86-msvc<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
-	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec_validator-$(EXTENSION_VERSION)-windows-x86.xpi
+	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-windows-x86.xpi
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Chrome Linux x86... ###'
@@ -78,6 +78,6 @@ xpi_x86:
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC).dll $(ADDON_PATH_CR)
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA).dll $(ADDON_PATH_CR)
 	sed -e 's/dnssecplugin/np$(PLUGIN_NAME_DNSSEC).dll/g' -e 's/tlsaplugin/np$(PLUGIN_NAME_TLSA).dll/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
-	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz chrome2 && mv CR-dnssec_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz ../$(PLUGIN_ADD_ON)
+	cd add-on && tar -czf CR-dnssec-tlsa_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz chrome2 && mv CR-dnssec-tlsa_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz ../$(PLUGIN_ADD_ON)
 	cd $(ADDON_PATH_CR) && rm -rf $(PLUGIN_NAME_DNSSEC_LIB) manifest.json $(PLUGIN_NAME_TLSA_LIB) np$(PLUGIN_NAME_DNSSEC).dll np$(PLUGIN_NAME_TLSA).dll
 	@echo '### DONE... #
