@@ -89,6 +89,15 @@
          "dnsseOffInfo": {
 		"message": "DNSSEC validace nebyla provedena, protože tato doména nebo její nadřazená doména je uvedena v seznamu vyloučených doménových jmen."
 		},
+ 	"dnssecwrongres": {
+		"message": "Resolver nepodporuje DNSSEC"
+		},
+         "dnssecWrongResolver": {
+		"message": " nelze ověřit pomocí DNSSEC technologie."
+		},
+         "dnssecWrongResolverInfo": {
+		"message": "Aktuálně nastavený resolver nepodporuje DNSSEC technologii. Prosím, změňte nastavení validátoru (nastavte volbu \"Bez resolveru\")."
+		},
          "0dnssecError": {
 		"message": " nelze ověřit pomocí DNSSEC technologie."
 		},

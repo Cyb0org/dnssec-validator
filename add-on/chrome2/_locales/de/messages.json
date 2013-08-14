@@ -83,6 +83,15 @@
 	 "nodomain": {
 		"message": "Die Nichtexistenz des Domänennamen "
 		},
+ 	"dnssecwrongres": {
+		"message": "Resolver unterstützt DNSSEC nicht"
+		},
+         "dnssecWrongResolver": {
+		"message": " kann nicht mit DNSSEC überprüft werden."
+		},
+         "dnssecWrongResolverInfo": {
+		"message": "Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht. Ändern Sie bitte die Einstellungen des Resolvers (Wahl \"Ohne Resolver\")."
+		},
          "dnsseOff": {
 		"message": " wurde nicht durch DNSSEC überprüft."
 		},

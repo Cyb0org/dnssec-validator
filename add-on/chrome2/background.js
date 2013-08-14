@@ -26,18 +26,20 @@ document.write("</head>");
 document.write("<body>");
 document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidator\" width=\"0\" height=\"0\"></object>");
 document.write("<script>");
-	// debug
+
+	// debug pretext
 	var DNSSEC = "DNSSEC: ";
 	// some variables for chrome IP API
 	var currentIPList= new Array();
 	var currentIPListDomain= new Array();
         // Save all IP addresses by URLs in a temporary object
-	var addr = "0.0.0.0";  // set default IP address
+	var addr = "0.0.0.0";        // set default IP address
 	var addrbackup = "0.0.0.0";  // set default IP address for backup
-	var fwdinfo = false;
 
 	// States of DNSSEC validator
 	var dnssecExtNPAPIConst = {
+		DNSSEC_EXIT_WRONG_RES                      : -2,
+		DNSSEC_EXIT_DNSSEC_OFF                     : -1,
   		DNSSEC_EXIT_FAILED                         : 0, /* state is unknown or fail*/
 		DNSSEC_EXIT_DOMAIN_UNSECURED 		   : 1, /* domain is not secured */
   		DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP   : 2, /* domain name is secured by DNSSEC and the IP address of browser is valid */
@@ -54,57 +56,54 @@ document.write("<script>");
 
 	//connection is secured, but domain has invalid signature
         var dnssecModes = {
-          // No DNSSEC signature
-          DNSSEC_MODE_OFF                    : "dnsseOff",
-	  DNSSEC_MODE_OFF_INFO               : "dnsseOffInfo",
+          // DNSSEC Validation OFF
+          DNSSEC_MODE_OFF                    		  : "dnsseOff",
+	  DNSSEC_MODE_OFF_INFO               		  : "dnsseOffInfo",
+	  // Wrong resovler for DNSSEC
+	  DNSSEC_MODE_WRONG_RES				  : "dnssecWrongResolver",
+ 	  DNSSEC_MODE_WRONG_RES_INFO			  : "dnssecWrongResolverInfo",
           // No DNSSEC signature
           DNSSEC_MODE_DOMAIN_UNSECURED                    : "1unsecuredDomain",
           DNSSEC_MODE_DOMAIN_UNSECURED_INFO               : "1unsecuredDomainInfo",
-    
 	  // Domain and also connection are secured
           DNSSEC_MODE_CONNECTION_DOMAIN_SECURED           : "2securedConnectionDomain",
           DNSSEC_MODE_CONNECTION_DOMAIN_SECURED_INFO      : "2securedConnectionDomainInfo",
-
           // Domain and also connection are secured but browser's IP address is invalid
           DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED : "3securedConnectionDomainInvIPaddr",
-          DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED_INFO : "3securedConnectionDomainInvIPaddrInfo",
-          
+          DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED_INFO : "3securedConnectionDomainInvIPaddrInfo",         
           // Domain is secured, but it has an invalid signature
           DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID            : "4invalidDomainSignature",
           DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID_INFO       : "4invalidDomainSignatureInfo",
-
      	 // No NSEC/NSEC3 for non-existent domain name
           DNSSEC_MODE_NODOMAIN_UNSECURED                  : "5unsecuredNoDomain",          
           DNSSEC_MODE_NODOMAIN_UNSECURED_INFO             : "5unsecuredNoDomainInfo", 
-
 	  // Connection is secured, but domain name does not exist
           DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED         : "6securedConnectionNoDomain",
           DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED_INFO    : "6securedConnectionNoDomainInfo",
-
-
           // Non-existent domain is secured, but it has an invalid signature
           DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID          : "7invalidNoDomainSignature",
           DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID_INFO     : "7invalidNoDomainSignatureInfo",
-
           // Getting security status
-          DNSSEC_MODE_ACTION     : "actionDnssec",
+          DNSSEC_MODE_ACTION     			  : "actionDnssec",
           // Inaction status
-          DNSSEC_MODE_INACTION   : "inactionDnssec",
+          DNSSEC_MODE_INACTION   			  : "inactionDnssec",
           // Error or unknown state occured
-          DNSSEC_MODE_ERROR 	 : "0dnssecError",
-	  DNSSEC_MODE_ERROR_INFO : "0dnssecErrorInfo",
+          DNSSEC_MODE_ERROR 	 			  : "0dnssecError",
+	  DNSSEC_MODE_ERROR_INFO 			  : "0dnssecErrorInfo",
 
-          // Tooltips
+          // Tooltips states
           DNSSEC_TOOLTIP_SECURED   : "dnssecok",
           DNSSEC_TOOLTIP_UNSECURED : "dnssecnone",
           DNSSEC_TOOLTIP_ACTION    : "dnssecaction",
           DNSSEC_TOOLTIP_ERROR     : "dnssecfail",
           DNSSEC_TOOLTIP_BOGUS     : "dnssecbogus",
-            
+          DNSSEC_TOOLTIP_WRONG_RES : "dnssecwrongres",
+	  DNSSEC_TOOLTIP_DNSSEC_OFF : "validatoroff",  
         };
 
 //****************************************************************
 // this function show comfirm window when resolver does not support DNSSEC
+// not used since version 2.2.0
 //****************************************************************
 function showresolverinfo(tabId) {
 	var choice = confirm(chrome.i18n.getMessage("fwdinfo"));
@@ -115,105 +114,108 @@ function showresolverinfo(tabId) {
 // this function sets DNSSEC mode. status ICON and popup text
 //****************************************************************
 function setMode(newMode, tabId, domain, status,  addr, ipval, changeInfo) {
-            var icon;
-	    var title;
-	    var domainpre;
-      	    var tooltiptitle;
+        var icon;
+	var title;
+	var domainpre;
+      	var tooltiptitle;
 	    
-	    console.log(DNSSEC + "Set mode: " + newMode + "; TabId: " + tabId + "; Doamin: " + domain + "; Status: " + status);
+	console.log(DNSSEC + "Set mode: " + newMode + "; TabId: " + tabId + "; Doamin: " + domain + "; Status: " + status);
             
 	switch (newMode) {
             /* green icon */
             // Both domain and connection are secured
             case this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED:
               	icon = "icon_green.png";
-	      	title = "dnssecok";
+	      	title = this.dnssecModes.DNSSEC_TOOLTIP_SECURED;
 	      	domainpre = "domain";
-        	tooltiptitle = chrome.i18n.getMessage("dnssecok");
+        	tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_SECURED);
               break;
             // Both non-existent domain and connection are secured
             case this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED:
               	icon = "icon_green.png";
-	      	title = "dnssecok";
+	      	title = this.dnssecModes.DNSSEC_TOOLTIP_SECURED;
 	      	domainpre = "nodomain";
-	        tooltiptitle = chrome.i18n.getMessage("dnssecok");
+	        tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_SECURED);
               break;
             // Domain and also connection are secured but browser's IP address is invalid
             case this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED:
 	        icon = "icon_red.png";
- 	 	title = "dnssecok";
+ 	 	title = this.dnssecModes.DNSSEC_TOOLTIP_SECURED;
 		domainpre = "domain";
-	        tooltiptitle = chrome.i18n.getMessage("dnssecok");
+	        tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_SECURED);
               break;
             /* grey icon */
-
             // No DNSSEC signature
             case this.dnssecModes.DNSSEC_MODE_DOMAIN_UNSECURED:
 	        icon = "icon_grey2.png";
-		title = "dnssecnone";
+		title = this.dnssecModes.DNSSEC_TOOLTIP_UNSECURED;
 	        domainpre = "domain";
-	        tooltiptitle = chrome.i18n.getMessage("dnssecnone");
+	        tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_UNSECURED);
               break; 
             case this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED:
                 icon = "icon_grey2.png";
-	        title = "dnssecnone";
+	        title = this.dnssecModes.DNSSEC_TOOLTIP_UNSECURED;
 	        domainpre = "nodomain";
-	        tooltiptitle = chrome.i18n.getMessage("dnssecnone");
+	        tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_UNSECURED);
               break;
-
             /* red icon */
             // Domain signature is invalid
             case this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID:
                  icon = "icon_red.png";
-	        title = "dnssecbogus";
+	        title = this.dnssecModes.DNSSEC_TOOLTIP_BOGUS;
 	        domainpre = "domain";
-	        tooltiptitle = chrome.i18n.getMessage("dnssecbogus");
+	        tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_BOGUS);
               break;
             // Non-existent domain signature is invalid
             case this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID:
                 icon = "icon_red.png";
-	        title = "dnssecbogus";
+	        title = this.dnssecModes.DNSSEC_TOOLTIP_BOGUS;
 	        domainpre = "nodomain";
-	        tooltiptitle = chrome.i18n.getMessage("dnssecbogus");
+	        tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_BOGUS);
               break;
             // Getting security status
             case this.dnssecModes.DNSSEC_MODE_ACTION:
                 icon = "icon_action.gif";
-	        title = "dnssecaction";
-	        tooltiptitle = chrome.i18n.getMessage("dnssecaction");
+	        title = this.dnssecModes.DNSSEC_TOOLTIP_ACTION;
+	        tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_ACTION);
               break;
             case this.dnssecModes.DNSSEC_MODE_OFF:
                 icon = "icon_white.png";
 		domainpre = "domain";
-  	        title = "validatoroff";
-                tooltiptitle = chrome.i18n.getMessage("validatoroff");
+  	        title = this.dnssecModes.DNSSEC_TOOLTIP_DNSSEC_OFF;
+                tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_DNSSEC_OFF);
+              break;
+            case this.dnssecModes.DNSSEC_MODE_WRONG_RES:
+                icon = "icon_white.png";
+		domainpre = "domain";
+  	        title = this.dnssecModes.DNSSEC_TOOLTIP_WRONG_RES;
+                tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_WRONG_RES);
               break;
             // An error occured
             case this.dnssecModes.DNSSEC_MODE_ERROR:
             // Unknown
             default:
                icon = "icon_unknown.png";
-	       title = "dnssecfail";
+	       title = this.dnssecModes.DNSSEC_TOOLTIP_ERROR;
 	       domainpre = "domain";	
-               tooltiptitle = chrome.i18n.getMessage("dnssecfail");
+               tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_ERROR);
      	} // switch
 
+        chrome.pageAction.setTitle({tabId: tabId, title: tooltiptitle}); 
 
-            chrome.pageAction.setTitle({tabId: tabId, title: tooltiptitle}); 
+        //console.log("icon: " + icon);
+        chrome.pageAction.setIcon({path: icon, tabId: tabId});
 
-            //console.log("icon: " + icon);
-            chrome.pageAction.setIcon({path: icon, tabId: tabId});
-
-            chrome.pageAction.show(tabId);
-            //chrome.pageAction.setTitle({tabId: tabId, 
-            //                            title: "DNSSEC status for " + domain + ": " + newMode});
+        chrome.pageAction.show(tabId);
+        //chrome.pageAction.setTitle({tabId: tabId, 
+        //                            title: "DNSSEC status for " + domain + ": " + newMode});
             
-            // This is extremely fucking annoying, but chrome.extension.getViews() won't work
-            // unless popup is opened, so we set the validation result like GET parameters.
-            chrome.pageAction.setPopup({tabId: tabId, popup: "popup.html?" + domain + "," 
+        // This is extremely fucking annoying, but chrome.extension.getViews() won't work
+        // unless popup is opened, so we set the validation result like GET parameters.
+        chrome.pageAction.setPopup({tabId: tabId, popup: "popup.html?" + domain + "," 
 		+ newMode + "," + icon + "," + title + "," + domainpre + "," + addr + "," + ipval});
 	    
-	    if (fwdinfo) if (changeInfo == "complete") showresolverinfo(tabId);	   
+	//if (fwdinfo) if (changeInfo == "complete") showresolverinfo(tabId);	   
      }; // setMode
 
 //****************************************************************
@@ -276,7 +278,7 @@ function onUrlChange(tabId, changeInfo, tab) {
 	// validate thi domain?
 	var validate = true;
 	// no resolver info pop-up
-	fwdinfo=false;
+	//fwdinfo=false;
     	if (filteron == "true") {
 		console.log(DNSSEC + 'Domain filter: ON');
 		var urldomainsepar=/[.]+/;
@@ -305,7 +307,9 @@ function onUrlChange(tabId, changeInfo, tab) {
 	else console.log(DNSSEC + 'Domain filter: OFF');
 	
 	console.log(DNSSEC + 'Validate this domain: ' + validate );
-       
+        var c = this.dnssecExtNPAPIConst;
+        var status = c.DNSSEC_EXIT_DNSSEC_OFF;
+
      	if (validate) {  
             var debug = localStorage["dnssecDebugOutput"];
 	    debug = (debug == "false") ? false : true;        	   
@@ -336,7 +340,6 @@ function onUrlChange(tabId, changeInfo, tab) {
 	    }//if
    
 	    var options = 0;
-	    var c = this.dnssecExtNPAPIConst;
 	    if (debug) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
 	    if (resolver != "nofwd") options |= c.DNSSEC_INPUT_FLAG_USEFWD;
 	    if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
@@ -366,29 +369,25 @@ function onUrlChange(tabId, changeInfo, tab) {
 			result[0]=resultnofwd[0];
 			console.log(DNSSEC + "Yes, domain name has bogus");
 			plugin.CacheFree();
-			fwdinfo=false;
+			//fwdinfo=false;
 		} 
 		else
 		{		   
 			console.log(DNSSEC + "Current resolver does not support DNSSEC!");
 			console.log(DNSSEC + "Results: FWD: " + result[0] + "; NOFWD: " + resultnofwd[0]);
-			result[0]=resultnofwd[0];
+			result[0]=c.DNSSEC_EXIT_WRONG_RES;
 			plugin.CacheFree();
-			fwdinfo=true;
+			//fwdinfo=true;
 		}//if		
 	    } //if
 
 	    if (addr == "0.0.0.0") addr = "n/a"; 
   	    icon = ""; 
-	    var status = result[0];
+	    status = result[0];
      	    var ipval = result[1];
             if (ipval == "")  ipval = "n/a";
-      }
-      else {
-	   status=-1;
-	   var c = this.dnssecExtNPAPIConst;
-      } // if validate
- 
+        }
+
      	switch (status) {
 	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP: 
 		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED,
@@ -418,8 +417,12 @@ function onUrlChange(tabId, changeInfo, tab) {
 	        this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED,
 			tabId, domain, status,  addr, ipval, changeInfo.status);
 	        break;
-	    case -1:
+	    case c.DNSSEC_EXIT_DNSSEC_OFF:
 	        this.setMode(this.dnssecModes.DNSSEC_MODE_OFF,
+			tabId, domain, status, addr, ipval, changeInfo.status);
+	        break;
+	    case c.DNSSEC_EXIT_WRONG_RES:
+	        this.setMode(this.dnssecModes.DNSSEC_MODE_WRONG_RES,
 			tabId, domain, status, addr, ipval, changeInfo.status);
 	        break;
 	    case c.DNSSEC_EXIT_FAILED:
@@ -428,7 +431,7 @@ function onUrlChange(tabId, changeInfo, tab) {
 			tabId, domain, status, addr,  ipval, changeInfo.status);
                 break;
 	    }
-    fwdinfo=false;
+    //fwdinfo=false;
     console.log(DNSSEC + "--------- End of DNSSEC Validation ("+ domain +") ---------\n");
 
 }; // onUrlChange
@@ -450,7 +453,19 @@ chrome.webRequest.onResponseStarted.addListener(function(info) {
 // Listen for any changes to the URL of any tab.
 //****************************************************************
 chrome.tabs.onUpdated.addListener(onUrlChange);
-                
+
+//****************************************************************
+// TLS/SSL features for DANE/TLSA validation
+//****************************************************************
+/*
+chrome.experimental.ssl;
+
+chrome.experimental.ssl.onCertificateVerify.addListener(function(channel) { 
+console.log("experimental.ssl: " + channel.hostname  + " -- " + channel.constructedChain[1]  + ";");
+
+}, { urls: [], types: [] },  []);
+*/
+              
 document.write("</script>");
 document.write("</body>");
 document.write("</html>");

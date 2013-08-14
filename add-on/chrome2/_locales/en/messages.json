@@ -83,6 +83,15 @@
 	 "nodomain": {
 		"message": "Nonexistence of the domain name "
 		},
+ 	"dnssecwrongres": {
+		"message": "Resolver doesn't support DNSSEC"
+		},
+         "dnssecWrongResolver": {
+		"message": " can not be verified by DNSSEC."
+		},
+         "dnssecWrongResolverInfo": {
+		"message": "Current DNS server or resolver does not support DNSSEC technology. Please, change the validator settings (choice \"Without resolver\")."
+		},
          "dnsseOff": {
 		"message": " was not verified by DNSSEC."
 		},
