@@ -37,6 +37,7 @@ OpenSSL used as well as that of the covered work.
 #include <string.h>
 #include <stdbool.h>
 #include <errno.h>
+#include <assert.h>
 #include "ub_dnssec_states.gen"
 
 /* Windows */
@@ -87,6 +88,40 @@ FILE *dfout;			         /* FILE - for debug information*/
 struct ub_ctx* ctx;        	// ub context structure
 char ip_validator[256];		// return IP address(es) of validator
 
+//*****************************************************************************
+/* comparison of IPv6 addresses as structure */
+// ----------------------------------------------------------------------------
+int ipv6str_equal(const char *lhs, const char *rhs)
+{
+	int ret;
+
+	struct in6_addr la, ra; /* Left and gight address. */
+
+	ret = inet_pton(AF_INET6, lhs, &la);
+	assert(ret == 1);
+
+	ret = inet_pton(AF_INET6, rhs, &ra);
+	assert(ret == 1);
+
+	return memcmp(&la, &ra, sizeof(struct in6_addr)) == 0;
+}
+
+//*****************************************************************************
+/* comparison of IPv6 addresses as string */
+// ----------------------------------------------------------------------------
+int ipv6str_equal_str(const char *lhs, const char *rhs)
+{
+	struct sockaddr_in6 la, ra;
+	char str[INET6_ADDRSTRLEN];
+	char str2[INET6_ADDRSTRLEN];
+	// store this IP address in sa:
+	inet_pton(AF_INET6, lhs, &(la.sin6_addr));
+	inet_pton(AF_INET6, rhs, &(ra.sin6_addr));
+	inet_ntop(AF_INET6, &(la.sin6_addr), str, INET6_ADDRSTRLEN);
+	inet_ntop(AF_INET6, &(ra.sin6_addr), str2, INET6_ADDRSTRLEN);
+
+	return strncmp(str, str2, INET6_ADDRSTRLEN) == 0;
+}
 
 //*****************************************************************************
 /* read input options into a structure */
@@ -125,7 +160,49 @@ char *strconcat(char *s1, char *s2)
 //  1 : IPs is equal
 // -1 : IP is not set or any error was detected 
 // ----------------------------------------------------------------------------
-short ipmatches(char *ipbrowser, char *ipvalidator)
+short ipv6matches(char *ipbrowser, char *ipvalidator)
+{
+    const char delimiters[] = " ";
+    char *token;
+    int isequal = 0;
+
+    if (opts.debug) printf(DEBUG_PREFIX "IPmatches: %s %s\n", ipbrowser, ipvalidator);
+    if (ws) fprintf(dfout, DEBUG_PREFIX "IPmatches: %s %s\n", ipbrowser, ipvalidator);
+    strcpy( ip_validator, ipvalidator );
+
+    if ((ipbrowser != NULL) &&  (ipvalidator != NULL))
+      {
+        token = strtok (ipvalidator, delimiters);
+        if (token==NULL) {			
+		return DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP;
+	}
+        isequal = ipv6str_equal((const char*)ipbrowser,(const char*)token);
+        if (isequal != 0) {
+ 		return DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP;
+	}
+        while (token != NULL) {                    
+            token = strtok (NULL, delimiters);
+            if (token==NULL) {
+       	        return DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP;
+	    }
+            isequal = ipv6str_equal((const char*)ipbrowser,(const char*)token);                       
+            if (isequal != 0) {
+		return DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP;
+	    }                  
+        }
+        return DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP;        
+     }
+   return DNSSEC_EXIT_FAILED;
+}
+
+
+//*****************************************************************************
+// match IPs from stub resolver and validator
+//  0 : IPs is not equal 
+//  1 : IPs is equal
+// -1 : IP is not set or any error was detected 
+// ----------------------------------------------------------------------------
+short ipv4matches(char *ipbrowser, char *ipvalidator)
 {
     const char delimiters[] = " ";
     char *token;
@@ -203,6 +280,7 @@ short examine_result(struct ub_result *result, char* ipbrowser) {
                        } // for                          
                        if (opts.debug) printf(DEBUG_PREFIX "IPv4 address of validator: %s\n", ipvalidator);
                        if (ws) fprintf(dfout, DEBUG_PREFIX "IPv4 address of validator: %s\n", ipvalidator);
+		       retval = ipv4matches(ipbrowser,ipvalidator);
                     }
                	    else {
                       /* AAAA examine result */	 
@@ -212,9 +290,9 @@ short examine_result(struct ub_result *result, char* ipbrowser) {
                           ipvalidator = strconcat(ipvalidator," ");                                                   
                      	} // for                      
                      	if (opts.debug) printf(DEBUG_PREFIX "IPv6 address of validator: %s\n", ipvalidator);
-                      if (ws) fprintf(dfout, DEBUG_PREFIX "IPv6 address of validator: %s\n", ipvalidator);
-                    } // result->qtype
-		    retval = ipmatches(ipbrowser,ipvalidator);
+                        if (ws) fprintf(dfout, DEBUG_PREFIX "IPv6 address of validator: %s\n", ipvalidator);
+			retval = ipv6matches(ipbrowser,ipvalidator);
+                    } // result->qtype		    
 		    free(ipvalidator);
  	                  // free malloc ipvalidator
               }
@@ -424,12 +502,13 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv, char *i
 } // ds_validate
 
 
-int main(void){
+
+// for commadline testing
+int main(int argc, char **argv)
+{
 	short i;
 	char *tmp = NULL;	
-	i = ds_validate("www.nic.cz", 9, "nofwd", "1.1.1.1", &tmp);
-	printf(DEBUG_PREFIX "Returned value: \"%d\" %s\n", i, tmp);		
-	printf(DEBUG_PREFIX "Returned value: \"%d\" %s\n", i, tmp);		
+	i = ds_validate(argv[1], 13, "nofwd", "2001:610:188:301:145::2:10", &tmp);
+	printf(DEBUG_PREFIX "Returned value: \"%d\" %s\n", i, tmp);				
 	return 1;
 }
-
