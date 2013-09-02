@@ -1,0 +1,123 @@
+{
+	"preftitle": {
+		"message": "Nastavení TLSA validátoru"
+		},
+	"prefresolver": {
+		"message": "DNS resolver(y) používané pro překlad jmen:"
+		},
+	"groupboxfilter": {
+		"message": "Domény vyřazené z validace"
+		},
+	"usefilter": {
+		"message": "Nevalidovat domény uvedené v seznamu"
+		},
+	"filtertext": {
+		"message": "Seznam vyřazených domén a TLD (oddělené čárkami)"
+		},
+	"legend": {
+		"message": "Nastavení resolveru"
+		},
+	"resolver0": {
+		"message": "Načíst ze systému"
+		},
+	"resolver1": {
+		"message": "Veřejné resolvery CZ.NICu"
+		},
+	"resolver2": {
+		"message": "Veřejné resolvery OARCu"
+		},
+	"resolver3": {
+		"message": " Vlastní "
+		},
+	"resolver4": {
+		"message": "Bez resolveru"
+		},
+	"savebutton": {
+		"message": "Uložit nastavení"
+		},
+	"testbutton": {
+		"message": "Test současného nastavení"
+		},
+	"cancelbutton": {
+		"message": "Zrušit"
+		},
+	"messageok": {
+		"message": "Úspěch - současné nastavení umožňuje TLSA validaci."
+		},
+	"messagebogus": {
+		"message": "Selhání - špatná DNSSEC odpověď, TLSA validace není možná s aktuálním nastavením."
+		},
+	"messageerror": {
+		"message": "Selhání - není DNS odpověď, IP adresa resolveru je buď špatná nebo selhalo připojení k síti."
+		},
+	"messageip": {
+		"message": "Chyba - špatný formát nastavené IP adresy."
+		},
+	"moreinfo": {
+		"message": "Více info"
+		},
+	"homepage": {
+		"message": "Jít na domovskou stránku doplňku pro další informace"
+		},
+         "dnsseOffInfo": {
+		"message": "TLSA validace nebyla provedena, protože tato doména nebo její nadřazená doména je uvedena v seznamu vyloučených doménových jmen."
+		},
+ 	"dnssecwrongres": {
+		"message": "Resolver nepodporuje DNSSEC"
+		},
+         "dnssecWrongResolver": {
+		"message": " nelze ověřit pomocí DNSSEC technologie."
+		},
+         "dnssecWrongResolverInfo": {
+		"message": "Aktuálně nastavený resolver nepodporuje DNSSEC technologii. Prosím, změňte nastavení validátoru (nastavte volbu \"Bez resolveru\")."
+		},
+"dm_rfesolverfailed": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno nebyl ověřen pomocí protokolu DANE, protože pří získání TLSA záznamů pro toto doménové jméno došlo k chybě."},
+"dm_rfesolverfailedInfo": { "message":  "Při zjišťování TLSA záznamů pro toto doménové jméno došlo k chybě. Příčinou může být buď výpadek spojení ke vzdálenému serveru, nebo aktuálně nastavená IP adresa DNS serveru není platnou adresou serveru pro překlad doménového jména."},
+"dm_nohttps": { "message":  "Jelikož pro toto doménové jméno není navázáno zabezpečené spojení ke vzdálenému serveru protokolem HTTPS, není možné provést validaci TLSA záznamů."},
+"dm_nohttpsInfo": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno nelze ověřit pomocí protokolu DANE, protože připojení ke vzdálenému serveru není realizováno protokolem HTTPS."},
+"dm_notlsarecord": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno nelze ověřit protokolem DANE, protože pro toto doménové jméno neexistuje TLSA záznam."},
+"dm_notlsarecordInfo": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno nebyla ověřena protokolem DANE, protože pro toto doménové jméno neexistuje TLSA záznam."},
+"dm_dnssecunsecured": { "message":  "Jelikož toto doménové jméno není zabezpečeno technologií DNSSEC, nelze ověřit platnost serverového certifikátu protokolem DANE."},
+"dm_dnssecunsecuredInfo": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno nelze ověřit protokolem DANE, protože toto doménové jméno není zabezpečeno technologií DNSSEC."},
+"dm_dnssecbogus": { "message":  "Toto doménové jméno je zabezpečeno technologií DNSSEC a byl odhalen neplatný DNSSEC podpis, nelze ověřit platnost serverového certifikátu pomocí protokolu DANE."},
+"dm_dnssecbogusInfo": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno nelze ověřit pomocí protokolu DANE, protože toto doménové jméno má neplatný DNSSEC podpis."},
+"dm_certchain": { "message":  " Certifikát vzdáleného serveru pro toto doménové jméno nelze ověřit pomocí protokolu DANE, protože se nepodařilo získat řetězec certifikátů."},
+"dm_certchainInfo": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno nelze ověřit protokolem DANE, protože se nepodařilo získat řetězec certifikátů."},
+"dm_certerr": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno nelze ověřit pomocí protokolu DANE, protože se nepodařilo získat certifikát vzdáleného serveru."},
+"dm_certerrInfo": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno nelze ověřit protokolem DANE, protože se nepodařilo získat certifikát vzdáleného serveru."},
+"tlsapramwrong": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno nebyl ověřen pomocí protokolu DANE, protože získaný TLSA záznam obsahuje neplatné hodnoty parametrů."},
+"tlsapramwrongInfo": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno nebyla ověřena pomocí protokolu DANE, protože TLSA záznam obsahuje neplatné hodnoty parametrů. To může signalizovat podvržení TLSA záznamů."},
+"dm_vf": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno byl ověřen pomocí protokolu DANE. Certifikát odpovídá záznamu TLSA, který je zabezpečen technologií DNSSEC."},
+"dm_vfInfo": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno byla ověřena pomocí protokolu DANE, avšak serverový certifikát neodpovídá TLSA záznamu, který je korektně zabezpečen pomocí technologie DNSSEC."},
+"dm_vf0": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno byl ověřen pomocí protokolu DANE. Certifikát neodpovídá záznamu TLSA, který je zabezpečen technologií DNSSEC."},
+"dm_vf0Info": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno byla ověřena pomocí protokolu DANE. Avšak serverový certifikát neprošel validací PKIX a neodpovídá CA certifikátu v TLSA záznamu (typ 0), který je ale korektně zabezpečen pomocí technologie DNSSEC."},
+"dm_vf1": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno byl ověřen pomocí protokolu DANE. Certifikát neodpovídá záznamu TLSA, který je zabezpečen technologií DNSSEC."},
+"dm_vf1Info": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno byla ověřena pomocí protokolu DANE. Avšak serverový certifikát neprošel validací PKIX a neodpovídá EE certifikátu v TLSA záznamu (typ 1), který je ale korektně zabezpečen pomocí technologie DNSSEC."},
+"dm_vf2": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno byl ověřen pomocí protokolu DANE. Certifikát odpovídá záznamu TLSA, který je zabezpečen technologií DNSSEC."},
+"dm_vf2Info": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno byla ověřena pomocí protokolu DANE, avšak serverový certifikát neprošel validací PKIX nebo neodpovídá CA certifikátu v TLSA záznamu (typ 2), který je korektně zabezpečen pomocí technologie DNSSEC."},
+"dm_vf3": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno byl ověřen pomocí protokolu DANE. Certifikát odpovídá záznamu TLSA, který je zabezpečen technologií DNSSEC."},
+"dm_vf3Info": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno byla ověřena pomocí protokolu DANE, avšak serverový certifikát neodpovídá EE certifikátu v TLSA záznamu (typ 3), který je korektně zabezpečen pomocí technologie DNSSEC."},
+"dm_vs0": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno byl ověřen pomocí protokolu DANE. Certifikát odpovídá záznamu TLSA, který je zabezpečen technologií DNSSEC."},
+"dm_vs0Info": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno byla ověřena pomocí protokolu DANE. Certifikát prošel validací PKIX a odpovídá CA certifikátu v TLSA záznamu (typ 0), který je korektně zabezpečen pomocí technologie DNSSEC."},
+"dm_vs1": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno byl ověřen pomocí protokolu DANE. Certifikát odpovídá záznamu TLSA, který je zabezpečen technologií DNSSEC."},
+"dm_vs1Info": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno byla ověřena pomocí protokolu DANE. Certifikát prošel validací PKIX a odpovídá EE certifikátu v TLSA záznamu (typ 1), který je korektně zabezpečen pomocí technologie DNSSEC."},
+"dm_vs2": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno byl ověřen pomocí protokolu DANE. Certifikát odpovídá záznamu TLSA, který je zabezpečen technologií DNSSEC."},
+"dm_vs2Info": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno byla ověřena pomocí protokolu DANE. Certifikát prošel validací PKIX a odpovídá CA certifikátu v TLSA záznamu (typ 2), který je korektně zabezpečen pomocí technologie DNSSEC."},
+"dm_vs3": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno byl ověřen pomocí protokolu DANE. Certifikát odpovídá záznamu TLSA, který je zabezpečen technologií DNSSEC."},
+"dm_vs3Info": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno byla ověřena pomocí protokolu DANE. Serverový certifikát odpovídá EE certifikátu v TLSA záznamu (typ 3), který je korektně zabezpečen pomocí technologie DNSSEC."},
+"dm_validationoff": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno nebylo ověřeno protokolem DANE, protože validace TLSA záznamů je pro toto doménové jméno vypnuta."},
+"dm_validationoffInfo": { "message":  "Platnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno nebylo ověřeno protokolem DANE, protože validace TLSA záznamů je pro toto doménové jméno vypnuta."},
+           "dmvsTooltip": {"message": "Certifikát odpovídá TLSA"},
+           "dmvfTooltip": {"message": "Certifikát neodpovídá TLSA"},
+           "dmaTooltip": {"message": "Probíhá validace TLSA"},
+           "dmfsTooltip": {"message": "Stav TLSA neznámý"},
+           "dmwpTooltip": {"message": "Neplatné hodnoty TLSA"},
+           "dmntrTooltip": {"message": "Neexistuje TLSA záznam"},
+           "dmnccTooltip": {"message": "Nelze získat certifikát"},
+           "dmoffTooltip": {"message": "TLSA validace vypnuta"},
+           "dmnohttpsTooltip": {"message": "Není HTTPS spojení"},
+           "dmdnssecbogusTooltip": {"message": "Neplatný podpis TLSA"},
+           "dmdnssecunsecTooltip": {"message": "Nezabezpečeno DNSSEC"},
+	   "warningpre" : {"message": "Upozornění TLSA validátoru!\n\nCertifikát serveru pro https://"},
+	   "warningpost" : {"message": "\nneodpovídá záznamu TLSA, což může signalizovat:\n- připojení na nedůvěryhodný server\n- neplatný nebo nedůvěryhodný certifikát serveru\n\nChcete ukončit spojení s tímto serverem?"}
+}

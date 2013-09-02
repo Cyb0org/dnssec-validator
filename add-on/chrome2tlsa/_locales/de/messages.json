@@ -1,0 +1,144 @@
+{
+	"preftitle": {
+		"message": "TLSA Validator-Einstellungen"
+		},
+	"prefresolver": {
+		"message": "Zur Namensauflösung benutzte DNS-Server:"
+		},
+	"groupboxfilter": {
+		"message": "Ausgeschlossene Domänen"
+		},
+	"usefilter": {
+		"message": "Schliesse Domänen aus dieser Liste aus"
+		},
+	"filtertext": {
+		"message": "Liste ausgeschlossener Domänen und TLDs (mit Komma abgetrennt)"
+		},
+	"legend": {
+		"message": "Resolver-Einstellungen"
+		},
+	"resolver0": {
+		"message": "Systemeinstellungen benutzen"
+		},
+	"resolver1": {
+		"message": "Öffentliche validierende Resolver CZ.NIC"
+		},
+	"resolver2": {
+		"message": "Öffentliche validierende Resolver OARC"
+		},
+	"resolver3": {
+		"message": " Eigener "
+		},
+	"resolver4": {
+		"message": "Ohne Resolver"
+		},
+	"savebutton": {
+		"message": "Einstellungen speichern"
+		},
+	"testbutton": {
+		"message": "Bestehende Einstellungen testen"
+		},
+	"cancelbutton": {
+		"message": "Stornieren"
+		},
+	"messageok": {
+		"message": "Erfolg – Die bestehenden Einstellungen ermöglichen Validierung durch DNSSEC."
+		},
+	"messagebogus": {
+		"message": "Versagen – ungültige DNSSEC Antwort, die DNSSEC-Validierung ist nicht mit bestehenden Einstellungen möglich."
+		},
+	"messageerror": {
+		"message": "Versagen – keine DNSSEC Antwort, die eingegebene IP-Adesse des Resolvers ist ungültig, oder es gibt einen Netzwerkfehler."
+		},
+	"messageip": {
+		"message": "Fehler – Zeichenkette enthält keine gültige IP-Adresse."
+		},
+	"moreinfo": {
+		"message": "Mehr info"
+		},
+	"homepage": {
+		"message": "Für mehr Informationen gehe zur Plugin Homepage"
+		},
+	"dnssecfail": {
+		"message": "DNSSEC-Zustand unbekannt"
+		},
+	"dnssecok": {
+		"message": "Gesichert durch DNSSEC"
+		},
+	"dnssecaction": {
+		"message": "Erwerbung des DNSSEC-Zustandes"
+		},
+	"dnssecbogus": {
+		"message": "Ungültige DNSSEC-Signatur"
+		},
+ 	"dnssecnone": {
+		"message": "Nicht durch DNSSEC gesichert"
+		},
+ 	"validatoroff": {
+		"message": "Nicht durch DNSSEC geprüft"
+		},
+	"domain": {
+		"message": "Der Domänenname "
+		},
+	 "nodomain": {
+		"message": "Die Nichtexistenz des Domänennamen "
+		},
+ 	"dnssecwrongres": {
+		"message": "Resolver unterstützt DNSSEC nicht"
+		},
+         "dnssecWrongResolver": {
+		"message": " kann nicht mit DNSSEC überprüft werden."
+		},
+         "dnssecWrongResolverInfo": {
+		"message": "Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht. Ändern Sie bitte die Einstellungen des Resolvers (Wahl \"Ohne Resolver\")."
+		},
+"dm_rfesolverfailed": { "message":  "The remote server certificate for this domain name could not be verified by DANE protocol because an error occurred while retrieving the TLSA record for this domain name."},
+"dm_rfesolverfailedInfo": { "message":  "An error occurred while retrieving the TLSA record for this domain name. This may be caused by loss of connection to the DNS server or the user-chosen validating resolver IP address is not an address of a validating resolver."},
+"dm_nohttps": { "message":  "No HTTPS secured connection to the remote server was established. Therefore, you can not perform TLSA records validation."},
+"dm_nohttpsInfo": { "message":  "The validity of TLS/SSL remote server certificate for the domain name could not be verified by DANE protocol because the connection to the remote server is not realized via HTTPS."},
+"dm_notlsarecord": { "message":  "The remote server certificate for this domain name could not be verified by DANE protocol because there is no TLSA record for this domain name."},
+"dm_notlsarecordInfo": { "message":  "The validity of TLS/SSL remote server certificate for this domain name could not be verified by protocol DANE because there is no TLSA record for this domain name."},
+"dm_dnssecunsecured": { "message":  "This domain name is not secured by DNSSEC, therefore it is not possible to verify the validity of remote server certifcate by DANE protocol."},
+"dm_dnssecunsecuredInfo": { "message":  "The validity of TLS/SSL remote server certificate for this domain name could not be verified by DANE protocol because this domain name is not secured by DNSSEC."},
+"dm_dnssecbogus": { "message":  "This domain name is secured by DNSSEC but an invalid domain name signature has been detected. Therefore, the validation of the server certificate can not be verified by DANE protocol."},
+"dm_dnssecbogusInfo": { "message":  "The validity of TLS/SSL remote server certificate for this domain name can not be verified by DANE protocol because an invalid domain name signature has been detected by DNSSEC."},
+"dm_certchain": { "message":  " The remote server certificate for this domain name can not be verified by DANE protocol because the certificate chain could not be obtained."},
+"dm_certchainInfo": { "message":  "The validity of TLS/SSL remote server certificate for the domain name can not be verified by DANE protocol because the certificate chain could not be obtained."},
+"dm_certerr": { "message":  "The remote server certificate for this domain name could not be verified by DANE protocol because the server certificate could not be obtained."},
+"dm_certerrInfo": { "message":  "The validity of TLS/SSL remote server certificate for the domain name can not be verified by DANE protocol because the server certificate could not be obtained."},
+"tlsapramwrong": { "message":  "The remote server certificate for this domain name was not verified by DANE because the TLSA record contains wrong parameter values."},
+"tlsapramwrongInfo": { "message":  "The validity of TLS/SSL remote server certificate for this domain name could not be verified by DANE protocol because the TLSA record has wrong parameter values. It could indicate spoofing of TLSA information!"},
+"dm_vf": { "message":  "The remote server certificate for this domain name was not verified by DANE. The certificate does not correspond to TLSA record which is secured by DNSSEC technology."},
+"dm_vfInfo": { "message":  "The validity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."},
+"dm_vf0": { "message":  "The remote server certificate for this domain name was not verified by DANE. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."},
+"dm_vf0Info": { "message":  "The validity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate has not passed the PKIX validation and does not correspond with the CA certificate in the TLSA record (type 0) which is secured by DNSSEC technology."},
+"dm_vf1": { "message":  "The remote server certificate for this domain name was not verified by DANE. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."},
+"dm_vf1Info": { "message":  "The validity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate has not passed the PKIX validation and does not corresponds with the EE certificate in the TLSA record (type 1) which is secured by DNSSEC technology."},
+"dm_vf2": { "message":  "The remote server certificate for this domain name was not verified by DANE. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."},
+"dm_vf2Info": { "message":  "The validity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate has not passed the PKIX validation and does not corresponds with the CA certificate in the TLSA record (type 2) which is secured by DNSSEC technology."},
+"dm_vf3": { "message":  "The remote server certificate for this domain name was not verified by DANE. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."},
+"dm_vf3Info": { "message":  "The validity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate does not correspond with the EE certificate in the TLSA record (type 3) which is secured by DNSSEC technology."},
+"dm_vs0": { "message":  "The remote server certificate for this domain name was verified by DANE. The certificate corresponds to TLSA record which is secured by DNSSEC technology."},
+"dm_vs0Info": { "message":  "The validity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate passed the PKIX validation and corresponds with the CA certificate in the TLSA record (type 0) which is secured by DNSSEC technology."},
+"dm_vs1": { "message":  "The remote server certificate for this domain name was verified by DANE. The certificate corresponds to TLSA record which is secured by DNSSEC technology."},
+"dm_vs1Info": { "message":  "The validity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate passed the PKIX validation and corresponds with the EE certificate in the TLSA record (type 1) which is secured by DNSSEC technology."},
+"dm_vs2": { "message":  "The remote server certificate for this domain name was verified by DANE. The certificate corresponds to TLSA record which is secured by DNSSEC technology."},
+"dm_vs2Info": { "message":  "The validity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate passed the PKIX validation and corresponds with the CA certificate in the TLSA record (type 2) which is secured by DNSSEC technology."},
+"dm_vs3": { "message":  "The remote server certificate for this domain name was verified by DANE. The certificate corresponds to TLSA record which is secured by DNSSEC technology."},
+"dm_vs3Info": { "message":  "The validity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate is corresponding with the EE certificate in the TLSA record (type 3) which is secured by DNSSEC technology."},
+"dm_validationoff": { "message":  "The remote server certificate for this domain name was not verified by DANE protocol. The TLSA validation has not been performed because this domain is mentioned in the list of excluded domains."},
+"dm_validationoffInfo": { "message":  "The validity of TLS/SSL remote server certificate for the domain name was not verified by DANE protocol. The TLSA validation has not been performed because this domain is mentioned in the list of excluded domains."},
+           "dmvsTooltip": {"message": "Certificate corresponds to TLSA"},
+           "dmvfTooltip": {"message": "TLSA validation failed"},
+           "dmaTooltip": {"message": "TLSA validation in progress"},
+           "dmfsTooltip": {"message": "TLSA status unknown"},
+           "dmwpTooltip": {"message": "Wrong TLSA parameters"},
+           "dmntrTooltip": {"message": "Non-existent TLSA record"},
+           "dmnccTooltip": {"message": "Unable to get certificate"},
+           "dmoffTooltip": {"message": "TLSA validation disabled"},
+           "dmnohttpsTooltip": {"message": "No HTTPS connection"},
+           "dmdnssecbogusTooltip": {"message": "Bogus DNSSEC signature"},
+           "dmdnssecunsecTooltip": {"message": "Not secured by DNSSEC"},
+	   "warningpre" : {"message": "TLSA validator warning!\n\nThe remote server certificate for https://"},
+	   "warningpost" : {"message": "\ndoes not correspond to the TLSA record. It can mean follows:\n- the connection on untrusted remote server\n- invalid or untrusted server certificate\n\nDo you want close the connection with this server?"}
+}
