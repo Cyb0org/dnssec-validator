@@ -3,26 +3,25 @@
      "scripts": [ "background.js" ]
    },
    "default_locale": "en",
-   "description": "Shows DNSSEC and TLSA status",
+   "author": "CZ.NIC Labs",
+   "description": "Shows DNSSEC status",
    "icons": {
       "128": "icon.png",
       "32": "icon.png",
       "48": "icon.png"
    },
-   "name": "DNSSEC/TLSA Validator",
+   "name": "DNSSEC Validator",
    "options_page": "options.html?4,0,8.8.8.8",
    "page_action": {
       "default_icon": "icon_action.gif",
-      "default_title": "DNSSEC/TLSA Validator",
+      "default_title": "DNSSEC Validator",
       "popup": "popup.html"
    },
    "manifest_version": 2,
    "minimum_chrome_version": "18",
-   "permissions": [ "experimental", "tabs", "webRequest", "*://*/*" ],
+   "permissions": [ "tabs", "webRequest", "*://*/*" ],
    "plugins": [ {
       "path": "dnssecplugin"
-    }, {
-      "path": "tlsaplugin"
     }],
    "update_url": "http://clients2.google.com/service/update2/crx",
    "version": "version-of-add-on"

@@ -29,6 +29,7 @@ document.write("<script>");
 
 	// debug pretext
 	var DNSSEC = "DNSSEC: ";
+	
 	// some variables for chrome IP API
 	var currentIPList= new Array();
 	var currentIPListDomain= new Array();
@@ -54,7 +55,6 @@ document.write("<script>");
   		DNSSEC_INPUT_FLAG_RESOLVIPV6               : 8, /* resolve IPv6 address (AAAA record) */
 	};
 
-	//connection is secured, but domain has invalid signature
         var dnssecModes = {
           // DNSSEC Validation OFF
           DNSSEC_MODE_OFF                    		  : "dnsseOff",
@@ -113,7 +113,7 @@ function showresolverinfo(tabId) {
 //****************************************************************
 // this function sets DNSSEC mode. status ICON and popup text
 //****************************************************************
-function setMode(newMode, tabId, domain, status,  addr, ipval, changeInfo) {
+function setModeDNSSEC(newMode, tabId, domain, status,  addr, ipval, changeInfo) {
         var icon;
 	var title;
 	var domainpre;
@@ -242,6 +242,148 @@ function getResolver() {
 
       return resolver;
 }; // getResolver
+
+//****************************************************************
+// SET DNSSEC status
+//****************************************************************
+function setDNSSECSecurityState(tabId, domain, status, addr, ipval, changeInfo ) {
+
+	var c = this.dnssecExtNPAPIConst;	
+	
+     	switch (status) {
+	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP: 
+		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED,
+			tabId, domain, status, addr, ipval, changeInfo);
+    		break;
+	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP: 
+		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED,
+			tabId, domain, status, addr,  ipval, changeInfo);
+	        break;
+	    case c.DNSSEC_EXIT_NODOMAIN_SIGNATURE_VALID: 
+		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED,
+			tabId, domain, status, addr,  ipval, changeInfo);
+	        break;
+	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS:
+	        this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID,
+			tabId, domain, status, addr,  ipval, changeInfo);
+	        break;
+	    case c.DNSSEC_EXIT_NODOMAIN_SIGNATURE_INVALID:
+	        this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID,
+			tabId, domain, status, addr,  ipval, changeInfo);
+	        break;
+	    case c.DNSSEC_EXIT_DOMAIN_UNSECURED:
+	        this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_DOMAIN_UNSECURED,
+			tabId, domain, status,  addr, ipval, changeInfo);
+                break;
+	    case c.DNSSEC_EXIT_NODOMAIN_UNSECURED:
+	        this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED,
+			tabId, domain, status,  addr, ipval, changeInfo);
+	        break;
+	    case c.DNSSEC_EXIT_DNSSEC_OFF:
+	        this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_OFF,
+			tabId, domain, status, addr, ipval, changeInfo);
+	        break;
+	    case c.DNSSEC_EXIT_WRONG_RES:
+	        this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_WRONG_RES,
+			tabId, domain, status, addr, ipval, changeInfo);
+	        break;
+	    case c.DNSSEC_EXIT_FAILED:
+	    default:
+	        this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_ERROR,
+			tabId, domain, status, addr,  ipval, changeInfo);
+                break;
+	    }
+};
+
+//****************************************************************
+// Called when the DNSSEC status is retriving
+//****************************************************************
+function dnssecvalidate(domain, tabId, changeInfo, tab) {                  	
+     
+	// set custom resolver
+        var resolver = this.getResolver();
+        var currentURL = tab.url;
+	var c = this.dnssecExtNPAPIConst;
+	var debug = localStorage["dnssecDebugOutput"];
+	     debug = (debug == "false") ? false : true;        	   
+
+	var resolvipv4 = false; // No IPv4 resolving as default
+	var resolvipv6 = false; // No IPv6 resolving as default
+
+        console.log(DNSSEC + "URL: " + currentURL);	  	     
+	addr = currentIPList[currentURL];
+	console.log(DNSSEC + "Browser URL IP: " + addr);
+	
+	if (addr == undefined) {
+		addr = currentIPListDomain[domain];
+	        console.log(DNSSEC + "Browser Domain IP: " + addr);
+	}//if
+	    
+	if (addr == undefined) {
+		addr = addrbackup;
+	        console.log(DNSSEC + "NO IP: " + addr);
+	}//if
+
+	    
+	// Check IP version
+	if (addr.indexOf(":") != -1) {
+		// ipv6
+	        resolvipv6 = true;
+	} else if (addr.indexOf(".") != -1) {
+	        // ipv4
+	        resolvipv4 = true;
+	}//if
+   
+	var options = 0;
+	if (debug) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+	if (resolver != "nofwd") options |= c.DNSSEC_INPUT_FLAG_USEFWD;
+	if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
+	if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
+	    
+	var icon = "icon_action.gif";
+	chrome.pageAction.setIcon({path: icon, tabId: tabId});
+ 	chrome.pageAction.show(tabId);
+
+	if (resolver!="") console.log(DNSSEC + "Validator input: " + domain + "; options: " + options  + "; resolver: " + resolver  + "; IP-br: " + addr);	    
+	else console.log(DNSSEC + "Validator input: " + domain + "; options: " + options  + "; resolver: system; IP-br: " + addr);
+	// Call of Validation function
+      	var plugin = document.getElementById("dnssec-plugin");	 	
+	var result = plugin.Validate(domain, options, resolver, addr);
+        console.log(DNSSEC + "Validator result: " + result[0] + "; " + result[1]);
+
+	if (result[0]==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+		console.log(DNSSEC + "Unbound return bogus state: Testing why?");
+		plugin.CacheFree();
+		options = 0;
+	    	if (debug) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+   	    	if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
+	    	if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
+	    	console.log(DNSSEC + "NOFWD input: " + domain + "; options: " + options  + "; resolver: nofwd; IP-br: " + addr);
+	    	var resultnofwd = plugin.Validate(domain, options, "nofwd", addr);
+	    	console.log(DNSSEC + "NOFWD result: " + resultnofwd[0] + "; " + resultnofwd[1]);
+		if (resultnofwd[0]==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+			result[0]=resultnofwd[0];
+			console.log(DNSSEC + "Yes, domain name has bogus");
+			plugin.CacheFree();
+			//fwdinfo=false;
+		} 
+		else
+		{		   
+			console.log(DNSSEC + "Current resolver does not support DNSSEC!");
+			console.log(DNSSEC + "Results: FWD: " + result[0] + "; NOFWD: " + resultnofwd[0]);
+			result[0]=c.DNSSEC_EXIT_WRONG_RES;
+			plugin.CacheFree();
+			//fwdinfo=true;
+		}//if		
+	    } //if
+
+	    if (addr == "0.0.0.0") addr = "n/a"; 
+  	    icon = ""; 
+     	    var ipval = result[1];
+            if (ipval == "")  ipval = "n/a";
+  
+     	return [result[0], ipval];
+}; // dnssecvalidate
         
 //****************************************************************
 // Called when the url of a tab changes.
@@ -250,6 +392,8 @@ function onUrlChange(tabId, changeInfo, tab) {
 
 	// reset any old popup
 	chrome.pageAction.setPopup({tabId: tabId, popup: ""});
+	chrome.pageAction.setPopup({tabId: tabId, popup: ""});
+
 
         // hide icon for chrome:// and chrome-extension:// urls
         if (tab.url.match(/^chrome(?:-extension)?:\/\//)) {
@@ -262,23 +406,21 @@ function onUrlChange(tabId, changeInfo, tab) {
                 chrome.pageAction.hide(tabId);
                 return;
          }//if
-       
-	 // set custom resolver
-         var resolver = this.getResolver();
+ 
+        if (changeInfo.status==undefined) return;
+
+        console.log("Browser: onUrlChange(TabID: " + tabId + ", Action: " + changeInfo.status 
+		+ ", Info: " + changeInfo.url + ");");
 
 	 // get domain name from URL
          var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
-
-  	console.log(DNSSEC + "--------- Start of DNSSEC Validation ("+ domain +") ---------");
-        console.log(DNSSEC + "onUrlChange(TabID: " + tabId + ", Action: " + changeInfo.status
-			+ ", Info: " + changeInfo.url + ");");
+  	  	
+	console.log(DNSSEC + "--------- Start of DNSSEC Validation ("+ domain +") ---------");  	
 
 	// get domain filter status
 	var filteron = localStorage["domainfilteron"];
 	// validate thi domain?
 	var validate = true;
-	// no resolver info pop-up
-	//fwdinfo=false;
     	if (filteron == "true") {
 		console.log(DNSSEC + 'Domain filter: ON');
 		var urldomainsepar=/[.]+/;
@@ -308,132 +450,17 @@ function onUrlChange(tabId, changeInfo, tab) {
 	
 	console.log(DNSSEC + 'Validate this domain: ' + validate );
         var c = this.dnssecExtNPAPIConst;
-        var status = c.DNSSEC_EXIT_DNSSEC_OFF;
+        var statusdnssec = c.DNSSEC_EXIT_DNSSEC_OFF;
 
      	if (validate) {  
-            var debug = localStorage["dnssecDebugOutput"];
-	    debug = (debug == "false") ? false : true;        	   
-    	    var currentURL = tab.url;
-	    console.log(DNSSEC + "URL: " + currentURL);	  	     
-	    addr = currentIPList[currentURL];
-	    console.log(DNSSEC + "Browser URL IP: " + addr);
-	    if (addr == undefined) {
-		addr = currentIPListDomain[domain];
-	        console.log(DNSSEC + "Browser Domain IP: " + addr);
-	    }//if
-	    
-	    if (addr == undefined) {
-		addr = addrbackup;
-	        console.log(DNSSEC + "NO IP: " + addr);
-	    }//if
-
-	    var resolvipv4 = false; // No IPv4 resolving as default
-	    var resolvipv6 = false; // No IPv6 resolving as default
-	    
-	    // Check IP version
-	    if (addr.indexOf(":") != -1) {
-	        // ipv6
-	        resolvipv6 = true;
-	    } else if (addr.indexOf(".") != -1) {
-	        // ipv4
-	        resolvipv4 = true;
-	    }//if
-   
-	    var options = 0;
-	    if (debug) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-	    if (resolver != "nofwd") options |= c.DNSSEC_INPUT_FLAG_USEFWD;
-	    if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
-	    if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
-	    
-	    var icon = "";
-	    icon = "icon_action.gif";
-	    chrome.pageAction.setIcon({path: icon, tabId: tabId});
- 	    chrome.pageAction.show(tabId);
-	    if (resolver!="") console.log(DNSSEC + "Validator input: " + domain + "; options: " + options  + "; resolver: " + resolver  + "; IP-br: " + addr);	    
-	    else console.log(DNSSEC + "Validator input: " + domain + "; options: " + options  + "; resolver: system; IP-br: " + addr);
-	    // Call of Validation function
-      	    var plugin = document.getElementById("dnssec-plugin");	 	
-	    var result = plugin.Validate(domain, options, resolver, addr);
-            console.log(DNSSEC + "Validator result: " + result[0] + "; " + result[1]);
-	    if (result[0]==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
-	        console.log(DNSSEC + "Unbound return bogus state: Testing why?");
-		plugin.CacheFree();
-		options = 0;
-	    	if (debug) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-   	    	if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
-	    	if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
-	    	console.log(DNSSEC + "NOFWD input: " + domain + "; options: " + options  + "; resolver: nofwd; IP-br: " + addr);
-	    	var resultnofwd = plugin.Validate(domain, options, "nofwd", addr);
-	    	console.log(DNSSEC + "NOFWD result: " + resultnofwd[0] + "; " + resultnofwd[1]);
-		if (resultnofwd[0]==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
-			result[0]=resultnofwd[0];
-			console.log(DNSSEC + "Yes, domain name has bogus");
-			plugin.CacheFree();
-			//fwdinfo=false;
-		} 
-		else
-		{		   
-			console.log(DNSSEC + "Current resolver does not support DNSSEC!");
-			console.log(DNSSEC + "Results: FWD: " + result[0] + "; NOFWD: " + resultnofwd[0]);
-			result[0]=c.DNSSEC_EXIT_WRONG_RES;
-			plugin.CacheFree();
-			//fwdinfo=true;
-		}//if		
-	    } //if
-
-	    if (addr == "0.0.0.0") addr = "n/a"; 
-  	    icon = ""; 
-	    status = result[0];
-     	    var ipval = result[1];
-            if (ipval == "")  ipval = "n/a";
+	    var data = dnssecvalidate(domain, tabId, changeInfo, tab);
+	    statusdnssec = data[0];
+	    var ipval = data[1];
+	    setDNSSECSecurityState(tabId, domain, statusdnssec, addr, ipval, changeInfo.status);
         }
+	else setDNSSECSecurityState(tabId, domain, statusdnssec, addr, "n/a", changeInfo.status);
 
-     	switch (status) {
-	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP: 
-		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED,
-			tabId, domain, status, addr, ipval, changeInfo.status);
-    		break;
-	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP: 
-		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED,
-			tabId, domain, status, addr,  ipval, changeInfo.status);
-	        break;
-	    case c.DNSSEC_EXIT_NODOMAIN_SIGNATURE_VALID: 
-		this.setMode(this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED,
-			tabId, domain, status, addr,  ipval, changeInfo.status);
-	        break;
-	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID,
-			tabId, domain, status, addr,  ipval, changeInfo.status);
-	        break;
-	    case c.DNSSEC_EXIT_NODOMAIN_SIGNATURE_INVALID:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID,
-			tabId, domain, status, addr,  ipval, changeInfo.status);
-	        break;
-	    case c.DNSSEC_EXIT_DOMAIN_UNSECURED:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_DOMAIN_UNSECURED,
-			tabId, domain, status,  addr, ipval, changeInfo.status);
-                break;
-	    case c.DNSSEC_EXIT_NODOMAIN_UNSECURED:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED,
-			tabId, domain, status,  addr, ipval, changeInfo.status);
-	        break;
-	    case c.DNSSEC_EXIT_DNSSEC_OFF:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_OFF,
-			tabId, domain, status, addr, ipval, changeInfo.status);
-	        break;
-	    case c.DNSSEC_EXIT_WRONG_RES:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_WRONG_RES,
-			tabId, domain, status, addr, ipval, changeInfo.status);
-	        break;
-	    case c.DNSSEC_EXIT_FAILED:
-	    default:
-	        this.setMode(this.dnssecModes.DNSSEC_MODE_ERROR,
-			tabId, domain, status, addr,  ipval, changeInfo.status);
-                break;
-	    }
-    //fwdinfo=false;
-    console.log(DNSSEC + "--------- End of DNSSEC Validation ("+ domain +") ---------\n");
-
+        console.log(DNSSEC + "--------- End of DNSSEC Validation ("+ domain +") ---------\n");
 }; // onUrlChange
 
 //****************************************************************  
@@ -444,7 +471,7 @@ chrome.webRequest.onResponseStarted.addListener(function(info) {
 	var urldomain = info.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
 	currentIPListDomain[ urldomain ] = info.ip;
     	//console.log("currentIPList: " + info.url + " -- " + info.ip + ";");
-      	//console.log("currentIPListDomain: " + urldomain + " -- " + info.ip + ";");                        		  
+      	//console.log("currentIPListDomain: " + urldomain + " -- " + info.ip + ";");
 	return;},
 	{ urls: [], types: [] },  []
 	);
@@ -453,19 +480,7 @@ chrome.webRequest.onResponseStarted.addListener(function(info) {
 // Listen for any changes to the URL of any tab.
 //****************************************************************
 chrome.tabs.onUpdated.addListener(onUrlChange);
-
-//****************************************************************
-// TLS/SSL features for DANE/TLSA validation
-//****************************************************************
-/*
-chrome.experimental.ssl;
-
-chrome.experimental.ssl.onCertificateVerify.addListener(function(channel) { 
-console.log("experimental.ssl: " + channel.hostname  + " -- " + channel.constructedChain[1]  + ";");
-
-}, { urls: [], types: [] },  []);
-*/
-              
+                
 document.write("</script>");
 document.write("</body>");
 document.write("</html>");
