@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-#include "NpapiTypes.h"
+
 #include "DNSSECValidatorPluginAPI.h"
 
 #include "DNSSECValidatorPlugin.h"
@@ -33,9 +33,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ///////////////////////////////////////////////////////////////////////////////
 void DNSSECValidatorPlugin::StaticInitialize()
 {
-    // Place one-time initialization stuff here; note that there isn't an absolute guarantee that
-    // this will only execute once per process, just a guarantee that it won't execute again until
-    // after StaticDeinitialize is called
+    // Place one-time initialization stuff here; As of FireBreath 1.4 this should only
+    // be called once per process
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -47,7 +46,8 @@ void DNSSECValidatorPlugin::StaticInitialize()
 ///////////////////////////////////////////////////////////////////////////////
 void DNSSECValidatorPlugin::StaticDeinitialize()
 {
-    // Place one-time deinitialization stuff here
+    // Place one-time deinitialization stuff here. As of FireBreath 1.4 this should
+    // always be called just before the plugin library is unloaded
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,6 +64,12 @@ DNSSECValidatorPlugin::DNSSECValidatorPlugin()
 ///////////////////////////////////////////////////////////////////////////////
 DNSSECValidatorPlugin::~DNSSECValidatorPlugin()
 {
+    // This is optional, but if you reset m_api (the shared_ptr to your JSAPI
+    // root object) and tell the host to free the retained JSAPI objects then
+    // unless you are holding another shared_ptr reference to your JSAPI object
+    // they will be released here.
+    releaseRootJSAPI();
+    m_host->freeRetainedObjects();
 }
 
 void DNSSECValidatorPlugin::onPluginReady()
@@ -72,6 +78,15 @@ void DNSSECValidatorPlugin::onPluginReady()
     // created, and we are ready to interact with the page and such.  The
     // PluginWindow may or may not have already fire the AttachedEvent at
     // this point.
+}
+
+void DNSSECValidatorPlugin::shutdown()
+{
+    // This will be called when it is time for the plugin to shut down;
+    // any threads or anything else that may hold a shared_ptr to this
+    // object should be released here so that this object can be safely
+    // destroyed. This is the last point that shared_from_this and weak_ptr
+    // references to this object will be valid
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,7 +103,7 @@ void DNSSECValidatorPlugin::onPluginReady()
 FB::JSAPIPtr DNSSECValidatorPlugin::createJSAPI()
 {
     // m_host is the BrowserHost
-    return FB::JSAPIPtr(new DNSSECValidatorPluginAPI(FB::ptr_cast<DNSSECValidatorPlugin>(shared_from_this()), m_host));
+    return boost::make_shared<DNSSECValidatorPluginAPI>(FB::ptr_cast<DNSSECValidatorPlugin>(shared_from_this()), m_host);
 }
 
 bool DNSSECValidatorPlugin::onMouseDown(FB::MouseDownEvent *evt, FB::PluginWindow *)
@@ -119,3 +134,4 @@ bool DNSSECValidatorPlugin::onWindowDetached(FB::DetachedEvent *evt, FB::PluginW
     // The window is about to be detached; act appropriately
     return false;
 }
+

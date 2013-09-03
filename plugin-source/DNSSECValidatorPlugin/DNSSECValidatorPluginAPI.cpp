@@ -19,40 +19,28 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
+
 #include "JSObject.h"
 #include "variant_list.h"
 #include "DOM/Document.h"
-#include "DOM/Window.h"
+#include "global/config.h"
+//#include "DOM/Window.h"
 
 #include "DNSSECValidatorPluginAPI.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-/// @fn DNSSECValidatorPluginAPI::DNSSECValidatorPluginAPI(DNSSECValidatorPluginPtr plugin, FB::BrowserHostPtr host)
+/// @fn FB::variant DNSSECValidatorPluginAPI::echo(const FB::variant& msg)
 ///
-/// @brief  Constructor for your JSAPI object.  You should register your methods, properties, and events
-///         that should be accessible to Javascript from here.
-///
-/// @see FB::JSAPIAuto::registerMethod
-/// @see FB::JSAPIAuto::registerProperty
-/// @see FB::JSAPIAuto::registerEvent
+/// @brief  Echos whatever is passed from Javascript.
+///         Go ahead and change it. See what happens!
 ///////////////////////////////////////////////////////////////////////////////
-DNSSECValidatorPluginAPI::DNSSECValidatorPluginAPI(DNSSECValidatorPluginPtr plugin, FB::BrowserHostPtr host) : m_plugin(plugin), m_host(host)
+FB::variant DNSSECValidatorPluginAPI::echo(const FB::variant& msg)
 {
-    registerMethod("CacheFree", make_method(this, &DNSSECValidatorPluginAPI::CacheFree));
-    registerMethod("Validate", make_method(this, &DNSSECValidatorPluginAPI::Validate));
-    registerMethod("ValidateAsync", make_method(this, &DNSSECValidatorPluginAPI::ValidateAsync));
-    registerMethod("ValidateAsync_thread", make_method(this, &DNSSECValidatorPluginAPI::ValidateAsync_thread));
-}
+    //static int n(0);
+    //fire_echo("So far, you clicked this many times: ", n++);
 
-///////////////////////////////////////////////////////////////////////////////
-/// @fn DNSSECValidatorPluginAPI::~DNSSECValidatorPluginAPI()
-///
-/// @brief  Destructor.  Remember that this object will not be released until
-///         the browser is done with it; this will almost definitely be after
-///         the plugin is released.
-///////////////////////////////////////////////////////////////////////////////
-DNSSECValidatorPluginAPI::~DNSSECValidatorPluginAPI()
-{
+    // return "foobar";
+    return msg;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -70,6 +58,28 @@ DNSSECValidatorPluginPtr DNSSECValidatorPluginAPI::getPlugin()
         throw FB::script_error("The plugin is invalid");
     }
     return plugin;
+}
+
+// Read/Write property testString
+std::string DNSSECValidatorPluginAPI::get_testString()
+{
+    return m_testString;
+}
+
+void DNSSECValidatorPluginAPI::set_testString(const std::string& val)
+{
+    m_testString = val;
+}
+
+// Read-only property version
+std::string DNSSECValidatorPluginAPI::get_version()
+{
+    return FBSTRING_PLUGIN_VERSION;
+}
+
+void DNSSECValidatorPluginAPI::testEvent()
+{
+    //fire_test();
 }
 
 

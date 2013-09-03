@@ -18,7 +18,6 @@ more details.
 You should have received a copy of the GNU General Public License along with
 DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
-
 #ifndef H_DNSSECValidatorPluginPLUGIN
 #define H_DNSSECValidatorPluginPLUGIN
 
@@ -28,6 +27,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "PluginCore.h"
 
+
+FB_FORWARD_PTR(DNSSECValidatorPlugin)
 class DNSSECValidatorPlugin : public FB::PluginCore
 {
 public:
@@ -40,8 +41,13 @@ public:
 
 public:
     void onPluginReady();
+    void shutdown();
     virtual FB::JSAPIPtr createJSAPI();
-    virtual bool IsWindowless() { return false; }
+    // If you want your plugin to always be windowless, set this to true
+    // If you want your plugin to be optionally windowless based on the
+    // value of the "windowless" param tag, remove this method or return
+    // FB::PluginCore::isWindowless()
+    virtual bool isWindowless() { return false; }
 
     BEGIN_PLUGIN_EVENT_MAP()
         EVENTTYPE_CASE(FB::MouseDownEvent, onMouseDown, FB::PluginWindow)
@@ -60,8 +66,7 @@ public:
     virtual bool onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *);
     /** END EVENTDEF -- DON'T CHANGE THIS LINE **/
 };
-typedef boost::shared_ptr<DNSSECValidatorPlugin> DNSSECValidatorPluginPtr;
-typedef boost::weak_ptr<DNSSECValidatorPlugin> DNSSECValidatorPluginWeakPtr;
 
 
 #endif
+

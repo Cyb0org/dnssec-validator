@@ -56,15 +56,13 @@ set(FBSTRING_FileExtents "")
 set(FBSTRING_PluginName "DNSSECValidatorPlugin")
 set(FBSTRING_MIMEType "application/x-dnssecvalidator")
 
-# Mac plugin settings
+# Mac plugin settings. If your plugin does not draw, set these all to 0
 set(FBMAC_USE_QUICKDRAW 0)
-set(FBMAC_USE_CARBON 0)
-set(FBMAC_USE_COCOA 0)
-set(FBMAC_USE_COREGRAPHICS 0)
+set(FBMAC_USE_CARBON 1)
+set(FBMAC_USE_COCOA 1)
+set(FBMAC_USE_COREGRAPHICS 1)
 set(FBMAC_USE_COREANIMATION 0)
+set(FBMAC_USE_INVALIDATINGCOREANIMATION 0)
 
 # If you want to register per-machine on Windows, uncomment this line
 #set (FB_ATLREG_MACHINEWIDE 1)
-
-# disable plugin drawing support
-set(FB_GUI_DISABLED 1)

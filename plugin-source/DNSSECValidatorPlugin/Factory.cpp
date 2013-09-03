@@ -36,7 +36,7 @@ public:
     {
         return boost::make_shared<DNSSECValidatorPlugin>();
     }
-
+    
     ///////////////////////////////////////////////////////////////////////////////
     /// @see FB::FactoryBase::globalPluginInitialize
     ///////////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ public:
     {
         DNSSECValidatorPlugin::StaticInitialize();
     }
-
+    
     ///////////////////////////////////////////////////////////////////////////////
     /// @see FB::FactoryBase::globalPluginDeinitialize
     ///////////////////////////////////////////////////////////////////////////////
@@ -64,3 +64,4 @@ FB::FactoryBasePtr getFactoryInstance()
     static boost::shared_ptr<PluginFactory> factory = boost::make_shared<PluginFactory>();
     return factory;
 }
+
