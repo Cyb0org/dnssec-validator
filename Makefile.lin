@@ -62,14 +62,14 @@ xpi_x86:
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Chrome Linux x86... ###'
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x86.so $(ADDON_PATH_CR)
-	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x86.so $(ADDON_PATH_CR)
-	sed -e 's/dnssecplugin/np$(PLUGIN_NAME_DNSSEC)_x86.so/g' -e 's/tlsaplugin/np$(PLUGIN_NAME_TLSA)_x86.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
-	cd add-on && tar -czf CR-dnssec-tlsa_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz chrome2 && mv CR-dnssec-tlsa_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz ../$(PLUGIN_ADD_ON)
-	cd $(ADDON_PATH_CR) && rm -rf np$(PLUGIN_NAME_DNSSEC)_x86.so manifest.json np$(PLUGIN_NAME_TLSA)_x86.so
+	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x86.so $(ADDON_PATH_CR_TLSA)
+	sed -e 's/dnssecplugin/np$(PLUGIN_NAME_DNSSEC)_x86.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
+	sed -e 's/tlsaplugin/np$(PLUGIN_NAME_TLSA)_x86.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR_TLSA)/manifest.json.template > $(ADDON_PATH_CR_TLSA)/manifest.json
+	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz chrome2 && mv CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz ../$(PLUGIN_ADD_ON)
+	cd add-on && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz chrome2tlsa && mv CR-tlsa_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz ../$(PLUGIN_ADD_ON)
+	cd $(ADDON_PATH_CR) && rm -rf np$(PLUGIN_NAME_DNSSEC)_x86.so manifest.json
+	cd $(ADDON_PATH_CR_TLSA) && rm -rf manifest.json np$(PLUGIN_NAME_TLSA)_x86.so
 	@echo '### DONE... ###'  
-
-
-
 
 sys_linux_x64:
 	@echo '### ...Creating plugins library for Linux x64... ###'
