@@ -1,0 +1,9 @@
+{
+  "name": "DNSSECValidatorPlugin",
+  "version": "${FBSTRING_PLUGIN_VERSION}",
+  "description": "Check DNSSEC status",
+
+	"plugins": [
+    { "path": "npDNSSECValidatorPlugin.dll", "public": true }
+  ]
+}
