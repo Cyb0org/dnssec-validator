@@ -42,11 +42,11 @@ ifeq ($(TARGET_OS),MAC)
     MAKE_OS := Makefile.mac
 
     ifeq ($(BUILD_64BIT),1)
-      ARCH := sys_macosx_x64
-      XPI := xpi_x64
+      ARCH := sys_macosx
+      XPI := xpi
     else
-      ARCH := sys_macosx_x86
-      XPI := xpi_x86
+      ARCH := sys_macosx
+      XPI := xpi
     endif 
 endif
 ifeq ($(TARGET_OS),WINDOWS)

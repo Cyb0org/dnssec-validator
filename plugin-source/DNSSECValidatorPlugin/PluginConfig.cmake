@@ -34,7 +34,7 @@ endif ( FB_PLATFORM_ARCH_32 )
 
 # these are the pieces that are relevant to using it from Javascript
 set(ACTIVEX_PROGID "CZNICLabs.DNSSECValidatorPlugin")
-set(MOZILLA_PLUGINID "www.nic.cz/DNSSECValidatorPlugin")
+set(MOZILLA_PLUGINID "nic.cz/DNSSECValidatorPlugin")
 
 # strings
 set(FBSTRING_CompanyName "CZ.NIC Labs")
