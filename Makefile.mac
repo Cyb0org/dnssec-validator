@@ -31,7 +31,7 @@ ADDON_PATH_CR_TLSA = add-on/chrome2tlsa
 #EXTENSION_VERSION = $(shell cat add-on/firefox2/install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p')
 EXTENSION_VERSION = $(shell cat add-on/firefox2/VERSION)
 
-#all: sys_macosx xpi
+#all: sys_macosx sys_macosx_x64 sys_macosx_x86 xpi xpi_x64 xpi_x86
 
 sys_macosx:
 	@echo '### ...Creating plugin library for MACOSX... ###'
@@ -52,6 +52,39 @@ sys_macosx:
 	rm -rf $(PLUGIN_FB_B)
 	rm -rf $(PLUGIN_FB_S)
 	@echo '### ...Plugin for MACOSX ... Done. ###'
+
+sys_macosx_x64:
+	@echo '### ...Creating plugin library for MACOSX x64... ###'
+	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)
+	mkdir $(PLUGIN_NAME_LIB)
+	cd FireBreath && mkdir projects && cd ..
+	cp -r plugin-source/* $(PLUGIN_FB_S)	
+	./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="x86_64"  -DCMAKE_BUILD_TYPE=MinSizeRel
+	cd $(PLUGIN_FB_B) && xcodebuild && cd ../..
+	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_DNSSEC)/Debug/$(PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/
+	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_TLSA)/Debug/$(PLUGIN_NAME_TLSA).plugin $(PLUGIN_NAME_LIB)/
+	strip -x -S $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_DNSSEC).plugin/Contents/MacOS/$(PLUGIN_NAME_DNSSEC)
+	strip -x -S $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_TLSA).plugin/Contents/MacOS/$(PLUGIN_NAME_TLSA)
+	rm -rf $(PLUGIN_FB_B)
+	rm -rf $(PLUGIN_FB_S)
+	@echo '### ...Plugin for MACOSX x64... Done. ###'
+
+sys_macosx_x86:
+	@echo '### ...Creating plugin library for MACOSX x86... ###'
+	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)
+	mkdir $(PLUGIN_NAME_LIB)
+	cd FireBreath && mkdir projects && cd ..
+	cp -r plugin-source/* $(PLUGIN_FB_S)	
+	./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386"  -DCMAKE_BUILD_TYPE=MinSizeRel
+	cd $(PLUGIN_FB_B) && xcodebuild && cd ../..
+	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_DNSSEC)/Debug/$(PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/
+	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_TLSA)/Debug/$(PLUGIN_NAME_TLSA).plugin $(PLUGIN_NAME_LIB)/
+	strip -x -S $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_DNSSEC).plugin/Contents/MacOS/$(PLUGIN_NAME_DNSSEC)
+	strip -x -S $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_TLSA).plugin/Contents/MacOS/$(PLUGIN_NAME_TLSA)
+	rm -rf $(PLUGIN_FB_B)
+	rm -rf $(PLUGIN_FB_S)
+	@echo '### ...Plugin for MACOSX x86... Done. ###'
+
 
 xpi:
 	@echo '### ...Creating package for Firefox MACOSX... ###'
@@ -74,6 +107,53 @@ xpi:
 	cd add-on && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-macosx.tar.gz chrome2tlsa && mv CR-tlsa_validator-$(EXTENSION_VERSION)-macosx.tar.gz ../$(PLUGIN_ADD_ON)
 	cd $(ADDON_PATH_CR) && rm -rf $(PLUGIN_NAME_DNSSEC).plugin manifest.json
 	cd $(ADDON_PATH_CR_TLSA) && rm -rf $(PLUGIN_NAME_TLSA).plugin manifest.json
-	@echo '### Package for Chrome MACOSX...Done. ###'  
-  
+	@echo '### Package for Chrome MACOSX...Done. ###'
+
+xpi_x64:
+	@echo '### ...Creating package for Firefox MACOSX x64... ###'
+	rm -rf $(ADDON_PATH_FF)/plugins
+	mkdir $(ADDON_PATH_FF)/plugins
+	chmod 777 $(ADDON_PATH_FF)/build.sh
+	cp -R $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_FF)/plugins
+	cp -R $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_TLSA).plugin $(ADDON_PATH_FF)/plugins
+	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86_64-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
+	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
+	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-macosx_x64.xpi
+	@echo '### Package for Firefox MACOSX...Done. ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating package for Chrome MACOSX ... ###'
+	cp -R $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_CR)
+	cp -R $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_TLSA).plugin $(ADDON_PATH_CR_TLSA)
+	sed -e 's/dnssecplugin/DNSSECValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
+	sed -e 's/tlsaplugin/TLSAValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR_TLSA)/manifest.json.template > $(ADDON_PATH_CR_TLSA)/manifest.json
+	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-macosx_x64.tar.gz chrome2 && mv CR-dnssec_validator-$(EXTENSION_VERSION)-macosx_x64.tar.gz ../$(PLUGIN_ADD_ON)
+	cd add-on && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-macosx_x64.tar.gz chrome2tlsa && mv CR-tlsa_validator-$(EXTENSION_VERSION)-macosx_x64.tar.gz ../$(PLUGIN_ADD_ON)
+	cd $(ADDON_PATH_CR) && rm -rf $(PLUGIN_NAME_DNSSEC).plugin manifest.json
+	cd $(ADDON_PATH_CR_TLSA) && rm -rf $(PLUGIN_NAME_TLSA).plugin manifest.json
+	@echo '### Package for Chrome MACOSX x64...Done. ###' 
+
+
+xpi_x86:
+	@echo '### ...Creating package for Firefox MACOSX x86... ###'
+	rm -rf $(ADDON_PATH_FF)/plugins
+	mkdir $(ADDON_PATH_FF)/plugins
+	chmod 777 $(ADDON_PATH_FF)/build.sh
+	cp -R $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_FF)/plugins
+	cp -R $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_TLSA).plugin $(ADDON_PATH_FF)/plugins
+	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
+	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
+	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-macosx_x86.xpi
+	@echo '### Package for Firefox MACOSX...Done. ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating package for Chrome MACOSX ... ###'
+	cp -R $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_CR)
+	cp -R $(PLUGIN_NAME_LIB)/$(PLUGIN_NAME_TLSA).plugin $(ADDON_PATH_CR_TLSA)
+	sed -e 's/dnssecplugin/DNSSECValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
+	sed -e 's/tlsaplugin/TLSAValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR_TLSA)/manifest.json.template > $(ADDON_PATH_CR_TLSA)/manifest.json
+	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-macosx_x86.tar.gz chrome2 && mv CR-dnssec_validator-$(EXTENSION_VERSION)-macosx_x86.tar.gz ../$(PLUGIN_ADD_ON)
+	cd add-on && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-macosx_x86.tar.gz chrome2tlsa && mv CR-tlsa_validator-$(EXTENSION_VERSION)-macosx.tar_x86.gz ../$(PLUGIN_ADD_ON)
+	cd $(ADDON_PATH_CR) && rm -rf $(PLUGIN_NAME_DNSSEC).plugin manifest.json
+	cd $(ADDON_PATH_CR_TLSA) && rm -rf $(PLUGIN_NAME_TLSA).plugin manifest.json
+	@echo '### Package for Chrome MACOSX x86...Done. ###' 
+
 clean:

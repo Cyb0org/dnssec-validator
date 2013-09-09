@@ -14,10 +14,12 @@ PROJECT(C++)
 # TARGET_OS - target OS name build is made for
  
 SET(LIB_CFLAGS "${LIB_CFLAGS} -fPIC")
+SET(BUILD_MAC96 0)
 
 # If build arch is not explicitly set, use current
 IF(NOT DEFINED TARGET_ARCH)
     SET(TARGET_ARCH "${CMAKE_SYSTEM_PROCESSOR}")
+    SET(BUILD_MAC96 1)
 ENDIF()
 
 # Set flags for dependent libraries, if/else hell on wheels
@@ -74,6 +76,7 @@ ADD_CUSTOM_COMMAND(TARGET RecursiveBuild
         CMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
         XPI_ARCH=${TARGET_ARCH}
         BUILD_64BIT=${BUILD_64BIT}
+        BUILD_MAC96=${BUILD_MAC96}
     )
 
 
