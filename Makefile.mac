@@ -151,7 +151,7 @@ xpi_x86:
 	sed -e 's/dnssecplugin/DNSSECValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
 	sed -e 's/tlsaplugin/TLSAValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR_TLSA)/manifest.json.template > $(ADDON_PATH_CR_TLSA)/manifest.json
 	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-macosx_x86.tar.gz chrome2 && mv CR-dnssec_validator-$(EXTENSION_VERSION)-macosx_x86.tar.gz ../$(PLUGIN_ADD_ON)
-	cd add-on && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-macosx_x86.tar.gz chrome2tlsa && mv CR-tlsa_validator-$(EXTENSION_VERSION)-macosx.tar_x86.gz ../$(PLUGIN_ADD_ON)
+	cd add-on && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-macosx_x86.tar.gz chrome2tlsa && mv CR-tlsa_validator-$(EXTENSION_VERSION)-macosx_x86.tar.gz ../$(PLUGIN_ADD_ON)
 	cd $(ADDON_PATH_CR) && rm -rf $(PLUGIN_NAME_DNSSEC).plugin manifest.json
 	cd $(ADDON_PATH_CR_TLSA) && rm -rf $(PLUGIN_NAME_TLSA).plugin manifest.json
 	@echo '### Package for Chrome MACOSX x86...Done. ###' 
