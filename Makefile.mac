@@ -37,6 +37,10 @@ sys_macosx:
 	@echo '### ...Creating plugin library for MACOSX... ###'
 	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)
 	mkdir $(PLUGIN_NAME_LIB)
+	cp libszal/libldns.a libs/ldns/lib
+	cp libszal/libssl.a libs/openssl/lib
+	cp libszal/libcrypto.a libs/openssl/lib
+	cp libszal/libunbound.a libs/unbound/lib
 	cd FireBreath && mkdir projects && cd ..
 	cp -r plugin-source/* $(PLUGIN_FB_S)	
 	./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386;x86_64"  -DCMAKE_BUILD_TYPE=MinSizeRel

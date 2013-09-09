@@ -47,7 +47,7 @@ set(FBSTRING_FileExtents "")
 if ( FB_PLATFORM_ARCH_32 )
     set(FBSTRING_PluginName "DNSSECValidatorPlugin")  # No 32bit postfix to maintain backward compatability.
 else ( FB_PLATFORM_ARCH_32 )
-    set(FBSTRING_PluginName "DNSSECValidatorPlugin_${FB_PLATFORM_ARCH_NAME}")
+    set(FBSTRING_PluginName "DNSSECValidatorPlugin")
 endif ( FB_PLATFORM_ARCH_32 )
 set(FBSTRING_MIMEType "application/x-dnssecvalidator")
 
