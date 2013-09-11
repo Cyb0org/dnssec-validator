@@ -15,6 +15,7 @@ PROJECT(C++)
  
 SET(LIB_CFLAGS "${LIB_CFLAGS} -fPIC")
 SET(BUILD_MAC96 0)
+SET(MAKETYPE "make")
 
 # If build arch is not explicitly set, use current
 IF(NOT DEFINED TARGET_ARCH)
@@ -37,6 +38,7 @@ IF(WIN32)
     SET(TARGET_OS "WINDOWS")
     SET(OPENSSL_ARGS "mingw ${LIB_CFLAGS}")
     SET(CONFIGURE_ARGS "--cross-compile-prefix=i586-mingw32msvc-")
+    MESSAGE("WIN")
 ELSEIF(UNIX)
     IF(APPLE)
         CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
@@ -45,21 +47,32 @@ ELSEIF(UNIX)
             SET(OPENSSL_ARGS "darwin64-x86_64-cc ${LIB_CFLAGS}")
             SET(CONFIGURE_ARGS "--target=x86_64-apple-darwin11")
             SET(CMAKE_OSX_ARCHITECTURES "x86_64")
+	    MESSAGE("APPLE x86_64")
         ELSE()
             SET(OPENSSL_ARGS "darwin-i386-cc ${LIB_CFLAGS}")
             SET(CONFIGURE_ARGS "--target=i686-apple-darwin11")
             SET(CMAKE_OSX_ARCHITECTURES "i386")
+	    MESSAGE("APPLE i386")
         ENDIF()
     ELSE() # Linux
         SET(TARGET_OS "LINUX")
-        IF(BUILD_64BIT)
+	IF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+	SET(OPENSSL_ARGS "BSD-x86_64 ${LIB_CFLAGS}")
+	SET(CONFIGURE_ARGS "--target=x86_64-pc-freebsd")
+	SET(MAKETYPE "gmake")
+	MESSAGE("FREEBSD x86_64")
+        ELSEIF(BUILD_64BIT)
             SET(OPENSSL_ARGS "linux-x86_64 ${LIB_CFLAGS}")
             SET(CONFIGURE_ARGS "--target=x86_64-pc-linux-gnu")
+	    MESSAGE("LINUX x86_64")
         ELSE()
             SET(OPENSSL_ARGS "linux-elf ${LIB_CFLAGS}")
             SET(CONFIGURE_ARGS "--target=i686-pc-linux-gnu")
+	    MESSAGE("LINUX x86")
         ENDIF()
     ENDIF()
+ELSE()
+    MESSAGE(SEND_ERROR "Unsupported OS")
 ENDIF()
 
 # Recursive build using Makefile.main is the target
@@ -67,7 +80,7 @@ ADD_CUSTOM_TARGET(RecursiveBuild ALL)
 
 # Calling Makefile.main passing the set variables on command line
 ADD_CUSTOM_COMMAND(TARGET RecursiveBuild 
-    COMMAND make 
+    COMMAND ${MAKETYPE} 
     ARGS -f Makefile.main 
         LIB_CFLAGS=${LIB_CFLAGS}
         OPENSSL_ARGS=${OPENSSL_ARGS} 
@@ -77,6 +90,7 @@ ADD_CUSTOM_COMMAND(TARGET RecursiveBuild
         XPI_ARCH=${TARGET_ARCH}
         BUILD_64BIT=${BUILD_64BIT}
         BUILD_MAC96=${BUILD_MAC96}
+	MAKETYPE=${MAKETYPE}
     )
 
 

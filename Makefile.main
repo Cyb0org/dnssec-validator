@@ -29,14 +29,21 @@ PLUGIN_BUILD_DIR := $(FIREBREATH_DIR)/build
 # PLUGIN_BINARY_TREE is necessary because Mac has dirtree structure instead of
 # a single file.
 ifeq ($(TARGET_OS),LINUX)
-    MAKE_OS := Makefile.lin
-    ifeq ($(BUILD_64BIT),1)
+   ifneq ($(MAKETYPE),"gmake")
+     ifeq ($(BUILD_64BIT),1)
+      MAKE_OS := Makefile.lin
       ARCH := sys_linux_x64
       XPI := xpi_x64
-    else
+     else
       ARCH := sys_linux_x86
       XPI := xpi_x86
-    endif 
+      MAKE_OS := Makefile.lin
+     endif
+   else
+     MAKE_OS := Makefile.bsd
+     ARCH := sys_freebsd_x64
+     XPI := xpi_x64 
+  endif
 endif
 ifeq ($(TARGET_OS),MAC)
     MAKE_OS := Makefile.mac
@@ -79,7 +86,7 @@ libs:
 
 ## openssl
 $(OPENSSL_LIB): $(OPENSSL_DIR)
-	(cd $< && ./Configure no-shared no-krb5 --prefix=$@ $(OPENSSL_ARGS) && make -j1 && make -j1 install)
+	(cd $< && ./Configure no-shared no-krb5 --prefix=$@ $(OPENSSL_ARGS) && $(MAKETYPE) -j1 && $(MAKETYPE) -j1 install)
 
 $(OPENSSL_DIR): $(OPENSSL_TARBALL)
 	tar xzf $< -C libs
@@ -89,8 +96,8 @@ $(LDNS_LIB): $(LDNS_DIR) $(OPENSSL_LIB)
 	(cd $< && \
 	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared --with-ssl=$(OPENSSL_LIB) \
 	    --with-pic --prefix=$@ $(CONFIGURE_ARGS) && \
-	    make && \
-	    make install)
+	    $(MAKETYPE) && \
+	    $(MAKETYPE) install)
 
 $(LDNS_DIR): $(LDNS_TARBALL)
 	tar xzf $< -C libs
@@ -101,8 +108,8 @@ $(UNBOUND_LIB): $(UNBOUND_DIR) $(LDNS_LIB) $(OPENSSL_LIB)
 	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared \
 	    --with-ssl=$(OPENSSL_LIB) --with-ldns=$(LDNS_LIB) --without-libevent \
 	    --with-pic --prefix=$@ $(CONFIGURE_ARGS) && \
-	    make && \
-	    make install)
+	    $(MAKETYPE) && \
+	    $(MAKETYPE) install)
 
 $(UNBOUND_DIR): $(UNBOUND_TARBALL)
 	tar xzf $< -C libs
@@ -112,8 +119,8 @@ libsource:
 
 ## plugin
 plugin:
-	make -f $(MAKE_OS) $(ARCH)
-	make -f $(MAKE_OS) $(XPI)
+	$(MAKETYPE) -f $(MAKE_OS) $(ARCH)
+	$(MAKETYPE) -f $(MAKE_OS) $(XPI)
 
 
 clean:
