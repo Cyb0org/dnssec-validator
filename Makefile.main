@@ -29,7 +29,11 @@ PLUGIN_BUILD_DIR := $(FIREBREATH_DIR)/build
 # PLUGIN_BINARY_TREE is necessary because Mac has dirtree structure instead of
 # a single file.
 ifeq ($(TARGET_OS),LINUX)
-   ifneq ($(MAKETYPE),"gmake")
+   ifeq ($(MAKETYPE),gmake)
+     MAKE_OS := Makefile.bsd
+     ARCH := sys_freebsd_x64
+     XPI := xpi_x64 
+   else
      ifeq ($(BUILD_64BIT),1)
       MAKE_OS := Makefile.lin
       ARCH := sys_linux_x64
@@ -39,10 +43,6 @@ ifeq ($(TARGET_OS),LINUX)
       XPI := xpi_x86
       MAKE_OS := Makefile.lin
      endif
-   else
-     MAKE_OS := Makefile.bsd
-     ARCH := sys_freebsd_x64
-     XPI := xpi_x64 
   endif
 endif
 ifeq ($(TARGET_OS),MAC)
