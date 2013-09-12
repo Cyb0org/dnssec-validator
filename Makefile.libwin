@@ -32,13 +32,13 @@ UNBOUND_TARBALL = $(LIBS_SOURCE)/unbound-1.4.20.tar.gz
 
 BASEDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
-OPENSSL_DIR := $(BASEDIR)/libs/openssl-1.0.1e
-LDNS_DIR := $(BASEDIR)/libs/ldns-1.6.16
-UNBOUND_DIR := $(BASEDIR)/libs/unbound-1.4.20
+OPENSSL_DIR := $(BASEDIR)/libswin/openssl-1.0.1e
+LDNS_DIR := $(BASEDIR)/libswin/ldns-1.6.16
+UNBOUND_DIR := $(BASEDIR)/libswin/unbound-1.4.20
 
-OPENSSL_LIB := $(BASEDIR)/libs/openssl
-LDNS_LIB := $(BASEDIR)/libs/ldns
-UNBOUND_LIB := $(BASEDIR)/libs/unbound
+OPENSSL_LIB := $(BASEDIR)/libswin/openssl
+LDNS_LIB := $(BASEDIR)/libswin/ldns
+UNBOUND_LIB := $(BASEDIR)/libswin/unbound
 
 X86_MINGW_CC = i586-mingw32msvc-gcc
 X86_MINGW_STRIP = i586-mingw32msvc-strip
@@ -46,43 +46,43 @@ X86_MINGW_RANLIB = i586-mingw32msvc-ranlib
 
 all: libs-build sys_windows_openssl sys_windows_ldns_pre sys_windows_ldns_post sys_windows_unbound_pre sys_windows_unbound_post
 
-libs-build: submodules libs $(OPENSSL_DIR) $(LDNS_DIR) $(UNBOUND_DIR) libsource
+libs-build: submodules libswin $(OPENSSL_DIR) $(LDNS_DIR) $(UNBOUND_DIR) libsource
 
 submodules:
-	git clone git@gitlab.labs.nic.cz:mstraka/dnssec-libs.git $(LIBS_SOURCE)
+	git clone https://gitlab.labs.nic.cz/mstraka/dnssec-libs.git $(LIBS_SOURCE)
 
-libs:
-	mkdir libs
+libswin:
+	mkdir libswin
 
 ## openssl
 $(OPENSSL_DIR): $(OPENSSL_TARBALL)
-	tar xzf $< -C libs
+	tar xzf $< -C libswin
 
 ## ldns
 $(LDNS_DIR): $(LDNS_TARBALL)
-	tar xzf $< -C libs
+	tar xzf $< -C libswin
 
 ## unbound
 $(UNBOUND_DIR): $(UNBOUND_TARBALL)
-	tar xzf $< -C libs
+	tar xzf $< -C libswin
 
 libsource:
 	rm -rf $(LIBS_SOURCE)
 
 sys_windows_openssl:
 	@echo '### Compiling library for Windows... ###'
-	cd libs && mkdir windows && cd windows && mkdir x86 && cd x86 && mkdir ldns && cd .. && cd ..
-	cd libs && cd $(OPENSSL) && ./Configure --cross-compile-prefix=i586-mingw32msvc- mingw enable-static-engine && make && ln -s . lib && cd .. && ln -s $(OPENSSL) openssl && cp $(OPENSSL)/libssl.a windows/x86 && cp $(OPENSSL)/libcrypto.a windows/x86
+	cd libswin && mkdir windows && cd windows && mkdir x86 && cd x86 && mkdir ldns && cd .. && cd ..
+	cd libswin && cd $(OPENSSL) && ./Configure --cross-compile-prefix=i586-mingw32msvc- mingw enable-static-engine && make && ln -s . lib && cd .. && ln -s $(OPENSSL) openssl && cp $(OPENSSL)/libssl.a windows/x86 && cp $(OPENSSL)/libcrypto.a windows/x86
 
 sys_windows_ldns_pre:
-	cd libs && cd $(LDNS) && export CC="i586-mingw32msvc-gcc" && ./configure --disable-shared --with-ssl=../$(OPENSSL) --host=mingw32  && make -i || @echo 'Continue if error...'
+	cd libswin && cd $(LDNS) && export CC="i586-mingw32msvc-gcc" && ./configure --disable-shared --with-ssl=../$(OPENSSL) --host=mingw32  && make -i || @echo 'Continue if error...'
 
 sys_windows_ldns_post:
-	cd libs && ln -s $(LDNS) ldns && cd $(LDNS) && $(X86_MINGW_RANLIB) .libs/libldns.a && cp .libs/libldns.a ../windows/x86 && cp ldns/config.h ../windows/x86/ldns && cp ldns/net.h ../windows/x86/ldns && cd ..
+	cd libswin && ln -s $(LDNS) ldns && cd $(LDNS) && $(X86_MINGW_RANLIB) .libs/libldns.a && cp .libswin/libldns.a ../windows/x86 && cp ldns/config.h ../windows/x86/ldns && cp ldns/net.h ../windows/x86/ldns && cd ..
 
 sys_windows_unbound_pre:
-	cd libs && cd $(UNBOUND) && export CC="i586-mingw32msvc-gcc" && ./configure --disable-shared --with-ssl=../$(OPENSSL) --with-ldns=../$(LDNS) --host=mingw32  && make -i || @echo 'Continue if error...'
+	cd libswin && cd $(UNBOUND) && export CC="i586-mingw32msvc-gcc" && ./configure --disable-shared --with-ssl=../$(OPENSSL) --with-ldns=../$(LDNS) --host=mingw32  && make -i || @echo 'Continue if error...'
 
 sys_windows_unbound_post:
-	cd libs && ln -s $(UNBOUND) unbound && cd $(UNBOUND) && $(X86_MINGW_RANLIB) .libs/libunbound.a && cp .libs/libunbound.a ../windows/x86 && cd ..
+	cd libswin && ln -s $(UNBOUND) unbound && cd $(UNBOUND) && $(X86_MINGW_RANLIB) .libswin/libunbound.a && cp .libswin/libunbound.a ../windows/x86 && cd ..
 	@echo '### Now you can build the library for Windows... ###'
