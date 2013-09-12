@@ -1,0 +1,86 @@
+### GENERAL REQUIREMENTS ###
+============================================
+  - OS: GNU/Linux/FreeBSD | Mac OS X | MS Windows
+  - CMake >=2.8 <http://www.cmake.org>
+  - FireBreath <http://www.firebreath.org>
+
+Development Tools
+============================================
+* C/C++, javascript, html, css
+* Projects: openssl - www.openssl.org, 
+	    ldns - www.nlnetlabs.nl/projects/ldns
+	    unbound - unbound.net
+	    Firebreath - www.firebreath.org
+
+
+Build requirements
+=============================================
+* gcc, g++
+* autotools (autoconf, automake, make)
+* cmake >= 2.6 (cmake >= 2.8 for Mac)
+* git (Makefile pulls submodules)
+* expat (unbound build dependency)
+Platform dependent stuff:
+    - Linux: GTK+ 2 development libraries (usually named gtk2-devel or libgtk2.0-dev, lib32gcc1 lib32stdc++6
+	                libc6-dev-i386 sed pkg-config libgtk2.0-dev; needed for FireBreath build)
+    - Mac: Xcode 4 (FireBreath says it needs it)
+    - Win: MS Visual Studio 2008 or latest version, mingw, for build on linux: gcc-mingw32
+
+
+
+==================================
+= Build instructions
+==================================
+
+-- Linux-like systems --
+For compilation on the Linux just call cmake 
+and make without any extra parameters:
+-----------------------------------------------
+$ cmake . && make
+-----------------------------------------------
+
+
+-- FreeBSD-like systems --
+For compilation on the BSD just call cmake 
+and make without any extra parameters:
+-----------------------------------------------
+$ cmake . && gmake
+-----------------------------------------------
+
+
+-- MAC OSX-like systems --
+For compilation on the MAC OS X is recommended 
+to set explicitly the target architecture, e.g.
+-----------------------------------------------
+$ cmake -DTARGET_ARCH=x86_64 . 
+  (cmake -DTARGET_ARCH=i386 .)
+$ make
+-----------------------------------------------
+
+
+-- Windows systems --
+Part 1 - build libs and dll, to be built on Linux:
+--------------------------------------------------
+$ make -f Makefile.libwin
+$ make -f Makefile.win sys_windows_pre
+--------------------------------------------------
+
+Part 2 - to be built on Windows:
+copy .dll into plugin directory
+---------------------------------------
+> plugin\FireBreath\prep2010.cmd plugin\projects plugin\build
+
+run VC++, open plugin/build/FireBreath.sln, select "MinSizeRel"
+configuration (Build -> Configuration Manager...) and build it
+---------------------------------------
+
+Part 3 - to be built on Linux:
+---------------------------------------
+$ make -f Makefile.win xpi_x86
+---------------------------------------
+
+
+
+
+
+
