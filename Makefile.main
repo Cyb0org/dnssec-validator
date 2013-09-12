@@ -1,29 +1,66 @@
-.PHONY: all submodules libs-build plugin
+# ====================
+# Global configuration
+# ====================
 
-all: libs-build plugin
+PLUGIN_NAME_DNSSEC = DNSSECValidatorPlugin
+PLUGIN_NAME_TLSA = TLSAValidatorPlugin
+EXTENSION_VERSION = $(shell cat Version)
+#EXTENSION_VERSION = $(shell cat add-on/firefox2/install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p')
+
+# TODO: remove?
+BASEDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+
+PLUGIN_ADD_ON = packages
+ADDON_PATH_FF = add-on/firefox2
+ADDON_PATH_CR = add-on/chrome2
+ADDON_PATH_CR_TLSA = add-on/chrome2tlsa
+
+## uncomment to make plugin build verbose - shows gcc invocations etc.
+#PLUGIN_VERBOSE_BUILD = VERBOSE=1
+
+## Configuration is one of Debug, Release, MinSizeRel and RelWithDebInfo.
+## You need to run 'make prepmake' after changing.
+PLUGIN_CONFIGURATION ?= MinSizeRel
+
+FIREBREATH_DIR := FireBreath
+
+BUNDLED_LIBS_SOURCE_DIR := libs-source
+BUNDLED_LIBS_DIR := libs
+
+PLUGIN_BUILD_DIR := build
+
+# ==============================================
+# Paths to libraries for bundled/unbundled build
+# ==============================================
+
+ifdef USE_SYSTEM_LIBS
+   DEPENDENCIES = $(FIREBREATH_DIR)
+else
+   OPENSSL_TARBALL = $(BUNDLED_LIBS_SOURCE_DIR)/openssl-1.0.1e.tar.gz
+   LDNS_TARBALL = $(BUNDLED_LIBS_SOURCE_DIR)/ldns-1.6.16.tar.gz
+   UNBOUND_TARBALL = $(BUNDLED_LIBS_SOURCE_DIR)/unbound-1.4.20.tar.gz
+   
+   OPENSSL_DIR := $(BASEDIR)/libs/openssl-1.0.1e
+   LDNS_DIR := $(BASEDIR)/libs/ldns-1.6.16
+   UNBOUND_DIR := $(BASEDIR)/libs/unbound-1.4.20
+   
+   OPENSSL_LIB := $(BASEDIR)/libs/openssl
+   LDNS_LIB := $(BASEDIR)/libs/ldns
+   UNBOUND_LIB := $(BASEDIR)/libs/unbound
+
+   DEPENDENCIES = $(FIREBREATH_DIR) $(BUNDLED_LIBS_SOURCE_DIR) $(OPENSSL_LIB) $(LDNS_LIB) $(UNBOUND_LIB)
+endif
+
+# ====================
+# Builds configuration
+# ====================
 
 CFLAGS=-fPIC
 export CFLAGS
 
-LIBS_SOURCE = libs-source
-OPENSSL_TARBALL = $(LIBS_SOURCE)/openssl-1.0.1e.tar.gz
-LDNS_TARBALL = $(LIBS_SOURCE)/ldns-1.6.16.tar.gz
-UNBOUND_TARBALL = $(LIBS_SOURCE)/unbound-1.4.20.tar.gz
-
-BASEDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-
-OPENSSL_DIR := $(BASEDIR)/libs/openssl-1.0.1e
-LDNS_DIR := $(BASEDIR)/libs/ldns-1.6.16
-UNBOUND_DIR := $(BASEDIR)/libs/unbound-1.4.20
-
-OPENSSL_LIB := $(BASEDIR)/libs/openssl
-LDNS_LIB := $(BASEDIR)/libs/ldns
-UNBOUND_LIB := $(BASEDIR)/libs/unbound
-
-FIREBREATH_DIR := $(BASEDIR)/FireBreath
-FIREBREATH_TAG := firebreath-1.6.0
-
-PLUGIN_BUILD_DIR := $(FIREBREATH_DIR)/build
+# =============
+# Build targets
+# =============
 
 # Different NPAPI plugin names based on OS
 # PLUGIN_BINARY_TREE is necessary because Mac has dirtree structure instead of
@@ -66,66 +103,57 @@ ifeq ($(TARGET_OS),WINDOWS)
     XPI := xpi_x86
 endif
 
-## uncomment to make plugin build verbose - shows gcc invocations etc.
-#PLUGIN_VERBOSE_BUILD = VERBOSE=1
+.PHONY: all submodules libs-build plugin
 
-## Configuration is one of Debug, Release, MinSizeRel and RelWithDebInfo.
-## You need to run 'make prepmake' after changing.
-PLUGIN_CONFIGURATION ?= MinSizeRel
+all:
+	echo use system libs: $(DEPENDENCIES)
+	echo fools
 
-libs-build: submodules libs $(OPENSSL_LIB) $(LDNS_LIB) $(UNBOUND_LIB) libsource
+$(FIREBREATH_DIR):
+	git clone https://github.com/firebreath/FireBreath.git $@
 
-submodules:
-	git clone https://gitlab.labs.nic.cz/mstraka/dnssec-libs.git $(LIBS_SOURCE)
-	git clone https://github.com/firebreath/FireBreath.git FireBreath
-	git submodule update --init --recursive
-	#(cd $(FIREBREATH_DIR) && git checkout $(FIREBREATH_TAG))
+# bundled libraries:
 
-libs:
-	mkdir libs
+$(BUNDLED_LIBS_SOURCE_DIR):
+	git clone https://gitlab.labs.nic.cz/mstraka/dnssec-libs.git $@
 
-## openssl
+$(BUNDLED_LIBS_DIR):
+	mkdir -p $@
+
+$(OPENSSL_DIR): $(BUNDLED_LIBS_SOURCE_DIR) $(BUNDLED_LIBS_DIR)
+	tar xzf $(OPENSSL_TARBALL) -C $(BUNDLED_LIBS_DIR)
+
 $(OPENSSL_LIB): $(OPENSSL_DIR)
 	(cd $< && ./Configure no-shared no-krb5 --prefix=$@ $(OPENSSL_ARGS) && $(MAKETYPE) -j1 && $(MAKETYPE) -j1 install)
 
-$(OPENSSL_DIR): $(OPENSSL_TARBALL)
-	tar xzf $< -C libs
+$(LDNS_DIR): $(BUNDLED_LIBS_SOURCE_DIR) $(BUNDLED_LIBS_DIR)
+	tar xzf $(LDNS_TARBALL) -C $(BUNDLED_LIBS_DIR)
 
-## ldns
 $(LDNS_LIB): $(LDNS_DIR) $(OPENSSL_LIB)
 	(cd $< && \
-	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared --with-ssl=$(OPENSSL_LIB) \
-	    --with-pic --prefix=$@ $(CONFIGURE_ARGS) && \
-	    $(MAKETYPE) && \
-	    $(MAKETYPE) install)
+	   CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared --with-ssl=$(OPENSSL_LIB) \
+	   --with-pic --prefix=$@ $(CONFIGURE_ARGS) && \
+	   $(MAKETYPE) && \
+	   $(MAKETYPE) install)
 
-$(LDNS_DIR): $(LDNS_TARBALL)
-	tar xzf $< -C libs
+$(UNBOUND_DIR): $(BUNDLED_LIBS_SOURCE_DIR) $(BUNDLED_LIBS_DIR)
+	tar xzf $(UNBOUND_TARBALL) -C $(BUNDLED_LIBS_DIR)
 
-## unbound
 $(UNBOUND_LIB): $(UNBOUND_DIR) $(LDNS_LIB) $(OPENSSL_LIB)
 	(cd $< && \
-	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared \
-	    --with-ssl=$(OPENSSL_LIB) --with-ldns=$(LDNS_LIB) --without-libevent \
-	    --with-pic --prefix=$@ $(CONFIGURE_ARGS) && \
-	    $(MAKETYPE) && \
-	    $(MAKETYPE) install)
-
-$(UNBOUND_DIR): $(UNBOUND_TARBALL)
-	tar xzf $< -C libs
-
-libsource:
-	rm -rf $(LIBS_SOURCE)
+	   CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared \
+	   --with-ssl=$(OPENSSL_LIB) --with-ldns=$(LDNS_LIB) --without-libevent \
+	   --with-pic --prefix=$@ $(CONFIGURE_ARGS) && \
+	   $(MAKETYPE) && \
+	   $(MAKETYPE) install)
 
 ## plugin
 plugin:
-	$(MAKETYPE) -f $(MAKE_OS) $(ARCH)
-	$(MAKETYPE) -f $(MAKE_OS) $(XPI)
-
+#	$(MAKETYPE) -f $(MAKE_OS) $(ARCH)
+#	$(MAKETYPE) -f $(MAKE_OS) $(XPI)
 
 clean:
-	rm -rf libs
-	rm -rf FireBreath
-	rm -rf $(LIBS_SOURCE)
+	rm -rf $(BUNDLED_LIBS_SOURCE_DIR)
+	rm -rf $(FIREBREATH_DIR)
+	rm -rf $(BUNDLED_LIBS_SOURCE_DIR)
 	rm -rf CMakeCache.txt CMakeFiles/ cmake_install.cmake
-

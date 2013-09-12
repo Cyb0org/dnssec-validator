@@ -19,17 +19,9 @@
 # DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 # ***** END LICENSE BLOCK *****
 
-PLUGIN_NAME_DNSSEC = DNSSECValidatorPlugin
-PLUGIN_NAME_TLSA = TLSAValidatorPlugin
 PLUGIN_FB_S = FireBreath/projects
 PLUGIN_FB_B = FireBreath/build
 PLUGIN_NAME_LIB = plugins-lib
-PLUGIN_ADD_ON = packages
-ADDON_PATH_FF = add-on/firefox2
-ADDON_PATH_CR = add-on/chrome2
-ADDON_PATH_CR_TLSA = add-on/chrome2tlsa
-#EXTENSION_VERSION = $(shell cat add-on/firefox2/install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p')
-EXTENSION_VERSION = $(shell cat Version)
 
 #all: sys_linux_x86 sys_linux_x64 xpi_x86 xpi_x64
 
@@ -77,7 +69,7 @@ sys_linux_x64:
 	mkdir $(PLUGIN_NAME_LIB)
 	cd FireBreath && mkdir projects && cd ..
 	cp -r plugin-source/* $(PLUGIN_FB_S)	
-	./FireBreath/prepmake.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m64  -DCMAKE_CXX_FLAGS=-m64  -DCMAKE_BUILD_TYPE=MinSizeRel
+	./FireBreath/prepmake.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m64  -DCMAKE_CXX_FLAGS=-m64  -DCMAKE_BUILD_TYPE=MinSizeRel -DWITH_SYSTEM_BOOST:BOOL=YES
 	make -C $(PLUGIN_FB_B)
 	cp $(PLUGIN_FB_B)/bin/$(PLUGIN_NAME_DNSSEC)/np$(PLUGIN_NAME_DNSSEC).so $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x64.so
 	cp $(PLUGIN_FB_B)/bin/$(PLUGIN_NAME_TLSA)/np$(PLUGIN_NAME_TLSA).so $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x64.so
