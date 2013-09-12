@@ -1,10 +1,10 @@
-v2.2.0 / 1.10.2013
+v2.1.0 / 1.10.2013
 
-- DANE/TLSA validation support
+- DANE/TLSA validation support (only MF and GC)
 - New design, new icons for DNSSEC/TLSA status
 - Fix bug with IPv6 comparison - (RFC 5952)
 - Popup with "resolver not support DNSSEC" was changed by new state of the icon
-- New build system (Makefiles)
+- New build system (Makefiles), support for FreeBSD
 
 v2.0.1 / 23.4.2013
 

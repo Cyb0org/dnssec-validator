@@ -35,7 +35,7 @@ PLUGIN_ADD_ON = packages
 ADDON_PATH_FF = add-on/firefox2
 ADDON_PATH_CR = add-on/chrome2
 #EXTENSION_VERSION = $(shell cat add-on/firefox2/install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p')
-EXTENSION_VERSION = $(shell cat add-on/firefox2/VERSION)
+EXTENSION_VERSION = $(shell cat Version)
 
 
 

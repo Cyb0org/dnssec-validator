@@ -141,7 +141,7 @@ function setModeTLSA(newMode, tabId, domain, status, changeInfo) {
               break;
 	    case this.tlsaModes.DANE_MODE_CERT_ERROR:
 	    case this.tlsaModes.DANE_MODE_NO_CERT_CHAIN:
-              	icon = "tlsared.png";
+              	icon = "tlsaerr.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_NO_CERT_CHAIN;
 	      	domainpre = "https://";
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_NO_CERT_CHAIN);
@@ -153,22 +153,16 @@ function setModeTLSA(newMode, tabId, domain, status, changeInfo) {
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_PARAM_WRONG);
               break;
 	    case this.tlsaModes.DANE_MODE_NO_TLSA_RECORD:
-              	icon = "tlsaorange.png";
+              	icon = "tlsagrey.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_NO_TLSA_RECORD;
 	      	domainpre = "https";
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_NO_TLSA_RECORD);
               break;
 	    case this.tlsaModes.DANE_MODE_NO_HTTPS:
-              	icon = "tlsaorange.png";
+              	icon = "tlsaoff.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_NO_HTTPS;
 	      	domainpre = "http";
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_NO_HTTPS);
-              break;
-	    case this.tlsaModes.DANE_MODE_DNSSEC_UNSECURED:
-              	icon = "tlsaoff.png";
-	      	title = this.tlsaModes.DANE_TOOLTIP_DNSSEC_UNSECURED;
-	      	domainpre = "https";
-        	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_DNSSEC_UNSECURED);
               break;
 	    case this.tlsaModes.DANE_MODE_DNSSEC_UNSECURED:
               	icon = "tlsaoff.png";
@@ -179,11 +173,11 @@ function setModeTLSA(newMode, tabId, domain, status, changeInfo) {
 	    case this.tlsaModes.DANE_MODE_VALIDATION_OFF:
               	icon = "tlsaoff.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_OFF;
-	      	domainpre = "https://";	
+	      	domainpre = "http://";	
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_OFF);
               break;
 	    case this.tlsaModes.DANE_MODE_DNSSEC_BOGUS:
-              	icon = "tlsaoff.png";
+              	icon = "tlsaorange.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_DNSSEC_BOGUS;
 	      	domainpre = "https";	
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_DNSSEC_BOGUS);

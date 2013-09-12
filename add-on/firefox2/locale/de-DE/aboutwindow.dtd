@@ -24,6 +24,6 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY aboutwindow.label "DNSSEC/TLSA Validator für Mozilla Firefox">
 <!ENTITY aboutwindow.description1 "Add-on für DNSSEC und TLSA Validierung">
 <!ENTITY aboutwindow.description2 "Unterstützte Versionen: 32bit und 64bit">
-<!ENTITY aboutwindow.version "Version 2.2.0">
+<!ENTITY aboutwindow.version "Version 2.1.0">
 <!ENTITY aboutwindow.company "CZ.NIC Labs">
 <!ENTITY aboutwindow.year "2013">
