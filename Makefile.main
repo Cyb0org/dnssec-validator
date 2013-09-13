@@ -14,6 +14,7 @@ PLUGIN_ADD_ON = packages
 ADDON_PATH_FF = add-on/firefox2
 ADDON_PATH_CR = add-on/chrome2
 ADDON_PATH_CR_TLSA = add-on/chrome2tlsa
+PLUGIN_BUILD_DIR := build
 
 ## uncomment to make plugin build verbose - shows gcc invocations etc.
 #PLUGIN_VERBOSE_BUILD = VERBOSE=1
@@ -22,33 +23,45 @@ ADDON_PATH_CR_TLSA = add-on/chrome2tlsa
 ## You need to run 'make prepmake' after changing.
 PLUGIN_CONFIGURATION ?= MinSizeRel
 
-FIREBREATH_DIR := FireBreath
+# ============
+# Dependencies
+# ============
 
-BUNDLED_LIBS_SOURCE_DIR := libs-source
-BUNDLED_LIBS_DIR := libs
+DOWNLOAD_DIR = download
 
-PLUGIN_BUILD_DIR := build
+FIREBREATH_VERSION = 1.7.0
+FIREBREATH_DIR = FireBreath
+FIREBREATH_TARBALL = firebreath-$(FIREBREATH_VERSION).tar.gz
+FIREBREATH_URL = https://github.com/firebreath/FireBreath/archive/$(FIREBREATH_TARBALL)
 
-# ==============================================
-# Paths to libraries for bundled/unbundled build
-# ==============================================
+BUNDLED_SOURCES_DIR = libs-source
+BUNDLED_LIBS_DIR = $(BASEDIR)/libs
+
+OPENSSL_VERSION = 1.0.1e
+OPENSSL_VERSIONED_NAME = openssl-$(OPENSSL_VERSION)
+OPENSSL_DIR = $(BUNDLED_SOURCES_DIR)/$(OPENSSL_VERSIONED_NAME)
+OPENSSL_LIB = $(BUNDLED_LIBS_DIR)/openssl
+OPENSSL_TARBALL = $(OPENSSL_VERSIONED_NAME).tar.gz
+OPENSSL_URL = https://www.openssl.org/source/$(OPENSSL_TARBALL)
+
+LDNS_VERSION = 1.6.16
+LDNS_VERSIONED_NAME = ldns-$(LDNS_VERSION)
+LDNS_DIR = $(BUNDLED_SOURCES_DIR)/$(LDNS_VERSIONED_NAME)
+LDNS_LIB = $(BUNDLED_LIBS_DIR)/ldns
+LDNS_TARBALL = $(LDNS_VERSIONED_NAME).tar.gz
+LDNS_URL = http://www.nlnetlabs.nl/downloads/ldns/$(LDNS_TARBALL)
+
+UNBOUND_VERSION = 1.4.20
+UNBOUND_VERSIONED_NAME = unbound-$(UNBOUND_VERSION)
+UNBOUND_DIR = $(BUNDLED_SOURCES_DIR)/$(UNBOUND_VERSIONED_NAME)
+UNBOUND_LIB = $(BUNDLED_LIBS_DIR)/unbound
+UNBOUND_TARBALL = $(UNBOUND_VERSIONED_NAME).tar.gz
+UNBOUND_URL = http://unbound.net/downloads/$(UNBOUND_TARBALL)
 
 ifdef USE_SYSTEM_LIBS
    DEPENDENCIES = $(FIREBREATH_DIR)
 else
-   OPENSSL_TARBALL = $(BUNDLED_LIBS_SOURCE_DIR)/openssl-1.0.1e.tar.gz
-   LDNS_TARBALL = $(BUNDLED_LIBS_SOURCE_DIR)/ldns-1.6.16.tar.gz
-   UNBOUND_TARBALL = $(BUNDLED_LIBS_SOURCE_DIR)/unbound-1.4.20.tar.gz
-   
-   OPENSSL_DIR := $(BASEDIR)/libs/openssl-1.0.1e
-   LDNS_DIR := $(BASEDIR)/libs/ldns-1.6.16
-   UNBOUND_DIR := $(BASEDIR)/libs/unbound-1.4.20
-   
-   OPENSSL_LIB := $(BASEDIR)/libs/openssl
-   LDNS_LIB := $(BASEDIR)/libs/ldns
-   UNBOUND_LIB := $(BASEDIR)/libs/unbound
-
-   DEPENDENCIES = $(FIREBREATH_DIR) $(BUNDLED_LIBS_SOURCE_DIR) $(OPENSSL_LIB) $(LDNS_LIB) $(UNBOUND_LIB)
+   DEPENDENCIES = $(FIREBREATH_DIR) $(OPENSSL_LIB) $(LDNS_LIB) $(UNBOUND_LIB)
 endif
 
 # ====================
@@ -105,47 +118,76 @@ endif
 
 .PHONY: all submodules libs-build plugin
 
-all:
+all: $(DEPENDENCIES)
 	echo use system libs: $(DEPENDENCIES)
 	echo fools
 
-$(FIREBREATH_DIR):
-	git clone https://github.com/firebreath/FireBreath.git $@
+# firebreath framework
 
-# bundled libraries:
+$(DOWNLOAD_DIR)/$(FIREBREATH_TARBALL):
+	mkdir -p $(DOWNLOAD_DIR)
+	wget $(FIREBREATH_URL) -O $@
 
-$(BUNDLED_LIBS_SOURCE_DIR):
-	git clone https://gitlab.labs.nic.cz/mstraka/dnssec-libs.git $@
+$(FIREBREATH_DIR): $(DOWNLOAD_DIR)/$(FIREBREATH_TARBALL)
+	mkdir -p $(FIREBREATH_DIR)
+	tar xzf $< --strip-components=1 -C $(FIREBREATH_DIR)
 
-$(BUNDLED_LIBS_DIR):
-	mkdir -p $@
+# bundled OpenSSL
 
-$(OPENSSL_DIR): $(BUNDLED_LIBS_SOURCE_DIR) $(BUNDLED_LIBS_DIR)
-	tar xzf $(OPENSSL_TARBALL) -C $(BUNDLED_LIBS_DIR)
+$(DOWNLOAD_DIR)/$(OPENSSL_TARBALL):
+	mkdir -p $(DOWNLOAD_DIR)
+	wget $(OPENSSL_URL) -O $@
+
+$(OPENSSL_DIR): $(DOWNLOAD_DIR)/$(OPENSSL_TARBALL)
+	mkdir -p $(BUNDLED_SOURCES_DIR)
+	tar xzf $< -C $(BUNDLED_SOURCES_DIR)
 
 $(OPENSSL_LIB): $(OPENSSL_DIR)
-	(cd $< && ./Configure no-shared no-krb5 --prefix=$@ $(OPENSSL_ARGS) && $(MAKETYPE) -j1 && $(MAKETYPE) -j1 install)
+	echo "-- compiling OpenSSL"
+	mkdir -p $(BUNDLED_LIBS_DIR)
+	(cd $< && \
+	./Configure no-shared no-krb5 --prefix=$@ $(OPENSSL_ARGS) && \
+	$(MAKETYPE) -j1 && \
+	$(MAKETYPE) -j1 install_sw)
 
-$(LDNS_DIR): $(BUNDLED_LIBS_SOURCE_DIR) $(BUNDLED_LIBS_DIR)
-	tar xzf $(LDNS_TARBALL) -C $(BUNDLED_LIBS_DIR)
+# bundled LDNS
+
+$(DOWNLOAD_DIR)/$(LDNS_TARBALL):
+	mkdir -p $(DOWNLOAD_DIR)
+	wget $(LDNS_URL) -O $@
+
+$(LDNS_DIR): $(DOWNLOAD_DIR)/$(LDNS_TARBALL)
+	mkdir -p $(BUNDLED_SOURCES_DIR)
+	tar xzf $< -C $(BUNDLED_SOURCES_DIR)
 
 $(LDNS_LIB): $(LDNS_DIR) $(OPENSSL_LIB)
+	echo "-- compiling ldns"
+	mkdir -p $(BUNDLED_LIBS_DIR)
 	(cd $< && \
-	   CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared --with-ssl=$(OPENSSL_LIB) \
-	   --with-pic --prefix=$@ $(CONFIGURE_ARGS) && \
-	   $(MAKETYPE) && \
-	   $(MAKETYPE) install)
+	CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared --with-ssl=$(OPENSSL_LIB) \
+	--with-pic --prefix=$@ $(CONFIGURE_ARGS) && \
+	$(MAKETYPE) && \
+	$(MAKETYPE) install)
 
-$(UNBOUND_DIR): $(BUNDLED_LIBS_SOURCE_DIR) $(BUNDLED_LIBS_DIR)
-	tar xzf $(UNBOUND_TARBALL) -C $(BUNDLED_LIBS_DIR)
+# bundled Unbound
 
-$(UNBOUND_LIB): $(UNBOUND_DIR) $(LDNS_LIB) $(OPENSSL_LIB)
+$(DOWNLOAD_DIR)/$(UNBOUND_TARBALL):
+	mkdir -p $(DOWNLOAD_DIR)
+	wget $(UNBOUND_URL) -O $@
+
+$(UNBOUND_DIR): $(DOWNLOAD_DIR)/$(UNBOUND_TARBALL)
+	mkdir -p $(BUNDLED_SOURCES_DIR)
+	tar xzf $< -C $(BUNDLED_SOURCES_DIR)
+
+$(UNBOUND_LIB): $(UNBOUND_DIR) $(OPENSSL_LIB) $(LDNS_LIB)
+	echo "-- compiling unbound"
+	mkdir -p $(BUNDLED_LIBS_DIR)
 	(cd $< && \
-	   CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared \
-	   --with-ssl=$(OPENSSL_LIB) --with-ldns=$(LDNS_LIB) --without-libevent \
-	   --with-pic --prefix=$@ $(CONFIGURE_ARGS) && \
-	   $(MAKETYPE) && \
-	   $(MAKETYPE) install)
+	CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared \
+	--with-ssl=$(OPENSSL_LIB) --with-ldns=$(LDNS_LIB) --without-libevent \
+	--with-pic --prefix=$@ $(CONFIGURE_ARGS) && \
+	$(MAKETYPE) && \
+	$(MAKETYPE) install)
 
 ## plugin
 plugin:
@@ -153,7 +195,8 @@ plugin:
 #	$(MAKETYPE) -f $(MAKE_OS) $(XPI)
 
 clean:
-	rm -rf $(BUNDLED_LIBS_SOURCE_DIR)
 	rm -rf $(FIREBREATH_DIR)
-	rm -rf $(BUNDLED_LIBS_SOURCE_DIR)
+	rm -rf $(DOWNLOAD_DIR)
+	rm -rf $(BUNDLED_SOURCES_DIR)
+	rm -rf $(BUNDLED_LIBS_DIR)
 	rm -rf CMakeCache.txt CMakeFiles/ cmake_install.cmake
