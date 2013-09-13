@@ -5,23 +5,19 @@
 PLUGIN_NAME_DNSSEC = DNSSECValidatorPlugin
 PLUGIN_NAME_TLSA = TLSAValidatorPlugin
 EXTENSION_VERSION = $(shell cat Version)
-#EXTENSION_VERSION = $(shell cat add-on/firefox2/install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p')
 
-# TODO: remove?
 BASEDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
-PLUGIN_ADD_ON = packages
-ADDON_PATH_FF = add-on/firefox2
-ADDON_PATH_CR = add-on/chrome2
-ADDON_PATH_CR_TLSA = add-on/chrome2tlsa
-PLUGIN_BUILD_DIR := build
+PLUGIN_SOURCE_DIR = plugin-source
+PLUGIN_BUILD_DIR = build
 
-## uncomment to make plugin build verbose - shows gcc invocations etc.
-#PLUGIN_VERBOSE_BUILD = VERBOSE=1
+PACKAGES_DIR = packages
 
-## Configuration is one of Debug, Release, MinSizeRel and RelWithDebInfo.
-## You need to run 'make prepmake' after changing.
-PLUGIN_CONFIGURATION ?= MinSizeRel
+FIREFOX_ADDON_DIR = add-on/firefox2
+CHROME_ADDON_DIR = add-on/chrome2
+CHROME_TLSA_ADDON_DIR = add-on/chrome2tlsa
+
+FIREBREATH_OPTS = -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_BUILD_TYPE=MinSizeRel
 
 # ============
 # Dependencies
@@ -58,18 +54,24 @@ UNBOUND_LIB = $(BUNDLED_LIBS_DIR)/unbound
 UNBOUND_TARBALL = $(UNBOUND_VERSIONED_NAME).tar.gz
 UNBOUND_URL = http://unbound.net/downloads/$(UNBOUND_TARBALL)
 
-ifdef USE_SYSTEM_LIBS
+ifdef WITH_SYSTEM_LIBS
    DEPENDENCIES = $(FIREBREATH_DIR)
+   FIREBREATH_OPTS += -DWITH_SYSTEM_BOOST:BOOL=YES
 else
    DEPENDENCIES = $(FIREBREATH_DIR) $(OPENSSL_LIB) $(LDNS_LIB) $(UNBOUND_LIB)
 endif
 
 # ====================
-# Builds configuration
+# Architecture options
 # ====================
 
-CFLAGS=-fPIC
-export CFLAGS
+ifeq ($(BUILD_64BIT),1)
+   PLUGIN_LIB_SUFFIX=_x64
+   FIREBREATH_OPTS += -DCMAKE_C_FLAGS=-m64 -DCMAKE_CXX_FLAGS=-m64
+else
+   PLUGIN_LIB_SUFFIX=_x86
+   FIREBREATH_OPTS += -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32
+endif
 
 # =============
 # Build targets
@@ -116,11 +118,17 @@ ifeq ($(TARGET_OS),WINDOWS)
     XPI := xpi_x86
 endif
 
-.PHONY: all submodules libs-build plugin
 
-all: $(DEPENDENCIES)
-	echo use system libs: $(DEPENDENCIES)
-	echo fools
+.PHONY: all clean build package
+
+all: build
+
+clean:
+	rm -rf $(FIREBREATH_DIR)
+	rm -rf $(DOWNLOAD_DIR)
+	rm -rf $(BUNDLED_SOURCES_DIR)
+	rm -rf $(BUNDLED_LIBS_DIR)
+	rm -rf CMakeCache.txt CMakeFiles/ cmake_install.cmake
 
 # firebreath framework
 
@@ -189,14 +197,63 @@ $(UNBOUND_LIB): $(UNBOUND_DIR) $(OPENSSL_LIB) $(LDNS_LIB)
 	$(MAKETYPE) && \
 	$(MAKETYPE) install)
 
-## plugin
-plugin:
-#	$(MAKETYPE) -f $(MAKE_OS) $(ARCH)
-#	$(MAKETYPE) -f $(MAKE_OS) $(XPI)
+# plugin
 
-clean:
-	rm -rf $(FIREBREATH_DIR)
-	rm -rf $(DOWNLOAD_DIR)
-	rm -rf $(BUNDLED_SOURCES_DIR)
-	rm -rf $(BUNDLED_LIBS_DIR)
-	rm -rf CMakeCache.txt CMakeFiles/ cmake_install.cmake
+$(PLUGIN_BUILD_DIR)/Makefile:
+	echo "-- creating build configuration"
+	mkdir -p $(PLUGIN_BUILD_DIR)
+	$(FIREBREATH_DIR)/prepmake.sh $(PLUGIN_SOURCE_DIR) $(PLUGIN_BUILD_DIR) $(FIREBREATH_OPTS)
+
+build: $(DEPENDENCIES) $(PLUGIN_BUILD_DIR)/Makefile
+	echo "-- building plugin"
+	$(MAKETYPE) -C $(PLUGIN_BUILD_DIR)
+	echo $(MAKETYPE) -f $(MAKE_OS) $(ARCH)
+	echo $(MAKETYPE) -f $(MAKE_OS) $(XPI)
+
+# package
+
+firefox-plugin: build
+	rm -rf $(FIREFOX_ADDON_DIR)/plugins
+	mkdir -p $(FIREFOX_ADDON_DIR)/plugins
+	cp -vf $(PLUGIN_BUILD_DIR)/bin/$(PLUGIN_NAME_DNSSEC)/np$(PLUGIN_NAME_DNSSEC).so \
+	      $(FIREFOX_ADDON_DIR)/plugins/np$(PLUGIN_NAME_DNSSEC)$(PLUGIN_LIB_SUFFIX).so
+	cp -vf $(PLUGIN_BUILD_DIR)/bin/$(PLUGIN_NAME_TLSA)/np$(PLUGIN_NAME_TLSA).so \
+	      $(FIREFOX_ADDON_DIR)/plugins/np$(PLUGIN_NAME_TLSA)$(PLUGIN_LIB_SUFFIX).so
+	# TODO: FIX TARGET PLATFORM
+	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' \
+	    -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86_64-gcc3<\/em:targetPlatform>/g' \
+		$(FIREFOX_ADDON_DIR)/install.rdf.template > $(FIREFOX_ADDON_DIR)/install.rdf
+	mkdir -p $(PACKAGES_DIR)
+	# TODO: FIX TARGET PLATFORM
+	pushd $(FIREFOX_ADDON_DIR) && sh build.sh && popd && mv $(FIREFOX_ADDON_DIR)/dnssec.xpi $(PACKAGES_DIR)/FF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-linux-x86_64.xpi
+
+chrome-plugin:
+	cp $(PLUGIN_BUILD_DIR)/bin/$(PLUGIN_NAME_DNSSEC)/np$(PLUGIN_NAME_DNSSEC).so \
+	   $(CHROME_ADDON_DIR)/np$(PLUGIN_NAME_DNSSEC)$(PLUGIN_LIB_SUFFIX).so
+	sed -e 's/dnssecplugin/np$(PLUGIN_NAME_DNSSEC)$(PLUGIN_LIB_SUFFIX).so/g' \
+	    -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' \
+	    $(CHROME_ADDON_DIR)/manifest.json.template > $(CHROME_ADDON_DIR)/manifest.json
+	mkdir -p $(PACKAGES_DIR)
+	# TODO: FIX TARGET PLATFORM
+	# TODO: FIX PATH INSIDE TARBALL
+	tar -czf $(PACKAGES_DIR)/CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x64.tar.gz $(CHROME_ADDON_DIR)
+	rm -f $(CHROME_ADDON_DIR)/manifest.json $(CHROME_ADDON_DIR)/np$(PLUGIN_NAME_DNSSEC)$(PLUGIN_LIB_SUFFIX).so
+
+chrome-plugin-tlsa:
+	cp $(PLUGIN_BUILD_DIR)/bin/$(PLUGIN_NAME_TLSA)/np$(PLUGIN_NAME_TLSA).so \
+	   $(CHROME_TLSA_ADDON_DIR)/np$(PLUGIN_NAME_TLSA)$(PLUGIN_LIB_SUFFIX).so
+	sed -e 's/tlsaplugin/np$(PLUGIN_NAME_TLSA)$(PLUGIN_LIB_SUFFIX).so/g' \
+	    -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' \
+	    $(CHROME_TLSA_ADDON_DIR)/manifest.json.template > $(CHROME_TLSA_ADDON_DIR)/manifest.json
+	mkdir -p $(PACKAGES_DIR)
+	# TODO: FIX TARGET PLATFORM
+	# TODO: FIX PATH INSIDE TARBALL
+	tar -czf $(PACKAGES_DIR)/CR-tlsa_validator-$(EXTENSION_VERSION)-linux-x64.tar.gz $(CHROME_TLSA_ADDON_DIR)
+	rm -f $(CHROME_TLSA_ADDON_DIR)/manifest.json $(CHROME_TLSA_ADDON_DIR)/np$(PLUGIN_NAME_TLSA)$(PLUGIN_LIB_SUFFIX).so
+
+
+packages: firefox-plugin chrome-plugin chrome-plugin-tlsa
+	echo "-- creating package"
+
+all: packages
+	

@@ -78,12 +78,12 @@ ELSE()
     MESSAGE(SEND_ERROR "Unsupported OS")
 ENDIF()
 
-IF(USE_SYSTEM_LIBS)
+IF(WITH_SYSTEM_LIBS)
 	MESSAGE("Using system libraries instead of bundled ones.")
-	SET(USE_SYSTEM_LIBS 1)
+	SET(WITH_SYSTEM_LIBS 1)
 ELSE()
 	MESSAGE("Using bundled libraries.")
-	SET(USE_SYSTEM_LIBS "")
+	SET(WITH_SYSTEM_LIBS "")
 ENDIF()
 
 # Recursive build using Makefile.main is the target
@@ -102,5 +102,5 @@ ADD_CUSTOM_COMMAND(TARGET RecursiveBuild
         BUILD_64BIT=${BUILD_64BIT}
         BUILD_MAC96=${BUILD_MAC96}
         MAKETYPE=${MAKETYPE}
-		USE_SYSTEM_LIBS=${USE_SYSTEM_LIBS}
+		WITH_SYSTEM_LIBS=${WITH_SYSTEM_LIBS}
     )
