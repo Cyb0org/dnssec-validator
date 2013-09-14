@@ -2,14 +2,15 @@
 # Global configuration
 # ====================
 
-PLUGIN_NAME_DNSSEC = DNSSECValidatorPlugin
-PLUGIN_NAME_TLSA = TLSAValidatorPlugin
 EXTENSION_VERSION = $(shell cat Version)
-
 BASEDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
-PLUGIN_SOURCE_DIR = plugin-source
-PLUGIN_BUILD_DIR = build
+DNSSEC_PLUGIN_NAME = DNSSECValidatorPlugin
+
+TLSA_PLUGIN_NAME = TLSAValidatorPlugin
+
+PLUGINS_SOURCE_DIR = plugin-source
+PLUGINS_BUILD_DIR = plugin-build
 
 PACKAGES_DIR = packages
 
@@ -23,7 +24,7 @@ FIREBREATH_OPTS = -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_BUILD_TYPE=MinSizeRel
 # Dependencies
 # ============
 
-DOWNLOAD_DIR = download
+DOWNLOADS_DIR = downloads
 
 FIREBREATH_VERSION = 1.7.0
 FIREBREATH_DIR = FireBreath
@@ -125,28 +126,28 @@ all: build
 
 clean:
 	rm -rf $(FIREBREATH_DIR)
-	rm -rf $(DOWNLOAD_DIR)
+	rm -rf $(DOWNLOADS_DIR)
 	rm -rf $(BUNDLED_SOURCES_DIR)
 	rm -rf $(BUNDLED_LIBS_DIR)
 	rm -rf CMakeCache.txt CMakeFiles/ cmake_install.cmake
 
 # firebreath framework
 
-$(DOWNLOAD_DIR)/$(FIREBREATH_TARBALL):
-	mkdir -p $(DOWNLOAD_DIR)
+$(DOWNLOADS_DIR)/$(FIREBREATH_TARBALL):
+	mkdir -p $(DOWNLOADS_DIR)
 	wget $(FIREBREATH_URL) -O $@
 
-$(FIREBREATH_DIR): $(DOWNLOAD_DIR)/$(FIREBREATH_TARBALL)
+$(FIREBREATH_DIR): $(DOWNLOADS_DIR)/$(FIREBREATH_TARBALL)
 	mkdir -p $(FIREBREATH_DIR)
 	tar xzf $< --strip-components=1 -C $(FIREBREATH_DIR)
 
 # bundled OpenSSL
 
-$(DOWNLOAD_DIR)/$(OPENSSL_TARBALL):
-	mkdir -p $(DOWNLOAD_DIR)
+$(DOWNLOADS_DIR)/$(OPENSSL_TARBALL):
+	mkdir -p $(DOWNLOADS_DIR)
 	wget $(OPENSSL_URL) -O $@
 
-$(OPENSSL_DIR): $(DOWNLOAD_DIR)/$(OPENSSL_TARBALL)
+$(OPENSSL_DIR): $(DOWNLOADS_DIR)/$(OPENSSL_TARBALL)
 	mkdir -p $(BUNDLED_SOURCES_DIR)
 	tar xzf $< -C $(BUNDLED_SOURCES_DIR)
 
@@ -160,11 +161,11 @@ $(OPENSSL_LIB): $(OPENSSL_DIR)
 
 # bundled LDNS
 
-$(DOWNLOAD_DIR)/$(LDNS_TARBALL):
-	mkdir -p $(DOWNLOAD_DIR)
+$(DOWNLOADS_DIR)/$(LDNS_TARBALL):
+	mkdir -p $(DOWNLOADS_DIR)
 	wget $(LDNS_URL) -O $@
 
-$(LDNS_DIR): $(DOWNLOAD_DIR)/$(LDNS_TARBALL)
+$(LDNS_DIR): $(DOWNLOADS_DIR)/$(LDNS_TARBALL)
 	mkdir -p $(BUNDLED_SOURCES_DIR)
 	tar xzf $< -C $(BUNDLED_SOURCES_DIR)
 
@@ -179,11 +180,11 @@ $(LDNS_LIB): $(LDNS_DIR) $(OPENSSL_LIB)
 
 # bundled Unbound
 
-$(DOWNLOAD_DIR)/$(UNBOUND_TARBALL):
-	mkdir -p $(DOWNLOAD_DIR)
+$(DOWNLOADS_DIR)/$(UNBOUND_TARBALL):
+	mkdir -p $(DOWNLOADS_DIR)
 	wget $(UNBOUND_URL) -O $@
 
-$(UNBOUND_DIR): $(DOWNLOAD_DIR)/$(UNBOUND_TARBALL)
+$(UNBOUND_DIR): $(DOWNLOADS_DIR)/$(UNBOUND_TARBALL)
 	mkdir -p $(BUNDLED_SOURCES_DIR)
 	tar xzf $< -C $(BUNDLED_SOURCES_DIR)
 
@@ -199,14 +200,14 @@ $(UNBOUND_LIB): $(UNBOUND_DIR) $(OPENSSL_LIB) $(LDNS_LIB)
 
 # plugin
 
-$(PLUGIN_BUILD_DIR)/Makefile:
+$(PLUGINS_BUILD_DIR)/Makefile:
 	echo "-- creating build configuration"
-	mkdir -p $(PLUGIN_BUILD_DIR)
-	$(FIREBREATH_DIR)/prepmake.sh $(PLUGIN_SOURCE_DIR) $(PLUGIN_BUILD_DIR) $(FIREBREATH_OPTS)
+	mkdir -p $(PLUGINS_BUILD_DIR)
+	$(FIREBREATH_DIR)/prepmake.sh $(PLUGINS_SOURCE_DIR) $(PLUGINS_BUILD_DIR) $(FIREBREATH_OPTS)
 
-build: $(DEPENDENCIES) $(PLUGIN_BUILD_DIR)/Makefile
+build: $(DEPENDENCIES) $(PLUGINS_BUILD_DIR)/Makefile
 	echo "-- building plugin"
-	$(MAKETYPE) -C $(PLUGIN_BUILD_DIR)
+	$(MAKETYPE) -C $(PLUGINS_BUILD_DIR)
 	echo $(MAKETYPE) -f $(MAKE_OS) $(ARCH)
 	echo $(MAKETYPE) -f $(MAKE_OS) $(XPI)
 
@@ -215,10 +216,10 @@ build: $(DEPENDENCIES) $(PLUGIN_BUILD_DIR)/Makefile
 firefox-plugin: build
 	rm -rf $(FIREFOX_ADDON_DIR)/plugins
 	mkdir -p $(FIREFOX_ADDON_DIR)/plugins
-	cp -vf $(PLUGIN_BUILD_DIR)/bin/$(PLUGIN_NAME_DNSSEC)/np$(PLUGIN_NAME_DNSSEC).so \
-	      $(FIREFOX_ADDON_DIR)/plugins/np$(PLUGIN_NAME_DNSSEC)$(PLUGIN_LIB_SUFFIX).so
-	cp -vf $(PLUGIN_BUILD_DIR)/bin/$(PLUGIN_NAME_TLSA)/np$(PLUGIN_NAME_TLSA).so \
-	      $(FIREFOX_ADDON_DIR)/plugins/np$(PLUGIN_NAME_TLSA)$(PLUGIN_LIB_SUFFIX).so
+	cp -vf $(PLUGINS_BUILD_DIR)/bin/$(DNSSEC_PLUGIN_NAME)/np$(DNSSEC_PLUGIN_NAME).so \
+	      $(FIREFOX_ADDON_DIR)/plugins/np$(DNSSEC_PLUGIN_NAME)$(PLUGIN_LIB_SUFFIX).so
+	cp -vf $(PLUGINS_BUILD_DIR)/bin/$(TLSA_PLUGIN_NAME)/np$(TLSA_PLUGIN_NAME).so \
+	      $(FIREFOX_ADDON_DIR)/plugins/np$(TLSA_PLUGIN_NAME)$(PLUGIN_LIB_SUFFIX).so
 	# TODO: FIX TARGET PLATFORM
 	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' \
 	    -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86_64-gcc3<\/em:targetPlatform>/g' \
@@ -228,28 +229,28 @@ firefox-plugin: build
 	pushd $(FIREFOX_ADDON_DIR) && sh build.sh && popd && mv $(FIREFOX_ADDON_DIR)/dnssec.xpi $(PACKAGES_DIR)/FF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-linux-x86_64.xpi
 
 chrome-plugin:
-	cp $(PLUGIN_BUILD_DIR)/bin/$(PLUGIN_NAME_DNSSEC)/np$(PLUGIN_NAME_DNSSEC).so \
-	   $(CHROME_ADDON_DIR)/np$(PLUGIN_NAME_DNSSEC)$(PLUGIN_LIB_SUFFIX).so
-	sed -e 's/dnssecplugin/np$(PLUGIN_NAME_DNSSEC)$(PLUGIN_LIB_SUFFIX).so/g' \
+	cp $(PLUGINS_BUILD_DIR)/bin/$(DNSSEC_PLUGIN_NAME)/np$(DNSSEC_PLUGIN_NAME).so \
+	   $(CHROME_ADDON_DIR)/np$(DNSSEC_PLUGIN_NAME)$(PLUGIN_LIB_SUFFIX).so
+	sed -e 's/dnssecplugin/np$(DNSSEC_PLUGIN_NAME)$(PLUGIN_LIB_SUFFIX).so/g' \
 	    -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' \
 	    $(CHROME_ADDON_DIR)/manifest.json.template > $(CHROME_ADDON_DIR)/manifest.json
 	mkdir -p $(PACKAGES_DIR)
 	# TODO: FIX TARGET PLATFORM
 	# TODO: FIX PATH INSIDE TARBALL
 	tar -czf $(PACKAGES_DIR)/CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x64.tar.gz $(CHROME_ADDON_DIR)
-	rm -f $(CHROME_ADDON_DIR)/manifest.json $(CHROME_ADDON_DIR)/np$(PLUGIN_NAME_DNSSEC)$(PLUGIN_LIB_SUFFIX).so
+	rm -f $(CHROME_ADDON_DIR)/manifest.json $(CHROME_ADDON_DIR)/np$(DNSSEC_PLUGIN_NAME)$(PLUGIN_LIB_SUFFIX).so
 
 chrome-plugin-tlsa:
-	cp $(PLUGIN_BUILD_DIR)/bin/$(PLUGIN_NAME_TLSA)/np$(PLUGIN_NAME_TLSA).so \
-	   $(CHROME_TLSA_ADDON_DIR)/np$(PLUGIN_NAME_TLSA)$(PLUGIN_LIB_SUFFIX).so
-	sed -e 's/tlsaplugin/np$(PLUGIN_NAME_TLSA)$(PLUGIN_LIB_SUFFIX).so/g' \
+	cp $(PLUGINS_BUILD_DIR)/bin/$(TLSA_PLUGIN_NAME)/np$(TLSA_PLUGIN_NAME).so \
+	   $(CHROME_TLSA_ADDON_DIR)/np$(TLSA_PLUGIN_NAME)$(PLUGIN_LIB_SUFFIX).so
+	sed -e 's/tlsaplugin/np$(TLSA_PLUGIN_NAME)$(PLUGIN_LIB_SUFFIX).so/g' \
 	    -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' \
 	    $(CHROME_TLSA_ADDON_DIR)/manifest.json.template > $(CHROME_TLSA_ADDON_DIR)/manifest.json
 	mkdir -p $(PACKAGES_DIR)
 	# TODO: FIX TARGET PLATFORM
 	# TODO: FIX PATH INSIDE TARBALL
 	tar -czf $(PACKAGES_DIR)/CR-tlsa_validator-$(EXTENSION_VERSION)-linux-x64.tar.gz $(CHROME_TLSA_ADDON_DIR)
-	rm -f $(CHROME_TLSA_ADDON_DIR)/manifest.json $(CHROME_TLSA_ADDON_DIR)/np$(PLUGIN_NAME_TLSA)$(PLUGIN_LIB_SUFFIX).so
+	rm -f $(CHROME_TLSA_ADDON_DIR)/manifest.json $(CHROME_TLSA_ADDON_DIR)/np$(TLSA_PLUGIN_NAME)$(PLUGIN_LIB_SUFFIX).so
 
 
 packages: firefox-plugin chrome-plugin chrome-plugin-tlsa
