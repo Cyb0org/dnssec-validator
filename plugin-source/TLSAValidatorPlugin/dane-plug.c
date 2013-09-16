@@ -543,7 +543,7 @@ int getcert(char* dest_url, struct cert_store_head *cert_list) {
   BIO               *outbio = NULL;
   X509                *cert = NULL;
   STACK_OF(X509)     *chain = NULL;
-  X509_NAME       *certname = NULL;
+  //X509_NAME       *certname = NULL;
   const SSL_METHOD *method;
   SSL_CTX *ctx;
   SSL *ssl;
@@ -629,16 +629,29 @@ int getcert(char* dest_url, struct cert_store_head *cert_list) {
   if (chain == NULL)
     if (debug) BIO_printf(outbio, "Error: Could not get a certificate chain: %s.\n", dest_url); 
   int value = sk_X509_num(chain);
-  BIO_printf(outbio, "CHAIN N:\n%i\n", value);
+  if (debug) BIO_printf(outbio, "#cert in chain: %i\n", value);
 
-  certname = X509_NAME_new();
-  certname = X509_get_subject_name(cert);
+  X509 *cert2 = NULL;
+  int i = 0;
+  if (chain && sk_X509_num(chain)) {        
+        for (i = 1; i < sk_X509_num(chain); i++) {
+	        if (debug) PEM_write_bio_X509(outbio, sk_X509_value(chain, i));
+		buf = NULL;
+		cert2 = sk_X509_value(chain, i);
+    		len = i2d_X509(cert2, &buf);
+    		hex = bintohex((uint8_t*)buf, len);
+  		if ((pkey = X509_get_pubkey(cert2)) == NULL)
+    		    if (debug) BIO_printf(outbio, "Error getting public key from certificate");
+	        buf2 = NULL;
+                len2 = i2d_PUBKEY(pkey, &buf2);
+ 		hex2 = bintohex((uint8_t*)buf2, len2);
+	 	add_certrecord_bottom(cert_list, (char*)buf, len, hex, (char*)buf2,len2, hex2); 
+    	 } //for
+   }//if
 
+  //certname = X509_NAME_new();
+  //certname = X509_get_subject_name(cert);
 
-  //BIO_printf(outbio, "Displaying the certificate subject data:\n");
-  //X509_NAME_print_ex(outbio, certname, 0, 0);
-  //BIO_printf(outbio, "\n");
-  
   EVP_PKEY_free(pkey);
   SSL_free(ssl);
 #ifdef WIN32
@@ -1243,6 +1256,6 @@ int main(int argc, char **argv) {
  int res = DANE_EXIT_RESOLVER_FAILED;
  char* certhex[] = {"000000FF00"}; 
  res = CheckDane(certhex, 0, 5, "8.8.8.8", argv[1], "443", "tcp", 1);
- if (debug) printf(DEBUG_PREFIX_DANE "result %i\n", res);
+ if (debug) printf(DEBUG_PREFIX_DANE "Final result: %i\n", res);
  return 1;
 }
