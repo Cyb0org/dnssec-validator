@@ -36,4 +36,8 @@
 		DANE_EXIT_VALIDATION_FALSE_TYPE1	 : -11, /* Validation of TLSA record (type1) is false */
 		DANE_EXIT_VALIDATION_FALSE_TYPE2	 : -12, /* Validation of TLSA record (type2) is false */
 		DANE_EXIT_VALIDATION_FALSE_TYPE3	 : -13, /* Validation of TLSA record (type3) is false */
+  		DANE_INPUT_FLAG_DEBUGOUTPUT              : 1, /* debug output */
+  		DANE_INPUT_FLAG_USEFWD                   : 2, /* use forwarder instead of default unbound servers */
+  		DANE_INPUT_FLAG_RESOLVIPV4               : 4, /* resolve IPv4 address (A record) */
+  		DANE_INPUT_FLAG_RESOLVIPV6               : 8, /* resolve IPv6 address (AAAA record) */
 	};

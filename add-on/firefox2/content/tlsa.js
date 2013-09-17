@@ -334,30 +334,45 @@ var tlsaValidator = {
   },
   
   // gets current certificate, if it FAILED the security check
-  get_invalid_cert: function(uri) {
-    var gSSLStatus = this.get_invalid_cert_SSLStatus(uri);
-		if(!gSSLStatus){
-			return null;
-		}
-		return gSSLStatus.QueryInterface(Components.interfaces.nsISSLStatus)
-				.serverCert;
-  },
-  
-  get_invalid_cert_SSLStatus: function(uri) {
-    var recentCertsSvc = 
-		Components.classes["@mozilla.org/security/recentbadcerts;1"]
-			.getService(Components.interfaces.nsIRecentBadCertsService);
-		if (!recentCertsSvc)
-			return null;
+ get_invalid_cert_SSLStatus: function(uri){
+     var recentCertsSvc = null;
 
-		var port = (uri.port == -1) ? 443 : uri.port;  
+      // firefox <= 19 and seamonkey
+      if (typeof Components.classes["@mozilla.org/security/recentbadcerts;1"] !== "undefined") {
 
-		var hostWithPort = uri.host + ":" + port;
-		var gSSLStatus = recentCertsSvc.getRecentBadCert(hostWithPort);
-		if (!gSSLStatus)
-			return null;
-		return gSSLStatus;
-  },
+            recentCertsSvc = Components.classes["@mozilla.org/security/recentbadcerts;1"]
+                               .getService(Components.interfaces.nsIRecentBadCertsService);
+      }
+      // firefox > v20
+      else if (typeof Components.classes["@mozilla.org/security/x509certdb;1"] !== "undefined") {
+
+         var certDB = Components.classes["@mozilla.org/security/x509certdb;1"]
+                      .getService(Components.interfaces.nsIX509CertDB);
+         if (!certDB) return null;
+
+         var privateMode = false;
+          if (typeof Components.classes['@mozilla.org/privatebrowsing;1'] !== 'undefined')
+             
+              privateMode = Components.classes["@mozilla.org/privatebrowsing;1"]
+                           .getService(Components.interfaces.nsIPrivateBrowsingService);
+              recentCertsSvc = certDB.getRecentBadCerts(privateMode);
+          }
+          else {
+             if (daneExtension.debugOutput)
+                dump("No way to get invalid cert status!");
+                return null;
+          }
+
+      if (!recentCertsSvc) return null;
+
+      var port = (uri.port == -1) ? 443 : uri.port;
+
+      var hostWithPort = uri.host + ":" + port;
+      var gSSLStatus = recentCertsSvc.getRecentBadCert(hostWithPort);
+      if (!gSSLStatus) return null;
+   return gSSLStatus;
+},
+
   
   //Override the certificate as trusted
   do_override: function(browser, cert) { 
@@ -442,10 +457,15 @@ check_tlsa_tab_change: function (channel, uri, port){
 
         var options = 0;
 	//if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-	if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+        if (dnssecExtension.debugOutput) options |= c.DANE_INPUT_FLAG_DEBUGOUTPUT;
+        if (dnssecExtPrefs.getInt("dnsserverchoose") != 3) options |= c.DANE_INPUT_FLAG_USEFWD;
+
+       var nameserver = "";
+       if (dnssecExtPrefs.getChar("dnsserveraddr") != "") nameserver = dnssecExtPrefs.getChar("dnsserveraddr");
+
         if (daneExtension.debugOutput)
 	    dump(this.DANE_DEBUG_PRE + "https://" + uri + "; certchain lenght: " + len + this.DANE_DEBUG_POST); 
-        var daneMatch = tlsa.TLSAValidate(derCerts, len, options, "",  uri, port, protocol, policy);
+        var daneMatch = tlsa.TLSAValidate(derCerts, len, options, nameserver, uri, port, protocol, policy);
 	if (daneExtension.debugOutput)
 	    dump(this.DANE_DEBUG_PRE + "For https://" + uri + " DANE return: " + daneMatch[0] + this.DANE_DEBUG_POST); 
 
@@ -520,10 +540,15 @@ check_tlsa_https: function (channel, cert, browser, uri, port){
 
         var options = 0;
 	//if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-	if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+        if (dnssecExtension.debugOutput) options |= c.DANE_INPUT_FLAG_DEBUGOUTPUT;
+        if (dnssecExtPrefs.getInt("dnsserverchoose") != 3) options |= c.DANE_INPUT_FLAG_USEFWD;
+
+       var nameserver = "";
+       if (dnssecExtPrefs.getChar("dnsserveraddr") != "") nameserver = dnssecExtPrefs.getChar("dnsserveraddr");
+
         if (daneExtension.debugOutput)
 	    dump(this.DANE_DEBUG_PRE + "https://" + uri + "; certchain lenght: " + len + this.DANE_DEBUG_POST); 
-        var daneMatch = tlsa.TLSAValidate(derCerts, len, options, "",  uri, port, protocol, policy);
+        var daneMatch = tlsa.TLSAValidate(derCerts, len, options, nameserver, uri, port, protocol, policy);
 	if (daneExtension.debugOutput)
 	    dump(this.DANE_DEBUG_PRE + "For https://" + uri + " DANE return: " + daneMatch[0] + this.DANE_DEBUG_POST); 
 	var ccancel = false;
