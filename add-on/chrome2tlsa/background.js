@@ -31,6 +31,7 @@ document.write("<script>");
 var DANE = "DANE: ";
 var olddomain = "null";
 var valid = true;
+var laststate = 0;
 
 
 // States of TLSA validator
@@ -341,69 +342,11 @@ function httpscheme(taburl){
 };
 
 
-//****************************************************************
-// Called when the url of a tab changes.
-//****************************************************************
-function onUrlChange(tabId, changeInfo, tab) {                  	
-
-  
-   	if (changeInfo.status==undefined) return;
-  	//if (changeInfo.url==undefined) return;
-
-        // hide icon for chrome:// and chrome-extension:// urls
-        if (tab.url.match(/^chrome(?:-extension)?:\/\//)) {
-              chrome.pageAction.hide(tabId);
-              return;
-        }//if
-
-	// deactive other tabs
-        if (tab.url.match(/^chrome(?:-devtools)?:\/\//)) {
-                chrome.pageAction.hide(tabId);
-                return;
-         }//if
-
-     console.log("Browser: onUrlChange(TabID: " + tabId + ", Action: " + changeInfo.status 
-		+ ", Info: " + changeInfo.url + ");");
-	
-
-        var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
-
-	if (changeInfo.status=="loading") { valid = false; olddomain = domain}
-	if (changeInfo.status=="complete") { valid = true; }
-
-}; // onUrlChange
-
-
-
-//****************************************************************
-// Called when the url of a tab changes.
-//****************************************************************
-function onBeforeRequest(tabId, url) {                  	
+function TLSAvalidate(scheme,domain){	  	
+	console.log(DANE + "--------- Start of TLSA Validation ("+ scheme +":"+ domain +") ---------");	
 
 	var debug = localStorage["dnssecDebugOutput"];
 	     debug = (debug == "false") ? false : true;        	   
-
-	// reset any old popup
-	chrome.pageAction.setPopup({tabId: tabId, popup: ""});
-       
-        // hide icon for chrome:// and chrome-extension:// urls
-        if (url.match(/^chrome(?:-extension)?:\/\//)) {
-              if (tabId >= 0) chrome.pageAction.hide(tabId);
-              return;
-        }//if
-
-	// deactive other tabs
-        if (url.match(/^chrome(?:-devtools)?:\/\//)) {
-                if (tabId >= 0) chrome.pageAction.hide(tabId);
-                return;
-         }//if
-
-	// get scheme from URL
-	var scheme = httpscheme(url);
-	// get domain name from URL
-        var domain = url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
-  	  	
-	console.log(DANE + "--------- Start of TLSA Validation ("+ scheme +":"+ domain +") ---------");	
 
         var resolver = this.getResolver();
 	// get domain filter status
@@ -451,16 +394,91 @@ function onBeforeRequest(tabId, url) {
 			var len = certchain.length;
 			len = 0;
 			var daneMatch = tlsa.TLSAValidate(certchain, len, options, resolver, domain, "443", "tcp", 1);
-			console.log("DANE: TLSA Validator result: " + daneMatch[0]);
 			result = daneMatch[0];
 		}
 		else  result = c.DANE_EXIT_NO_HTTPS;
-        }
-	
-	setTLSASecurityState(tabId, domain, result, "xxx");
-
-	console.log(DANE + "--------- End of TLSA Validation ("+ scheme +":"+ domain +") ---------\n");
+        }	
+	console.log("DANE: TLSA Validator result: " + result);
+	console.log(DANE + "--------- End of TLSA Validation ("+ scheme +":"+ domain +") ---------");
 	return result;
+};
+
+//****************************************************************
+// Called when the url of a tab changes.
+//****************************************************************
+function onUrlChange(tabId, changeInfo, tab) {                  	
+   	
+	if (changeInfo.status==undefined) return;
+ 
+        // hide icon for chrome:// and chrome-extension:// urls
+        if (tab.url.match(/^chrome(?:-extension)?:\/\//)) {
+              chrome.pageAction.hide(tabId);
+              return;
+        }//if
+
+	 // deactive other tabs
+        if (tab.url.match(/^chrome(?:-devtools)?:\/\//)) {
+                chrome.pageAction.hide(tabId);
+                return;
+         }//if
+
+    	// deactive other tabs
+        if (tab.url.match(/^about:/)) {
+                chrome.pageAction.hide(tabId);
+                return;
+         }//if
+	
+	 console.log("\nBrowser: onUrlChange(TabID: " + tabId + ", Action: " + changeInfo.status 
+		+ ", Info: " + changeInfo.url + ");");
+
+	if (changeInfo.status=="loading") {
+		chrome.pageAction.setPopup({tabId: tabId, popup: ""});
+		var scheme = httpscheme(tab.url);
+	        var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
+	        var ret = TLSAvalidate(scheme,domain);
+		setTLSASecurityState(tabId, domain, ret, "xxx");
+	}
+	 
+	//if (changeInfo.status=="loading") { setTLSASecurityState(tabId, domain, laststate, "xxx");}
+	if (changeInfo.status=="complete") {valid = true;}
+
+
+
+}; // onUrlChange
+
+
+
+//****************************************************************
+// Called when the url of a tab changes.
+//****************************************************************
+function onBeforeRequest(tabId, url) {                  	
+       
+        // hide icon for chrome:// and chrome-extension:// urls
+        if (url.match(/^chrome(?:-extension)?:\/\//)) {
+              if (tabId >= 0) chrome.pageAction.hide(tabId);
+              return;
+        }//if
+
+	// deactive other tabs
+        if (url.match(/^chrome(?:-devtools)?:\/\//)) {
+                if (tabId >= 0) chrome.pageAction.hide(tabId);
+                return;
+         }//if
+
+    	// deactive other tabs
+        if (url.match(/^about:/)) {
+                chrome.pageAction.hide(tabId);
+                return;
+         }//if
+
+	// get scheme from URL
+	var scheme = httpscheme(url);
+	// get domain name from URL
+        var domain = url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
+        var ret = TLSAvalidate(scheme,domain);
+        olddomain = domain;
+	valid = false;
+	return ret;
 
 
 }; // onUrlChange
@@ -477,10 +495,10 @@ chrome.webRequest.onBeforeRequest.addListener(
   function(details) {
 	if (details.tabId >= 0) {
 		var domain = details.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];		
-		if (valid)  {
-		console.log("Browser: onBeforeRequest(TabID: " + details.tabId + ", URL: " + details.url +");");					
-		console.log(DANE + "-- ("+ domain +" <> "+ olddomain + " <> "+ valid +") --");
-			//if (domain == olddomain) {						
+		if (valid)  {	
+			
+		console.log("\nBrowser: onBeforeRequest(TabID: " + details.tabId + ", URL: " + details.url +", valid: " + valid +");");	
+			if (domain != olddomain) {						
 		   		var c = this.tlsaExtNPAPIConst;
 				var result = onBeforeRequest(details.tabId, details.url);
 				if (result <= c.DANE_EXIT_DNSSEC_BOGUS) {
@@ -491,7 +509,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 						return {cancel: details.url.indexOf(domain) != -1};
 					}
 				}
-			//}
+			}
 		}	
 	}
   },
@@ -499,17 +517,43 @@ chrome.webRequest.onBeforeRequest.addListener(
   ["blocking"]);
 
 
+/*
+chrome.webNavigation.onCompleted.addListener(function(details) {
+        // hide icon for chrome:// and chrome-extension:// urls
+        if (details.url.match(/^chrome(?:-extension)?:\/\//)) {
+              chrome.pageAction.hide(details.tabId);
+              return;
+        }//if
+
+	// deactive other tabs
+        if (details.url.match(/^chrome(?:-devtools)?:\/\//)) {
+                chrome.pageAction.hide(details.tabId);
+                return;
+         }//if
+
+	// deactive other tabs
+        if (details.url.match(/^about:/)) {
+                chrome.pageAction.hide(details.tabId);
+                return;
+         }//if
+console.log("Browser: onCompleted(TabID: " + details.tabId + ", URL: " + details.url +");\n");
+  },
+{ urls: [], types: [] },  []);
+*/
+/*
+chrome.webNavigation.onBeforeNavigate.addListener(function(details) {	
+console.log("Browser: onBeforeNavigate(TabID: " + details.tabId + ", URL: " + details.url +");\n");
+  },
+{ urls: [], types: [] },  []);
+*/
+
 //****************************************************************
 // TLS/SSL features for DANE/TLSA validation
 //****************************************************************
 chrome.experimental.ssl;
-
 chrome.experimental.ssl.onCertificateVerify.addListener(function(channel) { 
 console.log("experimental.ssl: " + channel.hostname  + " -- " + channel.constructedChain[1]  + ";");
-
-}, { urls: [], types: [] },  []);
-
-
+}, { urls: []},  []);
                 
 document.write("</script>");
 document.write("</body>");
