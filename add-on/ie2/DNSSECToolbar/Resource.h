@@ -30,21 +30,21 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define ID_BUTTON2	                    32769
 
 // Key BMP
-#define IDI_ICON_KEY_ACTION1            300
-#define IDI_ICON_KEY_GREEN1             301
-#define IDI_ICON_KEY_RED1               302
-#define IDI_ICON_KEY_RED_IP1			303
-#define IDI_ICON_KEY_GREY1              304
-#define IDI_ICON_KEY_GREY_RC1           305
-#define IDI_ICON_KEY_GREY_YT1           306
-#define IDI_ICON_KEY_MIRROR				307
-#define IDI_ICON_KEY_WHITE1				308
+#define IDI_DNSSEC_ICON_ACTION1            300
+#define IDI_DNSSEC_ICON_GREEN1             301
+#define IDI_DNSSEC_ICON_RED1               302
+#define IDI_DNSSEC_ICON_RED_IP1			303
+#define IDI_DNSSEC_ICON_GREY1              304
+#define IDI_DNSSEC_ICON_GREY_RC1           305
+#define IDI_DNSSEC_ICON_GREY_YT1           306
+#define IDI_DNSSEC_ICON_MIRROR				307
+#define IDI_DNSSEC_ICON_WHITE1				308
 
 // key icon for DNSSEC dialog
-#define IDI_ICON_KEY_GREEN2             401
-#define IDI_ICON_KEY_RED2               402
-#define IDI_ICON_KEY_ORANGE2            403
-#define IDI_ICON_KEY_GREY2              404
+#define IDI_DNSSEC_ICON_GREEN2             401
+#define IDI_DNSSEC_ICON_RED2               402
+#define IDI_DNSSEC_ICON_ORANGE2            403
+#define IDI_DNSSEC_ICON_GREY2              404
 
 // status bar key status text
 #define	IDS_DNSSEC_KEY_TEXT_0 11110
@@ -55,15 +55,23 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define	IDS_DNSSEC_KEY_TEXT_5 11115
 #define	IDS_DNSSEC_KEY_TEXT_6 11116
 
+//TLSA icon
+#define	IDI_TLSA_ICON_GREEN 600
+#define	IDI_TLSA_ICON_RED	601
+#define	IDI_TLSA_ICON_WHITE	602
+#define	IDI_TLSA_ICON_GREY	603
+#define	IDI_TLSA_ICON_GREY_X 604
+#define IDI_TLSA_ICON_ORANGE 605
+
 //  Key Icon
-#define IDI_ICON_KEY_GREEN              220
-#define IDI_ICON_KEY_ACTION             221
-#define IDI_ICON_KEY_GREY               222
-#define IDI_ICON_KEY_GREY_RC            223
-#define IDI_ICON_KEY_REDIP				224
-#define IDI_ICON_KEY_RED                225
-#define IDI_ICON_KEY_GREY_YT            226
-#define IDI_ICON_KEY_WHITE				227
+#define IDI_DNSSEC_ICON_GREEN              220
+#define IDI_DNSSEC_ICON_ACTION             221
+#define IDI_DNSSEC_ICON_GREY               222
+#define IDI_DNSSEC_ICON_GREY_RC            223
+#define IDI_DNSSEC_ICON_REDIP				224
+#define IDI_DNSSEC_ICON_RED                225
+#define IDI_DNSSEC_ICON_GREY_YT            226
+#define IDI_DNSSEC_ICON_WHITE				227
 #define IDR_MENU_POPUP		            1000
 
 	// Deafult
@@ -105,23 +113,105 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define	IDS_STATE01_TEXT_TOOLTIP 127
 #define	IDS_STATE01_TEXT_DOMAIN  128
 #define	IDS_STATE01_TEXT_MAIN	129
-	// not used
-#define IDS_STATE9_TEXT_TOOLTIP 130
-#define	IDS_STATE9_TEXT_DOMAIN  131
-#define	IDS_STATE9_TEXT_MAIN	132
+	// state -2
+#define IDS_STATE02_TEXT_TOOLTIP 130
+#define	IDS_STATE02_TEXT_DOMAIN  131
+#define	IDS_STATE02_TEXT_MAIN	132
+
+
+	// state 10
+#define IDS_DANE_STATE10_LABEL 133
+#define IDS_DANE_STATE10_TEXT_MAIN 134
+#define IDS_DANE_STATE10_TEXT_ADD 135
+    // state 11
+#define IDS_DANE_STATE11_LABEL 136
+#define IDS_DANE_STATE11_TEXT_MAIN 137
+#define IDS_DANE_STATE11_TEXT_ADD 138
+    // state 12
+#define IDS_DANE_STATE12_LABEL 139
+#define IDS_DANE_STATE12_TEXT_MAIN 140 
+#define IDS_DANE_STATE12_TEXT_ADD 141
+    // state 13
+#define IDS_DANE_STATE13_LABEL 142
+#define IDS_DANE_STATE13_TEXT_MAIN 143 
+#define IDS_DANE_STATE13_TEXT_ADD 144 		
+    // state -9	
+#define IDS_DANE_STATEx9_LABEL 145
+#define IDS_DANE_STATEx9_TEXT_MAIN 146 
+#define IDS_DANE_STATEx9_TEXT_ADD 147 		
+   // state -10
+#define IDS_DANE_STATEx10_LABEL 148
+#define IDS_DANE_STATEx10_TEXT_MAIN 149 
+#define IDS_DANE_STATEx10_TEXT_ADD 150 		
+    // state -11
+#define IDS_DANE_STATEx11_LABEL 151
+#define IDS_DANE_STATEx11_TEXT_MAIN 152 
+#define IDS_DANE_STATEx11_TEXT_ADD 153
+    // state -12
+#define IDS_DANE_STATEx12_LABEL 154
+#define IDS_DANE_STATEx12_TEXT_MAIN 155 
+#define IDS_DANE_STATEx12_TEXT_ADD 156
+    // state -13
+#define IDS_DANE_STATEx13_LABEL 157
+#define IDS_DANE_STATEx13_TEXT_MAIN 158 
+#define IDS_DANE_STATEx13_TEXT_ADD 159
+    // state 1
+#define IDS_DANE_STATE1_LABEL 160
+#define IDS_DANE_STATE1_TEXT_MAIN 161 
+#define IDS_DANE_STATE1_TEXT_ADD 162
+    // state 0
+#define IDS_DANE_STATE0_LABEL 163
+#define IDS_DANE_STATE0_TEXT_MAIN 164 
+#define IDS_DANE_STATE0_TEXT_ADD 165
+	// state -2
+#define IDS_DANE_STATEx2_LABEL 166
+#define IDS_DANE_STATEx2_TEXT_MAIN 167 
+#define IDS_DANE_STATEx2_TEXT_ADD 168
+	// state -3
+#define IDS_DANE_STATEx3_LABEL 169
+#define IDS_DANE_STATEx3_TEXT_MAIN 170 
+#define IDS_DANE_STATEx3_TEXT_ADD 171
+	// state -4
+#define IDS_DANE_STATEx4_LABEL 172
+#define IDS_DANE_STATEx4_TEXT_MAIN 173 
+#define IDS_DANE_STATEx4_TEXT_ADD 174
+	// state -5
+#define IDS_DANE_STATEx5_LABEL 175
+#define IDS_DANE_STATEx5_TEXT_MAIN 176 
+#define IDS_DANE_STATEx5_TEXT_ADD 177
+	// state -6
+#define IDS_DANE_STATEx6_LABEL 178
+#define IDS_DANE_STATEx6_TEXT_MAIN 179 
+#define IDS_DANE_STATEx6_TEXT_ADD 180
+	// state -7
+#define IDS_DANE_STATEx7_LABEL 181
+#define IDS_DANE_STATEx7_TEXT_MAIN 182 
+#define IDS_DANE_STATEx7_TEXT_ADD 183
+	// state -8
+#define IDS_DANE_STATEx8_LABEL 184
+#define IDS_DANE_STATEx8_TEXT_MAIN 185 
+#define IDS_DANE_STATEx8_TEXT_ADD 186
+	// state -1
+#define IDS_DANE_STATEx1_LABEL 187
+#define IDS_DANE_STATEx1_TEXT_MAIN 188 
+#define IDS_DANE_STATEx1_TEXT_ADD 189
+	// state -99
+#define IDS_DANE_STATEx99_LABEL 190
+#define IDS_DANE_STATEx99_TEXT_MAIN 191 
+#define IDS_DANE_STATEx99_TEXT_ADD 192
 
 	// init text for tooltip
-#define IDS_NONE                        133
-#define IDS_ADDON_INIT                  134
-#define IDS_DNSSEC_ERROR_LABEL          135
-#define IDS_DNSSEC_ERROR_FAIL			136
+#define IDS_NONE                        533
+#define IDS_ADDON_INIT                  534
+#define IDS_DNSSEC_ERROR_LABEL          535
+#define IDS_DNSSEC_ERROR_FAIL			536
 	// init text for toolbar
-#define IDS_DNSSEC_OK			        137
-#define IDS_DNSSEC_FAIL					138
-#define IDS_IP_MATCH_TEXT				139
-#define IDS_IP_MATCH_TEXT_NO			140
-#define IDS_PRE_TEXT_ERROR				141
-#define IDS_ERROR_TEXT_DOMAIN			142
+#define IDS_DNSSEC_OK			        537
+#define IDS_DNSSEC_FAIL					538
+#define IDS_IP_MATCH_TEXT				539
+#define IDS_IP_MATCH_TEXT_NO			540
+#define IDS_PRE_TEXT_ERROR				541
+#define IDS_ERROR_TEXT_DOMAIN			542
 
 // dialog Settings
 #define IDD_DIALOG_MAIN                 1000
@@ -149,6 +239,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define IDC_DNSSEC_R					1025
 #define IDC_DOM_ENABLE					1026
 #define IDT_DOM_LIST					1027
+#define IDC_ENABLETLSA					1028
 
 // DNSSEC TEST messages in settings dialog
 #define IDS_DNSSECTEST_IP				1050
@@ -169,6 +260,20 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define IDC_STIPV						1038
 #define IDC_STIPBH						1039
 #define IDC_STIPVH						1040
+
+// dialog DNSSEC status
+#define IDD_DIALOG_TLSA				    2030
+#define IDC_ST1_TLSA					2031
+#define IDC_ST2_TLSA					2032
+#define IDC_ST3_TLSA					2033
+#define IDC_ST4_TLSA					2034
+#define IDC_ST5_TLSA					2035
+#define IDC_ST6_TLSA					2036
+#define IDC_STIPB_TLSA					2037
+#define IDC_STIPV_TLSA					2038
+#define IDC_STIPBH_TLSA					2039
+#define IDC_STIPVH_TLSA					2040
+
 
 // menu items
 #define ID_MENUPOPUP_OPTION1            32773

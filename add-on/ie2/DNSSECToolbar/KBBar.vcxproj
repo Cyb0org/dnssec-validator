@@ -563,7 +563,7 @@ echo Warning : Cannot register Unicode DLL on Windows 95
       <SubSystem>Windows</SubSystem>
       <OutputFile>.\Debug\IEdnssec.dll</OutputFile>
       <ImportLibrary>.\Debug\KBBar.lib</ImportLibrary>
-      <AdditionalDependencies>shlwapi.lib;ub_ds_windows-x86.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;ub_ds_windows-x86.lib;DANEcore-windows-x86.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\KBBar.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>C:\VirtualData\GIT\dnssec-validator\ie2\dll;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <TargetMachine>MachineX86</TargetMachine>
@@ -930,6 +930,7 @@ echo Warning : Cannot register Unicode DLL on Windows 95
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="dane-plug.h" />
     <ClInclude Include="hyperlink.h" />
     <ClInclude Include="KBBarBand.h" />
     <ClInclude Include="KBToolBarCtrl.h" />
@@ -939,6 +940,7 @@ echo Warning : Cannot register Unicode DLL on Windows 95
     <ClInclude Include="uthash.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="dane_states.gen" />
     <None Include="res\key_action.bmp" />
     <None Include="res\key_action.ico" />
     <None Include="res\key_green.bmp" />

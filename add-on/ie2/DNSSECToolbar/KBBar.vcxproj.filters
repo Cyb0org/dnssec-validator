@@ -63,6 +63,9 @@
     <ClInclude Include="ub_ds.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="dane-plug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="KBBar.def">
@@ -117,6 +120,9 @@
     </None>
     <None Include="res\key_red.bmp">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="dane_states.gen">
+      <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
 </Project>

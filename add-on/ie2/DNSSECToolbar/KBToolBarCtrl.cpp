@@ -29,9 +29,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #include "KBBar.h"
 #include "KBBarBand.h"
 #include "Windowsx.h"
-//#include "Ws2tcpip.h"
-//#include "In6addr.h"
-//#include "Winsock2.h"
+
 CHyperLink m_link;
 CKBBarBand* m_pBarBand;
 LANGID lang;
@@ -45,10 +43,6 @@ const DWORD DEFAULT_TOOLBAR_STYLE =
 		 WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE |
 		 TBSTYLE_FLAT |	TBSTYLE_TRANSPARENT  | BS_FLAT |	TBSTYLE_LIST | TBSTYLE_DROPDOWN	|			
 		 CCS_TOP | CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_NORESIZE;
-
-/////////////////////////////////////////////////////////////////////////////
-// CKBToolBarCtrl
-//CHyperLink m_link;
 
 //Constructor of CKBToolBarCtrl 
 CKBToolBarCtrl::CKBToolBarCtrl()
@@ -79,7 +73,7 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* 
 	if (!CToolBarCtrl::Create(DEFAULT_TOOLBAR_STYLE, rcClientParent, pWndParent, NULL))
 		return false;	
 
-	int res;
+	int res, res2 = 0;
 
 	// Generation of Bitmap List Index
 	for (int i=0; i<BITMAP_NUMBER; i++) {
@@ -90,7 +84,18 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* 
 			return false;
 		}//if
 	}
-	
+
+	if (tlsaenable == 1) {
+	// Generation of Bitmap List Index
+		for (int i=0; i<BITMAP_NUMBER_TLSA; i++) {
+			res2 = AddBitmap(1, StatusBitmap2[i]);
+			if (res2 == -1)
+			{
+				DWORD dwError = ::GetLastError();
+				return false;
+			}//if
+		}//for
+	}
 	//lang = GetSystemDefaultLangID();
 	lang = GetUserDefaultLangID();
 	
@@ -98,15 +103,18 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* 
 	// 0x0405 CZ
 	// Generation of String List Index CZ
 		for (int i=0; i<BITMAP_NUMBER+1; i++) res = AddStrings(stringtextCZ[i]);
+		if (tlsaenable == 1) for (int i=0; i<BITMAP_NUMBER_TLSA+1; i++) res2 = AddStrings(stringtextCZ2[i]);
 	}
 	// 0x0407 DE
 	else if (lang==0x0407) {
 		for (int i=0; i<BITMAP_NUMBER+1; i++) res = AddStrings(stringtextDE[i]);
+		if (tlsaenable == 1) for (int i=0; i<BITMAP_NUMBER_TLSA+1; i++) res2 = AddStrings(stringtextDE2[i]);
 	}
 	else
 	{
 	// Generation of String List Index EN
-	for (int i=0; i<BITMAP_NUMBER+1; i++) res = AddStrings(stringtextEN[i]);
+		for (int i=0; i<BITMAP_NUMBER+1; i++) res = AddStrings(stringtextEN[i]);
+		if (tlsaenable == 1) for (int i=0; i<BITMAP_NUMBER_TLSA+1; i++) res2 = AddStrings(stringtextEN2[i]);
 	} // if
 
 	// set button properties
@@ -116,37 +124,44 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* 
 		tbs.fsStyle = BTNS_DROPDOWN;
 		tbs.iBitmap = 0;
 		tbs.idCommand = ID_BUTTON1;
-		tbs.iString = 0;
-
+		tbs.iString = 8;
 	// add button into toolbar
-	if (!AddButtons(1, &tbs))
-		return false;
+	if (!AddButtons(1, &tbs)) return false;
+
+	if (tlsaenable == 1) {
+		tbs.dwData = 0;
+		tbs.fsState = TBSTATE_ENABLED;
+		tbs.fsStyle = BTNS_DROPDOWN;
+		tbs.iBitmap = 0;
+		tbs.idCommand = ID_BUTTON2;
+		tbs.iString = 17;
+		if (!AddButtons(1, &tbs)) return false;
+	}
+
 	CToolBarCtrl::SetExtendedStyle(TBSTYLE_EX_DRAWDDARROWS);
 	// set handle on this window
 	m_pBand = pBand;
-
 			// set ICON instead BMP
 	CImageList *pList = CKBToolBarCtrl::GetImageList();
-		HICON hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_ACTION));
+		HICON hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_ACTION));
 		pList->Replace(0, hIcon); // not 5 as a separate is not an image
-		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_GREEN));
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_GREEN));
 		pList->Replace(1, hIcon); // not 5 as a separate is not an image
-		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_RED));
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_RED));
 		pList->Replace(2, hIcon); // not 5 as a separate is not an image
-		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_REDIP));
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_REDIP));
 		pList->Replace(3, hIcon); // not 5 as a separate is not an image
-		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_GREY));
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_GREY));
 		pList->Replace(4, hIcon); // not 5 as a separate is not an image
-		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_GREY_RC));
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_GREY_RC));
 		pList->Replace(5, hIcon); // not 5 as a separate is not an image
-		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_GREY_YT));
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_GREY_YT));
 		pList->Replace(6, hIcon); // not 5 as a separate is not an image
-		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_KEY_WHITE));
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_WHITE));
 		pList->Replace(7, hIcon); // not 5 as a separate is not an image
 	CKBToolBarCtrl::SetImageList(pList);
 	CKBToolBarCtrl::Invalidate();
-	//CWnd* pButton = GetDlgItem(ID_BUTTON2);
-	//::SendMessage(::GetDlgItem(m_pBand->m_wndToolBar, ID_BUTTON2),BM_SETIMAGE,IMAGE_ICON,(LPARAM)hIcon);	
+	
 	return true;
 }
 
@@ -168,18 +183,54 @@ void CKBToolBarCtrl::OnTbnDropDown(NMHDR *pNMHDR, LRESULT *pResult)
 	_variant_t varURL;
 	_variant_t vWindow;
 	vWindow.bstrVal = (BSTR)("_blank");
+			RECT rc;
+					 TPMPARAMS tpm;
+					 HMENU hMenuStatusBar;
 	switch (pNMTB->iItem) 	{
 	case ID_BUTTON1:
-		//ATLTRACE("ID_BUTTON1():\n");
-		RECT rc;
+		ATLTRACE("ID_BUTTON1():\n");	
 		SendMessage(TB_GETRECT, ID_BUTTON1, (LPARAM)&rc);
 		::MapWindowPoints(m_pBand->m_wndToolBar, HWND_DESKTOP, (LPPOINT)&rc, 2);
-		 TPMPARAMS tpm;
+
          tpm.cbSize    = sizeof(TPMPARAMS);
          tpm.rcExclude = rc;
 		  //ATLTRACE("PWProc: rcClient l: %d; b: %d; r: %d; t: %d\n", rc.left, rc.bottom, rc.right, rc.top);
 			//obtaining the current menu
-			HMENU hMenuStatusBar = GetSubMenu(LoadMenu(GHins,MAKEINTRESOURCE(IDR_MENU_POPUP)), 0);
+			hMenuStatusBar = GetSubMenu(LoadMenu(GHins,MAKEINTRESOURCE(IDR_MENU_POPUP)), 0);
+			//if available
+			if(hMenuStatusBar) {
+				//obtaining the element that has been chosen 
+				int cmd = TrackPopupMenuEx(hMenuStatusBar, TPM_NONOTIFY|TPM_RETURNCMD|TPM_LEFTBUTTON|TPM_RIGHTALIGN, rc.left+142, rc.bottom, m_pBand->m_wndToolBar,  &tpm);			
+				switch (cmd) {
+					case ID_ENABLED : {
+						break;
+					}
+					case ID_ABOUT : { 
+						DialogBox(GHins, MAKEINTRESOURCE(IDD_DIALOG_MAIN_ABOUT), NULL , (DLGPROC)DialogProcAbout);
+						break;
+					}
+					case ID_SET : { 
+						DialogBox(GHins, MAKEINTRESOURCE(IDD_DIALOG_MAIN), NULL, (DLGPROC)DialogProcSettings);
+						break;
+					}
+					case ID_HOME : { 
+						m_pBand->webBrowser2->Navigate(L"http://www.dnssec-validator.cz", &varEmpty, &vWindow , &varEmpty, &varEmpty);						
+						break;
+					}
+				}
+			}
+		break;
+			
+	case ID_BUTTON2:
+		ATLTRACE("ID_BUTTON2():\n");
+
+		SendMessage(TB_GETRECT, ID_BUTTON2, (LPARAM)&rc);
+		::MapWindowPoints(m_pBand->m_wndToolBar, HWND_DESKTOP, (LPPOINT)&rc, 2);
+         tpm.cbSize    = sizeof(TPMPARAMS);
+         tpm.rcExclude = rc;
+		  //ATLTRACE("PWProc: rcClient l: %d; b: %d; r: %d; t: %d\n", rc.left, rc.bottom, rc.right, rc.top);
+			//obtaining the current menu
+			hMenuStatusBar = GetSubMenu(LoadMenu(GHins,MAKEINTRESOURCE(IDR_MENU_POPUP)), 0);
 			//if available
 			if(hMenuStatusBar) {
 				//obtaining the element that has been chosen 
@@ -205,7 +256,6 @@ void CKBToolBarCtrl::OnTbnDropDown(NMHDR *pNMHDR, LRESULT *pResult)
 		break;
 	}
 }
-
 
 /**************************************************************************/
 // Wrong resolver
@@ -272,14 +322,46 @@ void CKBToolBarCtrl::OnCommand()
 			else DialogBox(GHins, MAKEINTRESOURCE(IDD_DIALOG_DNSSEC), NULL, (DLGPROC)DialogProcDnssec);
 		break;
 		}
+			case ID_BUTTON2:
+				{
+			RECT rc;
+			RECT rc2;
+			SendMessage(TB_GETRECT, ID_BUTTON2, (LPARAM)&rc);
+			HWND handle=::FindWindow("IEFrame", NULL);
+			//ATLTRACE("Handle: %d\n", handle);
+			::GetWindowRect(handle,&rc2);
+			//ATLTRACE("PWProc1: rcClient l: %d; b: %d; r: %d; t: %d\n", rc2.left, rc2.bottom, rc2.right, rc2.top);
+			::MapWindowPoints(m_pBand->m_wndToolBar, HWND_DESKTOP, (LPPOINT)&rc, 2);
+			//ATLTRACE("PWProc2: rcClient l: %d; b: %d; r: %d; t: %d\n", rc.left, rc.bottom, rc.right, rc.top);
+			int dialog_size = 336;
+			LONG dei;
+			dei = rc2.right - rc2.left;
+			dei = dei / 2;
+			dei = dei + rc2.left;
+			//ATLTRACE("Handle: %d\n", dei);
+			if (rc.left < dei && (rc.left+dialog_size) < rc2.right) {
+				dx = (int)rc.left;
+				dy = (int)rc.bottom;
+			}
+			else {
+				dx = (int)rc.left+TB_MIN_SIZE_X-15-dialog_size;
+				dy = (int)rc.bottom;
+			}
+			//ATLTRACE("PWProc3: rcClient l: %d; b: %d; r: %d; t: %d\n",dx, dy, rc.right, rc.top);
+			DialogBox(GHins, MAKEINTRESOURCE(IDD_DIALOG_TLSA), NULL, (DLGPROC)DialogProcTlsa);
+		break;
+		}
+
+
+
 	}
 }
 
 /**************************************************************************/
 // Redraw of button bitmap when DNSSEC status was changed
 /**************************************************************************/
-bool CKBToolBarCtrl::RepaintButton(int bindex, int iconindex){
-	ATLTRACE("RepaintButton(%d):\n",iconindex);
+bool CKBToolBarCtrl::RepaintButtonDNSSEC(int bindex, int iconindex){
+	ATLTRACE("RepaintButtonDNSSEC(%d,%d):\n", bindex,iconindex);
 	//delete of last button from toolbar
 	if (!DeleteButton(bindex))
 	return false;
@@ -300,6 +382,43 @@ bool CKBToolBarCtrl::RepaintButton(int bindex, int iconindex){
 	return false;
 	// set button style arrows for popup menu
 	CToolBarCtrl::SetExtendedStyle(TBSTYLE_EX_DRAWDDARROWS);
+  return true;
+}
+
+/**************************************************************************/
+// Redraw of button bitmap when TLSA status was changed
+/**************************************************************************/
+bool CKBToolBarCtrl::RepaintButtonTLSA(int bindex, int iconindex){
+	ATLTRACE("RepaintButtonTLSA(%d,%d):\n",bindex,iconindex);
+	//delete of last button from toolbar
+
+	if (tlsaenable==1) {
+		if (IsButtonHidden(ID_BUTTON2)) HideButton(ID_BUTTON2, FALSE);
+		if (!DeleteButton(bindex)) return false;
+	//set new parameters for nu button 
+		TBBUTTON tbs;
+		tbs.dwData = 0;
+		tbs.fsState = TBSTATE_ENABLED;
+		tbs.fsStyle = BTNS_DROPDOWN;
+		tbs.iBitmap = iconindex;
+		tbs.idCommand = ID_BUTTON2;
+		if (textkey) tbs.iString = iconindex+9;
+		else {
+			tbs.iString = 17;
+			tbs.fsStyle = BTNS_AUTOSIZE | BTNS_DROPDOWN;
+		}// if textkey
+		//insert of new button into toolbar
+		if (!InsertButton(bindex,&tbs)) return false;
+	
+		// set button style arrows for popup menu
+		CToolBarCtrl::SetExtendedStyle(TBSTYLE_EX_DRAWDDARROWS);
+	
+	}
+	else {
+		if (!IsButtonHidden(ID_BUTTON2)) HideButton(ID_BUTTON2, TRUE);
+		tlsaresult = DANE_EXIT_VALIDATION_OFF;
+	}
+
   return true;
 }
 
@@ -339,11 +458,12 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 		else {
 			::CheckRadioButton(hwndDlg, IDC_R1, IDC_R4, IDC_R1);
 		} // if choice
-		::SendMessage(::GetDlgItem(hwndDlg, IDC_DOM_ENABLE), BM_SETCHECK,  fitleron ? BST_CHECKED : BST_UNCHECKED, 0);
+		::SendMessage(::GetDlgItem(hwndDlg, IDC_DOM_ENABLE), BM_SETCHECK,  filteron ? BST_CHECKED : BST_UNCHECKED, 0);
 		::SetWindowText(::GetDlgItem(hwndDlg,IDT_DOM_LIST),listtld);
 		::EnableWindow(::GetDlgItem(hwndDlg,IDT_DOM_LIST), FALSE);
-		if (fitleron) ::EnableWindow(::GetDlgItem(hwndDlg,IDT_DOM_LIST), TRUE);
+		if (filteron) ::EnableWindow(::GetDlgItem(hwndDlg,IDT_DOM_LIST), TRUE);
 		::SendMessage(::GetDlgItem(hwndDlg, IDC_SHOWTEXT), BM_SETCHECK,  textkey ? BST_CHECKED : BST_UNCHECKED, 0);
+		::SendMessage(::GetDlgItem(hwndDlg, IDC_ENABLETLSA), BM_SETCHECK,  tlsaenable ? BST_CHECKED : BST_UNCHECKED, 0);
         break;
 		}	
 	
@@ -363,14 +483,20 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 								int msgboxID;
 								// save keytext setting into Register
 								dwVal = (short)::SendMessage(::GetDlgItem(hwndDlg, IDC_DOM_ENABLE), BM_GETCHECK, 0, 0);
-								fitleron = dwVal;
-								if (dwVal) WritePrivateProfileString("DNSSEC", "fitleron", "1", szPath);
-								else WritePrivateProfileString("DNSSEC", "fitleron", "0", szPath);
+								filteron = dwVal;
+								if (dwVal) WritePrivateProfileString("DNSSEC", "filteron", "1", szPath);
+								else WritePrivateProfileString("DNSSEC", "filteron", "0", szPath);
 
 								dwVal = (short)::SendMessage(::GetDlgItem(hwndDlg, IDC_SHOWTEXT), BM_GETCHECK, 0, 0);
 								textkey = dwVal;
 								if (dwVal) WritePrivateProfileString("DNSSEC", "keytext", "1", szPath);
 								else WritePrivateProfileString("DNSSEC", "keytext", "0", szPath);
+
+								dwVal = (short)::SendMessage(::GetDlgItem(hwndDlg, IDC_ENABLETLSA), BM_GETCHECK, 0, 0);
+								tlsaenable = dwVal;
+								if (dwVal) WritePrivateProfileString("DNSSEC", "tlsaenable", "1", szPath);
+								else {WritePrivateProfileString("DNSSEC", "tlsaenable", "0", szPath);																														
+								}
 
 								// save debugoutput DWORD into Register
 								if (debugoutput_enable!=0) {
@@ -640,7 +766,6 @@ LRESULT CKBToolBarCtrl::DialogProcAbout(HWND hwndDlg, UINT uMsg, WPARAM wParam, 
 	return (INT_PTR)FALSE;
 }
 
-
 /**************************************************************************/
 // CallBack function for dialog DNSSEC
 /**************************************************************************/
@@ -793,6 +918,122 @@ LRESULT CKBToolBarCtrl::DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam,
 	return (INT_PTR)FALSE;
 }
 
+/**************************************************************************/
+// CallBack function for dialog TLSA
+/**************************************************************************/
+LRESULT CKBToolBarCtrl::DialogProcTlsa(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	//ATLTRACE("DialogProcAbout\n");
+	switch ( uMsg )
+	{
+		
+	case WM_INITDIALOG:
+        {	
+			const int STR_BUF_S = 512;
+			char strbuf[STR_BUF_S] = TEXT("");
+			char strbuf2[STR_BUF_S*2] = TEXT("");
+
+			// set popup window coordinates
+			::SetWindowPos(hwndDlg,NULL,dx,dy,0,0,SWP_NOSIZE);
+			::SendMessage(::GetDlgItem(hwndDlg, IDOK), BST_UNCHECKED, NULL, NULL);
+
+			// print domain name 
+			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST1_TLSA),paneldomainname);
+
+			// load and print titletext from resources
+			LoadStringA(GHins, paneltitletlsa, strbuf, STR_BUF_S);
+			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST2_TLSA),strbuf);
+
+			LoadStringA(GHins, paneltextmain, strbuf2, STR_BUF_S);
+			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST3_TLSA),strbuf2);			
+
+			// load and print posttext from resources
+			//LoadStringA(GHins, panelpostdomain, strbuf, STR_BUF_S);
+			//::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST4),strbuf);
+
+			// load and print addtext from resources
+			//ATLTRACE("DialogProcAbout %i\n",keylogo);
+
+			// set font for texts
+			HFONT hFont ;
+			LOGFONT lfFont;
+			memset(&lfFont, 0x00, sizeof(lfFont));
+			memcpy(lfFont.lfFaceName, TEXT("Arial"), 24);
+			
+			lfFont.lfHeight   = 15;
+			lfFont.lfWeight   = FW_BOLD;
+			lfFont.lfCharSet  = ANSI_CHARSET;
+			lfFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
+			lfFont.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+			lfFont.lfQuality  = DEFAULT_QUALITY;
+			hFont = CreateFontIndirect (&lfFont);
+			::SendMessage(::GetDlgItem(hwndDlg, IDC_ST1_TLSA), WM_SETFONT, (int)hFont, MAKELONG( TRUE, 0 ) );
+			
+			lfFont.lfHeight   = 18;
+			lfFont.lfWeight   = FW_BOLD;
+			hFont = CreateFontIndirect (&lfFont);
+			::SendMessage(::GetDlgItem(hwndDlg, IDC_ST2_TLSA), WM_SETFONT, (int)hFont, MAKELONG( TRUE, 0 ) );
+			// set bold font for button text
+			::SendMessage(::GetDlgItem(hwndDlg, IDOK), WM_SETFONT, (int)hFont, MAKELONG( TRUE, 0 ) );
+			
+			lfFont.lfHeight   = 14;
+			lfFont.lfWeight   = FW_NORMAL;
+			hFont = CreateFontIndirect (&lfFont);
+			::SendMessage(::GetDlgItem(hwndDlg, IDC_ST3_TLSA), WM_SETFONT, (int)hFont, MAKELONG( TRUE, 0 ) );
+			::SendMessage(::GetDlgItem(hwndDlg, IDC_ST4_TLSA), WM_SETFONT, (int)hFont, MAKELONG( TRUE, 0 ) );
+			
+			// load ico bitmap from resources
+			HICON hicon = (HICON)LoadImage(GHins,MAKEINTRESOURCE(tlsaiconres), IMAGE_ICON,0,0,0);
+			// set icon in popup window
+			::SendMessage(::GetDlgItem(hwndDlg, IDC_ST6_TLSA), STM_SETICON, (WPARAM)hicon, (LPARAM)NULL);
+	
+        break;
+		}	
+	case WM_COMMAND:
+			switch ( LOWORD(wParam) )
+			{
+				case IDOK:
+					EndDialog(hwndDlg, LOWORD(wParam));					
+					break;
+				case IDC_ST4_TLSA:
+			::ShowWindow(::GetDlgItem(hwndDlg, IDC_ST4_TLSA), SW_HIDE);
+			const int STR_BUF_S = 512;
+			char strbuf[STR_BUF_S] = TEXT("");
+			int mlength;
+			short popupheight;
+				//ATLTRACE("sfdfsdf");	
+				LoadStringA(GHins, paneltextadd, strbuf, STR_BUF_S);
+				mlength = strlen(strbuf); 
+				//ATLTRACE("\n%d\n",mlength);
+	
+			::ShowWindow(::GetDlgItem(hwndDlg, IDC_STIPB_TLSA), SW_HIDE);
+			::ShowWindow(::GetDlgItem(hwndDlg, IDC_STIPV_TLSA), SW_HIDE);
+			::ShowWindow(::GetDlgItem(hwndDlg, IDC_STIPBH_TLSA), SW_HIDE);
+			::ShowWindow(::GetDlgItem(hwndDlg, IDC_STIPVH_TLSA), SW_HIDE);
+				if (mlength < 240) popupheight = 200;
+				else if (mlength < 270) popupheight = 220;
+				else popupheight = 250;
+				::SetWindowPos(::GetDlgItem(hwndDlg,IDC_ST5_TLSA),NULL,0,0,300,popupheight-130,SWP_NOMOVE);
+				::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST5_TLSA),strbuf);
+				m_link.ConvertStaticToHyperlink(hwndDlg, IDC_LINK, _T("http://www.dnssec-validator.cz"));
+				// resize popup window if IP message was set
+				::SetWindowPos(::GetDlgItem(hwndDlg,IDC_LINK),NULL,15,popupheight-30,0,0,SWP_NOSIZE);
+				::SetWindowPos(hwndDlg,NULL,0,0,336,popupheight,SWP_NOMOVE);
+			
+					break;
+			}
+			break;
+    case WM_LBUTTONDOWN:
+			switch ( LOWORD(wParam) )
+			{
+				case MK_LBUTTON:
+					EndDialog(hwndDlg, LOWORD(wParam));					
+					break;
+			}
+			break;
+	}    
+	return (INT_PTR)FALSE;
+}
 
 /**************************************************************************/
 // Test on IPv4 or IPv6 
@@ -834,7 +1075,6 @@ bool CKBToolBarCtrl::ValidateIP6(char *ipadd)
 	if (strlen(tmp) > 40) return 0;
 	return 1;
 }
-
 
 /**************************************************************************/
 // Validation of IPv4, Validation of IPv6

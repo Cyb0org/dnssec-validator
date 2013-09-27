@@ -31,8 +31,10 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #include "hyperlink.h"
 #include "uthash.h"
 #include "ub_dnssec_states.gen"		// DNSSEC state constants
+#include "dane_states.gen"		// TLSA state constants
 extern "C" {					// use C language linkage
   #include "ub_ds.h"
+  #include "dane-plug.h"
 }
 #include "KBToolBarCtrl.h"
 #include <shlguid.h>     // IID_IWebBrowser2, DIID_DWebBrowserEvents2, etc
@@ -51,6 +53,7 @@ extern "C" {					// use C language linkage
 #define KEYTEXT				0
 #define RESOLVER			0
 #define RESOLVER2			0
+#define TLSAENABLE			1
 #define IPUSER		TEXT("8.8.8.8")
 #define IPNIC		TEXT("217.31.204.130")
 #define IPOARC		TEXT("149.20.64.20")
@@ -64,11 +67,13 @@ extern "C" {					// use C language linkage
 #define HKCU_REG_KEY TEXT("Software\\CZ.NIC\\DNSSEC Validator 2.0")
 #define INI_FILE_PATH _T("\\CZ.NIC\\DNSSEC Validator 2.0\\dnssec.ini")
 const int BUTTON_INDEX = 0;
+const short DANE_EXIT_WRONG_RESOLVER = -99;
 extern HINSTANCE GHins;
 // settings
 extern short textkey;
 extern short choice;
 extern short choice2;
+extern short tlsaenable;
 extern char dnssecseradr[IPADDR_MLEN];
 extern char* nic;
 extern char* oarc;
@@ -83,6 +88,11 @@ extern char ipvalidator4[256];
 extern char* ipbrowser4;
 extern char* ipvalidator6;
 extern char* ipbrowser6;
+// TLSA panel text
+extern WORD paneltitletlsa;
+extern WORD paneltextmain;
+extern WORD paneltextadd;
+// DNSSEC panel text
 extern WORD paneltitle;
 extern WORD panelpredonain;
 extern char* paneldomainname;
@@ -91,9 +101,12 @@ extern WORD paneltext;
 extern short paneltextip;
 extern WORD keylogo;
 extern WORD keylogo2;
+extern WORD tlsaiconres;
 extern int err;
 extern short res;
-extern short fitleron;
+extern short tlsaicon;
+extern short tlsaresult;
+extern short filteron;
 extern char listtld[TLD_LIST_MLEN];
 extern bool wrong;
 // variable for IE version check
@@ -193,7 +206,7 @@ public:
 	void FocusChange(bool bFocus);
 	bool CreateToolWindow(void);
 	// refresh icon
-	void RefreshIcon2(void);
+	void RefreshIcons(void);
 	//check DNS status as separated element of the main source code
 	void CheckDomainStatus(short change);
 	// create Status Bar
@@ -201,9 +214,12 @@ public:
 		// create Status Bar
 	bool CreateStatusBarText(void);
 	// sets the security status icon
-	void SetSecurityStatus(void);
-	// Index of Bitmap Button
-	int GetBitmapIndex(int Bitmap);
+	void SetSecurityDNSSECStatus(void);
+	void SetSecurityTLSAStatus(void);
+	
+	int GetTLSAindex(int tlsaresult);
+	// Index of Bitmap Button	
+	int GetIconIndex(int Bitmap);
 	// version of IE broswer
 	int GetMSIEversion(int *iMajor, int *iMinor);
 	// loads preference settings from the Windows registry or file

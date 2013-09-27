@@ -31,9 +31,9 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 */
 #pragma once
 const int BITMAP_NUMBER = 8;
-const int StatusBitmap[BITMAP_NUMBER] = {IDI_ICON_KEY_ACTION1 /*0*/, IDI_ICON_KEY_GREEN1 /*1*/,
-	IDI_ICON_KEY_RED1 /*2*/, IDI_ICON_KEY_RED_IP1 /*3*/,  IDI_ICON_KEY_GREY1 /*4*/, 
-	IDI_ICON_KEY_GREY_RC1 /*5*/, IDI_ICON_KEY_GREY_YT1 /*6*/, IDI_ICON_KEY_WHITE1 /*7*/};
+const int StatusBitmap[BITMAP_NUMBER] = {IDI_DNSSEC_ICON_ACTION1 /*0*/, IDI_DNSSEC_ICON_GREEN1 /*1*/,
+	IDI_DNSSEC_ICON_RED1 /*2*/, IDI_DNSSEC_ICON_RED_IP1 /*3*/,  IDI_DNSSEC_ICON_GREY1 /*4*/, 
+	IDI_DNSSEC_ICON_GREY_RC1 /*5*/, IDI_DNSSEC_ICON_GREY_YT1 /*6*/, IDI_DNSSEC_ICON_WHITE1 /*7*/};
 
 const LPCTSTR stringtextCZ[BITMAP_NUMBER+1] = {_T("& DNSSEC Validátor\0") /*0*/, _T("& Zabezpeèeno DNSSEC\0") /*1*/,
 	_T("& Neplatný DNSSEC podpis\0") /*2*/, _T("& Zabezpeèeno DNSSEC\0") /*3*/,  _T("& Neaktivní okno èi záložka\0") /*4*/, 
@@ -47,6 +47,27 @@ const LPCTSTR stringtextDE[BITMAP_NUMBER+1] = {_T("& DNSSEC Validator\0") /*0*/,
 	_T("& Bogus DNSSEC Signatur\0") /*2*/, _T("& Gesichert durch DNSSEC\0") /*3*/,  _T("& Inaktive Fenster oder Tab\0") /*4*/, 
 	_T("& Nicht gesichert durch DNSSEC\0") /*5*/, _T("& DNSSEC-Status unbekannt\0") /*6*/, _T("& Nicht durch DNSSEC geprüft\0") /*7*/, _T("& DNSSEC\0") /*8*/};
 		// Ein Fehler ist beim Abfragen des DNSSEC-Status aufgetreten
+
+
+const int BITMAP_NUMBER_TLSA = 8;
+const int StatusBitmap2[BITMAP_NUMBER_TLSA] = {IDI_DNSSEC_ICON_ACTION1 /*0*/, IDI_DNSSEC_ICON_GREEN1 /*1*/,
+	IDI_DNSSEC_ICON_RED1 /*2*/, IDI_DNSSEC_ICON_RED_IP1 /*3*/,  IDI_DNSSEC_ICON_GREY1 /*4*/, 
+	IDI_DNSSEC_ICON_GREY_RC1 /*5*/, IDI_DNSSEC_ICON_GREY_YT1 /*6*/, IDI_DNSSEC_ICON_WHITE1 /*7*/};
+
+const LPCTSTR stringtextCZ2[BITMAP_NUMBER_TLSA+1] = {_T("& TLSA Validátor\0") /*0*/, _T("& Certifikát odpovídá TLSA\0") /*1*/,
+	_T("& Certifikát neodpovídá TLSA\0") /*2*/, _T("& Zabezpeèeno TLSA\0") /*3*/,  _T("& Neaktivní okno èi záložka\0") /*4*/, 
+	_T("& Nezabezpeèeno TLSA\0") /*5*/, _T("& Stav TLSA neznámý\0") /*6*/, _T("& Neovìøeno TLSA\0") /*7*/, _T("& TLSA\0") /*8*/};
+
+const LPCTSTR stringtextEN2[BITMAP_NUMBER_TLSA+1] = {_T("& TLSA Validator\0") /*0*/, _T("& Secured by TLSA\0") /*1*/,
+	_T("& Bogus TLSA signature\0") /*2*/, _T("& Secured by TLSA\0") /*3*/,  _T("& Inactive window or tab\0") /*4*/, 
+	_T("& Not secured by TLSA\0") /*5*/, _T("& TLSA status unknown\0") /*6*/, _T("& Not verified by TLSA\0") /*7*/, _T("& TLSA\0") /*8*/};
+
+const LPCTSTR stringtextDE2[BITMAP_NUMBER_TLSA+1] = {_T("& TLSA Validator\0") /*0*/, _T("& Gesichert durch TLSA\0") /*1*/,
+	_T("& Bogus TLSA Signatur\0") /*2*/, _T("& Gesichert durch TLSA\0") /*3*/,  _T("& Inaktive Fenster oder Tab\0") /*4*/, 
+	_T("& Nicht gesichert durch TLSA\0") /*5*/, _T("& TLSA-Status unbekannt\0") /*6*/, _T("& Nicht durch TLSA geprüft\0") /*7*/, _T("& TLSA\0") /*8*/};
+		// Ein Fehler ist beim Abfragen des TLSA-Status aufgetreten
+
+
 class CKBBarBand;
 /////////////////////////////////////////////////////////////////////////////
 // CKBToolBarCtrl window
@@ -66,10 +87,12 @@ public:
 // Operations
 public:
 	bool Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* pBand, HINSTANCE GHins);
-	bool RepaintButton(int bindex, int iconindex);
+	bool RepaintButtonDNSSEC(int bindex, int iconindex);
+	bool RepaintButtonTLSA(int bindex, int iconindex);
 	int WrongResolver(void);
 	static LRESULT CALLBACK DialogProcAbout(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK DialogProcTlsa(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
     STDMETHOD(TranslateAcceleratorIO)(LPMSG pMsg);
 	static bool CKBToolBarCtrl::ValidateIP(char *ipadd);
@@ -77,6 +100,7 @@ public:
 	static bool CKBToolBarCtrl::ValidateIP4(char *ipadd);
 	static bool CKBToolBarCtrl::ValidateIP6(char *ipadd);
 	void OnTbnDropDown(NMHDR *pNMHDR, LRESULT *pResult);
+	void OnTbnDropDown2(NMHDR *pNMHDR, LRESULT *pResult);
 private:             ///< the hyperlink used in the 		 
 		 // Implementation
 public:
