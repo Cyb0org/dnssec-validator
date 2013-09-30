@@ -166,6 +166,8 @@ var dnssecExtension = {
       dnssecExtPrefs.setChar("dnsserveraddr", "nofwd");  // Save default settings of resolver
       dnssecExtPrefs.setBool("usefwd", true);  // Save default settings of resolver
       dnssecExtPrefs.setInt("dnsserverchoose", 3);  // Save default settings of resolver
+      dnssecExtPrefs.setInt("tlsa", true);  // Save default settings of resolver
+      dnssecExtPrefs.setInt("tlsablocking", true);  // Save default settings of resolver
       // Define timer callback
       this.timer.initWithCallback(
         function() {
@@ -491,7 +493,7 @@ var dnssecExtResolver = {
 	var domainlist = dnssecExtPrefs.getChar("domainlist");
 	var domainlistsepar=/[ ,;]+/;
 	var domainarraylist=domainlist.split(domainlistsepar);
-
+	var j;
 	// TLD
         for (j=0;j<domainarraylist.length;j++) { 
             if (urldomainarray[urldomainarray.length-1] == domainarraylist[j]) {validate=false; break;}

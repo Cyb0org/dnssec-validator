@@ -19,7 +19,7 @@
    },
    "manifest_version": 2,
    "minimum_chrome_version": "18",
-   "permissions": [ "experimental", "tabs", "webRequest", "webRequestBlocking", "*://*/*" ],
+   "permissions": [ "tabs", "webRequest", "webRequestBlocking", "*://*/*" ],
    "plugins": [ {
       "path": "tlsaplugin"
     }],

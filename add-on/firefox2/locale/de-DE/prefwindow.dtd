@@ -37,3 +37,8 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY usefilter.label "Schliesse Domänen aus dieser Liste aus">
 <!ENTITY usefilter.accesskey "L">
 <!ENTITY filtertext.label "Liste ausgeschlossener Domänen und TLDs (mit Komma abgetrennt)">
+<!ENTITY groupboxtlsa.label "TLSA Validator-Einstellungen">
+<!ENTITY tlsaonoff.label "Aktivieren TLSA Validation">
+<!ENTITY tlsaonoff.accesskey "A">
+<!ENTITY tlsablock.label "Abbrechen HTTPS-Verbindung wenn TLSA Validierung fehl">
+<!ENTITY tlsablock.accesskey "H">

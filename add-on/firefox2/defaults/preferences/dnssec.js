@@ -34,5 +34,7 @@ pref("extensions.dnssec.optdnsserveraddr", "8.8.8.8");
 pref("extensions.dnssec.version", "");
 pref("extensions.dnssec.popupfgcolor", "");
 pref("extensions.dnssec.popupbgcolor", "");
+pref("extensions.dnssec.tlsa", true);
+pref("extensions.dnssec.tlsablocking", true);
 // See http://kb.mozillazine.org/Localize_extension_descriptions
 // pref("extensions.dnssec@zbynek.michl.description", "chrome://dnssec/locale/dnssec.properties");

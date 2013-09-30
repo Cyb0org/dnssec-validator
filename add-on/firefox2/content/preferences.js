@@ -202,6 +202,11 @@ var dnssecExtPrefs = {
 
     tmpCheck = document.getElementById("dnssec-pref-usefilter").checked;
     document.getElementById("dnssec-pref-domains").disabled = !tmpCheck;
+
+    tmpCheck = document.getElementById("dnssec-pref-tlsaonoff").checked;
+    document.getElementById("dnssec-pref-tlsablock").disabled = !tmpCheck;
+
+
   },
 
   get _dnssecok () {

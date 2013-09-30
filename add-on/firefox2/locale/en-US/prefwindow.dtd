@@ -37,3 +37,8 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY usefilter.label "Exclude domains in list">
 <!ENTITY usefilter.accesskey "E">
 <!ENTITY filtertext.label "List of domains or TLDs (separated by commas)">
+<!ENTITY groupboxtlsa.label "TLSA validator settings">
+<!ENTITY tlsaonoff.label "Enable TLSA Validation">
+<!ENTITY tlsaonoff.accesskey "T">
+<!ENTITY tlsablock.label "Cancel HTTPS connection when TLSA validation fail">
+<!ENTITY tlsablock.accesskey "H">
