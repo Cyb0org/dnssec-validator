@@ -1,22 +1,22 @@
 /* ***** BEGIN LICENSE BLOCK *****
-Copyright 2012 CZ.NIC, z.s.p.o.
+Copyright 2013 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz>
 
-This file is part of DNSSEC Validator 2.0 Add-on.
+This file is part of DNSSEC/TLSA Validator 2.x Add-on.
 
-DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
+DNSSEC Validator 2.x Add-on is free software: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or (at your
 option) any later version.
 
-DNSSEC Validator 2.0 Add-on is distributed in the hope that it will be useful,
+DNSSEC/TLSA Validator 2.x Add-on is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 more details.
 
 You should have received a copy of the GNU General Public License along with
-DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
+DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
 document.write("<!DOCTYPE html>");
@@ -32,7 +32,6 @@ var DANE = "DANE: ";
 var olddomain = "null";
 var valid = true;
 var laststate = 0;
-
 
 // States of TLSA validator
 var tlsaExtNPAPIConst = {
@@ -502,11 +501,16 @@ chrome.webRequest.onBeforeRequest.addListener(
 		   		var c = this.tlsaExtNPAPIConst;
 				var result = onBeforeRequest(details.tabId, details.url);
 				if (result <= c.DANE_EXIT_DNSSEC_BOGUS) {
-					var alerttext = chrome.i18n.getMessage("warningpre") + " " + domain + " " + chrome.i18n.getMessage("warningpost");
-					var choice = confirm(alerttext);
-					if (choice) {				
-						console.log("DANE: Connection was aborted...");
-						return {cancel: details.url.indexOf(domain) != -1};
+				
+					var blockhttps = localStorage["blockhttps"];
+			   		blockhttps = (blockhttps == undefined || blockhttps == "false") ? false : true;				
+					if (blockhttps) {				
+						var alerttext = chrome.i18n.getMessage("warningpre") + " " + domain + " " + chrome.i18n.getMessage("warningpost");
+						var choice = confirm(alerttext);
+						if (choice) {				
+							console.log("DANE: Connection was aborted...");
+							return {cancel: details.url.indexOf(domain) != -1};
+						}
 					}
 				}
 			}
@@ -550,10 +554,10 @@ console.log("Browser: onBeforeNavigate(TabID: " + details.tabId + ", URL: " + de
 //****************************************************************
 // TLS/SSL features for DANE/TLSA validation
 //****************************************************************
-chrome.experimental.ssl;
-chrome.experimental.ssl.onCertificateVerify.addListener(function(channel) { 
-console.log("experimental.ssl: " + channel.hostname  + " -- " + channel.constructedChain[1]  + ";");
-}, { urls: []},  []);
+//chrome.experimental.ssl;
+//chrome.experimental.ssl.onCertificateVerify.addListener(function(channel) { 
+//console.log("experimental.ssl: " + channel.hostname  + " -- " + channel.constructedChain[1]  + ";");
+//}, { urls: []},  []);
                 
 document.write("</script>");
 document.write("</body>");

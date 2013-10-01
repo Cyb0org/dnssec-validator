@@ -11,6 +11,9 @@
 	"usefilter": {
 		"message": "Nevalidovat domény uvedené v seznamu"
 		},
+	"blockhttpstext": {
+		"message": "Povolit blokování HTTPS spojení TLSA validátorem"
+		},		
 	"filtertext": {
 		"message": "Seznam vyřazených domén a TLD (oddělené čárkami)"
 		},

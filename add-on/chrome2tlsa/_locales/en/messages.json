@@ -11,6 +11,9 @@
 	"usefilter": {
 		"message": "Exclude domains in list"
 		},
+	"blockhttpstext": {
+		"message": "Cancel HTTPS connection when TLSA validation fail"
+		},			
 	"filtertext": {
 		"message": "List of domains or TLDs (separated by commas)"
 		},

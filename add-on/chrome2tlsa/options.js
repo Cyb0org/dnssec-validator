@@ -3,41 +3,29 @@ Copyright 2012 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz>
 
-This file is part of DNSSEC Validator 2.0 Add-on.
+This file is part of DNSSEC/TLSA Validator 2.x Add-on.
 
-DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
+DNSSEC Validator 2.x Add-on is free software: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or (at your
 option) any later version.
 
-DNSSEC Validator 2.0 Add-on is distributed in the hope that it will be useful,
+DNSSEC/TLSA Validator 2.x Add-on is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 more details.
 
 You should have received a copy of the GNU General Public License along with
-DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
+DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-
+document.write("<object id=\"tlsa-plugin\" type=\"application/x-tlsavalidatorplugin\" width=\"0\" height=\"0\"></object>");
 var defaultResolver = "nofwd"; // LDNS will use system resolver if empty string is passed
 var defaultCustomResolver = "8.8.8.8";
 
-var dnssecExtNPAPIConst = {
-  		DNSSEC_EXIT_FAILED                         : 0, /* state is unknown or fail*/
-		DNSSEC_EXIT_DOMAIN_UNSECURED 		   : 1, /* domain is not secured */
-  		DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP   : 2, /* domain name is secured by DNSSEC and the IP address of browser is valid */
-  		DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP : 3, /* domain name is secured by DNSSEC but the IP address of browser is invalid */
-  		DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS        : 4, /* domain signature is not valid or chain of trust is not established */
-  		DNSSEC_EXIT_NODOMAIN_UNSECURED             : 5, /* non-existent domain is not secured */
-  		DNSSEC_EXIT_NODOMAIN_SIGNATURE_VALID       : 6, /* non-existent domain is secured by DNSSEC */
-  		DNSSEC_EXIT_NODOMAIN_SIGNATURE_INVALID     : 7, /* non-existent domain is not valid or chain of trust is not established */
-  		DNSSEC_INPUT_FLAG_DEBUGOUTPUT              : 1, /* debug output */
-  		DNSSEC_INPUT_FLAG_USEFWD                   : 2, /* use TCP instead of default UDP */
-  		DNSSEC_INPUT_FLAG_RESOLVIPV4               : 4, /* resolve IPv4 address (A record) */
-  		DNSSEC_INPUT_FLAG_RESOLVIPV6               : 8, /* resolve IPv6 address (AAAA record) */
-};
-
+//--------------------------------------------------------
+// Set string in the web element
+//--------------------------------------------------------
 function addText(id, str){
    if (document.createTextNode){
      var tn = document.createTextNode(str);
@@ -45,9 +33,9 @@ function addText(id, str){
   }
 }
 
-
-
-  // Support function
+//--------------------------------------------------------
+// Helper function from stackeoverflow
+//--------------------------------------------------------
 function substr_count(haystack, needle, offset, length) {
 
     var pos = 0, cnt = 0;
@@ -68,14 +56,19 @@ function substr_count(haystack, needle, offset, length) {
     return cnt;
 }
 
-  // Test for a valid dotted IPv4 address
+
+//--------------------------------------------------------
+// Test if the input is a valid IPv4 address
+//--------------------------------------------------------
 function  test_ipv4(ip) {
     var match = ip.match(/^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/);
     return match != null;
 
 }
 
-  // Test if the input is a valid IPv6 address
+//--------------------------------------------------------
+// Test if the input is a valid IPv6 address
+//--------------------------------------------------------
 function test_ipv6(ip) {
 
     // Test for empty address
@@ -114,7 +107,9 @@ function test_ipv6(ip) {
     return false;
 }
 
-
+//--------------------------------------------------------
+// check correct format of IP addresses in the textarea
+//--------------------------------------------------------
 function checkOptdnsserveraddr(str) {
     var n=str.split(" ");
     var result=0;
@@ -129,22 +124,30 @@ function checkOptdnsserveraddr(str) {
     else return true;
 }
 
+//--------------------------------------------------------
+// check correct format of domain and TLD in the textarea
+//--------------------------------------------------------
 function checkdomainlist() {
     var str=document.getElementById("domainlist").value;
     var match = str.match(/^[a-z0-9.-]+(, [a-z0-9.-]+)*$/);
     return match != null;
 }
 
+//--------------------------------------------------------
+// Cancel settings without saving on the localstorage
+//--------------------------------------------------------
 function cancelOptions() {
         console.log("CLOSE:");
-	window.close();
+		window.close();
 }
 
-
+//--------------------------------------------------------
+// Save settings on the localstorage
+//--------------------------------------------------------
 function saveOptions() {
-        console.log("SAVE:");
-	var radiogroup = document.dnssecSettings.resolver;
-        var resolver;
+    console.log("SAVE:");
+	var radiogroup = document.tlsaSettings.resolver;
+    var resolver;
 	for (var i = 0; i < radiogroup.length; i++) {
 		var child = radiogroup[i];
 			if (child.checked == true) {
@@ -153,87 +156,92 @@ function saveOptions() {
 		}
 	}
 	localStorage["dnssecResolver"] = resolver;
-	localStorage["dnssecCustomResolver"] = document.dnssecSettings.customResolver.value;
-        localStorage["dnssecDebugOutput"] = document.dnssecSettings.debugOutput.checked;
-	localStorage["domainfilteron"] = document.dnssecSettings.domainfilteron.checked;
-	localStorage["domainlist"] = document.dnssecSettings.domainlist.value;
-	document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidator\" width=\"0\" height=\"0\"></object>");
-        var plugin = document.getElementById("dnssec-plugin");
-	plugin.CacheFree();
+	localStorage["dnssecCustomResolver"] = document.tlsaSettings.customResolver.value;
+    localStorage["dnssecDebugOutput"] = document.tlsaSettings.debugOutput.checked;
+	localStorage["domainfilteron"] = document.tlsaSettings.domainfilteron.checked;
+	localStorage["blockhttps"] = document.tlsaSettings.blockhttps.checked;
+	localStorage["domainlist"] = document.tlsaSettings.domainlist.value;
+    var plugin = document.getElementById("tlsa-plugin");
+	plugin.TLSACacheFree();
 	document.write("<div>Settings were saved...</div>");
 	document.write("<div>Please, close this window...Thanks</div>");
 	window.close();
 }
 
+//--------------------------------------------------------
+// test on DNSSEC support
+//--------------------------------------------------------
 function testdnssec() {
-      console.log("TEST:");
+
+      //console.log("TEST:");
       var nameserver = "8.8.8.8";
-      var c = this.dnssecExtNPAPIConst;
       var options = 7;
       var testnic = 0;
       var ip = false;
       var dn = "www.nic.cz";
       var addr = "217.31.205.50";
       var chioce = 0;
-      var tmp = document.dnssecSettings.customResolver.value;
-      var vvvv = unescape(tmp);
-      console.log(vvvv);
-      var radiogroup = document.dnssecSettings.resolver;
-	for (var i = 0; i < radiogroup.length; i++) {
-		var child = radiogroup[i];
-		console.log('CHOICE: \"'+ i + '; ' + child.checked + '\"\n');
-		if (child.checked == true) {
-		  switch (i) {
-	    	    case 0: // System setting
-         		nameserver = "";
-			chioce=0;
-            	        break;
-		    case 1: // Custom
-			chioce=1;
-         		//tmp = document.dnssecSettings.customResolver.value;
-			if (!checkOptdnsserveraddr(tmp)) { 
-			   ip=true;
- 		        }
-			else
-			{
-			nameserver = tmp;
-			}
-            	        break;
-		    case 2: // NOFWD
-			chioce=2;
-         		nameserver = "nofwd";
-			options = 5; ;
-            	    	break;
-		    } //switch
+      var tmp = document.tlsaSettings.customResolver.value;
+      var radiogroup = document.tlsaSettings.resolver;
+      
+		for (var i = 0; i < radiogroup.length; i++) {
+			var child = radiogroup[i];
+			console.log('CHOICE: \"'+ i + '; ' + child.checked + '\"\n');
+			if (child.checked == true) {
+				  switch (i) {
+				    	    case 0: // System setting
+					         		nameserver = "";
+									chioce=0;
+			            	        break;
+						    case 1: // Custom
+									chioce=1;
+					         		//tmp = document.tlsaSettings.customResolver.value;
+									if (!checkOptdnsserveraddr(tmp)) { 
+										   ip=true;
+					 		        }
+									else {
+										nameserver = tmp;
+									}
+			            	        break;
+		    				case 2: // NOFWD
+									chioce=2;
+         							nameserver = "nofwd";
+									options = 5; ;
+            				    	break;
+				    } //switch
 	         } // if
-	} // for
-   if (ip) {
-        window.open('options.html?0,'+chioce+','+unescape(tmp), "_top");
-   }
-   else {
-     try {
-      console.log('INIT parameters: \"'+ dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
-      document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidator\" width=\"0\" height=\"0\"></object>");
-      var plugin = document.getElementById("dnssec-plugin");
-      plugin.CacheFree();
-      testnic = plugin.Validate(dn, options, nameserver, addr);
-      testnic = testnic[0];
-      if (testnic==0) {
-        window.open('options.html?1,'+chioce+','+unescape(tmp), "_top");
-      }
-      else if (testnic==4) {
-        window.open('options.html?2,'+chioce+','+unescape(tmp), "_top");
-      }
-      else { 
-        window.open('options.html?3,'+chioce+','+unescape(tmp), "_top");
-      }       
-    } catch (ex) {
-       console.log('Error: Plugin call failed!\n');
-	window.open('options.html', "_top");
-    }
-   }//if ip
+		} // for
+
+	   if (ip) {
+	        window.open('options.html?0,'+chioce+','+unescape(tmp), "_top");
+	   }
+	   else {
+		     try {
+			      console.log('INIT parameters: \"'+ dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
+			      var plugin = document.getElementById("tlsa-plugin");
+				  plugin.TLSACacheFree();
+			      var derCerts = new Array();
+			      derCerts.push("XXX");
+			      testnic = plugin.TLSAValidate(derCerts, 0, options, nameserver, dn, "443", "tcp", 1);     
+			      if (testnic==13) {
+				        window.open('options.html?3,'+chioce+','+unescape(tmp), "_top");
+			      }
+			      else if (testnic==-5) {
+				        window.open('options.html?2,'+chioce+','+unescape(tmp), "_top");
+			      }
+			      else { 
+				        window.open('options.html?1,'+chioce+','+unescape(tmp), "_top");
+			      }      
+		    } catch (ex) {
+			       console.log('Error: Plugin call failed!\n');
+			       window.open('options.html?1,'+chioce+','+unescape(tmp), "_top");
+		    } //try
+   	}//if ip
 }
 
+//--------------------------------------------------------
+// help function for clear TLSA localestorage
+//--------------------------------------------------------
 function eraseOptions() {
 	console.log("ERASE:");
 	localStorage.removeItem("dnssecResolver");
@@ -242,7 +250,10 @@ function eraseOptions() {
 	location.reload();
 }
 
-// Replaces onclick for the Save button
+
+//--------------------------------------------------------
+// Replaces onclick for the option buttons
+//--------------------------------------------------------
 window.onload = function(){
     document.querySelector('input[id="savebutton"]').onclick=saveOptions;
     document.querySelector('input[id="testbutton"]').onclick=testdnssec;
@@ -250,62 +261,60 @@ window.onload = function(){
 }
 
 
+//--------------------------------------------------------
+// show DNSSEC text about resover settings 
+//--------------------------------------------------------
 function testinfodisplay(state){
    if (state==0) {
-	document.getElementById("messageok").style.display = 'none';
-	document.getElementById("messagebogus").style.display = 'none';
-	document.getElementById("messageerror").style.display = 'none'
-	document.getElementById("messageip").style.display = 'block';
+		document.getElementById("messageok").style.display = 'none';
+		document.getElementById("messagebogus").style.display = 'none';
+		document.getElementById("messageerror").style.display = 'none'
+		document.getElementById("messageip").style.display = 'block';
    	}
     else if (state==1) {
-	document.getElementById("messageok").style.display = 'none';
-	document.getElementById("messagebogus").style.display = 'none';
-	document.getElementById("messageerror").style.display = 'block';
-        document.getElementById("messageip").style.display = 'none';
+		document.getElementById("messageok").style.display = 'none';
+		document.getElementById("messagebogus").style.display = 'none';
+		document.getElementById("messageerror").style.display = 'block';
+	    document.getElementById("messageip").style.display = 'none';
         }
     else if (state==2) {
-	document.getElementById("messageok").style.display = 'none';
-	document.getElementById("messagebogus").style.display = 'block';
-	document.getElementById("messageerror").style.display = 'none';
-	document.getElementById("messageip").style.display = 'none';
+		document.getElementById("messageok").style.display = 'none';
+		document.getElementById("messagebogus").style.display = 'block';
+		document.getElementById("messageerror").style.display = 'none';
+		document.getElementById("messageip").style.display = 'none';
         }
     else if (state==3) { 
-	document.getElementById("messageok").style.display = 'block';
-	document.getElementById("messagebogus").style.display = 'none';
-	document.getElementById("messageerror").style.display = 'none';
-        document.getElementById("messageip").style.display = 'none';
+		document.getElementById("messageok").style.display = 'block';
+		document.getElementById("messagebogus").style.display = 'none';
+		document.getElementById("messageerror").style.display = 'none';
+	    document.getElementById("messageip").style.display = 'none';
         }
     else {
-	document.getElementById("messageok").style.display = 'none';
-	document.getElementById("messagebogus").style.display = 'none';
-	document.getElementById("messageerror").style.display = 'none';
-        document.getElementById("messageip").style.display = 'none';
+		document.getElementById("messageok").style.display = 'none';
+		document.getElementById("messagebogus").style.display = 'none';
+		document.getElementById("messageerror").style.display = 'none';
+	    document.getElementById("messageip").style.display = 'none';
 	}
 } 
 
-
+//--------------------------------------------------------
+// Settings window initialization
+//--------------------------------------------------------
 window.addEventListener('load',function(){
 
-        resultRegexp = /\?([^?,]+),([^,]+),([^,]+)$/;
-        matches = resultRegexp.exec(document.location.href);
+    resultRegexp = /\?([^?,]+),([^,]+),([^,]+)$/;
+    matches = resultRegexp.exec(document.location.href);
 	state = matches[1];
-        choice = matches[2];
-        resolver = matches[3];
+    choice = matches[2];
+    resolver = matches[3];
+    
 	unescape(resolver);
-	console.log(state);
-	console.log(choice);
-	console.log(resolver);
-	console.log("LOAD:");
-	//var urllength = document.location.href.length;
-	//var state = document.location.href[urllength-1];
 	testinfodisplay(state);
 
-      	addText("preftitle", chrome.i18n.getMessage("preftitle"));
-      	addText("prefresolver", chrome.i18n.getMessage("prefresolver"));
+    addText("preftitle", chrome.i18n.getMessage("preftitle"));
+    addText("prefresolver", chrome.i18n.getMessage("prefresolver"));
 	addText("legend", chrome.i18n.getMessage("legend"));
-      	addText("resolver0", chrome.i18n.getMessage("resolver0"));
-	//addText("resolver1", chrome.i18n.getMessage("resolver1"));
-	//addText("resolver2", chrome.i18n.getMessage("resolver2"));
+    addText("resolver0", chrome.i18n.getMessage("resolver0"));
 	addText("resolver3", chrome.i18n.getMessage("resolver3"));
 	addText("resolver4", chrome.i18n.getMessage("resolver4"));
 	addText("messageok", chrome.i18n.getMessage("messageok"));
@@ -315,18 +324,19 @@ window.addEventListener('load',function(){
 	addText("groupboxfilter", chrome.i18n.getMessage("groupboxfilter"));
 	addText("usefilter", chrome.i18n.getMessage("usefilter"));
 	addText("filtertext", chrome.i18n.getMessage("filtertext"));
+    addText("blockhttpstext", chrome.i18n.getMessage("blockhttpstext"));
 	document.getElementById("testbutton").value=chrome.i18n.getMessage("testbutton");
 	document.getElementById("savebutton").value=chrome.i18n.getMessage("savebutton");
 	document.getElementById("cancelbutton").value=chrome.i18n.getMessage("cancelbutton");
 
 	if (state==4) {
 		var dnssecResolver = localStorage["dnssecResolver"];
-        	// IP address of custom resolver
-        	var dnssecCustomResolver = localStorage["dnssecCustomResolver"];
-        	// debug output of resolving to stderr
-        	var debugOutput = localStorage["dnssecDebugOutput"];
-
+        // IP address of custom resolver
+        var dnssecCustomResolver = localStorage["dnssecCustomResolver"];
+        // debug output of resolving to stderr
+        var debugOutput = localStorage["dnssecDebugOutput"];
 		var domainfilteron = localStorage["domainfilteron"];
+		var blockhttps = localStorage["blockhttps"];
 		var domainlist = localStorage["domainlist"];
 
 		if (dnssecResolver == undefined) {
@@ -336,15 +346,16 @@ window.addEventListener('load',function(){
 			dnssecCustomResolver = defaultCustomResolver;
 		}
 	        // OMG localstorage has everything as text
-	        debugOutput = (debugOutput == undefined || debugOutput == "false") ? false : true;
+        debugOutput = (debugOutput == undefined || debugOutput == "false") ? false : true;
 
-	        document.dnssecSettings.customResolver.value = dnssecCustomResolver;
-	        document.dnssecSettings.debugOutput.checked = debugOutput;
-	        document.dnssecSettings.domainlist.value = domainlist;
+        document.tlsaSettings.customResolver.value = dnssecCustomResolver;
+        document.tlsaSettings.debugOutput.checked = debugOutput;
+        document.tlsaSettings.domainlist.value = domainlist;
 		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;
-	        document.dnssecSettings.domainfilteron.checked = domainfilteron;
-
-		var radiogroup = document.dnssecSettings.resolver;
+		blockhttps = (blockhttps == undefined || blockhttps == "false") ? false : true;
+        document.tlsaSettings.domainfilteron.checked = domainfilteron;
+		document.tlsaSettings.blockhttps.checked = blockhttps;
+		var radiogroup = document.tlsaSettings.resolver;
 		for (var i = 0; i < radiogroup.length; i++) {
 			var child = radiogroup[i];
 				if (child.value == dnssecResolver) {
@@ -355,16 +366,18 @@ window.addEventListener('load',function(){
 	  }
 	else
 	 {
-	        document.dnssecSettings.customResolver.value = unescape(resolver);
-		var radiogroup = document.dnssecSettings.resolver;
+	    document.tlsaSettings.customResolver.value = unescape(resolver);
+		var radiogroup = document.tlsaSettings.resolver;
 		var child = radiogroup[choice];
 		child.checked = "true";
 		var domainfilteron = localStorage["domainfilteron"];
 		var domainlist = localStorage["domainlist"];
-	        document.dnssecSettings.domainlist.value = domainlist;
+		var blockhttps = localStorage["blockhttps"];
+	    document.tlsaSettings.domainlist.value = domainlist;
 		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;
-	        document.dnssecSettings.domainfilteron.checked = domainfilteron;
-			
+	    document.tlsaSettings.domainfilteron.checked = domainfilteron;
+   		blockhttps = (blockhttps == undefined || blockhttps == "false") ? false : true;
+        document.tlsaSettings.blockhttps.checked = blockhttps;			
 	}  //state
 });
 

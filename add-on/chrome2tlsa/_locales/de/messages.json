@@ -11,6 +11,9 @@
 	"usefilter": {
 		"message": "Schliesse Domänen aus dieser Liste aus"
 		},
+	"blockhttpstext": {
+		"message": "Abbrechen HTTPS-Verbindung wenn TLSA Validierung fehl"
+		},	
 	"filtertext": {
 		"message": "Liste ausgeschlossener Domänen und TLDs (mit Komma abgetrennt)"
 		},
