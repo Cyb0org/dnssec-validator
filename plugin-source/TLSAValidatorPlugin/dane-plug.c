@@ -1016,7 +1016,7 @@ int get_tlsa_record(struct tlsa_store_head *tlsa_list, struct ub_result *result,
 // free unbound context (erase cache data from ub context), ctx = NULL
 // external API
 // ----------------------------------------------------------------------------
-void ub_context_free(struct ub_ctx* ctx){
+void ub_context_free(){
     if (context==true) { 
       ub_ctx_delete(ctx);
       context = false;
