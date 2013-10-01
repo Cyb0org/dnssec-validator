@@ -1,7 +1,9 @@
 	// DNSSEC NPAPI constant returned by binary plugin	
 	var dnssecExtNPAPIConst = {
+		DNSSEC_EXIT_VALIDATION_OFF                 : -1, /* DNSSEC validation is OFF*/
+		DNSSEC_EXIT_WRONG_RESOLVER                 : -2, /* resolver does not support DNSSEC*/	
   		DNSSEC_EXIT_FAILED                         : 0, /* state is unknown or fail*/
-		DNSSEC_EXIT_DOMAIN_UNSECURED 		   : 1, /* domain is not secured */
+		DNSSEC_EXIT_DOMAIN_UNSECURED 		   	   : 1, /* domain is not secured */
   		DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP   : 2, /* domain name is secured by DNSSEC and the IP address of browser is valid */
   		DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP : 3, /* domain name is secured by DNSSEC but the IP address of browser is invalid */
   		DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS        : 4, /* domain signature is not valid or chain of trust is not established */

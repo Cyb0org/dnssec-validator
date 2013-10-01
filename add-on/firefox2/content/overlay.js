@@ -107,8 +107,8 @@ var dnssecExtension = {
   dnssecExtID: "dnssec@nic.cz",
   debugOutput: false,
   debugPrefix: "dnssec: ",
-  debugStartNotice: "----- DNSSEC resolving start -----\n",
-  debugEndNotice: "----- DNSSEC resolving end -----\n",
+  debugStartNotice: "------------ DNSSEC resolving start ---------------\n",
+  debugEndNotice: "------------ DNSSEC resolving end -----------------\n",
   asyncResolve: false,
   timer: null,
   oldAsciiHost: null,
@@ -166,8 +166,8 @@ var dnssecExtension = {
       dnssecExtPrefs.setChar("dnsserveraddr", "nofwd");  // Save default settings of resolver
       dnssecExtPrefs.setBool("usefwd", true);  // Save default settings of resolver
       dnssecExtPrefs.setInt("dnsserverchoose", 3);  // Save default settings of resolver
-      dnssecExtPrefs.setInt("tlsa", true);  // Save default settings of resolver
-      dnssecExtPrefs.setInt("tlsablocking", true);  // Save default settings of resolver
+      //dnssecExtPrefs.setInt("tlsa", true);  // Save default settings of resolver
+      //dnssecExtPrefs.setInt("tlsablocking", true);  // Save default settings of resolver
       // Define timer callback
       this.timer.initWithCallback(
         function() {
@@ -298,7 +298,8 @@ var dnssecExtResolver = {
     // Create variable to pass options
     var c = dnssecExtNPAPIConst;
     var options = 0;
-    if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+//    if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+    if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
     if (dnssecExtPrefs.getInt("dnsserverchoose") != 3) options |= c.DNSSEC_INPUT_FLAG_USEFWD;
     if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
     if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
@@ -356,17 +357,19 @@ var dnssecExtResolver = {
       dnssecExtResolver.ValidatedDataNoFwd(dn, resArr, res, addr);
 
     }
+    
 	var c = dnssecExtNPAPIConst;
 	var resolvipv4 = true;
-        var resolvipv6 = false;
+    var resolvipv6 = false;
 	var dsp = document.getElementById("dnssec-plugin");
 	dsp.CacheFree();
 	var options = 0;
+	//if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
 	if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
    	if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
 	if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
-	 if (dnssecExtension.debugOutput)
-          dump(dnssecExtension.debugPrefix + "NOFWD input: " + dn + "; options: " + options  + "; resolver: nofwd; IP-br: " + addr + ';\n');
+	if (dnssecExtension.debugOutput)
+          dump(dnssecExtension.debugPrefix + "NOFWD parameters: " + dn + "; options: " + options  + "; resolver: nofwd; IP-br: " + addr + ';\n');
 
    // Call NPAPI validation
     try {
@@ -394,27 +397,25 @@ var dnssecExtResolver = {
   //*****************************************************
   ValidatedDataNoFwd: function(dn, resArr, res, addr) {
 
-     var ext = dnssecExtension;
-     var c = dnssecExtNPAPIConst;
+    var ext = dnssecExtension;
+    var c = dnssecExtNPAPIConst;
     if (ext.debugOutput) {
-       dump(ext.debugPrefix + 'NOFWD result: ' + resArr[0] + '; ' + resArr[1] +' ;\n');
+       dump(ext.debugPrefix + 'NOFWD result: ' + resArr[0] + ' : ' + resArr[1] +' ;\n');
     }	    	
     
     var restmp = resArr[0];
     var ipvalidator = resArr[1];
     
     if (restmp==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
-	if (ext.debugOutput) dump(ext.debugPrefix + 'Yes, domain name has bogus\n');
-	res=restmp;
+		if (ext.debugOutput) dump(ext.debugPrefix + 'Yes, domain name has DNSSEC bogus\n');
+		res=restmp;
     } 
-    else
-    {
-	if (ext.debugOutput) dump(ext.debugPrefix + "Current resolver does not support DNSSEC!\n");
-	if (ext.debugOutput) dump(ext.debugPrefix + "Results: FWD: " + res + "; NOFWD: " + restmp +"\n");
-	var dsp = document.getElementById("dnssec-plugin");
-	dsp.CacheFree();
-	res=-2;
-	
+    else {
+		if (ext.debugOutput) dump(ext.debugPrefix + "Current resolver does not support DNSSEC!\n");
+		if (ext.debugOutput) dump(ext.debugPrefix + "Results: FWD: " + res + "; NOFWD: " + restmp +"\n");
+		var dsp = document.getElementById("dnssec-plugin");
+		dsp.CacheFree();
+		res=c.DNSSEC_EXIT_VALIDATION_OFF;
     }//if
 		
     // Set appropriate state if host name does not changed
@@ -443,8 +444,7 @@ var dnssecExtResolver = {
     var ext = dnssecExtension;
 
     if (ext.debugOutput) {
-      dump(ext.debugPrefix + 'Queried domain name: ' + dn + '\n');
-      dump(ext.debugPrefix + 'Getting return values: ' + resArr[0] + ';\n');
+      dump(ext.debugPrefix + 'Result: ' + dn + ' : ' + resArr[0] + '\n');
     }
 
     // Get validated data from cache or by NPAPI call
@@ -487,23 +487,32 @@ var dnssecExtResolver = {
 
     var filteron = dnssecExtPrefs.getBool("domainfilteron");
     var validate = true;
+	var c = dnssecExtNPAPIConst;
+	
     if (filteron) {
-	var urldomainsepar=/[.]+/;
-	var urldomainarray=dn.split(urldomainsepar);
-	var domainlist = dnssecExtPrefs.getChar("domainlist");
-	var domainlistsepar=/[ ,;]+/;
-	var domainarraylist=domainlist.split(domainlistsepar);
-	var j;
-	// TLD
+		var urldomainsepar=/[.]+/;
+		var urldomainarray=dn.split(urldomainsepar);
+		var domainlist = dnssecExtPrefs.getChar("domainlist");
+		var domainlistsepar=/[ ,;]+/;
+		var domainarraylist=domainlist.split(domainlistsepar);
+		var j=0;
+		// TLD
         for (j=0;j<domainarraylist.length;j++) { 
-            if (urldomainarray[urldomainarray.length-1] == domainarraylist[j]) {validate=false; break;}
+            if (urldomainarray[urldomainarray.length-1] == domainarraylist[j]) {
+            	validate=false;
+            	break;
+            } //if
+        } //for
 
+		// xxx.yy
+	 	if (validate) for (j=0;j<domainarraylist.length;j++) {
+		   if (domainarraylist[j].indexOf(urldomainarray[urldomainarray.length-2]) !=-1) {
+		   		validate=false; 
+		   		break;
+		   	}
         }
-	// xxx.yy
- 	if (validate) for (j=0;j<domainarraylist.length;j++) {
-	   if (domainarraylist[j].indexOf(urldomainarray[urldomainarray.length-2]) !=-1) {validate=false; break}
-            }
-        if (dnssecExtension.debugOutput) dump(dnssecExtension.debugPrefix + 'Validate this domain? ' + validate + ';\n');
+        if (dnssecExtension.debugOutput) 
+        	dump(dnssecExtension.debugPrefix + 'Validate this domain? ' + validate + ';\n');
     }//if
 
     if (validate) {
@@ -527,20 +536,20 @@ var dnssecExtResolver = {
 	      }
 	      // No need to check more addresses
 	      //if (resolvipv4 && resolvipv6) break;
-	 }
+		 }
 
-	 if (dnssecExtension.debugOutput)
-	      dump(dnssecExtension.debugPrefix + 'Browser uses IPv4/IPv6 resolving: \"'
+		 if (dnssecExtension.debugOutput)
+		      dump(dnssecExtension.debugPrefix + 'Browser uses IPv4/IPv6 resolving: \"'
         	   + resolvipv4 + '/' + resolvipv6 + '\"\n');
 
          // Resolve IPv4 if no version is desired
          if (!resolvipv4 && !resolvipv6) resolvipv4 = true;
-	 // Call NPAPI plugin core
-	 this.doNPAPIvalidation(dn, resolvipv4, resolvipv6, aRecord);
+		 // Call NPAPI plugin core
+		 this.doNPAPIvalidation(dn, resolvipv4, resolvipv6, aRecord);
      }
      else {
      // no DNSSEC validation resolve
-        dnssecExtHandler.setSecurityState(-1);
+        dnssecExtHandler.setSecurityState(c.DNSSEC_EXIT_VALIDATION_OFF);
         // Reset resolving flag
         if (dnssecExtension.debugOutput) {
           dump(dnssecExtension.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
@@ -550,7 +559,9 @@ var dnssecExtResolver = {
         if (dnssecExtension.debugOutput)
             dump(dnssecExtension.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
      }//if
+  
   },//function
+  
 };//class
 
 
@@ -820,9 +831,9 @@ var dnssecExtHandler = {
 
     var c = dnssecExtNPAPIConst;
     
-     if (dnssecExtension.debugOutput)
-      dump(dnssecExtension.debugPrefix + 'State: \"'
-           + state + '\"\n');
+   //  if (dnssecExtension.debugOutput)
+   //   dump(dnssecExtension.debugPrefix + 'State: \"'
+    //       + state + '\"\n');
 
     switch (state) {
 	// 1
@@ -852,12 +863,13 @@ var dnssecExtHandler = {
 	// 7
     case c.DNSSEC_EXIT_NODOMAIN_SIGNATURE_INVALID:
       this.setMode(this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID);
-      break;
+      break;     
 	// -1
-    case -1:
+    case c.DNSSEC_EXIT_VALIDATION_OFF:
       this.setMode(this.DNSSEC_MODE_OFF);
       break;
-    case -2:
+      //-2
+    case c.DNSSEC_EXIT_WRONG_RESOLVER:
       this.setMode(this.DNSSEC_MODE_WRONG_RESOLVER);
       break;
 	// 0
