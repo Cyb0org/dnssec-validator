@@ -26,7 +26,6 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 window.addEventListener("load", function() { dnssecExtension.init(); }, false);
 window.addEventListener("unload", function() { dnssecExtension.uninit(); }, false);
 
-
 var dnssecExtUrlBarListener = {
 
   onLocationChange: function(aWebProgress, aRequest, aLocationURI)
@@ -282,6 +281,7 @@ var dnssecExtension = {
 // **************************************************************
 var dnssecExtResolver = {
 
+	
   //******************************************
   // Called when request is not cached already
   //*******************************************
@@ -415,7 +415,7 @@ var dnssecExtResolver = {
 		if (ext.debugOutput) dump(ext.debugPrefix + "Results: FWD: " + res + "; NOFWD: " + restmp +"\n");
 		var dsp = document.getElementById("dnssec-plugin");
 		dsp.CacheFree();
-		res=c.DNSSEC_EXIT_VALIDATION_OFF;
+		res=c.DNSSEC_EXIT_WRONG_RESOLVER;
     }//if
 		
     // Set appropriate state if host name does not changed

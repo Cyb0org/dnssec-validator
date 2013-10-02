@@ -353,7 +353,9 @@ var dnssecExtPrefs = {
 
   onUnload : function(prefwindow) {      
       var dsp = document.getElementById("dnssec-plugin");
+      var dsp2 = document.getElementById("dane-tlsa-plugin");
       dsp.CacheFree();
+      dsp2.TLSACacheFree();
       return true;
   },
 

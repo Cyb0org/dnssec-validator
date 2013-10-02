@@ -23,6 +23,7 @@
  		DANE_EXIT_VALIDATION_SUCCESS_TYPE1	 : 11, /* Validation of TLSA record (type1) is success */
 		DANE_EXIT_VALIDATION_SUCCESS_TYPE2	 : 12, /* Validation of TLSA record (type2) is success */
 		DANE_EXIT_VALIDATION_SUCCESS_TYPE3	 : 13, /* Validation of TLSA record (type3) is success */
+		DANE_EXIT_WRONG_RESOLVER             : 2, /* resolver does not support DNSSEC*/	
 		DANE_EXIT_DNSSEC_SECURED		 : 1,  /* DANE: dnssec is secured - no used now */
 		DANE_EXIT_VALIDATION_OFF 		 : 0,  /* Validation of TLSA record is off for this domain */
 		DANE_EXIT_RESOLVER_FAILED      		 : -1, /* state is unknown or fail */            

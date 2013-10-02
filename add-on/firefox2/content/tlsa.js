@@ -341,9 +341,9 @@ processNewURL: function(aRequest, aLocationURI) {
 
     dump(' ...valid\n');
 
-   var tlsaonoff = dnssecExtPrefs.getBool("tlsa");
-   if (tlsaonoff) {   
-   
+   var tlsaon = dnssecExtPrefs.getBool("tlsa");
+   if (tlsaon) {   
+      	   
 	   if (this.is_in_domain_list(asciiHost)) {
 		   if (daneExtension.debugOutput) 
         	dump(this.DANE_DEBUG_PRE + 'Validate this domain: YES'+ this.DANE_DEBUG_POST);
@@ -495,10 +495,19 @@ check_tlsa_tab_change: function (channel, uri, port){
 	    dump(this.DANE_DEBUG_PRE + "https://" + uri + "; certchain lenght: " + len + this.DANE_DEBUG_POST); 
 
     var daneMatch = tlsa.TLSAValidate(derCerts, len, options, nameserver, uri, port, protocol, policy);
-
 	if (daneExtension.debugOutput)
 	    dump(this.DANE_DEBUG_PRE + "For https://" + uri + " DANE return: " + daneMatch[0] + this.DANE_DEBUG_POST); 
 
+	if (daneMatch[0] == c.DANE_EXIT_DNSSEC_BOGUS) { 
+		options = 0;
+			tlsa.TLSACacheFree();
+    	    var daneMatchnofwd = tlsa.TLSAValidate(derCerts, len, options, "nofwd", uri, port, protocol, policy);
+			if (daneMatchnofwd[0]!=daneMatch[0]) {
+				 daneMatch[0]=c.DANE_EXIT_WRONG_RESOLVER;
+	  			tlsa.TLSACacheFree();	
+	  		}
+	}
+	
    	if (daneMatch[0] <= c.DANE_EXIT_NO_CERT_CHAIN) { 	   	
 	   if (channel) {
 	      if (this.oldAsciiHost == uri) {  
@@ -622,6 +631,7 @@ var tlsaExtHandler = {
   DANE_MODE_NO_HTTPS		: "dm_nohttps",
   DANE_MODE_DNSSEC_SECURED      : "dm_dnssecsec", 
   DANE_MODE_CERT_ERROR          : "dm_certerr",
+  DANE_MODE_WRONG_RESOLVER		: "dm_wrongres",
 
   DANE_MODE_VALIDATION_FALSE		: "dm_vf",
   DANE_MODE_VALIDATION_FALSE_TYPE0	: "dm_vf0",
@@ -645,7 +655,8 @@ var tlsaExtHandler = {
   DANE_TOOLTIP_NO_HTTPS	        : "dmnohttpsTooltip",
   DANE_TOOLTIP_DNSSEC_BOGUS     : "dmdnssecbogusTooltip",
   DANE_TOOLTIP_DNSSEC_UNSECURED : "dmdnssecunsecTooltip",
-
+  DANE_TOOLTIP_WRONG_RESOLVER : "dmwrongresTooltip",
+  
   // Cache the most recent hostname seen in checkSecurity
   _asciiHostName : null,
   _utf8HostName : null,
@@ -680,6 +691,8 @@ var tlsaExtHandler = {
       this._stringBundle.getString("dane.tooltip.dnssec.bogus");
     this._tooltipLabel[this.DANE_TOOLTIP_DNSSEC_UNSECURED] =
       this._stringBundle.getString("dane.tooltip.dnssec.unsecured");
+    this._tooltipLabel[this.DANE_TOOLTIP_WRONG_RESOLVER] =
+      this._stringBundle.getString("dane.tooltip.wrong.resolver");
     return this._tooltipLabel;
   },
 
@@ -729,6 +742,8 @@ var tlsaExtHandler = {
       this._stringBundle.getString("dane.mode.validation.success.type3");
     this._securityText[this.DANE_MODE_VALIDATION_OFF] =
       this._stringBundle.getString("dane.mode.validation.off");
+     this._securityText[this.DANE_MODE_WRONG_RESOLVER] =
+      this._stringBundle.getString("dane.mode.wrong.resolver");                 
     return this._securityText;
   },
 
@@ -778,6 +793,8 @@ var tlsaExtHandler = {
       this._stringBundle.getString("dane.mode.validation.success.type3.detail");
     this._securityDetail[this.DANE_MODE_VALIDATION_OFF] =
       this._stringBundle.getString("dane.mode.validation.off.detail");
+    this._securityDetail[this.DANE_MODE_WRONG_RESOLVER] =
+      this._stringBundle.getString("dane.mode.wrong.resolver.detail");
     return this._securityDetail;
   },
 
@@ -916,6 +933,9 @@ var tlsaExtHandler = {
 	case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE3:
 		this.setMode(this.DANE_MODE_VALIDATION_SUCCESS_TYPE3);
 		break;
+	case c.DANE_EXIT_WRONG_RESOLVER:
+		this.setMode(this.DANE_MODE_WRONG_RESOLVER);
+		break;				
       default: this.setMode(this.DANE_MODE_ERROR);
       		break;
     }
@@ -991,6 +1011,9 @@ var tlsaExtHandler = {
 	     break;
 	case this.DANE_MODE_DNSSEC_UNSECURED:
 	     tooltip = this._tooltipLabel[this.DANE_TOOLTIP_DNSSEC_UNSECURED];
+	     break;
+   	case this.DANE_MODE_WRONG_RESOLVER:
+	     tooltip = this._tooltipLabel[this.DANE_TOOLTIP_WRONG_RESOLVER];
 	     break;
 	case this.DANE_MODE_DNSSEC_BOGUS:
 	     tooltip = this._tooltipLabel[this.DANE_TOOLTIP_DNSSEC_BOGUS];

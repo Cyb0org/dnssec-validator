@@ -68,7 +68,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
   height: 19px;
   list-style-image: url("chrome://dnssec/skin/tlsaactive.png"); /* 35x16 */
 }
-
+#tlsa-box.dm_wrongres > #tlsa-icon,
 #tlsa-box.dm_dnssecbogus > #tlsa-icon {
   width: 19px;
   height: 19px;
@@ -153,6 +153,9 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /* grey with error */
+
+
+#tlsa-popup.dm_wrongres > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
 #tlsa-popup.dm_dnssecbogus > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
   list-style-image: url("chrome://dnssec/skin/tlsaorange.png"); 
 }
