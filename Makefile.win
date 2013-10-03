@@ -68,6 +68,7 @@ xpi_x86:
 	cp $(PLUGIN_TMP)/np$(PLUGIN_NAME_DNSSEC).dll $(ADDON_PATH_FF)/plugins
 	cp $(PLUGIN_TMP)/np$(PLUGIN_NAME_TLSA).dll $(ADDON_PATH_FF)/plugins
 	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>WINNT_x86-msvc<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
+	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/about.template > $(ADDON_PATH_FF)/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
 	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-windows-x86.xpi
 	@echo '### DONE... ###'

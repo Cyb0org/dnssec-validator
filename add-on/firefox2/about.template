@@ -33,9 +33,13 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
       <description value="&aboutwindow.description1;"/>
       <description value="&aboutwindow.description2;"/>
       <description value=" "/>
-      <description value="&aboutwindow.version;"/>
+      <hbox>
+        <description value="&aboutwindow.version;"/>
+        <description value="xversionx"/>
+      </hbox>
       <description value="&aboutwindow.company;"/>
       <description value="&aboutwindow.year;"/>	
     </vbox>
   </hbox>
+
 </window>

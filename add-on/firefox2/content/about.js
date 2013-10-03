@@ -39,7 +39,7 @@ var dnssecExtAbout = {
 
 
   showAboutWindow : function() {
-    var optionsURL = "chrome://dnssec/content/about.xul";
+    var about = "chrome://dnssec/content/about.xul";
 
     // Check if the pref window is not already opened
     var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
@@ -47,7 +47,7 @@ var dnssecExtAbout = {
     var enumerator = wm.getEnumerator(null);
     while(enumerator.hasMoreElements()) {
       var win = enumerator.getNext();
-      if (win.document.documentURI == optionsURL) {
+      if (win.document.documentURI == about) {
         win.focus();
         return;
       }
@@ -59,8 +59,8 @@ var dnssecExtAbout = {
       features += this.isInstantApply() ? ",dialog=yes" : ",modal";
     } catch (e) {
       features += ",modal";
-    }
-    window.openDialog(optionsURL, "", features);
+    }    
+    window.openDialog(about, "", features);
   },
 
 };

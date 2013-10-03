@@ -56,6 +56,7 @@ xpi_x86:
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x86.so $(ADDON_PATH_FF)/plugins
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x86.so $(ADDON_PATH_FF)/plugins
 	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
+	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/about.template > $(ADDON_PATH_FF)/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
 	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-linux-x86.xpi
 	@echo '### DONE... ###'
@@ -86,6 +87,7 @@ sys_linux_x64:
 	rm -rf $(PLUGIN_FB_B)
 	rm -rf $(PLUGIN_FB_S)	
 	@echo '### ...Plugin x64 Linux ... Done. ###'
+	
 xpi_x64:
 	@echo '### Creating package for Firefox Linux x64... ###'
 	rm -rf $(ADDON_PATH_FF)/plugins
@@ -94,6 +96,7 @@ xpi_x64:
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x64.so $(ADDON_PATH_FF)/plugins
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x64.so $(ADDON_PATH_FF)/plugins
 	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Linux_x86_64-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
+	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/about.template > $(ADDON_PATH_FF)/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
 	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-linux-x64.xpi
 	@echo '### DONE... ###'
