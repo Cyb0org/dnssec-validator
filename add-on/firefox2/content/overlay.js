@@ -119,7 +119,7 @@ var dnssecExtension = {
     this.getDebugOutputFlag();
 
     if (this.debugOutput)
-      dump(this.debugPrefix + 'Start of add-on init\n');
+      dump(this.debugPrefix + 'Start of add-on\n');
 
     // Enable asynchronous resolving if desired
     this.getAsyncResolveFlag();
@@ -150,9 +150,6 @@ var dnssecExtension = {
 
     // Listen for webpage events
     gBrowser.addProgressListener(dnssecExtUrlBarListener);
-
-    if (this.debugOutput)
-      dump(this.debugPrefix + 'End of add-on init\n');
   },
 
   showHomepage: function(dnssecExt) {
@@ -196,7 +193,7 @@ var dnssecExtension = {
   uninit: function() {
 
     if (this.debugOutput)
-      dump(this.debugPrefix + 'Start of add-on uninit\n');
+      dump(this.debugPrefix + 'Stop of add-on\n');
 
     gBrowser.removeProgressListener(dnssecExtUrlBarListener);
 
@@ -210,10 +207,7 @@ var dnssecExtension = {
     var dsp = document.getElementById("dnssec-plugin");
     dsp.CacheFree();
     if (this.debugOutput) 
-	dump('add-on: ...Clear Cache...\n');
-
-    if (this.debugOutput)
-      dump(this.debugPrefix + 'End of add-on uninit\n');
+	dump(this.debugPrefix + 'Clear Cache...\n');
   },
 
     registerObserver: function(topic) {
