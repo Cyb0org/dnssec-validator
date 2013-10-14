@@ -102,7 +102,7 @@
 		"message": " kann nicht mit DNSSEC überprüft werden."
 		},
          "0dnssecErrorInfo": {
-		"message": "Während der Ermittlung des DNSSEC-Zustandes kam es zu einem Fehler. Dieser kann durch einen Anschlussausfall zum DNS-Server oder eine falsch angegebene IP-Adresse eines validierenden Resolvers verursacht sein."
+		"message": "Während der Ermittlung des DNSSEC-Zustandes kam es zu einem Fehler. Dieser kann durch einen Verbindungsausfall zum DNS-Server oder eine falsch angegebene IP-Adresse eines validierenden Resolvers verursacht sein."
 		},
          "1unsecuredDomain": {
 		"message": " ist nicht durch DNSSEC gesichert."
