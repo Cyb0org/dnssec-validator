@@ -1,26 +1,25 @@
-This file contains the list of people involved in the development
-of DNSSEC Validator 2.0 plugin along its history.
-The development of the DNSSEC Validator 2.0 plugin project was started at the CZ.NIC Labs.
+This file contains the list of people involved in the development of DNSSEC/TLSA Validator 2.x plugin along its history.
+The development of the DNSSEC/TLSA Validator 2.x plugin project was started at the CZ.NIC Labs.
 
-==========================================================
-PROJECT: DNSSEC Validator 2.0 plugin for Internet Browsers
-==========================================================
+===============================================================
+PROJECT: DNSSEC/TLSA Validator 2.x plugin for Internet Browsers
+===============================================================
 
 AUTHORS AND MAINTAINERS:
 
-*POJECT COORDINATOR:
---------------------
-- Onderj Sury		<onderj.sury@nic.cz>
+*PROJECT COORDINATOR:
+---------------------
+- Onderj Sury		<ondrej.sury@nic.cz>
 - Bedrich Kosata	<bedrich.kosata@nic.cz>
 
 *PLUGIN DEVELOPERS:
---------------------
+-------------------
 - Martin Straka		<martin.straka@nic.cz>
 
-*PLUGINS MAINTAINERS
---------------------
+*PLUGINS MAINTAINERS:
+---------------------
 - Martin Straka		<martin.straka@nic.cz>
-- Ondrej Mikle		<ondej.mikle@nic.cz>	
+- Ondrej Mikle		<ondrej.mikle@nic.cz>	
 
 
 ==========================================================
@@ -28,6 +27,7 @@ Work packages
 ==========================================================
 
 *Martin Straka (since 2012)
-- plugin core in C (based on libunbound)
-- new GUI for IE, FF and Chrome (HTML, CSS, Javascript)
+- new DNSSEC plugin core in C (based on libunbound)
+- new TLSA plugin core in C (based on libunbound)
+- new GUI for IE, FF, Chrome, Opera and Safari (HTML, CSS, Javascript)
 - CZ, EN and DE localization

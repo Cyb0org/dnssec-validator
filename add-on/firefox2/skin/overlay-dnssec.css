@@ -25,13 +25,14 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-box.securedConnectionNoDomain > #dnssec-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/icon_green.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/dnssec_valid.png"); /* 35x16 */
 }
 
+#dnssec-box.wrongresolver > #dnssec-icon,
 #dnssec-box.errorDnssec > #dnssec-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/icon_unknown.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/dnssec_error.png"); /* 35x16 */
 }
 
 
@@ -39,26 +40,37 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-box.unsecuredNoDomain > #dnssec-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/icon_grey2.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/dnssec_no.png"); /* 35x16 */
 }
 
 
-#dnssec-box.dnssecOff > #dnssec-icon,
+#dnssec-box.dnssecOff > #dnssec-icon {
+  width: 19px;
+  height: 19px;
+  list-style-image: url("chrome://dnssec/skin/dnssec_off.png"); /* 35x16 */
+}
+
 #dnssec-box.wrongresolver > #dnssec-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/icon_white.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/dnssec_white.png"); /* 35x16 */
 }
 
 #dnssec-box.actionDnssec > #dnssec-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/icon_action.gif"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/dnssec_action.png"); /* 35x16 */
 }
 
 
 #dnssec-box.securedConnectionDomainInvIPaddr > #dnssec-icon,
-#dnssec-box.securedConnectionNoDomainInvIPaddr > #dnssec-icon,
+#dnssec-box.securedConnectionNoDomainInvIPaddr > #dnssec-icon
+{
+  width: 19px;
+  height: 19px;
+  list-style-image: url("chrome://dnssec/skin/dnssec_ip.png"); /* 35x16 */
+}
+
 #dnssec-box.validDomainSignatureInvIPaddr > #dnssec-icon,
 #dnssec-box.validNoDomainSignatureInvIPaddr > #dnssec-icon,
 #dnssec-box.securedConnectionInvSigDomain > #dnssec-icon,
@@ -69,7 +81,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-box.invalidNoDomainSignatureInvIPaddr > #dnssec-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/icon_red.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/dnssec_bogus.png"); /* 35x16 */
 }
 
 #dnssec-box.validDomainSignature > #dnssec-icon,
@@ -78,7 +90,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-box.validAuthNoDomainSignature > #dnssec-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/icon_orange.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/dnssec_init.png"); /* 35x16 */
 }
 
 #dnssec-box.inactionDnssec {
@@ -119,7 +131,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 #dnssec-about-container > #dnssec-about-icon {
-  list-style-image: url("chrome://dnssec/skin/icon.png"); 
+  list-style-image: url("chrome://dnssec/skin/dnssec_valid.png"); 
 }
 
 #dnssec-about-window {
@@ -167,7 +179,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 /* grey */
 #dnssec-popup.unsecuredDomain > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.unsecuredNoDomain > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/icon_grey2.png"); 
+  list-style-image: url("chrome://dnssec/skin/dnssec_no.png"); 
 }
 
 /* orange */
@@ -175,39 +187,40 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-popup.validAuthDomainSignature > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.validNoDomainSignature > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.validAuthNoDomainSignature > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/icon_orange.png");
+  list-style-image: url("chrome://dnssec/skin/dnssec_orange.png");
+}
+
+/* red */
+#dnssec-popup.securedConnectionInvSigDomain > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
+#dnssec-popup.invalidDomainSignature > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
+#dnssec-popup.invalidNoDomainSignature > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon {
+  list-style-image: url("chrome://dnssec/skin/dnssec_bogus.png"); 
 }
 
 /* red */
 #dnssec-popup.securedConnectionDomainInvIPaddr > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.securedConnectionNoDomainInvIPaddr > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
-#dnssec-popup.securedConnectionInvSigDomain > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.securedConnectionInvSigDomainInvIPaddr > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
-#dnssec-popup.invalidDomainSignature > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
-#dnssec-popup.validDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
-#dnssec-popup.invalidDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
-#dnssec-popup.invalidNoDomainSignature > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.validNoDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.invalidNoDomainSignatureInvIPaddr > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/icon_red.png"); 
+  list-style-image: url("chrome://dnssec/skin/dnssec_ip.png"); 
 }
 
 /* green */
 #dnssec-popup.securedConnectionDomain > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.securedConnectionNoDomain > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/icon_green.png"); 
+  list-style-image: url("chrome://dnssec/skin/dnssec_valid.png"); 
 }
 
 /* grey with error */
-#dnssec-popup.errorDnssec > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/icon_unknown.png"); 
-}
-
-
-/* grey with error */
-#dnssec-popup.dnssecOff > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
+#dnssec-popup.errorDnssec > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.wrongresolver > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/icon_white.png"); 
+  list-style-image: url("chrome://dnssec/skin/dnssec_error.png"); 
+}
+
+/* grey with error */
+#dnssec-popup.dnssecOff > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon {
+  list-style-image: url("chrome://dnssec/skin/dnssec_off.png"); 
 }
 
 /* DNSSEC popup body text - title */

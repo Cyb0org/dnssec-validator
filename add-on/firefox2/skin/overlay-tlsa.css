@@ -26,53 +26,64 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #tlsa-box.dm_vs3 > #tlsa-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/tlsagreen.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/tlsa_valid.png"); /* 19x19 */
 }
 /*TLSA false*/
 #tlsa-box.dm_vf > #tlsa-icon,
 #tlsa-box.dm_vf0 > #tlsa-icon,
 #tlsa-box.dm_vf1 > #tlsa-icon,
 #tlsa-box.dm_vf2 > #tlsa-icon,
-#tlsa-box.dm_tlsapramwrong > #tlsa-icon,
-#tlsa-box.dm_vf3 > #tlsa-icon {
+#tlsa-box.dm_vf3 > #tlsa-icon,
+#tlsa-box.dm_dnssecbogus > #tlsa-icon,
+#tlsa-box.dm_tlsapramwrong > #tlsa-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/tlsared.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/tlsa_invalid.png"); /* 19x19 */
 }
 
 #tlsa-box.dm_error > #tlsa-icon,
-#tlsa-box.dm_rfesolverfailed > #tlsa-icon,
-#tlsa-box.dm_certchain > #tlsa-icon {
+#tlsa-box.dm_wrongres > #tlsa-icon,
+#tlsa-box.dm_rfesolverfailed > #tlsa-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/tlsaerr.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/tlsa_error.png"); /* 19x19 */
 }
 
+#tlsa-box.dm_validationoff > #tlsa-icon {
+  width: 19px;
+  height: 19px;
+  list-style-image: url("chrome://dnssec/skin/tlsa_off.png"); /* 19x19 */
+}
 
-#tlsa-box.dm_validationoff > #tlsa-icon,
-#tlsa-box.dm_nohttps > #tlsa-icon,
+#tlsa-box.dm_nohttps > #tlsa-icon {
+  width: 19px;
+  height: 19px;
+  list-style-image: url("chrome://dnssec/skin/tlsa_nohttps.png"); /* 19x19 */
+}
+
 #tlsa-box.dm_dnssecunsecured > #tlsa-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/tlsaoff.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/tlsa_nodnssec.png"); /* 19x19 */
 }
 
 #tlsa-box.dm_notlsarecord > #tlsa-icon{
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/tlsagrey.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/tlsa_no.png"); /* 19x19 */
 }
 
 #tlsa-box.dm_action > #tlsa-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/tlsaactive.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/tlsa_action.png"); /* 19x19 */
 }
-#tlsa-box.dm_wrongres > #tlsa-icon,
-#tlsa-box.dm_dnssecbogus > #tlsa-icon {
+
+#tlsa-box.dm_certerr > #tlsa-icon,
+#tlsa-box.dm_certchain > #tlsa-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/tlsaorange.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/tlsaorange.png"); /* 19x19 */
 }
 
 #tlsa-box.dm_inaction {
@@ -120,14 +131,14 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #tlsa-popup.dm_vs1 > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
 #tlsa-popup.dm_vs2 > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
 #tlsa-popup.dm_vs3 > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/tlsagreen.png"); 
+  list-style-image: url("chrome://dnssec/skin/tlsa_valid.png"); 
 }
 
 /* error */
-#tlsa-popup.dm_error  > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
-#tlsa-popup.dm_rfesolverfailed  > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
-#tlsa-popup.dm_certchain > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/tlsaerr.png");
+#tlsa-popup.dm_error > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
+#tlsa-popup.dm_rfesolverfailed > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
+#tlsa-popup.dm_wrongres > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
+  list-style-image: url("chrome://dnssec/skin/tlsa_error.png");
 }
 
 /* red */
@@ -135,28 +146,35 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #tlsa-popup.dm_vf0 > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
 #tlsa-popup.dm_vf1 > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
 #tlsa-popup.dm_vf2 > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
+#tlsa-popup.dm_dnssecbogus > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
 #tlsa-popup.dm_tlsapramwrong > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
 #tlsa-popup.dm_vf3 > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/tlsared.png"); 
+  list-style-image: url("chrome://dnssec/skin/tlsa_invalid.png"); 
 }
 
 /* off */
-#tlsa-popup.dm_validationoff > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
-#tlsa-popup.dm_nohttps > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
+#tlsa-popup.dm_validationoff > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
+  list-style-image: url("chrome://dnssec/skin/tlsa_off.png"); 
+}
+
+/* no dnssec */
 #tlsa-popup.dm_dnssecunsecured > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/tlsaoff.png"); 
+  list-style-image: url("chrome://dnssec/skin/tlsa_nodnssec.png"); 
 }
 
+/* nohttps */
+#tlsa-popup.dm_nohttps > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
+  list-style-image: url("chrome://dnssec/skin/tlsa_nohttps.png"); 
+}
+
+/* cert error */
 #tlsa-popup.dm_notlsarecord > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
-  list-style-image: url("chrome://dnssec/skin/tlsagrey.png"); 
+  list-style-image: url("chrome://dnssec/skin/tlsa_no.png"); 
 }
 
-
-/* grey with error */
-
-
-#tlsa-popup.dm_wrongres > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
-#tlsa-popup.dm_dnssecbogus > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
+/* cert error */
+#tlsa-popup.dm_certerr > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
+#tlsa-popup.dm_certchain > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {
   list-style-image: url("chrome://dnssec/skin/tlsaorange.png"); 
 }
 
