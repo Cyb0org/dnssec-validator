@@ -124,7 +124,7 @@ function setModeTLSA(newMode, tabId, domain, status, changeInfo) {
 	    case this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE1:
             case this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE2:
 	    case this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE3:
-              	icon = "tlsagreen.png";
+              	icon = "tlsa_valid.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_VALIDATION_SUCCESS;
 	      	domainpre = "https";
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_VALIDATION_SUCCESS);
@@ -134,62 +134,62 @@ function setModeTLSA(newMode, tabId, domain, status, changeInfo) {
             case this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE2:
 	    case this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE3:
 	    case this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE0:
-              	icon = "tlsared.png";
+              	icon = "tlsa_invalid.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_VALIDATION_FALSE;
 	      	domainpre = "https";
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_VALIDATION_FALSE);
               break;
 	    case this.tlsaModes.DANE_MODE_CERT_ERROR:
 	    case this.tlsaModes.DANE_MODE_NO_CERT_CHAIN:
-              	icon = "tlsaerr.png";
+              	icon = "tlsa_orange.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_NO_CERT_CHAIN;
 	      	domainpre = "https://";
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_NO_CERT_CHAIN);
               break;
 	    case this.tlsaModes.DANE_MODE_TLSA_PARAM_WRONG:
-              	icon = "tlsared.png";
+              	icon = "tlsa_invalid.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_PARAM_WRONG;
 	      	domainpre = "https";
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_PARAM_WRONG);
               break;
 	    case this.tlsaModes.DANE_MODE_NO_TLSA_RECORD:
-              	icon = "tlsagrey.png";
+              	icon = "tlsa_no.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_NO_TLSA_RECORD;
 	      	domainpre = "https";
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_NO_TLSA_RECORD);
               break;
 	    case this.tlsaModes.DANE_MODE_NO_HTTPS:
-              	icon = "tlsaoff.png";
+              	icon = "tlsa_nohttps.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_NO_HTTPS;
 	      	domainpre = "http";
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_NO_HTTPS);
               break;
 	    case this.tlsaModes.DANE_MODE_DNSSEC_UNSECURED:
-              	icon = "tlsaoff.png";
+              	icon = "tlsa_nodnssec.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_DNSSEC_UNSECURED;
 	      	domainpre = "https";	
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_DNSSEC_UNSECURED);
               break;
 	    case this.tlsaModes.DANE_MODE_VALIDATION_OFF:
-              	icon = "tlsaoff.png";
+              	icon = "tlsa_off.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_OFF;
 	      	domainpre = "http://";	
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_OFF);
               break;
 	    case this.tlsaModes.DANE_MODE_DNSSEC_BOGUS:
-              	icon = "tlsaorange.png";
+              	icon = "tlsa_invalid.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_DNSSEC_BOGUS;
 	      	domainpre = "https";	
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_DNSSEC_BOGUS);
               break;
 	    case this.tlsaModes.DANE_MODE_ACTION:
-              	icon = "tlsaactive.png";
+              	icon = "tlsa_action.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_ACTION;
 	      	domainpre = "https";	
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_ACTION);
               break;
             default:
-               icon = "tlsaerr.png";
+               icon = "tlsa_error.png";
 	       title = this.tlsaModes.DANE_MODE_RESOLVER_FAILED ;
 	       domainpre = "https";	
                tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_MODE_RESOLVER_FAILED );
