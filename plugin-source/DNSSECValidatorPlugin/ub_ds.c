@@ -143,14 +143,29 @@ short ds_get_worse_case(const short a, const short b) {
 //*****************************************************************************
 // safety strings concatenate funciton
 // ----------------------------------------------------------------------------
-char *strconcat(char *s1, char *s2)
+char *strconcat(const char *s1, const char *s2)
 {
-    size_t old_size;
-    char *t;
-    old_size = strlen(s1);
-    t = malloc(old_size + strlen(s2) + 1);
-    strcpy(t, s1);
-    strcpy(t + old_size, s2);
+    size_t s1_size = 0,
+            s2_size = 0;
+    char *t = NULL;
+    if (s1 != NULL) {
+    	s1_size = strlen(s1);
+    }
+    if (s2 != NULL) {
+    	s2_size = strlen(s2);
+    }
+    if ((s1_size + s2_size) > 0) {
+	    t = malloc(s1_size + s2_size + 1);
+	    if (t == NULL) {
+	    	return NULL; /* Allocation error. */
+	    }
+	    if (s1 != NULL) {
+	    	strcpy(t, s1);
+	    }
+	    if (s2 != NULL) {
+		    strcpy(t + s1_size, s2);
+		}
+	}
     return t;
 }
 
@@ -208,8 +223,8 @@ short ipv4matches(char *ipbrowser, char *ipvalidator)
     char *token;
     char* is = NULL;
 
-    if (opts.debug) printf(DEBUG_PREFIX "IPmatches: -%s- -%s-\n", ipbrowser, ipvalidator);
-    if (ws) fprintf(dfout, DEBUG_PREFIX "IPmatches: -%s- -%s-\n", ipbrowser, ipvalidator);
+    if (opts.debug) printf(DEBUG_PREFIX "IPmatches: %s %s\n", ipbrowser, ipvalidator);
+    if (ws) fprintf(dfout, DEBUG_PREFIX "IPmatches: %s %s\n", ipbrowser, ipvalidator);
     strcpy( ip_validator, ipvalidator );
 
     if ((ipbrowser != NULL) &&  (ipvalidator != NULL))
@@ -247,9 +262,9 @@ short examine_result(struct ub_result *result, char* ipbrowser) {
   char ipv6[INET6_ADDRSTRLEN];
   short retval;  
   char *ipv4;
-  char *ipvalidator;
+  char *ipvalidator = NULL,
+        *ipvalidator_old = NULL;
   retval =  DNSSEC_EXIT_FAILED;
-  ipvalidator = "";
  
   // debug
   if (opts.debug) printf(DEBUG_PREFIX "Examine result: %s %i %i %i %s \n", result->qname, result->qtype, result->qclass, result->rcode, ipbrowser); 
@@ -274,26 +289,38 @@ short examine_result(struct ub_result *result, char* ipbrowser) {
                    if (result->qtype == LDNS_RR_TYPE_A) {
                        /* A examine result */	
                        for (i=0; result->data[i]; i++) {	
-                          ipv4 = inet_ntoa(*(struct in_addr*)result->data[i]);                          
-                          ipvalidator = strconcat(ipvalidator,ipv4);
-                          ipvalidator = strconcat(ipvalidator," ");
+                          ipv4 = inet_ntoa(*(struct in_addr*)result->data[i]);
+                          ipvalidator_old = ipvalidator;
+                          ipvalidator = strconcat(ipvalidator_old,ipv4);
+                          free(ipvalidator_old);
+                          ipvalidator_old = ipvalidator;
+                          ipvalidator = strconcat(ipvalidator_old," ");
+                          free(ipvalidator_old);
+                          
                        } // for                          
                        if (opts.debug) printf(DEBUG_PREFIX "IPv4 address of validator: %s\n", ipvalidator);
                        if (ws) fprintf(dfout, DEBUG_PREFIX "IPv4 address of validator: %s\n", ipvalidator);
-		       retval = ipv4matches(ipbrowser,ipvalidator);
+				       retval = ipv4matches(ipbrowser,ipvalidator);
+				      
                     }
                	    else {
                       /* AAAA examine result */	 
                       for (i=0; result->data[i]; i++) {	
-                         inet_ntop(AF_INET6, ((struct in_addr*)result->data[i]), ipv6, INET6_ADDRSTRLEN);
-                         ipvalidator = strconcat(ipvalidator,ipv6);
-                          ipvalidator = strconcat(ipvalidator," ");                                                   
+                          inet_ntop(AF_INET6, ((struct in_addr*)result->data[i]), ipv6, INET6_ADDRSTRLEN);
+                          ipvalidator_old = ipvalidator;
+                          ipvalidator = strconcat(ipvalidator_old,ipv6);
+                          free(ipvalidator_old);
+                          ipvalidator_old = ipvalidator;
+                          ipvalidator = strconcat(ipvalidator_old," ");
+                          free(ipvalidator_old);
+
                      	} // for                      
                      	if (opts.debug) printf(DEBUG_PREFIX "IPv6 address of validator: %s\n", ipvalidator);
                         if (ws) fprintf(dfout, DEBUG_PREFIX "IPv6 address of validator: %s\n", ipvalidator);
-			retval = ipv6matches(ipbrowser,ipvalidator);
+						retval = ipv6matches(ipbrowser,ipvalidator);
+						
                     } // result->qtype		    
-		    free(ipvalidator);
+		    		free(ipvalidator);
  	                  // free malloc ipvalidator
               }
               else { 
@@ -333,7 +360,6 @@ short examine_result(struct ub_result *result, char* ipbrowser) {
     /* response code is SERVFAIL */
     retval = DNSSEC_EXIT_FAILED;
   } // LDNS_RCODE_SERVFAIL
-
   return retval;
 }
 
@@ -453,6 +479,7 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv, char *i
 	      }
         retval_ipv6 = examine_result(result, ipbrowser);
         retval = retval_ipv6;
+        ub_resolve_free(result);
    }
    else if (!opts.resolvipv6 && opts.resolvipv4) {
        /* query for A only */
@@ -464,6 +491,7 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv, char *i
        }
        retval_ipv4 = examine_result(result, ipbrowser);
        retval = retval_ipv4; 
+       ub_resolve_free(result);
    }
      /* query for A and AAAA */
    else {
@@ -474,7 +502,8 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv, char *i
 	          return retval;
 	      }
         retval_ipv6 = examine_result(result, ipbrowser);
-       
+        ub_resolve_free(result);
+        
         ub_retval = ub_resolve(ctx, domain, LDNS_RR_TYPE_A, LDNS_RR_CLASS_IN, &result);
 	      if(ub_retval != 0) {
 		      if (opts.debug) printf(DEBUG_PREFIX "Resolve error A: %s\n", ub_strerror(ub_retval));
@@ -482,8 +511,8 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv, char *i
 	        return retval;
         }
         retval_ipv4 = examine_result(result, ipbrowser);
-       
-        retval = ds_get_worse_case(retval_ipv4, retval_ipv6);
+		retval = ds_get_worse_case(retval_ipv4, retval_ipv6);
+		ub_resolve_free(result);
     }
   
   if (opts.debug) printf(DEBUG_PREFIX "Returned value (overall/ipv4/ipv6): \"%d/%d/%d\"\n", retval, retval_ipv4, retval_ipv6);
@@ -496,8 +525,6 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv, char *i
     *ipvalidator = "n/a";
   }
 
-  // free resolve context
-  ub_resolve_free(result);
   return retval;
 } // ds_validate
 
@@ -509,6 +536,7 @@ int main(int argc, char **argv)
 	short i;
 	char *tmp = NULL;	
 	i = ds_validate(argv[1], 13, "nofwd", "2001:610:188:301:145::2:10", &tmp);
-	printf(DEBUG_PREFIX "Returned value: \"%d\" %s\n", i, tmp);				
+	printf(DEBUG_PREFIX "Returned value: \"%d\" %s\n", i, tmp);	
+    ub_context_free();		
 	return 1;
 }
