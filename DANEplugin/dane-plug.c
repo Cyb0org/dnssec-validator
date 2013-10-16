@@ -646,21 +646,22 @@ int getcert(char *dest_url, struct cert_store_head *cert_list)
 	int i = 0;
 	if (chain && sk_X509_num(chain))
 	{        
-		for (i = 0; i < sk_X509_num(chain); i++) 
-		{
+		for (i = 0; i < sk_X509_num(chain); i++) {
 			//if (debug) PEM_write_bio_X509(outbio, sk_X509_value(chain, i));
 			buf = NULL;
 			cert2 = sk_X509_value(chain, i);
 			len = i2d_X509(cert2, &buf);
-			hex = bintohex((uint8_t*)buf, len);
-			if ((pkey = X509_get_pubkey(cert2)) == NULL)
-			{
+			hex = bintohex((uint8_t *) buf, len);
+			if ((pkey = X509_get_pubkey(cert2)) == NULL) {
 				if (debug) printf("Error getting public key from certificate");
 			}
 			buf2 = NULL;
 			len2 = i2d_PUBKEY(pkey, &buf2);
-			hex2 = bintohex((uint8_t*)buf2, len2);
-			add_certrecord_bottom(cert_list, (char*)buf, len, hex, (char*)buf2,len2, hex2);
+			hex2 = bintohex((uint8_t *) buf2, len2);
+			add_certrecord_bottom(cert_list, (char*) buf, len, hex,
+			    (char *) buf2, len2, hex2);
+			free(buf);
+			free(buf2);
 			free(hex);
 			free(hex2); 
 		} //for
