@@ -118,13 +118,13 @@ struct tlsa_store_head {
 
 /* structure to save certificate records */
 typedef struct cert_store_ctx_st {
-   char* cert_der;
+   char *cert_der;
    int cert_len;
-   char* cert_der_hex;
-   char* spki_der;
+   char *cert_der_hex;
+   char *spki_der;
    int spki_len;
-   char* spki_der_hex;
-  struct cert_store_ctx_st *next;
+   char *spki_der_hex;
+   struct cert_store_ctx_st *next;
 } cert_store_ctx; 
 
 /* pointer structure to save certificate records */
@@ -134,9 +134,9 @@ struct cert_store_head {
 
 /* structure to save certificate records */
 typedef struct cert_tmp_st {
-   char* spki_der;
-   int spki_len;
-   char* spki_der_hex;
+	char *spki_der;
+	int spki_len;
+	char *spki_der_hex;
 } cert_tmp_ctx; 
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
@@ -280,27 +280,31 @@ void add_tlsarecord(struct tlsa_store_head *tlsa_list, char *domain, uint8_t dns
 // ----------------------------------------------------------------------------
 void add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list, char *domain, uint8_t dnssec_status, uint8_t cert_usage, uint8_t selector, uint8_t matching_type, uint8_t *association, size_t association_size, char* assochex) 
 {
-	 tlsa_store_ctx *field_tlsa;
-	 field_tlsa = malloc(sizeof(tlsa_store_ctx));
- 	 field_tlsa->domain = malloc(strlen(domain) + 1);
- 	 strcpy(field_tlsa->domain, domain);
-	 field_tlsa->dnssec_status = dnssec_status;
-	 field_tlsa->cert_usage = cert_usage;
-	 field_tlsa->selector = selector;
-	 field_tlsa->matching_type = matching_type;
-	 field_tlsa->association = association;
-	 field_tlsa->association_size = association_size;
- 	 field_tlsa->assochex = malloc(strlen((char*)assochex) + 1);
- 	 strcpy((char*)field_tlsa->assochex, (char*)assochex);
-	 field_tlsa->next = NULL;
-	 if (tlsa_list->first) {
-	    tlsa_store_ctx *tmp = tlsa_list->first;
-	     while (tmp->next) tmp = tmp->next;
-             tmp->next = field_tlsa; 
-         }
-	 else {
-      	    tlsa_list->first = field_tlsa;
-         }
+	tlsa_store_ctx *field_tlsa;
+
+	field_tlsa = malloc(sizeof(tlsa_store_ctx));
+
+	field_tlsa->domain = malloc(strlen(domain) + 1);
+	strcpy(field_tlsa->domain, domain);
+	field_tlsa->dnssec_status = dnssec_status;
+	field_tlsa->cert_usage = cert_usage;
+	field_tlsa->selector = selector;
+	field_tlsa->matching_type = matching_type;
+	field_tlsa->association = association;
+	field_tlsa->association_size = association_size;
+	field_tlsa->assochex = malloc(strlen((char*)assochex) + 1);
+	strcpy((char*)field_tlsa->assochex, (char*)assochex);
+	field_tlsa->next = NULL;
+
+	if (tlsa_list->first != NULL) {
+		tlsa_store_ctx *tmp = tlsa_list->first;
+		while (tmp->next != NULL) {
+			tmp = tmp->next;
+		}
+		tmp->next = field_tlsa; 
+	} else {
+		tlsa_list->first = field_tlsa;
+	}
 }
 
 //*****************************************************************************
@@ -352,7 +356,21 @@ void print_tlsalist(const struct tlsa_store_head *tlsa_list) {
 //*****************************************************************************
 // Helper function (free TLSA list)
 // ----------------------------------------------------------------------------
-void free_tlsalist(struct tlsa_store_head *tlsa_list) {     
+void free_tlsalist(struct tlsa_store_head *tlsa_list)
+{
+	tlsa_store_ctx *aux;
+
+	while (tlsa_list->first != NULL) {
+		aux = tlsa_list->first->next;
+
+		free(tlsa_list->first->domain);
+		free(tlsa_list->first->assochex);
+		free(tlsa_list->first);
+
+		tlsa_list->first = aux;
+	}
+
+#if 0
   if (tlsa_list->first != NULL) {
      tlsa_store_ctx *field, *pom;
      field = tlsa_list->first->next;
@@ -365,6 +383,7 @@ void free_tlsalist(struct tlsa_store_head *tlsa_list) {
      } // while
      tlsa_list->first->next = NULL;
   } // if
+#endif
 }
 
 //*****************************************************************************
@@ -392,29 +411,36 @@ void add_certrecord(struct cert_store_head *cert_list, char* cert_der, int cert_
 //*****************************************************************************
 // Helper function (add new record in the certificate list - last)
 // ----------------------------------------------------------------------------
-void add_certrecord_bottom (struct cert_store_head *cert_list, char* cert_der, int cert_len, char* cert_der_hex,  char* spki_der, int spki_len,  char* spki_der_hex) 
+void add_certrecord_bottom(struct cert_store_head *cert_list, char *cert_der,
+    int cert_len, char *cert_der_hex, char *spki_der, int spki_len,
+    char *spki_der_hex)
 {
-	 cert_store_ctx *field_cert;
-	 field_cert = malloc(sizeof(cert_store_ctx));
-         field_cert->cert_der = malloc(cert_len + 1);
-	 memcpy(field_cert->cert_der, cert_der, cert_len);
- 	 field_cert->cert_len = cert_len;
- 	 field_cert->cert_der_hex = malloc(strlen(cert_der_hex) + 1);
- 	 strcpy(field_cert->cert_der_hex, cert_der_hex);
-         field_cert->spki_der = malloc(spki_len + 1);
-	 memcpy(field_cert->spki_der, spki_der, spki_len);
- 	 field_cert->spki_len = spki_len;
- 	 field_cert->spki_der_hex = malloc(strlen(spki_der_hex) + 1);
- 	 strcpy(field_cert->spki_der_hex, spki_der_hex);
-	 field_cert->next = NULL;
-	 if (cert_list->first) {
-	    cert_store_ctx *tmp = cert_list->first;
-	     while (tmp->next) tmp = tmp->next;
-             tmp->next = field_cert; 
-         }
-	 else {
-      	    cert_list->first = field_cert;
-         }
+	cert_store_ctx *field_cert;
+
+	field_cert = malloc(sizeof(cert_store_ctx));
+
+	field_cert->cert_der = malloc(cert_len + 1);
+	memcpy(field_cert->cert_der, cert_der, cert_len);
+	field_cert->cert_len = cert_len;
+	field_cert->cert_der_hex = malloc(strlen(cert_der_hex) + 1);
+	strcpy(field_cert->cert_der_hex, cert_der_hex);
+	field_cert->spki_der = malloc(spki_len + 1);
+	memcpy(field_cert->spki_der, spki_der, spki_len);
+	field_cert->spki_len = spki_len;
+	field_cert->spki_der_hex = malloc(strlen(spki_der_hex) + 1);
+	strcpy(field_cert->spki_der_hex, spki_der_hex);
+	field_cert->next = NULL;
+
+	if (cert_list->first != NULL) {
+		cert_store_ctx *tmp = cert_list->first;
+		while (tmp->next) {
+			tmp = tmp->next;
+		}
+		tmp->next = field_cert; 
+	}
+	else {
+		cert_list->first = field_cert;
+	}
 }
 
 //*****************************************************************************
@@ -434,21 +460,21 @@ void print_certlist(struct cert_store_head *cert_list) {
 //*****************************************************************************
 // Helper function (free certificate list)
 // ----------------------------------------------------------------------------
-void free_certlist(struct cert_store_head *cert_list) {     
-  if (cert_list->first != NULL) {
-     cert_store_ctx *field, *pom;
-     field = cert_list->first->next;
-     while (field != NULL) {
-         pom = field->next;
-	 free(field->cert_der);
-	 free(field->spki_der);
-	 free(field->cert_der_hex);
-	 free(field->spki_der_hex);
-         free(field);
-         field = pom;
-     } // while
-     cert_list->first->next = NULL;
-  } // if
+void free_certlist(struct cert_store_head *cert_list)
+{
+	cert_store_ctx *aux;
+
+	while (cert_list->first != NULL) {
+		aux = cert_list->first->next;
+
+		free(cert_list->first->cert_der);
+		free(cert_list->first->spki_der);
+		free(cert_list->first->cert_der_hex);
+		free(cert_list->first->spki_der_hex);
+		free(cert_list->first);
+
+		cert_list->first = aux;
+	}
 }
 
 //*****************************************************************************
@@ -531,18 +557,18 @@ char *mystrcat(const char *s1, const char *s2)
 //*****************************************************************************
 // HEX string to Binary data convertor
 // ----------------------------------------------------------------------------
-char* hextobin(char* data){
-
+char * hextobin(char *data)
+{
         int length = strlen(data);
         int i, j;
-		char buffer[2048] = "";
-		char *ret;
+	char buffer[2048] = "";
+	char *ret;
         assert((length % 2) == 0);
-        for(i = 0, j = 0; i < length; i+=2, ++j){
+        for(i = 0, j = 0; i < length; i += 2, ++j){
                 buffer[j] = hex_to_ascii(data[i], data[i+1]);
         }
         ret = malloc(length + 1);
-		memcpy(ret, buffer, length);
+	memcpy(ret, buffer, length);
         return ret;
 }
 
@@ -688,23 +714,24 @@ int getcert(char* dest_url, struct cert_store_head *cert_list) {
 // Get SPKI from binary data of certificate
 // return struct (binary SPKI, SPKI length, SPKI in HEX format and its length 
 // ----------------------------------------------------------------------------
-cert_tmp_ctx spkicert(const unsigned char* certder, int len){
-  
-  cert_tmp_ctx tmp;
-  EVP_PKEY *pkey = NULL;
-  X509* cert;
-  cert = d2i_X509(NULL, &certder, len);
-  
-    int len2;
-    unsigned char *buf2;
-    char *hex2;
-    buf2 = NULL;
-    len2 = i2d_PUBKEY(pkey, &buf2);
-    hex2 = bintohex((uint8_t*)buf2, len2);
-    tmp.spki_der=(char*)buf2; 
-    tmp.spki_len=len2;
-    tmp.spki_der_hex=hex2; 
-    return tmp;
+cert_tmp_ctx spkicert(const unsigned char *certder, int len)
+{
+	cert_tmp_ctx tmp;
+	EVP_PKEY *pkey = NULL;
+	X509 *cert;
+
+	cert = d2i_X509(NULL, &certder, len);
+
+	int len2;
+	unsigned char *buf2;
+	char *hex2;
+	buf2 = NULL;
+	len2 = i2d_PUBKEY(pkey, &buf2);
+	hex2 = bintohex((uint8_t*)buf2, len2);
+	tmp.spki_der = (char*) buf2; 
+	tmp.spki_len =len2;
+	tmp.spki_der_hex = hex2; 
+	return tmp;
 }
 
 //*****************************************************************************
@@ -1109,7 +1136,7 @@ short CheckDane(char* certchain[], int certcount, const uint16_t options, char *
 		    return exitcode;
 	  }
     context = true;
-    // set resolver/forawarder if it was set in options
+    // set resolver/forwarder if it was set in options
     if (usefwd) {
        if (strcmp (optdnssrv,"") != 0) {
 	    fwd_addr = strtok(optdnssrv, delims);
@@ -1169,31 +1196,45 @@ short CheckDane(char* certchain[], int certcount, const uint16_t options, char *
 		return exitcode;
      }
 		
-	 free(dn); 	
+	free(dn);
      // get TLSA records from response
      tlsa_ret = get_tlsa_record(&tlsa_list, result, domain);
-     if (tlsa_ret==DANE_EXIT_DNSSEC_UNSECURED) return DANE_EXIT_DNSSEC_UNSECURED;
-     else if (tlsa_ret==DANE_EXIT_DNSSEC_BOGUS) return DANE_EXIT_DNSSEC_BOGUS;
-     else if (tlsa_ret==DANE_EXIT_NO_TLSA_RECORD) return DANE_EXIT_NO_TLSA_RECORD;
-     else if (tlsa_ret==DANE_EXIT_RESOLVER_FAILED) return DANE_EXIT_RESOLVER_FAILED;
+	if (tlsa_ret==DANE_EXIT_DNSSEC_UNSECURED) {
+		free_tlsalist(&tlsa_list);
+		return DANE_EXIT_DNSSEC_UNSECURED;
+	} else if (tlsa_ret==DANE_EXIT_DNSSEC_BOGUS) {
+		free_tlsalist(&tlsa_list);
+		return DANE_EXIT_DNSSEC_BOGUS;
+	} else if (tlsa_ret==DANE_EXIT_NO_TLSA_RECORD) {
+		free_tlsalist(&tlsa_list);
+		return DANE_EXIT_NO_TLSA_RECORD;
+	} else if (tlsa_ret==DANE_EXIT_RESOLVER_FAILED) {
+		free_tlsalist(&tlsa_list);
+		return DANE_EXIT_RESOLVER_FAILED;
+	}
 
-     if (debug) print_tlsalist(&tlsa_list);
+	if (debug) {
+		print_tlsalist(&tlsa_list);
+	}
 
      int i;
      if (certcount > 0) {
 	    if (debug) printf(DEBUG_PREFIX_CER "External certchain is used\n");
 
-	    for ( i = 0; i < certcount; i++) {	    
+	    for ( i = 0; i < certcount; i++) {
 	    int certlen=strlen(certchain[i])/2;
-	    const unsigned char* certbin = (const unsigned char*)hextobin(certchain[i]);
+	    unsigned char *certbin = (unsigned char *) hextobin(certchain[i]);
 	    char *certbin2 = hextobin(certchain[i]);
 	    
-    	cert_tmp_ctx skpi= spkicert(certbin,certlen);
-    	    
-    	    
-	    add_certrecord_bottom(&cert_list, certbin2, certlen, certchain[i], skpi.spki_der, skpi.spki_len, skpi.spki_der_hex);
+	    cert_tmp_ctx skpi = spkicert(certbin, certlen);
+	    
+	    
+	    add_certrecord_bottom(&cert_list, certbin2, certlen, certchain[i],
+	        skpi.spki_der, skpi.spki_len, skpi.spki_der_hex);
 	    free(certbin);
-	    free(certbin2);	     
+	    free(certbin2);
+
+	    free(skpi.spki_der_hex); /* Messy clean-up. Create a better one. */
 	     }//for
       }
      else {
@@ -1201,7 +1242,11 @@ short CheckDane(char* certchain[], int certcount, const uint16_t options, char *
        strcpy (uri,"https://");
        strncat (uri, domain, strlen(domain));
        tlsa_ret = getcert(uri, &cert_list);
-       if (tlsa_ret==0) return DANE_EXIT_NO_CERT_CHAIN;
+       if (tlsa_ret == 0) {
+          free_tlsalist(&tlsa_list);
+          free_certlist(&cert_list);
+          return DANE_EXIT_NO_CERT_CHAIN;
+       }
      }
 
      if (debug) print_certlist(&cert_list);
@@ -1211,7 +1256,9 @@ short CheckDane(char* certchain[], int certcount, const uint16_t options, char *
      if (debug) printf(DEBUG_PREFIX_DANE "result: %i\n", tlsa_res);
 
      free_tlsalist(&tlsa_list);
-     free_certlist(&cert_list);	
+     free_certlist(&cert_list);
+
+	fprintf(stderr, "Normalni konec.\n");
   
      return tlsa_res;
 }
