@@ -799,9 +799,6 @@ cert_tmp_ctx spkicert(const unsigned char *certder, int len)
 {
 	cert_tmp_ctx tmp;
 	EVP_PKEY *pkey = NULL;
-	X509 *cert;
-
-	cert = d2i_X509(NULL, &certder, len);
 
 	int len2;
 	unsigned char *buf2;
