@@ -259,7 +259,7 @@ char* get_dnssec_status(uint8_t dnssec_status){
 void add_tlsarecord(struct tlsa_store_head *tlsa_list, char *domain, uint8_t dnssec_status, uint8_t cert_usage, uint8_t selector, uint8_t matching_type, uint8_t *association, size_t association_size, char* assochex) 
 {
 	 tlsa_store_ctx *field_tlsa;
-         field_tlsa = tlsa_list->first;
+     field_tlsa = tlsa_list->first;
 	 field_tlsa = malloc(sizeof(tlsa_store_ctx));
  	 field_tlsa->domain = malloc(strlen(domain) + 1);
  	 strcpy(field_tlsa->domain, domain);
@@ -465,7 +465,7 @@ static char nibbleToChar(uint8_t nibble)
 // ----------------------------------------------------------------------------
 char *bintohex(uint8_t *bytes, size_t buflen)
 {
-	char *retval;
+	char *retval = NULL;
 	int i;
 	buflen=buflen*2;
 	retval = malloc(buflen*2 + 1);
@@ -474,6 +474,7 @@ char *bintohex(uint8_t *bytes, size_t buflen)
 		retval[i*2+1] = nibbleToChar(bytes[i] & 0x0f);
 	}
     	retval[i] = '\0';
+    	
 	return retval;
 }
 
@@ -485,7 +486,7 @@ int hex_to_int(char c){
         int first = c / 16 - 3;
         int second = c % 16;
         int result = first*10 + second;
-        if(result > 9) result--;
+        if (result > 9) result--;
         return result;
 }
 
@@ -499,16 +500,32 @@ int hex_to_ascii(char c, char d){
 }
 
 //*****************************************************************************
-// Helper function (string concatenation)
+// safety strings concatenate funciton
 // ----------------------------------------------------------------------------
-char *mystrcat(char *str1, char *str2) {
-
-	char *str;
-	if (!str1) str1 = "";
-	if (!str2) str2 = "";
-	str = malloc(strlen(str1) + strlen(str2) + 1);
-	if (str) sprintf(str, "%s%s", str1, str2);
-	return str;
+char *mystrcat(const char *s1, const char *s2)
+{
+    size_t s1_size = 0,
+            s2_size = 0;
+    char *t = NULL;
+    if (s1 != NULL) {
+    	s1_size = strlen(s1);
+    }
+    if (s2 != NULL) {
+    	s2_size = strlen(s2);
+    }
+    if ((s1_size + s2_size) > 0) {
+	    t = malloc(s1_size + s2_size + 1);
+	    if (t == NULL) {
+	    	return NULL; /* Allocation error. */
+	    }
+	    if (s1 != NULL) {
+	    	strcpy(t, s1);
+	    }
+	    if (s2 != NULL) {
+		    strcpy(t + s1_size, s2);
+		}
+	}
+    return t;
 }
 
 //*****************************************************************************
@@ -518,14 +535,14 @@ char* hextobin(char* data){
 
         int length = strlen(data);
         int i, j;
-	char buffer[2048] = "";
-	char *ret;
+		char buffer[2048] = "";
+		char *ret;
         assert((length % 2) == 0);
         for(i = 0, j = 0; i < length; i+=2, ++j){
                 buffer[j] = hex_to_ascii(data[i], data[i+1]);
         }
         ret = malloc(length + 1);
-	memcpy(ret, buffer, length);
+		memcpy(ret, buffer, length);
         return ret;
 }
 
@@ -674,16 +691,10 @@ int getcert(char* dest_url, struct cert_store_head *cert_list) {
 cert_tmp_ctx spkicert(const unsigned char* certder, int len){
   
   cert_tmp_ctx tmp;
-  BIO  *outbio = NULL;
   EVP_PKEY *pkey = NULL;
   X509* cert;
   cert = d2i_X509(NULL, &certder, len);
-  outbio  = BIO_new(BIO_s_file());
-  outbio  = BIO_new_fp(stdout, BIO_NOCLOSE);
-
-  if ((pkey = X509_get_pubkey(cert)) == NULL)
-    BIO_printf(outbio, "Error getting public key from certificate");
-
+  
     int len2;
     unsigned char *buf2;
     char *hex2;
@@ -987,6 +998,7 @@ int get_tlsa_record(struct tlsa_store_head *tlsa_list, struct ub_result *result,
 			asshex = bintohex(association,association_size);
 			add_tlsarecord_bottom(tlsa_list, domain, sec_status, cert_usage, selector, matching_type, association, association_size, asshex);
 			free(asshex);
+
                         ldns_rr_free(rr);
                 }
                 exitcode = 1;                
@@ -1016,7 +1028,7 @@ int get_tlsa_record(struct tlsa_store_head *tlsa_list, struct ub_result *result,
 // free unbound context (erase cache data from ub context), ctx = NULL
 // external API
 // ----------------------------------------------------------------------------
-void ub_context_free(struct ub_ctx* ctx){
+void ub_context_free(){
     if (context==true) { 
       ub_ctx_delete(ctx);
       context = false;
@@ -1025,84 +1037,31 @@ void ub_context_free(struct ub_ctx* ctx){
 
 
 //*****************************************************************************
-// Unbound resolver initialization, set of forwarder
-// returnunbound context structure ctx (init)
-// ----------------------------------------------------------------------------
-struct ub_ctx* ResolverInit(struct ub_ctx* ctx, bool usefwd, char *optdnssrv)
-{
-   int ub_retval;
-   ctx = ub_ctx_create();
-   char *fwd_addr;
-   char delims[] = " ";
-   if (debug) printf(DEBUG_PREFIX "resolver: %s\n", optdnssrv);
-
-   if(!ctx) {
-        if (debug) printf(DEBUG_PREFIX "Error: could not create unbound context\n");
-	if (ws) fprintf(dfout, DEBUG_PREFIX "Error: could not create unbound context\n");
-
-       } // if
-
-    /* read public keys of root zone for DNSSEC verification */
-    // ds true = zone key will be set from file root.key
-    //    false = zone key will be set from TA constant
-    if (ds) {
-       if ((ub_retval=ub_ctx_add_ta_file(ctx, "root.key")) != 0) {
-          if (debug) printf(DEBUG_PREFIX "Error adding keys: %s\n", ub_strerror(ub_retval));
-          if (ws) fprintf(dfout, DEBUG_PREFIX "Error adding keys: %s\n", ub_strerror(ub_retval));
-
-       }
-    }
-    else {
-       if ((ub_retval=ub_ctx_add_ta(ctx, TA)) != 0) {
-          if (debug) printf(DEBUG_PREFIX "Error adding keys: %s\n", ub_strerror(ub_retval));
-          if (ws) fprintf(dfout, DEBUG_PREFIX "Error adding keys: %s\n", ub_strerror(ub_retval));
-	
-	}
-        if ((ub_retval=ub_ctx_set_option(ctx, "dlv-anchor:", DLV))) {
-  	  if (debug) printf(DEBUG_PREFIX "Error adding DLV keys: %s\n", ub_strerror(ub_retval));
-          if (ws) fprintf(dfout, DEBUG_PREFIX "Error adding DLV keys: %s\n", ub_strerror(ub_retval));
-        }
-     } // if (ds)   
- 
-
-     // set resolver/forawarder if it was set in options
-     if (usefwd) {
-
-     if (strcmp (optdnssrv,"") != 0) {
-
-        fwd_addr = strtok(optdnssrv, delims);
-        // set ip addresses of resolvers into ub context
-        while (fwd_addr != NULL) {
-		      if ((ub_retval=ub_ctx_set_fwd(ctx, optdnssrv)) != 0) {
-		        if (debug) printf(DEBUG_PREFIX "Error adding resolver IP address: %s\n", ub_strerror(ub_retval));
-  		      if (ws) fprintf(dfout, DEBUG_PREFIX "Error adding resolver IP address: %s\n", ub_strerror(ub_retval));
-		      } //if            	  
-	     fwd_addr = strtok(NULL, delims);
-	     } //while
-  	  }  
-    	else {
-       	 if ((ub_retval = ub_ctx_resolvconf(ctx, NULL)) != 0) {
-        	 if (debug)	printf(DEBUG_PREFIX "Error reading resolv.conf: %s. errno says: %s\n", ub_strerror(ub_retval), strerror(errno));
-	         if (ws)	fprintf(dfout, DEBUG_PREFIX "Error reading resolv.conf: %s. errno says: %s\n", ub_strerror(ub_retval), strerror(errno));
-        }   
-      }
-    } // if (usefwd)
-
-    return ctx;
-}
-
-//*****************************************************************************
 // Function char* get_tlsa_query
 // return _port._protocol.domain e.g: _443._tcp.www.nic.cz
 // ----------------------------------------------------------------------------
 char* get_tlsa_query(char* domain, char* port, char* protocol) {
 
-    char *tlsa_query = mystrcat("_", port);
-    	   tlsa_query = mystrcat(tlsa_query, "._");
-           tlsa_query = mystrcat(tlsa_query, protocol);
-    	   tlsa_query = mystrcat(tlsa_query, ".");	  
-	   tlsa_query = mystrcat(tlsa_query, domain);
-   return tlsa_query;
+  char *tlsa_query = NULL,
+        *tlsa_query_old = NULL;
+
+  tlsa_query_old = tlsa_query;
+  tlsa_query  = mystrcat("_", port);
+  free(tlsa_query_old);
+  tlsa_query_old = tlsa_query;
+  tlsa_query = mystrcat(tlsa_query, "._");
+  free(tlsa_query_old);
+  tlsa_query_old = tlsa_query;
+  tlsa_query = mystrcat(tlsa_query, protocol);
+  free(tlsa_query_old);
+  tlsa_query_old = tlsa_query;
+  tlsa_query = mystrcat(tlsa_query, ".");
+  free(tlsa_query_old);
+  tlsa_query_old = tlsa_query;	  
+  tlsa_query = mystrcat(tlsa_query, domain);
+  free(tlsa_query_old);
+   
+  return tlsa_query;
 }
 
 //*****************************************************************************
@@ -1203,12 +1162,14 @@ short CheckDane(char* certchain[], int certcount, const uint16_t options, char *
     //------------------------------------------------------------
 
     // create TLSA query 
-    retval = ub_resolve(ctx, get_tlsa_query(domain,port,protocol), LDNS_RR_TYPE_TLSA, LDNS_RR_CLASS_IN , &result);
+    char* dn = get_tlsa_query(domain,port,protocol);
+    retval = ub_resolve(ctx, dn, LDNS_RR_TYPE_TLSA, LDNS_RR_CLASS_IN , &result);
     if(retval != 0) {
 		if (debug) printf(DEBUG_PREFIX "resolve error: %s\n", ub_strerror(retval));
 		return exitcode;
      }
-
+		
+	 free(dn); 	
      // get TLSA records from response
      tlsa_ret = get_tlsa_record(&tlsa_list, result, domain);
      if (tlsa_ret==DANE_EXIT_DNSSEC_UNSECURED) return DANE_EXIT_DNSSEC_UNSECURED;
@@ -1224,8 +1185,15 @@ short CheckDane(char* certchain[], int certcount, const uint16_t options, char *
 
 	    for ( i = 0; i < certcount; i++) {	    
 	    int certlen=strlen(certchain[i])/2;
-    	    cert_tmp_ctx skpi= spkicert((const unsigned char*)hextobin(certchain[i]),certlen);
-	    add_certrecord_bottom(&cert_list, hextobin(certchain[i]), certlen, certchain[i], skpi.spki_der, skpi.spki_len, skpi.spki_der_hex); 
+	    const unsigned char* certbin = (const unsigned char*)hextobin(certchain[i]);
+	    char *certbin2 = hextobin(certchain[i]);
+	    
+    	cert_tmp_ctx skpi= spkicert(certbin,certlen);
+    	    
+    	    
+	    add_certrecord_bottom(&cert_list, certbin2, certlen, certchain[i], skpi.spki_der, skpi.spki_len, skpi.spki_der_hex);
+	    free(certbin);
+	    free(certbin2);	     
 	     }//for
       }
      else {
@@ -1254,8 +1222,9 @@ short CheckDane(char* certchain[], int certcount, const uint16_t options, char *
 int main(int argc, char **argv) {
 
  int res = DANE_EXIT_RESOLVER_FAILED;
- char* certhex[] = {"000000FF00"}; 
- res = CheckDane(certhex, 0, 5, "8.8.8.8", argv[1], "443", "tcp", 1);
+ char* certhex[] = {"12345678"}; 
+ res = CheckDane(certhex, 1, 5, "8.8.8.8", argv[1], "443", "tcp", 1);
  if (debug) printf(DEBUG_PREFIX_DANE "Final result: %i\n", res);
+ ub_context_free();	
  return 1;
 }
