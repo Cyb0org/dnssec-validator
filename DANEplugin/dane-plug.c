@@ -820,43 +820,64 @@ char *matchingData(uint8_t matching_type, uint8_t selector, struct cert_store_he
 // Servers certificate must coresponde EE certificate in TLSA
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
-int eeCertMatch1(struct tlsa_store_head *tlsa_list, struct cert_store_head *cert_list) 
+int eeCertMatch1(struct tlsa_store_ctx_st *tlsa_ctx,
+    struct cert_store_head *cert_list) 
 {
-     if (debug) printf(DEBUG_PREFIX_DANE "eeCertMatch\n");     
-     int ret_val = DANE_EXIT_VALIDATION_FALSE_TYPE1;
-     char *data = matchingData(tlsa_list->first->matching_type, tlsa_list->first->selector, cert_list);
-     if (strcmp ((const char*)data,"x") == 0) return DANE_EXIT_TLSA_PARAM_ERR;
-     if (strcmp ((const char*)data,(const char*)tlsa_list->first->assochex) == 0) {
-           ret_val = DANE_EXIT_VALIDATION_SUCCESS_TYPE1; 
-     }
-     if (debug) printf(DEBUG_PREFIX_DANE "CERT: %s\n", data);
-     if (debug) printf(DEBUG_PREFIX_DANE "TLSA: %s\n", tlsa_list->first->assochex);
+	if (debug) {
+		printf(DEBUG_PREFIX_DANE "eeCertMatch\n");
+	}
 
-     free(data);
-     return ret_val;
+	int ret_val = DANE_EXIT_VALIDATION_FALSE_TYPE1;
+	char *data = matchingData(tlsa_ctx->matching_type,
+	    tlsa_ctx->selector, cert_list);
+
+	if (strcmp((const char *) data, "x") == 0) {
+		return DANE_EXIT_TLSA_PARAM_ERR;
+	}
+	if (strcmp((const char *) data,
+	        (const char *) tlsa_ctx->assochex) == 0) {
+		ret_val = DANE_EXIT_VALIDATION_SUCCESS_TYPE1; 
+	}
+	if (debug) {
+		printf(DEBUG_PREFIX_DANE "CERT: %s\n", data);
+		printf(DEBUG_PREFIX_DANE "TLSA: %s\n", tlsa_ctx->assochex);
+	}
+
+	free(data);
+	return ret_val;
 }
 
 
 //*****************************************************************************
 // TLSA validation of EE certificate (type 3)
 // Binary data codes EE certificate
-// Servers certificate must coresponde EE certificate in TLSA
+// Servers certificate must corresponds EE certificate in TLSA
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
-int eeCertMatch3(struct tlsa_store_head *tlsa_list, struct cert_store_head *cert_list) 
+int eeCertMatch3(struct tlsa_store_ctx_st *tlsa_ctx,
+    struct cert_store_head *cert_list) 
 {
-     if (debug) printf(DEBUG_PREFIX_DANE "eeCertMatch\n");     
-     int ret_val = DANE_EXIT_VALIDATION_FALSE_TYPE3;
-     char *data = matchingData(tlsa_list->first->matching_type, tlsa_list->first->selector, cert_list);
-     if (strcmp ((const char*)data,"x") == 0) return DANE_EXIT_TLSA_PARAM_ERR;
-     if (strcmp ((const char*)data,(const char*)tlsa_list->first->assochex) == 0) {
-           ret_val = DANE_EXIT_VALIDATION_SUCCESS_TYPE3; 
-     }
-     if (debug) printf(DEBUG_PREFIX_DANE "CERT: %s\n", data);
-     if (debug) printf(DEBUG_PREFIX_DANE "TLSA: %s\n", tlsa_list->first->assochex);
+	if (debug) {
+		printf(DEBUG_PREFIX_DANE "eeCertMatch\n");
+	}
 
-     free(data);
-     return ret_val;
+	int ret_val = DANE_EXIT_VALIDATION_FALSE_TYPE3;
+	char *data = matchingData(tlsa_ctx->matching_type,
+	    tlsa_ctx->selector, cert_list);
+	if (strcmp((const char *) data, "x") == 0) {
+		return DANE_EXIT_TLSA_PARAM_ERR;
+	}
+	if (strcmp((const char *) data,
+	        (const char *) tlsa_ctx->assochex) == 0) {
+		ret_val = DANE_EXIT_VALIDATION_SUCCESS_TYPE3; 
+	}
+	if (debug) {
+		printf(DEBUG_PREFIX_DANE "CERT: %s\n", data);
+		printf(DEBUG_PREFIX_DANE "TLSA: %s\n", tlsa_ctx->assochex);
+	}
+
+	free(data);
+	return ret_val;
 }
 
 //*****************************************************************************
@@ -864,26 +885,41 @@ int eeCertMatch3(struct tlsa_store_head *tlsa_list, struct cert_store_head *cert
 // Binary data codes CA certificate
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
-int caCertMatch(struct tlsa_store_head *tlsa_list, struct cert_store_head *cert_list) 
+int caCertMatch(struct tlsa_store_ctx_st *tlsa_ctx,
+     struct cert_store_head *cert_list) 
 {
-     if (debug) printf(DEBUG_PREFIX_DANE "caCertMatch\n");
-     int ret_val = DANE_EXIT_VALIDATION_FALSE_TYPE0;
-     int i = 0;
-     cert_list->first = cert_list->first->next;
-     while (cert_list->first != NULL) {
-	   i++;
-	   char *data = matchingData(tlsa_list->first->matching_type, tlsa_list->first->selector, cert_list);
-	   if (strcmp ((const char*)data,"x") == 0) return DANE_EXIT_TLSA_PARAM_ERR;
-     	   if (strcmp ((const char*)data,(const char*)tlsa_list->first->assochex) == 0) {
-               return DANE_EXIT_VALIDATION_SUCCESS_TYPE0;
-	   }
-	   if (debug) printf(DEBUG_PREFIX_DANE "CERT: %s\n", data);
-	   if (debug) printf(DEBUG_PREFIX_DANE "TLSA: %s\n", tlsa_list->first->assochex);
+	cert_store_ctx *aux_cert;
 
-           free(data);	  
-	   cert_list->first = cert_list->first->next;
-    } //while
-    return ret_val;
+	if (debug) {
+		printf(DEBUG_PREFIX_DANE "caCertMatch\n");
+	}
+
+	int ret_val = DANE_EXIT_VALIDATION_FALSE_TYPE0;
+
+	if ((cert_list->first == NULL) || (cert_list->first->next == NULL)) {
+		return DANE_EXIT_NO_CERT_CHAIN;
+	}
+
+	aux_cert = cert_list->first->next;
+	while (aux_cert != NULL) {
+		char *data = matchingData(tlsa_ctx->matching_type,
+		    tlsa_ctx->selector, cert_list);
+		if (strcmp((const char *) data, "x") == 0) {
+			return DANE_EXIT_TLSA_PARAM_ERR;
+		}
+		if (strcmp((const char *) data,
+		        (const char *) tlsa_ctx->assochex) == 0) {
+			return DANE_EXIT_VALIDATION_SUCCESS_TYPE0;
+		}
+		if (debug) {
+			printf(DEBUG_PREFIX_DANE "CERT: %s\n", data);
+			printf(DEBUG_PREFIX_DANE "TLSA: %s\n", tlsa_ctx->assochex);
+		}
+
+		free(data);
+		aux_cert = aux_cert->next;
+	} //while
+	return ret_val;
 }
 
 //*****************************************************************************
@@ -892,25 +928,41 @@ int caCertMatch(struct tlsa_store_head *tlsa_list, struct cert_store_head *cert_
 // This certificate is use as new trust anchor
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
-int chainCertMatch(struct tlsa_store_head *tlsa_list, struct cert_store_head *cert_list) 
+int chainCertMatch(struct tlsa_store_ctx_st *tlsa_ctx,
+    struct cert_store_head *cert_list)
 {
-     if (debug) printf(DEBUG_PREFIX_DANE "chainCertMatch\n");
-     int ret_val = DANE_EXIT_VALIDATION_FALSE_TYPE2;
-     int i = 0;
-     while (cert_list->first != NULL) {
-	   char *data = matchingData(tlsa_list->first->matching_type, tlsa_list->first->selector, cert_list);
-	   if (strcmp ((const char*)data,"x") == 0) return DANE_EXIT_TLSA_PARAM_ERR;
-     	   if (strcmp ((const char*)data,(const char*)tlsa_list->first->assochex) == 0) {
-               return DANE_EXIT_VALIDATION_SUCCESS_TYPE2;
-	   }
-	   if (debug) printf(DEBUG_PREFIX_DANE "CERT: %s\n", data);
-	   if (debug) printf(DEBUG_PREFIX_DANE "TLSA: %s\n", tlsa_list->first->assochex);
+	cert_store_ctx *aux_cert;
 
-           free(data);	  
-	   cert_list->first = cert_list->first->next;
-	   i++;
-    } //while
-    return ret_val;
+	if (debug) {
+		printf(DEBUG_PREFIX_DANE "chainCertMatch\n");
+	}
+
+	if (cert_list->first == NULL) {
+		return DANE_EXIT_NO_CERT_CHAIN;
+	}
+
+	int ret_val = DANE_EXIT_VALIDATION_FALSE_TYPE2;
+
+	aux_cert = cert_list->first;
+	while (aux_cert != NULL) {
+		char *data = matchingData(tlsa_ctx->matching_type,
+		    tlsa_ctx->selector, cert_list);
+		if (strcmp((const char *) data, "x") == 0) {
+			return DANE_EXIT_TLSA_PARAM_ERR;
+		}
+		if (strcmp((const char *) data,
+		        (const char *) tlsa_ctx->assochex) == 0) {
+			return DANE_EXIT_VALIDATION_SUCCESS_TYPE2;
+		}
+		if (debug) {
+			printf(DEBUG_PREFIX_DANE "CERT: %s\n", data);
+			printf(DEBUG_PREFIX_DANE "TLSA: %s\n", tlsa_ctx->assochex);
+		}
+
+		free(data);
+		aux_cert = aux_cert->next;
+	} //while
+	return ret_val;
 }
 
 //*****************************************************************************
@@ -918,42 +970,56 @@ int chainCertMatch(struct tlsa_store_head *tlsa_list, struct cert_store_head *ce
 // Validates and compares TLSA records with certificate or SPKI
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
-int TLSAValidate(struct tlsa_store_head *tlsa_list, struct cert_store_head *cert_list){
-   int idx = DANE_EXIT_VALIDATION_FALSE;
-   while (tlsa_list->first != NULL) {	
-      idx = DANE_EXIT_VALIDATION_FALSE;
-      switch (tlsa_list->first->dnssec_status) {
-        case 0:
-            return DANE_EXIT_DNSSEC_UNSECURED;
-        case 2:
-            return DANE_EXIT_DNSSEC_BOGUS;
-        case 1:
-	     if (debug) printf(DEBUG_PREFIX_DANE "TLSAValidate->cert_usage: %i \n",tlsa_list->first->cert_usage);
-	     switch (tlsa_list->first->cert_usage) {
-	        case CA_CERT_PIN: //2			
-  			idx = caCertMatch(tlsa_list, cert_list);
-			break;            	
-        	case CA_TA_ADDED: //0
-			idx = chainCertMatch(tlsa_list, cert_list);
-			break; 
-	        case EE_CERT_PIN: //1
-			idx = eeCertMatch1(tlsa_list, cert_list);
-	  	        break; // continue checking
-		case EE_TA_ADDED: //3	    
-			idx = eeCertMatch3(tlsa_list, cert_list);
-	  	        break; // continue checking
-                default:
-			if (debug) printf(DEBUG_PREFIX_DANE "Wrong value of cert_usage parameter: %i \n",tlsa_list->first->cert_usage);
-			return DANE_EXIT_TLSA_PARAM_ERR;
-                    	break; // unknown cert usage, skip
-  	     } // switch
-            break; // continue checking
-       } // switch
-   tlsa_list->first = tlsa_list->first->next;
-   if (idx > DANE_EXIT_VALIDATION_FALSE) return idx;
-   } // while
+int TLSAValidate(struct tlsa_store_head *tlsa_list,
+    struct cert_store_head *cert_list)
+{
+	int idx;
+	tlsa_store_ctx *aux_tlsa;
 
-  return idx;
+	aux_tlsa = tlsa_list->first;
+	while (aux_tlsa != NULL) {
+		idx = DANE_EXIT_VALIDATION_FALSE;
+
+		switch (aux_tlsa->dnssec_status) {
+		case 0:
+			return DANE_EXIT_DNSSEC_UNSECURED;
+		case 2:
+			return DANE_EXIT_DNSSEC_BOGUS;
+		case 1:
+			if (debug) {
+				printf(DEBUG_PREFIX_DANE "TLSAValidate->cert_usage: %i \n",
+				    aux_tlsa->cert_usage);
+			}
+			switch (aux_tlsa->cert_usage) {
+			case CA_CERT_PIN: //2
+				idx = caCertMatch(aux_tlsa, cert_list);
+				break;
+			case CA_TA_ADDED: //0
+				idx = chainCertMatch(aux_tlsa, cert_list);
+				break;
+			case EE_CERT_PIN: //1
+				idx = eeCertMatch1(aux_tlsa, cert_list);
+				break; // continue checking
+			case EE_TA_ADDED: //3
+				idx = eeCertMatch3(aux_tlsa, cert_list);
+				break; // continue checking
+			default:
+				if (debug) {
+					printf(DEBUG_PREFIX_DANE "Wrong value of cert_usage parameter: %i \n",
+					    aux_tlsa->cert_usage);
+				}
+				return DANE_EXIT_TLSA_PARAM_ERR; // unknown cert usage, skip
+			} // switch
+			break; // continue checking
+		} // switch
+
+		aux_tlsa = aux_tlsa->next;
+		if (idx > DANE_EXIT_VALIDATION_FALSE) {
+			return idx;
+		}
+	} // while
+
+	return idx;
 }
 
 //*****************************************************************************
