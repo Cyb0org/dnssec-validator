@@ -817,7 +817,7 @@ cert_tmp_ctx spkicert(const unsigned char *certder, int len)
 
 //*****************************************************************************
 // DANE algorithm (opensslDigest)
-// return binary data of certifiacte or SPKI encode by sha256, sha512 as HEX string
+// return binary data of certificate or SPKI encode by sha256, sha512 as HEX string
 // ----------------------------------------------------------------------------
 char *opensslDigest(const EVP_MD *md, const char *data, int len) {
 
@@ -839,7 +839,7 @@ char *opensslDigest(const EVP_MD *md, const char *data, int len) {
 
 //*****************************************************************************
 // DANE algorithm
-// return binary data of certifiacte or SPKI encode by sha256
+// return binary data of certificate or SPKI encode by sha256
 // ----------------------------------------------------------------------------
 char *sha256(char *data, int len) {
     if (debug) printf(DEBUG_PREFIX_DANE "sha256\n");
@@ -848,7 +848,7 @@ char *sha256(char *data, int len) {
 
 //*****************************************************************************
 // DANE algorithm
-// return binary data of certifiacte or SPKI encode by sha512
+// return binary data of certificate or SPKI encode by sha512
 // ----------------------------------------------------------------------------
 char *sha512(char *data, int len) {
     if (debug) printf(DEBUG_PREFIX_DANE "sha512\n");
@@ -857,42 +857,67 @@ char *sha512(char *data, int len) {
 
 //*****************************************************************************
 // DANE algorithm  (selector)
-// return binary data of certifiacte or SPKI
+// return binary data of certificate or SPKI
 // ----------------------------------------------------------------------------
-char *selectorData(uint8_t selector, struct cert_store_head *cert_list) {
-    if (debug) printf(DEBUG_PREFIX_DANE "selectorData->selector: %i \n",selector);
-    switch (selector) {
-        case FULL:
-        	   return cert_list->first->cert_der;
-        case SPKI:
-	           return cert_list->first->spki_der;
-        default:
-	     	   if (debug) printf(DEBUG_PREFIX_DANE "Wrong value of selector parameter: %i \n",selector);
-                   return "x";
-    };
+char * selectorData(uint8_t selector, struct cert_store_ctx_st *cert_ctx)
+{
+	if (debug) {
+		printf(DEBUG_PREFIX_DANE "selectorData->selector: %i \n",
+		    selector);
+	}
+	switch (selector) {
+	case FULL:
+		return cert_ctx->cert_der;
+	case SPKI:
+		return cert_ctx->spki_der;
+	default:
+		if (debug) {
+			printf(DEBUG_PREFIX_DANE "Wrong value of selector parameter: %i \n",
+			    selector);
+		}
+		return "x";
+	}
 }
 
 //*****************************************************************************
 // DANE algorithm (matching_type)
-// return binary data of certifiacte or SPKI encode in SHA256, SHA512
+// return binary data of certificate or SPKI encode in SHA256, SHA512
 // ----------------------------------------------------------------------------
-char *matchingData(uint8_t matching_type, uint8_t selector, struct cert_store_head *cert_list) {  
-    if (debug) printf(DEBUG_PREFIX_DANE "matching_type: %i \n",matching_type);
-    char* data = selectorData(selector, cert_list);
-    if (strcmp ((const char*)data,"x") == 0) return "x"; 
-    switch (matching_type) {
-        case EXACT:
-            return data;
-        case SHA256:
-	    if (selector==SPKI) return sha256(data, cert_list->first->spki_len);
-	    else return sha256(data, cert_list->first->cert_len);
-        case SHA512:
-	    if (selector==SPKI) return sha512(data, cert_list->first->spki_len);
-	    else return sha512(data, cert_list->first->cert_len);
-        default:
-	    if (debug) printf(DEBUG_PREFIX_DANE "Wrong value of matching_type parameter: %i \n",matching_type);
-            return "x";
-    }
+char * matchingData(uint8_t matching_type, uint8_t selector,
+    struct cert_store_ctx_st *cert_ctx)
+{
+	if (debug) {
+		printf(DEBUG_PREFIX_DANE "matching_type: %i \n",
+		    matching_type);
+	}
+
+	char* data = selectorData(selector, cert_ctx);
+
+	if (strcmp ((const char*)data,"x") == 0) {
+		return "x";
+	}
+	switch (matching_type) {
+	case EXACT:
+		return data;
+	case SHA256:
+		if (selector==SPKI) {
+			return sha256(data, cert_ctx->spki_len);
+		} else {
+			return sha256(data, cert_ctx->cert_len);
+		}
+	case SHA512:
+		if (selector==SPKI) {
+			return sha512(data, cert_ctx->spki_len);
+		} else {
+			return sha512(data, cert_ctx->cert_len);
+		}
+	default:
+		if (debug) {
+			printf(DEBUG_PREFIX_DANE "Wrong value of matching_type parameter: %i \n",
+			    matching_type);
+		}
+		return "x";
+	}
 }
 
 //*****************************************************************************
@@ -902,7 +927,7 @@ char *matchingData(uint8_t matching_type, uint8_t selector, struct cert_store_he
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
 int eeCertMatch1(struct tlsa_store_ctx_st *tlsa_ctx,
-    struct cert_store_head *cert_list) 
+    struct cert_store_head *cert_list)
 {
 	if (debug) {
 		printf(DEBUG_PREFIX_DANE "eeCertMatch\n");
@@ -910,7 +935,7 @@ int eeCertMatch1(struct tlsa_store_ctx_st *tlsa_ctx,
 
 	int ret_val = DANE_EXIT_VALIDATION_FALSE_TYPE1;
 	char *data = matchingData(tlsa_ctx->matching_type,
-	    tlsa_ctx->selector, cert_list);
+	    tlsa_ctx->selector, cert_list->first);
 
 	if (strcmp((const char *) data, "x") == 0) {
 		return DANE_EXIT_TLSA_PARAM_ERR;
@@ -936,7 +961,7 @@ int eeCertMatch1(struct tlsa_store_ctx_st *tlsa_ctx,
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
 int eeCertMatch3(struct tlsa_store_ctx_st *tlsa_ctx,
-    struct cert_store_head *cert_list) 
+    struct cert_store_head *cert_list)
 {
 	if (debug) {
 		printf(DEBUG_PREFIX_DANE "eeCertMatch\n");
@@ -944,7 +969,7 @@ int eeCertMatch3(struct tlsa_store_ctx_st *tlsa_ctx,
 
 	int ret_val = DANE_EXIT_VALIDATION_FALSE_TYPE3;
 	char *data = matchingData(tlsa_ctx->matching_type,
-	    tlsa_ctx->selector, cert_list);
+	    tlsa_ctx->selector, cert_list->first);
 	if (strcmp((const char *) data, "x") == 0) {
 		return DANE_EXIT_TLSA_PARAM_ERR;
 	}
@@ -966,7 +991,8 @@ int eeCertMatch3(struct tlsa_store_ctx_st *tlsa_ctx,
 // Binary data codes CA certificate
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
-int caCertMatch(struct tlsa_store_ctx_st *tlsa_ctx, struct cert_store_head *cert_list) 
+int caCertMatch(struct tlsa_store_ctx_st *tlsa_ctx,
+    struct cert_store_head *cert_list) 
 {
 	cert_store_ctx *aux_cert;
 
@@ -983,7 +1009,7 @@ int caCertMatch(struct tlsa_store_ctx_st *tlsa_ctx, struct cert_store_head *cert
 	aux_cert = cert_list->first->next;
 	while (aux_cert != NULL) {
 		char *data = matchingData(tlsa_ctx->matching_type,
-		    tlsa_ctx->selector, cert_list);
+		    tlsa_ctx->selector, aux_cert);
 		if (strcmp((const char *) data, "x") == 0) {
 			return DANE_EXIT_TLSA_PARAM_ERR;
 		}
@@ -1008,7 +1034,8 @@ int caCertMatch(struct tlsa_store_ctx_st *tlsa_ctx, struct cert_store_head *cert
 // This certificate is use as new trust anchor
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
-int chainCertMatch(struct tlsa_store_ctx_st *tlsa_ctx, struct cert_store_head *cert_list)
+int chainCertMatch(struct tlsa_store_ctx_st *tlsa_ctx,
+    struct cert_store_head *cert_list)
 {
 	cert_store_ctx *aux_cert;
 
@@ -1025,7 +1052,7 @@ int chainCertMatch(struct tlsa_store_ctx_st *tlsa_ctx, struct cert_store_head *c
 	aux_cert = cert_list->first;
 	while (aux_cert != NULL) {
 		char *data = matchingData(tlsa_ctx->matching_type,
-		    tlsa_ctx->selector, cert_list);
+		    tlsa_ctx->selector, aux_cert);
 		if (strcmp((const char *) data, "x") == 0) {
 			return DANE_EXIT_TLSA_PARAM_ERR;
 		}
@@ -1070,10 +1097,10 @@ int TLSAValidate(struct tlsa_store_head *tlsa_list,
 				    aux_tlsa->cert_usage);
 			}
 			switch (aux_tlsa->cert_usage) {
-			case CA_CERT_PIN: //2
+			case CA_CERT_PIN: //0
 				idx = caCertMatch(aux_tlsa, cert_list);
 				break;
-			case CA_TA_ADDED: //0
+			case CA_TA_ADDED: //2
 				idx = chainCertMatch(aux_tlsa, cert_list);
 				break;
 			case EE_CERT_PIN: //1
@@ -1425,7 +1452,7 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options, char *
 
 	if (debug) print_certlist(&cert_list);
 
-	tlsa_res = TLSAValidate(&tlsa_list,&cert_list);
+	tlsa_res = TLSAValidate(&tlsa_list, &cert_list);
 
 	if (debug) printf(DEBUG_PREFIX_DANE "result: %i\n", tlsa_res);
 
@@ -1435,6 +1462,13 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options, char *
 	return tlsa_res;
 }
 
+
+static
+char cert[4096] = {1, 2, 3, 4, 5, 0, };
+
+static
+char *certhex[] = {cert};
+
 //*****************************************************************************
 // Main function for testing of lib, input: domain name
 // ----------------------------------------------------------------------------
@@ -1442,7 +1476,6 @@ int main(int argc, char **argv)
 {
 
 	int res = DANE_EXIT_RESOLVER_FAILED;
-	char* certhex[] = {"12345678"}; 
 
 	res = CheckDane(certhex, 0, 5, "8.8.8.8", argv[1], "443", "tcp", 1);
 	
@@ -1450,7 +1483,7 @@ int main(int argc, char **argv)
 		printf(DEBUG_PREFIX_DANE "DANE final result: %i\n", res);
 	}
 
-	ub_context_free();	
+	ub_context_free();
 
 	return 1;
 
