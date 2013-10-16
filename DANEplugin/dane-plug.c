@@ -216,9 +216,10 @@ int create_socket(char url_str[])
 
 	//create the basic TCP socket                                
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if(sockfd == -1)
-	{
-		if (debug) printf(DEBUG_PREFIX "error opening socket");
+	if(sockfd == -1) {
+		if (debug) {
+			printf(DEBUG_PREFIX "error opening socket");
+		}
 		return -1;
 	} //if
 
@@ -236,7 +237,7 @@ int create_socket(char url_str[])
 	{
 		if (debug) printf(DEBUG_PREFIX "Error: Cannot connect to host %s [%s] on port %d.\n",
 								 hostname, tmp_ptr, port);
-  	} //if
+	} //if
 
 
 	return sockfd;
@@ -491,25 +492,32 @@ static char nibbleToChar(uint8_t nibble)
 //*****************************************************************************
 // Helper function (binary data to hex string conversion)
 // ----------------------------------------------------------------------------
-char *bintohex(uint8_t *bytes, size_t buflen)
+char * bintohex(const uint8_t *bytes, size_t buflen)
 {
 	char *retval = NULL;
 	int i;
-	buflen=buflen*2;
-	retval = malloc(buflen*2 + 1);
-	for (i=0; i<buflen; i++) {
-		retval[i*2] = nibbleToChar(bytes[i] >> 4);
-		retval[i*2+1] = nibbleToChar(bytes[i] & 0x0f);
+
+	buflen = buflen * 2;
+
+	retval = malloc(buflen * 2 + 1);
+	if (retval == NULL) {
+		return NULL;
 	}
-    	retval[i] = '\0';
-    	
+
+	for (i = 0; i < buflen; ++i) {
+		retval[i * 2] = nibbleToChar(bytes[i] >> 4);
+		retval[i * 2 + 1] = nibbleToChar(bytes[i] & 0x0f);
+	}
+	retval[i] = '\0';
+
 	return retval;
 }
 
 //*****************************************************************************
 // Helper function (hex to int)
 // ----------------------------------------------------------------------------
-int hex_to_int(char c){
+int hex_to_int(char c)
+{
 	if(c >=97) c=c-32;
         int first = c / 16 - 3;
         int second = c % 16;
@@ -582,20 +590,18 @@ char * hextobin(char *data)
 // ----------------------------------------------------------------------------
 int getcert(char *dest_url, struct cert_store_head *cert_list) 
 {
-	int ret = 1;
-	EVP_PKEY *pkey = NULL;
-	X509 *cert = NULL;
-	STACK_OF(X509) *chain = NULL;
+	int i;
 	const SSL_METHOD *method;
-	SSL_CTX *ctx;
-	SSL *ssl;
-	int server = 0;
-	int len2;
-	unsigned char *buf2;
-	char *hex2;
-	int len;
-	unsigned char *buf;
-	char *hex;
+	SSL_CTX *ssl_ctx = NULL;
+	SSL *ssl = NULL;
+	int server_fd = -1;
+	X509 *cert = NULL;
+	STACK_OF(X509) *chain;
+	X509 *cert2;
+	EVP_PKEY *pkey = NULL;
+	unsigned char *buf = NULL, *buf2 = NULL;
+	char *hex = NULL, *hex2 = NULL;
+	int len, len2;
 
 	//These function calls initialize openssl for correct work.
 	OpenSSL_add_all_algorithms();
@@ -603,82 +609,185 @@ int getcert(char *dest_url, struct cert_store_head *cert_list)
 	ERR_load_crypto_strings();
 	SSL_load_error_strings();
 
-	if(SSL_library_init() < 0)
-	{
-		if (debug) printf("Could not initialize the OpenSSL library !\n");
-	}
+	/* Always returns 1. */
+	SSL_library_init();
 
 	method = SSLv23_client_method();
-	if ((ctx = SSL_CTX_new(method)) == NULL)
-	{
-		if (debug) printf("Unable to create a new SSL context structure.\n");
+	ssl_ctx = SSL_CTX_new(method);
+	if (ssl_ctx == NULL) {
+		if (debug) {
+			printf("Unable to create a new SSL context structure.\n");
+		}
+		goto fail;
 	}
 
-	SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2);
-	ssl = SSL_new(ctx);
-
-	server = create_socket(dest_url);
-	if(server == 0)
-	{
-		if (debug) printf("Error TCP connection to: %s.\n", dest_url);
+	SSL_CTX_set_options(ssl_ctx, SSL_OP_NO_SSLv2);
+	ssl = SSL_new(ssl_ctx);
+	if (ssl == NULL) {
+		if (debug) {
+			printf("Cannot create SSL structure.\n");
+		}
+		goto fail;
 	}
 
-	SSL_set_fd(ssl, server);
-	if ( SSL_connect(ssl) != 1 )
-	{
-		if (debug) printf("Error: Could not build a SSL session to: %s.\n", dest_url);
+	server_fd = create_socket(dest_url);
+	if(server_fd == -1) {
+		if (debug) {
+			printf("Error TCP connection to: %s.\n", dest_url);
+		}
+		goto fail;
+	}
+
+	if (SSL_set_fd(ssl, server_fd) != 1) {
+		if (debug) {
+			printf("Error: Cannot set server socket.\n");
+		}
+		goto fail;
+	}
+
+	if (SSL_connect(ssl) != 1) {
+		if (debug) {
+			printf("Error: Could not build a SSL session to: %s.\n",
+			    dest_url);
+		}
+		goto fail;
 	}
 
 	cert = SSL_get_peer_certificate(ssl);
-	if (cert == NULL)
-	{
-	    if (debug) printf("Error: Could not get a certificate from: %s.\n", dest_url);
+	if (cert == NULL) {
+		if (debug) {
+			printf("Error: Could not get a certificate from: %s.\n",
+			    dest_url);
+		}
 	}
 
 	chain = SSL_get_peer_cert_chain(ssl);
 	if (chain == NULL) {
-		if (debug) printf("Error: Could not get a certificate chain: %s.\n", dest_url); 
+		if (debug) {
+			printf("Error: Could not get a certificate chain: %s.\n",
+			    dest_url);
+		}
+		goto fail;
 	}
-	int value = sk_X509_num(chain);
-	if (debug) printf("#cert in chain: %i\n", value);
 
-	X509 *cert2 = NULL;
-	int i = 0;
-	if (chain && sk_X509_num(chain))
-	{        
-		for (i = 0; i < sk_X509_num(chain); i++) {
-			//if (debug) PEM_write_bio_X509(outbio, sk_X509_value(chain, i));
-			buf = NULL;
-			cert2 = sk_X509_value(chain, i);
-			len = i2d_X509(cert2, &buf);
-			hex = bintohex((uint8_t *) buf, len);
-			if ((pkey = X509_get_pubkey(cert2)) == NULL) {
-				if (debug) printf("Error getting public key from certificate");
+	if (debug) {
+		int value = sk_X509_num(chain);
+		printf("#cert in chain: %i\n", value);
+	}
+
+	for (i = 0; i < sk_X509_num(chain); ++i) {
+		//if (debug) PEM_write_bio_X509(outbio, sk_X509_value(chain, i));
+		cert2 = sk_X509_value(chain, i);
+		pkey = X509_get_pubkey(cert2);
+		if (pkey == NULL) {
+			if (debug) {
+				printf("Error getting public key from certificate");
 			}
-			buf2 = NULL;
-			len2 = i2d_PUBKEY(pkey, &buf2);
-			hex2 = bintohex((uint8_t *) buf2, len2);
-			add_certrecord_bottom(cert_list, (char*) buf, len, hex,
-			    (char *) buf2, len2, hex2);
-			free(buf);
-			free(buf2);
-			free(hex);
-			free(hex2); 
-		} //for
-	}//if
+			goto fail;
+		}
 
-	EVP_PKEY_free(pkey);
-	SSL_free(ssl);
+		buf = NULL;
+		len = i2d_X509(cert2, &buf);
+		if (len < 0) {
+			if (debug) {
+				printf("Error encoding into DER.\n");
+			}
+			goto fail;
+		}
+		hex = bintohex((uint8_t *) buf, len);
+		if (hex == NULL) {
+			if (debug) {
+				printf("Error converting DER to hex.\n");
+			}
+			goto fail;
+		}
+
+		buf2 = NULL;
+		len2 = i2d_PUBKEY(pkey, &buf2);
+		EVP_PKEY_free(pkey); pkey = NULL;
+		if (len2 < 0) {
+			if (debug) {
+				printf("Error encoding into DER.\n");
+			}
+			goto fail;
+		}
+		hex2 = bintohex((uint8_t *) buf2, len2);
+		if (hex2 == NULL) {
+			if (debug) {
+				printf("Error converting DER to hex.\n");
+			}
+			goto fail;
+		}
+
+		add_certrecord_bottom(cert_list, (char*) buf, len, hex,
+		    (char *) buf2, len2, hex2);
+		free(buf); buf = NULL;
+		free(buf2); buf2 = NULL;
+		free(hex); hex = NULL;
+		free(hex2); hex2 = NULL;
+	}
+
+	/* Chain does not have to be freed explicitly. */
+	/*
+	sk_X509_pop_free(chain, X509_free);
+	*/
+
+	X509_free(cert);
+
 #ifdef WIN32
-	closesocket(server);
+	closesocket(server_fd);
 	WSACleanup();
 #else
-	close(server);
+	close(server_fd);
 #endif
-	SSL_CTX_free(ctx);
-	
-	if (debug) printf("Finished SSL/TLS connection with server: %s.\n", dest_url);
-	return ret;
+
+	SSL_shutdown(ssl);
+	SSL_free(ssl);
+
+	SSL_CTX_free(ssl_ctx);
+
+	if (debug) {
+		printf("Finished SSL/TLS connection with server: %s.\n",
+		    dest_url);
+	}
+
+	return 1;
+
+fail:
+	if (ssl_ctx != NULL) {
+		SSL_CTX_free(ssl_ctx);
+	}
+	if (ssl != NULL) {
+		SSL_shutdown(ssl);
+		SSL_free(ssl);
+	}
+	if (server_fd != -1) {
+#ifdef WIN32
+		closesocket(server_fd);
+		WSACleanup();
+#else
+		close(server_fd);
+#endif
+	}
+	if (cert != NULL) {
+		X509_free(cert);
+	}
+	if (pkey != NULL) {
+		EVP_PKEY_free(pkey);
+	}
+	if (buf != NULL) {
+		free(buf);
+	}
+	if (buf2 != NULL) {
+		free(buf2);
+	}
+	if (hex != NULL) {
+		free(hex);
+	}
+	if (hex2 != NULL) {
+		free(hex2);
+	}
+	return 0;
 }
 
 //*****************************************************************************
