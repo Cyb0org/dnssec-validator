@@ -83,15 +83,13 @@ OpenSSL used as well as that of the covered work.
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 typedef struct {                     /* structure to save input options */
-  bool debug;                        // debug output enable
-  bool usefwd;                       // use of resolver
+	bool debug;                        // debug output enable
+	bool usefwd;                       // use of resolver
 } ds_options;
 ds_options opts;
 //----------------------------------------------------------------------------
 struct ub_ctx* ctx;
-bool ws = false;		         /* write debug info into output file */
 bool ds = false;   		/* load root DS key from file */
-FILE *dfout;			    /* FILE - for debug information*/
 bool debug = true;
 bool context = false;
 static char byteMap[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
@@ -100,36 +98,36 @@ static int byteMapLen = sizeof(byteMap);
 //----------------------------------------------------------------------------
 /* structure to save TLSA records */
 typedef struct tlsa_store_ctx_st {   
-   char* domain;
-   uint8_t dnssec_status;
-   uint8_t cert_usage;
-   uint8_t selector;
-   uint8_t matching_type;
-   uint8_t *association;
-   size_t association_size;
-   unsigned char* assochex; 
-   struct tlsa_store_ctx_st *next;
+	char *domain;
+	uint8_t dnssec_status;
+	uint8_t cert_usage;
+	uint8_t selector;
+	uint8_t matching_type;
+	uint8_t *association;
+	size_t association_size;
+	unsigned char* assochex; 
+	struct tlsa_store_ctx_st *next;
 } tlsa_store_ctx;
 
 /* pointer structure to save TLSA records */
 struct tlsa_store_head {
-    struct tlsa_store_ctx_st *first;
+	struct tlsa_store_ctx_st *first;
 };
 
 /* structure to save certificate records */
 typedef struct cert_store_ctx_st {
-   char *cert_der;
-   int cert_len;
-   char *cert_der_hex;
-   char *spki_der;
-   int spki_len;
-   char *spki_der_hex;
-   struct cert_store_ctx_st *next;
+	char *cert_der;
+	int cert_len;
+	char *cert_der_hex;
+	char *spki_der;
+	int spki_len;
+	char *spki_der_hex;
+	struct cert_store_ctx_st *next;
 } cert_store_ctx; 
 
 /* pointer structure to save certificate records */
 struct cert_store_head {
-    struct cert_store_ctx_st *first;
+	struct cert_store_ctx_st *first;
 };
 
 /* structure to save certificate records */
@@ -145,9 +143,10 @@ typedef struct cert_tmp_st {
 //*****************************************************************************
 // read input options into a structure
 // ----------------------------------------------------------------------------
-void ds_init_opts(const uint16_t options) {
-  opts.debug = options & DANE_INPUT_FLAG_DEBUGOUTPUT;
-  opts.usefwd = options & DANE_INPUT_FLAG_USEFWD;
+void ds_init_opts(const uint16_t options) 
+{
+	opts.debug = options & DANE_INPUT_FLAG_DEBUGOUTPUT;
+	opts.usefwd = options & DANE_INPUT_FLAG_USEFWD;
 }
 
 
@@ -210,7 +209,9 @@ int create_socket(char url_str[])
 	port = atoi(portnum);
 	if ( (host = gethostbyname(hostname)) == NULL ) 
 	{
-		if (debug) printf(DEBUG_PREFIX "Error: Cannot resolve hostname %s.\n",  hostname);
+		if (debug) {
+			printf(DEBUG_PREFIX "Error: Cannot resolve hostname %s.\n",  hostname);
+		}
 		abort();
 	} //if
 
@@ -218,7 +219,7 @@ int create_socket(char url_str[])
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(sockfd == -1) {
 		if (debug) {
-			printf(DEBUG_PREFIX "error opening socket");
+			printf(DEBUG_PREFIX "error opening socket\n");
 		}
 		return -1;
 	} //if
@@ -235,8 +236,10 @@ int create_socket(char url_str[])
 	//Try to make the host connect here                          *
 	if ( connect(sockfd, (struct sockaddr *) &dest_addr,sizeof(struct sockaddr_in)) == -1 ) 
 	{
-		if (debug) printf(DEBUG_PREFIX "Error: Cannot connect to host %s [%s] on port %d.\n",
+		if (debug) {
+			printf(DEBUG_PREFIX "Error: Cannot connect to host %s [%s] on port %d.\n",
 								 hostname, tmp_ptr, port);
+		}
 	} //if
 
 
@@ -246,7 +249,7 @@ int create_socket(char url_str[])
 //*****************************************************************************
 // Helper function (return DNSSEC status)
 // ----------------------------------------------------------------------------
-char *get_dnssec_status(uint8_t dnssec_status)
+char * get_dnssec_status(uint8_t dnssec_status)
 {
 	switch (dnssec_status) {
 		case 0: return "INSECURE";
@@ -259,10 +262,13 @@ char *get_dnssec_status(uint8_t dnssec_status)
 //*****************************************************************************
 // Helper function (add new record in the TLSA list - first)
 // ----------------------------------------------------------------------------
-void add_tlsarecord(struct tlsa_store_head *tlsa_list, char *domain, uint8_t dnssec_status, uint8_t cert_usage, uint8_t selector, uint8_t matching_type, uint8_t *association, size_t association_size, char* assochex) 
+void add_tlsarecord(struct tlsa_store_head *tlsa_list, char *domain, 
+	uint8_t dnssec_status, uint8_t cert_usage, uint8_t selector, 
+	uint8_t matching_type, uint8_t *association, size_t association_size, 
+	char* assochex) 
 {
 	 tlsa_store_ctx *field_tlsa;
-     field_tlsa = tlsa_list->first;
+     	 field_tlsa = tlsa_list->first;
 	 field_tlsa = malloc(sizeof(tlsa_store_ctx));
  	 field_tlsa->domain = malloc(strlen(domain) + 1);
  	 strcpy(field_tlsa->domain, domain);
@@ -281,7 +287,10 @@ void add_tlsarecord(struct tlsa_store_head *tlsa_list, char *domain, uint8_t dns
 //*****************************************************************************
 // Helper function (add new record in the TLSA list - last)
 // ----------------------------------------------------------------------------
-void add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list, char *domain, uint8_t dnssec_status, uint8_t cert_usage, uint8_t selector, uint8_t matching_type, uint8_t *association, size_t association_size, char* assochex) 
+void add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list, char *domain, 
+	uint8_t dnssec_status, uint8_t cert_usage, uint8_t selector, 
+	uint8_t matching_type, uint8_t *association, size_t association_size, 
+	char* assochex) 
 {
 	tlsa_store_ctx *field_tlsa;
 
@@ -315,45 +324,63 @@ void add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list, char *domain, uint
 // ----------------------------------------------------------------------------
 struct tlsa_store_head policyFilter(struct tlsa_store_head *tlsa_list, int policy)
 {
-   struct tlsa_store_head tlsa_list_new;        	
-   tlsa_list_new.first = NULL;
+	struct tlsa_store_head tlsa_list_new;        	
+	tlsa_list_new.first = NULL;
     
+	struct tlsa_store_ctx_st *tmp;
+	tmp=tlsa_list->first;
+	
+	while (tmp != NULL) {
+		switch (tmp->cert_usage) {
+			case CA_CERT_PIN:
+			case EE_CERT_PIN:
+				if (policy & ALLOW_TYPE_01) {
+					add_tlsarecord_bottom(&tlsa_list_new, 
+					tmp->domain, tmp->dnssec_status, tmp->cert_usage,
+					tmp->selector, tmp->matching_type, tmp->association, 
+					tmp->association_size, (char*)tmp->assochex); 
+		                }
+                		break;
+			case CA_TA_ADDED:
+			case EE_TA_ADDED:
+				if (policy & ALLOW_TYPE_23) {
+					add_tlsarecord_bottom(&tlsa_list_new, 
+					tmp->domain, tmp->dnssec_status, tmp->cert_usage,
+					tmp->selector, tmp->matching_type, tmp->association,
+					tmp->association_size, (char*)tmp->assochex); 
+		                }
+		                break;
+		        default:
+				break;
+		} //switch
+	} //while
 
-   struct tlsa_store_ctx_st *tmp;
-   tmp=tlsa_list->first;
-   while (tmp != NULL) {
-        switch (tmp->cert_usage) {
-            case CA_CERT_PIN:
-            case EE_CERT_PIN:
-                if (policy & ALLOW_TYPE_01) {
-                    add_tlsarecord_bottom(&tlsa_list_new, tmp->domain, tmp->dnssec_status, tmp->cert_usage, tmp->selector, tmp->matching_type, tmp->association, tmp->association_size, (char*)tmp->assochex); 
-                }
-                break;
-            case CA_TA_ADDED:
-            case EE_TA_ADDED:
-                if (policy & ALLOW_TYPE_23) {
-                    add_tlsarecord_bottom(&tlsa_list_new, tmp->domain, tmp->dnssec_status, tmp->cert_usage, tmp->selector, tmp->matching_type, tmp->association, tmp->association_size, (char*)tmp->assochex); 
-                }
-                break;
-            default:
-                break;
-        }; 
-    }
-    return tlsa_list_new;
+	return tlsa_list_new;
 }
 
 //*****************************************************************************
 // Helper function (print TLSA list)
 // ----------------------------------------------------------------------------
-void print_tlsalist(const struct tlsa_store_head *tlsa_list) {
-   struct tlsa_store_ctx_st *tmp;
-   tmp=tlsa_list->first;
-   while (tmp != NULL) {
-       printf(DEBUG_PREFIX "---------------------------------------------\n");
-       printf(DEBUG_PREFIX "%s: dnssec: %s (%d), cert usage: %d, selector: %d, matching type: %d, assoc.hex: %s, assoc.size: %zu \n", tmp->domain, get_dnssec_status(tmp->dnssec_status), tmp->dnssec_status, tmp->cert_usage, tmp->selector, tmp->matching_type, tmp->assochex, tmp->association_size);
-      tmp = tmp->next;
-   } // while
-   printf(DEBUG_PREFIX "---------------------------------------------\n");
+void print_tlsalist(const struct tlsa_store_head *tlsa_list) 
+{
+	struct tlsa_store_ctx_st *tmp;
+	tmp=tlsa_list->first;
+
+	while (tmp != NULL) {
+	
+		if (debug) {
+			printf(DEBUG_PREFIX "---------------------------------------------\n");
+			printf(DEBUG_PREFIX "%s: dnssec: %s (%d), cert usage: %d, selector: %d,	matching type: %d, assoc.hex: %s, assoc.size: %zu \n", 
+				tmp->domain, get_dnssec_status(tmp->dnssec_status), 
+				tmp->dnssec_status, tmp->cert_usage, tmp->selector, 
+				tmp->matching_type, tmp->assochex, tmp->association_size);
+		}
+		tmp = tmp->next;
+	} // while
+
+	if (debug) {
+		printf(DEBUG_PREFIX "---------------------------------------------\n");
+	}
 } 
 
 //*****************************************************************************
@@ -372,27 +399,14 @@ void free_tlsalist(struct tlsa_store_head *tlsa_list)
 
 		tlsa_list->first = aux;
 	}
-
-#if 0
-  if (tlsa_list->first != NULL) {
-     tlsa_store_ctx *field, *pom;
-     field = tlsa_list->first->next;
-     while (field != NULL) {
-         pom = field->next;
-	 free(field->domain);
-	 free(field->assochex);
-         free(field);
-         field = pom;
-     } // while
-     tlsa_list->first->next = NULL;
-  } // if
-#endif
 }
 
 //*****************************************************************************
 // Helper function (add new record in the certificate list - first)
 // ----------------------------------------------------------------------------
-void add_certrecord(struct cert_store_head *cert_list, char* cert_der, int cert_len, char* cert_der_hex,  char* spki_der, int spki_len,  char* spki_der_hex) 
+void add_certrecord(struct cert_store_head *cert_list, char* cert_der, 
+	int cert_len, char* cert_der_hex,  char* spki_der, int spki_len,
+	char* spki_der_hex) 
 {
 	 cert_store_ctx *field_cert;
          field_cert = cert_list->first;
@@ -449,15 +463,24 @@ void add_certrecord_bottom(struct cert_store_head *cert_list, char *cert_der,
 //*****************************************************************************
 // Helper function (print certificate list)
 // ----------------------------------------------------------------------------
-void print_certlist(struct cert_store_head *cert_list) {
-   struct cert_store_ctx_st *tmp;
-   tmp=cert_list->first;
-   while (tmp != NULL) {
-       printf(DEBUG_PREFIX_CER "---------------------------------------------\n");
-       printf(DEBUG_PREFIX_CER "certlen: %i\n%s\nspkilen: %i\n%s\n", tmp->cert_len, tmp->cert_der_hex, tmp->spki_len, tmp->spki_der_hex);
-      tmp = tmp->next;
-   } // while
-   printf(DEBUG_PREFIX_CER "---------------------------------------------\n");
+void print_certlist(struct cert_store_head *cert_list) 
+{
+	struct cert_store_ctx_st *tmp;
+	tmp=cert_list->first;
+
+	while (tmp != NULL) {
+		if (debug) {
+			printf(DEBUG_PREFIX_CER "---------------------------------------------\n");
+			printf(DEBUG_PREFIX_CER "certlen: %i\n%s\nspkilen: %i\n%s\n", 
+				tmp->cert_len, tmp->cert_der_hex, tmp->spki_len, 
+				tmp->spki_der_hex);
+		}
+		tmp = tmp->next;
+	} // while
+
+	if (debug) {
+		printf(DEBUG_PREFIX_CER "---------------------------------------------\n");
+	}
 } 
 
 //*****************************************************************************
@@ -529,8 +552,9 @@ int hex_to_int(char c)
 //*****************************************************************************
 // Helper function (hex to char)
 // ----------------------------------------------------------------------------
-int hex_to_ascii(char c, char d){
-        int high = hex_to_int(c) * 16;
+int hex_to_ascii(char c, char d) 
+{
+	int high = hex_to_int(c) * 16;
         int low = hex_to_int(d);
         return high+low;
 }
@@ -540,28 +564,34 @@ int hex_to_ascii(char c, char d){
 // ----------------------------------------------------------------------------
 char *mystrcat(const char *s1, const char *s2)
 {
-    size_t s1_size = 0,
-            s2_size = 0;
-    char *t = NULL;
-    if (s1 != NULL) {
-    	s1_size = strlen(s1);
-    }
-    if (s2 != NULL) {
-    	s2_size = strlen(s2);
-    }
-    if ((s1_size + s2_size) > 0) {
-	    t = malloc(s1_size + s2_size + 1);
-	    if (t == NULL) {
-	    	return NULL; /* Allocation error. */
-	    }
-	    if (s1 != NULL) {
-	    	strcpy(t, s1);
-	    }
-	    if (s2 != NULL) {
-		    strcpy(t + s1_size, s2);
+	size_t s1_size = 0,
+	s2_size = 0;
+	char *t = NULL;
+
+	if (s1 != NULL) {
+		s1_size = strlen(s1);
+	}
+
+	if (s2 != NULL) {
+		s2_size = strlen(s2);
+	}
+
+	if ((s1_size + s2_size) > 0) {
+		t = malloc(s1_size + s2_size + 1);
+		if (t == NULL) {
+			return NULL; /* Allocation error. */
+		}
+
+		if (s1 != NULL) {
+			strcpy(t, s1);
+		}
+
+		if (s2 != NULL) {
+			strcpy(t + s1_size, s2);
 		}
 	}
-    return t;
+
+	return t;
 }
 
 //*****************************************************************************
@@ -681,7 +711,7 @@ int getcert(char *dest_url, struct cert_store_head *cert_list)
 		pkey = X509_get_pubkey(cert2);
 		if (pkey == NULL) {
 			if (debug) {
-				printf("Error getting public key from certificate");
+				printf("Error getting public key from certificate\n");
 			}
 			goto fail;
 		}
@@ -816,40 +846,48 @@ cert_tmp_ctx spkicert(const unsigned char *certder, int len)
 // DANE algorithm (opensslDigest)
 // return binary data of certificate or SPKI encode by sha256, sha512 as HEX string
 // ----------------------------------------------------------------------------
-char *opensslDigest(const EVP_MD *md, const char *data, int len) {
+char * opensslDigest(const EVP_MD *md, const char *data, int len) {
 
-    EVP_MD_CTX mdctx;
-    unsigned int md_len;
-    unsigned char md_value[64];
-    char *hex;
+	EVP_MD_CTX mdctx;
+	unsigned int md_len;
+	unsigned char md_value[64];
+	char *hex;
 
-    assert(md);
-    EVP_MD_CTX_init(&mdctx);
-    EVP_DigestInit_ex(&mdctx, md, NULL);
-    EVP_DigestUpdate(&mdctx, data, len);
-    EVP_DigestFinal_ex(&mdctx, md_value, &md_len);
-    EVP_MD_CTX_cleanup(&mdctx);
-    hex = bintohex((uint8_t*)md_value, md_len);
+	assert(md);
+	EVP_MD_CTX_init(&mdctx);
+	EVP_DigestInit_ex(&mdctx, md, NULL);
+	EVP_DigestUpdate(&mdctx, data, len);
+	EVP_DigestFinal_ex(&mdctx, md_value, &md_len);
+	EVP_MD_CTX_cleanup(&mdctx);
+	hex = bintohex((uint8_t*)md_value, md_len);
 
-    return hex;
+	return hex;
 }
 
 //*****************************************************************************
 // DANE algorithm
 // return binary data of certificate or SPKI encode by sha256
 // ----------------------------------------------------------------------------
-char *sha256(char *data, int len) {
-    if (debug) printf(DEBUG_PREFIX_DANE "sha256\n");
-    return opensslDigest(EVP_sha256(), data, len);
+char * sha256(char *data, int len) {
+
+	if (debug) {
+		printf(DEBUG_PREFIX_DANE "sha256\n");
+	}
+
+	return opensslDigest(EVP_sha256(), data, len);
 }
 
 //*****************************************************************************
 // DANE algorithm
 // return binary data of certificate or SPKI encode by sha512
 // ----------------------------------------------------------------------------
-char *sha512(char *data, int len) {
-    if (debug) printf(DEBUG_PREFIX_DANE "sha512\n");
-    return opensslDigest(EVP_sha512(), data, len);
+char * sha512(char *data, int len) {
+
+	if (debug) {
+		printf(DEBUG_PREFIX_DANE "sha512\n");
+	}
+
+	return opensslDigest(EVP_sha512(), data, len);
 }
 
 //*****************************************************************************
@@ -935,6 +973,7 @@ int eeCertMatch1(struct tlsa_store_ctx_st *tlsa_ctx,
 	    tlsa_ctx->selector, cert_list->first);
 
 	if (strcmp((const char *) data, "x") == 0) {
+		free(data);
 		return DANE_EXIT_TLSA_PARAM_ERR;
 	}
 	if (strcmp((const char *) data,
@@ -968,6 +1007,7 @@ int eeCertMatch3(struct tlsa_store_ctx_st *tlsa_ctx,
 	char *data = matchingData(tlsa_ctx->matching_type,
 	    tlsa_ctx->selector, cert_list->first);
 	if (strcmp((const char *) data, "x") == 0) {
+		free(data);
 		return DANE_EXIT_TLSA_PARAM_ERR;
 	}
 	if (strcmp((const char *) data,
@@ -1008,10 +1048,12 @@ int caCertMatch(struct tlsa_store_ctx_st *tlsa_ctx,
 		char *data = matchingData(tlsa_ctx->matching_type,
 		    tlsa_ctx->selector, aux_cert);
 		if (strcmp((const char *) data, "x") == 0) {
+			free(data);
 			return DANE_EXIT_TLSA_PARAM_ERR;
 		}
 		if (strcmp((const char *) data,
 		        (const char *) tlsa_ctx->assochex) == 0) {
+			free(data);
 			return DANE_EXIT_VALIDATION_SUCCESS_TYPE0;
 		}
 		if (debug) {
@@ -1051,10 +1093,12 @@ int chainCertMatch(struct tlsa_store_ctx_st *tlsa_ctx,
 		char *data = matchingData(tlsa_ctx->matching_type,
 		    tlsa_ctx->selector, aux_cert);
 		if (strcmp((const char *) data, "x") == 0) {
+			free(data);
 			return DANE_EXIT_TLSA_PARAM_ERR;
 		}
 		if (strcmp((const char *) data,
 		        (const char *) tlsa_ctx->assochex) == 0) {
+			free(data);
 			return DANE_EXIT_VALIDATION_SUCCESS_TYPE2;
 		}
 		if (debug) {
@@ -1136,35 +1180,36 @@ int get_tlsa_record(struct tlsa_store_head *tlsa_list, struct ub_result *result,
 	int exitcode = DANE_EXIT_RESOLVER_FAILED;
 
 	/* show security status */
-	if(result->secure) 
-	{
+	if(result->secure) {
 		/* show tlsa_first result */
-		if(result->havedata) 
-		{
+		if(result->havedata) {
 
-			if (debug) printf(DEBUG_PREFIX " Domain is secure...check tlsa record...\n");
+			if (debug) {
+				printf(DEBUG_PREFIX " Domain is secure...check tlsa record...\n");
+			}
 
 	                ldns_pkt *packet;
 	                ldns_status parse_status = ldns_wire2pkt(&packet, (uint8_t*)(result->answer_packet), result->answer_len);
                 
-	                if (parse_status != LDNS_STATUS_OK)
-			{
-				if (debug) printf(DEBUG_PREFIX "Failed to parse response packet\n");
+	                if (parse_status != LDNS_STATUS_OK) {
+				if (debug) {
+					printf(DEBUG_PREFIX "Failed to parse response packet\n");
+				}
 				ub_resolve_free(result);
 	                        return DANE_EXIT_RESOLVER_FAILED;
 	                } //if
                 
 			ldns_rr_list *rrs = ldns_pkt_rr_list_by_type(packet, LDNS_RR_TYPE_TLSA, LDNS_SECTION_ANSWER);		
 
-			for (i = 0; i < ldns_rr_list_rr_count(rrs); i++) 
-			{
+			for (i = 0; i < ldns_rr_list_rr_count(rrs); i++) {
 				/* extract first rdf, which is the whole TLSA record */
 				ldns_rr *rr = ldns_rr_list_rr(rrs, i);
 				// Since ldns 1.6.14, RR for TLSA is parsed into 4 RDFs 
 	                        // instead of 1 RDF in ldns 1.6.13.
-	                        if (ldns_rr_rd_count(rr) < 4) 
-				{
-					if (debug) printf(DEBUG_PREFIX "RR %d hasn't enough fields\n", i);
+	                        if (ldns_rr_rd_count(rr) < 4) {
+					if (debug) {
+						printf(DEBUG_PREFIX "RR %d hasn't enough fields\n", i);
+					}
 					ub_resolve_free(result);
 					return DANE_EXIT_TLSA_PARAM_ERR;
 				}	
@@ -1179,7 +1224,9 @@ int get_tlsa_record(struct tlsa_store_head *tlsa_list, struct ub_result *result,
 	                            ldns_rdf_size(rdf_association)  < 0 )
 				{
 
-	                                if (debug) printf(DEBUG_PREFIX "Improperly formatted TLSA RR %d\n", i);
+	                                if (debug) {
+						printf(DEBUG_PREFIX "Improperly formatted TLSA RR %d\n", i);
+					}
 					ub_resolve_free(result);
 					return DANE_EXIT_TLSA_PARAM_ERR;
 				}//if
@@ -1200,25 +1247,32 @@ int get_tlsa_record(struct tlsa_store_head *tlsa_list, struct ub_result *result,
 			} //for
 
 			exitcode = DANE_EXIT_DNSSEC_SECURED;                
-	                if (packet) ldns_pkt_free(packet);
-	                if (rrs) ldns_rr_list_free(rrs);
+	                if (packet) {
+				ldns_pkt_free(packet);
+			}
+	                if (rrs) {
+				ldns_rr_list_free(rrs);
+			}
 
 	        } 
-		else
-		{
-	                if (debug) printf(DEBUG_PREFIX "Unbound haven't received any data for %s. ", domain);
+		else {
+	                if (debug) {
+				printf(DEBUG_PREFIX "Unbound haven't received any data for %s.\n", domain);
+			}
 			exitcode = DANE_EXIT_NO_TLSA_RECORD;
 	        } //if
 	} 
-	else if(result->bogus) 
-	{
+	else if(result->bogus) {
 		exitcode = DANE_EXIT_DNSSEC_BOGUS;
-		if (debug) printf(DEBUG_PREFIX "Domain is bogus: %s \n", result->why_bogus);
+		if (debug) {
+			printf(DEBUG_PREFIX "Domain is bogus: %s \n", result->why_bogus);
+		}
 	}
-	else 
-	{
+	else {
 		exitcode = DANE_EXIT_DNSSEC_UNSECURED;
-		if (debug) printf(DEBUG_PREFIX " Domain is insecure...\n");
+		if (debug) {
+			printf(DEBUG_PREFIX " Domain is insecure...\n");
+		}
 	}
 
 	ub_resolve_free(result);
@@ -1243,7 +1297,7 @@ void ub_context_free()
 // Function char* get_tlsa_query
 // return _port._protocol.domain e.g: _443._tcp.www.nic.cz
 // ----------------------------------------------------------------------------
-char *get_tlsa_query(char *domain, char *port, char *protocol) 
+char * get_tlsa_query(char *domain, char *port, char *protocol) 
 {
 	char *tlsa_query = NULL,
 	*tlsa_query_old = NULL;
@@ -1304,45 +1358,32 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options, char *
 
 	//-----------------------------------------------
 	// Unbound resolver initialization, set forwarder 
-	if (!context) 
-	{
+	if (!context) {
 		ctx = ub_ctx_create();
 
-		if(!ctx) 
-		{
+		if(!ctx) {
 			if (debug) printf(DEBUG_PREFIX "Error: could not create unbound context\n");
-			if (ws) fprintf(dfout, DEBUG_PREFIX "Error: could not create unbound context\n");
 			return exitcode;
 	 	 }
 		context = true;
 
 		// set resolver/forwarder if it was set in options
-		if (usefwd) 
-		{
-			if (strcmp (optdnssrv,"") != 0) 
-			{
+		if (usefwd) {
+			if (strcmp (optdnssrv,"") != 0) {
 				fwd_addr = strtok(optdnssrv, delims);
 				// set ip addresses of resolvers into ub context
-				while (fwd_addr != NULL) 
-				{
-					if ((ub_retval=ub_ctx_set_fwd(ctx, optdnssrv)) != 0) 
-					{
+				while (fwd_addr != NULL) {
+					if ((ub_retval=ub_ctx_set_fwd(ctx, optdnssrv)) != 0) {
 						if (debug) printf(DEBUG_PREFIX "Error adding resolver IP address: %s\n", 
-									ub_strerror(ub_retval));
-						if (ws) fprintf(dfout, DEBUG_PREFIX "Error adding resolver IP address: %s\n", 
 									ub_strerror(ub_retval));
 						return exitcode;
 					} //if            	  
 					fwd_addr = strtok(NULL, delims);
 				} //while
 		  	}  
-			else 
-			{
-				if ((ub_retval = ub_ctx_resolvconf(ctx, NULL)) != 0) 
-				{
+			else {
+				if ((ub_retval = ub_ctx_resolvconf(ctx, NULL)) != 0) {
 					if (debug) printf(DEBUG_PREFIX "Error reading resolv.conf: %s. errno says: %s\n", 
-								ub_strerror(ub_retval), strerror(errno));
-					if (ws) fprintf(dfout, DEBUG_PREFIX "Error reading resolv.conf: %s. errno says: %s\n",
 								ub_strerror(ub_retval), strerror(errno));
 					return exitcode;
 		        	} //if  
@@ -1352,30 +1393,22 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options, char *
 	      	/* read public keys of root zone for DNSSEC verification */
 		// ds true = zone key will be set from file root.key
 		//    false = zone key will be set from TA constant
-		if (ds) 
-		{
-			if ((ub_retval=ub_ctx_add_ta_file(ctx, "root.key")) != 0) 
-			{
-				if (debug) printf(DEBUG_PREFIX "Error adding keys: %s\n", ub_strerror(ub_retval));
-				if (ws) fprintf(dfout, DEBUG_PREFIX "Error adding keys: %s\n", ub_strerror(ub_retval));
+		if (ds) {
+			if ((ub_retval=ub_ctx_add_ta_file(ctx, "root.key")) != 0) {
+				if (debug) printf(DEBUG_PREFIX "Error adding keys: %s\n", ub_strerror(ub_retval));			
 				return exitcode;
               		} //if
 		}
-		else
-		{
-			if ((ub_retval=ub_ctx_add_ta(ctx, TA)) != 0) 
-			{
+		else {
+			if ((ub_retval=ub_ctx_add_ta(ctx, TA)) != 0) {
 				if (debug) printf(DEBUG_PREFIX "Error adding keys: %s\n", ub_strerror(ub_retval));
-				if (ws) fprintf(dfout, DEBUG_PREFIX "Error adding keys: %s\n", ub_strerror(ub_retval));
 				return exitcode;
 			}
 		}// if (ds)   
 
 		// set dlv-anchor
-		if ((ub_retval=ub_ctx_set_option(ctx, "dlv-anchor:", DLV))) 
-		{
+		if ((ub_retval=ub_ctx_set_option(ctx, "dlv-anchor:", DLV))) {
 			if (debug) printf(DEBUG_PREFIX "Error adding DLV keys: %s\n", ub_strerror(ub_retval));
-			if (ws) fprintf(dfout, DEBUG_PREFIX "Error adding DLV keys: %s\n", ub_strerror(ub_retval));
 			return exitcode;      
 	        } 
 	} // end of init resolver
@@ -1415,12 +1448,13 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options, char *
 	}
 
  	int i;
-	if (certcount > 0) 
-	{
-		if (debug) printf(DEBUG_PREFIX_CER "Browser's certificate chain is used\n");
+	if (certcount > 0) {
 
-		for ( i = 0; i < certcount; i++) 
-		{
+		if (debug) {
+			printf(DEBUG_PREFIX_CER "Browser's certificate chain is used\n");
+		}
+
+		for ( i = 0; i < certcount; i++) {
 			int certlen=strlen(certchain[i])/2;
 			unsigned char *certbin = (unsigned char *) hextobin(certchain[i]);
 			char *certbin2 = hextobin(certchain[i]);   
@@ -1434,8 +1468,7 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options, char *
 			free(skpi.spki_der_hex); /* Messy clean-up. Create a better one. */
 		}//for
 	}
-	else
-	{
+	else {
 		if (debug) printf(DEBUG_PREFIX_CER "External certificate chain is used\n");	
 		strcpy (uri,"https://");
 		strncat (uri, domain, strlen(domain));
@@ -1447,11 +1480,15 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options, char *
 		} //if
 	} //if
 
-	if (debug) print_certlist(&cert_list);
+	if (debug) {
+		print_certlist(&cert_list);
+	}
 
 	tlsa_res = TLSAValidate(&tlsa_list, &cert_list);
 
-	if (debug) printf(DEBUG_PREFIX_DANE "result: %i\n", tlsa_res);
+	if (debug) {
+		printf(DEBUG_PREFIX_DANE "result: %i\n", tlsa_res);
+	}
 
 	free_tlsalist(&tlsa_list);
 	free_certlist(&cert_list);
@@ -1477,7 +1514,7 @@ int main(int argc, char **argv)
 	res = CheckDane(certhex, 0, 5, "8.8.8.8", argv[1], "443", "tcp", 1);
 	
 	if (debug) {
-		printf(DEBUG_PREFIX_DANE "DANE final result: %i\n", res);
+		printf(DEBUG_PREFIX_DANE "Main final result: %i\n", res);
 	}
 
 	ub_context_free();
