@@ -252,10 +252,10 @@ int create_socket(char url_str[])
 char * get_dnssec_status(uint8_t dnssec_status)
 {
 	switch (dnssec_status) {
-		case 0: return "INSECURE";
-		case 1: return "SECURE";
-		case 2: return "BOGUS";
-		default: return "ERROR";
+	case 0: return "INSECURE";
+	case 1: return "SECURE";
+	case 2: return "BOGUS";
+	default: return "ERROR";
 	}
 }
 
@@ -332,26 +332,26 @@ struct tlsa_store_head policyFilter(struct tlsa_store_head *tlsa_list, int polic
 	
 	while (tmp != NULL) {
 		switch (tmp->cert_usage) {
-			case CA_CERT_PIN:
-			case EE_CERT_PIN:
-				if (policy & ALLOW_TYPE_01) {
-					add_tlsarecord_bottom(&tlsa_list_new, 
-					tmp->domain, tmp->dnssec_status, tmp->cert_usage,
-					tmp->selector, tmp->matching_type, tmp->association, 
-					tmp->association_size, (char*)tmp->assochex); 
-		                }
-                		break;
-			case CA_TA_ADDED:
-			case EE_TA_ADDED:
-				if (policy & ALLOW_TYPE_23) {
-					add_tlsarecord_bottom(&tlsa_list_new, 
-					tmp->domain, tmp->dnssec_status, tmp->cert_usage,
-					tmp->selector, tmp->matching_type, tmp->association,
-					tmp->association_size, (char*)tmp->assochex); 
-		                }
-		                break;
-		        default:
-				break;
+		case CA_CERT_PIN:
+		case EE_CERT_PIN:
+			if (policy & ALLOW_TYPE_01) {
+				add_tlsarecord_bottom(&tlsa_list_new, 
+				tmp->domain, tmp->dnssec_status, tmp->cert_usage,
+				tmp->selector, tmp->matching_type, tmp->association, 
+				tmp->association_size, (char*)tmp->assochex); 
+			}
+                	break;
+		case CA_TA_ADDED:
+		case EE_TA_ADDED:
+			if (policy & ALLOW_TYPE_23) {
+				add_tlsarecord_bottom(&tlsa_list_new, 
+				tmp->domain, tmp->dnssec_status, tmp->cert_usage,
+				tmp->selector, tmp->matching_type, tmp->association,
+				tmp->association_size, (char*)tmp->assochex); 
+			}
+	                break;
+	        default:
+			break;
 		} //switch
 	} //while
 
