@@ -1,6 +1,6 @@
 {
 	"preftitle": {
-		"message": "Nastavení validátoru"
+		"message": "Nastavení DNSSEC validátoru"
 		},
 	"prefresolver": {
 		"message": "DNS resolver(y) používané pro překlad jmen:"

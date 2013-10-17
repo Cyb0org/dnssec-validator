@@ -1,6 +1,6 @@
 {
 	"preftitle": {
-		"message": "Validator settings"
+		"message": "DNSSEC Validator settings"
 		},
 	"prefresolver": {
 		"message": "DNS resolver(s) used for name resolution:"
