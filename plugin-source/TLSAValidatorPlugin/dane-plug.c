@@ -702,7 +702,7 @@ int getcert(char *dest_url, struct cert_store_head *cert_list)
 
 	if (debug) {
 		int value = sk_X509_num(chain);
-		printf("#cert in chain: %i\n", value);
+		printf("Number of certificates in chain: %i\n", value);
 	}
 
 	for (i = 0; i < sk_X509_num(chain); ++i) {
@@ -834,7 +834,7 @@ cert_tmp_ctx spkicert(const unsigned char *certder, int len)
 	
 	if ((pkey = X509_get_pubkey(cert)) == NULL) {
 		if (debug) {
-			printf("Error getting public key from certificate\n");
+			printf(DEBUG_PREFIX_DANE "Error getting public key from certificate\n");
 		}
 	}
 
@@ -921,7 +921,7 @@ char * selectorData(uint8_t selector, struct cert_store_ctx_st *cert_ctx)
 			printf(DEBUG_PREFIX_DANE "Wrong value of selector parameter: %i \n",
 			    selector);
 		}
-		return "x";
+		return NULL;
 	}
 }
 
@@ -939,8 +939,8 @@ char * matchingData(uint8_t matching_type, uint8_t selector,
 
 	char* data = selectorData(selector, cert_ctx);
 
-	if (strcmp ((const char*)data,"x") == 0) {
-		return "x";
+	if (data == NULL) {
+		return data;
 	}
 	switch (matching_type) {
 	case EXACT:
@@ -962,7 +962,7 @@ char * matchingData(uint8_t matching_type, uint8_t selector,
 			printf(DEBUG_PREFIX_DANE "Wrong value of matching_type parameter: %i \n",
 			    matching_type);
 		}
-		return "x";
+		return NULL;
 	}
 }
 
@@ -976,17 +976,18 @@ int eeCertMatch1(struct tlsa_store_ctx_st *tlsa_ctx,
     struct cert_store_head *cert_list)
 {
 	if (debug) {
-		printf(DEBUG_PREFIX_DANE "eeCertMatch\n");
+		printf(DEBUG_PREFIX_DANE "eeCertMatch1\n");
 	}
 
 	int ret_val = DANE_EXIT_VALIDATION_FALSE_TYPE1;
 	char *data = matchingData(tlsa_ctx->matching_type,
 	    tlsa_ctx->selector, cert_list->first);
 
-	if (strcmp((const char *) data, "x") == 0) {
+	if (data == NULL) {
 		free(data);
 		return DANE_EXIT_TLSA_PARAM_ERR;
 	}
+
 	if (strcmp((const char *) data,
 	        (const char *) tlsa_ctx->assochex) == 0) {
 		ret_val = DANE_EXIT_VALIDATION_SUCCESS_TYPE1; 
@@ -1011,16 +1012,18 @@ int eeCertMatch3(struct tlsa_store_ctx_st *tlsa_ctx,
     struct cert_store_head *cert_list)
 {
 	if (debug) {
-		printf(DEBUG_PREFIX_DANE "eeCertMatch\n");
+		printf(DEBUG_PREFIX_DANE "eeCertMatch3\n");
 	}
 
 	int ret_val = DANE_EXIT_VALIDATION_FALSE_TYPE3;
 	char *data = matchingData(tlsa_ctx->matching_type,
 	    tlsa_ctx->selector, cert_list->first);
-	if (strcmp((const char *) data, "x") == 0) {
+
+	if (data == NULL) {
 		free(data);
 		return DANE_EXIT_TLSA_PARAM_ERR;
 	}
+
 	if (strcmp((const char *) data,
 	        (const char *) tlsa_ctx->assochex) == 0) {
 		ret_val = DANE_EXIT_VALIDATION_SUCCESS_TYPE3; 
@@ -1045,7 +1048,7 @@ int caCertMatch(struct tlsa_store_ctx_st *tlsa_ctx,
 	cert_store_ctx *aux_cert;
 
 	if (debug) {
-		printf(DEBUG_PREFIX_DANE "caCertMatch\n");
+		printf(DEBUG_PREFIX_DANE "caCertMatch0\n");
 	}
 
 	int ret_val = DANE_EXIT_VALIDATION_FALSE_TYPE0;
@@ -1058,7 +1061,7 @@ int caCertMatch(struct tlsa_store_ctx_st *tlsa_ctx,
 	while (aux_cert != NULL) {
 		char *data = matchingData(tlsa_ctx->matching_type,
 		    tlsa_ctx->selector, aux_cert);
-		if (strcmp((const char *) data, "x") == 0) {
+		if (data == NULL) {
 			free(data);
 			return DANE_EXIT_TLSA_PARAM_ERR;
 		}
@@ -1090,7 +1093,7 @@ int chainCertMatch(struct tlsa_store_ctx_st *tlsa_ctx,
 	cert_store_ctx *aux_cert;
 
 	if (debug) {
-		printf(DEBUG_PREFIX_DANE "chainCertMatch\n");
+		printf(DEBUG_PREFIX_DANE "chainCertMatch2\n");
 	}
 
 	if (cert_list->first == NULL) {
@@ -1103,7 +1106,7 @@ int chainCertMatch(struct tlsa_store_ctx_st *tlsa_ctx,
 	while (aux_cert != NULL) {
 		char *data = matchingData(tlsa_ctx->matching_type,
 		    tlsa_ctx->selector, aux_cert);
-		if (strcmp((const char *) data, "x") == 0) {
+		if (data == NULL) {
 			free(data);
 			return DANE_EXIT_TLSA_PARAM_ERR;
 		}
@@ -1166,13 +1169,17 @@ int TLSAValidate(struct tlsa_store_head *tlsa_list,
 					printf(DEBUG_PREFIX_DANE "Wrong value of cert_usage parameter: %i \n",
 					    aux_tlsa->cert_usage);
 				}
-				return DANE_EXIT_TLSA_PARAM_ERR; // unknown cert usage, skip
+				idx = DANE_EXIT_TLSA_PARAM_ERR; // unknown cert usage, skip
 			} // switch
 			break; // continue checking
 		} // switch
 
+		if (debug) {
+			printf(DEBUG_PREFIX_DANE "Return: %i > %i\n", idx, DANE_EXIT_NO_CERT_CHAIN);
+		}
+
 		aux_tlsa = aux_tlsa->next;
-		if (idx > DANE_EXIT_VALIDATION_FALSE) {
+		if (idx > DANE_EXIT_NO_CERT_CHAIN) {
 			return idx;
 		}
 	} // while
@@ -1196,7 +1203,7 @@ int get_tlsa_record(struct tlsa_store_head *tlsa_list, struct ub_result *result,
 		if(result->havedata) {
 
 			if (debug) {
-				printf(DEBUG_PREFIX " Domain is secure...check tlsa record...\n");
+				printf(DEBUG_PREFIX "Domain is secured by DNSSEC ... found TLSA record(s).\n");
 			}
 
 	                ldns_pkt *packet;
@@ -1446,6 +1453,9 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options, char *
 	} else if (tlsa_ret == DANE_EXIT_DNSSEC_BOGUS) {
 		free_tlsalist(&tlsa_list);
 		return DANE_EXIT_DNSSEC_BOGUS;
+	} else if (tlsa_ret == DANE_EXIT_TLSA_PARAM_ERR) {
+		free_tlsalist(&tlsa_list);
+		return DANE_EXIT_TLSA_PARAM_ERR;
 	} else if (tlsa_ret == DANE_EXIT_NO_TLSA_RECORD) {
 		free_tlsalist(&tlsa_list);
 		return DANE_EXIT_NO_TLSA_RECORD;
