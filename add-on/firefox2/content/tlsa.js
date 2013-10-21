@@ -22,7 +22,6 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 window.addEventListener("load", function() { daneExtension.init(); }, false);
 window.addEventListener("unload", function() { daneExtension.uninit(); }, false);
 
-var debugOutputplugin = false;
 // **********************************************************************
 /* onPageLoad: observe that page is completed in any tabs or window    */
 // **********************************************************************
@@ -178,7 +177,36 @@ init: function() {
 	//gBrowser.addEventListener("load", onPageLoad, true);
 
 	tlsaExtCache.init();
+	this.clearMFcache('all');
 
+},
+
+getService: function(service_type) {
+	switch (service_type) {
+	case 'cache':
+		return Components.classes["@mozilla.org/network/cache-service;1"]
+			.getService(Components.interfaces.nsICacheService);
+	break;
+	}
+},
+
+clearMFcache : function(cache) {
+	if (cache == 'all') {
+		this.getService('cache').evictEntries(Components.interfaces.nsICache.STORE_ON_DISK);
+		this.getService('cache').evictEntries(Components.interfaces.nsICache.STORE_IN_MEMORY);
+		//this.getService('cache').evictEntries(Components.interfaces.nsICache.STORE_OFFLINE);
+	} else {
+		if (cache == 'disk') {
+			this.getService('cache').evictEntries(Components.interfaces.nsICache.STORE_ON_DISK);
+		}
+		if (cache == 'memory') {
+			this.getService('cache').evictEntries(Components.interfaces.nsICache.STORE_IN_MEMORY);
+		}
+	}
+
+	if (this.debugOutput) {
+		dump(this.debugPrefix + 'Clear main MF cache\n');
+	}				
 },
 
 getDebugOutputFlag: function() {
@@ -271,14 +299,17 @@ observe: function(channel, topic, data) {
 				if (host == this.oldAsciiHost) {
 
       					if (daneExtension.debugOutput) {
-						dump(' ...duplicated'+ this.DANE_DEBUG_POST);
+						dump(' ...duplicated\n'+ this.DANE_DEBUG_POST);
 					}
 					var cacheitem = tlsaExtCache.getRecord(host);
-					if (cacheitem[0] == '' && cacheitem[1] == '') return;
+					if (cacheitem[1] == 'no') {
+						return;
+					}
+					else if (cacheitem[0] == '' && cacheitem[1] == '') return;
 			    	}
 		   		else {
 					if (daneExtension.debugOutput) {
-			   			dump(' ...valid'+ this.DANE_DEBUG_POST);
+			   			dump(' ...valid\n'+ this.DANE_DEBUG_POST);
 					}
 		   			this.oldAsciiHost = host;
 		   		}
@@ -668,7 +699,7 @@ check_tlsa_tab_change: function (channel, uri, port) {
 	var protocol = "tcp";
        
 	var options = 0;
-	if (debugOutputplugin) {
+	if (daneExtension.debugOutput) {
 		options |= c.DANE_INPUT_FLAG_DEBUGOUTPUT;
 	}
 	if (dnssecExtPrefs.getInt("dnsserverchoose") != 3) {
@@ -791,7 +822,7 @@ check_tlsa_https: function (channel, cert, browser, uri, port) {
 	var protocol = "tcp";
        
 	var options = 0;
-	if (debugOutputplugin) {
+	if (daneExtension.debugOutput) {
 		options |= c.DANE_INPUT_FLAG_DEBUGOUTPUT;
 	}
 	if (dnssecExtPrefs.getInt("dnsserverchoose") != 3) {
