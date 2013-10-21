@@ -30,8 +30,72 @@ document.write("<script>");
 // debug pretext
 var DANE = "DANE: ";
 var olddomain = "null";
-var valid = true;
 var laststate = 0;
+var initcache = true;
+
+/* TLSA Validator's internal cache - shared with all window tabs */
+var tlsaExtCache = {
+
+	data: null,
+
+	init: function() {
+		// Create new array for caching
+		this.data = new Array();
+		initcache = false;
+	},
+
+
+	record: function(tlsaresult, block) {
+		this.state = tlsaresult;  // tlsa result
+		this.block = block;    // blocked ?
+	},
+
+	addRecord: function(domain, tlsaresult, block) {	
+		delete this.data[domain];
+		this.data[domain] = new this.record(tlsaresult, block);
+	},
+
+	getRecord: function(n) {
+		const c = this.data;
+
+		if (typeof c[n] != 'undefined') {
+			return [c[n].state, c[n].block];
+		}
+		return ['', ''];
+	},
+
+	printContent: function() {
+	
+		var i = 0;
+		var n;
+		const c = this.data;
+
+		if (true) { 
+			console.log(DANE + 'Cache content:');
+		}
+	          
+		for (n in c) {
+			if (true) { 
+				console.log(DANE +'      r' + i + ': \"' + n + '\": \"' + c[n].state + '\"; ' + c[n].block);
+			}
+      			i++;
+		}
+
+		if (true) { 
+			console.log(DANE + 'Total records count: ' + i);
+		}
+	},
+
+	delAllRecords: function() {
+
+		if (true) { 
+			console.log(DANE + 'Flushing all cache records...');
+		}
+		delete this.data;
+		this.data = new Array();
+	},
+};
+
 
 // States of TLSA validator
 var tlsaExtNPAPIConst = {
@@ -397,7 +461,7 @@ function TLSAvalidate(scheme,domain){
 		}
 		else  result = c.DANE_EXIT_NO_HTTPS;
         }	
-	console.log("DANE: TLSA Validator result: " + result);
+	console.log(DANE + "TLSA Validator result: " + result);
 	console.log(DANE + "--------- End of TLSA Validation ("+ scheme +":"+ domain +") ---------");
 	return result;
 };
@@ -409,27 +473,28 @@ function onUrlChange(tabId, changeInfo, tab) {
    	
 	if (changeInfo.status==undefined) return;
  
-        // hide icon for chrome:// and chrome-extension:// urls
-        if (tab.url.match(/^chrome(?:-extension)?:\/\//)) {
-              chrome.pageAction.hide(tabId);
-              return;
-        }//if
+	// hide icon for chrome:// and chrome-extension:// urls
+	if (tab.url.match(/^chrome(?:-extension)?:\/\//)) {
+		if (tabId >= 0) {
+			chrome.pageAction.hide(tabId);
+		}
+		return;
+	}//if
 
-	 // deactive other tabs
-        if (tab.url.match(/^chrome(?:-devtools)?:\/\//)) {
-                chrome.pageAction.hide(tabId);
-                return;
-         }//if
+	// deactive other tabs
+	if (tab.url.match(/^chrome(?:-devtools)?:\/\//)) {
+		if (tabId >= 0) {
+			chrome.pageAction.hide(tabId);
+		}
+		return;
+	}//if
 
-    	// deactive other tabs
-        if (tab.url.match(/^about:/)) {
-                chrome.pageAction.hide(tabId);
-                return;
-         }//if
+	// deactive other tabs
+	if (tab.url.match(/^about:/)) {
+		chrome.pageAction.hide(tabId);
+		return;
+	}//if
 	
-	 console.log("\nBrowser: onUrlChange(TabID: " + tabId + ", Action: " + changeInfo.status 
-		+ ", Info: " + changeInfo.url + ");");
-
 	if (changeInfo.status=="loading") {
 		chrome.pageAction.setPopup({tabId: tabId, popup: ""});
 		var scheme = httpscheme(tab.url);
@@ -437,12 +502,6 @@ function onUrlChange(tabId, changeInfo, tab) {
 	        var ret = TLSAvalidate(scheme,domain);
 		setTLSASecurityState(tabId, domain, ret, "xxx");
 	}
-	 
-	//if (changeInfo.status=="loading") { setTLSASecurityState(tabId, domain, laststate, "xxx");}
-	if (changeInfo.status=="complete") {valid = true;}
-
-
-
 }; // onUrlChange
 
 
@@ -452,40 +511,42 @@ function onUrlChange(tabId, changeInfo, tab) {
 //****************************************************************
 function onBeforeRequest(tabId, url) {                  	
        
-        // hide icon for chrome:// and chrome-extension:// urls
-        if (url.match(/^chrome(?:-extension)?:\/\//)) {
-              if (tabId >= 0) chrome.pageAction.hide(tabId);
-              return;
-        }//if
+	// hide icon for chrome:// and chrome-extension:// urls
+	if (url.match(/^chrome(?:-extension)?:\/\//)) {
+		if (tabId >= 0) {
+			chrome.pageAction.hide(tabId);
+		}
+		return;
+	}//if
 
 	// deactive other tabs
-        if (url.match(/^chrome(?:-devtools)?:\/\//)) {
-                if (tabId >= 0) chrome.pageAction.hide(tabId);
-                return;
-         }//if
+	if (url.match(/^chrome(?:-devtools)?:\/\//)) {
+		if (tabId >= 0) {
+			chrome.pageAction.hide(tabId);
+		}
+		return;
+	}//if
 
-    	// deactive other tabs
-        if (url.match(/^about:/)) {
-                chrome.pageAction.hide(tabId);
-                return;
-         }//if
+	// deactive other tabs
+	if (url.match(/^about:/)) {
+		chrome.pageAction.hide(tabId);
+		return;
+	}//if
 
 	// get scheme from URL
 	var scheme = httpscheme(url);
 	// get domain name from URL
-        var domain = url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
-        var ret = TLSAvalidate(scheme,domain);
-        olddomain = domain;
-	valid = false;
+	var domain = url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
+	var ret = TLSAvalidate(scheme,domain);
+//	olddomain = domain;
 	return ret;
-
-
 }; // onUrlChange
 
 //****************************************************************
 // Listen for any changes to the URL of any tab or tab was switched
 //****************************************************************
 chrome.tabs.onUpdated.addListener(onUrlChange);
+
 
 //****************************************************************
 // Listen for any webRequest of any tab
@@ -494,62 +555,52 @@ chrome.webRequest.onBeforeRequest.addListener(
   function(details) {
 	if (details.tabId >= 0) {
 		var domain = details.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];		
-		if (valid)  {	
-			
-		console.log("\nBrowser: onBeforeRequest(TabID: " + details.tabId + ", URL: " + details.url +", valid: " + valid +");");	
-			if (domain != olddomain) {						
-		   		var c = this.tlsaExtNPAPIConst;
-				var result = onBeforeRequest(details.tabId, details.url);
-				if (result <= c.DANE_EXIT_DNSSEC_BOGUS) {
-				
-					var blockhttps = localStorage["blockhttps"];
-			   		blockhttps = (blockhttps == undefined || blockhttps == "false") ? false : true;				
-					if (blockhttps) {				
-						var alerttext = chrome.i18n.getMessage("warningpre") + " " + domain + " " + chrome.i18n.getMessage("warningpost");
-						var choice = confirm(alerttext);
-						if (choice) {				
-							console.log("DANE: Connection was aborted...");
-							return {cancel: details.url.indexOf(domain) != -1};
-						}
-					}
+		if (domain == olddomain) {						
+			var cacheitem = tlsaExtCache.getRecord(domain);
+			if (cacheitem[1] == 'no') {
+				return;
+			}
+			else if (cacheitem[0] == '' && cacheitem[1] == '') {
+				 return;
+			}
+		}
+		else {
+			olddomain = domain;
+		}
+		console.log("\nBrowser: onBeforeRequest(TabID: " + details.tabId + ", URL: " + details.url +");");	
+
+   		var c = this.tlsaExtNPAPIConst;
+		var result = onBeforeRequest(details.tabId, details.url);
+		if (result <= c.DANE_EXIT_DNSSEC_BOGUS) {
+			var block = "no";				
+			var blockhttps = localStorage["blockhttps"];
+	   		blockhttps = (blockhttps == undefined || blockhttps == "false") ? false : true;	
+		
+			if (blockhttps) {				
+				var alerttext = chrome.i18n.getMessage("warningpre") + " " + domain + " " + chrome.i18n.getMessage("warningpost");
+				var choice = confirm(alerttext);
+				if (choice) {				
+					console.log(DANE + "Connection to this server was canceled by user...");
+					block = "yes";
+					tlsaExtCache.addRecord(domain, result , block);
+					tlsaExtCache.printContent();
+					return {cancel: details.url.indexOf(domain) != -1};							
+				}
+				else {
+					block = "no";
+					tlsaExtCache.addRecord(domain, result , block);
+					tlsaExtCache.printContent();
+					console.log(DANE + "Connection to this server was permitted by user....");
 				}
 			}
-		}	
-	}
-  },
-  {urls: ["<all_urls>"]},
-  ["blocking"]);
+		}
+	}	
+}, {urls: ["<all_urls>"]}, ["blocking"]);
 
 
-/*
-chrome.webNavigation.onCompleted.addListener(function(details) {
-        // hide icon for chrome:// and chrome-extension:// urls
-        if (details.url.match(/^chrome(?:-extension)?:\/\//)) {
-              chrome.pageAction.hide(details.tabId);
-              return;
-        }//if
-
-	// deactive other tabs
-        if (details.url.match(/^chrome(?:-devtools)?:\/\//)) {
-                chrome.pageAction.hide(details.tabId);
-                return;
-         }//if
-
-	// deactive other tabs
-        if (details.url.match(/^about:/)) {
-                chrome.pageAction.hide(details.tabId);
-                return;
-         }//if
-console.log("Browser: onCompleted(TabID: " + details.tabId + ", URL: " + details.url +");\n");
-  },
-{ urls: [], types: [] },  []);
-*/
-/*
-chrome.webNavigation.onBeforeNavigate.addListener(function(details) {	
-console.log("Browser: onBeforeNavigate(TabID: " + details.tabId + ", URL: " + details.url +");\n");
-  },
-{ urls: [], types: [] },  []);
-*/
+if (initcache) {
+	tlsaExtCache.init();
+}
 
 //****************************************************************
 // TLS/SSL features for DANE/TLSA validation
