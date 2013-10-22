@@ -175,9 +175,12 @@ init: function() {
 	// Listen for webpage events
 	gBrowser.addProgressListener(daneExtUrlBarListener);
 	//gBrowser.addEventListener("load", onPageLoad, true);
-
 	tlsaExtCache.init();
-	this.clearMFcache('all');
+
+	var clearcache = dnssecExtPrefs.getBool("clearcache");
+	if (clearcache) {
+		this.clearMFcache('all');
+	}
 
 },
 

@@ -42,3 +42,5 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY tlsaonoff.accesskey "P">
 <!ENTITY tlsablock.label "Povolit blokování HTTPS spojení TLSA validátorem">
 <!ENTITY tlsablock.accesskey "H">
+<!ENTITY clearcache.label "Vymazat mezipaměť prohlížeče při každém spuštění">
+<!ENTITY clearcache.accesskey "m">

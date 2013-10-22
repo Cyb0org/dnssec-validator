@@ -36,5 +36,6 @@ pref("extensions.dnssec.popupfgcolor", "");
 pref("extensions.dnssec.popupbgcolor", "");
 pref("extensions.dnssec.tlsa", true);
 pref("extensions.dnssec.tlsablocking", true);
+pref("extensions.dnssec.clearcache", true);
 // See http://kb.mozillazine.org/Localize_extension_descriptions
 // pref("extensions.dnssec@zbynek.michl.description", "chrome://dnssec/locale/dnssec.properties");

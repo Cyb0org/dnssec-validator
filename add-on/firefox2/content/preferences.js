@@ -205,7 +205,7 @@ var dnssecExtPrefs = {
 
     tmpCheck = document.getElementById("dnssec-pref-tlsaonoff").checked;
     document.getElementById("dnssec-pref-tlsablock").disabled = !tmpCheck;
-
+    document.getElementById("dnssec-pref-clearcache").disabled = !tmpCheck;
 
   },
 

@@ -43,6 +43,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
       <preference id="optdnsserveraddr" name="extensions.dnssec.optdnsserveraddr" type="string"/>
       <preference id="domainfilteron" name="extensions.dnssec.domainfilteron" type="bool"/>
       <preference id="tlsablocking" name="extensions.dnssec.tlsablocking" type="bool"/>
+      <preference id="clearcache" name="extensions.dnssec.clearcache" type="bool"/>
       <preference id="tlsa" name="extensions.dnssec.tlsa" type="bool"/>
       <preference id="domainlist" name="extensions.dnssec.domainlist" type="string"/>
       <preference id="version" name="extensions.dnssec.version" type="string"/>
@@ -50,6 +51,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
       <preference id="popupfgcolor" name="extensions.dnssec.popupfgcolor" type="string"/>
       <preference id="popupbgcolor" name="extensions.dnssec.popupbgcolor" type="string"/>
     </preferences>
+
     <groupbox>
       <caption label="&groupboxdnsserver.label;"/>
       <radiogroup id="dnssec-pref-dnsserverchoose" preference="dnsserverchoose" oncommand="dnssecExtPrefs.dnsserverchooseCommand();">
@@ -94,6 +96,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
       <caption label="&groupboxtlsa.label;"/>
       <checkbox id="dnssec-pref-tlsaonoff" label="&tlsaonoff.label;" preference="tlsa" accesskey="&tlsaonoff.accesskey;" checked="true" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
       <checkbox id="dnssec-pref-tlsablock" label="&tlsablock.label;" preference="tlsablocking" accesskey="&tlsablock.accesskey;" checked="true" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
+      <checkbox id="dnssec-pref-clearcache" label="&clearcache.label;" preference="clearcache" accesskey="&clearcache.accesskey;" checked="true" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
     </groupbox>
     <separator class="groove-thin"/>
 </prefpane>

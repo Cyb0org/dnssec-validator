@@ -42,3 +42,5 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY tlsaonoff.accesskey "T">
 <!ENTITY tlsablock.label "Cancel HTTPS connection when TLSA validation fail">
 <!ENTITY tlsablock.accesskey "H">
+<!ENTITY clearcache.label "Clear browser cache at start-up">
+<!ENTITY clearcache.accesskey "b">
