@@ -30,6 +30,7 @@ document.write("<script>");
 // debug pretext
 var DANE = "DANE: ";
 var olddomain = "null";
+var currenturl = "null";
 var laststate = 0;
 var initcache = true;
 
@@ -494,15 +495,27 @@ function onUrlChange(tabId, changeInfo, tab) {
 		chrome.pageAction.hide(tabId);
 		return;
 	}//if
+
+
 	
 	if (changeInfo.status=="loading") {
 		console.log("\nBrowser: onUrlChange(TabID: " + tabId + ", URL: " + tab.url +");");
+
+
 		chrome.pageAction.setPopup({tabId: tabId, popup: ""});
 		var scheme = httpscheme(tab.url);
 	        var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
+		currenturl = domain;
 	        var ret = TLSAvalidate(scheme,domain);
 		setTLSASecurityState(tabId, domain, ret, "xxx");
 	}
+
+	if (changeInfo.status=="complete") {		
+		currenturl = "null";
+
+	}
+
+
 }; // onUrlChange
 
 
@@ -563,10 +576,16 @@ chrome.webRequest.onBeforeRequest.addListener(
 			}
 			else if (cacheitem[0] == '' && cacheitem[1] == '') {
 				 return;
+			} else if (currenturl != "null") {
+					return;		
 			}
 		}
 		else {
 			olddomain = domain;
+			var cacheitem = tlsaExtCache.getRecord(domain);
+			if (cacheitem[1] == 'no') {
+				return;
+			}
 		}
 		console.log("\nBrowser: onBeforeRequest(TabID: " + details.tabId + ", URL: " + details.url +");");	
 
