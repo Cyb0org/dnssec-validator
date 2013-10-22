@@ -160,6 +160,7 @@ function saveOptions() {
     localStorage["dnssecDebugOutput"] = document.tlsaSettings.debugOutput.checked;
 	localStorage["domainfilteron"] = document.tlsaSettings.domainfilteron.checked;
 	localStorage["blockhttps"] = document.tlsaSettings.blockhttps.checked;
+	localStorage["clearcache"] = document.tlsaSettings.clearcache.checked;
 	localStorage["domainlist"] = document.tlsaSettings.domainlist.value;
     var plugin = document.getElementById("tlsa-plugin");
 	plugin.TLSACacheFree();
@@ -300,21 +301,20 @@ function testinfodisplay(state){
 //--------------------------------------------------------
 // Settings window initialization
 //--------------------------------------------------------
-window.addEventListener('load',function(){
+window.addEventListener('load',function() {
 
-    resultRegexp = /\?([^?,]+),([^,]+),([^,]+)$/;
-    matches = resultRegexp.exec(document.location.href);
+	resultRegexp = /\?([^?,]+),([^,]+),([^,]+)$/;
+	matches = resultRegexp.exec(document.location.href);
 	state = matches[1];
-    choice = matches[2];
-    resolver = matches[3];
-    
-	unescape(resolver);
+	choice = matches[2];
+	resolver = matches[3];
+    	unescape(resolver);
 	testinfodisplay(state);
 
-    addText("preftitle", chrome.i18n.getMessage("preftitle"));
-    addText("prefresolver", chrome.i18n.getMessage("prefresolver"));
+	addText("preftitle", chrome.i18n.getMessage("preftitle"));
+	addText("prefresolver", chrome.i18n.getMessage("prefresolver"));
 	addText("legend", chrome.i18n.getMessage("legend"));
-    addText("resolver0", chrome.i18n.getMessage("resolver0"));
+	addText("resolver0", chrome.i18n.getMessage("resolver0"));
 	addText("resolver3", chrome.i18n.getMessage("resolver3"));
 	addText("resolver4", chrome.i18n.getMessage("resolver4"));
 	addText("messageok", chrome.i18n.getMessage("messageok"));
@@ -324,19 +324,21 @@ window.addEventListener('load',function(){
 	addText("groupboxfilter", chrome.i18n.getMessage("groupboxfilter"));
 	addText("usefilter", chrome.i18n.getMessage("usefilter"));
 	addText("filtertext", chrome.i18n.getMessage("filtertext"));
-    addText("blockhttpstext", chrome.i18n.getMessage("blockhttpstext"));
+	addText("blockhttpstext", chrome.i18n.getMessage("blockhttpstext"));
+	addText("clearcachetext", chrome.i18n.getMessage("clearcachetext"));
 	document.getElementById("testbutton").value=chrome.i18n.getMessage("testbutton");
 	document.getElementById("savebutton").value=chrome.i18n.getMessage("savebutton");
 	document.getElementById("cancelbutton").value=chrome.i18n.getMessage("cancelbutton");
 
 	if (state==4) {
 		var dnssecResolver = localStorage["dnssecResolver"];
-        // IP address of custom resolver
-        var dnssecCustomResolver = localStorage["dnssecCustomResolver"];
-        // debug output of resolving to stderr
-        var debugOutput = localStorage["dnssecDebugOutput"];
+	        // IP address of custom resolver
+	        var dnssecCustomResolver = localStorage["dnssecCustomResolver"];
+	        // debug output of resolving to stderr
+	        var debugOutput = localStorage["dnssecDebugOutput"];
 		var domainfilteron = localStorage["domainfilteron"];
 		var blockhttps = localStorage["blockhttps"];
+		var clearcache = localStorage["clearcache"];
 		var domainlist = localStorage["domainlist"];
 
 		if (dnssecResolver == undefined) {
@@ -346,15 +348,16 @@ window.addEventListener('load',function(){
 			dnssecCustomResolver = defaultCustomResolver;
 		}
 	        // OMG localstorage has everything as text
-        debugOutput = (debugOutput == undefined || debugOutput == "false") ? false : true;
-
-        document.tlsaSettings.customResolver.value = dnssecCustomResolver;
-        document.tlsaSettings.debugOutput.checked = debugOutput;
-        document.tlsaSettings.domainlist.value = domainlist;
+	        debugOutput = (debugOutput == undefined || debugOutput == "false") ? false : true;
+	        document.tlsaSettings.customResolver.value = dnssecCustomResolver;
+	        document.tlsaSettings.debugOutput.checked = debugOutput;
+	        document.tlsaSettings.domainlist.value = domainlist;
 		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;
-		blockhttps = (blockhttps == undefined || blockhttps == "false") ? false : true;
-        document.tlsaSettings.domainfilteron.checked = domainfilteron;
+		blockhttps = (blockhttps == undefined || blockhttps == "true") ? true : false;
+		clearcache = (clearcache == undefined || clearcache == "true") ? true : false;
+	        document.tlsaSettings.domainfilteron.checked = domainfilteron;
 		document.tlsaSettings.blockhttps.checked = blockhttps;
+		document.tlsaSettings.clearcache.checked = clearcache;
 		var radiogroup = document.tlsaSettings.resolver;
 		for (var i = 0; i < radiogroup.length; i++) {
 			var child = radiogroup[i];
@@ -363,21 +366,23 @@ window.addEventListener('load',function(){
 				    break;
 			}
 		}
-	  }
-	else
-	 {
-	    document.tlsaSettings.customResolver.value = unescape(resolver);
+	}
+	else {
+		document.tlsaSettings.customResolver.value = unescape(resolver);
 		var radiogroup = document.tlsaSettings.resolver;
 		var child = radiogroup[choice];
 		child.checked = "true";
 		var domainfilteron = localStorage["domainfilteron"];
 		var domainlist = localStorage["domainlist"];
 		var blockhttps = localStorage["blockhttps"];
-	    document.tlsaSettings.domainlist.value = domainlist;
+		var clearcache = clearcache["clearcache"];
+		document.tlsaSettings.domainlist.value = domainlist;
 		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;
-	    document.tlsaSettings.domainfilteron.checked = domainfilteron;
-   		blockhttps = (blockhttps == undefined || blockhttps == "false") ? false : true;
-        document.tlsaSettings.blockhttps.checked = blockhttps;			
+		document.tlsaSettings.domainfilteron.checked = domainfilteron;
+   		blockhttps = (blockhttps == undefined || blockhttps == "true") ? true : false;
+		document.tlsaSettings.blockhttps.checked = blockhttps;	
+		clearcache = (clearcache == undefined || clearcache == "true") ? true : false;
+		document.tlsaSettings.clearcache.checked = clearcache;		
 	}  //state
 });
 

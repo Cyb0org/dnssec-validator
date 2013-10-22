@@ -17,6 +17,9 @@
 	"filtertext": {
 		"message": "Liste ausgeschlossener Domänen und TLDs (mit Komma abgetrennt)"
 		},
+	"clearcachetext": {
+		"message": "Lösche Browser-Cache beim Neustart"
+		},
 	"legend": {
 		"message": "Resolver-Einstellungen"
 		},

@@ -17,6 +17,9 @@
 	"filtertext": {
 		"message": "List of domains or TLDs (separated by commas)"
 		},
+	"clearcachetext": {
+		"message": "Clear browser cache at start-up"
+		},
 	"legend": {
 		"message": "Resolver settings"
 		},

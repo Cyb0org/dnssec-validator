@@ -496,6 +496,7 @@ function onUrlChange(tabId, changeInfo, tab) {
 	}//if
 	
 	if (changeInfo.status=="loading") {
+		console.log("\nBrowser: onUrlChange(TabID: " + tabId + ", URL: " + tab.url +");");
 		chrome.pageAction.setPopup({tabId: tabId, popup: ""});
 		var scheme = httpscheme(tab.url);
 	        var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
@@ -598,8 +599,22 @@ chrome.webRequest.onBeforeRequest.addListener(
 }, {urls: ["<all_urls>"]}, ["blocking"]);
 
 
+var callback = function () {
+  // Do something clever here once data has been removed.
+};
+
+
 if (initcache) {
 	tlsaExtCache.init();
+	var clearcache = localStorage["clearcache"];
+	clearcache = (clearcache == undefined || clearcache == "true") ? true : false;
+	if (clearcache) {
+		// new API since Chrome Dev 19.0.1055.1
+		if( chrome['browsingData'] && chrome['browsingData']['removeCache'] ){
+			chrome.browsingData.removeCache( {'since': 0}, callback);
+			console.log(DANE + "Clear browser cache....");
+		}	
+	}
 }
 
 //****************************************************************
