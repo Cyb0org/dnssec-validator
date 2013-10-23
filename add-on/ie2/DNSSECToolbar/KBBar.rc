@@ -3,20 +3,20 @@ Copyright 2012 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz>
 
-This file is part of DNSSEC Validator Add-on.
+This file is part of DNSSEC/TLSA Validator Add-on.
 
-DNSSEC Validator Add-on is free software: you can redistribute it and/or
+DNSSEC/TLSA Validator Add-on is free software: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or (at your
 option) any later version.
 
-DNSSEC Validator Add-on is distributed in the hope that it will be useful,
+DNSSEC/TLSA Validator Add-on is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 more details.
 
 You should have received a copy of the GNU General Public License along with
-DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
+DNSSEC/TLSA Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 Some parts of these codes are based on the DNSSECVerify4IENav project
 <http://cs.mty.itesm.mx/dnssecmx>, which is distributed under the Code Project
@@ -34,6 +34,55 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// INIT Bitmap
+//
+IDI_BMP_INIT0		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT1		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT2		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT3		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT4		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT5		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT6		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT7		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT8		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT9		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT10		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT11		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT12		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT13		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT14		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT15		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT16		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT17		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT18		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+/////////////////////////////////////////////////////////////////////////////
+//
+// ICONS
+//
+// DNSSEC ICONS
+IDI_DNSSEC_ICON_INIT		ICON	"res\\dnssec_init.ico"
+IDI_DNSSEC_ICON_ACTION		ICON	"res\\dnssec_action.ico"
+IDI_DNSSEC_ICON_OFF			ICON	"res\\dnssec_off.ico"
+IDI_DNSSEC_ICON_ERROR		ICON	"res\\dnssec_error.ico"
+IDI_DNSSEC_ICON_NO			ICON	"res\\dnssec_no.ico"
+IDI_DNSSEC_ICON_VALID		ICON	"res\\dnssec_valid.ico"
+IDI_DNSSEC_ICON_BOGUS		ICON	"res\\dnssec_bogus.ico"
+IDI_DNSSEC_ICON_IP			ICON	"res\\dnssec_ip.ico"
+IDI_DNSSEC_ICON_ORANGE		ICON	"res\\dnssec_orange.ico"
+// TLSA ICONS
+IDI_TLSA_ICON_INIT			ICON	"res\\tlsa_init.ico"
+IDI_TLSA_ICON_ACTION		ICON	"res\\tlsa_action.ico"
+IDI_TLSA_ICON_OFF			ICON	"res\\tlsa_off.ico"
+IDI_TLSA_ICON_ERROR			ICON	"res\\tlsa_error.ico"
+IDI_TLSA_ICON_NO			ICON	"res\\tlsa_no.ico"
+IDI_TLSA_ICON_NOHTTPS		ICON	"res\\tlsa_nohttps.ico"
+IDI_TLSA_ICON_VALID			ICON	"res\\tlsa_valid.ico"
+IDI_TLSA_ICON_INVALID		ICON	"res\\tlsa_invalid.ico"
+IDI_TLSA_ICON_ORANGE		ICON	"res\\tlsa_orange.ico"
+IDI_TLSA_ICON_NODNSSEC		ICON	"res\\tlsa_nodnssec.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 // English (U.S.) resources
@@ -235,38 +284,6 @@ IDR_KBBARBAND         REGISTRY DISCARDABLE    "KBBarBand.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// INIT Bitmap
-//
-IDI_DNSSEC_BMP_INIT		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_TLSA_BMP_INIT		BITMAP  DISCARDABLE     "res\\tlsa_init.bmp"
-/////////////////////////////////////////////////////////////////////////////
-//
-// ICONS
-//
-// DNSSEC ICONS
-IDI_DNSSEC_ICON_INIT		ICON	"res\\dnssec_init.ico"
-IDI_DNSSEC_ICON_ACTION		ICON	"res\\dnssec_action.ico"
-IDI_DNSSEC_ICON_OFF			ICON	"res\\dnssec_off.ico"
-IDI_DNSSEC_ICON_ERROR		ICON	"res\\dnssec_error.ico"
-IDI_DNSSEC_ICON_NO			ICON	"res\\dnssec_no.ico"
-IDI_DNSSEC_ICON_VALID		ICON	"res\\dnssec_valid.ico"
-IDI_DNSSEC_ICON_BOGUS		ICON	"res\\dnssec_bogus.ico"
-IDI_DNSSEC_ICON_IP			ICON	"res\\dnssec_ip.ico"
-IDI_DNSSEC_ICON_ORANGE		ICON	"res\\dnssec_orange.ico"
-// TLSA ICONS
-IDI_TLSA_ICON_INIT			ICON	"res\\tlsa_init.ico"
-IDI_TLSA_ICON_ACTION		ICON	"res\\tlsa_action.ico"
-IDI_TLSA_ICON_OFF			ICON	"res\\tlsa_off.ico"
-IDI_TLSA_ICON_ERROR			ICON	"res\\tlsa_error.ico"
-IDI_TLSA_ICON_NO			ICON	"res\\tlsa_no.ico"
-IDI_TLSA_ICON_NOHTTPS		ICON	"res\\tlsa_nohttps.ico"
-IDI_TLSA_ICON_VALID			ICON	"res\\tlsa_valid.ico"
-IDI_TLSA_ICON_INVALID		ICON	"res\\tlsa_invalid.ico"
-IDI_TLSA_ICON_ORANGE		ICON	"res\\tlsa_orange.ico"
-IDI_TLSA_ICON_NODNSSEC		ICON	"res\\tlsa_nodnssec.ico"
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Menu
 //
 IDR_MENU_POPUP MENU
@@ -288,14 +305,6 @@ END
 
 STRINGTABLE
 BEGIN
-	
-	IDS_DNSSEC_KEY_TEXT_0 " Not secured by DNSSEC"
-	IDS_DNSSEC_KEY_TEXT_1 " Secured by DNSSEC and DNS records are valid"
-	IDS_DNSSEC_KEY_TEXT_2 " Secured by DNSSEC but IP address can be changed or DNSSEC signature is not valid"
-	IDS_DNSSEC_KEY_TEXT_3 " Secured by DNSSEC but DNS server resolver does not verify validity of DNSSEC signature"
-	IDS_DNSSEC_KEY_TEXT_4 " Not secured by DNSSEC technology"
-	IDS_DNSSEC_KEY_TEXT_5 " Not secured by DNSSEC technology"
-	IDS_DNSSEC_KEY_TEXT_6 " DNS connection error"
 
 	// Deafult
 	IDS_PRE_TEXT_ERROR		"Security of the domain name"
@@ -470,8 +479,10 @@ END
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
-
-
+//*************************************************************************
+//*************************************************************************
+//*************************************************************************
+//*************************************************************************
 
 /////////////////////////////////////////////////////////////////////////////
 //CZECH resources
@@ -506,8 +517,6 @@ BEGIN
 END
 
 #endif    // APSTUDIO_INVOKED
-
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -557,80 +566,6 @@ IDR_KBBARBAND         REGISTRY DISCARDABLE    "KBBarBand.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// INIT Bitmap
-//
-IDI_BMP_INIT0		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT1		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT2		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT3		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT4		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT5		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT6		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT7		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT8		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT9		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT10		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT11		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT12		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT13		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT14		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT15		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT16		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT17		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_BMP_INIT18		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-/////////////////////////////////////////////////////////////////////////////
-//
-// ICONS
-//
-// DNSSEC ICONS
-IDI_DNSSEC_ICON_INIT		ICON	"res\\dnssec_init.ico"
-IDI_DNSSEC_ICON_ACTION		ICON	"res\\dnssec_action.ico"
-IDI_DNSSEC_ICON_OFF			ICON	"res\\dnssec_off.ico"
-IDI_DNSSEC_ICON_ERROR		ICON	"res\\dnssec_error.ico"
-IDI_DNSSEC_ICON_NO			ICON	"res\\dnssec_no.ico"
-IDI_DNSSEC_ICON_VALID		ICON	"res\\dnssec_valid.ico"
-IDI_DNSSEC_ICON_BOGUS		ICON	"res\\dnssec_bogus.ico"
-IDI_DNSSEC_ICON_IP			ICON	"res\\dnssec_ip.ico"
-IDI_DNSSEC_ICON_ORANGE		ICON	"res\\dnssec_orange.ico"
-// TLSA ICONS
-IDI_TLSA_ICON_INIT			ICON	"res\\tlsa_init.ico"
-IDI_TLSA_ICON_ACTION		ICON	"res\\tlsa_action.ico"
-IDI_TLSA_ICON_OFF			ICON	"res\\tlsa_off.ico"
-IDI_TLSA_ICON_ERROR			ICON	"res\\tlsa_error.ico"
-IDI_TLSA_ICON_NO			ICON	"res\\tlsa_no.ico"
-IDI_TLSA_ICON_NOHTTPS		ICON	"res\\tlsa_nohttps.ico"
-IDI_TLSA_ICON_VALID			ICON	"res\\tlsa_valid.ico"
-IDI_TLSA_ICON_INVALID		ICON	"res\\tlsa_invalid.ico"
-IDI_TLSA_ICON_ORANGE		ICON	"res\\tlsa_orange.ico"
-IDI_TLSA_ICON_NODNSSEC		ICON	"res\\tlsa_nodnssec.ico"
-
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
-IDI_DNSSEC_ICON_GREEN1      BITMAP  DISCARDABLE                    "res\\key_green.bmp"
-IDI_DNSSEC_ICON_ACTION1     BITMAP  DISCARDABLE                    "res\\key_action.bmp"
-IDI_DNSSEC_ICON_GREY1       BITMAP  DISCARDABLE                    "res\\key_grey.bmp"
-IDI_DNSSEC_ICON_GREY_RC1    BITMAP  DISCARDABLE                    "res\\key_grey_rc.bmp"
-IDI_DNSSEC_ICON_RED_IP1     BITMAP  DISCARDABLE                    "res\\key_red.bmp"
-IDI_DNSSEC_ICON_RED1        BITMAP  DISCARDABLE                    "res\\key_red.bmp"
-IDI_DNSSEC_ICON_GREY_YT1    BITMAP  DISCARDABLE                    "res\\key_grey_yt.bmp"
-IDI_DNSSEC_ICON_WHITE1    BITMAP  DISCARDABLE						"res\\key_action.bmp"
-
-IDI_DNSSEC_ICON_GREEN      ICON                    "res\\key_green.ico"
-IDI_DNSSEC_ICON_ACTION     ICON                    "res\\key_action.ico"
-IDI_DNSSEC_ICON_GREY       ICON                    "res\\key_grey.ico"
-IDI_DNSSEC_ICON_GREY_RC    ICON                    "res\\key_grey_rc.ico"
-IDI_DNSSEC_ICON_REDIP		ICON                    "res\\key_red.ico"
-IDI_DNSSEC_ICON_RED        ICON                    "res\\key_red.ico"
-IDI_DNSSEC_ICON_GREY_YT    ICON                    "res\\key_grey_yt.ico"
-IDI_DNSSEC_ICON_MIRROR     ICON					"res\\key_green.ico"
-IDI_DNSSEC_ICON_WHITE		ICON					"res\\key_action.ico"
-*/
-/////////////////////////////////////////////////////////////////////////////
-//
 // Menu
 //
 IDR_MENU_POPUP MENU
@@ -644,7 +579,6 @@ BEGIN
     END
 END
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
@@ -652,14 +586,6 @@ END
 
 STRINGTABLE
 BEGIN
-	
-	IDS_DNSSEC_KEY_TEXT_0 " NezabezpeËeno DNSSEC"
-	IDS_DNSSEC_KEY_TEXT_1 " ZabezpeËeno DNSSEC a nedoölo k naruöenÌ integrity DNS zpr·vy p¯i p¯enosu"
-	IDS_DNSSEC_KEY_TEXT_2 " ZabezpeËeno DNSSEC, ale doölo buÔ k pozmÏnÏnÌ IP adres nebo DNSSEC podpis nenÌ validnÌ"
-	IDS_DNSSEC_KEY_TEXT_3 " ZabezpeËeno DNSSEC, ale pouûÌvan˝ DNS server resolver neumÌ ovÏ¯it validitu podpisu"
-	IDS_DNSSEC_KEY_TEXT_4 " NezabezpeËeno DNSSEC technologiÌ"
-	IDS_DNSSEC_KEY_TEXT_5 " NezabezpeËeno DNSSEC technologiÌ"
-	IDS_DNSSEC_KEY_TEXT_6 " P¯i zjiöùov·nÌ DNSSEC zabezpeËenÌ nastala chyba"
 
 	// Deafult
 	IDS_PRE_TEXT_ERROR		"ZabezpeËenÌ domÈnovÈho jmÈna"
@@ -969,6 +895,10 @@ END
 /////////////////////////////////////////////////////////////////////////////
 
 
+//*************************************************************************
+//*************************************************************************
+//*************************************************************************
+//*************************************************************************
 
 /////////////////////////////////////////////////////////////////////////////
 // GERMANY resources
@@ -1174,38 +1104,6 @@ IDR_KBBARBAND         REGISTRY DISCARDABLE    "KBBarBand.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// INIT Bitmap
-//
-IDI_DNSSEC_BMP_INIT		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
-IDI_TLSA_BMP_INIT		BITMAP  DISCARDABLE     "res\\tlsa_init.bmp"
-/////////////////////////////////////////////////////////////////////////////
-//
-// ICONS
-//
-// DNSSEC ICONS
-IDI_DNSSEC_ICON_INIT		ICON	"res\\dnssec_init.ico"
-IDI_DNSSEC_ICON_ACTION		ICON	"res\\dnssec_action.ico"
-IDI_DNSSEC_ICON_OFF			ICON	"res\\dnssec_off.ico"
-IDI_DNSSEC_ICON_ERROR		ICON	"res\\dnssec_error.ico"
-IDI_DNSSEC_ICON_NO			ICON	"res\\dnssec_no.ico"
-IDI_DNSSEC_ICON_VALID		ICON	"res\\dnssec_valid.ico"
-IDI_DNSSEC_ICON_BOGUS		ICON	"res\\dnssec_bogus.ico"
-IDI_DNSSEC_ICON_IP			ICON	"res\\dnssec_ip.ico"
-IDI_DNSSEC_ICON_ORANGE		ICON	"res\\dnssec_orange.ico"
-// TLSA ICONS
-IDI_TLSA_ICON_INIT			ICON	"res\\tlsa_init.ico"
-IDI_TLSA_ICON_ACTION		ICON	"res\\tlsa_action.ico"
-IDI_TLSA_ICON_OFF			ICON	"res\\tlsa_off.ico"
-IDI_TLSA_ICON_ERROR			ICON	"res\\tlsa_error.ico"
-IDI_TLSA_ICON_NO			ICON	"res\\tlsa_no.ico"
-IDI_TLSA_ICON_NOHTTPS		ICON	"res\\tlsa_nohttps.ico"
-IDI_TLSA_ICON_VALID			ICON	"res\\tlsa_valid.ico"
-IDI_TLSA_ICON_INVALID		ICON	"res\\tlsa_invalid.ico"
-IDI_TLSA_ICON_ORANGE		ICON	"res\\tlsa_orange.ico"
-IDI_TLSA_ICON_NODNSSEC		ICON	"res\\tlsa_nodnssec.ico"
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Menu
 //
 IDR_MENU_POPUP MENU
@@ -1226,15 +1124,6 @@ END
 //
 STRINGTABLE
 BEGIN
-
-	IDS_DNSSEC_KEY_TEXT_0 " Not secured by DNSSEC"
-	IDS_DNSSEC_KEY_TEXT_1 " Secured by DNSSEC and DNS records are valid"
-	IDS_DNSSEC_KEY_TEXT_2 " Secured by DNSSEC but IP address can be changed or DNSSEC signature is not valid"
-	IDS_DNSSEC_KEY_TEXT_3 " Secured by DNSSEC but DNS server resolver does not verify validity of DNSSEC signature"
-	IDS_DNSSEC_KEY_TEXT_4 " Not secured by DNSSEC technology"
-	IDS_DNSSEC_KEY_TEXT_5 " Not secured by DNSSEC technology"
-	IDS_DNSSEC_KEY_TEXT_6 " DNS connection error"
-
 		// Deafult
 	IDS_PRE_TEXT_ERROR		"Der Dom‰nenname"
 	IDS_PRE_TEXT_DOMAIN		"Der Dom‰nenname"	

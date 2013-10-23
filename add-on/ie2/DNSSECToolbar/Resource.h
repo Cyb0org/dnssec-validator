@@ -73,22 +73,6 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define IDI_TLSA_ICON_ORANGE				239
 #define IDI_TLSA_ICON_NODNSSEC				240
 
-
-// key icon for DNSSEC dialog
-#define IDI_DNSSEC_ICON_GREEN2             401
-#define IDI_DNSSEC_ICON_RED2               402
-#define IDI_DNSSEC_ICON_ORANGE2            403
-#define IDI_DNSSEC_ICON_GREY2              404
-
-// status bar key status text
-#define	IDS_DNSSEC_KEY_TEXT_0 11110
-#define	IDS_DNSSEC_KEY_TEXT_1 11111
-#define	IDS_DNSSEC_KEY_TEXT_2 11112
-#define	IDS_DNSSEC_KEY_TEXT_3 11113
-#define	IDS_DNSSEC_KEY_TEXT_4 11114
-#define	IDS_DNSSEC_KEY_TEXT_5 11115
-#define	IDS_DNSSEC_KEY_TEXT_6 11116
-
 //  Key Icon
 #define IDR_MENU_POPUP		            1000
 
