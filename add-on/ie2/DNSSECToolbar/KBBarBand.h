@@ -216,10 +216,9 @@ public:
 	// sets the security status icon
 	void SetSecurityDNSSECStatus(void);
 	void SetSecurityTLSAStatus(void);
-	
-	int GetTLSAindex(int tlsaresult);
+
 	// Index of Bitmap Button	
-	int GetIconIndex(int Bitmap);
+	int GetIconIndex(int icon);
 	// version of IE broswer
 	int GetMSIEversion(int *iMajor, int *iMinor);
 	// loads preference settings from the Windows registry or file

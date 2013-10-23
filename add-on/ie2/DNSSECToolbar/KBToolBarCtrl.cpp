@@ -73,7 +73,7 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* 
 	if (!CToolBarCtrl::Create(DEFAULT_TOOLBAR_STYLE, rcClientParent, pWndParent, NULL))
 		return false;	
 
-	int res, res2 = 0;
+	int res = 0;
 
 	// Generation of Bitmap List Index
 	for (int i=0; i<BITMAP_NUMBER; i++) {
@@ -85,36 +85,22 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* 
 		}//if
 	}
 
-	if (tlsaenable == 1) {
-	// Generation of Bitmap List Index
-		for (int i=0; i<BITMAP_NUMBER_TLSA; i++) {
-			res2 = AddBitmap(1, StatusBitmap2[i]);
-			if (res2 == -1)
-			{
-				DWORD dwError = ::GetLastError();
-				return false;
-			}//if
-		}//for
-	}
 	//lang = GetSystemDefaultLangID();
 	lang = GetUserDefaultLangID();
 	
 	if (lang==0x0405){
 	// 0x0405 CZ
 	// Generation of String List Index CZ
-		for (int i=0; i<BITMAP_NUMBER+1; i++) res = AddStrings(stringtextCZ[i]);
-		if (tlsaenable == 1) for (int i=0; i<BITMAP_NUMBER_TLSA+1; i++) res2 = AddStrings(stringtextCZ2[i]);
+		for (int i=0; i<BITMAP_NUMBER+2; i++) res = AddStrings(stringtextCZ[i]);
 	}
 	// 0x0407 DE
 	else if (lang==0x0407) {
-		for (int i=0; i<BITMAP_NUMBER+1; i++) res = AddStrings(stringtextDE[i]);
-		if (tlsaenable == 1) for (int i=0; i<BITMAP_NUMBER_TLSA+1; i++) res2 = AddStrings(stringtextDE2[i]);
+		for (int i=0; i<BITMAP_NUMBER+2; i++) res = AddStrings(stringtextDE[i]);
 	}
 	else
 	{
 	// Generation of String List Index EN
-		for (int i=0; i<BITMAP_NUMBER+1; i++) res = AddStrings(stringtextEN[i]);
-		if (tlsaenable == 1) for (int i=0; i<BITMAP_NUMBER_TLSA+1; i++) res2 = AddStrings(stringtextEN2[i]);
+		for (int i=0; i<BITMAP_NUMBER+2; i++) res = AddStrings(stringtextEN[i]);
 	} // if
 
 	// set button properties
@@ -124,7 +110,7 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* 
 		tbs.fsStyle = BTNS_DROPDOWN;
 		tbs.iBitmap = 0;
 		tbs.idCommand = ID_BUTTON1;
-		tbs.iString = 8;
+		tbs.iString = BITMAP_NUMBER;
 	// add button into toolbar
 	if (!AddButtons(1, &tbs)) return false;
 
@@ -134,7 +120,7 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* 
 		tbs.fsStyle = BTNS_DROPDOWN;
 		tbs.iBitmap = 0;
 		tbs.idCommand = ID_BUTTON2;
-		tbs.iString = 17;
+		tbs.iString = BITMAP_NUMBER+1;
 		if (!AddButtons(1, &tbs)) return false;
 	}
 
@@ -142,23 +128,46 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* 
 	// set handle on this window
 	m_pBand = pBand;
 			// set ICON instead BMP
+	HICON hIcon;
 	CImageList *pList = CKBToolBarCtrl::GetImageList();
-		HICON hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_ACTION));
-		pList->Replace(0, hIcon); // not 5 as a separate is not an image
-		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_GREEN));
-		pList->Replace(1, hIcon); // not 5 as a separate is not an image
-		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_RED));
-		pList->Replace(2, hIcon); // not 5 as a separate is not an image
-		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_REDIP));
-		pList->Replace(3, hIcon); // not 5 as a separate is not an image
-		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_GREY));
-		pList->Replace(4, hIcon); // not 5 as a separate is not an image
-		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_GREY_RC));
-		pList->Replace(5, hIcon); // not 5 as a separate is not an image
-		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_GREY_YT));
-		pList->Replace(6, hIcon); // not 5 as a separate is not an image
-		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_WHITE));
-		pList->Replace(7, hIcon); // not 5 as a separate is not an image
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_INIT));
+		pList->Replace(0, hIcon); // 
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_OFF));
+		pList->Replace(1, hIcon); // 
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_ERROR));
+		pList->Replace(2, hIcon); //
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_ACTION));
+		pList->Replace(3, hIcon); // 
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_NO));
+		pList->Replace(4, hIcon); //
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_VALID));
+		pList->Replace(5, hIcon); //
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_BOGUS));
+		pList->Replace(6, hIcon); //
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_IP));
+		pList->Replace(7, hIcon); //
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DNSSEC_ICON_ORANGE));
+		pList->Replace(8, hIcon); //
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TLSA_ICON_INIT));
+		pList->Replace(9, hIcon); //
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TLSA_ICON_OFF));
+		pList->Replace(10, hIcon); // 
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TLSA_ICON_ERROR));
+		pList->Replace(11, hIcon); //
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TLSA_ICON_ACTION));
+		pList->Replace(12, hIcon); //
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TLSA_ICON_NODNSSEC));
+		pList->Replace(13, hIcon); // 
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TLSA_ICON_VALID));
+		pList->Replace(14, hIcon); // 
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TLSA_ICON_INVALID));
+		pList->Replace(15, hIcon); //
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TLSA_ICON_NOHTTPS));
+		pList->Replace(16, hIcon); //
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TLSA_ICON_NO));
+		pList->Replace(17, hIcon); //
+		hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TLSA_ICON_ORANGE));
+		pList->Replace(18, hIcon); //
 	CKBToolBarCtrl::SetImageList(pList);
 	CKBToolBarCtrl::Invalidate();
 	
@@ -318,7 +327,7 @@ void CKBToolBarCtrl::OnCommand()
 				dy = (int)rc.bottom;
 			}
 			//ATLTRACE("PWProc3: rcClient l: %d; b: %d; r: %d; t: %d\n",dx, dy, rc.right, rc.top);
-			if (keylogo==4 || keylogo==0) ;
+			if (keylogo==3 || keylogo==0) ;
 			else DialogBox(GHins, MAKEINTRESOURCE(IDD_DIALOG_DNSSEC), NULL, (DLGPROC)DialogProcDnssec);
 		break;
 		}
@@ -374,7 +383,7 @@ bool CKBToolBarCtrl::RepaintButtonDNSSEC(int bindex, int iconindex){
 		tbs.idCommand = ID_BUTTON1;
 		if (textkey) tbs.iString = iconindex;
 		else {
-			tbs.iString = 8;
+			tbs.iString = BITMAP_NUMBER;
 			tbs.fsStyle = BTNS_AUTOSIZE | BTNS_DROPDOWN;
 		}// if textkey
 	//insert of new button into toolbar
@@ -402,9 +411,9 @@ bool CKBToolBarCtrl::RepaintButtonTLSA(int bindex, int iconindex){
 		tbs.fsStyle = BTNS_DROPDOWN;
 		tbs.iBitmap = iconindex;
 		tbs.idCommand = ID_BUTTON2;
-		if (textkey) tbs.iString = iconindex+9;
+		if (textkey) tbs.iString = iconindex;
 		else {
-			tbs.iString = 17;
+			tbs.iString = BITMAP_NUMBER+1;
 			tbs.fsStyle = BTNS_AUTOSIZE | BTNS_DROPDOWN;
 		}// if textkey
 		//insert of new button into toolbar

@@ -40,7 +40,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 // size of buffer for URL parts save
 #define STR_BUF_SIZE	512
 // default icon status 
-WORD statldicon=IDI_DNSSEC_ICON_GREY;
+WORD statldicon=IDI_DNSSEC_ICON_INIT;
 // for ICON KEY status - not used
 WORD ldiconBar;
 char * temp = "";
@@ -60,7 +60,7 @@ short ipv6 = IPv6;
 short ipv46 = IPv4;
 short ipresult = 0;
 short res;
-short tlsaicon;
+short tlsaicon = 9;
 short tlsaresult;
 char*  ipbrowser4;
 char*  ipbrowser6;
@@ -467,7 +467,8 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 				
 				if (strcmp(predomain4,"about:Tabs")==0 || strcmp(predomain4,"about:Blank")==0 || strcmp(predomain4,"about:blank")==0 || strcmp(predomain4,"javascript:false;")==0) 
 				{
-				ldicon = GetIconIndex(IDI_DNSSEC_ICON_GREY1);						
+				ldicon = GetIconIndex(IDI_DNSSEC_ICON_INIT);
+				tlsaicon = GetIconIndex(IDI_TLSA_ICON_INIT);						
 				keylogo=ldicon;
 				RefreshIcons();
 				
@@ -506,7 +507,8 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 				//ATLTRACE(predomain2);
 				if (strcmp(predomain2,"about:Tabs")==0 || strcmp(predomain2,"about:Blank")==0 || strcmp(predomain2,"about:blank")==0 || strcmp(predomain2,"javascript:false;")==0) 
 				{
-				ldicon = GetIconIndex(IDI_DNSSEC_ICON_GREY1);						
+				ldicon = GetIconIndex(IDI_DNSSEC_ICON_INIT);
+				tlsaicon = GetIconIndex(IDI_TLSA_ICON_INIT);
 				RefreshIcons();
 				keylogo=ldicon;
 				}
@@ -539,7 +541,8 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 				char * predomain4 =_com_util::ConvertBSTRToString(BURL2);				
 				if (strcmp(predomain4,"about:Tabs")==0 || strcmp(predomain4,"about:Blank")==0 || strcmp(predomain4,"about:blank")==0 || strcmp(predomain4,"javascript:false;")==0) 
 				{
-				ldicon = GetIconIndex(IDI_DNSSEC_ICON_GREY1);						
+				ldicon = GetIconIndex(IDI_DNSSEC_ICON_INIT);
+				tlsaicon = GetIconIndex(IDI_TLSA_ICON_INIT);						
 				keylogo=ldicon;
 				RefreshIcons();
 				
@@ -572,45 +575,12 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 	return S_FALSE;
 }
 
-int CKBBarBand::GetTLSAindex(int tlsaresult){	
-	switch (tlsaresult) {
-		case 10: 
-		case 11: 
-		case 12: 
-		case 13: 
-			return 1;
-			break;
-		case -10: 
-		case -11: 
-		case -12: 
-		case -13: 
-			return 3;
-			break;		
-		case -2: 
-		case -3: 
-		case -4: 
-		case -5: 
-			return 2;
-			break;	
-		case -99: 
-			return 7;
-			break;	
-		default: 
-			return 17; 
-			break;
-			
-	
-	}//switch	
-	
-}
-
-
 /**************************************************************************/
 // refresh icon in the status bar (WM_PAINT invocation)
 /**************************************************************************/
 void CKBBarBand::RefreshIcons(void) {
 	m_wndToolBar.RepaintButtonDNSSEC(0,ldicon);
-	m_wndToolBar.RepaintButtonTLSA(1,GetTLSAindex(tlsaresult));
+	m_wndToolBar.RepaintButtonTLSA(1,tlsaicon);
 }
 
 /**************************************************************************/
@@ -828,13 +798,74 @@ void CKBBarBand::CreateIconTooltip(HWND hwndParent)
 /**************************************************************************/
 // Bitmap index convert
 /**************************************************************************/
-int CKBBarBand::GetIconIndex(int Bitmap)
+int CKBBarBand::GetIconIndex(int icon)
 {	
-	//ATLTRACE("GetIconIndex():\n");
-	for (int i=0; i<BITMAP_NUMBER; i++) {
-	  if (Bitmap==StatusBitmap[i]) return i;
-	}//for
-	return 0;
+	ATLTRACE("GetIconIndex(%d):\n", icon);	
+	int iconindex = 0;
+	switch (icon) {
+	case IDI_DNSSEC_ICON_INIT: 
+			iconindex = 0; 
+			break;
+	case IDI_DNSSEC_ICON_OFF: 
+			iconindex = 1; 
+			break;
+	case IDI_DNSSEC_ICON_ERROR:
+			iconindex = 2; 
+			break;
+	case IDI_DNSSEC_ICON_ACTION: 
+			iconindex = 3; 
+			break;
+	case IDI_DNSSEC_ICON_NO:
+			iconindex = 4;
+			break;
+	case IDI_DNSSEC_ICON_VALID:
+			iconindex = 5; 
+			break;
+	case IDI_DNSSEC_ICON_BOGUS:
+			iconindex = 6;
+			break;
+	case IDI_DNSSEC_ICON_IP:
+			iconindex = 7;
+			break;
+	case IDI_DNSSEC_ICON_ORANGE:
+			iconindex = 8;
+			break;
+	case IDI_TLSA_ICON_INIT: 
+			iconindex = 9;
+			break;
+	case IDI_TLSA_ICON_OFF:
+			iconindex = 10;
+			break;
+	case IDI_TLSA_ICON_ERROR: 
+			iconindex = 11;
+			break;
+	case IDI_TLSA_ICON_ACTION:
+			iconindex = 12;
+			break;
+	case IDI_TLSA_ICON_NODNSSEC: 
+			iconindex = 13; 
+			break;
+	case IDI_TLSA_ICON_VALID: 
+			iconindex = 14; 
+			break;
+	case IDI_TLSA_ICON_INVALID: 
+			iconindex = 15;
+			break;
+	case IDI_TLSA_ICON_NOHTTPS:
+			iconindex = 16; 
+			break;
+	case IDI_TLSA_ICON_NO: 
+			iconindex = 17; 
+			break;
+	case IDI_TLSA_ICON_ORANGE: 
+			iconindex = 18;
+			break;
+	default: 
+			iconindex = 0; 
+			break;
+	}
+		ATLTRACE("GetIconIndexRETURN(%d):\n", iconindex);	
+		return iconindex;
 }//
 
 /**************************************************************************/
@@ -854,112 +885,112 @@ void CKBBarBand::SetSecurityTLSAStatus()
 
 	// state 10
 	case DANE_EXIT_VALIDATION_SUCCESS_TYPE0:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_GREEN);
-		tlsaiconresr = IDI_TLSA_ICON_GREEN;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_VALID);
+		tlsaiconresr = IDI_TLSA_ICON_VALID;
 		panel_label = IDS_DANE_STATE10_LABEL;
 		panel_text1 = IDS_DANE_STATE10_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATE10_TEXT_ADD;
  		break;
     // state 11
 	case DANE_EXIT_VALIDATION_SUCCESS_TYPE1:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_GREEN);
-		tlsaiconresr = IDI_TLSA_ICON_GREEN;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_VALID);
+		tlsaiconresr = IDI_TLSA_ICON_VALID;
 		panel_label = IDS_DANE_STATE11_LABEL;
 		panel_text1 = IDS_DANE_STATE11_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATE11_TEXT_ADD;
  		break;
     // state 12
 	case DANE_EXIT_VALIDATION_SUCCESS_TYPE2:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_GREEN);
-		tlsaiconresr = IDI_TLSA_ICON_GREEN;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_VALID);
+		tlsaiconresr = IDI_TLSA_ICON_VALID;
 		panel_label = IDS_DANE_STATE12_LABEL;
 		panel_text1 = IDS_DANE_STATE12_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATE12_TEXT_ADD;
  		break;
     // state 13
 	case DANE_EXIT_VALIDATION_SUCCESS_TYPE3:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_GREEN);
-		tlsaiconresr = IDI_TLSA_ICON_GREEN;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_VALID);
+		tlsaiconresr = IDI_TLSA_ICON_VALID;
 		panel_label = IDS_DANE_STATE13_LABEL;
 		panel_text1 = IDS_DANE_STATE13_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATE13_TEXT_ADD;
  		break;
     // state -9
 	case DANE_EXIT_VALIDATION_FALSE:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_RED);
-		tlsaiconresr = IDI_TLSA_ICON_RED;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_INVALID);
+		tlsaiconresr = IDI_TLSA_ICON_INVALID;
 		panel_label = IDS_DANE_STATEx9_LABEL;
 		panel_text1 = IDS_DANE_STATEx9_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx9_TEXT_ADD;
  		break;
     // state -10
 	case DANE_EXIT_VALIDATION_FALSE_TYPE0:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_RED);
-		tlsaiconresr = IDI_TLSA_ICON_RED;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_INVALID);
+		tlsaiconresr = IDI_TLSA_ICON_INVALID;
 		panel_label = IDS_DANE_STATEx10_LABEL;
 		panel_text1 = IDS_DANE_STATEx10_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx10_TEXT_ADD;
  		break;
     // state -11
 	case DANE_EXIT_VALIDATION_FALSE_TYPE1:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_RED);
-		tlsaiconresr = IDI_TLSA_ICON_RED;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_INVALID);
+		tlsaiconresr = IDI_TLSA_ICON_INVALID;
 		panel_label = IDS_DANE_STATEx11_LABEL;
 		panel_text1 = IDS_DANE_STATEx11_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx11_TEXT_ADD;
  		break;
     // state -12
 	case DANE_EXIT_VALIDATION_FALSE_TYPE2:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_RED);
-		tlsaiconresr = IDI_TLSA_ICON_RED;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_INVALID);
+		tlsaiconresr = IDI_TLSA_ICON_INVALID;
 		panel_label = IDS_DANE_STATEx12_LABEL;
 		panel_text1 = IDS_DANE_STATEx12_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx12_TEXT_ADD;
  		break;
     // state -13
 	case DANE_EXIT_VALIDATION_FALSE_TYPE3:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_RED);
-		tlsaiconresr = IDI_TLSA_ICON_RED;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_INVALID);
+		tlsaiconresr = IDI_TLSA_ICON_INVALID;
 		panel_label = IDS_DANE_STATEx13_LABEL;
 		panel_text1 = IDS_DANE_STATEx13_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx13_TEXT_ADD;
  		break;
     // state 1
 	case DANE_EXIT_DNSSEC_SECURED:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_GREEN);
-		tlsaiconresr = IDI_TLSA_ICON_GREEN;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_INIT);
+		tlsaiconresr = IDI_TLSA_ICON_INIT;
 		panel_label = IDS_DANE_STATE1_LABEL;
 		panel_text1 = IDS_DANE_STATE1_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATE1_TEXT_ADD;
  		break;
     // state 0
 	case DANE_EXIT_VALIDATION_OFF:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_WHITE);
-		tlsaiconresr = IDI_TLSA_ICON_WHITE;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_OFF);
+		tlsaiconresr = IDI_TLSA_ICON_OFF;
 		panel_label = IDS_DANE_STATE0_LABEL;
 		panel_text1 = IDS_DANE_STATE0_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATE0_TEXT_ADD;
  		break;
 	// state -2
 	case DANE_EXIT_NO_HTTPS:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_GREY);
-		tlsaiconresr = IDI_TLSA_ICON_GREY;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_NOHTTPS);
+		tlsaiconresr = IDI_TLSA_ICON_NOHTTPS;
 		panel_label = IDS_DANE_STATEx2_LABEL;
 		panel_text1 = IDS_DANE_STATEx2_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx2_TEXT_ADD;
  		break;
 	// state -3
 	case DANE_EXIT_NO_TLSA_RECORD:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_GREY);
-		tlsaiconresr = IDI_TLSA_ICON_GREY;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_NO);
+		tlsaiconresr = IDI_TLSA_ICON_NO;
 		panel_label = IDS_DANE_STATEx3_LABEL;
 		panel_text1 = IDS_DANE_STATEx3_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx3_TEXT_ADD;
  		break; 
 	// state -4
 	case DANE_EXIT_DNSSEC_UNSECURED:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_GREY);
-		tlsaiconresr = IDI_TLSA_ICON_GREY;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_NODNSSEC);
+		tlsaiconresr = IDI_TLSA_ICON_NODNSSEC;
 		panel_label = IDS_DANE_STATEx4_LABEL;
 		panel_text1 = IDS_DANE_STATEx4_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx4_TEXT_ADD;
@@ -974,40 +1005,40 @@ void CKBBarBand::SetSecurityTLSAStatus()
  		break;
 	// state -6
 	case DANE_EXIT_NO_CERT_CHAIN:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_ORANGE);
-		tlsaiconresr = IDI_TLSA_ICON_ORANGE;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_INVALID);
+		tlsaiconresr = IDI_TLSA_ICON_INVALID;
 		panel_label = IDS_DANE_STATEx6_LABEL;
 		panel_text1 = IDS_DANE_STATEx6_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx6_TEXT_ADD;
  		break;
 	// state -7
 	case DANE_EXIT_CERT_ERROR:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_ORANGE);
-		tlsaiconresr = IDI_TLSA_ICON_ORANGE;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_INVALID);
+		tlsaiconresr = IDI_TLSA_ICON_INVALID;
 		panel_label = IDS_DANE_STATEx7_LABEL;
 		panel_text1 = IDS_DANE_STATEx7_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx7_TEXT_ADD;
  		break;
 	// state -8
 	case DANE_EXIT_TLSA_PARAM_ERR:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_RED);
-		tlsaiconresr = IDI_TLSA_ICON_RED;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_INVALID);
+		tlsaiconresr = IDI_TLSA_ICON_INVALID;
 		panel_label = IDS_DANE_STATEx8_LABEL;
 		panel_text1 = IDS_DANE_STATEx8_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx8_TEXT_ADD;
  		break;
 	// state -99
 	case DANE_EXIT_WRONG_RESOLVER:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_GREY);
-		tlsaiconresr = IDI_TLSA_ICON_GREY;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_ERROR);
+		tlsaiconresr = IDI_TLSA_ICON_ERROR;
 		panel_label = IDS_DANE_STATEx99_LABEL;
 		panel_text1 = IDS_DANE_STATEx99_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx99_TEXT_ADD;
  		break;	
     case DANE_EXIT_RESOLVER_FAILED:
     default:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_GREY_X);
-		tlsaiconresr = IDI_TLSA_ICON_GREY_X;
+		daneicon = GetIconIndex(IDI_TLSA_ICON_ERROR);
+		tlsaiconresr = IDI_TLSA_ICON_ERROR;
 		panel_label = IDS_DANE_STATEx1_LABEL;
 		panel_text1 = IDS_DANE_STATEx1_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx1_TEXT_ADD;
@@ -1040,8 +1071,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 
 	// state 1
 	case DNSSEC_EXIT_DOMAIN_UNSECURED:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_GREY_RC1);
-		ldiconBar = IDI_DNSSEC_ICON_GREY_RC;
+		ldicon = GetIconIndex(IDI_DNSSEC_ICON_NO);
+		ldiconBar = IDI_DNSSEC_ICON_NO;
 		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE1_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
@@ -1050,8 +1081,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
  		break;		
 	// state 2
 	case DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_GREEN1);
-		ldiconBar = IDI_DNSSEC_ICON_GREEN;
+		ldicon = GetIconIndex(IDI_DNSSEC_ICON_VALID);
+		ldiconBar = IDI_DNSSEC_ICON_VALID;
 		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE2_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
@@ -1060,8 +1091,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
  		break;
 	// state 3
 	case DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_RED_IP1);
-		ldiconBar = IDI_DNSSEC_ICON_REDIP;
+		ldicon = GetIconIndex(IDI_DNSSEC_ICON_IP);
+		ldiconBar = IDI_DNSSEC_ICON_IP;
 		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE3_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
@@ -1070,8 +1101,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
  		break;
 	// state 4
 	case DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_RED1);
-		ldiconBar = IDI_DNSSEC_ICON_RED;
+		ldicon = GetIconIndex(IDI_DNSSEC_ICON_BOGUS);
+		ldiconBar = IDI_DNSSEC_ICON_BOGUS;
 		tiicon = TTI_ERROR;
 		tiicontitle = IDS_STATE4_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
@@ -1080,8 +1111,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
  		break;
 	// state 5
 	case DNSSEC_EXIT_NODOMAIN_UNSECURED:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_GREY_RC1);
-		ldiconBar = IDI_DNSSEC_ICON_GREY_RC;
+		ldicon = GetIconIndex(IDI_DNSSEC_ICON_NO);
+		ldiconBar = IDI_DNSSEC_ICON_NO;
 		tiicon = TTI_WARNING;
 		tiicontitle = IDS_STATE5_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_NODOMAIN;
@@ -1090,8 +1121,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
  		break;
    // state 6
 	case DNSSEC_EXIT_NODOMAIN_SIGNATURE_VALID:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_GREEN1);
-		ldiconBar = IDI_DNSSEC_ICON_GREEN;
+		ldicon = GetIconIndex(IDI_DNSSEC_ICON_VALID);
+		ldiconBar = IDI_DNSSEC_ICON_VALID;
 		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE6_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_NODOMAIN;
@@ -1100,8 +1131,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
  		break;
     // state 7
 	case DNSSEC_EXIT_NODOMAIN_SIGNATURE_INVALID:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_RED1);
-		ldiconBar = IDI_DNSSEC_ICON_RED;
+		ldicon = GetIconIndex(IDI_DNSSEC_ICON_BOGUS);
+		ldiconBar = IDI_DNSSEC_ICON_BOGUS;
 		tiicon = TTI_ERROR;
 		tiicontitle = IDS_STATE7_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_NODOMAIN;
@@ -1110,8 +1141,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
  		break;  
     // state -1
 	case DNSSEC_EXIT_VALIDATOR_OFF:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_WHITE1);
-		ldiconBar = IDI_DNSSEC_ICON_WHITE;
+		ldicon = GetIconIndex(IDI_DNSSEC_ICON_OFF);
+		ldiconBar = IDI_DNSSEC_ICON_OFF;
 		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE01_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
@@ -1120,8 +1151,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
  		break;
 	//-2
 	case DNSSEC_EXIT_WRONG_RESOLVER:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_WHITE1);
-		ldiconBar = IDI_DNSSEC_ICON_WHITE;
+		ldicon = GetIconIndex(IDI_DNSSEC_ICON_ERROR);
+		ldiconBar = IDI_DNSSEC_ICON_ERROR;
 		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE02_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
@@ -1131,8 +1162,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 	// other states
     case DNSSEC_EXIT_FAILED:
     default:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_GREY_YT1);
-		ldiconBar = IDI_DNSSEC_ICON_GREY_YT;
+		ldicon = GetIconIndex(IDI_DNSSEC_ICON_ERROR);
+		ldiconBar = IDI_DNSSEC_ICON_ERROR;
 		tiicon = TTI_ERROR;
 		tiicontitle = IDS_STATE0_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_ERROR;
@@ -1201,7 +1232,7 @@ void CKBBarBand::DnssecStatus(short change)
 
 	//output status has changed , special cases
 	if (strcmp(predomain,"about:Tabs")==0 || strcmp(predomain,"about:Blank")==0 || strcmp(predomain,"about:blank")==0) {
-	ldicon = GetIconIndex(IDI_DNSSEC_ICON_GREY1);						
+	ldicon = GetIconIndex(IDI_DNSSEC_ICON_INIT);						
 	RefreshIcons();
 	}else{
 		//default FAIL URL 

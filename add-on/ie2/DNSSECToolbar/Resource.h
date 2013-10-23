@@ -29,16 +29,50 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define ID_BUTTON1                      32768
 #define ID_BUTTON2	                    32769
 
-// Key BMP
-#define IDI_DNSSEC_ICON_ACTION1            300
-#define IDI_DNSSEC_ICON_GREEN1             301
-#define IDI_DNSSEC_ICON_RED1               302
-#define IDI_DNSSEC_ICON_RED_IP1			303
-#define IDI_DNSSEC_ICON_GREY1              304
-#define IDI_DNSSEC_ICON_GREY_RC1           305
-#define IDI_DNSSEC_ICON_GREY_YT1           306
-#define IDI_DNSSEC_ICON_MIRROR				307
-#define IDI_DNSSEC_ICON_WHITE1				308
+// INIT BMP
+#define IDI_BMP_INIT0	200
+#define IDI_BMP_INIT1	201
+#define IDI_BMP_INIT2	202
+#define IDI_BMP_INIT3	203
+#define IDI_BMP_INIT4	204
+#define IDI_BMP_INIT5	205
+#define IDI_BMP_INIT6	206
+#define IDI_BMP_INIT7	207
+#define IDI_BMP_INIT8	208
+#define IDI_BMP_INIT9	209
+#define IDI_BMP_INIT10	210
+#define IDI_BMP_INIT11	211
+#define IDI_BMP_INIT12	212
+#define IDI_BMP_INIT13	213
+#define IDI_BMP_INIT14	214
+#define IDI_BMP_INIT15	215
+#define IDI_BMP_INIT16	216
+#define IDI_BMP_INIT17	217
+#define IDI_BMP_INIT18	218
+
+// DNSSEC ICONS
+#define IDI_DNSSEC_ICON_INIT				220
+#define IDI_DNSSEC_ICON_ACTION			    221
+#define IDI_DNSSEC_ICON_OFF					222
+#define IDI_DNSSEC_ICON_ERROR				223
+#define IDI_DNSSEC_ICON_NO					224
+#define IDI_DNSSEC_ICON_VALID				225
+#define IDI_DNSSEC_ICON_BOGUS				226
+#define IDI_DNSSEC_ICON_IP					227
+#define IDI_DNSSEC_ICON_ORANGE				228
+
+// TLSA ICONS
+#define IDI_TLSA_ICON_INIT					230
+#define IDI_TLSA_ICON_ACTION			    231
+#define IDI_TLSA_ICON_OFF					232
+#define IDI_TLSA_ICON_ERROR					234
+#define IDI_TLSA_ICON_NO					235
+#define IDI_TLSA_ICON_NOHTTPS				236
+#define IDI_TLSA_ICON_VALID					237
+#define IDI_TLSA_ICON_INVALID				238
+#define IDI_TLSA_ICON_ORANGE				239
+#define IDI_TLSA_ICON_NODNSSEC				240
+
 
 // key icon for DNSSEC dialog
 #define IDI_DNSSEC_ICON_GREEN2             401
@@ -55,23 +89,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define	IDS_DNSSEC_KEY_TEXT_5 11115
 #define	IDS_DNSSEC_KEY_TEXT_6 11116
 
-//TLSA icon
-#define	IDI_TLSA_ICON_GREEN 600
-#define	IDI_TLSA_ICON_RED	601
-#define	IDI_TLSA_ICON_WHITE	602
-#define	IDI_TLSA_ICON_GREY	603
-#define	IDI_TLSA_ICON_GREY_X 604
-#define IDI_TLSA_ICON_ORANGE 605
-
 //  Key Icon
-#define IDI_DNSSEC_ICON_GREEN              220
-#define IDI_DNSSEC_ICON_ACTION             221
-#define IDI_DNSSEC_ICON_GREY               222
-#define IDI_DNSSEC_ICON_GREY_RC            223
-#define IDI_DNSSEC_ICON_REDIP				224
-#define IDI_DNSSEC_ICON_RED                225
-#define IDI_DNSSEC_ICON_GREY_YT            226
-#define IDI_DNSSEC_ICON_WHITE				227
 #define IDR_MENU_POPUP		            1000
 
 	// Deafult
@@ -289,9 +307,9 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        211
+#define _APS_NEXT_RESOURCE_VALUE        21100
 #define _APS_NEXT_COMMAND_VALUE         32775
-#define _APS_NEXT_CONTROL_VALUE         201
-#define _APS_NEXT_SYMED_VALUE           144
+#define _APS_NEXT_CONTROL_VALUE         20100
+#define _APS_NEXT_SYMED_VALUE           14400
 #endif
 #endif

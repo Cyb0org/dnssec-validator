@@ -30,44 +30,36 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #endif // _MSC_VER > 1000
 */
 #pragma once
-const int BITMAP_NUMBER = 8;
-const int StatusBitmap[BITMAP_NUMBER] = {IDI_DNSSEC_ICON_ACTION1 /*0*/, IDI_DNSSEC_ICON_GREEN1 /*1*/,
-	IDI_DNSSEC_ICON_RED1 /*2*/, IDI_DNSSEC_ICON_RED_IP1 /*3*/,  IDI_DNSSEC_ICON_GREY1 /*4*/, 
-	IDI_DNSSEC_ICON_GREY_RC1 /*5*/, IDI_DNSSEC_ICON_GREY_YT1 /*6*/, IDI_DNSSEC_ICON_WHITE1 /*7*/};
+const int BITMAP_NUMBER = 19;
+const int StatusBitmap[BITMAP_NUMBER] = {IDI_BMP_INIT0, IDI_BMP_INIT1, IDI_BMP_INIT2, IDI_BMP_INIT3, IDI_BMP_INIT4,
+			IDI_BMP_INIT5, IDI_BMP_INIT6, IDI_BMP_INIT7, IDI_BMP_INIT8, IDI_BMP_INIT9, IDI_BMP_INIT10, IDI_BMP_INIT11,
+			IDI_BMP_INIT12, IDI_BMP_INIT13, IDI_BMP_INIT14, IDI_BMP_INIT15, IDI_BMP_INIT16, IDI_BMP_INIT17, IDI_BMP_INIT18
+};
 
-const LPCTSTR stringtextCZ[BITMAP_NUMBER+1] = {_T("& DNSSEC Valid·tor\0") /*0*/, _T("& ZabezpeËeno DNSSEC\0") /*1*/,
-	_T("& Neplatn˝ DNSSEC podpis\0") /*2*/, _T("& ZabezpeËeno DNSSEC\0") /*3*/,  _T("& NeaktivnÌ okno Ëi z·loûka\0") /*4*/, 
-	_T("& NezabezpeËeno DNSSEC\0") /*5*/, _T("& Stav DNSSEC nezn·m˝\0") /*6*/, _T("& NeovÏ¯eno DNSSEC\0") /*7*/, _T("& DNSSEC\0") /*8*/};
+const LPCTSTR stringtextCZ[BITMAP_NUMBER+2] = {_T("& DNSSEC Valid·tor\0") /*0*/, _T("& NeovÏ¯eno DNSSEC\0") /*1*/,
+	_T("& Stav DNSSEC nezn·m˝\0") /*2*/, _T("& Zjiöùov·nÌ DNSSEC zabezpeËenÌ\0") /*3*/,  _T("& NezabezpeËeno DNSSEC\0") /*4*/, 
+	_T("& ZabezpeËeno DNSSEC\0") /*5*/, _T("& Neplatn˝ DNSSEC podpis\0") /*6*/, _T("& ZabezpeËeno DNSSEC\0") /*7*/,
+	_T("& NeovÏ¯eno DNSSEC\0") /*8*/, _T("& TLSA Valid·tor\0") /*9*/, _T("& TLSA validace vypnuta\0") /*10*/,
+	_T("& Stav TLSA nezn·m˝\0") /*11*/, _T("& ProbÌh· validace TLSA\0") /*12*/,  _T("& NezabezpeËeno DNSSEC\0") /*13*/, 
+	_T("& Certifik·t odpovÌd· TLSA\0") /*14*/, _T("& Certifik·t neodpovÌd· TLSA\0") /*15*/, _T("& NenÌ HTTPS spojenÌ\0") /*16*/,
+	_T("& Neexistuje TLSA z·znam\0") /*17*/, _T("& Neplatn˝ DNSSEC podpis\0") /*18*/, _T("& DNSSEC\0") /*19*/, _T("& TLSA\0") /*20*/};
 
-const LPCTSTR stringtextEN[BITMAP_NUMBER+1] = {_T("& DNSSEC Validator\0") /*0*/, _T("& Secured by DNSSEC\0") /*1*/,
-	_T("& Bogus DNSSEC signature\0") /*2*/, _T("& Secured by DNSSEC\0") /*3*/,  _T("& Inactive window or tab\0") /*4*/, 
-	_T("& Not secured by DNSSEC\0") /*5*/, _T("& DNSSEC status unknown\0") /*6*/, _T("& Not verified by DNSSEC\0") /*7*/, _T("& DNSSEC\0") /*8*/};
-
-const LPCTSTR stringtextDE[BITMAP_NUMBER+1] = {_T("& DNSSEC Validator\0") /*0*/, _T("& Gesichert durch DNSSEC\0") /*1*/,
-	_T("& Bogus DNSSEC Signatur\0") /*2*/, _T("& Gesichert durch DNSSEC\0") /*3*/,  _T("& Inaktive Fenster oder Tab\0") /*4*/, 
-	_T("& Nicht gesichert durch DNSSEC\0") /*5*/, _T("& DNSSEC-Status unbekannt\0") /*6*/, _T("& Nicht durch DNSSEC gepr¸ft\0") /*7*/, _T("& DNSSEC\0") /*8*/};
-		// Ein Fehler ist beim Abfragen des DNSSEC-Status aufgetreten
-
-
-const int BITMAP_NUMBER_TLSA = 8;
-const int StatusBitmap2[BITMAP_NUMBER_TLSA] = {IDI_DNSSEC_ICON_ACTION1 /*0*/, IDI_DNSSEC_ICON_GREEN1 /*1*/,
-	IDI_DNSSEC_ICON_RED1 /*2*/, IDI_DNSSEC_ICON_RED_IP1 /*3*/,  IDI_DNSSEC_ICON_GREY1 /*4*/, 
-	IDI_DNSSEC_ICON_GREY_RC1 /*5*/, IDI_DNSSEC_ICON_GREY_YT1 /*6*/, IDI_DNSSEC_ICON_WHITE1 /*7*/};
-
-const LPCTSTR stringtextCZ2[BITMAP_NUMBER_TLSA+1] = {_T("& TLSA Valid·tor\0") /*0*/, _T("& Certifik·t odpovÌd· TLSA\0") /*1*/,
-	_T("& Certifik·t neodpovÌd· TLSA\0") /*2*/, _T("& ZabezpeËeno TLSA\0") /*3*/,  _T("& NeaktivnÌ okno Ëi z·loûka\0") /*4*/, 
-	_T("& NezabezpeËeno TLSA\0") /*5*/, _T("& Stav TLSA nezn·m˝\0") /*6*/, _T("& NeovÏ¯eno TLSA\0") /*7*/, _T("& TLSA\0") /*8*/};
-
-const LPCTSTR stringtextEN2[BITMAP_NUMBER_TLSA+1] = {_T("& TLSA Validator\0") /*0*/, _T("& Secured by TLSA\0") /*1*/,
-	_T("& Bogus TLSA signature\0") /*2*/, _T("& Secured by TLSA\0") /*3*/,  _T("& Inactive window or tab\0") /*4*/, 
-	_T("& Not secured by TLSA\0") /*5*/, _T("& TLSA status unknown\0") /*6*/, _T("& Not verified by TLSA\0") /*7*/, _T("& TLSA\0") /*8*/};
-
-const LPCTSTR stringtextDE2[BITMAP_NUMBER_TLSA+1] = {_T("& TLSA Validator\0") /*0*/, _T("& Gesichert durch TLSA\0") /*1*/,
-	_T("& Bogus TLSA Signatur\0") /*2*/, _T("& Gesichert durch TLSA\0") /*3*/,  _T("& Inaktive Fenster oder Tab\0") /*4*/, 
-	_T("& Nicht gesichert durch TLSA\0") /*5*/, _T("& TLSA-Status unbekannt\0") /*6*/, _T("& Nicht durch TLSA gepr¸ft\0") /*7*/, _T("& TLSA\0") /*8*/};
-		// Ein Fehler ist beim Abfragen des TLSA-Status aufgetreten
+const LPCTSTR stringtextEN[BITMAP_NUMBER+2] = {_T("& DNSSEC Validator\0") /*0*/, _T("& Not verified by DNSSEC\0") /*1*/,
+	_T("& DNSSEC status unknown\0") /*2*/, _T("& Retrieving DNSSEC status\0") /*3*/,  _T("& Not secured by DNSSEC\0") /*4*/, 
+	_T("& Secured by DNSSEC\0") /*5*/, _T("& Bogus DNSSEC signature\0") /*6*/, _T("& Secured by DNSSEC\0") /*7*/,
+	_T("& Not verified by DNSSEC\0") /*8*/, _T("& TLSA Validator\0") /*9*/, _T("& TLSA validation disabled\0") /*10*/,
+	_T("& TLSA status unknown\0") /*11*/, _T("& TLSA validation in progress\0") /*12*/,  _T("& Not secured by DNSSEC\0") /*13*/, 
+	_T("& Certificate corresponds to TLSA\0") /*14*/, _T("& TLSA validation failed\0") /*15*/, _T("& No HTTPS connection\0") /*16*/,
+	_T("& Non-existent TLSA record\0") /*17*/, _T("& Bogus DNSSEC signature\0") /*18*/, _T("& DNSSEC\0") /*19*/, _T("& TLSA\0") /*20*/};
 
 
+const LPCTSTR stringtextDE[BITMAP_NUMBER+2] = {_T("& DNSSEC-Validator\0") /*0*/, _T("& Nicht durch DNSSEC gepr¸ft\0") /*1*/,
+	_T("& DNSSEC-Zustand unbekannt\0") /*2*/, _T("& Erwerbung des DNSSEC-Zustandes\0") /*3*/,  _T("& Nicht durch DNSSEC gesichert\0") /*4*/, 
+	_T("& Gesichert durch DNSSEC\0") /*5*/, _T("& Ung¸ltige DNSSEC-Signatur\0") /*6*/, _T("& Gesichert durch DNSSEC\0") /*7*/,
+	_T("& Nicht durch DNSSEC gepr¸ft\0") /*8*/, _T("& TLSA-Validator\0") /*9*/, _T("& TLSA Validierung ausgeschaltet\0") /*10*/,
+	_T("& TLSA Status unbekannt\0") /*11*/, _T("& TLSA Validierung wird durchgef¸hrt\0") /*12*/,  _T("& Nicht durch DNSSEC gesichert\0") /*13*/, 
+	_T("& Zertifikat entspricht TLSA\0") /*14*/, _T("& Zertifikat entspricht nicht TLSA\0") /*15*/, _T("& Keine HTTPS Verbindung\0") /*16*/,
+	_T("& Kein TLSA Eintrag vorhanden\0") /*17*/, _T("& Ung¸ltige DNSSEC Signatur\0") /*18*/, _T("& DNSSEC\0") /*19*/, _T("& TLSA\0") /*20*/};
 class CKBBarBand;
 /////////////////////////////////////////////////////////////////////////////
 // CKBToolBarCtrl window

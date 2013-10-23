@@ -122,7 +122,7 @@ CAPTION "DNSSEC Validator for IE"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,180,92,50,14
-	ICON            IDI_DNSSEC_ICON_MIRROR,IDC_STATIC,20,20,0,0
+	ICON            IDI_DNSSEC_ICON_VALID,IDC_STATIC,20,20,0,0
 	GROUPBOX        "About plugin",IDC_STATIC,10,7,230,80
     LTEXT           "DNSSEC Validator for Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Add-on plugin for DNSSEC checking",IDC_STATIC,50,30,180,10
@@ -167,7 +167,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP
 FONT 8, "Arial", 400, 0, 0x1
 BEGIN
     PUSHBUTTON		"x",IDOK,205,3,10,9
-	ICON			IDI_DNSSEC_ICON_MIRROR, IDC_ST6, 10,5,20,20
+	ICON			IDI_DNSSEC_ICON_VALID, IDC_ST6, 10,5,20,20
 	CONTROL         "www.nic.cz",IDC_ST1,"Static",SS_LEFT,40,5,160,10
     CONTROL			"DNSSEC header",IDC_ST2,"Static",SS_LEFT,40,13,160,20
     CONTROL         "Text1",IDC_ST3,"Static",SS_LEFT,10,30,200,25
@@ -235,26 +235,35 @@ IDR_KBBARBAND         REGISTRY DISCARDABLE    "KBBarBand.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Bitmap
+// INIT Bitmap
 //
-IDI_DNSSEC_ICON_GREEN1      BITMAP  DISCARDABLE                    "res\\key_green.bmp"
-IDI_DNSSEC_ICON_ACTION1     BITMAP  DISCARDABLE                    "res\\key_action.bmp"
-IDI_DNSSEC_ICON_GREY1       BITMAP  DISCARDABLE                    "res\\key_grey.bmp"
-IDI_DNSSEC_ICON_GREY_RC1    BITMAP  DISCARDABLE                    "res\\key_grey_rc.bmp"
-IDI_DNSSEC_ICON_RED_IP1     BITMAP  DISCARDABLE                    "res\\key_red.bmp"
-IDI_DNSSEC_ICON_RED1        BITMAP  DISCARDABLE                    "res\\key_red.bmp"
-IDI_DNSSEC_ICON_GREY_YT1    BITMAP  DISCARDABLE                    "res\\key_grey_yt.bmp"
-IDI_DNSSEC_ICON_WHITE1    BITMAP  DISCARDABLE						"res\\key_action.bmp"
-
-IDI_DNSSEC_ICON_GREEN      ICON                    "res\\key_green.ico"
-IDI_DNSSEC_ICON_ACTION     ICON                    "res\\key_action.ico"
-IDI_DNSSEC_ICON_GREY       ICON                    "res\\key_grey.ico"
-IDI_DNSSEC_ICON_GREY_RC    ICON                    "res\\key_grey_rc.ico"
-IDI_DNSSEC_ICON_REDIP		ICON                    "res\\key_red.ico"
-IDI_DNSSEC_ICON_RED        ICON                    "res\\key_red.ico"
-IDI_DNSSEC_ICON_GREY_YT    ICON                    "res\\key_grey_yt.ico"
-IDI_DNSSEC_ICON_MIRROR     ICON					"res\\key_green.ico"
-IDI_DNSSEC_ICON_WHITE		ICON					"res\\key_action.ico"
+IDI_DNSSEC_BMP_INIT		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_TLSA_BMP_INIT		BITMAP  DISCARDABLE     "res\\tlsa_init.bmp"
+/////////////////////////////////////////////////////////////////////////////
+//
+// ICONS
+//
+// DNSSEC ICONS
+IDI_DNSSEC_ICON_INIT		ICON	"res\\dnssec_init.ico"
+IDI_DNSSEC_ICON_ACTION		ICON	"res\\dnssec_action.ico"
+IDI_DNSSEC_ICON_OFF			ICON	"res\\dnssec_off.ico"
+IDI_DNSSEC_ICON_ERROR		ICON	"res\\dnssec_error.ico"
+IDI_DNSSEC_ICON_NO			ICON	"res\\dnssec_no.ico"
+IDI_DNSSEC_ICON_VALID		ICON	"res\\dnssec_valid.ico"
+IDI_DNSSEC_ICON_BOGUS		ICON	"res\\dnssec_bogus.ico"
+IDI_DNSSEC_ICON_IP			ICON	"res\\dnssec_ip.ico"
+IDI_DNSSEC_ICON_ORANGE		ICON	"res\\dnssec_orange.ico"
+// TLSA ICONS
+IDI_TLSA_ICON_INIT			ICON	"res\\tlsa_init.ico"
+IDI_TLSA_ICON_ACTION		ICON	"res\\tlsa_action.ico"
+IDI_TLSA_ICON_OFF			ICON	"res\\tlsa_off.ico"
+IDI_TLSA_ICON_ERROR			ICON	"res\\tlsa_error.ico"
+IDI_TLSA_ICON_NO			ICON	"res\\tlsa_no.ico"
+IDI_TLSA_ICON_NOHTTPS		ICON	"res\\tlsa_nohttps.ico"
+IDI_TLSA_ICON_VALID			ICON	"res\\tlsa_valid.ico"
+IDI_TLSA_ICON_INVALID		ICON	"res\\tlsa_invalid.ico"
+IDI_TLSA_ICON_ORANGE		ICON	"res\\tlsa_orange.ico"
+IDI_TLSA_ICON_NODNSSEC		ICON	"res\\tlsa_nodnssec.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -548,6 +557,57 @@ IDR_KBBARBAND         REGISTRY DISCARDABLE    "KBBarBand.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// INIT Bitmap
+//
+IDI_BMP_INIT0		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT1		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT2		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT3		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT4		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT5		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT6		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT7		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT8		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT9		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT10		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT11		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT12		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT13		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT14		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT15		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT16		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT17		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT18		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+/////////////////////////////////////////////////////////////////////////////
+//
+// ICONS
+//
+// DNSSEC ICONS
+IDI_DNSSEC_ICON_INIT		ICON	"res\\dnssec_init.ico"
+IDI_DNSSEC_ICON_ACTION		ICON	"res\\dnssec_action.ico"
+IDI_DNSSEC_ICON_OFF			ICON	"res\\dnssec_off.ico"
+IDI_DNSSEC_ICON_ERROR		ICON	"res\\dnssec_error.ico"
+IDI_DNSSEC_ICON_NO			ICON	"res\\dnssec_no.ico"
+IDI_DNSSEC_ICON_VALID		ICON	"res\\dnssec_valid.ico"
+IDI_DNSSEC_ICON_BOGUS		ICON	"res\\dnssec_bogus.ico"
+IDI_DNSSEC_ICON_IP			ICON	"res\\dnssec_ip.ico"
+IDI_DNSSEC_ICON_ORANGE		ICON	"res\\dnssec_orange.ico"
+// TLSA ICONS
+IDI_TLSA_ICON_INIT			ICON	"res\\tlsa_init.ico"
+IDI_TLSA_ICON_ACTION		ICON	"res\\tlsa_action.ico"
+IDI_TLSA_ICON_OFF			ICON	"res\\tlsa_off.ico"
+IDI_TLSA_ICON_ERROR			ICON	"res\\tlsa_error.ico"
+IDI_TLSA_ICON_NO			ICON	"res\\tlsa_no.ico"
+IDI_TLSA_ICON_NOHTTPS		ICON	"res\\tlsa_nohttps.ico"
+IDI_TLSA_ICON_VALID			ICON	"res\\tlsa_valid.ico"
+IDI_TLSA_ICON_INVALID		ICON	"res\\tlsa_invalid.ico"
+IDI_TLSA_ICON_ORANGE		ICON	"res\\tlsa_orange.ico"
+IDI_TLSA_ICON_NODNSSEC		ICON	"res\\tlsa_nodnssec.ico"
+
+
+/*
+/////////////////////////////////////////////////////////////////////////////
+//
 // Bitmap
 //
 IDI_DNSSEC_ICON_GREEN1      BITMAP  DISCARDABLE                    "res\\key_green.bmp"
@@ -568,7 +628,7 @@ IDI_DNSSEC_ICON_RED        ICON                    "res\\key_red.ico"
 IDI_DNSSEC_ICON_GREY_YT    ICON                    "res\\key_grey_yt.ico"
 IDI_DNSSEC_ICON_MIRROR     ICON					"res\\key_green.ico"
 IDI_DNSSEC_ICON_WHITE		ICON					"res\\key_action.ico"
-
+*/
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
@@ -794,7 +854,7 @@ CAPTION "DNSSEC Validátor pro IE"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,180,92,50,14
-	ICON            IDI_DNSSEC_ICON_MIRROR,IDC_STATIC,20,20,0,0
+	ICON            IDI_DNSSEC_ICON_VALID,IDC_STATIC,20,20,0,0
 	GROUPBOX        "O pluginu",IDC_STATIC,10,7,230,80
     LTEXT           "DNSSEC Validátor pro Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Zásuvný plugin pro kontrolu DNSSEC",IDC_STATIC,50,30,180,10
@@ -810,7 +870,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP
 FONT 8, "Arial", 400, 0, 0x1
 BEGIN
     PUSHBUTTON		"x",IDOK,205,3,10,9
-	ICON			IDI_DNSSEC_ICON_MIRROR, IDC_ST6, 10,5,20,20
+	ICON			IDI_DNSSEC_ICON_VALID, IDC_ST6, 10,5,20,20
 	CONTROL         "www.nic.cz",IDC_ST1,"Static",SS_LEFT,40,5,160,10
     CONTROL			"DNSSEC hlavièka",IDC_ST2,"Static",SS_LEFT,40,13,160,20
     CONTROL         "Text1",IDC_ST3,"Static",SS_LEFT,10,30,200,25
@@ -829,7 +889,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP
 FONT 8, "Arial", 400, 0, 0x1
 BEGIN
     PUSHBUTTON		"x",IDOK,205,3,10,9
-	ICON			IDI_DNSSEC_ICON_MIRROR, IDC_ST6_TLSA, 10,5,20,20
+	ICON			IDI_DNSSEC_ICON_VALID, IDC_ST6_TLSA, 10,5,20,20
 	CONTROL         "www.nic.cz",IDC_ST1_TLSA,"Static",SS_LEFT,40,5,160,10
     CONTROL			"DNSSEC hlavièka",IDC_ST2_TLSA,"Static",SS_LEFT,40,13,160,20
     CONTROL         "Text1",IDC_ST3_TLSA,"Static",SS_LEFT,10,30,200,25
@@ -997,7 +1057,7 @@ CAPTION "DNSSEC Validator für IE"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "Ja",IDOK,180,92,50,14
-	ICON            IDI_DNSSEC_ICON_MIRROR,IDC_STATIC,20,20,0,0
+	ICON            IDI_DNSSEC_ICON_VALID,IDC_STATIC,20,20,0,0
 	GROUPBOX        "Über plugin",IDC_STATIC,10,7,230,80
     LTEXT           "DNSSEC Validator für Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Add-on für DNSSEC Validierung",IDC_STATIC,50,30,180,10
@@ -1044,7 +1104,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP
 FONT 8, "Arial", 400, 0, 0x1
 BEGIN
     PUSHBUTTON		"x",IDOK,205,3,10,9
-	ICON			IDI_DNSSEC_ICON_MIRROR, IDC_ST6, 10,5,20,20
+	ICON			IDI_DNSSEC_ICON_VALID, IDC_ST6, 10,5,20,20
 	CONTROL         "www.nic.cz",IDC_ST1,"Static",SS_LEFT,40,5,160,10
     CONTROL			"DNSSEC header",IDC_ST2,"Static",SS_LEFT,40,13,160,20
     CONTROL         "Text1",IDC_ST3,"Static",SS_LEFT,10,30,200,25
@@ -1114,26 +1174,35 @@ IDR_KBBARBAND         REGISTRY DISCARDABLE    "KBBarBand.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Bitmap
+// INIT Bitmap
 //
-IDI_DNSSEC_ICON_GREEN1      BITMAP  DISCARDABLE                    "res\\key_green.bmp"
-IDI_DNSSEC_ICON_ACTION1     BITMAP  DISCARDABLE                    "res\\key_action.bmp"
-IDI_DNSSEC_ICON_GREY1       BITMAP  DISCARDABLE                    "res\\key_grey.bmp"
-IDI_DNSSEC_ICON_GREY_RC1    BITMAP  DISCARDABLE                    "res\\key_grey_rc.bmp"
-IDI_DNSSEC_ICON_RED_IP1     BITMAP  DISCARDABLE                    "res\\key_red.bmp"
-IDI_DNSSEC_ICON_RED1        BITMAP  DISCARDABLE                    "res\\key_red.bmp"
-IDI_DNSSEC_ICON_GREY_YT1    BITMAP  DISCARDABLE                    "res\\key_grey_yt.bmp"
-IDI_DNSSEC_ICON_WHITE1    BITMAP  DISCARDABLE						"res\\key_action.bmp"
-
-IDI_DNSSEC_ICON_GREEN      ICON                    "res\\key_green.ico"
-IDI_DNSSEC_ICON_ACTION     ICON                    "res\\key_action.ico"
-IDI_DNSSEC_ICON_GREY       ICON                    "res\\key_grey.ico"
-IDI_DNSSEC_ICON_GREY_RC    ICON                    "res\\key_grey_rc.ico"
-IDI_DNSSEC_ICON_REDIP		ICON                    "res\\key_red.ico"
-IDI_DNSSEC_ICON_RED        ICON                    "res\\key_red.ico"
-IDI_DNSSEC_ICON_GREY_YT    ICON                    "res\\key_grey_yt.ico"
-IDI_DNSSEC_ICON_MIRROR     ICON					"res\\key_green.ico"
-IDI_DNSSEC_ICON_WHITE		ICON					"res\\key_action.ico"
+IDI_DNSSEC_BMP_INIT		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_TLSA_BMP_INIT		BITMAP  DISCARDABLE     "res\\tlsa_init.bmp"
+/////////////////////////////////////////////////////////////////////////////
+//
+// ICONS
+//
+// DNSSEC ICONS
+IDI_DNSSEC_ICON_INIT		ICON	"res\\dnssec_init.ico"
+IDI_DNSSEC_ICON_ACTION		ICON	"res\\dnssec_action.ico"
+IDI_DNSSEC_ICON_OFF			ICON	"res\\dnssec_off.ico"
+IDI_DNSSEC_ICON_ERROR		ICON	"res\\dnssec_error.ico"
+IDI_DNSSEC_ICON_NO			ICON	"res\\dnssec_no.ico"
+IDI_DNSSEC_ICON_VALID		ICON	"res\\dnssec_valid.ico"
+IDI_DNSSEC_ICON_BOGUS		ICON	"res\\dnssec_bogus.ico"
+IDI_DNSSEC_ICON_IP			ICON	"res\\dnssec_ip.ico"
+IDI_DNSSEC_ICON_ORANGE		ICON	"res\\dnssec_orange.ico"
+// TLSA ICONS
+IDI_TLSA_ICON_INIT			ICON	"res\\tlsa_init.ico"
+IDI_TLSA_ICON_ACTION		ICON	"res\\tlsa_action.ico"
+IDI_TLSA_ICON_OFF			ICON	"res\\tlsa_off.ico"
+IDI_TLSA_ICON_ERROR			ICON	"res\\tlsa_error.ico"
+IDI_TLSA_ICON_NO			ICON	"res\\tlsa_no.ico"
+IDI_TLSA_ICON_NOHTTPS		ICON	"res\\tlsa_nohttps.ico"
+IDI_TLSA_ICON_VALID			ICON	"res\\tlsa_valid.ico"
+IDI_TLSA_ICON_INVALID		ICON	"res\\tlsa_invalid.ico"
+IDI_TLSA_ICON_ORANGE		ICON	"res\\tlsa_orange.ico"
+IDI_TLSA_ICON_NODNSSEC		ICON	"res\\tlsa_nodnssec.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
