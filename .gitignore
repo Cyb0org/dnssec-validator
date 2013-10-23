@@ -37,6 +37,7 @@ firefox/install.rdf
 plugin/FireBreath/
 plugin/build/
 tmp_build/
+add-on/firefox2/content/about.xul
 .*.swp
 
 #compiled plugin libraries
