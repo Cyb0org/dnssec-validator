@@ -24,6 +24,6 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 @import url("chrome://dnssec/skin/overlay-tlsa.css");
 
 #dnssec-box {
-  height: 18px;
-  padding: 1px 2px;
+  height: 19px;
+  padding: 0px 0px;
 }
