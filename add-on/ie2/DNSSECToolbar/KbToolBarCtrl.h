@@ -49,8 +49,8 @@ const LPCTSTR stringtextEN[BITMAP_NUMBER+2] = {_T("& DNSSEC Validator\0") /*0*/,
 	_T("& Secured by DNSSEC\0") /*5*/, _T("& Bogus DNSSEC signature\0") /*6*/, _T("& Secured by DNSSEC\0") /*7*/,
 	_T("& Not verified by DNSSEC\0") /*8*/, _T("& TLSA Validator\0") /*9*/, _T("& TLSA validation disabled\0") /*10*/,
 	_T("& TLSA status unknown\0") /*11*/, _T("& TLSA validation in progress\0") /*12*/,  _T("& Not secured by DNSSEC\0") /*13*/, 
-	_T("& Certificate corresponds to TLSA\0") /*14*/, _T("& TLSA validation failed\0") /*15*/, _T("& No HTTPS connection\0") /*16*/,
-	_T("& Non-existent TLSA record\0") /*17*/, _T("& Bogus DNSSEC signature\0") /*18*/, _T("& DNSSEC\0") /*19*/, _T("& TLSA\0") /*20*/};
+	_T("& Certificate corresponds to TLSA\0") /*14*/, _T("& Certificate doesn't correspond to TLSA\0") /*15*/, _T("& No HTTPS connection\0") /*16*/,
+	_T("& TLSA record does not exist\0") /*17*/, _T("& Bogus DNSSEC signature\0") /*18*/, _T("& DNSSEC\0") /*19*/, _T("& TLSA\0") /*20*/};
 
 
 const LPCTSTR stringtextDE[BITMAP_NUMBER+2] = {_T("& DNSSEC-Validator\0") /*0*/, _T("& Nicht durch DNSSEC geprüft\0") /*1*/,

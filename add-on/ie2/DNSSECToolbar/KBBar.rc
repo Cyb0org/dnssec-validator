@@ -126,8 +126,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,0
- PRODUCTVERSION 2,0
+ FILEVERSION 2,1
+ PRODUCTVERSION 2,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -143,13 +143,13 @@ BEGIN
         BLOCK "040904B0"
         BEGIN
             VALUE "CompanyName", "CZ.NIC Labs"
-            VALUE "FileDescription", "DNSSEC Validator for IE\0"
-            VALUE "FileVersion", "2,0\0"
+            VALUE "FileDescription", "DNSSEC/TLSA Validator for IE\0"
+            VALUE "FileVersion", "2,1\0"
             VALUE "InternalName", "IEdnssec.dll\0"
             VALUE "LegalCopyright", "Copyright 2012\0"
             VALUE "OriginalFilename", "IEdnssec.dll\0"
-            VALUE "ProductName", "DNSSEC Validator for IE\0"
-            VALUE "ProductVersion", "2,0\0"
+            VALUE "ProductName", "DNSSEC/TLSA Validator for IE\0"
+            VALUE "ProductVersion", "2,1\0"
             VALUE "OLESelfRegister", "\0"
         END
     END
@@ -167,16 +167,16 @@ END
 IDD_DIALOG_MAIN_ABOUT DIALOGEX 0, 0, 250, 110
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
-CAPTION "DNSSEC Validator for IE"
+CAPTION "DNSSEC/TLSA Validator for IE"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,180,92,50,14
 	ICON            IDI_DNSSEC_ICON_VALID,IDC_STATIC,20,20,0,0
 	GROUPBOX        "About plugin",IDC_STATIC,10,7,230,80
-    LTEXT           "DNSSEC Validator for Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
-    LTEXT           "Add-on plugin for DNSSEC checking",IDC_STATIC,50,30,180,10
+    LTEXT           "DNSSEC/TLSA Validator for Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
+    LTEXT           "Add-on plugin for DNSSEC and TLSA checking",IDC_STATIC,50,30,180,10
     LTEXT           "Support browsers: 32-bit version of IE6 - IE10",IDC_STATIC,50,40,180,10
-    LTEXT           "Version 2.0.1", IDC_STATIC,50,50,180,10
+    LTEXT           "Version 2.1.0", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2013", IDC_STATIC,50,70,100,10
 	LTEXT           "http://www.dnssec-validator.cz/", IDC_LINK,10,95,120,10
@@ -363,83 +363,83 @@ BEGIN
 
 		// state 10
 	IDS_DANE_STATE10_LABEL "Certificate corresponds to TLSA"
-	IDS_DANE_STATE10_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
-	IDS_DANE_STATE10_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate passed the PKIX validation and corresponds with the CA certificate in the TLSA record (type 0) which is secured by DNSSEC technology."
+	IDS_DANE_STATE10_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE protocol. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
+	IDS_DANE_STATE10_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate passed the PKIX validation and corresponds with the CA certificate in the TLSA record (type 0). TLSA record is secured by DNSSEC technology."
     // state 11
 	IDS_DANE_STATE11_LABEL "Certificate corresponds to TLSA"
-	IDS_DANE_STATE11_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
-	IDS_DANE_STATE11_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate passed the PKIX validation and corresponds with the EE certificate in the TLSA record (type 1) which is secured by DNSSEC technology."
+	IDS_DANE_STATE11_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE protocol. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
+	IDS_DANE_STATE11_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate passed the PKIX validation and corresponds with the EE certificate in the TLSA record (type 1). TLSA record is secured by DNSSEC technology."
     // state 12
 	IDS_DANE_STATE12_LABEL	"Certificate corresponds to TLSA"
-	IDS_DANE_STATE12_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
-	IDS_DANE_STATE12_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate passed the PKIX validation and corresponds with the CA certificate in the TLSA record (type 2) which is secured by DNSSEC technology."
+	IDS_DANE_STATE12_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE protocol. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
+	IDS_DANE_STATE12_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate passed the PKIX validation and corresponds with the CA certificate in the TLSA record (type 2). TLSA record is secured by DNSSEC technology."
     // state 13
 	IDS_DANE_STATE13_LABEL "Certificate corresponds to TLSA"	
-	IDS_DANE_STATE13_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
-	IDS_DANE_STATE13_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate is corresponding with the EE certificate in the TLSA record (type 3) which is secured by DNSSEC technology."
+	IDS_DANE_STATE13_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE protocol. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
+	IDS_DANE_STATE13_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate is corresponding with the EE certificate in the TLSA record (type 3). TLSA record is secured by DNSSEC technology."
     // state -9	
-	IDS_DANE_STATEx9_LABEL	"TLSA validation failed"
-	IDS_DANE_STATEx9_TEXT_MAIN "The remote server certificate for this domain name was not verified by DANE. The certificate does not correspond to TLSA record which is secured by DNSSEC technology."
-	IDS_DANE_STATEx9_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."
+	IDS_DANE_STATEx9_LABEL	"Certificate doesn't correspond to TLSA"
+	IDS_DANE_STATEx9_TEXT_MAIN "The DANE protocol verification of remote server's certificate for this domain name failed. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."
+	IDS_DANE_STATEx9_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."
    // state -10
-	IDS_DANE_STATEx10_LABEL	"TLSA validation failed"	
-	IDS_DANE_STATEx10_TEXT_MAIN	"The remote server certificate for this domain name was not verified by DANE. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."
-	IDS_DANE_STATEx10_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate has not passed the PKIX validation and does not correspond with the CA certificate in the TLSA record (type 0) which is secured by DNSSEC technology."
+	IDS_DANE_STATEx10_LABEL	"Certificate doesn't correspond to TLSA"	
+	IDS_DANE_STATEx10_TEXT_MAIN	"The DANE protocol verification of remote server's certificate for this domain name failed. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."
+	IDS_DANE_STATEx10_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name couldn't be verified by DANE protocol. The certificate does not correspond with the CA certificate in the TLSA record (type 0). TLSA record is secured by DNSSEC technology."
     // state -11
-	IDS_DANE_STATEx11_LABEL "TLSA validation failed"		
-	IDS_DANE_STATEx11_TEXT_MAIN "The remote server certificate for this domain name was not verified by DANE. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."		 
-	IDS_DANE_STATEx11_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate has not passed the PKIX validation and does not corresponds with the EE certificate in the TLSA record (type 1) which is secured by DNSSEC technology."	
+	IDS_DANE_STATEx11_LABEL "Certificate doesn't correspond to TLSA"		
+	IDS_DANE_STATEx11_TEXT_MAIN "The DANE protocol verification of remote server's certificate for this domain name failed. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."		 
+	IDS_DANE_STATEx11_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name couldn't be verified by DANE protocol. The certificate does not correspond with the EE certificate in the TLSA record (type 1). TLSA record is secured by DNSSEC technology."	
     // state -12
-	IDS_DANE_STATEx12_LABEL "TLSA validation failed"		
-	IDS_DANE_STATEx12_TEXT_MAIN "The remote server certificate for this domain name was not verified by DANE. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."		 
-	IDS_DANE_STATEx12_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate has not passed the PKIX validation and does not corresponds with the CA certificate in the TLSA record (type 2) which is secured by DNSSEC technology."	
+	IDS_DANE_STATEx12_LABEL "Certificate doesn't correspond to TLSA"		
+	IDS_DANE_STATEx12_TEXT_MAIN "The DANE protocol verification of remote server's certificate for this domain name failed. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."		 
+	IDS_DANE_STATEx12_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name couldn't be verified by DANE protocol. The certificate does not correspond with the CA certificate in the TLSA record (type 2). TLSA record is secured by DNSSEC technology."	
     // state -13
-	IDS_DANE_STATEx13_LABEL "TLSA validation failed"		
-	IDS_DANE_STATEx13_TEXT_MAIN "The remote server certificate for this domain name was not verified by DANE. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."		 
-	IDS_DANE_STATEx13_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate does not correspond with the EE certificate in the TLSA record (type 3) which is secured by DNSSEC technology."	
+	IDS_DANE_STATEx13_LABEL "Certificate doesn't correspond to TLSA"		
+	IDS_DANE_STATEx13_TEXT_MAIN "The DANE protocol verification of remote server's certificate for this domain name failed. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."		 
+	IDS_DANE_STATEx13_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name couldn't be verified by DANE protocol. The certificate does not correspond with the EE certificate in the TLSA record (type 3). TLSA record is secured by DNSSEC technology."	
     // state 1
-	IDS_DANE_STATE1_LABEL "Certificate corresponds to TLSA"
-	IDS_DANE_STATE1_TEXT_MAIN ""	 
-	IDS_DANE_STATE1_TEXT_ADD ""	
+	IDS_DANE_STATE1_LABEL "Secured by DNSSEC"
+	IDS_DANE_STATE1_TEXT_MAIN "Secured by DNSSEC."	 
+	IDS_DANE_STATE1_TEXT_ADD "Secured by DNSSEC."	
     // state 0
 	IDS_DANE_STATE0_LABEL "TLSA validation disabled"	
-	IDS_DANE_STATE0_TEXT_MAIN "The remote server certificate for this domain name was not verified by DANE protocol. The TLSA validation has not been performed because this domain is mentioned in the list of excluded domains."	 
-	IDS_DANE_STATE0_TEXT_ADD "The validity of TLS/SSL remote server certificate for the domain name was not verified by DANE protocol. The TLSA validation has not been performed because this domain is mentioned in the list of excluded domains."	
+	IDS_DANE_STATE0_TEXT_MAIN "The remote server certificate for this domain name was not verified by DANE protocol. The TLSA validation has not been performed because TLSA validation is disabled or this domain is mentioned in the list of excluded domains."	 
+	IDS_DANE_STATE0_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for the domain name was not verified by DANE protocol. The TLSA validation has not been performed because TLSA validation is disabled or this domain name or TLD is mentioned in the list of excluded domains."	
 	// state -2
 	IDS_DANE_STATEx2_LABEL "No HTTPS connection"	
-	IDS_DANE_STATEx2_TEXT_MAIN "No HTTPS secured connection to the remote server was established. Therefore, you can not perform TLSA records validation."	 
-	IDS_DANE_STATEx2_TEXT_ADD "The validity of TLS/SSL remote server certificate for the domain name could not be verified by DANE protocol because the connection to the remote server is not realized via HTTPS."	
+	IDS_DANE_STATEx2_TEXT_MAIN "No HTTPS secured connection to the remote server was established. Therefore, you can not perform TLSA record validation."	 
+	IDS_DANE_STATEx2_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for the domain name could not be verified by DANE protocol because the connection to the remote server is not realized via HTTPS protocol."	
 	// state -3
-	IDS_DANE_STATEx3_LABEL "Non-existent TLSA record"	
+	IDS_DANE_STATEx3_LABEL "TLSA record does not exist"	
 	IDS_DANE_STATEx3_TEXT_MAIN "The remote server certificate for this domain name could not be verified by DANE protocol because there is no TLSA record for this domain name."	 
-	IDS_DANE_STATEx3_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name could not be verified by protocol DANE because there is no TLSA record for this domain name."	
+	IDS_DANE_STATEx3_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name could not be verified by DANE protocol because there is no TLSA record for this domain name."	
 	// state -4
 	 IDS_DANE_STATEx4_LABEL	"Not secured by DNSSEC"	
 	 IDS_DANE_STATEx4_TEXT_MAIN "This domain name is not secured by DNSSEC, therefore it is not possible to verify the validity of remote server certifcate by DANE protocol."		 
-	 IDS_DANE_STATEx4_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name could not be verified by DANE protocol because this domain name is not secured by DNSSEC."	
+	 IDS_DANE_STATEx4_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name could not be verified by DANE protocol because this domain name is not secured by DNSSEC."	
 	// state -5
 	 IDS_DANE_STATEx5_LABEL	"Bogus DNSSEC signature"	
 	 IDS_DANE_STATEx5_TEXT_MAIN "This domain name is secured by DNSSEC but an invalid domain name signature has been detected. Therefore, the validation of the server certificate can not be verified by DANE protocol."		 
-	 IDS_DANE_STATEx5_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name can not be verified by DANE protocol because an invalid domain name signature has been detected by DNSSEC."	
+	 IDS_DANE_STATEx5_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name can not be verified by DANE protocol because an invalid domain name signature has been detected by DNSSEC."	
 	// state -6
 	 IDS_DANE_STATEx6_LABEL	"Unable to get certificate"	
 	 IDS_DANE_STATEx6_TEXT_MAIN "The remote server certificate for this domain name can not be verified by DANE protocol because the certificate chain could not be obtained."		 
-	 IDS_DANE_STATEx6_TEXT_ADD	"The validity of TLS/SSL remote server certificate for the domain name can not be verified by DANE protocol because the certificate chain could not be obtained."
+	 IDS_DANE_STATEx6_TEXT_ADD	"The authenticity of TLS/SSL remote server certificate for the domain name can not be verified by DANE protocol because the certificate chain could not be obtained."
 	// state -7
 	 IDS_DANE_STATEx7_LABEL	"Unable to get certificate"	
 	 IDS_DANE_STATEx7_TEXT_MAIN "The remote server certificate for this domain name could not be verified by DANE protocol because the server certificate could not be obtained."		 
-	 IDS_DANE_STATEx7_TEXT_ADD "The validity of TLS/SSL remote server certificate for the domain name can not be verified by DANE protocol because the server certificate could not be obtained."	
+	 IDS_DANE_STATEx7_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for the domain name can not be verified by DANE protocol because the server certificate could not be obtained."	
 	// state -8
 	 IDS_DANE_STATEx8_LABEL	"Wrong TLSA parameters"	
-	 IDS_DANE_STATEx8_TEXT_MAIN "The remote server certificate for this domain name was not verified by DANE because the TLSA record contains wrong parameter values."  
-	 IDS_DANE_STATEx8_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name could not be verified by DANE protocol because the TLSA record has wrong parameter values."	
+	 IDS_DANE_STATEx8_TEXT_MAIN "The remote server certificate for this domain name was not verified by DANE protocol because the TLSA record contains wrong parameter values."  
+	 IDS_DANE_STATEx8_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name could not be verified by DANE protocol because the TLSA record has wrong parameter values. It could indicate spoofing of TLSA information."	
 	// state -1
 	 IDS_DANE_STATEx1_LABEL	"TLSA status unknown"	
 	 IDS_DANE_STATEx1_TEXT_MAIN	"The remote server certificate for this domain name could not be verified by DANE protocol because an error occurred while retrieving the TLSA record for this domain name."	 
 	 IDS_DANE_STATEx1_TEXT_ADD	"An error occurred while retrieving the TLSA record for this domain name. This may be caused by loss of connection to the DNS server or the user-chosen validating resolver IP address is not an address of a validating resolver."
 	// state -99
 	 IDS_DANE_STATEx99_LABEL "TLSA status unknown"	
-	 IDS_DANE_STATEx99_TEXT_MAIN "The remote server certificate for this domain name could not be verified by DANE protocol."	 
+	 IDS_DANE_STATEx99_TEXT_MAIN "The remote server certificate for this domain name could not be verified by DANE protocol because actual DNS server or resolver does not support DNSSEC technology."	 
 	 IDS_DANE_STATEx99_TEXT_ADD	 "Current DNS server or resolver does not support DNSSEC technology. Please, change the validator settings (choice Without resolver)."	
 
 
@@ -524,8 +524,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,0
- PRODUCTVERSION 2,0
+ FILEVERSION 2,1
+ PRODUCTVERSION 2,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -541,13 +541,13 @@ BEGIN
         BLOCK "040904B0"
         BEGIN
             VALUE "CompanyName", "CZ.NIC Labs"
-            VALUE "FileDescription", "DNSSEC Valid·tor pro IE\0"
-            VALUE "FileVersion", "2.0\0"
+            VALUE "FileDescription", "DNSSEC/TLSA Valid·tor pro IE\0"
+            VALUE "FileVersion", "2.1\0"
             VALUE "InternalName", "IEdnssec.dll\0"
             VALUE "LegalCopyright", "Copyright 2012\0"
             VALUE "OriginalFilename", "IEdnssec.dll\0"
-            VALUE "ProductName", "DNSSEC Valid·tor pro IE\0"
-            VALUE "ProductVersion", "2.0\0"
+            VALUE "ProductName", "DNSSEC/TLSA Valid·tor pro IE\0"
+            VALUE "ProductVersion", "2.1\0"
             VALUE "OLESelfRegister", "\0"
         END
     END
@@ -645,84 +645,84 @@ BEGIN
 
 		// state 10
 	IDS_DANE_STATE10_LABEL "Certifik·t odpovÌd· TLSA"
-	IDS_DANE_STATE10_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en pomocÌ protokolu DANE. Certifik·t odpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."
-	IDS_DANE_STATE10_TEXT_ADD "Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena pomocÌ protokolu DANE. Certifik·t proöel validacÌ PKIX a odpovÌd· CA certifik·tu v TLSA z·znamu (typ 0), kter˝ je korektnÏ zabezpeËen pomocÌ technologie DNSSEC."
+	IDS_DANE_STATE10_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en protokolem DANE. Certifik·t odpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."
+	IDS_DANE_STATE10_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena protokolem DANE. Certifik·t proöel validacÌ PKIX a odpovÌd· CA certifik·tu v TLSA z·znamu (typ 0). Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."
     // state 11
 	IDS_DANE_STATE11_LABEL "Certifik·t odpovÌd· TLSA"
-	IDS_DANE_STATE11_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en pomocÌ protokolu DANE. Certifik·t odpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."
-	IDS_DANE_STATE11_TEXT_ADD "Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena pomocÌ protokolu DANE. Certifik·t proöel validacÌ PKIX a odpovÌd· EE certifik·tu v TLSA z·znamu (typ 1), kter˝ je korektnÏ zabezpeËen pomocÌ technologie DNSSEC."
+	IDS_DANE_STATE11_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en protokolem DANE. Certifik·t odpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."
+	IDS_DANE_STATE11_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena protokolem DANE. Certifik·t proöel validacÌ PKIX a odpovÌd· EE certifik·tu v TLSA z·znamu (typ 1). Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."
     // state 12
 	IDS_DANE_STATE12_LABEL	"Certifik·t odpovÌd· TLSA"
-	IDS_DANE_STATE12_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en pomocÌ protokolu DANE. Certifik·t odpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."	 
-	IDS_DANE_STATE12_TEXT_ADD "Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena pomocÌ protokolu DANE. Certifik·t proöel validacÌ PKIX a odpovÌd· CA certifik·tu v TLSA z·znamu (typ 2), kter˝ je korektnÏ zabezpeËen pomocÌ technologie DNSSEC."	
+	IDS_DANE_STATE12_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en protokolem DANE. Certifik·t odpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."	 
+	IDS_DANE_STATE12_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena protokolem DANE. Certifik·t proöel validacÌ PKIX a odpovÌd· CA certifik·tu v TLSA z·znamu (typ 2). Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."	
     // state 13
 	IDS_DANE_STATE13_LABEL "Certifik·t odpovÌd· TLSA"	
-	IDS_DANE_STATE13_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en pomocÌ protokolu DANE. Certifik·t odpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."
-	IDS_DANE_STATE13_TEXT_ADD "Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena pomocÌ protokolu DANE. Serverov˝ certifik·t odpovÌd· EE certifik·tu v TLSA z·znamu (typ 3), kter˝ je korektnÏ zabezpeËen pomocÌ technologie DNSSEC."	 		
+	IDS_DANE_STATE13_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en protokolem DANE. Certifik·t odpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."
+	IDS_DANE_STATE13_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena protokolem DANE. Serverov˝ certifik·t odpovÌd· EE certifik·tu v TLSA z·znamu (typ 3). Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."	 		
     // state -9	
 	IDS_DANE_STATEx9_LABEL	"Certifik·t neodpovÌd· TLSA"
-	IDS_DANE_STATEx9_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en pomocÌ protokolu DANE. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."	 
-	IDS_DANE_STATEx9_TEXT_ADD "Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena pomocÌ protokolu DANE, avöak serverov˝ certifik·t neodpovÌd· TLSA z·znamu, kter˝ je korektnÏ zabezpeËen pomocÌ technologie DNSSEC."	 		
+	IDS_DANE_STATEx9_TEXT_MAIN "Pokus o ovÏ¯enÌ certifik·tu serveru pro toto spojenÌ protokolem DANE se nezda¯il. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."	 
+	IDS_DANE_STATEx9_TEXT_ADD "OvÏ¯enÌ d˘vÏryhodnosti TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno protokolem DANE se nezda¯ilo. Serverov˝ certifik·t neodpovÌd· TLSA z·znamu. Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."	 		
    // state -10
 	IDS_DANE_STATEx10_LABEL	"Certifik·t neodpovÌd· TLSA"	
-	IDS_DANE_STATEx10_TEXT_MAIN	"Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en pomocÌ protokolu DANE. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC." 	 
-	IDS_DANE_STATEx10_TEXT_ADD "Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena pomocÌ protokolu DANE. Avöak serverov˝ certifik·t neproöel validacÌ PKIX a neodpovÌd· CA certifik·tu v TLSA z·znamu (typ 0), kter˝ je ale korektnÏ zabezpeËen pomocÌ technologie DNSSEC."	 		
+	IDS_DANE_STATEx10_TEXT_MAIN	"Pokus o ovÏ¯enÌ certifik·tu serveru pro toto spojenÌ protokolem DANE se nezda¯il. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC." 	 
+	IDS_DANE_STATEx10_TEXT_ADD "OvÏ¯enÌ d˘vÏryhodnosti TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno protokolem DANE se nezda¯ilo. Serverov˝ certifik·t neodpovÌd· CA certifik·tu v TLSA z·znamu (typ 0). Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."	 		
     // state -11
 	IDS_DANE_STATEx11_LABEL "Certifik·t neodpovÌd· TLSA"		
-	IDS_DANE_STATEx11_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en pomocÌ protokolu DANE. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."		 
-	IDS_DANE_STATEx11_TEXT_ADD "Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena pomocÌ protokolu DANE. Avöak serverov˝ certifik·t neproöel validacÌ PKIX a neodpovÌd· EE certifik·tu v TLSA z·znamu (typ 1), kter˝ je ale korektnÏ zabezpeËen pomocÌ technologie DNSSEC."	
+	IDS_DANE_STATEx11_TEXT_MAIN "Pokus o ovÏ¯enÌ certifik·tu serveru pro toto spojenÌ protokolem DANE se nezda¯il. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."		 
+	IDS_DANE_STATEx11_TEXT_ADD "OvÏ¯enÌ d˘vÏryhodnosti TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno protokolem DANE se nezda¯ilo. Serverov˝ certifik·t neodpovÌd· EE certifik·tu v TLSA z·znamu (typ 1). Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."	
     // state -12
 	IDS_DANE_STATEx12_LABEL "Certifik·t neodpovÌd· TLSA"		
-	IDS_DANE_STATEx12_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en pomocÌ protokolu DANE. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."		 
-	IDS_DANE_STATEx12_TEXT_ADD "Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena pomocÌ protokolu DANE, avöak serverov˝ certifik·t neproöel validacÌ PKIX nebo neodpovÌd· CA certifik·tu v TLSA z·znamu (typ 2), kter˝ je korektnÏ zabezpeËen pomocÌ technologie DNSSEC."	
+	IDS_DANE_STATEx12_TEXT_MAIN "Pokus o ovÏ¯enÌ certifik·tu serveru pro toto spojenÌ protokolem DANE se nezda¯il. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."		 
+	IDS_DANE_STATEx12_TEXT_ADD "OvÏ¯enÌ d˘vÏryhodnosti TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno protokolem DANE se nezda¯ilo. Serverov˝ certifik·t neodpovÌd· CA certifik·tu v TLSA z·znamu (typ 2). Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."	
     // state -13
 	IDS_DANE_STATEx13_LABEL "Certifik·t neodpovÌd· TLSA"		
-	IDS_DANE_STATEx13_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en pomocÌ protokolu DANE. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."		 
-	IDS_DANE_STATEx13_TEXT_ADD "Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena pomocÌ protokolu DANE, avöak serverov˝ certifik·t neodpovÌd· EE certifik·tu v TLSA z·znamu (typ 3), kter˝ je korektnÏ zabezpeËen pomocÌ technologie DNSSEC."	
+	IDS_DANE_STATEx13_TEXT_MAIN "Pokus o ovÏ¯enÌ certifik·tu serveru pro toto spojenÌ protokolem DANE se nezda¯il. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."		 
+	IDS_DANE_STATEx13_TEXT_ADD "OvÏ¯enÌ d˘vÏryhodnosti TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno protokolem DANE se nezda¯ilo. Serverov˝ certifik·t neodpovÌd· EE certifik·tu v TLSA z·znamu (typ 3). Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."	
     // state 1
-	IDS_DANE_STATE1_LABEL "Certifik·t odpovÌd· TLSA"
-	IDS_DANE_STATE1_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en pomocÌ protokolu DANE. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."	 
-	IDS_DANE_STATE1_TEXT_ADD "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en pomocÌ protokolu DANE. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."	
+	IDS_DANE_STATE1_LABEL "ZabezpeËeno DNSSEC"
+	IDS_DANE_STATE1_TEXT_MAIN "ZabezpeËeno DNSSEC."	 
+	IDS_DANE_STATE1_TEXT_ADD "ZabezpeËeno DNSSEC."	
     // state 0
 	IDS_DANE_STATE0_LABEL "TLSA validace vypnuta"	
-	IDS_DANE_STATE0_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebylo ovÏ¯eno protokolem DANE, protoûe validace TLSA z·znam˘ je pro toto domÈnovÈ jmÈno vypnuta."	 
-	IDS_DANE_STATE0_TEXT_ADD "Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebylo ovÏ¯eno protokolem DANE, protoûe validace TLSA z·znam˘ je pro toto domÈnovÈ jmÈno vypnuta."	
+	IDS_DANE_STATE0_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyl ovÏ¯en protokolem DANE, protoûe validace TLSA z·znamu nenÌ povolena nebo toto domÈnovÈ jmÈno je z validace vylouËeno."	 
+	IDS_DANE_STATE0_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyla ovÏ¯ena protokolem DANE, protoûe validace TLSA z·znamu je vypnuta nebo toto domÈnovÈ jmÈno nebo jeho TLD je na seznamu domÈn vy¯azen˝ch z validace."	
 	// state -2
 	IDS_DANE_STATEx2_LABEL "NenÌ HTTPS spojenÌ"	
-	IDS_DANE_STATEx2_TEXT_MAIN "Jelikoû pro toto domÈnovÈ jmÈno nenÌ nav·z·no zabezpeËenÈ spojenÌ ke vzd·lenÈmu serveru protokolem HTTPS, nenÌ moûnÈ provÈst validaci TLSA z·znam˘."	 
-	IDS_DANE_STATEx2_TEXT_ADD "Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it pomocÌ protokolu DANE, protoûe p¯ipojenÌ ke vzd·lenÈmu serveru nenÌ realizov·no protokolem HTTPS."	
+	IDS_DANE_STATEx2_TEXT_MAIN "Jelikoû pro toto domÈnovÈ jmÈno nenÌ nav·z·no zabezpeËenÈ spojenÌ ke vzd·lenÈmu serveru protokolem HTTPS, nenÌ moûnÈ provÈst validaci TLSA z·znamu."	 
+	IDS_DANE_STATEx2_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe p¯ipojenÌ ke vzd·lenÈmu serveru nenÌ realizov·no protokolem HTTPS."	
 	// state -3
 	IDS_DANE_STATEx3_LABEL "Neexistuje TLSA z·znam"	
 	IDS_DANE_STATEx3_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe pro toto domÈnovÈ jmÈno neexistuje TLSA z·znam."	 
-	IDS_DANE_STATEx3_TEXT_ADD "Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyla ovÏ¯ena protokolem DANE, protoûe pro toto domÈnovÈ jmÈno neexistuje TLSA z·znam."	
+	IDS_DANE_STATEx3_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyla ovÏ¯ena protokolem DANE, protoûe pro toto domÈnovÈ jmÈno neexistuje TLSA z·znam."	
 	// state -4
 	 IDS_DANE_STATEx4_LABEL	"NezabezpeËeno DNSSEC"	
-	 IDS_DANE_STATEx4_TEXT_MAIN "Jelikoû toto domÈnovÈ jmÈno nenÌ zabezpeËeno technologiÌ DNSSEC, nelze ovÏ¯it platnost serverovÈho certifik·tu protokolem DANE."		 
-	 IDS_DANE_STATEx4_TEXT_ADD "Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe toto domÈnovÈ jmÈno nenÌ zabezpeËeno technologiÌ DNSSEC."	
+	 IDS_DANE_STATEx4_TEXT_MAIN "Jelikoû toto domÈnovÈ jmÈno nenÌ zabezpeËeno technologiÌ DNSSEC, nelze ovÏ¯it d˘vÏryhodnost serverovÈho certifik·tu protokolem DANE."		 
+	 IDS_DANE_STATEx4_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe toto domÈnovÈ jmÈno nenÌ zabezpeËeno technologiÌ DNSSEC."	
 	// state -5
 	 IDS_DANE_STATEx5_LABEL	"Neplatn˝ DNSSEC podpis"	
-	 IDS_DANE_STATEx5_TEXT_MAIN "Toto domÈnovÈ jmÈno je zabezpeËeno technologiÌ DNSSEC a byl odhalen neplatn˝ DNSSEC podpis, nelze ovÏ¯it platnost serverovÈho certifik·tu pomocÌ protokolu DANE."		 
-	 IDS_DANE_STATEx5_TEXT_ADD "Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it pomocÌ protokolu DANE, protoûe toto domÈnovÈ jmÈno m· neplatn˝ DNSSEC podpis."	
+	 IDS_DANE_STATEx5_TEXT_MAIN "DomÈnovÈ jmÈno je zabezpeËeno technologiÌ DNSSEC, byl vöak odhalen neplatn˝ podpis z·znam˘, proto nelze ovÏ¯it d˘vÏryhodnost serverovÈho certifik·tu protokolem DANE."		 
+	 IDS_DANE_STATEx5_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe DNS z·znamy pro toto domÈnovÈ jmÈno majÌ neplatn˝ DNSSEC podpis."	
 	// state -6
 	 IDS_DANE_STATEx6_LABEL	"Nelze zÌskat certifik·t"	
-	 IDS_DANE_STATEx6_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it pomocÌ protokolu DANE, protoûe se nepoda¯ilo zÌskat ¯etÏzec certifik·t˘."		 
-	 IDS_DANE_STATEx6_TEXT_ADD	"Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe se nepoda¯ilo zÌskat ¯etÏzec certifik·t˘."
+	 IDS_DANE_STATEx6_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe se nepoda¯ilo zÌskat ¯etÏzec certifik·t˘."		 
+	 IDS_DANE_STATEx6_TEXT_ADD	"The authenticity of TLS/SSL remote server certificate for the domain name can not be verified by DANE protocol because the certificate chain could not be obtained."
 	// state -7
 	 IDS_DANE_STATEx7_LABEL	"Nelze zÌskat certifik·t"	
-	 IDS_DANE_STATEx7_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it pomocÌ protokolu DANE, protoûe se nepoda¯ilo zÌskat certifik·t vzd·lenÈho serveru."		 
-	 IDS_DANE_STATEx7_TEXT_ADD "Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe se nepoda¯ilo zÌskat certifik·t vzd·lenÈho serveru."	
+	 IDS_DANE_STATEx7_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe se nepoda¯ilo zÌskat certifik·t vzd·lenÈho serveru."		 
+	 IDS_DANE_STATEx7_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe se nepoda¯ilo zÌskat certifik·t vzd·lenÈho serveru."	
 	// state -8
 	 IDS_DANE_STATEx8_LABEL	"NeplatnÈ hodnoty TLSA"	
-	 IDS_DANE_STATEx8_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyl ovÏ¯en pomocÌ protokolu DANE, protoûe zÌskan˝ TLSA z·znam obsahuje neplatnÈ hodnoty parametr˘."  
-	 IDS_DANE_STATEx8_TEXT_ADD "Platnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyla ovÏ¯ena pomocÌ protokolu DANE, protoûe TLSA z·znam obsahuje neplatnÈ hodnoty parametr˘. To m˘ûe signalizovat podvrûenÌ TLSA z·znam˘."	
+	 IDS_DANE_STATEx8_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyl ovÏ¯en protokolem DANE, protoûe zÌskan˝ TLSA z·znam obsahuje neplatnÈ hodnoty parametr˘."  
+	 IDS_DANE_STATEx8_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyla ovÏ¯ena protokolem DANE, protoûe zÌskan˝ TLSA z·znam obsahuje neplatnÈ hodnoty parametr˘. To m˘ûe signalizovat podvrûenÌ TLSA z·znamu."	
 	// state -1
 	 IDS_DANE_STATEx1_LABEL	"Stav TLSA nezn·m˝"	
-	 IDS_DANE_STATEx1_TEXT_MAIN	"Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyl ovÏ¯en pomocÌ protokolu DANE, protoûe p¯Ì zÌsk·nÌ TLSA z·znam˘ pro toto domÈnovÈ jmÈno doölo k chybÏ."	 
-	 IDS_DANE_STATEx1_TEXT_ADD	"P¯i zjiöùov·nÌ TLSA z·znam˘ pro toto domÈnovÈ jmÈno doölo k chybÏ. P¯ÌËinou m˘ûe b˝t buÔ v˝padek spojenÌ ke vzd·lenÈmu serveru, nebo aktu·lnÏ nastaven· IP adresa DNS serveru nenÌ platnou adresou serveru pro p¯eklad domÈnovÈho jmÈna."
+	 IDS_DANE_STATEx1_TEXT_MAIN	"Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyl ovÏ¯en protokolem DANE, protoûe p¯Ì zÌsk·nÌ TLSA z·znamu pro toto domÈnovÈ jmÈno doölo k chybÏ."	 
+	 IDS_DANE_STATEx1_TEXT_ADD	"P¯i zjiöùov·nÌ TLSA z·znamu pro toto domÈnovÈ jmÈno doölo k chybÏ. P¯ÌËinou m˘ûe b˝t buÔ v˝padek spojenÌ ke vzd·lenÈmu serveru, nebo aktu·lnÏ nastaven· IP adresa DNS serveru nenÌ platnou adresou serveru pro p¯eklad domÈnovÈho jmÈna."
 	// state -99
 	 IDS_DANE_STATEx99_LABEL "Stav TLSA nezn·m˝"	
 	 IDS_DANE_STATEx99_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyl ovÏ¯en pomocÌ protokolu DANE, protoûe nastaven˝ resolver nepodporuje DNSSEC technologii."	 
-	 IDS_DANE_STATEx99_TEXT_ADD	 "Aktu·lnÏ nastaven˝ resolver nepodporuje DNSSEC technologii. ProsÌm, zmÏÚte nastavenÌ valid·toru (nastavte volbu Bez resolveru)."	
+	 IDS_DANE_STATEx99_TEXT_ADD	 "Aktu·lnÏ nastaven˝ DNS server nebo resolver nepodporuje DNSSEC technologii. ProsÌm, zmÏÚte nastavenÌ valid·toru (nastavte volbu Bez resolveru)."	
 
 	IDS_NONE                " "
     IDS_ADDON_INIT          "DoplnÏk inicializov·n"
@@ -776,16 +776,16 @@ END
 IDD_DIALOG_MAIN_ABOUT DIALOGEX 0, 0, 250, 110
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP |  
     WS_CAPTION | WS_SYSMENU
-CAPTION "DNSSEC Valid·tor pro IE"
+CAPTION "DNSSEC/TLSA Valid·tor pro IE"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,180,92,50,14
 	ICON            IDI_DNSSEC_ICON_VALID,IDC_STATIC,20,20,0,0
 	GROUPBOX        "O pluginu",IDC_STATIC,10,7,230,80
-    LTEXT           "DNSSEC Valid·tor pro Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
-    LTEXT           "Z·suvn˝ plugin pro kontrolu DNSSEC",IDC_STATIC,50,30,180,10
+    LTEXT           "DNSSEC/TLSA Valid·tor pro Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
+    LTEXT           "Z·suvn˝ plugin pro kontrolu DNSSEC a TLSA",IDC_STATIC,50,30,180,10
     LTEXT           "PodporovanÈ prohlÌûeËe: 32-bit verze IE6 - IE10",IDC_STATIC,50,40,180,10
-    LTEXT           "Verze 2.0.1", IDC_STATIC,50,50,180,10
+    LTEXT           "Verze 2.1.0", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2013", IDC_STATIC,50,70,100,10
 	LTEXT           "http://www.dnssec-validator.cz/", IDC_LINK,10,95,120,10
@@ -942,8 +942,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,0
- PRODUCTVERSION 2,0
+ FILEVERSION 2,1
+ PRODUCTVERSION 2,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -959,13 +959,13 @@ BEGIN
         BLOCK "040904B0"
         BEGIN
             VALUE "CompanyName", "CZ.NIC Labs"
-            VALUE "FileDescription", "DNSSEC Validator f¸r IE\0"
-            VALUE "FileVersion", "2,0\0"
+            VALUE "FileDescription", "DNSSEC/TLSA Validator f¸r IE\0"
+            VALUE "FileVersion", "2,1\0"
             VALUE "InternalName", "IEdnssec.dll\0"
             VALUE "LegalCopyright", "Copyright 2012\0"
             VALUE "OriginalFilename", "IEdnssec.dll\0"
-            VALUE "ProductName", "DNSSEC Validator f¸r IE\0"
-            VALUE "ProductVersion", "2,0\0"
+            VALUE "ProductName", "DNSSEC/TLSA Validator f¸r IE\0"
+            VALUE "ProductVersion", "2,1\0"
             VALUE "OLESelfRegister", "\0"
         END
     END
@@ -983,16 +983,16 @@ END
 IDD_DIALOG_MAIN_ABOUT DIALOGEX 0, 0, 250, 110
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
-CAPTION "DNSSEC Validator f¸r IE"
+CAPTION "DNSSEC/TLSA Validator f¸r IE"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "Ja",IDOK,180,92,50,14
 	ICON            IDI_DNSSEC_ICON_VALID,IDC_STATIC,20,20,0,0
 	GROUPBOX        "‹ber plugin",IDC_STATIC,10,7,230,80
-    LTEXT           "DNSSEC Validator f¸r Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
-    LTEXT           "Add-on f¸r DNSSEC Validierung",IDC_STATIC,50,30,180,10
+    LTEXT           "DNSSEC/TLSA Validator f¸r Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
+    LTEXT           "Add-on f¸r DNSSEC/TLSA Validierung",IDC_STATIC,50,30,180,10
     LTEXT           "Unterst¸tzte Versionen: 32-bit Versionen von IE6 - IE10",IDC_STATIC,50,40,180,10
-    LTEXT           "Version 2.0.1", IDC_STATIC,50,50,180,10
+    LTEXT           "Version 2.1.0", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2013", IDC_STATIC,50,70,100,10
 	LTEXT           "http://www.dnssec-validator.cz/", IDC_LINK,10,95,120,10
@@ -1181,85 +1181,85 @@ BEGIN
 	IDS_STATE02_TEXT_MAIN	"Der zur Zeit eingestellte Resolver unterst¸tzt DNSSEC nicht. ƒndern Sie bitte die Einstellungen des Resolvers (Wahl 'Ohne Resolver')."
 
 			// state 10
-	IDS_DANE_STATE10_LABEL "Certificate corresponds to TLSA"
-	IDS_DANE_STATE10_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
-	IDS_DANE_STATE10_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate passed the PKIX validation and corresponds with the CA certificate in the TLSA record (type 0) which is secured by DNSSEC technology."
+	IDS_DANE_STATE10_LABEL "Zertifikat entspricht TLSA"
+	IDS_DANE_STATE10_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne wurde durch DANE Protokoll best‰tigt. Das Zertifikat entspricht dem durch DNSSEC gesicherten TLSA Eintrag."
+	IDS_DANE_STATE10_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat wurde durch DANE Protokoll best‰tigt. Das Zertifikat lief eine PKIX Validierung durch und entspricht dem CA Zertifikat im TLSA Eintrag (Typ 0). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."
     // state 11
-	IDS_DANE_STATE11_LABEL "Certificate corresponds to TLSA"
-	IDS_DANE_STATE11_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
-	IDS_DANE_STATE11_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate passed the PKIX validation and corresponds with the EE certificate in the TLSA record (type 1) which is secured by DNSSEC technology."
+	IDS_DANE_STATE11_LABEL "Zertifikat entspricht TLSA"
+	IDS_DANE_STATE11_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne wurde durch DANE Protokoll best‰tigt. Das Zertifikat entspricht dem durch DNSSEC gesicherten TLSA Eintrag."
+	IDS_DANE_STATE11_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat wurde durch DANE Protokoll best‰tigt. Das Zertifikat lief eine PKIX Validierung durch und entspricht dem EE Zertifikat im TLSA Eintrag (Typ 1). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."
     // state 12
-	IDS_DANE_STATE12_LABEL	"Certificate corresponds to TLSA"
-	IDS_DANE_STATE12_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
-	IDS_DANE_STATE12_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate passed the PKIX validation and corresponds with the CA certificate in the TLSA record (type 2) which is secured by DNSSEC technology."
+	IDS_DANE_STATE12_LABEL	"Zertifikat entspricht TLSA"
+	IDS_DANE_STATE12_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne wurde durch DANE Protokoll best‰tigt. Das Zertifikat entspricht dem durch DNSSEC gesicherten TLSA Eintrag."
+	IDS_DANE_STATE12_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat wurde durch DANE Protokoll best‰tigt. Das Zertifikat lief eine PKIX Validierung durch und entspricht dem CA Zertifikat im TLSA Eintrag (Typ 2). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."
     // state 13
-	IDS_DANE_STATE13_LABEL "Certificate corresponds to TLSA"	
-	IDS_DANE_STATE13_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
-	IDS_DANE_STATE13_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate is corresponding with the EE certificate in the TLSA record (type 3) which is secured by DNSSEC technology."
+	IDS_DANE_STATE13_LABEL "Zertifikat entspricht TLSA"	
+	IDS_DANE_STATE13_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne wurde durch DANE Protokoll best‰tigt. Das Zertifikat entspricht dem durch DNSSEC gesicherten TLSA Eintrag."
+	IDS_DANE_STATE13_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat wurde durch DANE Protokoll best‰tigt. Das Zertifikat entspricht dem EE Zertifikat im TLSA Eintrag (Typ 3). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."
     // state -9	
-	IDS_DANE_STATEx9_LABEL	"TLSA validation failed"
-	IDS_DANE_STATEx9_TEXT_MAIN "The remote server certificate for this domain name was not verified by DANE. The certificate does not correspond to TLSA record which is secured by DNSSEC technology."
-	IDS_DANE_STATEx9_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."
+	IDS_DANE_STATEx9_LABEL	"Zertifikat entspricht nicht TLSA"
+	IDS_DANE_STATEx9_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem durch DNSSEC gesicherten TLSA Eintrag."
+	IDS_DANE_STATEx9_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Das Serverzertifikat entspricht nicht dem TLSA Eintrag. Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."
    // state -10
-	IDS_DANE_STATEx10_LABEL	"TLSA validation failed"	
-	IDS_DANE_STATEx10_TEXT_MAIN	"The remote server certificate for this domain name was not verified by DANE. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."
-	IDS_DANE_STATEx10_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate has not passed the PKIX validation and does not correspond with the CA certificate in the TLSA record (type 0) which is secured by DNSSEC technology."
+	IDS_DANE_STATEx10_LABEL	"Zertifikat entspricht nicht TLSA"	
+	IDS_DANE_STATEx10_TEXT_MAIN	"Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem durch DNSSEC gesicherten TLSA Eintrag."
+	IDS_DANE_STATEx10_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem CA Zertifikat im TLSA Eintrag (Typ 0). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."
     // state -11
-	IDS_DANE_STATEx11_LABEL "TLSA validation failed"		
-	IDS_DANE_STATEx11_TEXT_MAIN "The remote server certificate for this domain name was not verified by DANE. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."		 
-	IDS_DANE_STATEx11_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate has not passed the PKIX validation and does not corresponds with the EE certificate in the TLSA record (type 1) which is secured by DNSSEC technology."	
+	IDS_DANE_STATEx11_LABEL "Zertifikat entspricht nicht TLSA"		
+	IDS_DANE_STATEx11_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem durch DNSSEC gesicherten TLSA Eintrag."		 
+	IDS_DANE_STATEx11_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem EE Zertifikat im TLSA Eintrag (Typ 1). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."	
     // state -12
-	IDS_DANE_STATEx12_LABEL "TLSA validation failed"		
-	IDS_DANE_STATEx12_TEXT_MAIN "The remote server certificate for this domain name was not verified by DANE. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."		 
-	IDS_DANE_STATEx12_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate has not passed the PKIX validation and does not corresponds with the CA certificate in the TLSA record (type 2) which is secured by DNSSEC technology."	
+	IDS_DANE_STATEx12_LABEL "Zertifikat entspricht nicht TLSA"		
+	IDS_DANE_STATEx12_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem durch DNSSEC gesicherten TLSA Eintrag."		 
+	IDS_DANE_STATEx12_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem CA Zertifikat im TLSA Eintrag (Typ 2). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."	
     // state -13
-	IDS_DANE_STATEx13_LABEL "TLSA validation failed"		
-	IDS_DANE_STATEx13_TEXT_MAIN "The remote server certificate for this domain name was not verified by DANE. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."		 
-	IDS_DANE_STATEx13_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate does not correspond with the EE certificate in the TLSA record (type 3) which is secured by DNSSEC technology."	
+	IDS_DANE_STATEx13_LABEL "Zertifikat entspricht nicht TLSA"		
+	IDS_DANE_STATEx13_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem durch DNSSEC gesicherten TLSA Eintrag."		 
+	IDS_DANE_STATEx13_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem EE Zertifikat im TLSA Eintrag (Typ 3). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."	
     // state 1
-	IDS_DANE_STATE1_LABEL "Certificate corresponds to TLSA"
-	IDS_DANE_STATE1_TEXT_MAIN ""	 
-	IDS_DANE_STATE1_TEXT_ADD ""	
+	IDS_DANE_STATE1_LABEL "Gesichert durch DNSSEC"
+	IDS_DANE_STATE1_TEXT_MAIN "Gesichert durch DNSSEC."	 
+	IDS_DANE_STATE1_TEXT_ADD "Gesichert durch DNSSEC."	
     // state 0
-	IDS_DANE_STATE0_LABEL "TLSA validation disabled"	
-	IDS_DANE_STATE0_TEXT_MAIN "The remote server certificate for this domain name was not verified by DANE protocol. The TLSA validation has not been performed because this domain is mentioned in the list of excluded domains."	 
-	IDS_DANE_STATE0_TEXT_ADD "The validity of TLS/SSL remote server certificate for the domain name was not verified by DANE protocol. The TLSA validation has not been performed because this domain is mentioned in the list of excluded domains."	
+	IDS_DANE_STATE0_LABEL "TLSA Validierung ausgeschaltet"	
+	IDS_DANE_STATE0_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Die Validierung von TLSA Eintr‰gen ist nicht genehmigt, oder diese Dom‰ne ist von der Validierung ausgeschlossen."	 
+	IDS_DANE_STATE0_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Die Validierung von TLSA Eintr‰gen ist nicht genehmigt, oder diese Dom‰ne, oder die TLD, ist in der Liste der ausgeschlossenen Dom‰nen erw‰hnt."	
 	// state -2
-	IDS_DANE_STATEx2_LABEL "No HTTPS connection"	
-	IDS_DANE_STATEx2_TEXT_MAIN "No HTTPS secured connection to the remote server was established. Therefore, you can not perform TLSA records validation."	 
-	IDS_DANE_STATEx2_TEXT_ADD "The validity of TLS/SSL remote server certificate for the domain name could not be verified by DANE protocol because the connection to the remote server is not realized via HTTPS."	
+	IDS_DANE_STATEx2_LABEL "Keine HTTPS Verbindung"	
+	IDS_DANE_STATEx2_TEXT_MAIN "Weil f¸r diese Dom‰ne keine HTTPS Verbindung hergestellt wurde, ist es nicht mˆglich eine Validierung des TLSA Eintrags auszuf¸hren."	 
+	IDS_DANE_STATEx2_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Die Verbindung zum Server ist nicht mittels HTTPS Protokoll realisiert."	
 	// state -3
-	IDS_DANE_STATEx3_LABEL "Non-existent TLSA record"	
-	IDS_DANE_STATEx3_TEXT_MAIN "The remote server certificate for this domain name could not be verified by DANE protocol because there is no TLSA record for this domain name."	 
-	IDS_DANE_STATEx3_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name could not be verified by protocol DANE because there is no TLSA record for this domain name."	
+	IDS_DANE_STATEx3_LABEL "Kein TLSA Eintrag vorhanden"	
+	IDS_DANE_STATEx3_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Es gibt keinen TLSA Eintrag f¸r diese Dom‰ne."	 
+	IDS_DANE_STATEx3_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Kein TLSA Eintrag f¸r diese Dom‰ne konnte ermittelt werden."	
 	// state -4
-	 IDS_DANE_STATEx4_LABEL	"Not secured by DNSSEC"	
-	 IDS_DANE_STATEx4_TEXT_MAIN "This domain name is not secured by DNSSEC, therefore it is not possible to verify the validity of remote server certifcate by DANE protocol."		 
-	 IDS_DANE_STATEx4_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name could not be verified by DANE protocol because this domain name is not secured by DNSSEC."	
+	 IDS_DANE_STATEx4_LABEL	"Nicht durch DNSSEC gesichert"	
+	 IDS_DANE_STATEx4_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Diese Dom‰ne ist nicht durch DNSSEC gesichert."		 
+	 IDS_DANE_STATEx4_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Diese Dom‰ne ist nicht durch DNSSEC gesichert."	
 	// state -5
-	 IDS_DANE_STATEx5_LABEL	"Bogus DNSSEC signature"	
-	 IDS_DANE_STATEx5_TEXT_MAIN "This domain name is secured by DNSSEC but an invalid domain name signature has been detected. Therefore, the validation of the server certificate can not be verified by DANE protocol."		 
-	 IDS_DANE_STATEx5_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name can not be verified by DANE protocol because an invalid domain name signature has been detected by DNSSEC."	
+	 IDS_DANE_STATEx5_LABEL	"Ung¸ltige DNSSEC Signatur"	
+	 IDS_DANE_STATEx5_TEXT_MAIN "Die Dom‰ne ist durch DNSSEC gesichert, aber die Signatur ist ung¸ltig. Darum kann man die Vertrauensw¸rdigkeit des Serverzertifikats nicht mittels DANE best‰tigen."		 
+	 IDS_DANE_STATEx5_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Die DNS Eintr‰ge f¸r diese Dom‰ne haben eine ung¸ltige DNSSEC Signatur."	
 	// state -6
-	 IDS_DANE_STATEx6_LABEL	"Unable to get certificate"	
-	 IDS_DANE_STATEx6_TEXT_MAIN "The remote server certificate for this domain name can not be verified by DANE protocol because the certificate chain could not be obtained."		 
-	 IDS_DANE_STATEx6_TEXT_ADD	"The validity of TLS/SSL remote server certificate for the domain name can not be verified by DANE protocol because the certificate chain could not be obtained."
+	 IDS_DANE_STATEx6_LABEL	"Zertifikat unverf¸gbar"	
+	 IDS_DANE_STATEx6_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Die Zertifikatskette konnte nicht hergestellt werden."		 
+	 IDS_DANE_STATEx6_TEXT_ADD	"Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Die Vertrauenskette konnte nicht hergestellt werden, weil zurzeit nicht alle nˆtige Zertifikate vorhanden sind."
 	// state -7
-	 IDS_DANE_STATEx7_LABEL	"Unable to get certificate"	
-	 IDS_DANE_STATEx7_TEXT_MAIN "The remote server certificate for this domain name could not be verified by DANE protocol because the server certificate could not be obtained."		 
-	 IDS_DANE_STATEx7_TEXT_ADD "The validity of TLS/SSL remote server certificate for the domain name can not be verified by DANE protocol because the server certificate could not be obtained."	
+	 IDS_DANE_STATEx7_LABEL	"Zertifikat unverf¸gbar"	
+	 IDS_DANE_STATEx7_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Das Serverzertifikat konnte nicht empfangen werden."		 
+	 IDS_DANE_STATEx7_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Das Serverzertifikat kann zurzeit nicht empfangen werden."	
 	// state -8
-	 IDS_DANE_STATEx8_LABEL	"Wrong TLSA parameters"	
-	 IDS_DANE_STATEx8_TEXT_MAIN "The remote server certificate for this domain name was not verified by DANE because the TLSA record contains wrong parameter values."  
-	 IDS_DANE_STATEx8_TEXT_ADD "The validity of TLS/SSL remote server certificate for this domain name could not be verified by DANE protocol because the TLSA record has wrong parameter values."	
+	 IDS_DANE_STATEx8_LABEL	"Ung¸ltige TLSA Parametern"	
+	 IDS_DANE_STATEx8_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Der erhaltene TLSA Eintrag enth‰lt ung¸ltige Parameterwerte."  
+	 IDS_DANE_STATEx8_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Der erhaltene TLSA Eintrag enth‰lt ung¸ltige Parameterwerte. Dies kann an ein TLSA Manipulationsversuch (Spoofing) hindeuten."	
 	// state -1
-	 IDS_DANE_STATEx1_LABEL	"TLSA status unknown"	
-	 IDS_DANE_STATEx1_TEXT_MAIN	"The remote server certificate for this domain name could not be verified by DANE protocol because an error occurred while retrieving the TLSA record for this domain name."	 
-	 IDS_DANE_STATEx1_TEXT_ADD	"An error occurred while retrieving the TLSA record for this domain name. This may be caused by loss of connection to the DNS server or the user-chosen validating resolver IP address is not an address of a validating resolver."
+	 IDS_DANE_STATEx1_LABEL	"TLSA Status unbekannt"	
+	 IDS_DANE_STATEx1_TEXT_MAIN	"Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Es kam zu einem Fehler w‰hrend Erwerbs des TLSA Eintrags f¸r diese Dom‰ne."	 
+	 IDS_DANE_STATEx1_TEXT_ADD	"Es kam zu einem Fehler w‰hrend Erwerbs des TLSA Eintrags f¸r diese Dom‰ne. Dies kann durch einen Verbindungsausfall zum DNS-Server verursacht werden, oder die von Benutzer gew‰hlte IP-Adresse eines validierenden Resolvers ist keine richtige Adresse eines validierenden Resolvers."
 	// state -99
-	 IDS_DANE_STATEx99_LABEL "TLSA status unknown"	
-	 IDS_DANE_STATEx99_TEXT_MAIN "The remote server certificate for this domain name could not be verified by DANE protocol."	 
-	 IDS_DANE_STATEx99_TEXT_ADD	 "Current DNS server or resolver does not support DNSSEC technology. Please, change the validator settings (choice Without resolver)."	
+	 IDS_DANE_STATEx99_LABEL "TLSA Status unbekannt"	
+	 IDS_DANE_STATEx99_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Der zur Zeit eingestellte Resolver unterst¸tzt DNSSEC nicht."	 
+	 IDS_DANE_STATEx99_TEXT_ADD	 "Der zur Zeit eingestellte Resolver unterst¸tzt DNSSEC nicht. ƒndern Sie bitte die Einstellungen des Resolvers (Wahl 'Ohne Resolver')."	
 
     IDS_NONE                " "
     IDS_ADDON_INIT          "Add-on initialisiert"
