@@ -520,8 +520,6 @@ char * bintohex(const uint8_t *bytes, size_t buflen)
 	char *retval = NULL;
 	int i;
 
-	buflen = buflen * 2;
-
 	retval = malloc(buflen * 2 + 1);
 	if (retval == NULL) {
 		return NULL;
@@ -1536,7 +1534,7 @@ int main(int argc, char **argv)
 
 	int res = DANE_EXIT_RESOLVER_FAILED;
 
-	res = CheckDane(certhex, 0, 5, "8.8.8.8", argv[1], "443", "tcp", 1);
+	res = CheckDane(certhex, 1, 5, "8.8.8.8", argv[1], "443", "tcp", 1);
 	
 	if (debug) {
 		printf(DEBUG_PREFIX_DANE "Main final result: %i\n", res);

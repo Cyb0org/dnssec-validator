@@ -520,8 +520,6 @@ char * bintohex(const uint8_t *bytes, size_t buflen)
 	char *retval = NULL;
 	int i;
 
-	buflen = buflen * 2;
-
 	retval = malloc(buflen * 2 + 1);
 	if (retval == NULL) {
 		return NULL;
