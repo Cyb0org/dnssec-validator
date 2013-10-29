@@ -849,7 +849,7 @@ cert_tmp_ctx spkicert(const unsigned char *certder, int len)
 	tmp.spki_der_hex = hex2; 
 	X509_free(cert);
 	EVP_PKEY_free(pkey);
-	free(buf2);
+	//free(buf2);
 	return tmp;
 }
 
@@ -1289,7 +1289,7 @@ int get_tlsa_record(struct tlsa_store_head *tlsa_list, struct ub_result *result,
 	else {
 		exitcode = DANE_EXIT_DNSSEC_UNSECURED;
 		if (debug) {
-			printf(DEBUG_PREFIX " Domain is insecure...\n");
+			printf(DEBUG_PREFIX "Domain is insecure...\n");
 		}
 	}
 
@@ -1474,14 +1474,7 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options, char *
 		if (debug) {
 			printf(DEBUG_PREFIX_CER "Browser's certificate chain is used\n");
 		}
-/*
-	    for ( i = 0; i < certcount; i++) {	    
-	    int certlen=strlen(certchain[i])/2;
-    	    cert_tmp_ctx skpi= spkicert((const unsigned char*)hextobin(certchain[i]),certlen);
-	    add_certrecord_bottom(&cert_list, hextobin(certchain[i]), certlen, certchain[i], skpi.spki_der, skpi.spki_len, skpi.spki_der_hex); 
-	     }//for
-*/
-//#if 0
+
 		for ( i = 0; i < certcount; i++) {
 			int certlen=strlen(certchain[i])/2;
 			unsigned char *certbin = (unsigned char *) hextobin(certchain[i]);
@@ -1494,8 +1487,8 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options, char *
 			free(certbin);
 			free(certbin2);
 			free(skpi.spki_der_hex); /* Messy clean-up. Create a better one. */
+			free(skpi.spki_der);
 		}//for
-//#endif
 	}
 	else {
 		if (debug) printf(DEBUG_PREFIX_CER "External certificate chain is used\n");	
@@ -1543,7 +1536,7 @@ int main(int argc, char **argv)
 
 	int res = DANE_EXIT_RESOLVER_FAILED;
 
-	res = CheckDane(certhex, 0, 5, "8.8.8.8", argv[1], "443", "tcp", 1);
+	res = CheckDane(certhex, 1, 5, "8.8.8.8", argv[1], "443", "tcp", 1);
 	
 	if (debug) {
 		printf(DEBUG_PREFIX_DANE "Main final result: %i\n", res);

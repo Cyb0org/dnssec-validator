@@ -849,7 +849,7 @@ cert_tmp_ctx spkicert(const unsigned char *certder, int len)
 	tmp.spki_der_hex = hex2; 
 	X509_free(cert);
 	EVP_PKEY_free(pkey);
-	free(buf2);
+	//free(buf2);
 	return tmp;
 }
 
@@ -1487,6 +1487,7 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options, char *
 			free(certbin);
 			free(certbin2);
 			free(skpi.spki_der_hex); /* Messy clean-up. Create a better one. */
+			free(skpi.spki_der);
 		}//for
 	}
 	else {
