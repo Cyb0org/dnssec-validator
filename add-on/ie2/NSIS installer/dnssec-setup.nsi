@@ -6,21 +6,21 @@ SetCompressor /solid /final lzma
 !include MUI2.nsh
 !include "FileFunc.nsh"
 
-!define VERSION "2.0.1"
-!define QUADVERSION "2.0.1.0"
+!define VERSION "2.1.0"
+!define QUADVERSION "2.1.0.0"
 !define guid '{669695BC-A811-4A9D-8CDF-BA8C795F261C}'
 
-outFile "IE-dnssec_validator-${VERSION}-windows.exe"
-Name "DNSSEC Validator plugin for IE 2.0.1"
+outFile "IE-dnssec-tlsa_validator-${VERSION}-windows.exe"
+Name "DNSSEC/TLSA Validator 2.1.0 for IE"
 
 # default install directory
 installDir "$PROGRAMFILES\CZ.NIC\DNSSEC Validator 2.0"
 installDirRegKey HKLM "Software\DNSSECValidator 2.0" "InstallLocation"
 RequestExecutionLevel admin
 #give credits to Nullsoft: BrandingText ""
-VIAddVersionKey "ProductName" "DNSSEC Validator 2.0.1"
+VIAddVersionKey "ProductName" "DNSSEC/TLSA Validator 2.1.0"
 VIAddVersionKey "CompanyName" "CZ.NIC Labs"
-VIAddVersionKey "FileDescription" "(un)install the DNSSEC Validator for IE 2.0.1"
+VIAddVersionKey "FileDescription" "(un)install the DNSSEC/TLSA Validator 2.1.0 for IE"
 VIAddVersionKey "LegalCopyright" "Copyright 2013, CZ.NIC Labs"
 VIAddVersionKey "FileVersion" "${QUADVERSION}"
 VIAddVersionKey "ProductVersion" "${QUADVERSION}"
@@ -43,7 +43,7 @@ Var StartMenuFolder
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "setup_left.bmp"
 !define MUI_ABORTWARNING
 
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of DNSSEC Validator plugin for Internet Explorer on your computer.$\r$\n$\nNote: If the Internet Explorer browser is running on your computer, it is recommended close him before starting installation of plugin.$\r$\n$\r$\nClick Next to continue."
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of DNSSEC/TLSA Validator plugin for Internet Explorer on your computer.$\r$\n$\nNote: If the Internet Explorer browser is running on your computer, it is recommended close him before starting installation of plugin.$\r$\n$\r$\nClick Next to continue."
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_DIRECTORY
 
@@ -56,7 +56,7 @@ Var StartMenuFolder
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the uninstallation of DNSSEC Validator plugin for Internet Explorer from your computer.$\r$\n$\nNote: If the Internet Explorer browser is running on your computer, it is recommended close him before uninstallation of plugin.$\r$\n$\r$\nClick Next to continue."
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the uninstallation of DNSSEC/TLSA Validator plugin for Internet Explorer from your computer.$\r$\n$\nNote: If the Internet Explorer browser is running on your computer, it is recommended close him before uninstallation of plugin.$\r$\n$\r$\nClick Next to continue."
 !insertmacro MUI_UNPAGE_WELCOME
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
@@ -68,6 +68,7 @@ section "-hidden.postinstall"
 	# copy files
 	setOutPath $INSTDIR
 	File ".\ub_ds_windows-x86.dll"
+  File ".\DANEcore-windows-x86.dll"
 	File ".\IEdnssec.dll"
 	File ".\key.ico"
 	File ".\RegPlugin.bat"
@@ -97,9 +98,9 @@ section "-hidden.postinstall"
 	# start menu items
 	!insertmacro MUI_STARTMENU_WRITE_BEGIN DNSSECStartMenu
 	CreateDirectory "$SMPROGRAMS\$StartMenuFolder"
-	CreateShortCut "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk" "$INSTDIR\uninst.exe" "" "" "" "" "" "Uninstall DNSSEC Validator 2.0 plugin for IE"
-  CreateShortCut "$SMPROGRAMS\$StartMenuFolder\RegPlugin.lnk" "$INSTDIR\RegPlugin.bat" "" "" "" "" "" "Manual registration of DNSSEC Validator 2.0 plugin"
-  CreateShortCut "$SMPROGRAMS\$StartMenuFolder\UnRegPlugin.lnk" "$INSTDIR\UnRegPlugin.bat" "" "" "" "" "" "Manual un-registration of DNSSEC Validator 2.0 plugin"
+	CreateShortCut "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk" "$INSTDIR\uninst.exe" "" "" "" "" "" "Uninstall DNSSEC/TLSA Validator 2.0 plugin for IE"
+  CreateShortCut "$SMPROGRAMS\$StartMenuFolder\RegPlugin.lnk" "$INSTDIR\RegPlugin.bat" "" "" "" "" "" "Manual registration of DNSSEC/TLSA Validator 2.0 plugin"
+  CreateShortCut "$SMPROGRAMS\$StartMenuFolder\UnRegPlugin.lnk" "$INSTDIR\UnRegPlugin.bat" "" "" "" "" "" "Manual un-registration of DNSSEC/TLSA Validator 2.0 plugin"
 	!insertmacro MUI_STARTMENU_WRITE_END
 
 	# register DNSSEC toolbar
@@ -119,7 +120,8 @@ section "un.Unbound"
   # deregister uninstall
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\DNSSECValidator 2.0"
   Delete "$INSTDIR\uninst.exe"   # delete self
-  Delete "$INSTDIR\ub_ds_windows-x86.dll"   
+  Delete "$INSTDIR\ub_ds_windows-x86.dll" 
+  Delete "$INSTDIR\DANEcore-windows-x86.dll"    
 	Delete "$INSTDIR\IEdnssec.dll"
 	Delete "$INSTDIR\key.ico"
 	Delete "$INSTDIR\RegPlugin.bat"
