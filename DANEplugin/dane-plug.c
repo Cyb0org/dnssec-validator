@@ -521,6 +521,7 @@ char * bintohex(const uint8_t *bytes, size_t buflen)
 	int i;
 
 	retval = malloc(buflen * 2 + 1);
+	
 	if (retval == NULL) {
 		return NULL;
 	}
@@ -529,8 +530,7 @@ char * bintohex(const uint8_t *bytes, size_t buflen)
 		retval[i * 2] = nibbleToChar(bytes[i] >> 4);
 		retval[i * 2 + 1] = nibbleToChar(bytes[i] & 0x0f);
 	}
-	retval[i] = '\0';
-
+	retval[i*2] = '\0';
 	return retval;
 }
 
@@ -1534,7 +1534,7 @@ int main(int argc, char **argv)
 
 	int res = DANE_EXIT_RESOLVER_FAILED;
 
-	res = CheckDane(certhex, 1, 5, "8.8.8.8", argv[1], "443", "tcp", 1);
+	res = CheckDane(certhex, 0, 5, "8.8.8.8", argv[1], "443", "tcp", 1);
 	
 	if (debug) {
 		printf(DEBUG_PREFIX_DANE "Main final result: %i\n", res);
