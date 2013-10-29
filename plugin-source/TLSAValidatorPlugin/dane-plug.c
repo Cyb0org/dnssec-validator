@@ -520,9 +520,8 @@ char * bintohex(const uint8_t *bytes, size_t buflen)
 	char *retval = NULL;
 	int i;
 
-	buflen = buflen * 2;
-
 	retval = malloc(buflen * 2 + 1);
+	
 	if (retval == NULL) {
 		return NULL;
 	}
@@ -531,8 +530,7 @@ char * bintohex(const uint8_t *bytes, size_t buflen)
 		retval[i * 2] = nibbleToChar(bytes[i] >> 4);
 		retval[i * 2 + 1] = nibbleToChar(bytes[i] & 0x0f);
 	}
-	retval[i] = '\0';
-
+	retval[i*2] = '\0';
 	return retval;
 }
 
@@ -849,7 +847,7 @@ cert_tmp_ctx spkicert(const unsigned char *certder, int len)
 	tmp.spki_der_hex = hex2; 
 	X509_free(cert);
 	EVP_PKEY_free(pkey);
-	free(buf2);
+	//free(buf2);
 	return tmp;
 }
 
@@ -1487,6 +1485,7 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options, char *
 			free(certbin);
 			free(certbin2);
 			free(skpi.spki_der_hex); /* Messy clean-up. Create a better one. */
+			free(skpi.spki_der);
 		}//for
 	}
 	else {
