@@ -6,9 +6,9 @@ CFLAGS=-fPIC
 export CFLAGS
 
 LIBS_SOURCE = libs-source
-OPENSSL_TARBALL = $(LIBS_SOURCE)/openssl-1.0.1e.tar.gz
-LDNS_TARBALL = $(LIBS_SOURCE)/ldns-1.6.16.tar.gz
-UNBOUND_TARBALL = $(LIBS_SOURCE)/unbound-1.4.21.tar.gz
+OPENSSL_TARBALL = $(LIBS_SOURCE)/openssl.tar.gz
+LDNS_TARBALL = $(LIBS_SOURCE)/ldns.tar.gz
+UNBOUND_TARBALL = $(LIBS_SOURCE)/unbound.tar.gz
 
 BASEDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
