@@ -43,7 +43,7 @@ Var StartMenuFolder
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "setup_left.bmp"
 !define MUI_ABORTWARNING
 
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of DNSSEC/TLSA Validator plugin for Internet Explorer on your computer.$\r$\n$\nNote: If the Internet Explorer browser is running on your computer, it is recommended close him before starting installation of plugin.$\r$\n$\r$\nClick Next to continue."
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of Internet Explorer DNSSEC/TLSA Validator plugin.$\r$\n$\nNote: It is recommended to close all running Internet Explorer windows before proceeding with the installation of the plugin.$\r$\n$\r$\nClick Next to continue."
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_DIRECTORY
 
@@ -56,7 +56,7 @@ Var StartMenuFolder
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the uninstallation of DNSSEC/TLSA Validator plugin for Internet Explorer from your computer.$\r$\n$\nNote: If the Internet Explorer browser is running on your computer, it is recommended close him before uninstallation of plugin.$\r$\n$\r$\nClick Next to continue."
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the uninstallation of Internet Explorer DNSSEC/TLSA Validator plugin.$\r$\n$\nNote: It is recommended close all running Internet Explorer windows before proceeding with the uninstallation of the plugin.$\r$\n$\r$\nClick Next to continue."
 !insertmacro MUI_UNPAGE_WELCOME
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
