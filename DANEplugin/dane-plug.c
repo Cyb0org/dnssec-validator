@@ -942,7 +942,7 @@ char * matchingData(uint8_t matching_type, uint8_t selector,
 	}
 	switch (matching_type) {
 	case EXACT:
-		return data;
+		return cert_ctx->cert_der_hex;
 	case SHA256:
 		if (selector==SPKI) {
 			return sha256(data, cert_ctx->spki_len);
