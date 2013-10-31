@@ -925,7 +925,8 @@ char * selectorData(uint8_t selector, struct cert_store_ctx_st *cert_ctx)
 
 //*****************************************************************************
 // DANE algorithm (matching_type)
-// return binary data of certificate or SPKI encode in SHA256, SHA512
+// return copy binary data of certificate or SPKI encode in SHA256, SHA512
+// Caller must ensure proper deallocation of memory.
 // ----------------------------------------------------------------------------
 char * matchingData(uint8_t matching_type, uint8_t selector,
     struct cert_store_ctx_st *cert_ctx)
@@ -936,13 +937,19 @@ char * matchingData(uint8_t matching_type, uint8_t selector,
 	}
 
 	char* data = selectorData(selector, cert_ctx);
+	char *der_copy;
 
 	if (data == NULL) {
 		return data;
 	}
 	switch (matching_type) {
 	case EXACT:
-		return cert_ctx->cert_der_hex;
+		der_copy = malloc(strlen(cert_ctx->cert_der_hex) + 1);
+		if (der_copy == NULL) {
+			return NULL;
+		}
+		strcpy(der_copy, cert_ctx->cert_der_hex);
+		return der_copy;
 	case SHA256:
 		if (selector==SPKI) {
 			return sha256(data, cert_ctx->spki_len);
