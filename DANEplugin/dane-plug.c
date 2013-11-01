@@ -1544,8 +1544,25 @@ int main(int argc, char **argv)
 {
 
 	int res = DANE_EXIT_RESOLVER_FAILED;
+	char * domain = "www.nic.cz";
+	char * port = "443";
+	char * protocol = "tcp";
+	res = CheckDane(certhex, 0, 5, "8.8.8.8", argv[1], argv[2], argv[3], 1);
+/*	
+	if (argv[1] != "") {
+		domain = argv[1];	
+	}
+	if (argv[2] != "") {
+		port = argv[2];	
+	}
+	if (argv[3] != "") {
+		protocol = argv[3];	
+	}
 
-	res = CheckDane(certhex, 0, 5, "8.8.8.8", argv[1], "443", "tcp", 1);
+
+
+res = CheckDane(certhex, 0, 5, "8.8.8.8", domain, port, protocol, 1);
+*/
 	
 	if (debug) {
 		printf(DEBUG_PREFIX_DANE "Main final result: %i\n", res);

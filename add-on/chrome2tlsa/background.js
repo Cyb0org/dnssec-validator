@@ -406,8 +406,8 @@ function httpscheme(taburl){
 };
 
 
-function TLSAvalidate(scheme,domain){	  	
-	console.log(DANE + "--------- Start of TLSA Validation ("+ scheme +":"+ domain +") ---------");	
+function TLSAvalidate(scheme, domain, port){	  	
+	console.log(DANE + "--------- Start of TLSA Validation ("+ scheme +":"+ domain +":"+ port +") ---------");	
 
 	var debug = localStorage["dnssecDebugOutput"];
 	     debug = (debug == "false") ? false : true;        	   
@@ -457,13 +457,13 @@ function TLSAvalidate(scheme,domain){
 		        certchain.push("xxx");
 			var len = certchain.length;
 			len = 0;
-			var daneMatch = tlsa.TLSAValidate(certchain, len, options, resolver, domain, "443", "tcp", 1);
+			var daneMatch = tlsa.TLSAValidate(certchain, len, options, resolver, domain, port, "tcp", 1);
 			result = daneMatch[0];
 		}
 		else  result = c.DANE_EXIT_NO_HTTPS;
         }	
 	console.log(DANE + "TLSA Validator result: " + result);
-	console.log(DANE + "--------- End of TLSA Validation ("+ scheme +":"+ domain +") ---------");
+	console.log(DANE + "--------- End of TLSA Validation ("+ scheme +":"+ domain +":"+ port +") ---------");
 	return result;
 };
 
@@ -504,10 +504,14 @@ function onUrlChange(tabId, changeInfo, tab) {
 
 		chrome.pageAction.setPopup({tabId: tabId, popup: ""});
 		var scheme = httpscheme(tab.url);
-	        var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
-		currenturl = domain;
-	        var ret = TLSAvalidate(scheme,domain);
-		setTLSASecurityState(tabId, domain, ret, "xxx");
+
+		var tmp = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(:[0-9]+)*(:)?/);
+		var domain = tmp[1];
+		var port = (tmp[2] == undefined) ? 443 : tmp[2].substring(1);	
+		var port2 = (tmp[2] == undefined) ? "" : tmp[2];
+
+	        var ret = TLSAvalidate(scheme, domain, port);
+		setTLSASecurityState(tabId, domain+port2, ret, "xxx");
 	}
 
 	if (changeInfo.status=="complete") {		
@@ -549,9 +553,12 @@ function onBeforeRequest(tabId, url) {
 
 	// get scheme from URL
 	var scheme = httpscheme(url);
-	// get domain name from URL
-	var domain = url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
-	var ret = TLSAvalidate(scheme,domain);
+
+	var tmp = url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(:[0-9]+)*(:)?/);
+	var domain = tmp[1];
+	var port = (tmp[2] == undefined) ? 443 : tmp[2].substring(1);
+
+	var ret = TLSAvalidate(scheme,domain,port);
 //	olddomain = domain;
 	return ret;
 }; // onUrlChange

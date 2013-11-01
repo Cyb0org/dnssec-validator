@@ -280,7 +280,9 @@ observe: function(channel, topic, data) {
 			channel.QueryInterface(Ci.nsIHttpChannel);	
 			var url = channel.URI.spec;
 			var host = channel.URI.hostPort;		
-	
+			var port = (channel.URI.port == -1) ? 443 : channel.URI.port;
+
+
 			var si = channel.securityInfo;
 			if (!si) return;
 
@@ -347,7 +349,7 @@ observe: function(channel, topic, data) {
 				var cert = st.serverCert;
 				if (!cert) return;
 									
-				tlsaValidator.check_tlsa_https(channel, cert, browser, host, "443");
+				tlsaValidator.check_tlsa_https(channel, cert, browser, host, port);
 
 			}	
 			else if (daneExtension.debugOutput) 
@@ -507,6 +509,7 @@ processNewURL: function(aRequest, aLocationURI) {
 
 	scheme = aLocationURI.scheme;             // Get URI scheme
 	asciiHost = aLocationURI.asciiHost;       // Get punycoded hostname
+	var port = (aLocationURI.port == -1) ? 443 : aLocationURI.port;
 
 	if (daneExtension.debugOutput) {
 		dump(this.DANE_DEBUG_PRE + 'Scheme: "' + scheme 
@@ -558,7 +561,7 @@ processNewURL: function(aRequest, aLocationURI) {
 				if (daneExtension.debugOutput) {
 					dump(this.DANE_DEBUG_PRE + "Connection is secured (https)" + this.DANE_DEBUG_POST);
 				}
-				tlsa = this.check_tlsa_tab_change(aRequest, asciiHost, "443");			
+				tlsa = this.check_tlsa_tab_change(aRequest, asciiHost, port);			
 				return tlsa;
 			}
 		}	
