@@ -214,7 +214,10 @@ function testdnssec() {
 		} // for
 
 	   if (ip) {
-	        window.open('options.html?0,'+chioce+','+unescape(tmp), "_top");
+		document.getElementById("messageok").style.display = 'none';
+		document.getElementById("messagebogus").style.display = 'none';
+		document.getElementById("messageerror").style.display = 'none'
+		document.getElementById("messageip").style.display = 'block';
 	   }
 	   else {
 		     try {
@@ -225,17 +228,29 @@ function testdnssec() {
 			      derCerts.push("XXX");
 			      testnic = plugin.TLSAValidate(derCerts, 0, options, nameserver, dn, "443", "tcp", 1);     
 			      if (testnic==13) {
-				        window.open('options.html?3,'+chioce+','+unescape(tmp), "_top");
+					document.getElementById("messageok").style.display = 'block';
+					document.getElementById("messagebogus").style.display = 'none';
+					document.getElementById("messageerror").style.display = 'none';
+					document.getElementById("messageip").style.display = 'none';
 			      }
 			      else if (testnic==-5) {
-				        window.open('options.html?2,'+chioce+','+unescape(tmp), "_top");
+					document.getElementById("messageok").style.display = 'none';
+					document.getElementById("messagebogus").style.display = 'block';
+					document.getElementById("messageerror").style.display = 'none';
+					document.getElementById("messageip").style.display = 'none';
 			      }
 			      else { 
-				        window.open('options.html?1,'+chioce+','+unescape(tmp), "_top");
-			      }      
+					document.getElementById("messageok").style.display = 'none';
+					document.getElementById("messagebogus").style.display = 'none';
+					document.getElementById("messageerror").style.display = 'block';
+					document.getElementById("messageip").style.display = 'none';
+			      } 
 		    } catch (ex) {
-			       console.log('Error: Plugin call failed!\n');
-			       window.open('options.html?1,'+chioce+','+unescape(tmp), "_top");
+			     	console.log('Error: Plugin call failed!\n');
+			       	document.getElementById("messageok").style.display = 'none';
+				document.getElementById("messagebogus").style.display = 'none';
+				document.getElementById("messageerror").style.display = 'none';
+				document.getElementById("messageip").style.display = 'none';
 		    } //try
    	}//if ip
 }
@@ -266,6 +281,7 @@ window.onload = function(){
 // show DNSSEC text about resover settings 
 //--------------------------------------------------------
 function testinfodisplay(state){
+
    if (state==0) {
 		document.getElementById("messageok").style.display = 'none';
 		document.getElementById("messagebogus").style.display = 'none';
