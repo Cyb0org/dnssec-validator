@@ -228,8 +228,6 @@ public:
 	// loads preference settings from the Windows registry or file
 	void LoadOptionsFromRegistry(void);
 	void LoadOptionsFromFile(void);
-	// url to domain name
-	char *UrlToDomain(char* url);
 	// creates a tooltip for showing information texts
 	void CreateIconTooltip(HWND hwndParent);
 	void CreateToolTipForRect(HWND hwndParent);

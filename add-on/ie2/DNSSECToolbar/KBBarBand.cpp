@@ -115,6 +115,35 @@ typedef struct {   /* structure to save IPv4/IPv6 address from stub resolver */
 } ip64struct;
 ip64struct ip64buf;
 
+typedef struct {   /* structure to save IPv4/IPv6 address from stub resolver */
+  char *protocol;
+  char *domain;
+  char *port;
+} domstruct;
+domstruct domainstruct;
+
+
+/**************************************************************************/
+//to convert URL string on domain name and port, removed http:\\, https:\\ .. 
+/**************************************************************************/
+domstruct UrlToDomain(char *url) 
+{
+	//if (debug) ATLTRACE("UrlToDomain(%s);\n",url);
+
+	static char separator[]   = "://";
+	domstruct domainstruct;
+	char *domainname=NULL;
+	char *next_token=NULL;
+	
+	domainstruct.protocol = strtok_s(url, separator, &next_token);
+	if (debug) ATLTRACE("UrlToDomain-Protocol(%s);\n",domainstruct.protocol);
+	domainstruct.domain = strtok_s(NULL,separator, &next_token);	
+	if (debug) ATLTRACE("UrlToDomain-Doamin(%s);\n",domainstruct.domain);
+	domainstruct.port = strtok_s(NULL,separator, &next_token);	
+	if (debug) ATLTRACE("UrlToDomain-Prot(%s);\n",domainstruct.port);
+
+	return domainstruct;
+}
 
 /**************************************************************************/
 // inet_ntop function for win32
@@ -1150,7 +1179,6 @@ void CKBBarBand::CheckDomainStatus(char * url)
 	if (debug) ATLTRACE("CheckDomainStatus(%s);\n", url);
   
 	//temporal element that helps to fragment the given URL in a domain
-	char* tmpdomain = NULL;
 	bool resolvipv4 = true;
 	bool resolvipv6 = true;
 	bool cache_en = true;
@@ -1159,9 +1187,9 @@ void CKBBarBand::CheckDomainStatus(char * url)
 	debugoutput = true; 
 	short resultipv4 = 0; //the DNSSEC validation result
 	short resultipv6 = 0; //the DNSSEC validation result	
-	tmpdomain=UrlToDomain(url);	
+	domstruct tmpdomain=UrlToDomain(url);
 	char * domaintmp = (char*)malloc(2083*sizeof(char));
-	strcpy_s(domaintmp,2048,tmpdomain);
+	strcpy_s(domaintmp,2048,tmpdomain.domain);
 
 	char* dnsip; 
 	LoadOptionsFromFile();
@@ -1343,18 +1371,18 @@ void CKBBarBand::CheckDomainStatus(char * url)
 		ATLTRACE("DNSSEC result: %d\n", dnssecresult);
 		ATLTRACE("-------------- DNSSEC validation End -----------------\n");
 		
-		
+		if (tmpdomain.port==NULL) tmpdomain.port="443";
 		// tlsa validation
 		if (tlsaenable == 1) {
 			if (!wrong) {							
-				if (strcmp (url,"https") == 0) {
-					ATLTRACE("Scheme is %s", url);
+				if (strcmp (tmpdomain.protocol,"https") == 0) {
+					ATLTRACE("Scheme is https");
 					ATLTRACE("\n-------------- TLSA validation Start -----------------\n");				
 					EnterCriticalSection(&cs);
 					short tlsares;
 					const char* certhex[] = {"FF"};
-					ATLTRACE("DANE request: %s, %d, %d, %s, %s, %s, %s, %d\n", certhex[0], 0, options, dnsip, domaintmp, "443", "tcp", 1);
-					tlsares = CheckDane(certhex, 0, options, dnsip, domaintmp, "443", "tcp", 1);
+					ATLTRACE("DANE request: %s, %d, %d, %s, %s, %s, %s, %d\n", certhex[0], 0, options, dnsip, domaintmp, tmpdomain.port, "tcp", 1);
+					tlsares = CheckDane(certhex, 0, options, dnsip, domaintmp, tmpdomain.port, "tcp", 1);
 					ATLTRACE("DANE result: %s: %d\n", domaintmp, tlsares);
 					tlsaresult = tlsares;
 					LeaveCriticalSection(&cs);
@@ -1362,7 +1390,7 @@ void CKBBarBand::CheckDomainStatus(char * url)
 				} //if
 				else {
 					tlsaresult = DANE_EXIT_NO_HTTPS;
-					ATLTRACE("Scheme is %s, no TLSA validation\n", url);
+					ATLTRACE("Scheme is http, TLSA validation will not start\n");
 				}
 			} 
 			else tlsaresult = DANE_EXIT_WRONG_RESOLVER;
@@ -1425,40 +1453,6 @@ void CKBBarBand::ShowFwdTooltip()
 	ti.lpszText = tibuf2;
 	SendMessage(hwndTT, TTM_SETTITLE, TTI_WARNING, (LPARAM) tibuf);
 	SendMessage(hwndTT, TTM_UPDATETIPTEXT, 0, (LPARAM) (LPTOOLINFO) &ti);
-}
-
-/**************************************************************************/
-//to convert URL string on domain name, removed http:\\ 
-/**************************************************************************/
-char* CKBBarBand::UrlToDomain(char *url) 
-{
-	if (debug) ATLTRACE("UrlToDomain(%s);\n",url);
-
-	static char separator[]   = "://";
-	char *domainname=NULL;
-	char *next_token=NULL;
-	char *aux_token = NULL;
-
-	//to store current domain name
-	//domainname=(char*)malloc(2083*sizeof(char));
-	//next_token=(char*)malloc(2083*sizeof(char));
-	domainname = strtok_s(url, separator, &next_token);
-
-
-		if (debug) ATLTRACE("UrlToDomain(%s);\n",domainname);
-		if (debug) ATLTRACE("UrlToDomain(%s);\n",next_token);
-
-	domainname = strtok_s(NULL,separator, &next_token);
-		
-	if (debug) ATLTRACE("UrlToDomain(%s);\n",domainname);
-	if (debug) ATLTRACE("UrlToDomain(%s);\n",next_token);
-	
-	//aux_token = (char *)malloc(strlen(domainname) + 1);
-	//memcpy(aux_token, domainname, strlen(domainname) + 1);
-	
-	
-	//return aux_token;	
-	return domainname;
 }
 
 /**************************************************************************/
