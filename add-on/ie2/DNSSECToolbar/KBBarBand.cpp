@@ -40,9 +40,13 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 // size of buffer for URL parts save
 #define STR_BUF_SIZE	512
 // default icon status 
-WORD statldicon=IDI_DNSSEC_ICON_INIT;
+WORD statdnssecicon=IDI_DNSSEC_ICON_INIT;
 // for ICON KEY status - not used
-WORD ldiconBar;
+WORD dnsseciconBar;
+
+bool debug = true;
+
+
 char * temp = "";
 short textkey = KEYTEXT;
 short choice = RESOLVER;
@@ -440,135 +444,90 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 	//ATLTRACE(DEBUG_PREFIX "dispidMember: %d\n");
 	//loading MSIE elements
 	HRESULT hr = webBrowser2->get_HWND((LONG_PTR*)&hwnd);
+	BSTR BURL = L"";
+	char * tmpurl = "";
 	//succeed?
 	if (SUCCEEDED(hr)) {
 		switch(dispidMember) {
-			case DISPID_DOCUMENTCOMPLETE : { 
-				ATLTRACE("Invoke(): DISPID_DOCUMENTCOMPLETE\n");
-				//if (wrong) m_wndToolBar.WrongResolver();
-			} break;
-			
 
-
+			// Fires if window or tab was changed 
 			case DISPID_WINDOWSTATECHANGED : {
-				ATLTRACE("Invoke(): DISPID_WINDOWSTATECHANGED\n");
+				if (debug) ATLTRACE("Invoke(): DISPID_WINDOWSTATECHANGED: ");
+
 				if (pDispParams) {
 					 DWORD dwMask  = pDispParams->rgvarg[0].lVal;
 					 DWORD dwFlags = pDispParams->rgvarg[1].lVal;
 				    // We only care about WINDOWSTATE_USERVISIBLE.
 					if (dwMask & OLECMDIDF_WINDOWSTATE_USERVISIBLE)
 					{
-					bool visible = !!(dwFlags & OLECMDIDF_WINDOWSTATE_USERVISIBLE);
-					//LoadOptionsFromRegistry();
-					LoadOptionsFromFile();
-				BSTR BURL2 = L"";
-				HRESULT hrs = webBrowser2->get_LocationURL(&BURL2);
-				char * predomain4 =_com_util::ConvertBSTRToString(BURL2);
-				
-				if (strcmp(predomain4,"about:Tabs")==0 || strcmp(predomain4,"about:Blank")==0 || strcmp(predomain4,"about:blank")==0 || strcmp(predomain4,"javascript:false;")==0) 
-				{
-				ldicon = GetIconIndex(IDI_DNSSEC_ICON_INIT);
-				tlsaicon = GetIconIndex(IDI_TLSA_ICON_INIT);						
-				keylogo=ldicon;
-				RefreshIcons();
-				
-				}
-				else
-				{
-	
-				    bstrUrlName = BURL2; 					
-				ATLTRACE("\n");
-				ATLTRACE(temp);
-				ATLTRACE(" ----- ");
-				ATLTRACE(predomain4);
-				ATLTRACE("\n");
-					if (!strcmp(predomain4,temp)==0) {
-						temp = predomain4;
-						DnssecStatus(1);
-					
-					
-					}					
-					state = ldicon;
-					keylogo=ldicon;
-					RefreshIcons();
-				}
-	
+						bool visible = !!(dwFlags & OLECMDIDF_WINDOWSTATE_USERVISIBLE);
+						LoadOptionsFromFile();					
+						HRESULT hrs = webBrowser2->get_LocationURL(&BURL);
+						tmpurl =_com_util::ConvertBSTRToString(BURL);
+						if (debug) ATLTRACE("%s", tmpurl);
+						if (strcmp(tmpurl,"")==0 || strcmp(tmpurl,"about:Tabs")==0 || strcmp(tmpurl,"about:Blank")==0 || strcmp(tmpurl,"about:blank")==0 || strcmp(tmpurl,"javascript:false;")==0 || strcmp(tmpurl,"res://ieframe.dll/dnserrordiagoff.htm")==0) {
+							if (debug) ATLTRACE("null\n");
+							dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_INIT);
+							tlsaicon = GetIconIndex(IDI_TLSA_ICON_INIT);						
+							keylogo=dnssecicon;
+							RefreshIcons();
+						} else {
+							if (debug) ATLTRACE("\n");					
+							if (!strcmp(tmpurl,temp)==0) {
+								temp = tmpurl;
+								CheckDomainStatus(tmpurl);
+							}							
+							state = dnssecicon;
+							keylogo=dnssecicon;
+							RefreshIcons();
+						}
 					}
 				}
+				free(tmpurl);
 			} break;
 
 			case DISPID_BEFORENAVIGATE2 : {				
-				ATLTRACE("Invoke(): DISPID_BEFORENAVIGATE2\n");
-				//ATLASSERT((*pDispParams).rgvarg[5].vt = VT_BYREF | VT_BSTR);
-				BSTR BURL = L"";
+				if (debug) ATLTRACE("Invoke(): DISPID_BEFORENAVIGATE2: ");	
 				HRESULT hrs = webBrowser2->get_LocationURL(&BURL);
-				bstrUrlName2 = ((*pDispParams).rgvarg)[5].pvarVal->bstrVal;
-				char * predomain2 =_com_util::ConvertBSTRToString(BURL);
-				//ATLTRACE(predomain2);
-				if (strcmp(predomain2,"about:Tabs")==0 || strcmp(predomain2,"about:Blank")==0 || strcmp(predomain2,"about:blank")==0 || strcmp(predomain2,"javascript:false;")==0) 
-				{
-				ldicon = GetIconIndex(IDI_DNSSEC_ICON_INIT);
-				tlsaicon = GetIconIndex(IDI_TLSA_ICON_INIT);
-				RefreshIcons();
-				keylogo=ldicon;
-				}
-				else
-				{
-				/*temp2 = UrlToDomain(predomain2);
-				//ATLTRACE("\n2");
-				//ATLTRACE(temp2);
-				//ATLTRACE(urladdr);
-				//ATLTRACE("\n2");
-					if (strcmp(temp2,urladdr)==0)
-					{
-						ldicon = state;
-						RefreshIcons();
-					}
-					else
-					{*/
-				    ldicon = state;
-					keylogo=ldicon;
-					//ldicon = GetIconIndex(IDI_DNSSEC_ICON_ACTION1);				
+				tmpurl =_com_util::ConvertBSTRToString(BURL);
+				if (debug) ATLTRACE("%s", tmpurl);
+				if (strcmp(tmpurl,"")==0 || strcmp(tmpurl,"about:Tabs")==0 || strcmp(tmpurl,"about:Blank")==0 || strcmp(tmpurl,"about:blank")==0 || strcmp(tmpurl,"javascript:false;")==0 || strcmp(tmpurl,"res://ieframe.dll/dnserrordiagoff.htm")==0) {
+					if (debug) ATLTRACE("null\n");
+					dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_INIT);
+					tlsaicon = GetIconIndex(IDI_TLSA_ICON_INIT);					
 					RefreshIcons();
-					/*}*/
+					keylogo=dnssecicon;
+				} else {
+					temp = tmpurl;
+					if (debug) ATLTRACE("\n");
+					CheckDomainStatus(tmpurl);
+					state = dnssecicon;
+					keylogo=dnssecicon;							
 				}	
+			free(tmpurl);			
 			} break;
-
+/*
 			case DISPID_NAVIGATECOMPLETE2 : {	
-				ATLTRACE("Invoke(): DISPID_NAVIGATECOMPLETE2\n");				
-				BSTR BURL2 = L"";
-				HRESULT hrs = webBrowser2->get_LocationURL(&BURL2);
-				char * predomain4 =_com_util::ConvertBSTRToString(BURL2);				
-				if (strcmp(predomain4,"about:Tabs")==0 || strcmp(predomain4,"about:Blank")==0 || strcmp(predomain4,"about:blank")==0 || strcmp(predomain4,"javascript:false;")==0) 
-				{
-				ldicon = GetIconIndex(IDI_DNSSEC_ICON_INIT);
-				tlsaicon = GetIconIndex(IDI_TLSA_ICON_INIT);						
-				keylogo=ldicon;
-				RefreshIcons();
-				
-				}
-				else
-				{
-				/*temp = UrlToDomain(predomain4);
-					if (strcmp(temp,urladdr)==0)
-					{
-						ldicon = state;
-						RefreshIcons();
-					}
-					else
-					{
-					*/
-				    bstrUrlName = BURL2;
-					temp = predomain4;
-					DnssecStatus(1);
-					//urladdr = temp;
-					state = ldicon;
-					keylogo=ldicon;					
-					/*}*/
+				ATLTRACE("Invoke(): DISPID_NAVIGATECOMPLETE2: ");				
+				HRESULT hrs = webBrowser2->get_LocationURL(&BURL);
+				tmpurl =_com_util::ConvertBSTRToString(BURL);
+				if (debug) ATLTRACE("%s", tmpurl);
+				if (strcmp(tmpurl,"")==0 || strcmp(tmpurl,"about:Tabs")==0 || strcmp(tmpurl,"about:Blank")==0 || strcmp(tmpurl,"about:blank")==0 || strcmp(tmpurl,"javascript:false;")==0 || strcmp(tmpurl,"res://ieframe.dll/dnserrordiagoff.htm")==0) {
+					if (debug) ATLTRACE("null\n");
+					dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_INIT);
+					tlsaicon = GetIconIndex(IDI_TLSA_ICON_INIT);						
+					keylogo=dnssecicon;
+					RefreshIcons();
+				} else {
+					if (debug) ATLTRACE("\n");
+					dnssecicon = state;
+					keylogo=dnssecicon;
+					RefreshIcons();			
 				}
 			} break;
+*/
 			//default status
-			default : {				
+			default : {
 			} break;
 		}
 	}
@@ -576,10 +535,10 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 }
 
 /**************************************************************************/
-// refresh icon in the status bar (WM_PAINT invocation)
+// refresh icons in the toolbar bar
 /**************************************************************************/
 void CKBBarBand::RefreshIcons(void) {
-	m_wndToolBar.RepaintButtonDNSSEC(0,ldicon);
+	m_wndToolBar.RepaintButtonDNSSEC(0,dnssecicon);
 	m_wndToolBar.RepaintButtonTLSA(1,tlsaicon);
 }
 
@@ -800,7 +759,7 @@ void CKBBarBand::CreateIconTooltip(HWND hwndParent)
 /**************************************************************************/
 int CKBBarBand::GetIconIndex(int icon)
 {	
-	ATLTRACE("GetIconIndex(%d):\n", icon);	
+	//ATLTRACE("GetIconIndex(%d):\n", icon);	
 	int iconindex = 0;
 	switch (icon) {
 	case IDI_DNSSEC_ICON_INIT: 
@@ -864,7 +823,7 @@ int CKBBarBand::GetIconIndex(int icon)
 			iconindex = 0; 
 			break;
 	}
-		ATLTRACE("GetIconIndexRETURN(%d):\n", iconindex);	
+		//ATLTRACE("GetIconIndexRETURN(%d):\n", iconindex);	
 		return iconindex;
 }//
 
@@ -873,7 +832,7 @@ int CKBBarBand::GetIconIndex(int icon)
 /**************************************************************************/
 void CKBBarBand::SetSecurityTLSAStatus()
 {
-	ATLTRACE("SetSecurityTLSAStatus(%d):\n", tlsaresult);	
+	if (debug) ATLTRACE("SetSecurityTLSAStatus(%d):\n", tlsaresult);	
 	int daneicon = 0;
 	WORD panel_label = IDS_NONE; // main label of popup
 	WORD panel_text1 = IDS_NONE; // TLSA main text
@@ -1058,7 +1017,7 @@ void CKBBarBand::SetSecurityTLSAStatus()
 /**************************************************************************/
 void CKBBarBand::SetSecurityDNSSECStatus()
 {
-	ATLTRACE("SetSecurityDNSSECStatus(%d):\n", result);
+	if (debug) ATLTRACE("SetSecurityDNSSECStatus(%d):\n", dnssecresult);
 	// DNSSEC status tooltipinfo
 	WORD tiicon = TTI_NONE;		// icon in tooltipinfo
 	WORD tiicontitle = IDS_NONE;// main title of tooltipinfo
@@ -1067,12 +1026,12 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 	WORD titext = IDS_NONE;     // DNSSEC status text
 	
 	// switch of DNSSEC status - icon, popup info
-	switch (result) {
+	switch (dnssecresult) {
 
 	// state 1
 	case DNSSEC_EXIT_DOMAIN_UNSECURED:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_NO);
-		ldiconBar = IDI_DNSSEC_ICON_NO;
+		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_NO);
+		dnsseciconBar = IDI_DNSSEC_ICON_NO;
 		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE1_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
@@ -1081,8 +1040,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
  		break;		
 	// state 2
 	case DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_VALID);
-		ldiconBar = IDI_DNSSEC_ICON_VALID;
+		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_VALID);
+		dnsseciconBar = IDI_DNSSEC_ICON_VALID;
 		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE2_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
@@ -1091,8 +1050,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
  		break;
 	// state 3
 	case DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_IP);
-		ldiconBar = IDI_DNSSEC_ICON_IP;
+		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_IP);
+		dnsseciconBar = IDI_DNSSEC_ICON_IP;
 		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE3_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
@@ -1101,8 +1060,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
  		break;
 	// state 4
 	case DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_BOGUS);
-		ldiconBar = IDI_DNSSEC_ICON_BOGUS;
+		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_BOGUS);
+		dnsseciconBar = IDI_DNSSEC_ICON_BOGUS;
 		tiicon = TTI_ERROR;
 		tiicontitle = IDS_STATE4_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
@@ -1111,8 +1070,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
  		break;
 	// state 5
 	case DNSSEC_EXIT_NODOMAIN_UNSECURED:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_NO);
-		ldiconBar = IDI_DNSSEC_ICON_NO;
+		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_NO);
+		dnsseciconBar = IDI_DNSSEC_ICON_NO;
 		tiicon = TTI_WARNING;
 		tiicontitle = IDS_STATE5_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_NODOMAIN;
@@ -1121,8 +1080,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
  		break;
    // state 6
 	case DNSSEC_EXIT_NODOMAIN_SIGNATURE_VALID:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_VALID);
-		ldiconBar = IDI_DNSSEC_ICON_VALID;
+		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_VALID);
+		dnsseciconBar = IDI_DNSSEC_ICON_VALID;
 		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE6_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_NODOMAIN;
@@ -1131,8 +1090,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
  		break;
     // state 7
 	case DNSSEC_EXIT_NODOMAIN_SIGNATURE_INVALID:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_BOGUS);
-		ldiconBar = IDI_DNSSEC_ICON_BOGUS;
+		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_BOGUS);
+		dnsseciconBar = IDI_DNSSEC_ICON_BOGUS;
 		tiicon = TTI_ERROR;
 		tiicontitle = IDS_STATE7_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_NODOMAIN;
@@ -1141,8 +1100,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
  		break;  
     // state -1
 	case DNSSEC_EXIT_VALIDATOR_OFF:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_OFF);
-		ldiconBar = IDI_DNSSEC_ICON_OFF;
+		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_OFF);
+		dnsseciconBar = IDI_DNSSEC_ICON_OFF;
 		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE01_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
@@ -1151,8 +1110,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
  		break;
 	//-2
 	case DNSSEC_EXIT_WRONG_RESOLVER:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_ERROR);
-		ldiconBar = IDI_DNSSEC_ICON_ERROR;
+		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_ERROR);
+		dnsseciconBar = IDI_DNSSEC_ICON_ERROR;
 		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE02_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
@@ -1162,8 +1121,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 	// other states
     case DNSSEC_EXIT_FAILED:
     default:
-		ldicon = GetIconIndex(IDI_DNSSEC_ICON_ERROR);
-		ldiconBar = IDI_DNSSEC_ICON_ERROR;
+		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_ERROR);
+		dnsseciconBar = IDI_DNSSEC_ICON_ERROR;
 		tiicon = TTI_ERROR;
 		tiicontitle = IDS_STATE0_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_ERROR;
@@ -1172,91 +1131,24 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 		break;
 
 	}// switch
-	err = ldicon;
-	keylogo2 = ldiconBar;
+	err = dnssecicon;
+	keylogo2 = dnsseciconBar;
 	paneltitle  = tiicontitle;
 	panelpredonain  = tipref;
-	paneldomainname = domain;
+	paneldomainname = (char *)domain;
 	panelpostdomain  = tistatus;
 	paneltext  = titext;
 	paneltextip = ipresult;
-	res=result;
-	/*
-	char tmpbuf[STR_BUF_SIZE] = TEXT("");
-	char tibuf[STR_BUF_SIZE*4] = TEXT(""); // buffer to store tooltip string
-
-	LoadStringA(GHins, tipref, tmpbuf, STR_BUF_SIZE);
-	strncat_s(tibuf, tmpbuf, STR_BUF_SIZE);
-	strncat_s(tibuf, TEXT("\n"), 1);
-	strncat_s(tibuf, domain, STR_BUF_SIZE);
-	strncat_s(tibuf, TEXT("\n"), 1);
-	LoadStringA(GHins, tistatus, tmpbuf, STR_BUF_SIZE);
-	strncat_s(tibuf, tmpbuf, STR_BUF_SIZE);
-	strncat_s(tibuf, TEXT("\n\n"), 2);
-	LoadStringA(GHins, titext, tmpbuf, STR_BUF_SIZE);
-	strncat_s(tibuf, tmpbuf, STR_BUF_SIZE);
-    LoadStringA(GHins, tiicontitle, tmpbuf, STR_BUF_SIZE);
-
-	ti.lpszText = tibuf;
-	RefreshIcons();
-
-	SendMessage(hwndTT, TTM_SETTITLE, tiicon, (LPARAM) tmpbuf);
-	SendMessage(hwndTT, TTM_UPDATETIPTEXT, 0, (LPARAM) (LPTOOLINFO) &ti);
-	*/
+	res=dnssecresult;
 }//
-
-/**************************************************************************/
-// It displays DNSSEC status function
-/**************************************************************************/
-void CKBBarBand::DnssecStatus(short change)
-{
-	//ATLTRACE("displaydnssecstatus() call\n");
-
-	//the next lines allow to the plugin to cast the URL name to
-	//a "standard readable" string char*
-	//but now in the case of the domain name
-	domain = (char*)malloc(2083*sizeof(char));
-	predomain= (char*)malloc(2083*sizeof(char));
-	predomain=_com_util::ConvertBSTRToString(bstrUrlName);
-	//ATLTRACE(predomain);
-	//ATLTRACE("\n");
-	//error URL
-	static char pattern[]="res://ieframe.dll/dnserrordiagoff.htm#";
-	char *errordomain=NULL;
-	errordomain=(char*)malloc(2083*sizeof(char));
-	strcpy_s(errordomain,2083,predomain);
-
-	//this element will allocate the list of DNS primary servers
-	char **prevDNSlist;
-	prevDNSlist=(char**)malloc(200*sizeof(char));
-
-	//output status has changed , special cases
-	if (strcmp(predomain,"about:Tabs")==0 || strcmp(predomain,"about:Blank")==0 || strcmp(predomain,"about:blank")==0) {
-	ldicon = GetIconIndex(IDI_DNSSEC_ICON_INIT);						
-	RefreshIcons();
-	}else{
-		//default FAIL URL 
-		if (strcmp(predomain,"res://ieframe.dll/dnserrordiagoff.htm")!=0) { //current navigation
-			char *isstring=NULL;
-			isstring=(char*)malloc(2083*sizeof(char));
-			isstring=strstr(errordomain,pattern);
-			// here the current domain is verified
-			if (isstring==NULL){
-			CheckDomainStatus(change);
-			}
-		}
-	}
-}
 
 /**************************************************************************/
 // It checks whether a domain is a DNSSEC domain
 /**************************************************************************/
-void CKBBarBand::CheckDomainStatus(short change) 
+void CKBBarBand::CheckDomainStatus(char * url) 
 {   
-	//ATLTRACE("checkdomainstatus() call\n");
-    
-	// if IE is version 8.xx, create tooltip	
-
+	if (debug) ATLTRACE("CheckDomainStatus(%s);\n", url);
+  
 	//temporal element that helps to fragment the given URL in a domain
 	char* tmpdomain = NULL;
 	bool resolvipv4 = true;
@@ -1267,14 +1159,9 @@ void CKBBarBand::CheckDomainStatus(short change)
 	debugoutput = true; 
 	short resultipv4 = 0; //the DNSSEC validation result
 	short resultipv6 = 0; //the DNSSEC validation result	
-	tmpdomain= (char*)malloc(2083*sizeof(char));
-	tmpdomain=UrlToDomain(predomain);	
-	strcpy_s(domain,2048,tmpdomain);	
-	//if (change==1) {
-		if (strcmp(domain,"about:blank")==0) {
-		//ATLTRACE("xxxxxxxxxxxxxxxxxxxxxxxxxxxx\n");
-	}
-	else {
+	tmpdomain=UrlToDomain(url);	
+	char * domaintmp = (char*)malloc(2083*sizeof(char));
+	strcpy_s(domaintmp,2048,tmpdomain);
 
 	char* dnsip; 
 	LoadOptionsFromFile();
@@ -1285,7 +1172,7 @@ void CKBBarBand::CheckDomainStatus(short change)
 		char str1[TLD_LIST_MLEN] = "";
 		//ATLTRACE("Domain: %s \n", domain);
 		//ATLTRACE("ListTLD: %s \n", listtld);
-		strncpy_s (str1, sizeof(str1), domain, sizeof(str1));
+		strncpy_s (str1, sizeof(str1), domaintmp, sizeof(str1));
 		strncpy_s (str2, sizeof(str2), listtld, sizeof(str2));
 		char* pch1; 
 		char* pch2;
@@ -1314,7 +1201,7 @@ void CKBBarBand::CheckDomainStatus(short change)
 		//---------------------------------------------------
 		// now xxx.yy format
 		if (validated) {
-		   strncpy_s (str1, sizeof(str1), domain, sizeof(str1));
+		   strncpy_s (str1, sizeof(str1), domaintmp, sizeof(str1));
 		   strncpy_s (str2, sizeof(str2), listtld, sizeof(str2));
 		   //ATLTRACE("%s\n",str1);
 		   char* newcontext	= NULL;
@@ -1330,7 +1217,7 @@ void CKBBarBand::CheckDomainStatus(short change)
 						//ATLTRACE("Find domain\n");
 						break;
 					} // if
-					strncpy_s (str1, sizeof(str1), domain, sizeof(str1));
+					strncpy_s (str1, sizeof(str1), domaintmp, sizeof(str1));
 					//ATLTRACE("2. %s==%s\n",pch2,str1);
 					if (strcmp (pch2,str1) == 0) {
 						validated = false;
@@ -1365,7 +1252,7 @@ void CKBBarBand::CheckDomainStatus(short change)
 			else if (choice==3) {dnsip = "nofwd"; usedfwd = false;}
 			else dnsip = "";
 		ip64struct ipv64;
-		ipv64=stub_resolve(domain);
+		ipv64=stub_resolve(domaintmp);
 		
 		// validation IPv4
 		ipbrowser4=ipv64.ipv4;
@@ -1376,20 +1263,20 @@ void CKBBarBand::CheckDomainStatus(short change)
 			if (usedfwd) options |= DNSSEC_INPUT_FLAG_USEFWD;
 			if (resolvipv4) options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;
 			if (resolvipv6) options |= DNSSEC_INPUT_FLAG_RESOLVIPV6;
-			if (change==1) {
+
 				char* ipvalidator4tmp;
 				wrong = false;
 				EnterCriticalSection(&cs);
 				//ATLTRACE("Critical section begin\n");
-				ATLTRACE("IPv4 request: %s : %d : %s : %s\n", domain, options, dnsip, ipbrowser4);
-				resultipv4 = ds_validate(domain, options, dnsip, ipbrowser4, &ipvalidator4tmp);	
-				ATLTRACE("IPv4 result: %s: %d : %s\n", domain, resultipv4, ipvalidator4tmp); 				
+				ATLTRACE("IPv4 request: %s : %d : %s : %s\n", domaintmp, options, dnsip, ipbrowser4);
+				resultipv4 = ds_validate(domaintmp, options, dnsip, ipbrowser4, &ipvalidator4tmp);	
+				ATLTRACE("IPv4 result: %s: %d : %s\n", domaintmp, resultipv4, ipvalidator4tmp); 				
 				LeaveCriticalSection(&cs);
 				if (resultipv4==DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
 				  ATLTRACE("Unbound return bogus state: Testing why?\n");
 				  ub_context_free();
 				  short res = 0 ;
-				  res = TestResolver(domain, ipbrowser4, '4');
+				  res = TestResolver(domaintmp, ipbrowser4, '4');
 				  if (res==DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
 					  resultipv4 = 	res;
 					  ATLTRACE("Yes, domain name has bogus\n");
@@ -1405,7 +1292,7 @@ void CKBBarBand::CheckDomainStatus(short change)
 				  } // if bogus
 				
 				} // if bogus
-			}
+			
 		}
 		ATLTRACE("----------------------------------------------------\n");
 		// validation IPv6
@@ -1419,19 +1306,19 @@ void CKBBarBand::CheckDomainStatus(short change)
 			if (resolvipv4) options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;
 			if (resolvipv6) options |= DNSSEC_INPUT_FLAG_RESOLVIPV6;
 			// Request ownership of the critical section
-			if (change==1) {
+
 				wrong = false;
 				EnterCriticalSection(&cs);
 				//ATLTRACE("Critical section begin\n");
-				ATLTRACE("IPv6 request: %s : %d : %s : %s\n", domain, options, dnsip, ipbrowser6);
-				resultipv6 = ds_validate(domain, options, dnsip, ipbrowser6, &ipvalidator6);
-				ATLTRACE("IPv6 result: %s: %d : %s\n", domain, resultipv6, ipvalidator6); 
+				ATLTRACE("IPv6 request: %s : %d : %s : %s\n", domaintmp, options, dnsip, ipbrowser6);
+				resultipv6 = ds_validate(domaintmp, options, dnsip, ipbrowser6, &ipvalidator6);
+				ATLTRACE("IPv6 result: %s: %d : %s\n", domaintmp, resultipv6, ipvalidator6); 
 				LeaveCriticalSection(&cs);
 				if (resultipv6==DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
 				  ATLTRACE("Unbound return bogus state: Testing why?\n");
 				  ub_context_free();
 				  short res = 0 ;
-				  res = TestResolver(domain, ipbrowser6, '6');
+				  res = TestResolver(domaintmp, ipbrowser6, '6');
 				  if (res==DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
 					  resultipv6 = 	res;
 					  ATLTRACE("Yes, domain name has bogus\n");
@@ -1449,40 +1336,40 @@ void CKBBarBand::CheckDomainStatus(short change)
 				  } // if bogus
 				
 				} // if bogus
-			}
+			
 		}
 
-		(resultipv4 <= resultipv6 ?  result = resultipv6 : result = resultipv4);
-		ATLTRACE("DNSSEC result: %d\n", result);
+		(resultipv4 <= resultipv6 ?  dnssecresult = resultipv6 : dnssecresult = resultipv4);
+		ATLTRACE("DNSSEC result: %d\n", dnssecresult);
 		ATLTRACE("-------------- DNSSEC validation End -----------------\n");
 		
 		
 		// tlsa validation
 		if (tlsaenable == 1) {
 			if (!wrong) {							
-				if (strcmp (predomain,"https") == 0) {
-					ATLTRACE("Scheme is %s", predomain);
+				if (strcmp (url,"https") == 0) {
+					ATLTRACE("Scheme is %s", url);
 					ATLTRACE("\n-------------- TLSA validation Start -----------------\n");				
 					EnterCriticalSection(&cs);
 					short tlsares;
 					const char* certhex[] = {"FF"};
-					ATLTRACE("DANE request: %s, %d, %d, %s, %s, %s, %s, %d\n", certhex[0], 0, options, dnsip, domain, "443", "tcp", 1);
-					tlsares = CheckDane(certhex, 0, options, dnsip, domain, "443", "tcp", 1);
-					ATLTRACE("DANE result: %s: %d\n", domain, tlsares);
+					ATLTRACE("DANE request: %s, %d, %d, %s, %s, %s, %s, %d\n", certhex[0], 0, options, dnsip, domaintmp, "443", "tcp", 1);
+					tlsares = CheckDane(certhex, 0, options, dnsip, domaintmp, "443", "tcp", 1);
+					ATLTRACE("DANE result: %s: %d\n", domaintmp, tlsares);
 					tlsaresult = tlsares;
 					LeaveCriticalSection(&cs);
 					ATLTRACE("-------------- TLSA validation End ------------------\n\n");
 				} //if
 				else {
 					tlsaresult = DANE_EXIT_NO_HTTPS;
-					ATLTRACE("Scheme is %s, no TLSA validation\n", predomain);
+					ATLTRACE("Scheme is %s, no TLSA validation\n", url);
 				}
 			} 
 			else tlsaresult = DANE_EXIT_WRONG_RESOLVER;
 		} //if
 	}
 	else {
-		result = DNSSEC_EXIT_VALIDATOR_OFF;
+		dnssecresult = DNSSEC_EXIT_VALIDATOR_OFF;
 		tlsaresult = DANE_EXIT_VALIDATION_OFF;
 	}
 
@@ -1490,7 +1377,9 @@ void CKBBarBand::CheckDomainStatus(short change)
 	SetSecurityDNSSECStatus();
 	if (tlsaenable == 1) SetSecurityTLSAStatus();
 	RefreshIcons();
-  }
+	strcpy_s(domain, domaintmp);
+	free(domaintmp);
+	
 }
 
 /**************************************************************************/
@@ -1543,23 +1432,33 @@ void CKBBarBand::ShowFwdTooltip()
 /**************************************************************************/
 char* CKBBarBand::UrlToDomain(char *url) 
 {
-	//ATLTRACE("UrlToDomain() call\n");
-	//static char instead of char
+	if (debug) ATLTRACE("UrlToDomain(%s);\n",url);
+
 	static char separator[]   = "://";
 	char *domainname=NULL;
 	char *next_token=NULL;
+	char *aux_token = NULL;
+
 	//to store current domain name
-	domainname=(char*)malloc(2083*sizeof(char));
-	next_token=(char*)malloc(2083*sizeof(char));
-	//checking whether there is an available URL element
-	if (strcmp(url,"")==0){
-		return "about:blank";
-	}
-	else {
-		domainname = strtok_s(url, separator, &next_token);
-		domainname = strtok_s(NULL,separator, &next_token);
-		return domainname;
-	}
+	//domainname=(char*)malloc(2083*sizeof(char));
+	//next_token=(char*)malloc(2083*sizeof(char));
+	domainname = strtok_s(url, separator, &next_token);
+
+
+		if (debug) ATLTRACE("UrlToDomain(%s);\n",domainname);
+		if (debug) ATLTRACE("UrlToDomain(%s);\n",next_token);
+
+	domainname = strtok_s(NULL,separator, &next_token);
+		
+	if (debug) ATLTRACE("UrlToDomain(%s);\n",domainname);
+	if (debug) ATLTRACE("UrlToDomain(%s);\n",next_token);
+	
+	//aux_token = (char *)malloc(strlen(domainname) + 1);
+	//memcpy(aux_token, domainname, strlen(domainname) + 1);
+	
+	
+	//return aux_token;	
+	return domainname;
 }
 
 /**************************************************************************/
@@ -1663,12 +1562,18 @@ HRESULT CKBBarBand::RegGetString(HKEY hKey, LPCTSTR szValueName, LPTSTR * lpszRe
     lResult = RegQueryValueEx(hKey, szValueName, 0, &dwType, (LPBYTE) *lpszResult, &dwDataSize );
     // Check result and type again.
     // If we fail here we must free the memory we allocated...
-    if (lResult != ERROR_SUCCESS) { free(*lpszResult); return HRESULT_FROM_WIN32(lResult); }
-    else if (dwType != REG_SZ)    { free(*lpszResult); return DISP_E_TYPEMISMATCH; }
+    if (lResult != ERROR_SUCCESS) { 
+			free(*lpszResult); 
+			return HRESULT_FROM_WIN32(lResult); 
+	}
+    else if (dwType != REG_SZ)    { 
+			free(*lpszResult); return DISP_E_TYPEMISMATCH; 
+	}
     // We are not guaranteed a null terminated string from RegQueryValueEx.
     // Explicitly null terminate the returned string...
     (*lpszResult)[(dwBufSize / sizeof(TCHAR)) - 1] = TEXT('\0');
- 
+	free(*lpszResult);
+
     return NOERROR;
 }
  

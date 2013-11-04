@@ -66,9 +66,13 @@ extern "C" {					// use C language linkage
 #define HKU_REG_KEY TEXT(".DEFAULT\\Software\\CZ.NIC\\DNSSEC Validator 2.0")
 #define HKCU_REG_KEY TEXT("Software\\CZ.NIC\\DNSSEC Validator 2.0")
 #define INI_FILE_PATH _T("\\CZ.NIC\\DNSSEC Validator 2.0\\dnssec.ini")
+
+
+
 const int BUTTON_INDEX = 0;
 const short DANE_EXIT_WRONG_RESOLVER = -99;
 extern HINSTANCE GHins;
+extern bool debug;
 // settings
 extern short textkey;
 extern short choice;
@@ -138,10 +142,10 @@ public:
 		//hTabWnd=NULL; //main Handle Tab Window reference
 		hWndNewPane=NULL; // main Handle Tab Status Bar Pane
 		hTabWnd=NULL;
-		domain=NULL; //current domain for each tab
+		//domain=NULL; //current domain for each tab
 		predomain=NULL;
 		predomaintest=NULL;
-		ldicon=4; //default key is grey
+		dnssecicon=0; //default key is grey
 		// tooltip init
 		tiInitialized = false;
 		tiInitialized1 = false;
@@ -208,7 +212,7 @@ public:
 	// refresh icon
 	void RefreshIcons(void);
 	//check DNS status as separated element of the main source code
-	void CheckDomainStatus(short change);
+	void CheckDomainStatus(char * url);
 	// create Status Bar
 	bool CreateStatusBarKey(void);
 		// create Status Bar
@@ -224,10 +228,8 @@ public:
 	// loads preference settings from the Windows registry or file
 	void LoadOptionsFromRegistry(void);
 	void LoadOptionsFromFile(void);
-	// gets the security status of DNSSEC
-	void DnssecStatus(short change);
 	// url to domain name
-	char *UrlToDomain(char*);
+	char *UrlToDomain(char* url);
 	// creates a tooltip for showing information texts
 	void CreateIconTooltip(HWND hwndParent);
 	void CreateToolTipForRect(HWND hwndParent);
@@ -251,12 +253,12 @@ public:
 	DWORD m_dwBandID;
 	DWORD m_dwViewMode;
 
-	char *domain;// current domain for each tab
+	char domain[2048];// current domain for each tab
 	char *predomain;
 	char *predomaintest;
 	static CRITICAL_SECTION cs;
-	short result; //the DNSSEC validation result
-	int ldicon,ldicon2,text; //ldicon element
+	short dnssecresult; //the DNSSEC validation result
+	int dnssecicon,dnssecicon2,text; //dnssecicon element
 
 	CWnd m_wndReflectionWnd;
 	CRect rcClientParent2;	
