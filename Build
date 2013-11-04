@@ -80,8 +80,9 @@ Part 3 - to be built on Linux:
 $ make -f Makefile.win xpi_x86
 ---------------------------------------
 
-
-
-
-
+===============================================
+= Clean project (libs, FireBreath, cmake files)
+===============================================
+$ make -f Makefile.main clean
+----------------------------------------------
 
