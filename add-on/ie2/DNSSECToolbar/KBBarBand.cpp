@@ -128,7 +128,7 @@ domstruct domainstruct;
 /**************************************************************************/
 domstruct UrlToDomain(char *url) 
 {
-	//if (debug) ATLTRACE("UrlToDomain(%s);\n",url);
+	//if (debug) if (debug) ATLTRACE("UrlToDomain(%s);\n",url);
 
 	static char separator[]   = "://";
 	domstruct domainstruct;
@@ -136,11 +136,11 @@ domstruct UrlToDomain(char *url)
 	char *next_token=NULL;
 	
 	domainstruct.protocol = strtok_s(url, separator, &next_token);
-	if (debug) ATLTRACE("UrlToDomain-Protocol(%s);\n",domainstruct.protocol);
+	if (debug) if (debug) ATLTRACE("UrlToDomain-Protocol(%s);\n",domainstruct.protocol);
 	domainstruct.domain = strtok_s(NULL,separator, &next_token);	
-	if (debug) ATLTRACE("UrlToDomain-Doamin(%s);\n",domainstruct.domain);
+	if (debug) if (debug) ATLTRACE("UrlToDomain-Doamin(%s);\n",domainstruct.domain);
 	domainstruct.port = strtok_s(NULL,separator, &next_token);	
-	if (debug) ATLTRACE("UrlToDomain-Prot(%s);\n",domainstruct.port);
+	if (debug) if (debug) ATLTRACE("UrlToDomain-Prot(%s);\n",domainstruct.port);
 
 	return domainstruct;
 }
@@ -271,7 +271,7 @@ ip64struct stub_resolve(const char *domain)
 /**************************************************************************/
 STDMETHODIMP CKBBarBand::SetSite(IUnknown* pUnkSite)
 {
-		//ATLTRACE( "SetSite() call\n");
+		//if (debug) ATLTRACE( "SetSite() call\n");
 		if (m_pIOSite)
 		{
 			m_pIOSite->Release();
@@ -322,7 +322,7 @@ STDMETHODIMP CKBBarBand::SetSite(IUnknown* pUnkSite)
 	}
 STDMETHODIMP CKBBarBand::GetSite(REFIID riid, LPVOID *ppvReturn)
 {
-	//ATLTRACE("GetSite():\n");
+	//if (debug) ATLTRACE("GetSite():\n");
 	*ppvReturn = NULL;
 
 	if(m_pIOSite)
@@ -335,19 +335,19 @@ STDMETHODIMP CKBBarBand::GetSite(REFIID riid, LPVOID *ppvReturn)
 /**************************************************************************/
 STDMETHODIMP CKBBarBand::GetWindow(HWND *phWnd)
 {
-		//ATLTRACE("GetWindow():\n");
+		//if (debug) ATLTRACE("GetWindow():\n");
 	*phWnd = m_wndToolBar.GetSafeHwnd();
 
 	return S_OK;
 }
 STDMETHODIMP CKBBarBand::ResizeBorderDW(LPCRECT prcBorder, IUnknown* punkSite, BOOL fReserved)
 {
-	//ATLTRACE("ResizeBorderDW():\n");
+	//if (debug) ATLTRACE("ResizeBorderDW():\n");
 	ATLTRACENOTIMPL("IDockingWindow::ResizeBorderDW");
 }
 STDMETHODIMP CKBBarBand::ContextSensitiveHelp(BOOL fEnterMode)
 {
-	//ATLTRACE("ContextSensitiveHelp():\n");
+	//if (debug) ATLTRACE("ContextSensitiveHelp():\n");
 	ATLTRACENOTIMPL("IOleWindow::ContextSensitiveHelp");
 }
 /**************************************************************************/
@@ -355,7 +355,7 @@ STDMETHODIMP CKBBarBand::ContextSensitiveHelp(BOOL fEnterMode)
 /**************************************************************************/
 STDMETHODIMP CKBBarBand::ShowDW(BOOL fShow)
 {
-	//ATLTRACE("ShowDW():\n");
+	//if (debug) ATLTRACE("ShowDW():\n");
 	if(m_wndToolBar.GetSafeHwnd())
 	{
 		if(fShow)
@@ -373,7 +373,7 @@ STDMETHODIMP CKBBarBand::ShowDW(BOOL fShow)
 }
 STDMETHODIMP CKBBarBand::CloseDW(DWORD dwReserved)
 {
-	//ATLTRACE("CloseDW():\n");
+	//if (debug) ATLTRACE("CloseDW():\n");
 	ShowDW(FALSE);
 	return S_OK;
 }
@@ -382,7 +382,7 @@ STDMETHODIMP CKBBarBand::CloseDW(DWORD dwReserved)
 /**************************************************************************/
 STDMETHODIMP CKBBarBand::UIActivateIO(BOOL fActivate, LPMSG pMsg)
 {
-	//ATLTRACE("UIActivateIO():\n");
+	//if (debug) ATLTRACE("UIActivateIO():\n");
 	if(fActivate)
 	{
 		SetFocus(m_wndToolBar);
@@ -391,13 +391,13 @@ STDMETHODIMP CKBBarBand::UIActivateIO(BOOL fActivate, LPMSG pMsg)
 }
 STDMETHODIMP CKBBarBand::HasFocusIO(void)
 { 
-	//ATLTRACE("HasFocusIO():\n");
+	//if (debug) ATLTRACE("HasFocusIO():\n");
 	HWND hwndFocus = ::GetFocus();
 	return S_OK;
 }
 STDMETHODIMP CKBBarBand::TranslateAcceleratorIO(LPMSG pMsg)
 {
-	//ATLTRACE("TranslateAcceleratorIO():\n");
+	//if (debug) ATLTRACE("TranslateAcceleratorIO():\n");
 	return m_wndToolBar.TranslateAcceleratorIO(pMsg);
 }
 /**************************************************************************/
@@ -405,7 +405,7 @@ STDMETHODIMP CKBBarBand::TranslateAcceleratorIO(LPMSG pMsg)
 /**************************************************************************/
 STDMETHODIMP CKBBarBand::GetBandInfo(DWORD dwBandID, DWORD dwViewMode, DESKBANDINFO* pdbi)
 {
-//ATLTRACE("GetBandInfo():\n");
+//if (debug) ATLTRACE("GetBandInfo():\n");
 USES_CONVERSION;
 
 	if(pdbi)
@@ -467,10 +467,10 @@ USES_CONVERSION;
 //Invoke: This method allows to obtain MSIE events
 /**************************************************************************/
 STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS *pDispParams, VARIANT *pvarResult, EXCEPINFO *pExcepInfo, UINT *puArgErr) {
-   //ATLTRACE("Invoke() call\n");
+   //if (debug) ATLTRACE("Invoke() call\n");
 	USES_CONVERSION;//avoiding warnings with respect to ATL DATA_TYPE element
 	HWND hwnd=NULL;
-	//ATLTRACE(DEBUG_PREFIX "dispidMember: %d\n");
+	//if (debug) ATLTRACE(DEBUG_PREFIX "dispidMember: %d\n");
 	//loading MSIE elements
 	HRESULT hr = webBrowser2->get_HWND((LONG_PTR*)&hwnd);
 	BSTR BURL = L"";
@@ -481,7 +481,7 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 
 			// Fires if window or tab was changed 
 			case DISPID_WINDOWSTATECHANGED : {
-				if (debug) ATLTRACE("Invoke(): DISPID_WINDOWSTATECHANGED: ");
+				if (debug) if (debug) ATLTRACE("Invoke(): DISPID_WINDOWSTATECHANGED: ");
 
 				if (pDispParams) {
 					 DWORD dwMask  = pDispParams->rgvarg[0].lVal;
@@ -493,15 +493,15 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 						LoadOptionsFromFile();					
 						HRESULT hrs = webBrowser2->get_LocationURL(&BURL);
 						tmpurl =_com_util::ConvertBSTRToString(BURL);
-						if (debug) ATLTRACE("%s", tmpurl);
+						if (debug) if (debug) ATLTRACE("%s", tmpurl);
 						if (strcmp(tmpurl,"")==0 || strcmp(tmpurl,"about:Tabs")==0 || strcmp(tmpurl,"about:Blank")==0 || strcmp(tmpurl,"about:blank")==0 || strcmp(tmpurl,"javascript:false;")==0 || strcmp(tmpurl,"res://ieframe.dll/dnserrordiagoff.htm")==0) {
-							if (debug) ATLTRACE("null\n");
+							if (debug) if (debug) ATLTRACE("null\n");
 							dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_INIT);
 							tlsaicon = GetIconIndex(IDI_TLSA_ICON_INIT);						
 							keylogo=dnssecicon;
 							RefreshIcons();
 						} else {
-							if (debug) ATLTRACE("\n");					
+							if (debug) if (debug) ATLTRACE("\n");					
 							if (!strcmp(tmpurl,temp)==0) {
 								temp = tmpurl;
 								CheckDomainStatus(tmpurl);
@@ -516,19 +516,19 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 			} break;
 
 			case DISPID_BEFORENAVIGATE2 : {				
-				if (debug) ATLTRACE("Invoke(): DISPID_BEFORENAVIGATE2: ");	
+				if (debug) if (debug) ATLTRACE("Invoke(): DISPID_BEFORENAVIGATE2: ");	
 				HRESULT hrs = webBrowser2->get_LocationURL(&BURL);
 				tmpurl =_com_util::ConvertBSTRToString(BURL);
-				if (debug) ATLTRACE("%s", tmpurl);
+				if (debug) if (debug) ATLTRACE("%s", tmpurl);
 				if (strcmp(tmpurl,"")==0 || strcmp(tmpurl,"about:Tabs")==0 || strcmp(tmpurl,"about:Blank")==0 || strcmp(tmpurl,"about:blank")==0 || strcmp(tmpurl,"javascript:false;")==0 || strcmp(tmpurl,"res://ieframe.dll/dnserrordiagoff.htm")==0) {
-					if (debug) ATLTRACE("null\n");
+					if (debug) if (debug) ATLTRACE("null\n");
 					dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_INIT);
 					tlsaicon = GetIconIndex(IDI_TLSA_ICON_INIT);					
 					RefreshIcons();
 					keylogo=dnssecicon;
 				} else {
 					temp = tmpurl;
-					if (debug) ATLTRACE("\n");
+					if (debug) if (debug) ATLTRACE("\n");
 					CheckDomainStatus(tmpurl);
 					state = dnssecicon;
 					keylogo=dnssecicon;							
@@ -537,18 +537,18 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 			} break;
 /*
 			case DISPID_NAVIGATECOMPLETE2 : {	
-				ATLTRACE("Invoke(): DISPID_NAVIGATECOMPLETE2: ");				
+				if (debug) ATLTRACE("Invoke(): DISPID_NAVIGATECOMPLETE2: ");				
 				HRESULT hrs = webBrowser2->get_LocationURL(&BURL);
 				tmpurl =_com_util::ConvertBSTRToString(BURL);
-				if (debug) ATLTRACE("%s", tmpurl);
+				if (debug) if (debug) ATLTRACE("%s", tmpurl);
 				if (strcmp(tmpurl,"")==0 || strcmp(tmpurl,"about:Tabs")==0 || strcmp(tmpurl,"about:Blank")==0 || strcmp(tmpurl,"about:blank")==0 || strcmp(tmpurl,"javascript:false;")==0 || strcmp(tmpurl,"res://ieframe.dll/dnserrordiagoff.htm")==0) {
-					if (debug) ATLTRACE("null\n");
+					if (debug) if (debug) ATLTRACE("null\n");
 					dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_INIT);
 					tlsaicon = GetIconIndex(IDI_TLSA_ICON_INIT);						
 					keylogo=dnssecicon;
 					RefreshIcons();
 				} else {
-					if (debug) ATLTRACE("\n");
+					if (debug) if (debug) ATLTRACE("\n");
 					dnssecicon = state;
 					keylogo=dnssecicon;
 					RefreshIcons();			
@@ -596,7 +596,7 @@ LRESULT CKBBarBand::WndProc(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lPar
 bool CKBBarBand::CreateToolWindow()
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState()); // Needed for any MFC usage in DLL
-	//ATLTRACE("CreateToolWindow():\n");
+	//if (debug) ATLTRACE("CreateToolWindow():\n");
 	CRect rcClientParent;
 	rcClientParent2=rcClientParent;
 	CWnd* pWndParent = CWnd::FromHandle(m_hWndParent);
@@ -707,7 +707,7 @@ int CKBBarBand::GetMSIEversion(int *iMajor, int *iMinor)
 /**************************************************************************/
 bool CKBBarBand::CreateStatusBarKey()
 {
-//ATLTRACE("CreateStatusBar():\n");
+//if (debug) ATLTRACE("CreateStatusBar():\n");
 HWND hWndNewPane = CreateWindowEx(
 	0,					// no extended styles
 	STATUSCLASSNAME,	// name of status bar class
@@ -731,7 +731,7 @@ return true;
 /**************************************************************************/
 bool CKBBarBand::CreateStatusBarText()
 {
-//ATLTRACE("CreateStatusBar():\n");
+//if (debug) ATLTRACE("CreateStatusBar():\n");
 HWND hWndNewPane2 = CreateWindowEx(
 	0,					// no extended styles
 	STATUSCLASSNAME,	// name of status bar class
@@ -757,7 +757,7 @@ return true;
 /**************************************************************************/
 void CKBBarBand::CreateIconTooltip(HWND hwndParent)
 {
-   // ATLTRACE("CreateIconTooltip() call\n");	
+   // if (debug) ATLTRACE("CreateIconTooltip() call\n");	
 	// Create a tooltip.
     hwndTT = CreateWindowEx(NULL, TOOLTIPS_CLASS, NULL, 
                                  WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP | TTS_BALLOON,
@@ -788,7 +788,7 @@ void CKBBarBand::CreateIconTooltip(HWND hwndParent)
 /**************************************************************************/
 int CKBBarBand::GetIconIndex(int icon)
 {	
-	//ATLTRACE("GetIconIndex(%d):\n", icon);	
+	//if (debug) ATLTRACE("GetIconIndex(%d):\n", icon);	
 	int iconindex = 0;
 	switch (icon) {
 	case IDI_DNSSEC_ICON_INIT: 
@@ -852,7 +852,7 @@ int CKBBarBand::GetIconIndex(int icon)
 			iconindex = 0; 
 			break;
 	}
-		//ATLTRACE("GetIconIndexRETURN(%d):\n", iconindex);	
+		//if (debug) ATLTRACE("GetIconIndexRETURN(%d):\n", iconindex);	
 		return iconindex;
 }//
 
@@ -861,7 +861,7 @@ int CKBBarBand::GetIconIndex(int icon)
 /**************************************************************************/
 void CKBBarBand::SetSecurityTLSAStatus()
 {
-	if (debug) ATLTRACE("SetSecurityTLSAStatus(%d):\n", tlsaresult);	
+	if (debug) if (debug) ATLTRACE("SetSecurityTLSAStatus(%d):\n", tlsaresult);	
 	int daneicon = 0;
 	WORD panel_label = IDS_NONE; // main label of popup
 	WORD panel_text1 = IDS_NONE; // TLSA main text
@@ -1046,7 +1046,7 @@ void CKBBarBand::SetSecurityTLSAStatus()
 /**************************************************************************/
 void CKBBarBand::SetSecurityDNSSECStatus()
 {
-	if (debug) ATLTRACE("SetSecurityDNSSECStatus(%d):\n", dnssecresult);
+	if (debug) if (debug) ATLTRACE("SetSecurityDNSSECStatus(%d):\n", dnssecresult);
 	// DNSSEC status tooltipinfo
 	WORD tiicon = TTI_NONE;		// icon in tooltipinfo
 	WORD tiicontitle = IDS_NONE;// main title of tooltipinfo
@@ -1176,7 +1176,7 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 /**************************************************************************/
 void CKBBarBand::CheckDomainStatus(char * url) 
 {   
-	if (debug) ATLTRACE("CheckDomainStatus(%s);\n", url);
+	if (debug) if (debug) ATLTRACE("CheckDomainStatus(%s);\n", url);
   
 	//temporal element that helps to fragment the given URL in a domain
 	bool resolvipv4 = true;
@@ -1198,30 +1198,30 @@ void CKBBarBand::CheckDomainStatus(char * url)
 	if (filteron) {
 		char str2[TLD_LIST_MLEN] = "";
 		char str1[TLD_LIST_MLEN] = "";
-		//ATLTRACE("Domain: %s \n", domain);
-		//ATLTRACE("ListTLD: %s \n", listtld);
+		//if (debug) ATLTRACE("Domain: %s \n", domain);
+		//if (debug) ATLTRACE("ListTLD: %s \n", listtld);
 		strncpy_s (str1, sizeof(str1), domaintmp, sizeof(str1));
 		strncpy_s (str2, sizeof(str2), listtld, sizeof(str2));
 		char* pch1; 
 		char* pch2;
 		char* context	= NULL;
-		//ATLTRACE("%s\n",str1);
+		//if (debug) ATLTRACE("%s\n",str1);
 		pch1 = strtok_s (str1,". ", &context);
 		char xxx[10] = "";
 		// ---- tld first --------------------------------
 		while (pch1 != NULL) {
-			//ATLTRACE("%s\n",pch1);
+			//if (debug) ATLTRACE("%s\n",pch1);
 			strncpy_s (xxx, sizeof(xxx), pch1, sizeof(xxx));
 			pch1 = strtok_s (NULL, ". ", &context);		
 		} //while
-		//ATLTRACE("-----------%s\n",xxx);
+		//if (debug) ATLTRACE("-----------%s\n",xxx);
 		
 		pch2 = strtok_s (str2," ,", &context);
 		while (pch2 != NULL) {
-				//ATLTRACE("%s\n",pch2);
+				//if (debug) ATLTRACE("%s\n",pch2);
 				if (strcmp (pch2,xxx) == 0) {
 					validated = false;
-					//ATLTRACE("Find tld\n");
+					//if (debug) ATLTRACE("Find tld\n");
 					break;
 				}
 				pch2 = strtok_s (NULL, " ,", &context);
@@ -1231,25 +1231,25 @@ void CKBBarBand::CheckDomainStatus(char * url)
 		if (validated) {
 		   strncpy_s (str1, sizeof(str1), domaintmp, sizeof(str1));
 		   strncpy_s (str2, sizeof(str2), listtld, sizeof(str2));
-		   //ATLTRACE("%s\n",str1);
+		   //if (debug) ATLTRACE("%s\n",str1);
 		   char* newcontext	= NULL;
 		   char *pch = strstr (str1,"www.");
 		   if (pch != NULL) {
 				pch = strtok_s (str1," .", &newcontext);
-				//ATLTRACE("......%s\n",newcontext);		   		   
+				//if (debug) ATLTRACE("......%s\n",newcontext);		   		   
 				pch2 = strtok_s (str2," ,", &context);	
 				while (pch2 != NULL) {
-					//ATLTRACE("1. %s==%s\n",pch2,newcontext);
+					//if (debug) ATLTRACE("1. %s==%s\n",pch2,newcontext);
 					if (strcmp (pch2,newcontext) == 0) {
 						validated = false;
-						//ATLTRACE("Find domain\n");
+						//if (debug) ATLTRACE("Find domain\n");
 						break;
 					} // if
 					strncpy_s (str1, sizeof(str1), domaintmp, sizeof(str1));
-					//ATLTRACE("2. %s==%s\n",pch2,str1);
+					//if (debug) ATLTRACE("2. %s==%s\n",pch2,str1);
 					if (strcmp (pch2,str1) == 0) {
 						validated = false;
-						//ATLTRACE("Find domain\n");
+						//if (debug) ATLTRACE("Find domain\n");
 						break;
 					} // if
 					pch2 = strtok_s (NULL, " ,", &context);
@@ -1258,10 +1258,10 @@ void CKBBarBand::CheckDomainStatus(char * url)
 		   else {
 				pch2 = strtok_s (str2," ,", &context);	
 				while (pch2 != NULL) {
-					//ATLTRACE("%s\n",pch2);
+					//if (debug) ATLTRACE("%s\n",pch2);
 					if (strcmp (pch2,str1) == 0) {
 						validated = false;
-						//ATLTRACE("Find domain\n");
+						//if (debug) ATLTRACE("Find domain\n");
 						break;
 					} // if
 					pch2 = strtok_s (NULL, " ,", &context);
@@ -1273,7 +1273,7 @@ void CKBBarBand::CheckDomainStatus(char * url)
 	} // filteron
 
 	if (validated) {
-		ATLTRACE("\n-------------- DNSSEC validation Start ---------------\n");
+		if (debug) if (debug) ATLTRACE("\n-------------- DNSSEC validation Start ---------------\n");
 		usedfwd = true;
 		if (choice==2) dnsip = dnssecseradr;
 			else if (choice==1) if (choice2==0) dnsip = nic; else dnsip = oarc;
@@ -1295,26 +1295,26 @@ void CKBBarBand::CheckDomainStatus(char * url)
 				char* ipvalidator4tmp;
 				wrong = false;
 				EnterCriticalSection(&cs);
-				//ATLTRACE("Critical section begin\n");
-				ATLTRACE("IPv4 request: %s : %d : %s : %s\n", domaintmp, options, dnsip, ipbrowser4);
+				//if (debug) ATLTRACE("Critical section begin\n");
+				if (debug) if (debug) ATLTRACE("IPv4 request: %s : %d : %s : %s\n", domaintmp, options, dnsip, ipbrowser4);
 				resultipv4 = ds_validate(domaintmp, options, dnsip, ipbrowser4, &ipvalidator4tmp);	
-				ATLTRACE("IPv4 result: %s: %d : %s\n", domaintmp, resultipv4, ipvalidator4tmp); 				
+				if (debug) if (debug) ATLTRACE("IPv4 result: %s: %d : %s\n", domaintmp, resultipv4, ipvalidator4tmp); 				
 				LeaveCriticalSection(&cs);
 				if (resultipv4==DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
-				  ATLTRACE("Unbound return bogus state: Testing why?\n");
+				  if (debug) if (debug) ATLTRACE("Unbound return bogus state: Testing why?\n");
 				  ub_context_free();
 				  short res = 0 ;
 				  res = TestResolver(domaintmp, ipbrowser4, '4');
 				  if (res==DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
 					  resultipv4 = 	res;
-					  ATLTRACE("Yes, domain name has bogus\n");
+					  if (debug) if (debug) ATLTRACE("Yes, domain name has bogus\n");
 					  ub_context_free();
 				  }
 				  else 
 				  {					
-					ATLTRACE("Current resolver does not support DNSSEC!\n");
+					if (debug) if (debug) ATLTRACE("Current resolver does not support DNSSEC!\n");
 					wrong = true;
-					ATLTRACE("Results: FWD: %d NOFWD: %d\n", resultipv4, res);
+					if (debug) if (debug) ATLTRACE("Results: FWD: %d NOFWD: %d\n", resultipv4, res);
 					resultipv4 = DNSSEC_EXIT_WRONG_RESOLVER;
 					ub_context_free();
 				  } // if bogus
@@ -1322,7 +1322,7 @@ void CKBBarBand::CheckDomainStatus(char * url)
 				} // if bogus
 			
 		}
-		ATLTRACE("----------------------------------------------------\n");
+		if (debug) if (debug) ATLTRACE("----------------------------------------------------\n");
 		// validation IPv6
 		ipbrowser6=ipv64.ipv6;
 		if (strcmp (ipbrowser6,"") != 0) {
@@ -1337,25 +1337,25 @@ void CKBBarBand::CheckDomainStatus(char * url)
 
 				wrong = false;
 				EnterCriticalSection(&cs);
-				//ATLTRACE("Critical section begin\n");
-				ATLTRACE("IPv6 request: %s : %d : %s : %s\n", domaintmp, options, dnsip, ipbrowser6);
+				//if (debug) ATLTRACE("Critical section begin\n");
+				if (debug) if (debug) ATLTRACE("IPv6 request: %s : %d : %s : %s\n", domaintmp, options, dnsip, ipbrowser6);
 				resultipv6 = ds_validate(domaintmp, options, dnsip, ipbrowser6, &ipvalidator6);
-				ATLTRACE("IPv6 result: %s: %d : %s\n", domaintmp, resultipv6, ipvalidator6); 
+				if (debug) if (debug) ATLTRACE("IPv6 result: %s: %d : %s\n", domaintmp, resultipv6, ipvalidator6); 
 				LeaveCriticalSection(&cs);
 				if (resultipv6==DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
-				  ATLTRACE("Unbound return bogus state: Testing why?\n");
+				  if (debug) if (debug) ATLTRACE("Unbound return bogus state: Testing why?\n");
 				  ub_context_free();
 				  short res = 0 ;
 				  res = TestResolver(domaintmp, ipbrowser6, '6');
 				  if (res==DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
 					  resultipv6 = 	res;
-					  ATLTRACE("Yes, domain name has bogus\n");
+					  if (debug) if (debug) ATLTRACE("Yes, domain name has bogus\n");
 					  ub_context_free();
 				  }
 				  else 
 				  {					
-					ATLTRACE("Current resolver does not support DNSSEC!\n");
-					ATLTRACE("Results: FWD: %d NOFWD: %d\n", resultipv6, res);
+					if (debug) if (debug) ATLTRACE("Current resolver does not support DNSSEC!\n");
+					if (debug) if (debug) ATLTRACE("Results: FWD: %d NOFWD: %d\n", resultipv6, res);
 					//set tooltip
 					//ShowFwdTooltip();
 					wrong = true;					
@@ -1368,29 +1368,29 @@ void CKBBarBand::CheckDomainStatus(char * url)
 		}
 
 		(resultipv4 <= resultipv6 ?  dnssecresult = resultipv6 : dnssecresult = resultipv4);
-		ATLTRACE("DNSSEC result: %d\n", dnssecresult);
-		ATLTRACE("-------------- DNSSEC validation End -----------------\n");
+		if (debug) if (debug) ATLTRACE("DNSSEC result: %d\n", dnssecresult);
+		if (debug) if (debug) ATLTRACE("-------------- DNSSEC validation End -----------------\n");
 		
 		if (tmpdomain.port==NULL) tmpdomain.port="443";
 		// tlsa validation
 		if (tlsaenable == 1) {
 			if (!wrong) {							
 				if (strcmp (tmpdomain.protocol,"https") == 0) {
-					ATLTRACE("Scheme is https");
-					ATLTRACE("\n-------------- TLSA validation Start -----------------\n");				
+					if (debug) if (debug) ATLTRACE("Scheme is https");
+					if (debug) if (debug) ATLTRACE("\n-------------- TLSA validation Start -----------------\n");				
 					EnterCriticalSection(&cs);
 					short tlsares;
 					const char* certhex[] = {"FF"};
-					ATLTRACE("DANE request: %s, %d, %d, %s, %s, %s, %s, %d\n", certhex[0], 0, options, dnsip, domaintmp, tmpdomain.port, "tcp", 1);
+					if (debug) if (debug) ATLTRACE("DANE request: %s, %d, %d, %s, %s, %s, %s, %d\n", certhex[0], 0, options, dnsip, domaintmp, tmpdomain.port, "tcp", 1);
 					tlsares = CheckDane(certhex, 0, options, dnsip, domaintmp, tmpdomain.port, "tcp", 1);
-					ATLTRACE("DANE result: %s: %d\n", domaintmp, tlsares);
+					if (debug) if (debug) ATLTRACE("DANE result: %s: %d\n", domaintmp, tlsares);
 					tlsaresult = tlsares;
 					LeaveCriticalSection(&cs);
-					ATLTRACE("-------------- TLSA validation End ------------------\n\n");
+					if (debug) if (debug) ATLTRACE("-------------- TLSA validation End ------------------\n\n");
 				} //if
 				else {
 					tlsaresult = DANE_EXIT_NO_HTTPS;
-					ATLTRACE("Scheme is http, TLSA validation will not start\n");
+					if (debug) if (debug) ATLTRACE("Scheme is http, TLSA validation will not start\n");
 				}
 			} 
 			else tlsaresult = DANE_EXIT_WRONG_RESOLVER;
@@ -1423,10 +1423,10 @@ short CKBBarBand::TestResolver(char *domain, char *ipbrowser, char IPv)
 	if (IPv == '6') options |= DNSSEC_INPUT_FLAG_RESOLVIPV6;
 	
 	EnterCriticalSection(&cs);
-	//ATLTRACE("Critical section begin\n");
-	ATLTRACE("TEST DNSSEC: %s : %d : %s : %s\n", domain, options, "nowfd", ipbrowser);
+	//if (debug) ATLTRACE("Critical section begin\n");
+	if (debug) ATLTRACE("TEST DNSSEC: %s : %d : %s : %s\n", domain, options, "nowfd", ipbrowser);
 	res = ds_validate(domain, options, "nowfd", ipbrowser, &ipvalidator);
-	ATLTRACE("TEST result: %d : %s\n", res, ipvalidator); 
+	if (debug) ATLTRACE("TEST result: %d : %s\n", res, ipvalidator); 
 	LeaveCriticalSection(&cs);
 	return res;
 }
@@ -1460,7 +1460,7 @@ void CKBBarBand::ShowFwdTooltip()
 /**************************************************************************/
 void CKBBarBand::LoadOptionsFromRegistry(void) {
 	
-	//ATLTRACE("LoadOptionsFromRegistry() call\n");	
+	//if (debug) ATLTRACE("LoadOptionsFromRegistry() call\n");	
 
 	DWORD dwRet;
 	HKEY hKey;
@@ -1471,7 +1471,7 @@ void CKBBarBand::LoadOptionsFromRegistry(void) {
 	dwRet = RegOpenKeyEx(HKEY_USERS, HKU_REG_KEY, 0, KEY_QUERY_VALUE, &hKey);
 	if (dwRet == ERROR_SUCCESS) {
 
-		//ATLTRACE("LoadOptionsFromRegistry() - ERROR_SUCCESS\n");
+		//if (debug) ATLTRACE("LoadOptionsFromRegistry() - ERROR_SUCCESS\n");
 
 		// Get the registry values...
 		hr = RegGetString(hKey,"userip", &szVal);
@@ -1523,7 +1523,7 @@ void CKBBarBand::LoadOptionsFromRegistry(void) {
 		RegCloseKey(hKey);
 
 	} else {
-		//ATLTRACE("Cannot open DNSSEC Validator's registry key\n");
+		//if (debug) ATLTRACE("Cannot open DNSSEC Validator's registry key\n");
 	}
 }
 
@@ -1599,7 +1599,7 @@ HRESULT CKBBarBand::RegGetDWord(HKEY hKey, LPCTSTR szValueName, DWORD * lpdwResu
 /**************************************************************************/
 void CKBBarBand::LoadOptionsFromFile(void) {
 
-	//ATLTRACE("\nLoadOptionsFromFile\n");
+	//if (debug) ATLTRACE("\nLoadOptionsFromFile\n");
 	TCHAR szPath[MAX_PATH];
 	char dbserver[IPADDR_MLEN];
 	char list[TLD_LIST_MLEN];

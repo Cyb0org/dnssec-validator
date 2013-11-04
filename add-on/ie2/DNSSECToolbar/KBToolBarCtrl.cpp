@@ -69,7 +69,7 @@ END_MESSAGE_MAP()
 /**************************************************************************/
 bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CKBBarBand* pBand, HINSTANCE GHins) 
 {
-	//ATLTRACE("CreateToolbar():\n");
+	//if (debug) ATLTRACE("CreateToolbar():\n");
 	if (!CToolBarCtrl::Create(DEFAULT_TOOLBAR_STYLE, rcClientParent, pWndParent, NULL))
 		return false;	
 
@@ -197,13 +197,13 @@ void CKBToolBarCtrl::OnTbnDropDown(NMHDR *pNMHDR, LRESULT *pResult)
 					 HMENU hMenuStatusBar;
 	switch (pNMTB->iItem) 	{
 	case ID_BUTTON1:
-		ATLTRACE("ID_BUTTON1():\n");	
+		if (debug) ATLTRACE("ID_BUTTON1():\n");	
 		SendMessage(TB_GETRECT, ID_BUTTON1, (LPARAM)&rc);
 		::MapWindowPoints(m_pBand->m_wndToolBar, HWND_DESKTOP, (LPPOINT)&rc, 2);
 
          tpm.cbSize    = sizeof(TPMPARAMS);
          tpm.rcExclude = rc;
-		  //ATLTRACE("PWProc: rcClient l: %d; b: %d; r: %d; t: %d\n", rc.left, rc.bottom, rc.right, rc.top);
+		  //if (debug) ATLTRACE("PWProc: rcClient l: %d; b: %d; r: %d; t: %d\n", rc.left, rc.bottom, rc.right, rc.top);
 			//obtaining the current menu
 			hMenuStatusBar = GetSubMenu(LoadMenu(GHins,MAKEINTRESOURCE(IDR_MENU_POPUP)), 0);
 			//if available
@@ -231,13 +231,13 @@ void CKBToolBarCtrl::OnTbnDropDown(NMHDR *pNMHDR, LRESULT *pResult)
 		break;
 			
 	case ID_BUTTON2:
-		ATLTRACE("ID_BUTTON2():\n");
+		if (debug) ATLTRACE("ID_BUTTON2():\n");
 
 		SendMessage(TB_GETRECT, ID_BUTTON2, (LPARAM)&rc);
 		::MapWindowPoints(m_pBand->m_wndToolBar, HWND_DESKTOP, (LPPOINT)&rc, 2);
          tpm.cbSize    = sizeof(TPMPARAMS);
          tpm.rcExclude = rc;
-		  //ATLTRACE("PWProc: rcClient l: %d; b: %d; r: %d; t: %d\n", rc.left, rc.bottom, rc.right, rc.top);
+		  //if (debug) ATLTRACE("PWProc: rcClient l: %d; b: %d; r: %d; t: %d\n", rc.left, rc.bottom, rc.right, rc.top);
 			//obtaining the current menu
 			hMenuStatusBar = GetSubMenu(LoadMenu(GHins,MAKEINTRESOURCE(IDR_MENU_POPUP)), 0);
 			//if available
@@ -296,7 +296,7 @@ int CKBToolBarCtrl::WrongResolver()
 /**************************************************************************/
 void CKBToolBarCtrl::OnCommand()
 {	
-	//ATLTRACE("OnCommandButton():\n");
+	//if (debug) ATLTRACE("OnCommandButton():\n");
 	const MSG* pMsg = GetCurrentMessage();
 	int nID = LOWORD(pMsg->wParam);
 	switch (nID)
@@ -307,17 +307,17 @@ void CKBToolBarCtrl::OnCommand()
 			RECT rc2;
 			SendMessage(TB_GETRECT, ID_BUTTON1, (LPARAM)&rc);
 			HWND handle=::FindWindow("IEFrame", NULL);
-			//ATLTRACE("Handle: %d\n", handle);
+			//if (debug) ATLTRACE("Handle: %d\n", handle);
 			::GetWindowRect(handle,&rc2);
-			//ATLTRACE("PWProc1: rcClient l: %d; b: %d; r: %d; t: %d\n", rc2.left, rc2.bottom, rc2.right, rc2.top);
+			//if (debug) ATLTRACE("PWProc1: rcClient l: %d; b: %d; r: %d; t: %d\n", rc2.left, rc2.bottom, rc2.right, rc2.top);
 			::MapWindowPoints(m_pBand->m_wndToolBar, HWND_DESKTOP, (LPPOINT)&rc, 2);
-			//ATLTRACE("PWProc2: rcClient l: %d; b: %d; r: %d; t: %d\n", rc.left, rc.bottom, rc.right, rc.top);
+			//if (debug) ATLTRACE("PWProc2: rcClient l: %d; b: %d; r: %d; t: %d\n", rc.left, rc.bottom, rc.right, rc.top);
 			int dialog_size = 336;
 			LONG dei;
 			dei = rc2.right - rc2.left;
 			dei = dei / 2;
 			dei = dei + rc2.left;
-			//ATLTRACE("Handle: %d\n", dei);
+			//if (debug) ATLTRACE("Handle: %d\n", dei);
 			if (rc.left < dei && (rc.left+dialog_size) < rc2.right) {
 				dx = (int)rc.left;
 				dy = (int)rc.bottom;
@@ -326,7 +326,7 @@ void CKBToolBarCtrl::OnCommand()
 				dx = (int)rc.left+TB_MIN_SIZE_X-15-dialog_size;
 				dy = (int)rc.bottom;
 			}
-			//ATLTRACE("PWProc3: rcClient l: %d; b: %d; r: %d; t: %d\n",dx, dy, rc.right, rc.top);
+			//if (debug) ATLTRACE("PWProc3: rcClient l: %d; b: %d; r: %d; t: %d\n",dx, dy, rc.right, rc.top);
 			if (keylogo==3 || keylogo==0) ;
 			else DialogBox(GHins, MAKEINTRESOURCE(IDD_DIALOG_DNSSEC), NULL, (DLGPROC)DialogProcDnssec);
 		break;
@@ -337,17 +337,17 @@ void CKBToolBarCtrl::OnCommand()
 			RECT rc2;
 			SendMessage(TB_GETRECT, ID_BUTTON2, (LPARAM)&rc);
 			HWND handle=::FindWindow("IEFrame", NULL);
-			//ATLTRACE("Handle: %d\n", handle);
+			//if (debug) ATLTRACE("Handle: %d\n", handle);
 			::GetWindowRect(handle,&rc2);
-			//ATLTRACE("PWProc1: rcClient l: %d; b: %d; r: %d; t: %d\n", rc2.left, rc2.bottom, rc2.right, rc2.top);
+			//if (debug) ATLTRACE("PWProc1: rcClient l: %d; b: %d; r: %d; t: %d\n", rc2.left, rc2.bottom, rc2.right, rc2.top);
 			::MapWindowPoints(m_pBand->m_wndToolBar, HWND_DESKTOP, (LPPOINT)&rc, 2);
-			//ATLTRACE("PWProc2: rcClient l: %d; b: %d; r: %d; t: %d\n", rc.left, rc.bottom, rc.right, rc.top);
+			//if (debug) ATLTRACE("PWProc2: rcClient l: %d; b: %d; r: %d; t: %d\n", rc.left, rc.bottom, rc.right, rc.top);
 			int dialog_size = 336;
 			LONG dei;
 			dei = rc2.right - rc2.left;
 			dei = dei / 2;
 			dei = dei + rc2.left;
-			//ATLTRACE("Handle: %d\n", dei);
+			//if (debug) ATLTRACE("Handle: %d\n", dei);
 			if (rc.left < dei && (rc.left+dialog_size) < rc2.right) {
 				dx = (int)rc.left;
 				dy = (int)rc.bottom;
@@ -356,7 +356,7 @@ void CKBToolBarCtrl::OnCommand()
 				dx = (int)rc.left+TB_MIN_SIZE_X-15-dialog_size;
 				dy = (int)rc.bottom;
 			}
-			//ATLTRACE("PWProc3: rcClient l: %d; b: %d; r: %d; t: %d\n",dx, dy, rc.right, rc.top);
+			//if (debug) ATLTRACE("PWProc3: rcClient l: %d; b: %d; r: %d; t: %d\n",dx, dy, rc.right, rc.top);
 			DialogBox(GHins, MAKEINTRESOURCE(IDD_DIALOG_TLSA), NULL, (DLGPROC)DialogProcTlsa);
 		break;
 		}
@@ -370,7 +370,7 @@ void CKBToolBarCtrl::OnCommand()
 // Redraw of button bitmap when DNSSEC status was changed
 /**************************************************************************/
 bool CKBToolBarCtrl::RepaintButtonDNSSEC(int bindex, int iconindex){
-	ATLTRACE("RepaintButtonDNSSEC(%d,%d):\n", bindex,iconindex);
+	if (debug) ATLTRACE("RepaintButtonDNSSEC(%d,%d):\n", bindex,iconindex);
 	//delete of last button from toolbar
 	if (!DeleteButton(bindex))
 	return false;
@@ -398,7 +398,7 @@ bool CKBToolBarCtrl::RepaintButtonDNSSEC(int bindex, int iconindex){
 // Redraw of button bitmap when TLSA status was changed
 /**************************************************************************/
 bool CKBToolBarCtrl::RepaintButtonTLSA(int bindex, int iconindex){
-	ATLTRACE("RepaintButtonTLSA(%d,%d):\n",bindex,iconindex);
+	if (debug) ATLTRACE("RepaintButtonTLSA(%d,%d):\n",bindex,iconindex);
 	//delete of last button from toolbar
 
 	if (tlsaenable==1) {
@@ -436,23 +436,23 @@ bool CKBToolBarCtrl::RepaintButtonTLSA(int bindex, int iconindex){
 /**************************************************************************/
 LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	//ATLTRACE("DialogProcSettings\n");
+	//if (debug) ATLTRACE("DialogProcSettings\n");
 	switch ( uMsg )
 	{
 	case WM_INITDIALOG:
         {
-		//ATLTRACE("WM_INITDIALOG\n");
+		//if (debug) ATLTRACE("WM_INITDIALOG\n");
 		::SendDlgItemMessage(hwndDlg, IDC_COMBO, CB_INITSTORAGE, 2, 10);
 		::SendDlgItemMessage(hwndDlg, IDC_COMBO, CB_INSERTSTRING, 0, (LPARAM)"CZ.NIC");
 		::SendDlgItemMessage(hwndDlg, IDC_COMBO, CB_INSERTSTRING, 1, (LPARAM)"OARC");
 		if (choice2) ::SendDlgItemMessage(hwndDlg, IDC_COMBO, CB_SETCURSEL, 1, 0);
 		else ::SendDlgItemMessage(hwndDlg, IDC_COMBO, CB_SETCURSEL, 0, 0);
 		::EnableWindow(::GetDlgItem(hwndDlg,IDC_COMBO), FALSE);
-		//ATLTRACE("%d", textkey);		
+		//if (debug) ATLTRACE("%d", textkey);		
 		::SetWindowText(::GetDlgItem(hwndDlg,IDC_EDIT),dnssecseradr);
 		::EnableWindow(::GetDlgItem(hwndDlg,IDC_EDIT), FALSE);			
 		::EnableWindow(::GetDlgItem(hwndDlg,IDC_COMBO), FALSE);		
-		//ATLTRACE("%d", choice);
+		//if (debug) ATLTRACE("%d", choice);
 		if (choice==2) {
 			::CheckRadioButton(hwndDlg, IDC_R1, IDC_R4, IDC_R3);
 			::EnableWindow(::GetDlgItem(hwndDlg,IDC_EDIT), TRUE);			
@@ -480,7 +480,7 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 		
 		switch ( LOWORD(wParam) )
 			{
-				//ATLTRACE("WM_COMMAND\n");
+				//if (debug) ATLTRACE("WM_COMMAND\n");
 				case IDOK:
 					{
 							
@@ -588,7 +588,7 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 								// save keytext setting into Register
 								dwVal = (DWORD)::SendMessage(::GetDlgItem(hwndDlg, IDC_SHOWTEXT), BM_GETCHECK, 0, 0);
 								dwRet = RegSetValueEx(hKey, "keytext", NULL, REG_DWORD, (CONST BYTE*)&dwVal, sizeof(dwVal));
-								//if (dwRet != ERROR_SUCCESS)  //ATLTRACE("\nmam1\n");
+								//if (dwRet != ERROR_SUCCESS)  //if (debug) ATLTRACE("\nmam1\n");
 								// save tcpudp DWORD into Register
 								dwVal = (DWORD)::SendMessage(::GetDlgItem(hwndDlg, IDC_TCP), BM_GETCHECK, 0, 0);
 								dwRet = RegSetValueEx(hKey, "tcpudp", NULL, REG_DWORD, (CONST BYTE*)&dwVal, sizeof(dwVal));
@@ -723,9 +723,9 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 					options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;					
 					//EnterCriticalSection(&cs);
 					if (!wrongip) {
-						//ATLTRACE("\nTEST: www.nic.cz : %d : %s : 217.31.205.50\n", options, dnsip);
+						//if (debug) ATLTRACE("\nTEST: www.nic.cz : %d : %s : 217.31.205.50\n", options, dnsip);
 						resultipv4 = ds_validate("www.nic.cz", options, dnsip,  "217.31.205.50", &ipvalidator);
-						//ATLTRACE("TEST: www.nic.cz : %d : %s\n", resultipv4, ipvalidator);
+						//if (debug) ATLTRACE("TEST: www.nic.cz : %d : %s\n", resultipv4, ipvalidator);
 						if (resultipv4==0) LoadStringA(GHins, IDS_DNSSECTEST_ERROR, strbuf, STR_BUF_S);
 						else if ((resultipv4==4)) LoadStringA(GHins, IDS_DNSSECTEST_BOGUS, strbuf, STR_BUF_S);
 						else LoadStringA(GHins, IDS_DNSSECTEST_OK, strbuf, STR_BUF_S);
@@ -750,7 +750,7 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 /**************************************************************************/
 LRESULT CKBToolBarCtrl::DialogProcAbout(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	//ATLTRACE("DialogProcAbout\n");
+	//if (debug) ATLTRACE("DialogProcAbout\n");
 	switch ( uMsg )
 	{
 		
@@ -764,7 +764,7 @@ LRESULT CKBToolBarCtrl::DialogProcAbout(HWND hwndDlg, UINT uMsg, WPARAM wParam, 
 	case WM_COMMAND:
 			switch ( LOWORD(wParam) )
 			{
-				//ATLTRACE("WM_COMMAND\n");
+				//if (debug) ATLTRACE("WM_COMMAND\n");
 				case IDOK:
 					EndDialog(hwndDlg, LOWORD(wParam));					
 					break;
@@ -780,7 +780,7 @@ LRESULT CKBToolBarCtrl::DialogProcAbout(HWND hwndDlg, UINT uMsg, WPARAM wParam, 
 /**************************************************************************/
 LRESULT CKBToolBarCtrl::DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	//ATLTRACE("DialogProcAbout\n");
+	//if (debug) ATLTRACE("DialogProcAbout\n");
 	switch ( uMsg )
 	{
 		
@@ -815,7 +815,7 @@ LRESULT CKBToolBarCtrl::DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam,
 			//::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST4),strbuf);
 
 			// load and print addtext from resources
-			//ATLTRACE("DialogProcAbout %i\n",keylogo);
+			//if (debug) ATLTRACE("DialogProcAbout %i\n",keylogo);
 
 			// set font for texts
 			HFONT hFont ;
@@ -864,10 +864,10 @@ LRESULT CKBToolBarCtrl::DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam,
 			char strbuf[STR_BUF_S] = TEXT("");
 			int mlength;
 			short popupheight;
-				//ATLTRACE("sfdfsdf");	
+				//if (debug) ATLTRACE("sfdfsdf");	
 				LoadStringA(GHins, paneltext, strbuf, STR_BUF_S);
 				mlength = strlen(strbuf); 
-				//ATLTRACE("\n%d\n",mlength);
+				//if (debug) ATLTRACE("\n%d\n",mlength);
 
 			if (res == 3) {
 				if (mlength < 240) popupheight = 200;
@@ -932,7 +932,7 @@ LRESULT CKBToolBarCtrl::DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam,
 /**************************************************************************/
 LRESULT CKBToolBarCtrl::DialogProcTlsa(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	//ATLTRACE("DialogProcAbout\n");
+	//if (debug) ATLTRACE("DialogProcAbout\n");
 	switch ( uMsg )
 	{
 		
@@ -961,7 +961,7 @@ LRESULT CKBToolBarCtrl::DialogProcTlsa(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
 			//::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST4),strbuf);
 
 			// load and print addtext from resources
-			//ATLTRACE("DialogProcAbout %i\n",keylogo);
+			//if (debug) ATLTRACE("DialogProcAbout %i\n",keylogo);
 
 			// set font for texts
 			HFONT hFont ;
@@ -1010,10 +1010,10 @@ LRESULT CKBToolBarCtrl::DialogProcTlsa(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
 			char strbuf[STR_BUF_S] = TEXT("");
 			int mlength;
 			short popupheight;
-				//ATLTRACE("sfdfsdf");	
+				//if (debug) ATLTRACE("sfdfsdf");	
 				LoadStringA(GHins, paneltextadd, strbuf, STR_BUF_S);
 				mlength = strlen(strbuf); 
-				//ATLTRACE("\n%d\n",mlength);
+				//if (debug) ATLTRACE("\n%d\n",mlength);
 	
 			::ShowWindow(::GetDlgItem(hwndDlg, IDC_STIPB_TLSA), SW_HIDE);
 			::ShowWindow(::GetDlgItem(hwndDlg, IDC_STIPV_TLSA), SW_HIDE);
