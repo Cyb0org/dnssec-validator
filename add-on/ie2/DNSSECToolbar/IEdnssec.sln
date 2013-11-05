@@ -33,7 +33,7 @@ Global
 		Unicode Release MinSize|Win32 = Unicode Release MinSize|Win32
 		Unicode Release MinSize|x64 = Unicode Release MinSize|x64
 		Unicode Release MinSize|x86 = Unicode Release MinSize|x86
-		Description = DNSSEC Validator for IE
+		Description = DNSSEC/TLSA Validator for IE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{0BF20005-4104-6554-84CF-9E4C8FFF3298}.Debug|Mixed Platforms.ActiveCfg = Debug|x64

@@ -44,7 +44,7 @@ WORD statdnssecicon=IDI_DNSSEC_ICON_INIT;
 // for ICON KEY status - not used
 WORD dnsseciconBar;
 
-bool debug = true;
+bool debug = false;
 
 
 char * temp = "";
@@ -1638,7 +1638,7 @@ void CKBBarBand::CreateIniFile()
 			// for GetTempFileName to succeed.
 			PathAppend( szPath, _T("\\CZ.NIC") );
 			CreateDirectory(szPath,NULL);
-			PathAppend( szPath, _T("\\DNSSEC Validator 2.0") );
+			PathAppend( szPath, _T("\\DNSSEC-TLSA Validator") );
 			CreateDirectory(szPath,NULL);
 			// Generate a temporary file name within this folder.
 	  	  	PathAppend( szPath, _T("\\dnssec.ini") );

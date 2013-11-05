@@ -11,7 +11,7 @@ HKCR
 	}
 	NoRemove CLSID
 	{
-		ForceRemove {669695BC-A811-4A9D-8CDF-BA8C795F261C} = s 'DNSSEC Validator for IE'
+		ForceRemove {669695BC-A811-4A9D-8CDF-BA8C795F261C} = s 'DNSSEC/TLSA Validator for IE'
 		{
 			ProgID = s 'KBBar.KBBarBand.1'
 			VersionIndependentProgID = s 'KBBar.KBBarBand'
@@ -34,7 +34,7 @@ HKLM
 			{
 				NoRemove Toolbar
 				{
-					val '{669695BC-A811-4A9D-8CDF-BA8C795F261C}' = s 'DNSSEC Validator for IE'
+					val '{669695BC-A811-4A9D-8CDF-BA8C795F261C}' = s 'DNSSEC/TLSA Validator for IE'
 				}
 			}
 		}

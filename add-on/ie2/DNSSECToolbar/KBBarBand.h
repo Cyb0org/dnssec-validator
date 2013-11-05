@@ -63,9 +63,9 @@ extern "C" {					// use C language linkage
 #define CACHE				1
 #define IPv4				1
 #define IPv6				0
-#define HKU_REG_KEY TEXT(".DEFAULT\\Software\\CZ.NIC\\DNSSEC Validator 2.0")
-#define HKCU_REG_KEY TEXT("Software\\CZ.NIC\\DNSSEC Validator 2.0")
-#define INI_FILE_PATH _T("\\CZ.NIC\\DNSSEC Validator 2.0\\dnssec.ini")
+#define HKU_REG_KEY TEXT(".DEFAULT\\Software\\CZ.NIC\\DNSSEC-TLSA Validator")
+#define HKCU_REG_KEY TEXT("Software\\CZ.NIC\\DNSSEC-TLSA Validator")
+#define INI_FILE_PATH _T("\\CZ.NIC\\DNSSEC-TLSA Validator\\dnssec.ini")
 
 
 

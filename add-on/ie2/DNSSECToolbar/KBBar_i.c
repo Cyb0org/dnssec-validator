@@ -6,7 +6,7 @@
 
 
  /* File created by MIDL compiler version 7.00.0555 */
-/* at Mon Nov 04 15:41:01 2013
+/* at Tue Nov 05 11:13:26 2013
  */
 /* Compiler settings for KBBar.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 7.00.0555 
