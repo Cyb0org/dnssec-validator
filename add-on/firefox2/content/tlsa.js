@@ -569,7 +569,7 @@ get_invalid_cert_SSLStatus: function(uri) {
 	}
 	else {
 		if (daneExtension.debugOutput) {
-			dump("No way to get invalid cert status!");
+			dump("No way to get invalid cert status!\n");
 		}
 		return null;
 	}
@@ -596,7 +596,7 @@ check_tlsa_tab_change: function (channel, uri, port, protocol) {
 	if (daneExtension.debugOutput) {
 		dump(this.DANE_DEBUG_PRE + "------------ TLSA validation start ----------------" + this.DANE_DEBUG_POST); 
 	}
-
+	tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_ACTION);
 	var c = tlsaExtNPAPIConst;
 	var cert = this.getCertificate(window.gBrowser);
 		if (daneExtension.debugOutput) {
@@ -607,7 +607,7 @@ check_tlsa_tab_change: function (channel, uri, port, protocol) {
 			dump(this.DANE_DEBUG_PRE + "No certificate!" + this.DANE_DEBUG_POST);
 		}
 		//tlsaExtHandler.setSecurityState(c.DANE_EXIT_NO_CERT_CHAIN);
-		tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_ACTION)
+		tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_ACTION);
 		if (daneExtension.debugOutput) {
 			dump(this.DANE_DEBUG_PRE + "------------- TLSA validation end ------------------" + this.DANE_DEBUG_POST); 
 		}
