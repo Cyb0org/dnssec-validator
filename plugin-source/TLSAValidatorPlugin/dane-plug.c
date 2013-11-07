@@ -616,7 +616,7 @@ char * hextobin(char *data)
 // Helper function 
 // return success or error
 // ----------------------------------------------------------------------------
-int getcert(char *dest_url, struct cert_store_head *cert_list) 
+int getcert(char *dest_url, char *domain , struct cert_store_head *cert_list) 
 {
 	int i;
 	const SSL_METHOD *method;
@@ -671,6 +671,17 @@ int getcert(char *dest_url, struct cert_store_head *cert_list)
 			printf("Error: Cannot set server socket.\n");
 		}
 		goto fail;
+	}
+
+
+	if (domain != NULL) {
+		if (!SSL_set_tlsext_host_name(ssl,domain)) {
+			if (debug) {
+				printf("Error: Unable to set TLS servername extension: %s.\n",
+				    domain);
+			}
+			goto fail;
+		}
 	}
 
 	if (SSL_connect(ssl) != 1) {
@@ -1503,7 +1514,7 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options, char *
 		if (debug) printf(DEBUG_PREFIX_CER "External certificate chain is used\n");	
 		strcpy (uri,"https://");
 		strncat (uri, domain, strlen(domain));
-		tlsa_ret = getcert(uri, &cert_list);
+		tlsa_ret = getcert(uri, domain, &cert_list);
 		if (tlsa_ret == 0) {
 			free_tlsalist(&tlsa_list);
 			free_certlist(&cert_list);
