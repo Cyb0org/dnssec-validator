@@ -1442,6 +1442,7 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options,
 	bool usefwd = false;
 	short exitcode = DANE_EXIT_RESOLVER_FAILED;
 	char* dn = NULL;
+
 	ds_init_opts(options);
 	debug = opts.debug;
 	usefwd = opts.usefwd;
@@ -1477,12 +1478,12 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options,
 
 		// set resolver/forwarder if it was set in options
 		if (usefwd) {
-			if (strcmp(optdnssrv,"") != 0) {
+			if (strcmp(optdnssrv, "") != 0) {
 				fwd_addr = strtok(optdnssrv, delims);
 				// set ip addresses of resolvers into ub context
 				while (fwd_addr != NULL) {
 					ub_retval = ub_ctx_set_fwd(ctx,
-					    optdnssrv);
+					    fwd_addr);
 					if (ub_retval != 0) {
 						if (debug) {
 							printf(DEBUG_PREFIX "Error adding resolver IP address: %s\n",
@@ -1650,6 +1651,13 @@ int main(int argc, char **argv)
 	char *dname = NULL, *port = NULL;
 	int res = DANE_EXIT_RESOLVER_FAILED;
 
+	uint16_t options;
+
+	char resolver_addresses[256];
+	/* Must be taken through writeable buffer.
+	 * TODO -- Modify it so it can take constant string literals. */
+	strcpy(resolver_addresses, "8.8.8.8 217.31.204.130");
+
 	if ((argc < 2) || (argc > 3)) {
 		fprintf(stderr, "Usage:\n\t%s dname [port]\n", argv[0]);
 		return 1;
@@ -1660,7 +1668,11 @@ int main(int argc, char **argv)
 		port = argv[2];
 	}
 
-	res = CheckDane(certhex, 0, 5, "8.8.8.8", dname, port, "tcp", 1);
+	options =
+	    DANE_INPUT_FLAG_DEBUGOUTPUT |
+	    DANE_INPUT_FLAG_USEFWD;
+
+	res = CheckDane(certhex, 0, options, resolver_addresses, dname, port, "tcp", 1);
 
 	if (debug) {
 		printf(DEBUG_PREFIX_DANE "Main final result: %i\n", res);
