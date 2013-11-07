@@ -1,9 +1,10 @@
 CMakeCache.txt
 CMakeFiles/
-DANEplugin/dane-plug
-DANEplugin/iptest
-DANEplugin/ssl-test
-DANEplugin/unbound-test-dnssec
+tests/dane-plug
+tests/iptest
+tests/ssl-test
+tests/unbound-test-dnssec
+tests/ub-ds
 FireBreath/
 Makefile
 Makefile.Dlin
