@@ -29,11 +29,10 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #include "Winuser.h"
 #include "resource.h"       // main symbols
 #include "hyperlink.h"
-#include "uthash.h"
-#include "ub_dnssec_states.gen"		// DNSSEC state constants
-#include "dane_states.gen"		// TLSA state constants
+#include "dnssec-states.gen"		// DNSSEC state constants
+#include "dane-states.gen"		// TLSA state constants
 extern "C" {					// use C language linkage
-  #include "ub_ds.h"
+  #include "dnssec-plug.h"
   #include "dane-plug.h"
 }
 #include "KBToolBarCtrl.h"
