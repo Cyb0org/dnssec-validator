@@ -509,12 +509,12 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv,
 		// set resolver/forawarder if it was set in options
 		if (opts.usefwd) {
 
-			if (strcmp(optdnssrv,"") != 0) {
+			if (strcmp(optdnssrv, "") != 0) {
 				fwd_addr = strtok(optdnssrv, delims);
 				// set ip addresses of resolvers into ub context
 				while (fwd_addr != NULL) {
 					ub_retval = ub_ctx_set_fwd(ctx,
-					    optdnssrv);
+					    fwd_addr);
 					if (ub_retval != 0) {
 						if (opts.debug) {
 							printf(DEBUG_PREFIX "Error adding resolver IP address: %s\n",
@@ -694,6 +694,12 @@ int main(int argc, char **argv)
 	char *dname = NULL;
 	short i;
 	char *tmp = NULL;
+	uint16_t options;
+
+	char resolver_addresses[256];
+	/* Must be taken through writeable buffer.
+	 * TODO -- Modify it so it can take constant string literals. */
+	strcpy(resolver_addresses, "8.8.8.8 217.31.204.130");
 
 	if (argc != 2) {
 		fprintf(stderr, "Usage\n\t%s dname\n", argv[0]);
@@ -702,8 +708,14 @@ int main(int argc, char **argv)
 
 	dname = argv[1];
 
-	i = ds_validate(dname, 13, "nofwd", "2001:610:188:301:145::2:10",
-	    &tmp);
+	options =
+	    DNSSEC_INPUT_FLAG_DEBUGOUTPUT |
+	    DNSSEC_INPUT_FLAG_USEFWD |
+	    DNSSEC_INPUT_FLAG_RESOLVIPV4 |
+	    DNSSEC_INPUT_FLAG_RESOLVIPV6;
+
+	i = ds_validate(dname, options, resolver_addresses,
+	    "2001:610:188:301:145::2:10", &tmp);
 	printf(DEBUG_PREFIX "Returned value: \"%d\" %s\n", i, tmp);
 	ub_context_free();
 	return 0;
