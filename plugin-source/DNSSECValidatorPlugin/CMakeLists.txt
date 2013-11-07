@@ -20,7 +20,7 @@ endif ()
 
 # add validating library to build on UNIX
 if (NOT WIN32)
-    set(DSLIB ub_ds.c)
+    set(DSLIB dnssec-plug.c)
 endif ()
 
 file (GLOB GENERAL RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}

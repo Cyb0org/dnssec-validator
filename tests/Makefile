@@ -21,7 +21,7 @@ CFLAGS2 += $(INCLUDES) $(BOOST_FLAGS) -Wall -pedantic -g
 CXXFLAGS += $(INCLUDES) $(BOOST_FLAGS) -Wall -g
 LDFLAGS += $(DANE_CORE_LIB) $(LIBS)
 
-TARGETS := dane-plug unbound-test-dnssec ssl-test iptest ub-ds
+TARGETS := dane-plug unbound-test-dnssec ssl-test iptest dnssec-plug
 
 ## Generic targets
 
@@ -32,7 +32,7 @@ run-tests: build-tests
 	./unbound-test-dnssec
 	./ssl-test
 	./iptest
-	./ub-ds
+	./dnssec-plug
 
 clean-tests:
 	rm -f $(TARGETS)
@@ -52,7 +52,7 @@ ssl-test: ssl-test.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
 	$(CC) $< -o $@ $(CFLAGS2) $(LDFLAGS) 
 #	gcc -Wall -pedantic -g -lssl -lcrypto -o ssl-test ssl-test.c  
 
-ub-ds: ub_ds.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
+dnssec-plug: dnssec-plug.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
 	$(CC) $< -o $@ $(CFLAGS) $(LDFLAGS)
 
 

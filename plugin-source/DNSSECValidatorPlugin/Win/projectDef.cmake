@@ -45,14 +45,14 @@ add_windows_plugin(${PROJNAME} SOURCES)
 
 # generate .lib from the validating library compiled by mingw
 add_custom_command(TARGET ${PROJNAME} PRE_LINK
-                   COMMAND lib.exe /machine:x86 /def:ub_ds_windows-x86.def
+                   COMMAND lib.exe /machine:x86 /def:DNSSECcore-windows-x86.def
                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../../ub_tmp_build
     )
 
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
 target_link_libraries(${PROJNAME}
     ${PLUGIN_INTERNAL_DEPS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../ub_tmp_build/ub_ds_windows-x86.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../ub_tmp_build/DNSSECcore-windows-x86.lib
     )
 
 set(WIX_HEAT_FLAGS

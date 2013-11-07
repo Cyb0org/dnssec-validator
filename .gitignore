@@ -4,7 +4,7 @@ tests/dane-plug
 tests/iptest
 tests/ssl-test
 tests/unbound-test-dnssec
-tests/ub-ds
+tests/dnssec-plug
 FireBreath/
 Makefile
 Makefile.Dlin

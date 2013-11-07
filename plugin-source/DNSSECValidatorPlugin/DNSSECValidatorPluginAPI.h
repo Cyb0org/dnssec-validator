@@ -27,7 +27,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #include "DNSSECValidatorPlugin.h"
 
 extern "C" {   /* use C language linkage */
-  #include "ub_ds.h"
+  #include "dnssec-plug.h"
 }
 
 

@@ -6,7 +6,7 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "ub_dnssec_states.gen"
+#include "dnssec-states.gen"
 
 #include "unbound.h"
 #include "ldns/ldns.h"
