@@ -52,10 +52,10 @@ extern "C" {
 //        options - options of validator, IPv4, IPv6, usefwd, etc..
 //        *optdnssrv - IP address of resolver/forvarder
 //        *ipbrowser - is IP address of browser which browser used fo connection of the server
-// Out:	  **ipvalidator - is IP address(es) of validator
+// Out:   **ipvalidator - is IP address(es) of validator
 // ----------------------------------------------------------------------------
 short ds_validate(const char *domain, const uint16_t options,
-                  const char *optdnssrv, const char *ipbrowser, char **ipvalidator);
+    const char *optdnssrv, const char *ipbrowser, char **ipvalidator);
 
 //*****************************************************************************
 // free ub context (erase cache data from ub-context of unbound)
