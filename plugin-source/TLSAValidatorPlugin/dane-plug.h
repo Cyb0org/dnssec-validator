@@ -48,18 +48,20 @@ extern "C" {
 //*****************************************************************************
 // Main DANE/TLSA validation function, external API
 // Input parmateers:
-// 	char* certchain[] - array of derCert in HEX (certificate chain)
-//	int certcount - number of cert in array - count(array)
-//	const uint16_t options - TLSA validator option (debug,IPv4,IPv6) 
-//	char *optdnssrv - list of IP resolver addresses separated by space
-//	char* domain - domain name (e.g.: wwww.nic.cz, torproject.org, ...)
-//	char* port - number of port for SSL (443, 25)
-//	char* protocol - "tcp" only 
-//	int policy - certificate policy from browser
+//        char* certchain[] - array of derCert in HEX (certificate chain)
+//        int certcount - number of cert in array - count(array)
+//        const uint16_t options - TLSA validator option (debug,IPv4,IPv6) 
+//        char *optdnssrv - list of IP resolver addresses separated by space
+//        char* domain - domain name (e.g.: wwww.nic.cz, torproject.org, ...)
+//        char* port - number of port for SSL (443, 25)
+//        char* protocol - "tcp" only 
+//        int policy - certificate policy from browser
 // Return: DANE/TLSA validation status (x<0=valfail or error, x>0 = success)
-//	   return values: dane-state.gen file
+//         return values: dane-state.gen file
 // ----------------------------------------------------------------------------
-short CheckDane(const char* certchain[], int certcount, const uint16_t options, const char *optdnssrv, const char* domain, const char* port, const char* protocol, int policy);
+short CheckDane(const char* certchain[], int certcount, const uint16_t options,
+    const char *optdnssrv, const char *domain, const char *port,
+    const char *protocol, int policy);
 
 //*****************************************************************************
 // free ub context (erase cache data from ub-context of unbound)
