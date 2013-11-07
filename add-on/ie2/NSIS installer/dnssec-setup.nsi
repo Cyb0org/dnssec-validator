@@ -69,8 +69,8 @@ Var StartMenuFolder
 section "-hidden.postinstall"
 	# copy files
 	setOutPath $INSTDIR
-	File ".\ub_ds_windows-x86.dll"
-  File ".\DANEcore-windows-x86.dll"
+	File ".\DNSSECcore-windows-x86.dll"
+	File ".\DANEcore-windows-x86.dll"
 	File ".\IEdnssec.dll"
 	File ".\key.ico"
 	File ".\RegPlugin.bat"
@@ -78,7 +78,7 @@ section "-hidden.postinstall"
   
 	# store installation folder
 	WriteRegStr HKLM "Software\${PROGRAM_NAME}" "InstallLocation" "$INSTDIR"
-  Delete "$LOCALAPPDATA\CZ.NIC\${PROGRAM_NAME}\dnssec.ini"
+	Delete "$LOCALAPPDATA\CZ.NIC\${PROGRAM_NAME}\dnssec.ini"
 	# register uninstaller
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "DisplayName" "DNSSEC/TLSA Validator add-on"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "UninstallString" "$\"$INSTDIR\uninst.exe$\""
@@ -87,22 +87,22 @@ section "-hidden.postinstall"
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "NoRepair" "1"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "URLInfoAbout" "http://www.dnssec-validator.cz"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "Publisher" "CZ.NIC Labs"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "Version" "${VERSION}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "DisplayVersion" "${VERSION}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "Contact" "CZ.NIC Labs"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "DisplayIcon" "$\"$INSTDIR\key.ico$\""
-  ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
-  IntFmt $0 "0x%08X" $0
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "EstimatedSize" "$0"
-  WriteUninstaller "uninst.exe"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "Version" "${VERSION}"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "DisplayVersion" "${VERSION}"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "Contact" "CZ.NIC Labs"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "DisplayIcon" "$\"$INSTDIR\key.ico$\""
+	${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+	IntFmt $0 "0x%08X" $0
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "EstimatedSize" "$0"
+	WriteUninstaller "uninst.exe"
 
 
 	# start menu items
 	!insertmacro MUI_STARTMENU_WRITE_BEGIN DNSSECStartMenu
 	CreateDirectory "$SMPROGRAMS\$StartMenuFolder"
 	CreateShortCut "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk" "$INSTDIR\uninst.exe" "" "" "" "" "" "Uninstall DNSSEC/TLSA Validator add-on for IE"
-  CreateShortCut "$SMPROGRAMS\$StartMenuFolder\RegPlugin.lnk" "$INSTDIR\RegPlugin.bat" "" "" "" "" "" "Manual registration of DNSSEC/TLSA Validator add-on"
-  CreateShortCut "$SMPROGRAMS\$StartMenuFolder\UnRegPlugin.lnk" "$INSTDIR\UnRegPlugin.bat" "" "" "" "" "" "Manual un-registration of DNSSEC/TLSA Validator add-on"
+	CreateShortCut "$SMPROGRAMS\$StartMenuFolder\RegPlugin.lnk" "$INSTDIR\RegPlugin.bat" "" "" "" "" "" "Manual registration of DNSSEC/TLSA Validator add-on"
+	CreateShortCut "$SMPROGRAMS\$StartMenuFolder\UnRegPlugin.lnk" "$INSTDIR\UnRegPlugin.bat" "" "" "" "" "" "Manual un-registration of DNSSEC/TLSA Validator add-on"
 	!insertmacro MUI_STARTMENU_WRITE_END
 
 	# register DNSSEC toolbar
@@ -118,74 +118,75 @@ sectionEnd
 # uninstaller section
 section "un.Unbound"
 	UnRegDLL "$INSTDIR\IEdnssec.dll"
-  
-  # deregister uninstall
+  	# deregister uninstall
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}"
-  Delete "$INSTDIR\uninst.exe"   # delete self
-  Delete "$INSTDIR\ub_ds_windows-x86.dll" 
-  Delete "$INSTDIR\DANEcore-windows-x86.dll"    
+	Delete "$INSTDIR\DNSSECcore-windows-x86.dll" 
+	Delete "$INSTDIR\DANEcore-windows-x86.dll"    
 	Delete "$INSTDIR\IEdnssec.dll"
 	Delete "$INSTDIR\key.ico"
 	Delete "$INSTDIR\RegPlugin.bat"
 	Delete "$INSTDIR\UnRegPlugin.bat"
-  Delete "$LOCALAPPDATA\CZ.NIC\${PROGRAM_NAME}\dnssec.ini"
+	Delete "$LOCALAPPDATA\CZ.NIC\${PROGRAM_NAME}\dnssec.ini"
+	RMDir "$LOCALAPPDATA\CZ.NIC\${PROGRAM_NAME}"
+	RMDir "$LOCALAPPDATA\CZ.NIC"
+	Delete "$INSTDIR\uninst.exe"   # delete self
+	RMDir "$PROGRAMFILES\CZ.NIC\${PROGRAM_NAME}"
+	RMDir "$PROGRAMFILES\CZ.NIC"
 	RMDir "$INSTDIR"
 
 	# start menu items
 	!insertmacro MUI_STARTMENU_GETFOLDER DNSSECStartMenu $StartMenuFolder
 	Delete "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk"
-  Delete "$SMPROGRAMS\$StartMenuFolder\RegPlugin.lnk"
-  Delete "$SMPROGRAMS\$StartMenuFolder\UnRegPlugin.lnk"
+	Delete "$SMPROGRAMS\$StartMenuFolder\RegPlugin.lnk"
+	Delete "$SMPROGRAMS\$StartMenuFolder\UnRegPlugin.lnk"
+	RMDir "$SMPROGRAMS\CZ.NIC\${PROGRAM_NAME}"
+	RMDir "$SMPROGRAMS\CZ.NIC\"
 	RMDir "$SMPROGRAMS\$StartMenuFolder"
 	DeleteRegKey HKLM "Software\${PROGRAM_NAME}"
 sectionEnd
 
 Function .onInit
  
-  ReadRegStr $R0 HKLM \
-  "Software\Microsoft\Windows\CurrentVersion\Uninstall\DNSSECValidator 2.0" \
-  "UninstallString"
-  ;StrCmp $R0 "" done
+	ReadRegStr $R0 HKLM \
+	"Software\Microsoft\Windows\CurrentVersion\Uninstall\DNSSECValidator 2.0" \
+	"UninstallString"
 
-  ReadRegStr $R1 HKLM \
-  "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" \
-  "UninstallString"
-  ;StrCmp $R1 "" done 
+	ReadRegStr $R1 HKLM \
+	"Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" \
+	"UninstallString"
 
-  ${If} $R0 != "" 
-	MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
-	"DNSSEC Validator 2.0 is already installed. $\n$\nClick `OK` to remove the \
-	previous version or `Cancel` to cancel this upgrade." \
-	IDOK uninst
-	Abort
-  ${EndIf}
+
+	${If} $R0 != "" 
+		MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+		"DNSSEC Validator 2.0 is already installed. $\n$\nClick `OK` to remove the \
+		previous version or `Cancel` to cancel this upgrade." \
+		IDOK uninst
+		Abort
+	${EndIf}
   
-  ${If} $R1 != ""
-	MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
-	"DNSSEC/TLSA Validator ${VERSION} is already installed. $\n$\nClick `OK` to remove the \
-  	previous version or `Cancel` to cancel this upgrade." \
-	IDOK uninst
-	Abort
-   ${EndIf}
+	${If} $R1 != ""
+		MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+		"DNSSEC/TLSA Validator ${VERSION} is already installed. $\n$\nClick `OK` to remove the \
+	  	previous version or `Cancel` to cancel this upgrade." \
+		IDOK uninst
+		Abort
+	${EndIf}
 
-;Run the uninstaller
-uninst:
-  ClearErrors
-  ${If} $R0 != "" 
-	ExecWait '$R0 _?=$PROGRAMFILES\CZ.NIC\${PROGRAM_NAME_OLD}'
-  ${EndIf}	
-
-  ${If} $R1 != "" 
- 	ExecWait '$R1 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
-  ${EndIf}	
-
-  IfErrors no_remove_uninstaller done
-    ;You can either use Delete /REBOOTOK in the uninstaller or add some code
-    ;here to remove the uninstaller. Use a registry key to check
-    ;whether the user has chosen to uninstall. If you are using an uninstaller
-    ;components page, make sure all sections are uninstalled.
-   no_remove_uninstaller:
-
-done:
+	;Run the uninstaller
+	uninst:
+		ClearErrors
+		${If} $R0 != "" 
+			ExecWait '$R0 _?=$PROGRAMFILES\CZ.NIC\${PROGRAM_NAME_OLD}'
+		${EndIf}	
+	
+		${If} $R1 != "" 
+			ExecWait '$R1 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
+		${EndIf}	
+	
+		IfErrors no_remove_uninstaller done
+	
+	no_remove_uninstaller:
+	
+	done:
 
 FunctionEnd
