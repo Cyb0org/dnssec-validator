@@ -157,7 +157,7 @@ void ds_init_opts(const uint16_t options)
 // url_str contains only domain name (+ optional port number)
 // ----------------------------------------------------------------------------
 static
-int create_socket(char *url_str)
+int create_socket(char *url_str, char *port_str)
 {
 	int sockfd;
 	char hostname[256] = "";
@@ -168,6 +168,15 @@ int create_socket(char *url_str)
 
 	struct hostent *host;
 	struct sockaddr_in dest_addr;
+
+	/*
+	 * TODO -- Add input sanity check.
+	 * Copy port number.
+	 */
+	if ((port_str != NULL) && (port_str[0] != '\0')) {
+		strncpy(portnum, port_str, 5);
+		portnum[5] = '\0';
+	}
 
 #ifdef WIN32
 	WSADATA wsaData;
@@ -637,7 +646,7 @@ char * hextobin(char *data)
 // return success or error
 // ----------------------------------------------------------------------------
 static
-int getcert(char *dest_url, char *domain , struct cert_store_head *cert_list) 
+int getcert(char *dest_url, char *domain, char *port, struct cert_store_head *cert_list) 
 {
 	int i;
 	const SSL_METHOD *method;
@@ -679,7 +688,7 @@ int getcert(char *dest_url, char *domain , struct cert_store_head *cert_list)
 		goto fail;
 	}
 
-	server_fd = create_socket(dest_url);
+	server_fd = create_socket(dest_url, port);
 	if(server_fd == -1) {
 		if (debug) {
 			printf("Error TCP connection to: %s.\n", dest_url);
@@ -1565,7 +1574,7 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options, char *
 		}
 		strcpy (uri,"https://");
 		strncat (uri, domain, strlen(domain));
-		tlsa_ret = getcert(uri, domain, &cert_list);
+		tlsa_ret = getcert(uri, domain, port, &cert_list);
 		if (tlsa_ret == 0) {
 			free_tlsalist(&tlsa_list);
 			free_certlist(&cert_list);
@@ -1607,7 +1616,7 @@ int main(int argc, char **argv)
 
 	int res = DANE_EXIT_RESOLVER_FAILED;
 
-	res = CheckDane(certhex, 0, 5, "8.8.8.8", argv[1], "443", "tcp", 1);
+	res = CheckDane(certhex, 0, 5, "8.8.8.8", argv[1], argv[2], "tcp", 1);
 	
 	if (debug) {
 		printf(DEBUG_PREFIX_DANE "Main final result: %i\n", res);
