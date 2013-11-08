@@ -621,22 +621,26 @@ char * mystrcat(const char *s1, const char *s2)
 }
 
 //*****************************************************************************
-// HEX string to Binary data convertor
+// HEX string to Binary data converter
 // ----------------------------------------------------------------------------
 static
 char * hextobin(char *data)
 {
-	int length = strlen(data);
-	int i, j;
-	char buffer[2048] = "";
-	char *ret;
+	size_t length = strlen(data);
+	unsigned i;
+	char *buf;
+
+	/* Two hex digits encode one byte. */
 	assert((length % 2) == 0);
-	for(i = 0, j = 0; i < length; i += 2, ++j){
-		buffer[j] = hex_to_ascii(data[i], data[i+1]);
+	buf = malloc(length >> 1);
+	if (buf == NULL) {
+		return NULL;
 	}
-	ret = malloc(length + 1);
-	memcpy(ret, buffer, length);
-	return ret;
+
+	for(i = 0; i < length; i += 2){
+		buf[i >> 1] = hex_to_ascii(data[i], data[i + 1]);
+	}
+	return buf;
 }
 
 //*****************************************************************************
