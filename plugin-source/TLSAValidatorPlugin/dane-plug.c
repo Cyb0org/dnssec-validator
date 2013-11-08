@@ -584,15 +584,18 @@ int hex_to_ascii(char c, char d)
 	return high+low;
 }
 
+#if 0
 //*****************************************************************************
-// safety strings concatenate funciton
+// safe string concatenation function
+// Returns NULL on error or when both input parameters are NULL.
+// Returns newly allocated string containing concatenated input data.
 // ----------------------------------------------------------------------------
 static
-char * mystrcat(const char *s1, const char *s2)
+char * strcat_clone(const char *s1, const char *s2)
 {
 	size_t s1_size = 0,
-	s2_size = 0;
-	char *t = NULL;
+	       s2_size = 0;
+	char *cat = NULL;
 
 	if (s1 != NULL) {
 		s1_size = strlen(s1);
@@ -602,23 +605,26 @@ char * mystrcat(const char *s1, const char *s2)
 		s2_size = strlen(s2);
 	}
 
-	if ((s1_size + s2_size) > 0) {
-		t = malloc(s1_size + s2_size + 1);
-		if (t == NULL) {
+	if ((s1 != NULL) && (s2 != NULL)) {
+		cat = malloc(s1_size + s2_size + 1);
+		if (cat == NULL) {
 			return NULL; /* Allocation error. */
 		}
 
-		if (s1 != NULL) {
-			strcpy(t, s1);
+		if (s1_size > 0) {
+			memcpy(cat, s1, s1_size);
 		}
 
-		if (s2 != NULL) {
-			strcpy(t + s1_size, s2);
+		if (s2_size > 0) {
+			memcpy(cat + s1_size, s2, s2_size);
 		}
+
+		cat[s1_size + s2_size] = '\0';
 	}
 
-	return t;
+	return cat;
 }
+#endif
 
 //*****************************************************************************
 // HEX string to Binary data converter
@@ -1387,30 +1393,53 @@ void ub_context_free(void)
 
 //*****************************************************************************
 // Function char* get_tlsa_query
-// return _port._protocol.domain e.g: _443._tcp.www.nic.cz
+// returns newly allocated string containing _port._protocol.domain
+// e.g: _443._tcp.www.nic.cz
 // ----------------------------------------------------------------------------
 static
-char * get_tlsa_query(char *domain, char *port, char *protocol) 
+char * get_tlsa_query(const char *domain, const char *port,
+    const char *protocol)
 {
-	char *tlsa_query = NULL,
-	*tlsa_query_old = NULL;
+	char *tlsa_query;
+	unsigned dom_len, port_len, proto_len;
+	unsigned offs;
 
-	tlsa_query_old = tlsa_query;
-	tlsa_query  = mystrcat("_", port);
-	free(tlsa_query_old);
-	tlsa_query_old = tlsa_query;
-	tlsa_query = mystrcat(tlsa_query, "._");
-	free(tlsa_query_old);
-	tlsa_query_old = tlsa_query;
-	tlsa_query = mystrcat(tlsa_query, protocol);
-	free(tlsa_query_old);
-	tlsa_query_old = tlsa_query;
-	tlsa_query = mystrcat(tlsa_query, ".");
-	free(tlsa_query_old);
-	tlsa_query_old = tlsa_query;
-	tlsa_query = mystrcat(tlsa_query, domain);
-	free(tlsa_query_old);
-   
+	assert(domain != NULL);
+	if (domain == NULL) return NULL;
+	assert(port != NULL);
+	if (port == NULL) return NULL;
+	assert(protocol != NULL);
+	if(protocol == NULL) return NULL;
+
+	dom_len = strlen(domain);
+	port_len = strlen(port);
+	proto_len = strlen(protocol);
+
+	/* '_' + '.' + '_' + '.' + '\0' */
+	tlsa_query = malloc(dom_len + port_len + proto_len + 5);
+	if (tlsa_query == NULL) {
+		return NULL;
+	}
+
+	offs = 0;
+	tlsa_query[offs++] = '_';
+
+	memcpy(tlsa_query + offs, port, port_len);
+	offs += port_len;
+
+	tlsa_query[offs++] = '.';
+	tlsa_query[offs++] = '_';
+
+	memcpy(tlsa_query + offs, protocol, proto_len);
+	offs += proto_len;
+
+	tlsa_query[offs++] = '.';
+
+	memcpy(tlsa_query + offs, domain, dom_len);
+	offs += dom_len;
+
+	tlsa_query[offs] = '\0';
+
 	return tlsa_query;
 }
 
