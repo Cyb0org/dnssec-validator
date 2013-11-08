@@ -1468,7 +1468,15 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options,
 	int tlsa_res = -1;
 	int tlsa_ret = 0;
 	int retval = 0;
-	char uri[256];
+#define HTTPS_PREF "https://"
+#define HTTPS_PREF_LEN 8
+#define MAX_URI_LEN (256 + 64) /*
+                                * RFC 1034, RFC 1035 -- Maximal domain name
+                                * length is 255 octets. Adding 64 bytes for
+                                * prefixes and other stuff should be
+                                * sufficient.
+                                */
+	char uri[MAX_URI_LEN];
 	int ub_retval = 0;
 	char *fwd_addr = NULL;
 	char delims[] = " ";
@@ -1640,8 +1648,8 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options,
 		if (debug) {
 			printf(DEBUG_PREFIX_CER "External certificate chain is used\n");
 		}
-		strcpy(uri,"https://");
-		strncat(uri, domain, strlen(domain));
+		memcpy(uri, "https://", HTTPS_PREF_LEN + 1);
+		strncat(uri, domain, MAX_URI_LEN - HTTPS_PREF_LEN - 1);
 		tlsa_ret = getcert(uri, domain, port, &cert_list);
 		if (tlsa_ret == 0) {
 			free_tlsalist(&tlsa_list);
@@ -1664,6 +1672,10 @@ short CheckDane(char *certchain[], int certcount, const uint16_t options,
 	free_certlist(&cert_list);
   
 	return tlsa_res;
+
+#undef HTTPS_PREF
+#undef HTTPS_PREF_LEN
+#undef MAX_URI_LEN
 }
 
 
