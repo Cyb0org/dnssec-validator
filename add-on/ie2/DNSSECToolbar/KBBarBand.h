@@ -99,6 +99,7 @@ extern WORD paneltextadd;
 extern WORD paneltitle;
 extern WORD panelpredonain;
 extern char* paneldomainname;
+extern char tlsapaneldomainname[2800];
 extern WORD panelpostdomain;
 extern WORD paneltext;
 extern short paneltextip;
@@ -112,6 +113,7 @@ extern short tlsaresult;
 extern short filteron;
 extern char listtld[TLD_LIST_MLEN];
 extern bool wrong;
+
 // variable for IE version check
 extern int iRes,iMajor,iMinor;
 //#if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
@@ -218,7 +220,7 @@ public:
 	bool CreateStatusBarText(void);
 	// sets the security status icon
 	void SetSecurityDNSSECStatus(void);
-	void SetSecurityTLSAStatus(void);
+	void SetSecurityTLSAStatus();
 
 	// Index of Bitmap Button	
 	int GetIconIndex(int icon);

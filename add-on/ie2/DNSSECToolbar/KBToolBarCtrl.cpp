@@ -947,7 +947,8 @@ LRESULT CKBToolBarCtrl::DialogProcTlsa(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
 			::SendMessage(::GetDlgItem(hwndDlg, IDOK), BST_UNCHECKED, NULL, NULL);
 
 			// print domain name 
-			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST1_TLSA),paneldomainname);
+			if (debug) ATLTRACE("TLSA Panel Title: %s\n", tlsapaneldomainname);
+			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST1_TLSA),tlsapaneldomainname);
 
 			// load and print titletext from resources
 			LoadStringA(GHins, paneltitletlsa, strbuf, STR_BUF_S);

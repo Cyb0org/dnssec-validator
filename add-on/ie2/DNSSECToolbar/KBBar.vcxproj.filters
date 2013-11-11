@@ -122,7 +122,7 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="dane_states.gen">
-      <Filter>Source Files</Filter>
+      <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
 </Project>
