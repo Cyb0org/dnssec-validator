@@ -44,7 +44,7 @@ WORD statdnssecicon=IDI_DNSSEC_ICON_INIT;
 // for ICON KEY status - not used
 WORD dnsseciconBar;
 
-bool debug = true;
+bool debug = false;
 
 
 char * temp = "";
@@ -78,7 +78,7 @@ WORD paneltextadd  = 0;
 WORD paneltitle  = 0;
 WORD panelpredonain  = 0;
 char* paneldomainname  = 0;
-char tlsapaneldomainname[2800]; 
+char tlsapaneldomainname[280]; 
 WORD panelpostdomain  = 0;
 WORD paneltext  = 0;
 short paneltextip  = 1;

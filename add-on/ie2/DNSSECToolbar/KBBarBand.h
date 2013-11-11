@@ -99,7 +99,7 @@ extern WORD paneltextadd;
 extern WORD paneltitle;
 extern WORD panelpredonain;
 extern char* paneldomainname;
-extern char tlsapaneldomainname[2800];
+extern char tlsapaneldomainname[280];
 extern WORD panelpostdomain;
 extern WORD paneltext;
 extern short paneltextip;

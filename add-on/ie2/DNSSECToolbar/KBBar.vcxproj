@@ -930,17 +930,13 @@ echo Warning : Cannot register Unicode DLL on Windows 95
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="dane-plug.h" />
     <ClInclude Include="hyperlink.h" />
     <ClInclude Include="KBBarBand.h" />
     <ClInclude Include="KBToolBarCtrl.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="StdAfx.h" />
-    <ClInclude Include="ub_ds.h" />
-    <ClInclude Include="uthash.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="dane_states.gen" />
     <None Include="res\key_action.bmp" />
     <None Include="res\key_action.ico" />
     <None Include="res\key_green.bmp" />
@@ -955,7 +951,6 @@ echo Warning : Cannot register Unicode DLL on Windows 95
     <None Include="res\key_red.bmp" />
     <None Include="res\key_red.ico" />
     <None Include="res\mirror_key.ico" />
-    <None Include="ub_dnssec_states.gen" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
