@@ -37,23 +37,28 @@ document.write("<script>");
 	var addr = "0.0.0.0";        // set default IP address
 	var addrbackup = "0.0.0.0";  // set default IP address for backup
 
-	// States of DNSSEC validator
-	var dnssecExtNPAPIConst = {
-		DNSSEC_EXIT_WRONG_RES                      : -2,
-		DNSSEC_EXIT_DNSSEC_OFF                     : -1,
-  		DNSSEC_EXIT_FAILED                         : 0, /* state is unknown or fail*/
-		DNSSEC_EXIT_DOMAIN_UNSECURED 		   : 1, /* domain is not secured */
-  		DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP   : 2, /* domain name is secured by DNSSEC and the IP address of browser is valid */
-  		DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP : 3, /* domain name is secured by DNSSEC but the IP address of browser is invalid */
-  		DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS        : 4, /* domain signature is not valid or chain of trust is not established */
-  		DNSSEC_EXIT_NODOMAIN_UNSECURED             : 5, /* non-existent domain is not secured */
-  		DNSSEC_EXIT_NODOMAIN_SIGNATURE_VALID       : 6, /* non-existent domain is secured by DNSSEC */
-  		DNSSEC_EXIT_NODOMAIN_SIGNATURE_INVALID     : 7, /* non-existent domain is not valid or chain of trust is not established */
-  		DNSSEC_INPUT_FLAG_DEBUGOUTPUT              : 1, /* debug output */
-  		DNSSEC_INPUT_FLAG_USEFWD                   : 2, /* use TCP instead of default UDP */
-  		DNSSEC_INPUT_FLAG_RESOLVIPV4               : 4, /* resolve IPv4 address (A record) */
-  		DNSSEC_INPUT_FLAG_RESOLVIPV6               : 8, /* resolve IPv6 address (AAAA record) */
-	};
+// DNSSEC NPAPI constant returned by binary plugin	
+var dnssecExtNPAPIConst = {
+
+	DNSSEC_RESOLVER_NO_DNSSEC	: -3, /* resolver does not support DNSSEC */
+	DNSSEC_ERROR_RESOLVER		: -2, /* bad resolver or wrong IP address of DNS*/
+	DNSSEC_ERROR_GENERIC		: -1, /* any except those listed above */
+	DNSSEC_OFF			: 0, /* domain name validation disabled */
+
+	DNSSEC_DOMAIN_UNSECURED		: 1, /* domain is not secured */
+	DNSSEC_COT_DOMAIN_SECURED	: 2, /* both domain and connection are secured and IPs is valid */
+	DNSSEC_COT_DOMAIN_SECURED_BAD_IP: 3, /* both domain and connection are secured and IPs are differ */  
+	DNSSEC_COT_DOMAIN_BOGUS		: 4, /* domain signature is not valid or COT is not established */
+	DNSSEC_NXDOMAIN_UNSECURED	: 5, /* non-existent domain is not secured */
+	DNSSEC_NXDOMAIN_SIGNATURE_VALID	: 6, /* domain name does not exist and connection are secured */
+	DNSSEC_NXDOMAIN_SIGNATURE_INVALID: 7, /* domain name does not exist and NSEC/NSEC3 is not valid */
+
+	DNSSEC_FLAG_DEBUG		: 1, /* debug output */
+	DNSSEC_FLAG_USEFWD		: 2, /* use forwarder/resolver */
+	DNSSEC_FLAG_RESOLVIPV4		: 4, /* use IPv4, A for validation */
+	DNSSEC_FLAG_RESOLVIPV6		: 8, /* use IPv6, AAAA for validation */
+};
+
 
         var dnssecModes = {
           // DNSSEC Validation OFF
@@ -251,43 +256,43 @@ function setDNSSECSecurityState(tabId, domain, status, addr, ipval, changeInfo )
 	var c = this.dnssecExtNPAPIConst;	
 	
      	switch (status) {
-	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP: 
+	    case c.DNSSEC_COT_DOMAIN_SECURED: 
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED,
 			tabId, domain, status, addr, ipval, changeInfo);
     		break;
-	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP: 
+	    case c.DNSSEC_COT_DOMAIN_SECURED_BAD_IP: 
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED,
 			tabId, domain, status, addr,  ipval, changeInfo);
 	        break;
-	    case c.DNSSEC_EXIT_NODOMAIN_SIGNATURE_VALID: 
+	    case c.DNSSEC_NXDOMAIN_SIGNATURE_VALID: 
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED,
 			tabId, domain, status, addr,  ipval, changeInfo);
 	        break;
-	    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS:
+	    case c.DNSSEC_COT_DOMAIN_BOGUS:
 	        this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID,
 			tabId, domain, status, addr,  ipval, changeInfo);
 	        break;
-	    case c.DNSSEC_EXIT_NODOMAIN_SIGNATURE_INVALID:
+	    case c.DNSSEC_NXDOMAIN_SIGNATURE_INVALID:
 	        this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID,
 			tabId, domain, status, addr,  ipval, changeInfo);
 	        break;
-	    case c.DNSSEC_EXIT_DOMAIN_UNSECURED:
+	    case c.DNSSEC_DOMAIN_UNSECURED:
 	        this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_DOMAIN_UNSECURED,
 			tabId, domain, status,  addr, ipval, changeInfo);
                 break;
-	    case c.DNSSEC_EXIT_NODOMAIN_UNSECURED:
+	    case c.DNSSEC_NXDOMAIN_UNSECURED:
 	        this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED,
 			tabId, domain, status,  addr, ipval, changeInfo);
 	        break;
-	    case c.DNSSEC_EXIT_DNSSEC_OFF:
+	    case c.DNSSEC_OFF:
 	        this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_OFF,
 			tabId, domain, status, addr, ipval, changeInfo);
 	        break;
-	    case c.DNSSEC_EXIT_WRONG_RES:
+	    case c.DNSSEC_RESOLVER_NO_DNSSEC:
 	        this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_WRONG_RES,
 			tabId, domain, status, addr, ipval, changeInfo);
 	        break;
-	    case c.DNSSEC_EXIT_FAILED:
+	    case c.DNSSEC_ERROR_RESOLVER:
 	    default:
 	        this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_ERROR,
 			tabId, domain, status, addr,  ipval, changeInfo);
@@ -335,10 +340,10 @@ function dnssecvalidate(domain, tabId, changeInfo, tab) {
 	}//if
    
 	var options = 0;
-	if (debug) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-	if (resolver != "nofwd") options |= c.DNSSEC_INPUT_FLAG_USEFWD;
-	if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
-	if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
+	if (debug) options |= c.DNSSEC_FLAG_DEBUG;
+	if (resolver != "nofwd") options |= c.DNSSEC_FLAG_USEFWD;
+	if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
+	if (resolvipv6) options |= c.DNSSEC_FLAG_RESOLVIPV6;
 	    
 	var icon = "dnssec_action.png";
 	chrome.pageAction.setIcon({path: icon, tabId: tabId});
@@ -351,17 +356,17 @@ function dnssecvalidate(domain, tabId, changeInfo, tab) {
 	var result = plugin.Validate(domain, options, resolver, addr);
         console.log(DNSSEC + "Validator result: " + result[0] + "; " + result[1]);
 
-	if (result[0]==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+	if (result[0]==c.DNSSEC_COT_DOMAIN_BOGUS) {
 		console.log(DNSSEC + "Unbound return bogus state: Testing why?");
 		plugin.CacheFree();
 		options = 0;
-	    	if (debug) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-   	    	if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
-	    	if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
+	    	if (debug) options |= c.DNSSEC_FLAG_DEBUG;
+   	    	if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
+	    	if (resolvipv6) options |= c.DNSSEC_FLAG_RESOLVIPV6;
 	    	console.log(DNSSEC + "NOFWD input: " + domain + "; options: " + options  + "; resolver: nofwd; IP-br: " + addr);
 	    	var resultnofwd = plugin.Validate(domain, options, "nofwd", addr);
 	    	console.log(DNSSEC + "NOFWD result: " + resultnofwd[0] + "; " + resultnofwd[1]);
-		if (resultnofwd[0]==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+		if (resultnofwd[0]==c.DNSSEC_COT_DOMAIN_BOGUS) {
 			result[0]=resultnofwd[0];
 			console.log(DNSSEC + "Yes, domain name has bogus");
 			plugin.CacheFree();
@@ -371,7 +376,7 @@ function dnssecvalidate(domain, tabId, changeInfo, tab) {
 		{		   
 			console.log(DNSSEC + "Current resolver does not support DNSSEC!");
 			console.log(DNSSEC + "Results: FWD: " + result[0] + "; NOFWD: " + resultnofwd[0]);
-			result[0]=c.DNSSEC_EXIT_WRONG_RES;
+			result[0]=c.DNSSEC_RESOLVER_NO_DNSSEC;
 			plugin.CacheFree();
 			//fwdinfo=true;
 		}//if		
@@ -450,7 +455,7 @@ function onUrlChange(tabId, changeInfo, tab) {
 	
 	console.log(DNSSEC + 'Validate this domain: ' + validate );
         var c = this.dnssecExtNPAPIConst;
-        var statusdnssec = c.DNSSEC_EXIT_DNSSEC_OFF;
+        var statusdnssec = c.DNSSEC_OFF;
 
      	if (validate) {  
 	    var data = dnssecvalidate(domain, tabId, changeInfo, tab);

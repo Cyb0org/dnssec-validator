@@ -119,7 +119,7 @@ var daneExtUrlBarListener = {
 		//dump('BrowserTLSA: onSecurityChange(' +aState + ')\n');
 		var uri = null;
 		uri = window.gBrowser.currentURI;
-		var tlsares = tlsaValidator.processNewURL(aRequest, uri);
+		tlsaValidator.processNewURL(aRequest, uri);
 	},
 
 	onStateChange: function(aWebProgress, aRequest, aStateFlags, aStatus) {
@@ -185,12 +185,8 @@ init: function() {
 },
 
 getService: function(service_type) {
-	switch (service_type) {
-	case 'cache':
-		return Components.classes["@mozilla.org/network/cache-service;1"]
+	return Components.classes["@mozilla.org/network/cache-service;1"]
 			.getService(Components.interfaces.nsICacheService);
-	break;
-	}
 },
 
 clearMFcache : function(cache) {
@@ -354,10 +350,11 @@ observe: function(channel, topic, data) {
 			else if (daneExtension.debugOutput) 
         		dump(this.DANE_DEBUG_PRE + 'Validate this domain: no'+ this.DANE_DEBUG_POST);	
 		}//tlsaoff
-		else if (daneExtension.debugOutput) { 
-			dump(this.DANE_DEBUG_PRE + 'TLSA Validation is disable'+ this.DANE_DEBUG_POST);
-		}	
-
+		else {
+			if (daneExtension.debugOutput) { 
+				dump(this.DANE_DEBUG_PRE + 'TLSA Validation is disable'+ this.DANE_DEBUG_POST);
+			}	
+		}
 		if (daneExtension.debugOutput) { 
 			dump(tlsaValidator.DANE_DEBUG_POST);	
 		}
@@ -387,7 +384,6 @@ is_in_domain_list: function(dn) {
 
 	var filteron = dnssecExtPrefs.getBool("domainfilteron");
 	var validate = true;
-	var c = dnssecExtNPAPIConst;
 	
 	if (filteron) {
 		var urldomainsepar=/[.]+/;
@@ -471,27 +467,24 @@ processNewURL: function(aRequest, aLocationURI) {
 				if (daneExtension.debugOutput) {
 					dump(this.DANE_DEBUG_PRE + "Connection is NOT secured (no https)" + this.DANE_DEBUG_POST);
 				}
-				tlsaExtHandler.setSecurityState(c.DANE_EXIT_NO_HTTPS);				
-				return c.DANE_EXIT_NO_HTTPS;
+				tlsaExtHandler.setSecurityState(c.DANE_NO_HTTPS);				
 			} 
 			else {
-				var tlsa = c.DANE_EXIT_VALIDATION_OFF;
+				var tlsa = c.DANE_OFF;
 				if (daneExtension.debugOutput) {
 					dump(this.DANE_DEBUG_PRE + "Connection is secured (https)" + this.DANE_DEBUG_POST);
 				}
 
 				var port = (aLocationURI.port == -1) ? 443 : aLocationURI.port;
 
-				tlsa = this.check_tlsa_tab_change(aRequest, asciiHost, port, "tcp");			
-				return tlsa;
+				var tlsa = this.check_tlsa_tab_change(aRequest, asciiHost, port, "tcp");
 			}
 		}	
 		else {
 			if (daneExtension.debugOutput) { 
 				dump(this.DANE_DEBUG_PRE + 'Validate this domain: no'+ this.DANE_DEBUG_POST);
 			}        			
-			tlsaExtHandler.setSecurityState(c.DANE_EXIT_VALIDATION_OFF);
-	  		return c.DANE_EXIT_VALIDATION_OFF; 		
+			tlsaExtHandler.setSecurityState(c.DANE_OFF);		
 		}
 	}
 	else {
@@ -499,8 +492,7 @@ processNewURL: function(aRequest, aLocationURI) {
 			dump(this.DANE_DEBUG_PRE + 'TLSA Validation is disable'+ this.DANE_DEBUG_POST);
 		}
         			
-		tlsaExtHandler.setSecurityState(c.DANE_EXIT_VALIDATION_OFF);
-		return c.DANE_EXIT_VALIDATION_OFF; 
+		tlsaExtHandler.setSecurityState(c.DANE_OFF);
 	}
 },
 
@@ -599,27 +591,23 @@ check_tlsa_tab_change: function (channel, uri, port, protocol) {
 	tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_ACTION);
 	var c = tlsaExtNPAPIConst;
 	var cert = this.getCertificate(window.gBrowser);
-		if (daneExtension.debugOutput) {
-			dump(this.DANE_DEBUG_PRE + "---" +cert + "---"+this.DANE_DEBUG_POST);
-		}
 	if (!cert) {
 		if (daneExtension.debugOutput) {
 			dump(this.DANE_DEBUG_PRE + "No certificate!" + this.DANE_DEBUG_POST);
 		}
-		//tlsaExtHandler.setSecurityState(c.DANE_EXIT_NO_CERT_CHAIN);
-		tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_ACTION);
+		tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_INIT);
 		if (daneExtension.debugOutput) {
 			dump(this.DANE_DEBUG_PRE + "------------- TLSA validation end ------------------" + this.DANE_DEBUG_POST); 
 		}
-		return c.DANE_EXIT_NO_CERT_CHAIN;
+		return c.DANE_NO_CERT_CHAIN;
 	}
           
 	var derCerts = new Array();
 	var chain = cert.getChain();
 	var len = chain.length;
 	for (var i = 0; i < chain.length; i++) {
-		var cert = chain.queryElementAt(i, Components.interfaces.nsIX509Cert);
-		var derData = cert.getRawDER({});
+		var certx = chain.queryElementAt(i, Components.interfaces.nsIX509Cert);
+		var derData = certx.getRawDER({});
 		var derHex = derData.map(function(x) {return ("0"+x.toString(16)).substr(-2);}).join("");
 		derCerts.push(derHex);
 	} //for
@@ -629,10 +617,10 @@ check_tlsa_tab_change: function (channel, uri, port, protocol) {
        
 	var options = 0;
 	if (daneExtension.debugOutput) {
-		options |= c.DANE_INPUT_FLAG_DEBUGOUTPUT;
+		options |= c.DANE_FLAG_DEBUG;
 	}
 	if (dnssecExtPrefs.getInt("dnsserverchoose") != 3) {
-		options |= c.DANE_INPUT_FLAG_USEFWD;
+		options |= c.DANE_FLAG_USEFWD;
 	}
 
 	var nameserver = "";
@@ -645,26 +633,31 @@ check_tlsa_tab_change: function (channel, uri, port, protocol) {
 	}	
 
 	var tlsa = document.getElementById("dane-tlsa-plugin");
+	if (daneExtension.debugOutput) {
+		dump(this.DANE_DEBUG_PRE +"DANE core request: {certchain}, " 
+		  + len +", "+ options +", "+ nameserver +", "+ uri +", "+ 
+		port +", "+ protocol +", "+ policy+ this.DANE_DEBUG_POST); 
+	}	
 	var daneMatch = tlsa.TLSAValidate(derCerts, len, options, nameserver, uri, port, protocol, policy);
 
 	if (daneExtension.debugOutput) {
 		dump(this.DANE_DEBUG_PRE + "Return: " + daneMatch[0] + " for https://" + uri + ";" + this.DANE_DEBUG_POST); 
 	}
 
-	if (daneMatch[0] == c.DANE_EXIT_DNSSEC_BOGUS) { 
+	if (daneMatch[0] == c.DANE_DNSSEC_BOGUS) { 
 
 		options = 0;
 		tlsa.TLSACacheFree();
 		var daneMatchnofwd = tlsa.TLSAValidate(derCerts, len, options, "nofwd", uri, port, protocol, policy);
 
 		if (daneMatchnofwd[0]!=daneMatch[0]) {
-			daneMatch[0]=c.DANE_EXIT_WRONG_RESOLVER;
+			daneMatch[0]=c.DANE_RESOLVER_NO_DNSSEC;
 			tlsa.TLSACacheFree();	
 		}
 	}
 
 	var block = "no";
-   	if (daneMatch[0] <= c.DANE_EXIT_DNSSEC_BOGUS) { 	   	
+   	if (daneMatch[0] >= c.DANE_DNSSEC_BOGUS) { 	   	
 		
 		var cacheitem = tlsaExtCache.getRecord(uri);			
 		if (cacheitem[1] == "no" || cacheitem[1] == "yes") {
@@ -728,7 +721,7 @@ check_tlsa_https: function (channel, cert, browser, domain, port, protocol, url)
 			dump(this.DANE_DEBUG_PRE + "Certificate chain missing!" + this.DANE_DEBUG_POST);
 		}
 
-		tlsaExtHandler.setSecurityState(c.DANE_EXIT_NO_CERT_CHAIN);
+		tlsaExtHandler.setSecurityState(c.DANE_NO_CERT_CHAIN);
 
 		if (daneExtension.debugOutput) {
 			dump(this.DANE_DEBUG_PRE + "----------- TLSA VALIDATION END -------------" + this.DANE_DEBUG_POST);
@@ -740,8 +733,8 @@ check_tlsa_https: function (channel, cert, browser, domain, port, protocol, url)
 	var chain = cert.getChain();
 	var len = chain.length;
 	for (var i = 0; i < chain.length; i++) {  
-		var cert = chain.queryElementAt(i, Components.interfaces.nsIX509Cert);	
-		var derData = cert.getRawDER({});
+		var certx = chain.queryElementAt(i, Components.interfaces.nsIX509Cert);	
+		var derData = certx.getRawDER({});
 		var derHex = derData.map(function(x) {return ("0"+x.toString(16)).substr(-2);}).join("");
 		derCerts.push(derHex);
         } //for
@@ -750,10 +743,10 @@ check_tlsa_https: function (channel, cert, browser, domain, port, protocol, url)
        
 	var options = 0;
 	if (daneExtension.debugOutput) {
-		options |= c.DANE_INPUT_FLAG_DEBUGOUTPUT;
+		options |= c.DANE_FLAG_DEBUG;
 	}
 	if (dnssecExtPrefs.getInt("dnsserverchoose") != 3) {
-		options |= c.DANE_INPUT_FLAG_USEFWD;
+		options |= c.DANE_FLAG_USEFWD;
 	}
 
 	var nameserver = "";
@@ -766,6 +759,11 @@ check_tlsa_https: function (channel, cert, browser, domain, port, protocol, url)
 	}
 
 	var tlsa = document.getElementById("dane-tlsa-plugin");
+	if (daneExtension.debugOutput) {
+		dump(this.DANE_DEBUG_PRE +"DANE core request: {certchain}, " 
+		  + len +", "+ options +", "+ nameserver +", "+ domain +", "+ 
+		port +", "+ protocol +", "+ policy+ this.DANE_DEBUG_POST); 
+	}	
 	var daneMatch = tlsa.TLSAValidate(derCerts, len, options, nameserver, domain, port, protocol, policy);
 
 	if (daneExtension.debugOutput) {
@@ -773,7 +771,7 @@ check_tlsa_https: function (channel, cert, browser, domain, port, protocol, url)
 	}
 
 	var block = "no";
-   	if (daneMatch[0] <= c.DANE_EXIT_DNSSEC_BOGUS) { 	   	
+   	if (daneMatch[0] >= c.DANE_DNSSEC_BOGUS) { 	   	
 		if (channel) {
 			var tlsablock = dnssecExtPrefs.getBool("tlsablocking"); 
 			if (tlsablock) {      
@@ -846,6 +844,7 @@ var tlsaExtHandler = {
   DANE_MODE_VALIDATION_SUCCESS_TYPE1	: "dm_vs1",
   DANE_MODE_VALIDATION_SUCCESS_TYPE2	: "dm_vs2",
   DANE_MODE_VALIDATION_SUCCESS_TYPE3	: "dm_vs3",
+  DANE_MODE_INIT			: "dm_nxdomain",
 
   //DANE/TLSA tooltip	
   DANE_TOOLTIP_VALIDATION_SUCCESS 		: "dmvsTooltip",
@@ -1080,66 +1079,63 @@ var tlsaExtHandler = {
     var c = tlsaExtNPAPIConst;
 
     switch (state) {
-	case c.DANE_EXIT_VALIDATION_OFF:
+	case c.DANE_OFF:
 		this.setMode(this.DANE_MODE_VALIDATION_OFF);
 		break;
- 	case c.DANE_EXIT_NO_TLSA_RECORD:
+ 	case c.DANE_NO_TLSA:
 		this.setMode(this.DANE_MODE_NO_TLSA_RECORD);
 		break;
-	case c.DANE_EXIT_RESOLVER_FAILED:
+	case c.DANE_ERROR_RESOLVER:
 		this.setMode(this.DANE_MODE_RESOLVER_FAILED);
 		break;
-	case c.DANE_EXIT_DNSSEC_BOGUS:
+	case c.DANE_DNSSEC_BOGUS:
 		this.setMode(this.DANE_MODE_DNSSEC_BOGUS);
 		break;
-	case c.DANE_EXIT_DNSSEC_UNSECURED:
+	case c.DANE_DNSSEC_UNSECURED:
 		this.setMode(this.DANE_MODE_DNSSEC_UNSECURED);
 		break;
-	case c.DANE_EXIT_NO_HTTPS:
+	case c.DANE_NO_HTTPS:
 		this.setMode(this.DANE_MODE_NO_HTTPS);
 		break;
-	case c.DANE_EXIT_TLSA_PARAM_ERR:
+	case c.DANE_TLSA_PARAM_ERR:
 		this.setMode(this.DANE_MODE_TLSA_PARAM_WRONG);
 		break;
-	case c.DANE_EXIT_DNSSEC_SECURED:
+	case c.DANE_DNSSEC_SECURED:
 		this.setMode(this.DANE_MODE_DNSSEC_SECURED);
 		break;
-	case c.DANE_EXIT_CERT_ERROR:
+	case c.DANE_CERT_ERROR:
 		this.setMode(this.DANE_MODE_CERT_ERROR);
 		break;
-	case c.DANE_EXIT_NO_CERT_CHAIN:
+	case c.DANE_NO_CERT_CHAIN:
 		this.setMode(this.DANE_MODE_NO_CERT_CHAIN);
 		break;
-	case c.DANE_EXIT_VALIDATION_FALSE:
-		this.setMode(this.DANE_MODE_VALIDATION_FALSE);
-		break;
-	case c.DANE_EXIT_VALIDATION_FALSE_TYPE0:
+	case c.DANE_INVALID_TYPE0:
 		this.setMode(this.DANE_MODE_VALIDATION_FALSE_TYPE0);
 		break;
-	case c.DANE_EXIT_VALIDATION_FALSE_TYPE1:
+	case c.DANE_INVALID_TYPE1:
 		this.setMode(this.DANE_MODE_VALIDATION_FALSE_TYPE1);
 		break;
-	case c.DANE_EXIT_VALIDATION_FALSE_TYPE2:
+	case c.DANE_INVALID_TYPE2:
 		this.setMode(this.DANE_MODE_VALIDATION_FALSE_TYPE2);
 		break;
-	case c.DANE_EXIT_VALIDATION_FALSE_TYPE3:
+	case c.DANE_INVALID_TYPE3:
 		this.setMode(this.DANE_MODE_VALIDATION_FALSE_TYPE3);
 		break;
-	case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE0:
+	case c.DANE_VALID_TYPE0:
 		this.setMode(this.DANE_MODE_VALIDATION_SUCCESS_TYPE0);
 		break;
-	case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE1:
+	case c.DANE_VALID_TYPE1:
 		this.setMode(this.DANE_MODE_VALIDATION_SUCCESS_TYPE1);
 		break;
-	case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE2:
+	case c.DANE_VALID_TYPE2:
 		this.setMode(this.DANE_MODE_VALIDATION_SUCCESS_TYPE2);
 		break;
-	case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE3:
+	case c.DANE_VALID_TYPE3:
 		this.setMode(this.DANE_MODE_VALIDATION_SUCCESS_TYPE3);
 		break;
-	case c.DANE_EXIT_WRONG_RESOLVER:
+	case c.DANE_RESOLVER_NO_DNSSEC:
 		this.setMode(this.DANE_MODE_WRONG_RESOLVER);
-		break;				
+		break;		
       default: this.setMode(this.DANE_MODE_ERROR);
       		break;
     }
@@ -1221,6 +1217,9 @@ var tlsaExtHandler = {
 	     break;
 	case this.DANE_MODE_DNSSEC_BOGUS:
 	     tooltip = this._tooltipLabel[this.DANE_TOOLTIP_DNSSEC_BOGUS];
+	     break;
+	case this.DANE_MODE_INIT:
+	     tooltip = "";
 	     break;
     // Unknown
        default: tooltip = "";
@@ -1326,7 +1325,7 @@ var tlsaExtHandler = {
       return; // Left click, space or enter only
 
     // No popup window while...
-    if (this._tlsaBox && (this._tlsaBox.className == this.DANE_MODE_ACTION )) // getting security status
+    if (this._tlsaBox && ((this._tlsaBox.className == this.DANE_MODE_ACTION) || (this._tlsaBox.className == this.DANE_MODE_INIT) )) // getting security status
       return;
 
     this.hideAddInfo();	

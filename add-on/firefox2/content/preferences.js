@@ -274,20 +274,7 @@ var dnssecExtPrefs = {
 	switch (document.getElementById("dnssec-pref-dnsserverchoose").value) {
 	    case '0': // System setting
          	nameserver = "";
-            	break;
-/*              
-	    case '1': // Preset
-	      switch (document.getElementById("dnssec-pref-dnsserverpresetchoose").value) {
-	        case '1': // OARC's ODVR
-        	nameserver = document.getElementById("dnssec-pref-oarcdnsserveraddr").value;
-	        break;
-	      case '0': // CZ.NIC's ODVR
-	      default:
-	        nameserver =  document.getElementById("dnssec-pref-cznicdnsserveraddr").value;
-	        break;
-	        }
-              break;
-*/              
+            	break;            
 	    case '2': // Custom
          	nameserver = document.getElementById("dnssec-pref-optdnsserveraddr").value;
 		if (!this.checkOptdnsserveraddr()) { 
@@ -316,7 +303,7 @@ var dnssecExtPrefs = {
       testnic = testnic[0];
       //dump('TEST Return: ' + testnic + '\n');
       //this.setLoading(false);
-      if (testnic==0) {
+      if (testnic==-2) {
 	document.getElementById("dnssecok").style.display = 'none';
 	document.getElementById("dnssecbogus").style.display = 'none';
 	document.getElementById("dnssecerror").style.display = 'block';

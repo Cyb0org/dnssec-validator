@@ -97,30 +97,34 @@ var tlsaExtCache = {
 	},
 };
 
-
-// States of TLSA validator
+// DANE NPAPI constant returned by binary plugin
 var tlsaExtNPAPIConst = {
-	DANE_EXIT_VALIDATION_SUCCESS_TYPE0	 : 10,
-	DANE_EXIT_VALIDATION_SUCCESS_TYPE1	 : 11,
-	DANE_EXIT_VALIDATION_SUCCESS_TYPE2	 : 12,
-	DANE_EXIT_VALIDATION_SUCCESS_TYPE3	 : 13,
-	DANE_EXIT_DNSSEC_SECURED		 : 1,
-	DANE_EXIT_VALIDATION_OFF 		 : 0,
-	DANE_EXIT_RESOLVER_FAILED      		 : -1,             
-	DANE_EXIT_NO_HTTPS			 : -2,
-	DANE_EXIT_NO_TLSA_RECORD		 : -3,
-	DANE_EXIT_DNSSEC_UNSECURED		 : -4,
-	DANE_EXIT_DNSSEC_BOGUS			 : -5, 
-	DANE_EXIT_NO_CERT_CHAIN			 : -6,
-	DANE_EXIT_CERT_ERROR			 : -7,
-	DANE_EXIT_TLSA_PARAM_ERR		 : -8,
-	DANE_EXIT_VALIDATION_FALSE		 : -9,
-	DANE_EXIT_VALIDATION_FALSE_TYPE0	 : -10,
-	DANE_EXIT_VALIDATION_FALSE_TYPE1	 : -11,
-	DANE_EXIT_VALIDATION_FALSE_TYPE2	 : -12,
-	DANE_EXIT_VALIDATION_FALSE_TYPE3	 : -13,
-	DANE_INPUT_FLAG_DEBUGOUTPUT              : 1,
-	DANE_INPUT_FLAG_USEFWD                   : 2, 
+
+	DANE_RESOLVER_NO_DNSSEC		: -10, /* resolver does not support DNSSEC */
+	DANE_ERROR_RESOLVER		: -2, /* bad resolver or wrong IP address of DNS*/
+	DANE_ERROR_GENERIC		: -1, /* any except those listed above */
+	DANE_OFF			: 0,  /* domain name validation disabled */
+
+	DANE_NO_HTTPS			: 1,  /* no https connection on the remote server */
+	DANE_DNSSEC_UNSECURED		: 2,  /* domain name or TLSA is not secured by DNSSEC */
+	DANE_NO_TLSA			: 3,  /* domain name have not TLSA */
+	DANE_DNSSEC_SECURED		: 9,  /* domain name or TLSA is secured by DNSSEC */
+	DANE_VALID_TYPE0		: 10, /* Certificate corresponds to TLSA (type 0) */
+	DANE_VALID_TYPE1		: 11, /* Certificate corresponds to TLSA (type 1) */
+	DANE_VALID_TYPE2		: 12, /* Certificate corresponds to TLSA (type 2) */
+	DANE_VALID_TYPE3		: 13, /* Certificate corresponds to TLSA (type 3) */
+
+	DANE_DNSSEC_BOGUS		: 16, /* DNSSEC of domain name or TLSA is bogus */
+	DANE_CERT_ERROR			: 17, /* Server certificate missing */
+	DANE_NO_CERT_CHAIN		: 18, /* Server certificate chain missing */
+	DANE_TLSA_PARAM_ERR		: 19, /* Wrong TLSA parameter(s) */
+	DANE_INVALID_TYPE0		: 20, /* Certificate does not corresponds to TLSA (type 0) */
+	DANE_INVALID_TYPE1		: 21, /* Certificate does not corresponds to TLSA (type 1) */
+	DANE_INVALID_TYPE2		: 22, /* Certificate does not corresponds to TLSA (type 2) */
+	DANE_INVALID_TYPE3		: 23, /* Certificate does not corresponds to TLSA (type 3) */
+
+	DANE_FLAG_DEBUG			: 1, /* debug output */
+	DANE_FLAG_USEFWD		: 2, /* use forwarder/resolver */
 };
 
 var tlsaModes = {
@@ -310,80 +314,76 @@ function setTLSASecurityState(tabId, domain, status, changeInfo ) {
 	var c = this.tlsaExtNPAPIConst;	
 
      	switch (status) {
-	    case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE0: 
+	    case c.DANE_VALID_TYPE0: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE0,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE1: 
+	    case c.DANE_VALID_TYPE1: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE1,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE2: 
+	    case c.DANE_VALID_TYPE2: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE1,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_VALIDATION_SUCCESS_TYPE3: 
+	    case c.DANE_VALID_TYPE3: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE3,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_DNSSEC_SECURED: 
+	    case c.DANE_DNSSEC_SECURED: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_DNSSEC_SECURED,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_VALIDATION_OFF: 
+	    case c.DANE_OFF: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_OFF,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_RESOLVER_FAILED: 
+	    case c.DANE_ERROR_RESOLVER: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_RESOLVER_FAILED,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_NO_HTTPS: 
+	    case c.DANE_NO_HTTPS: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_NO_HTTPS,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_NO_TLSA_RECORD: 
+	    case c.DANE_NO_TLSA: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_NO_TLSA_RECORD,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_DNSSEC_UNSECURED: 
+	    case c.DANE_DNSSEC_UNSECURED: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_DNSSEC_UNSECURED,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_DNSSEC_BOGUS: 
+	    case c.DANE_DNSSEC_BOGUS: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_DNSSEC_BOGUS,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_NO_CERT_CHAIN: 
+	    case c.DANE_NO_CERT_CHAIN: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_NO_CERT_CHAIN,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_CERT_ERROR: 
+	    case c.DANE_CERT_ERROR: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_CERT_ERROR,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_TLSA_PARAM_ERR: 
+	    case c.DANE_TLSA_PARAM_ERR: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_TLSA_PARAM_WRONG,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_VALIDATION_FALSE_TYPE0: 
+	    case c.DANE_INVALID_TYPE0: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE0,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_VALIDATION_FALSE_TYPE1: 
+	    case c.DANE_INVALID_TYPE1: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE1,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_VALIDATION_FALSE_TYPE2: 
+	    case c.DANE_INVALID_TYPE2: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE2,
 			tabId, domain, status, changeInfo);
     		break;
-	    case c.DANE_EXIT_VALIDATION_FALSE_TYPE3: 
+	    case c.DANE_INVALID_TYPE3: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE3,
-			tabId, domain, status, changeInfo);
-    		break;
-	    case c.DANE_EXIT_VALIDATION_FALSE: 
-		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_FALSE,
 			tabId, domain, status, changeInfo);
     		break;
 	    default:
@@ -445,14 +445,15 @@ function TLSAvalidate(scheme, domain, port){
 	else console.log(DANE + 'Domain filter: OFF');
 	console.log(DANE + 'Validate this domain: ' + validate );
     	var c = this.tlsaExtNPAPIConst;
-	var result = c.DANE_EXIT_VALIDATION_OFF;
+	var result = c.DANE_OFF;
 
      	if (validate) { 
 		if (scheme == "https") { 
 		        var tlsa = document.getElementById("tlsa-plugin");
 			var options = 0;
 			var c = this.tlsaExtNPAPIConst;
-			options |= c.DANE_INPUT_FLAG_DEBUGOUTPUT;
+			if (debug) options |= c.DNSSEC_FLAG_DEBUG;
+			if (resolver != "nofwd") options |= c.DNSSEC_FLAG_USEFWD;
 			var certchain = new Array();
 		        certchain.push("xxx");
 			var len = certchain.length;
@@ -460,7 +461,7 @@ function TLSAvalidate(scheme, domain, port){
 			var daneMatch = tlsa.TLSAValidate(certchain, len, options, resolver, domain, port, "tcp", 1);
 			result = daneMatch[0];
 		}
-		else  result = c.DANE_EXIT_NO_HTTPS;
+		else  result = c.DANE_NO_HTTPS;
         }	
 	console.log(DANE + "TLSA Validator result: " + result);
 	console.log(DANE + "--------- End of TLSA Validation ("+ scheme +":"+ domain +":"+ port +") ---------");
@@ -598,7 +599,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 
    		var c = this.tlsaExtNPAPIConst;
 		var result = onBeforeRequest(details.tabId, details.url);
-		if (result <= c.DANE_EXIT_DNSSEC_BOGUS) {
+		if (result >= c.DANE_DNSSEC_BOGUS) {
 			var block = "no";				
 			var blockhttps = localStorage["blockhttps"];
 	   		blockhttps = (blockhttps == undefined || blockhttps == "false") ? false : true;	

@@ -29,26 +29,31 @@ such a combination shall include the source code for the parts of
 OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
-  const short DANE_EXIT_VALIDATION_SUCCESS_TYPE0	 = 10;
-  const short DANE_EXIT_VALIDATION_SUCCESS_TYPE1	 = 11;
-  const short DANE_EXIT_VALIDATION_SUCCESS_TYPE2	 = 12;
-  const short DANE_EXIT_VALIDATION_SUCCESS_TYPE3	 = 13;
-  const short DANE_EXIT_DNSSEC_SECURED			 = 1;
-  const short DANE_EXIT_VALIDATION_OFF 			 = 0;
-  const short DANE_EXIT_RESOLVER_FAILED      		 = -1;             
-  const short DANE_EXIT_NO_HTTPS			 = -2;
-  const short DANE_EXIT_NO_TLSA_RECORD			 = -3;
-  const short DANE_EXIT_DNSSEC_UNSECURED		 = -4;
-  const short DANE_EXIT_DNSSEC_BOGUS			 = -5; 
-  const short DANE_EXIT_NO_CERT_CHAIN			 = -6;
-  const short DANE_EXIT_CERT_ERROR			 = -7;
-  const short DANE_EXIT_TLSA_PARAM_ERR			 = -8;
-  const short DANE_EXIT_VALIDATION_FALSE		 = -9;
-  const short DANE_EXIT_VALIDATION_FALSE_TYPE0		 = -10;
-  const short DANE_EXIT_VALIDATION_FALSE_TYPE1		 = -11;
-  const short DANE_EXIT_VALIDATION_FALSE_TYPE2		 = -12;
-  const short DANE_EXIT_VALIDATION_FALSE_TYPE3		 = -13;
 
-  const unsigned short DANE_INPUT_FLAG_DEBUGOUTPUT       = 1; /* debug output */
-  const unsigned short DANE_INPUT_FLAG_USEFWD            = 2; /* use forvarder/resolver */
+const short DANE_RESOLVER_NO_DNSSEC	= -10; /* resolver does not support DNSSEC */
+const short DANE_ERROR_RESOLVER		= -2; /* bad resolver or wrong IP address of DNS*/
+const short DANE_ERROR_GENERIC		= -1; /* any except those listed above */
+const short DANE_OFF			= 0;  /* domain name validation disabled */
+
+const short DANE_NO_HTTPS		= 1;  /* no https connection on the remote server */
+const short DANE_DNSSEC_UNSECURED	= 2;  /* domain name or TLSA is not secured by DNSSEC */
+const short DANE_NO_TLSA		= 3;  /* domain name have not TLSA */
+const short DANE_DNSSEC_SECURED		= 9;  /* domain name or TLSA is secured by DNSSEC */
+const short DANE_VALID_TYPE0		= 10; /* Certificate corresponds to TLSA (type 0) */
+const short DANE_VALID_TYPE1		= 11; /* Certificate corresponds to TLSA (type 1) */
+const short DANE_VALID_TYPE2		= 12; /* Certificate corresponds to TLSA (type 2) */
+const short DANE_VALID_TYPE3		= 13; /* Certificate corresponds to TLSA (type 3) */
+
+const short DANE_DNSSEC_BOGUS		= 16; /* DNSSEC of domain name or TLSA is bogus */
+const short DANE_CERT_ERROR		= 17; /* Server certificate missing */
+const short DANE_NO_CERT_CHAIN		= 18; /* Server certificate chain missing */
+const short DANE_TLSA_PARAM_ERR		= 19; /* Wrong TLSA parameter(s) */
+const short DANE_INVALID_TYPE0		= 20; /* Certificate does not corresponds to TLSA (type 0) */
+const short DANE_INVALID_TYPE1		= 21; /* Certificate does not corresponds to TLSA (type 1) */
+const short DANE_INVALID_TYPE2		= 22; /* Certificate does not corresponds to TLSA (type 2) */
+const short DANE_INVALID_TYPE3		= 23; /* Certificate does not corresponds to TLSA (type 3) */
+
+const unsigned short DANE_FLAG_DEBUG	= 1; /* debug output */
+const unsigned short DANE_FLAG_USEFWD	= 2; /* use forwarder/resolver */
+
 

@@ -1,46 +1,72 @@
-	// DNSSEC NPAPI constant returned by binary plugin	
-	var dnssecExtNPAPIConst = {
-		DNSSEC_EXIT_VALIDATION_OFF                 : -1, /* DNSSEC validation is OFF*/
-		DNSSEC_EXIT_WRONG_RESOLVER                 : -2, /* resolver does not support DNSSEC*/	
-  		DNSSEC_EXIT_FAILED                         : 0, /* state is unknown or fail*/
-		DNSSEC_EXIT_DOMAIN_UNSECURED 		   	   : 1, /* domain is not secured */
-  		DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP   : 2, /* domain name is secured by DNSSEC and the IP address of browser is valid */
-  		DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP : 3, /* domain name is secured by DNSSEC but the IP address of browser is invalid */
-  		DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS        : 4, /* domain signature is not valid or chain of trust is not established */
-  		DNSSEC_EXIT_NODOMAIN_UNSECURED             : 5, /* non-existent domain is not secured */
-  		DNSSEC_EXIT_NODOMAIN_SIGNATURE_VALID       : 6, /* non-existent domain is secured by DNSSEC */
-  		DNSSEC_EXIT_NODOMAIN_SIGNATURE_INVALID     : 7, /* non-existent domain is not valid or chain of trust is not established */
-  		DNSSEC_INPUT_FLAG_DEBUGOUTPUT              : 1, /* debug output */
-  		DNSSEC_INPUT_FLAG_USEFWD                   : 2, /* use forwarder instead of default unbound servers */
-  		DNSSEC_INPUT_FLAG_RESOLVIPV4               : 4, /* resolve IPv4 address (A record) */
-  		DNSSEC_INPUT_FLAG_RESOLVIPV6               : 8, /* resolve IPv6 address (AAAA record) */
-	};
+/* ***** BEGIN LICENSE BLOCK *****
+Copyright 2013 CZ.NIC, z.s.p.o.
 
+Authors: Martin Straka <martin.straka@nic.cz>
 
-	// DANE NPAPI constant returned by binary plugin
-	var tlsaExtNPAPIConst = {
-  		DANE_EXIT_VALIDATION_SUCCESS_TYPE0	 : 10, /* Validation of TLSA record (type0) is success */
- 		DANE_EXIT_VALIDATION_SUCCESS_TYPE1	 : 11, /* Validation of TLSA record (type1) is success */
-		DANE_EXIT_VALIDATION_SUCCESS_TYPE2	 : 12, /* Validation of TLSA record (type2) is success */
-		DANE_EXIT_VALIDATION_SUCCESS_TYPE3	 : 13, /* Validation of TLSA record (type3) is success */
-		DANE_EXIT_WRONG_RESOLVER             : 2, /* resolver does not support DNSSEC*/	
-		DANE_EXIT_DNSSEC_SECURED		 : 1,  /* DANE: dnssec is secured - no used now */
-		DANE_EXIT_VALIDATION_OFF 		 : 0,  /* Validation of TLSA record is off for this domain */
-		DANE_EXIT_RESOLVER_FAILED      		 : -1, /* state is unknown or fail */            
-		DANE_EXIT_NO_HTTPS			 : -2, /* current url is not https */
-		DANE_EXIT_NO_TLSA_RECORD		 : -3, /* TLSA record for this domain does not exists */
-		DANE_EXIT_DNSSEC_UNSECURED		 : -4, /* Dnssec is insecured, TLSA will not starts */
-		DANE_EXIT_DNSSEC_BOGUS			 : -5, /* Dnssec signature is bogus, TLSA validation is stop */
-		DANE_EXIT_NO_CERT_CHAIN			 : -6, /* No certificate chain for this server */
-		DANE_EXIT_CERT_ERROR			 : -7,  /* Certificate error */
-		DANE_EXIT_TLSA_PARAM_ERR		 : -8,  /* Wrong parameters of TLSA record */
-		DANE_EXIT_VALIDATION_FALSE		 : -9,  /* Validation of TLSA record is false */
-		DANE_EXIT_VALIDATION_FALSE_TYPE0	 : -10, /* Validation of TLSA record (type0) is false */
-		DANE_EXIT_VALIDATION_FALSE_TYPE1	 : -11, /* Validation of TLSA record (type1) is false */
-		DANE_EXIT_VALIDATION_FALSE_TYPE2	 : -12, /* Validation of TLSA record (type2) is false */
-		DANE_EXIT_VALIDATION_FALSE_TYPE3	 : -13, /* Validation of TLSA record (type3) is false */
-  		DANE_INPUT_FLAG_DEBUGOUTPUT              : 1, /* debug output */
-  		DANE_INPUT_FLAG_USEFWD                   : 2, /* use forwarder instead of default unbound servers */
-  		DANE_INPUT_FLAG_RESOLVIPV4               : 4, /* resolve IPv4 address (A record) */
-  		DANE_INPUT_FLAG_RESOLVIPV6               : 8, /* resolve IPv6 address (AAAA record) */
-	};
+This file is part of DNSSEC/TLSA Validator 2 Add-on.
+
+DNSSEC/TLSA Validator 2 Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC/TLSA Validator 2 Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC/TLSA Validator 2 Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** */
+
+// DNSSEC NPAPI constant returned by binary plugin	
+var dnssecExtNPAPIConst = {
+
+	DNSSEC_RESOLVER_NO_DNSSEC	: -3, /* resolver does not support DNSSEC */
+	DNSSEC_ERROR_RESOLVER		: -2, /* bad resolver or wrong IP address of DNS*/
+	DNSSEC_ERROR_GENERIC		: -1, /* any except those listed above */
+	DNSSEC_OFF			: 0, /* domain name validation disabled */
+
+	DNSSEC_DOMAIN_UNSECURED		: 1, /* domain is not secured */
+	DNSSEC_COT_DOMAIN_SECURED	: 2, /* both domain and connection are secured and IPs is valid */
+	DNSSEC_COT_DOMAIN_SECURED_BAD_IP: 3, /* both domain and connection are secured and IPs are differ */  
+	DNSSEC_COT_DOMAIN_BOGUS		: 4, /* domain signature is not valid or COT is not established */
+	DNSSEC_NXDOMAIN_UNSECURED	: 5, /* non-existent domain is not secured */
+	DNSSEC_NXDOMAIN_SIGNATURE_VALID	: 6, /* domain name does not exist and connection are secured */
+	DNSSEC_NXDOMAIN_SIGNATURE_INVALID: 7, /* domain name does not exist and NSEC/NSEC3 is not valid */
+
+	DNSSEC_FLAG_DEBUG		: 1, /* debug output */
+	DNSSEC_FLAG_USEFWD		: 2, /* use forwarder/resolver */
+	DNSSEC_FLAG_RESOLVIPV4		: 4, /* use IPv4, A for validation */
+	DNSSEC_FLAG_RESOLVIPV6		: 8, /* use IPv6, AAAA for validation */
+};
+
+// DANE NPAPI constant returned by binary plugin
+var tlsaExtNPAPIConst = {
+
+	DANE_RESOLVER_NO_DNSSEC		: -10, /* resolver does not support DNSSEC */
+	DANE_ERROR_RESOLVER		: -2, /* bad resolver or wrong IP address of DNS*/
+	DANE_ERROR_GENERIC		: -1, /* any except those listed above */
+	DANE_OFF			: 0,  /* domain name validation disabled */
+
+	DANE_NO_HTTPS			: 1,  /* no https connection on the remote server */
+	DANE_DNSSEC_UNSECURED		: 2,  /* domain name or TLSA is not secured by DNSSEC */
+	DANE_NO_TLSA			: 3,  /* domain name have not TLSA */
+	DANE_DNSSEC_SECURED		: 9,  /* domain name or TLSA is secured by DNSSEC */
+	DANE_VALID_TYPE0		: 10, /* Certificate corresponds to TLSA (type 0) */
+	DANE_VALID_TYPE1		: 11, /* Certificate corresponds to TLSA (type 1) */
+	DANE_VALID_TYPE2		: 12, /* Certificate corresponds to TLSA (type 2) */
+	DANE_VALID_TYPE3		: 13, /* Certificate corresponds to TLSA (type 3) */
+
+	DANE_DNSSEC_BOGUS		: 16, /* DNSSEC of domain name or TLSA is bogus */
+	DANE_CERT_ERROR			: 17, /* Server certificate missing */
+	DANE_NO_CERT_CHAIN		: 18, /* Server certificate chain missing */
+	DANE_TLSA_PARAM_ERR		: 19, /* Wrong TLSA parameter(s) */
+	DANE_INVALID_TYPE0		: 20, /* Certificate does not corresponds to TLSA (type 0) */
+	DANE_INVALID_TYPE1		: 21, /* Certificate does not corresponds to TLSA (type 1) */
+	DANE_INVALID_TYPE2		: 22, /* Certificate does not corresponds to TLSA (type 2) */
+	DANE_INVALID_TYPE3		: 23, /* Certificate does not corresponds to TLSA (type 3) */
+
+	DANE_FLAG_DEBUG			: 1, /* debug output */
+	DANE_FLAG_USEFWD		: 2, /* use forwarder/resolver */
+};

@@ -26,7 +26,7 @@ PLUGIN_FB_B = FireBreath/build
 PLUGIN_NAME_LIB = plugins-lib
 PLUGIN_ADD_ON = packages
 ADDON_PATH_FF = add-on/firefox2
-ADDON_PATH_CR = add-on/chrome2
+ADDON_PATH_CR = add-on/chrome2dnssec
 ADDON_PATH_CR_TLSA = add-on/chrome2tlsa
 #EXTENSION_VERSION = $(shell cat add-on/firefox2/install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p')
 EXTENSION_VERSION = $(shell cat Version)
@@ -66,7 +66,7 @@ xpi_x86:
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x86.so $(ADDON_PATH_CR_TLSA)
 	sed -e 's/dnssecplugin/np$(PLUGIN_NAME_DNSSEC)_x86.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
 	sed -e 's/tlsaplugin/np$(PLUGIN_NAME_TLSA)_x86.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR_TLSA)/manifest.json.template > $(ADDON_PATH_CR_TLSA)/manifest.json
-	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz chrome2 && mv CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz ../$(PLUGIN_ADD_ON)
+	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz chrome2dnssec && mv CR-dnssec_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz ../$(PLUGIN_ADD_ON)
 	cd add-on && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz chrome2tlsa && mv CR-tlsa_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz ../$(PLUGIN_ADD_ON)
 	cd $(ADDON_PATH_CR) && rm -rf np$(PLUGIN_NAME_DNSSEC)_x86.so manifest.json
 	cd $(ADDON_PATH_CR_TLSA) && rm -rf manifest.json np$(PLUGIN_NAME_TLSA)_x86.so
@@ -88,7 +88,7 @@ sys_freebsd_x64:
 	rm -rf $(PLUGIN_FB_S)	
 	@echo '### ...Plugin x64 FreeBSD ... Done. ###'
 xpi_x64:
-	@echo '### Creating package for Firefox Linux x64... ###'
+	@echo '### Creating package for Firefox FreeBSD x64... ###'
 	rm -rf $(ADDON_PATH_FF)/plugins
 	mkdir $(ADDON_PATH_FF)/plugins
 	chmod 777 $(ADDON_PATH_FF)/build.sh
@@ -105,7 +105,7 @@ xpi_x64:
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x64.so $(ADDON_PATH_CR_TLSA)
 	sed -e 's/dnssecplugin/np$(PLUGIN_NAME_DNSSEC)_x64.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
 	sed -e 's/tlsaplugin/np$(PLUGIN_NAME_TLSA)_x64.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR_TLSA)/manifest.json.template > $(ADDON_PATH_CR_TLSA)/manifest.json
-	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-freebsd-x64.tar.gz chrome2 && mv CR-dnssec_validator-$(EXTENSION_VERSION)-freebsd-x64.tar.gz ../$(PLUGIN_ADD_ON)
+	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-freebsd-x64.tar.gz chrome2dnssec && mv CR-dnssec_validator-$(EXTENSION_VERSION)-freebsd-x64.tar.gz ../$(PLUGIN_ADD_ON)
 	cd add-on && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-freebsd-x64.tar.gz chrome2tlsa && mv CR-tlsa_validator-$(EXTENSION_VERSION)-freebsd-x64.tar.gz ../$(PLUGIN_ADD_ON)
 	cd $(ADDON_PATH_CR) && rm -rf np$(PLUGIN_NAME_DNSSEC)_x64.so manifest.json
 	cd $(ADDON_PATH_CR_TLSA) && rm -rf manifest.json np$(PLUGIN_NAME_TLSA)_x64.so

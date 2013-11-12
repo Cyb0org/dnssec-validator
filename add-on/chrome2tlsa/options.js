@@ -233,7 +233,7 @@ function testdnssec() {
 					document.getElementById("messageerror").style.display = 'none';
 					document.getElementById("messageip").style.display = 'none';
 			      }
-			      else if (testnic==-5) {
+			      else if (testnic==16) {
 					document.getElementById("messageok").style.display = 'none';
 					document.getElementById("messagebogus").style.display = 'block';
 					document.getElementById("messageerror").style.display = 'none';

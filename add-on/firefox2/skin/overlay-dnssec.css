@@ -53,7 +53,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-box.wrongresolver > #dnssec-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/dnssec_white.png"); /* 35x16 */
+  list-style-image: url("chrome://dnssec/skin/dnssec_error.png"); /* 35x16 */
 }
 
 #dnssec-box.actionDnssec > #dnssec-icon {

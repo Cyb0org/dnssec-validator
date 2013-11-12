@@ -29,6 +29,10 @@ such a combination shall include the source code for the parts of
 OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
+#ifndef _DNSSEC_PLUG_H_
+#define _DNSSEC_PLUG_H_
+
+
 #ifndef XP_WIN
   #include <stdint.h>
 #else
@@ -65,3 +69,5 @@ void ub_context_free(void);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* _DNSSEC_PLUG_H_ */

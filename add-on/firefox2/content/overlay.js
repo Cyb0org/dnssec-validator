@@ -19,10 +19,6 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-
-//Components.utils.import("resource://gre/modules/ctypes.jsm");
-//Components.utils.import("resource://gre/modules/AddonManager.jsm"); 
-
 window.addEventListener("load", function() { dnssecExtension.init(); }, false);
 window.addEventListener("unload", function() { dnssecExtension.uninit(); }, false);
 
@@ -31,8 +27,8 @@ var dnssecExtUrlBarListener = {
   onLocationChange: function(aWebProgress, aRequest, aLocationURI)
   {
     //dump('Browser: onLocationChange()\n');
-    var host = dnssecExtension.processNewURL(aLocationURI);
-    //var tlsares = tlsaValidator.processNewURL(aRequest, aLocationURI);     	
+    dnssecExtension.processNewURL(aLocationURI);
+
   },
 
   onSecurityChange: function(aWebProgress, aRequest, aState)
@@ -162,8 +158,7 @@ var dnssecExtension = {
       dnssecExtPrefs.setChar("dnsserveraddr", "nofwd");  // Save default settings of resolver
       dnssecExtPrefs.setBool("usefwd", true);  // Save default settings of resolver
       dnssecExtPrefs.setInt("dnsserverchoose", 3);  // Save default settings of resolver
-      //dnssecExtPrefs.setInt("tlsa", true);  // Save default settings of resolver
-      //dnssecExtPrefs.setInt("tlsablocking", true);  // Save default settings of resolver
+
       // Define timer callback
       this.timer.initWithCallback(
         function() {
@@ -264,7 +259,7 @@ var dnssecExtension = {
 
     // Check DNS security
     dnssecExtHandler.checkSecurity(asciiHost, utf8Host);
-    return asciiHost;
+    
   },
 };//class
 
@@ -292,11 +287,11 @@ var dnssecExtResolver = {
     // Create variable to pass options
     var c = dnssecExtNPAPIConst;
     var options = 0;
-//    if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-    if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-    if (dnssecExtPrefs.getInt("dnsserverchoose") != 3) options |= c.DNSSEC_INPUT_FLAG_USEFWD;
-    if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
-    if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
+
+    if (dnssecExtension.debugOutput) options |= c.DNSSEC_FLAG_DEBUG;
+    if (dnssecExtPrefs.getInt("dnsserverchoose") != 3) options |= c.DNSSEC_FLAG_USEFWD;
+    if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
+    if (resolvipv6) options |= c.DNSSEC_FLAG_RESOLVIPV6;
 
         // Check browser's IP address(es)
     var addr = null;
@@ -358,10 +353,10 @@ var dnssecExtResolver = {
 	var dsp = document.getElementById("dnssec-plugin");
 	dsp.CacheFree();
 	var options = 0;
-	//if (dnssecExtension.debugOutput) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-	if (false) options |= c.DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-   	if (resolvipv4) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV4;
-	if (resolvipv6) options |= c.DNSSEC_INPUT_FLAG_RESOLVIPV6;
+	
+	if (dnssecExtension.debugOutput) options |= c.DNSSEC_FLAG_DEBUG;
+   	if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
+	if (resolvipv6) options |= c.DNSSEC_FLAG_RESOLVIPV6;
 	if (dnssecExtension.debugOutput)
           dump(dnssecExtension.debugPrefix + "NOFWD parameters: " + dn + "; options: " + options  + "; resolver: nofwd; IP-br: " + addr + ';\n');
 
@@ -400,7 +395,7 @@ var dnssecExtResolver = {
     var restmp = resArr[0];
     var ipvalidator = resArr[1];
     
-    if (restmp==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+    if (restmp==c.DNSSEC_COT_DOMAIN_BOGUS) {
 		if (ext.debugOutput) dump(ext.debugPrefix + 'Yes, domain name has DNSSEC bogus\n');
 		res=restmp;
     } 
@@ -409,7 +404,7 @@ var dnssecExtResolver = {
 		if (ext.debugOutput) dump(ext.debugPrefix + "Results: FWD: " + res + "; NOFWD: " + restmp +"\n");
 		var dsp = document.getElementById("dnssec-plugin");
 		dsp.CacheFree();
-		res=c.DNSSEC_EXIT_WRONG_RESOLVER;
+		res=c.DNSSEC_RESOLVER_NO_DNSSEC;
     }//if
 		
     // Set appropriate state if host name does not changed
@@ -449,7 +444,7 @@ var dnssecExtResolver = {
 
     var c = dnssecExtNPAPIConst;
     var d = tlsaExtNPAPIConst;
-    if (res==c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+    if (res==c.DNSSEC_COT_DOMAIN_BOGUS) {
       	if (ext.debugOutput) dump(ext.debugPrefix + "Unbound return bogus state: Testing why?\n");
 	this.revalidate(dn,addr,res);
 	return;
@@ -543,7 +538,7 @@ var dnssecExtResolver = {
      }
      else {
      // no DNSSEC validation resolve
-        dnssecExtHandler.setSecurityState(c.DNSSEC_EXIT_VALIDATION_OFF);
+        dnssecExtHandler.setSecurityState(c.DNSSEC_OFF);
         // Reset resolving flag
         if (dnssecExtension.debugOutput) {
           dump(dnssecExtension.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
@@ -567,7 +562,7 @@ var dnssecExtResolver = {
 var dnssecExtHandler = {
 
   // Mode strings used to control CSS display
-  // -2 .Current resolver does not support DNSSEC
+  // -3 .Current resolver does not support DNSSEC
   DNSSEC_MODE_WRONG_RESOLVER                    : "wrongresolver",
   // 1. No DNSSEC signature
   DNSSEC_MODE_DOMAIN_UNSECURED                    : "unsecuredDomain",
@@ -589,8 +584,11 @@ var dnssecExtHandler = {
   DNSSEC_MODE_INACTION : "inactionDnssec",
   // Error or unknown state occured
   DNSSEC_MODE_ERROR : "errorDnssec",
-  // -1. DNSSEC OFF
+  // 0. DNSSEC OFF
   DNSSEC_MODE_OFF   : "dnssecOff",
+
+  DNSSEC_MODE_ERROR_GENERIC : "GenericError",
+
   // Tooltips
   DNSSEC_TOOLTIP_SECURED   : "securedTooltip",
   DNSSEC_TOOLTIP_UNSECURED : "unsecuredTooltip",
@@ -831,45 +829,48 @@ var dnssecExtHandler = {
 
     switch (state) {
 	// 1
-    case c.DNSSEC_EXIT_DOMAIN_UNSECURED:
+    case c.DNSSEC_DOMAIN_UNSECURED:
       this.setMode(this.DNSSEC_MODE_DOMAIN_UNSECURED);
       break;
 	// 2
-    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP: 
+    case c.DNSSEC_COT_DOMAIN_SECURED: 
 	this.setMode(this.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED);
     	break;
 	// 3
-    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP: 
+    case c.DNSSEC_COT_DOMAIN_SECURED_BAD_IP: 
 	this.setMode(this.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED);
         break;
 	// 4
-    case c.DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS:
+    case c.DNSSEC_COT_DOMAIN_BOGUS:
         this.setMode(this.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID);
       break;
 	// 5
-    case c.DNSSEC_EXIT_NODOMAIN_UNSECURED:
+    case c.DNSSEC_NXDOMAIN_UNSECURED:
       this.setMode(this.DNSSEC_MODE_NODOMAIN_UNSECURED);
       break;
 	// 6	
-    case c.DNSSEC_EXIT_NODOMAIN_SIGNATURE_VALID: 
+    case c.DNSSEC_NXDOMAIN_SIGNATURE_VALID: 
 	this.setMode(this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID);
       break;
 	// 7
-    case c.DNSSEC_EXIT_NODOMAIN_SIGNATURE_INVALID:
+    case c.DNSSEC_NXDOMAIN_SIGNATURE_INVALID:
       this.setMode(this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID);
       break;     
-	// -1
-    case c.DNSSEC_EXIT_VALIDATION_OFF:
+	// 0
+    case c.DNSSEC_OFF:
       this.setMode(this.DNSSEC_MODE_OFF);
       break;
-      //-2
-    case c.DNSSEC_EXIT_WRONG_RESOLVER:
+      //-3
+    case c.DNSSEC_RESOLVER_NO_DNSSEC:
       this.setMode(this.DNSSEC_MODE_WRONG_RESOLVER);
       break;
-	// 0
-    case c.DNSSEC_EXIT_FAILED:
-    default:
+	// -2
+    case c.DNSSEC_ERROR_RESOLVER:
       this.setMode(this.DNSSEC_MODE_ERROR);
+      break;
+	// -1
+    default:
+      this.setMode(this.DNSSEC_MODE_ERROR_GENERIC);
       break;
     }
   },
@@ -1017,6 +1018,9 @@ var dnssecExtHandler = {
       tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_ACTION];
       break;
     // An error occured
+    case this.DNSSEC_MODE_ERROR_GENERIC:
+      tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_ERROR];
+      break;
     case this.DNSSEC_MODE_ERROR:
       tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_ERROR];
       break;
