@@ -603,7 +603,7 @@ check_tlsa_tab_change: function (channel, domain, port, protocol) {
 		if (daneExtension.debugOutput) {
 			dump(this.DANE_DEBUG_PRE + "------------- TLSA validation end ------------------" + this.DANE_DEBUG_POST); 
 		}
-		return c.DANE_NO_CERT_CHAIN;
+		return null;
 	}
           
 	var derCerts = new Array();
@@ -658,7 +658,7 @@ check_tlsa_tab_change: function (channel, domain, port, protocol) {
 		}
 		// Set error mode
 		tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_ERROR);
-	      	return;
+	      	return null;
 	}
 
 	if (daneMatch[0] == c.DANE_DNSSEC_BOGUS) { 
@@ -667,8 +667,8 @@ check_tlsa_tab_change: function (channel, domain, port, protocol) {
 		tlsa.TLSACacheFree();
 		var daneMatchnofwd = tlsa.TLSAValidate(derCerts, len, options, "nofwd", domain, port, protocol, policy);
 
-		if (daneMatchnofwd[0]!=daneMatch[0]) {
-			daneMatch[0]=c.DANE_RESOLVER_NO_DNSSEC;
+		if (daneMatchnofwd[0] != daneMatch[0]) {
+			daneMatch[0] = c.DANE_RESOLVER_NO_DNSSEC;
 			tlsa.TLSACacheFree();	
 		}
 	}
@@ -718,8 +718,6 @@ check_tlsa_tab_change: function (channel, domain, port, protocol) {
 	if (daneExtension.debugOutput) {
 		dump(this.DANE_DEBUG_PRE + "------------ TLSA validation end ------------------" + this.DANE_DEBUG_POST);
 	}
-
-	return daneMatch[0];
 },
 
 //--------------------------------------------------------------
