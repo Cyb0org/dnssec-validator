@@ -83,8 +83,8 @@ ds_options opts;
 
 //----------------------------------------------------------------------------
 
-static struct ub_ctx* ctx = NULL;     // ub context structure
-char ip_validator[256]; // return IP address(es) of validator
+static struct ub_ctx *ctx = NULL; // ub context structure
+char ip_validated[256]; // holds resolved and validated IP address(es)
 
 static
 int printf_debug(const char *fmt, ...)
@@ -217,7 +217,7 @@ short ipv6matches(const char *ipbrowser, const char *ipvalidator)
 	int isequal = 0;
 
 	printf_debug("IP matches: %s %s\n", ipbrowser, ipvalidator);
-	strcpy(ip_validator, ipvalidator);
+	strcpy(ip_validated, ipvalidator);
 
 	if ((ipbrowser != NULL) && (ipbrowser[0] != '\0') &&
 	    (ipvalidator != NULL) && (ipvalidator[0] != '\0')) {
@@ -270,7 +270,7 @@ short ipv4matches(const char *ipbrowser, const char *ipvalidator)
 	char* is = NULL;
 
 	printf_debug("IP matches: %s %s\n", ipbrowser, ipvalidator);
-	strcpy(ip_validator, ipvalidator);
+	strcpy(ip_validated, ipvalidator);
 
 	if ((ipbrowser != NULL) && (ipbrowser[0] != '\0') &&
 	    (ipvalidator != NULL) && (ipvalidator[0] != '\0')) {
@@ -448,8 +448,7 @@ short ds_validate(const char *domain, const uint16_t options,
 	retval_ipv6 = DNSSEC_OFF;
 	ub_retval = 0;
 
-	char *x = "";
-	strcpy(ip_validator, x);
+	ip_validated[0] = '\0';
 
 	/* options init - get integer values send from browser */
 	ds_init_opts(options);
@@ -472,8 +471,7 @@ short ds_validate(const char *domain, const uint16_t options,
 
 		// set resolver/forawarder if it was set in options
 		if (opts.usefwd) {
-
-			if (strcmp(optdnssrv, "") != 0) {
+			if ((optdnssrv != NULL) && (optdnssrv[0] != '\0')) {
 				size_t size = strlen(optdnssrv) + 1;
 				char *str_cpy = malloc(size);
 				if (str_cpy == NULL) {
@@ -588,7 +586,7 @@ short ds_validate(const char *domain, const uint16_t options,
 
 	/* export resolved addrs buf as static */
 	if (ipvalidator != NULL) {
-		*ipvalidator = ip_validator;
+		*ipvalidator = ip_validated;
 	}
 
 	return retval;
