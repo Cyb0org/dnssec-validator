@@ -586,7 +586,7 @@ static
 char * bintohex(const uint8_t *bytes, size_t buflen)
 {
 	char *retval = NULL;
-	int i;
+	unsigned i;
 
 	retval = malloc(buflen * 2 + 1);
 
@@ -598,7 +598,7 @@ char * bintohex(const uint8_t *bytes, size_t buflen)
 		retval[i * 2] = nibbleToChar(bytes[i] >> 4);
 		retval[i * 2 + 1] = nibbleToChar(bytes[i] & 0x0f);
 	}
-	retval[i*2] = '\0';
+	retval[i * 2] = '\0';
 	return retval;
 }
 
@@ -1256,7 +1256,7 @@ static
 int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
     const struct ub_result *ub_res, const char *domain)
 {
-	int i = 0;
+	unsigned i = 0;
 	int exitcode = DANE_ERROR_RESOLVER;
 
 	assert(tlsa_list != NULL);
@@ -1438,7 +1438,7 @@ char * create_tlsa_qname(const char *domain, const char *port,
 //         return values: dane-state.gen file
 // ----------------------------------------------------------------------------
 short CheckDane(const char *certchain[], int certcount, const uint16_t options,
-    char *optdnssrv, const char *domain,  const char *port_str,
+    const char *optdnssrv, const char *domain,  const char *port_str,
     const char *protocol, int policy)
 {
 	struct ub_result *ub_res;
@@ -1496,23 +1496,32 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 
 		// set resolver/forwarder if it was set in options
 		if (opts.usefwd) {
-			if (strcmp(optdnssrv, "") != 0) {
-				fwd_addr = strtok(optdnssrv, delims);
+			if ((optdnssrv != NULL) && (optdnssrv[0] != '\0')) {
+				size_t size = strlen(optdnssrv) + 1;
+				char *str_cpy = malloc(size);
+				if (str_cpy == NULL) {
+					return DANE_ERROR_GENERIC;
+				}
+				memcpy(str_cpy, optdnssrv, size);
+				fwd_addr = strtok(str_cpy, delims);
 				// set ip addresses of resolvers into ub context
 				while (fwd_addr != NULL) {
 					printf_debug(DEBUG_PREFIX,
-					    "Adding resolver IP address: %s\n",
+					    "Adding resolver IP address '%s'\n",
 					    fwd_addr);
 					ub_retval = ub_ctx_set_fwd(ctx,
 					    fwd_addr);
 					if (ub_retval != 0) {
 						printf_debug(DEBUG_PREFIX,
-						    "Error adding resolver IP address: %s\n",
+						    "Error adding resolver IP address '%s': %s\n",
+						    fwd_addr,
 						    ub_strerror(ub_retval));
+						free(str_cpy);
 						return exitcode;
 					} //if
 					fwd_addr = strtok(NULL, delims);
 				} //while
+				free(str_cpy);
 			} else {
 				printf_debug(DEBUG_PREFIX,
 				    "Using system resolver.\n");
@@ -1659,15 +1668,12 @@ int main(int argc, char **argv)
 
 	uint16_t options;
 
-	char resolver_addresses[256] = { '\0', };
-	// Must be taken through writeable buffer.
-	// TODO -- Modify it so it can take constant string literals.
-	strcpy(resolver_addresses,
-	    ""
-//	    " 8.8.8.8"
-//	    " 217.31.204.130"
+	const char *resolver_addresses =
+//	    "::1"
+	    " 8.8.8.8"
+	    " 217.31.204.130"
 //	    " 193.29.206.206"
-	    );
+	    ;
 
 	if ((argc < 2) || (argc > 3)) {
 		fprintf(stderr, "Usage:\n\t%s dname [port]\n", argv[0]);
