@@ -16,6 +16,7 @@ BOOST_FLAGS := -I$(FB_DIR)/src/3rdParty/boost -DBOOST_ALL_NO_LIB=1
 
 INCLUDES := -I$(OPENSSL_LIB)/include -I$(LDNS_LIB)/include -I$(UNBOUND_LIB)/include -I$(PLUGIN_SOURCE_DIR) $(FB_INCLUDE)
 LIBS := -L$(UNBOUND_LIB)/lib -L$(OPENSSL_LIB)/lib -L$(LDNS_LIB)/lib -lunbound -lldns -lssl -lcrypto -lpthread -ldl
+CPPFLAGS += -DCMNDLINE_TEST
 CFLAGS += $(INCLUDES) $(BOOST_FLAGS) -Wall -pedantic -g -std=c99
 CFLAGS2 += $(INCLUDES) $(BOOST_FLAGS) -Wall -pedantic -g
 CXXFLAGS += $(INCLUDES) $(BOOST_FLAGS) -Wall -g
@@ -53,6 +54,4 @@ ssl-test: ssl-test.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
 #	gcc -Wall -pedantic -g -lssl -lcrypto -o ssl-test ssl-test.c  
 
 dnssec-plug: dnssec-plug.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
-	$(CC) $< -o $@ $(CFLAGS) $(LDFLAGS)
-
-
+	$(CC) $< -o $@ $(CPPFLAGS) $(CFLAGS) $(LDFLAGS)
