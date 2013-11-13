@@ -3,20 +3,20 @@ Copyright 2013 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz>
 
-This file is part of DNSSEC/TLSA Validator 2.0 Add-on.
+This file is part of DNSSEC/TLSA Validator 2 Add-on.
 
-DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
+DNSSEC/TLSA Validator 2 Add-on is free software: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or (at your
 option) any later version.
 
-DNSSEC Validator 2.0 Add-on is distributed in the hope that it will be useful,
+DNSSEC/TLSA Validator 2 Add-on is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 more details.
 
 You should have received a copy of the GNU General Public License along with
-DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
+DNSSEC/TLSA Validator 2 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
 window.addEventListener("load", function() { daneExtension.init(); }, false);
@@ -44,7 +44,9 @@ function onPageLoad(event) {
 };
 */
 
+// **********************************************************************
 /* TLSA Validator's internal cache - shared with all window tabs */
+// **********************************************************************
 var tlsaExtCache = {
 
 	data: null,
@@ -86,7 +88,9 @@ var tlsaExtCache = {
 
 		for (n in c) {
 			if (daneExtension.debugOutput) { 
-				dump(tlsaValidator.DANE_DEBUG_PRE +'      r' + i + ': \"' + n + '\": \"' + c[n].state + '\"; ' + c[n].block + '\n');
+				dump(tlsaValidator.DANE_DEBUG_PRE +'      r' + 
+				i + ': \"' + n + '\": \"' + c[n].state + '\"; ' + 
+				c[n].block + '\n');
 			}
       			i++;
 		}
@@ -321,7 +325,7 @@ observe: function(channel, topic, data) {
 				try {
 			    	var win = nc.getInterface(Ci.nsIDOMWindow);
 				} catch (e) {
-			    return; // no window for e.g. favicons
+					return; // no window for e.g. favicons
 				}
 				if (!win.document) return;
 
@@ -583,7 +587,7 @@ get_invalid_cert_SSLStatus: function(uri) {
 //---------------------------------------------------------
 // check TLSA records when tab or url is changed
 //---------------------------------------------------------
-check_tlsa_tab_change: function (channel, uri, port, protocol) {
+check_tlsa_tab_change: function (channel, domain, port, protocol) {
 
 	if (daneExtension.debugOutput) {
 		dump(this.DANE_DEBUG_PRE + "------------ TLSA validation start ----------------" + this.DANE_DEBUG_POST); 
@@ -629,26 +633,39 @@ check_tlsa_tab_change: function (channel, uri, port, protocol) {
 	}
 
 	if (daneExtension.debugOutput) {
-		dump(this.DANE_DEBUG_PRE +"HTTPS request: https://" + uri + "; certchain length: " + len + ";"+ this.DANE_DEBUG_POST); 
-	}	
+		dump(this.DANE_DEBUG_PRE +"HTTPS request: https://" + domain 
+		+ "; certchain length: " + len + ";"+ this.DANE_DEBUG_POST); 
 
-	var tlsa = document.getElementById("dane-tlsa-plugin");
-	if (daneExtension.debugOutput) {
 		dump(this.DANE_DEBUG_PRE +"DANE core request: {certchain}, " 
-		  + len +", "+ options +", "+ nameserver +", "+ uri +", "+ 
+		  + len +", "+ options +", "+ nameserver +", "+ domain +", "+ 
 		port +", "+ protocol +", "+ policy+ this.DANE_DEBUG_POST); 
 	}	
-	var daneMatch = tlsa.TLSAValidate(derCerts, len, options, nameserver, uri, port, protocol, policy);
 
-	if (daneExtension.debugOutput) {
-		dump(this.DANE_DEBUG_PRE + "Return: " + daneMatch[0] + " for https://" + uri + ";" + this.DANE_DEBUG_POST); 
+	// Call NPAPI validation
+	try {
+		var tlsa = document.getElementById("dane-tlsa-plugin");
+		var daneMatch = tlsa.TLSAValidate(derCerts, len, options, 
+				nameserver, domain, port, protocol, policy);
+		if (daneExtension.debugOutput) {
+			dump(this.DANE_DEBUG_PRE + "Return: " + daneMatch[0] 
+			+ " for https://" + domain + ";" + this.DANE_DEBUG_POST); 
+		} 
+	} catch (ex) {
+
+		if (daneExtension.debugOutput) {
+			dump(this.DANE_DEBUG_PRE + 'Error: TLSA plugin call failed!' + this.DANE_DEBUG_POST);
+			dump(this.DANE_DEBUG_PRE + "----------- TLSA validation end --------------" + this.DANE_DEBUG_POST);
+		}
+		// Set error mode
+		tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_ERROR);
+	      	return;
 	}
 
 	if (daneMatch[0] == c.DANE_DNSSEC_BOGUS) { 
 
 		options = 0;
 		tlsa.TLSACacheFree();
-		var daneMatchnofwd = tlsa.TLSAValidate(derCerts, len, options, "nofwd", uri, port, protocol, policy);
+		var daneMatchnofwd = tlsa.TLSAValidate(derCerts, len, options, "nofwd", domain, port, protocol, policy);
 
 		if (daneMatchnofwd[0]!=daneMatch[0]) {
 			daneMatch[0]=c.DANE_RESOLVER_NO_DNSSEC;
@@ -659,10 +676,10 @@ check_tlsa_tab_change: function (channel, uri, port, protocol) {
 	var block = "no";
    	if (daneMatch[0] >= c.DANE_DNSSEC_BOGUS) { 	   	
 		
-		var cacheitem = tlsaExtCache.getRecord(uri);			
+		var cacheitem = tlsaExtCache.getRecord(domain);			
 		if (cacheitem[1] == "no" || cacheitem[1] == "yes") {
 			if (daneExtension.debugOutput) {
-				dump(this.DANE_DEBUG_PRE + "Cache: "+ uri + "; " + cacheitem[0] + "; " + cacheitem[1] + ";" + this.DANE_DEBUG_POST);							
+				dump(this.DANE_DEBUG_PRE + "Cache: "+ domain + "; " + cacheitem[0] + "; " + cacheitem[1] + ";" + this.DANE_DEBUG_POST);							
 			}
 		}
 		else {
@@ -674,22 +691,23 @@ check_tlsa_tab_change: function (channel, uri, port, protocol) {
 					var pre = stringbundle.getString("warning.dialog.pre");
 					var post = stringbundle.getString("warning.dialog.post");	
 						
-					if (confirm(pre + uri + " "+post)) {					
+					if (confirm(pre + domain + " "+post)) {					
 						channel.cancel(Components.results.NS_BINDING_ABORTED);
 						block = "yes";
 						if (daneExtension.debugOutput) {
 							dump(this.DANE_DEBUG_PRE + "https request for (" +
-		    					uri+ ") was CANCELED!" + this.DANE_DEBUG_POST);				
+		    					domain+ ") was CANCELED!" +
+							this.DANE_DEBUG_POST);				
 						}
 					}
 					else {
 						block = "no";
 						if (daneExtension.debugOutput) {
 							dump(this.DANE_DEBUG_PRE + "https request for (" +
-	    						uri+ ") was CONFIRMED" + this.DANE_DEBUG_POST); 
+	    						domain+ ") was CONFIRMED" + this.DANE_DEBUG_POST); 
 				    		}
 					}	
-					tlsaExtCache.addRecord(uri, daneMatch[0] , block);
+					tlsaExtCache.addRecord(domain, daneMatch[0] , block);
 					tlsaExtCache.printContent();
 				}
 			}
@@ -755,19 +773,31 @@ check_tlsa_https: function (channel, cert, browser, domain, port, protocol, url)
 	}
 
 	if (daneExtension.debugOutput) {
-		dump(this.DANE_DEBUG_PRE + "HTTPS request: https://" + domain + "; certchain length: " + len + ";"+ this.DANE_DEBUG_POST); 
-	}
+		dump(this.DANE_DEBUG_PRE + "HTTPS request: https://" + 
+		domain + "; certchain length: " + len + ";"+ this.DANE_DEBUG_POST);
 
-	var tlsa = document.getElementById("dane-tlsa-plugin");
-	if (daneExtension.debugOutput) {
-		dump(this.DANE_DEBUG_PRE +"DANE core request: {certchain}, " 
+		dump(this.DANE_DEBUG_PRE +"TLSA core request: {certchain}, " 
 		  + len +", "+ options +", "+ nameserver +", "+ domain +", "+ 
 		port +", "+ protocol +", "+ policy+ this.DANE_DEBUG_POST); 
 	}	
-	var daneMatch = tlsa.TLSAValidate(derCerts, len, options, nameserver, domain, port, protocol, policy);
 
-	if (daneExtension.debugOutput) {
-		dump(this.DANE_DEBUG_PRE + "Return: " + daneMatch[0] + " for https://" + domain + ";" + this.DANE_DEBUG_POST); 
+	// Call NPAPI validation
+	try {
+		var tlsa = document.getElementById("dane-tlsa-plugin");
+		var daneMatch = tlsa.TLSAValidate(derCerts, len, options, 
+				nameserver, domain, port, protocol, policy);
+		if (daneExtension.debugOutput) {
+			dump(this.DANE_DEBUG_PRE + "Return: " + daneMatch[0] 
+			+ " for https://" + domain + ";" + this.DANE_DEBUG_POST); 
+		} 
+	} catch (ex) {
+		if (daneExtension.debugOutput) {
+			dump(this.DANE_DEBUG_PRE + 'Error: TLSA plugin call failed!' + this.DANE_DEBUG_POST);
+			dump(this.DANE_DEBUG_PRE + "----------- TLSA VALIDATION END --------------" + this.DANE_DEBUG_POST);
+		}
+		// Set error mode
+		tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_ERROR);
+	      	return;
 	}
 
 	var block = "no";
@@ -819,52 +849,49 @@ check_tlsa_https: function (channel, cert, browser, domain, port, protocol, url)
 //*****************************************************************************
 //*****************************************************************************
 var tlsaExtHandler = {
+	// DANE/TLSA MODE
+	DANE_MODE_INACTION 				: "dm_inaction",
+	DANE_MODE_VALIDATION_OFF   			: "dm_validationoff",
+	DANE_MODE_ACTION   				: "dm_action",
+	DANE_MODE_ERROR 				: "dm_error",
+	DANE_MODE_RESOLVER_FAILED     			: "dm_rfesolverfailed",
+	DANE_MODE_DNSSEC_BOGUS				: "dm_dnssecbogus",
+	DANE_MODE_DNSSEC_UNSECURED			: "dm_dnssecunsecured",
+	DANE_MODE_NO_TLSA_RECORD			: "dm_notlsarecord",		
+	DANE_MODE_NO_CERT_CHAIN				: "dm_certchain",
+	DANE_MODE_TLSA_PARAM_WRONG			: "dm_tlsapramwrong",
+	DANE_MODE_NO_HTTPS				: "dm_nohttps",
+	DANE_MODE_DNSSEC_SECURED      			: "dm_dnssecsec", 
+	DANE_MODE_CERT_ERROR          			: "dm_certerr",
+	DANE_MODE_WRONG_RESOLVER			: "dm_wrongres",
+	DANE_MODE_VALIDATION_FALSE			: "dm_vf",
+	DANE_MODE_VALIDATION_FALSE_TYPE0		: "dm_vf0",
+	DANE_MODE_VALIDATION_FALSE_TYPE1		: "dm_vf1",
+	DANE_MODE_VALIDATION_FALSE_TYPE2		: "dm_vf2",
+	DANE_MODE_VALIDATION_FALSE_TYPE3		: "dm_vf3",
+	DANE_MODE_VALIDATION_SUCCESS_TYPE0		: "dm_vs0",
+	DANE_MODE_VALIDATION_SUCCESS_TYPE1		: "dm_vs1",
+	DANE_MODE_VALIDATION_SUCCESS_TYPE2		: "dm_vs2",
+	DANE_MODE_VALIDATION_SUCCESS_TYPE3		: "dm_vs3",
+	DANE_MODE_INIT					: "dm_nxdomain",
 
-  // DANE/TLSA MODE
-  DANE_MODE_INACTION 					: "dm_inaction",
-  DANE_MODE_VALIDATION_OFF   			: "dm_validationoff",
-  DANE_MODE_ACTION   					: "dm_action",
-  DANE_MODE_ERROR 						: "dm_error",
-  DANE_MODE_RESOLVER_FAILED     		: "dm_rfesolverfailed",
-  DANE_MODE_DNSSEC_BOGUS				: "dm_dnssecbogus",
-  DANE_MODE_DNSSEC_UNSECURED			: "dm_dnssecunsecured",
-  DANE_MODE_NO_TLSA_RECORD				: "dm_notlsarecord",		
-  DANE_MODE_NO_CERT_CHAIN				: "dm_certchain",
-  DANE_MODE_TLSA_PARAM_WRONG			: "dm_tlsapramwrong",
-  DANE_MODE_NO_HTTPS					: "dm_nohttps",
-  DANE_MODE_DNSSEC_SECURED      		: "dm_dnssecsec", 
-  DANE_MODE_CERT_ERROR          		: "dm_certerr",
-  DANE_MODE_WRONG_RESOLVER				: "dm_wrongres",
-  DANE_MODE_VALIDATION_FALSE			: "dm_vf",
-  DANE_MODE_VALIDATION_FALSE_TYPE0		: "dm_vf0",
-  DANE_MODE_VALIDATION_FALSE_TYPE1		: "dm_vf1",
-  DANE_MODE_VALIDATION_FALSE_TYPE2		: "dm_vf2",
-  DANE_MODE_VALIDATION_FALSE_TYPE3		: "dm_vf3",
-  DANE_MODE_VALIDATION_SUCCESS_TYPE0	: "dm_vs0",
-  DANE_MODE_VALIDATION_SUCCESS_TYPE1	: "dm_vs1",
-  DANE_MODE_VALIDATION_SUCCESS_TYPE2	: "dm_vs2",
-  DANE_MODE_VALIDATION_SUCCESS_TYPE3	: "dm_vs3",
-  DANE_MODE_INIT			: "dm_nxdomain",
-
-  //DANE/TLSA tooltip	
-  DANE_TOOLTIP_VALIDATION_SUCCESS 		: "dmvsTooltip",
-  DANE_TOOLTIP_VALIDATION_FALSE 		: "dmvfTooltip",
-  DANE_TOOLTIP_ACTION          			: "dmaTooltip",
-  DANE_TOOLTIP_FAILED_RESOLVER  		: "dmfsTooltip",
-  DANE_TOOLTIP_PARAM_WRONG				: "dmwpTooltip",
-  DANE_TOOLTIP_NO_TLSA_RECORD   		: "dmntrTooltip",
-  DANE_TOOLTIP_NO_CERT_CHAIN    		: "dmnccTooltip",
-  DANE_TOOLTIP_OFF	        			: "dmoffTooltip",
-  DANE_TOOLTIP_NO_HTTPS	        		: "dmnohttpsTooltip",
-  DANE_TOOLTIP_DNSSEC_BOGUS     		: "dmdnssecbogusTooltip",
-  DANE_TOOLTIP_DNSSEC_UNSECURED 		: "dmdnssecunsecTooltip",
-  DANE_TOOLTIP_WRONG_RESOLVER 			: "dmwrongresTooltip",
+	//DANE/TLSA tooltip	
+	DANE_TOOLTIP_VALIDATION_SUCCESS 		: "dmvsTooltip",
+	DANE_TOOLTIP_VALIDATION_FALSE 			: "dmvfTooltip",
+	DANE_TOOLTIP_ACTION          			: "dmaTooltip",
+	DANE_TOOLTIP_FAILED_RESOLVER  			: "dmfsTooltip",
+	DANE_TOOLTIP_PARAM_WRONG			: "dmwpTooltip",
+	DANE_TOOLTIP_NO_TLSA_RECORD   			: "dmntrTooltip",
+	DANE_TOOLTIP_NO_CERT_CHAIN    			: "dmnccTooltip",
+	DANE_TOOLTIP_OFF	        		: "dmoffTooltip",
+	DANE_TOOLTIP_NO_HTTPS	        		: "dmnohttpsTooltip",
+	DANE_TOOLTIP_DNSSEC_BOGUS     			: "dmdnssecbogusTooltip",
+	DANE_TOOLTIP_DNSSEC_UNSECURED 			: "dmdnssecunsecTooltip",
+	DANE_TOOLTIP_WRONG_RESOLVER 			: "dmwrongresTooltip",
   
-  // Cache the most recent hostname seen in checkSecurity
-  _asciiHostName : null,
-  _utf8HostName : null,
-
-  valstate : -1,
+	// Cache the most recent hostname seen in checkSecurity
+	_asciiHostName : null,
+	_utf8HostName : null,
 
   get _tooltipLabel () {
     delete this._stringBundle;
@@ -1344,3 +1371,4 @@ var tlsaExtHandler = {
     this._tlsaPopup.openPopup(this._tlsaBox, 'after_end', -10, 0);
   }
 }
+
