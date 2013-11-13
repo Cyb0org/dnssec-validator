@@ -98,6 +98,8 @@
          "dnssecWrongResolverInfo": {
 		"message": "Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht. Ändern Sie bitte die Einstellungen des Resolvers (Wahl \"Ohne Resolver\")."
 		},
+"dm_errgen": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Es kam zu einem Fehler während Erwerbs der TLSA Validator core."},
+"dm_errgenInfo": { "message":  "Bitte Neustart Sie Ihren Web-Browser..."},
 "dm_rfesolverfailed": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Es kam zu einem Fehler während Erwerbs des TLSA Eintrags für diese Domäne."},
 "dm_rfesolverfailedInfo": { "message":  "Es kam zu einem Fehler während Erwerbs des TLSA Eintrags für diese Domäne. Dies kann durch einen Verbindungsausfall zum DNS-Server verursacht werden, oder die von Benutzer gewählte IP-Adresse eines validierenden Resolvers ist keine richtige Adresse eines validierenden Resolvers."},
 "dm_nohttps": { "message":  "Weil für diese Domäne keine HTTPS Verbindung hergestellt wurde, ist es nicht möglich eine Validierung des TLSA Eintrags auszuführen."},
@@ -145,6 +147,7 @@
            "dmnohttpsTooltip": {"message": "Keine HTTPS Verbindung"},
            "dmdnssecbogusTooltip": {"message": "Ungültige DNSSEC Signatur"},
            "dmdnssecunsecTooltip": {"message": "Nicht durch DNSSEC gesichert"},
+           "dmerrorgenericTooltip": {"message": "Validator scheitern"},
 	   "warningpre" : {"message": "TLSA-Validator Warnung!\n\ndas Serverzertifikat für https://"},
 	   "warningpost" : {"message": "\nentspricht nicht dem TLSA Eintrag. Dies kann bedeuten:\n- Versuch sich mit einem nicht vertrauenswürdigem Server zu vrebinden\n- ungültiger oder unzuverlässiger Serverzertifikat\n\nWollen Sie die Verbindung zu diesem Server abbrechen?"}
 }

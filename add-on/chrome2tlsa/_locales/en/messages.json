@@ -74,6 +74,8 @@
          "dnssecWrongResolverInfo": {
 		"message": "Current DNS server or resolver does not support DNSSEC technology. Please, change the validator settings (choice \"Without resolver\")."
 		},
+"dm_errgen": { "message":  "The remote server certificate for this domain name could not be verified by DANE protocol because an error occurred in TLSA validator core."},
+"dm_errgenInfo": { "message":  "Please, restart your web-browser..."},
 "dm_rfesolverfailed": { "message":  "The remote server certificate for this domain name could not be verified by DANE protocol because an error occurred while retrieving the TLSA record for this domain name."},
 "dm_rfesolverfailedInfo": { "message":  "An error occurred while retrieving the TLSA record for this domain name. This may be caused by loss of connection to the DNS server or the user-chosen validating resolver IP address is not an address of a validating resolver."},
 "dm_nohttps": { "message":  "No HTTPS secured connection to the remote server was established. Therefore, you can not perform TLSA record validation."},
@@ -121,6 +123,7 @@
            "dmnohttpsTooltip": {"message": "No HTTPS connection"},
            "dmdnssecbogusTooltip": {"message": "Bogus DNSSEC signature"},
            "dmdnssecunsecTooltip": {"message": "Not secured by DNSSEC"},
+           "dmerrorgenericTooltip": {"message": "Validator fail"},
 	   "warningpre" : {"message": "TLSA validator warning!\n\nThe remote server certificate for https://"},
 	   "warningpost" : {"message": "\ndoes not correspond to the TLSA record. This can be caused by:\n- trying to connect to untrusted remote server\n- invalid or untrusted server certificate\n\nDo you want close the connection to this server?"}
 }

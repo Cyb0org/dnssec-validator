@@ -21,10 +21,10 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 // set text of html elements
 function addText(id, str){
-      if (document.createTextNode){
-        var tn = document.createTextNode(str);
-        document.getElementById(id).appendChild(tn);
-      } // if
+	if (document.createTextNode){
+		var tn = document.createTextNode(str);
+		document.getElementById(id).appendChild(tn);
+	} // if
 } 
 
 // set icon into popup
@@ -35,25 +35,25 @@ function TLSAicon(icon){
 }
 
 // send parameters into detail popup
-function NextLevel(overal){
-	 var pic = document.getElementById("moreinfo-tlsa"); 
-	 if (pic == typeof('undefined')) return;
-	 pic.href = "detail-tlsa.html?"+overal;
+function NextLevel(overall){
+	var pic = document.getElementById("moreinfo-tlsa"); 
+	if (pic == typeof('undefined')) return;
+	pic.href = "detail-tlsa.html?"+overall;
 }
 
-        resultRegexp = /\?([^?,]+),([^,]+),([^,]+),([^,]+),([^,]+)$/;
-        matches = resultRegexp.exec(document.location.href);
+	resultRegexp = /\?([^?,]+),([^,]+),([^,]+),([^,]+),([^,]+)$/;
+	matches = resultRegexp.exec(document.location.href);
 	domain = matches[1];
-        statusString = matches[2];
-        icon = matches[3];
+	statusString = matches[2];
+	icon = matches[3];
 	status = matches[4];
 	domainpre = matches[5];
 	var domaintmp = domain;
-	if (domainpre == "https") domaintmp="https://"+domain;
-	overal = domain + "," + statusString + "," + icon + "," + status + "," + domainpre + "," + statusString + "Info";      
-        addText("domain-name-title-tlsa", domaintmp);
-        addText("long-text-tlsa", chrome.i18n.getMessage(statusString));
+	domaintmp=domainpre+"://"+domain;
+	overall = domain + "," + statusString + "," + icon + "," + status + "," + domainpre + "," + statusString + "Info";      
+	addText("domain-name-title-tlsa", domaintmp);
+	addText("long-text-tlsa", chrome.i18n.getMessage(statusString));
 	addText("tlsa-title", chrome.i18n.getMessage(status));
 	addText("moreinfo-tlsa", chrome.i18n.getMessage("moreinfo"));
 	TLSAicon(icon);	
-	NextLevel(overal);
+	NextLevel(overall);

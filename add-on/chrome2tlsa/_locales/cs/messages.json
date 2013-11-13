@@ -77,6 +77,8 @@
          "dnssecWrongResolverInfo": {
 		"message": "Aktuálně nastavený resolver nepodporuje DNSSEC technologii. Prosím, změňte nastavení validátoru (nastavte volbu \"Bez resolveru\")."
 		},
+"dm_errgen": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno nebyl ověřen protokolem DANE, protože došlo k selhání TLSA validátoru."},
+"dm_errgenInfo": { "message":  "Prosím, restartujte webový prohlížeč pro jeho inicializaci..."},
 "dm_rfesolverfailed": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno nebyl ověřen protokolem DANE, protože pří získání TLSA záznamu pro toto doménové jméno došlo k chybě."},
 "dm_rfesolverfailedInfo": { "message":  "Při zjišťování TLSA záznamu pro toto doménové jméno došlo k chybě. Příčinou může být buď výpadek spojení ke vzdálenému serveru, nebo aktuálně nastavená IP adresa DNS serveru není platnou adresou serveru pro překlad doménového jména."},
 "dm_nohttps": { "message":  "Jelikož pro toto doménové jméno není navázáno zabezpečené spojení ke vzdálenému serveru protokolem HTTPS, není možné provést validaci TLSA záznamu."},
@@ -124,6 +126,7 @@
            "dmnohttpsTooltip": {"message": "Není HTTPS spojení"},
            "dmdnssecbogusTooltip": {"message": "Neplatný podpis TLSA"},
            "dmdnssecunsecTooltip": {"message": "Nezabezpečeno DNSSEC"},
+           "dmerrorgenericTooltip": {"message": "Chyba validátoru"},
 	   "warningpre" : {"message": "Upozornění TLSA validátoru!\n\nCertifikát serveru pro https://"},
 	   "warningpost" : {"message": "\nneodpovídá záznamu TLSA, což může signalizovat:\n- připojení na nedůvěryhodný server\n- neplatný nebo nedůvěryhodný certifikát serveru\n\nChcete ukončit spojení s tímto serverem?"}
 }

@@ -151,6 +151,8 @@ var tlsaModes = {
 	DANE_MODE_VALIDATION_SUCCESS_TYPE1	: "dm_vs1",
 	DANE_MODE_VALIDATION_SUCCESS_TYPE2	: "dm_vs2",
 	DANE_MODE_VALIDATION_SUCCESS_TYPE3	: "dm_vs3",
+	DANE_MODE_ERROR_GENERIC			: "dm_errgen",
+
   //DANE/TLSA tooltip	
 	DANE_TOOLTIP_VALIDATION_SUCCESS 	: "dmvsTooltip",
 	DANE_TOOLTIP_VALIDATION_FALSE 		: "dmvfTooltip",
@@ -163,28 +165,21 @@ var tlsaModes = {
 	DANE_TOOLTIP_NO_HTTPS	        	: "dmnohttpsTooltip",
 	DANE_TOOLTIP_DNSSEC_BOGUS     		: "dmdnssecbogusTooltip",
 	DANE_TOOLTIP_DNSSEC_UNSECURED 		: "dmdnssecunsecTooltip",
+	DANE_TOOLTIP_ERROR_GENERIC 		: "dmerrorgenericTooltip",
 };
-
-//****************************************************************
-// this function show comfirm window when resolver does not support DNSSEC
-// not used since version 2.2.0
-//****************************************************************
-function showresolverinfo(tabId) {
-	var choice = confirm(chrome.i18n.getMessage("fwdinfo"));
-	if (choice) chrome.tabs.create({url: "options.html?4,0,8.8.8.8"});
-};//showresolverinfo
-
 
 //****************************************************************
 // this function sets TLSA mode. status ICON and popup text
 //****************************************************************
-function setModeTLSA(newMode, tabId, domain, status, changeInfo) {
-        var icon;
+function setModeTLSA(newMode, tabId, domain, status, scheme) {
+	var icon;
 	var title;
 	var domainpre;
-      	var tooltiptitle;
+	var tooltiptitle;
 	    
-	console.log(DANE + "Set mode: " + newMode + "; TabId: " + tabId + "; Domain: " + domain + "; Status: " + status);
+	console.log(DANE + "Set mode: " + newMode + "; TabId: " + tabId 
+		+ "; Domain: " + domain + "; Status: " + status + "; Scheme: " 
+		+ scheme);
             
 	switch (newMode) {
             /* green icon */
@@ -195,7 +190,7 @@ function setModeTLSA(newMode, tabId, domain, status, changeInfo) {
 	    case this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE3:
               	icon = "tlsa_valid.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_VALIDATION_SUCCESS;
-	      	domainpre = "https";
+	      	domainpre = scheme;
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_VALIDATION_SUCCESS);
               break;
             case this.tlsaModes.DANE_MODE_VALIDATION_FALSE:
@@ -205,63 +200,69 @@ function setModeTLSA(newMode, tabId, domain, status, changeInfo) {
 	    case this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE0:
               	icon = "tlsa_invalid.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_VALIDATION_FALSE;
-	      	domainpre = "https";
+	      	domainpre = scheme;
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_VALIDATION_FALSE);
               break;
 	    case this.tlsaModes.DANE_MODE_CERT_ERROR:
 	    case this.tlsaModes.DANE_MODE_NO_CERT_CHAIN:
               	icon = "tlsa_orange.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_NO_CERT_CHAIN;
-	      	domainpre = "https://";
+	      	domainpre = scheme;
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_NO_CERT_CHAIN);
               break;
 	    case this.tlsaModes.DANE_MODE_TLSA_PARAM_WRONG:
               	icon = "tlsa_invalid.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_PARAM_WRONG;
-	      	domainpre = "https";
+	      	domainpre = scheme;
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_PARAM_WRONG);
               break;
 	    case this.tlsaModes.DANE_MODE_NO_TLSA_RECORD:
               	icon = "tlsa_no.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_NO_TLSA_RECORD;
-	      	domainpre = "https";
+	      	domainpre = scheme;
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_NO_TLSA_RECORD);
               break;
 	    case this.tlsaModes.DANE_MODE_NO_HTTPS:
               	icon = "tlsa_nohttps.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_NO_HTTPS;
-	      	domainpre = "http";
+	      	domainpre = scheme;
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_NO_HTTPS);
               break;
 	    case this.tlsaModes.DANE_MODE_DNSSEC_UNSECURED:
               	icon = "tlsa_nodnssec.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_DNSSEC_UNSECURED;
-	      	domainpre = "https";	
+	      	domainpre = scheme;	
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_DNSSEC_UNSECURED);
               break;
 	    case this.tlsaModes.DANE_MODE_VALIDATION_OFF:
               	icon = "tlsa_off.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_OFF;
-	      	domainpre = "http://";	
+	      	domainpre = scheme;	
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_OFF);
               break;
 	    case this.tlsaModes.DANE_MODE_DNSSEC_BOGUS:
               	icon = "tlsa_invalid.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_DNSSEC_BOGUS;
-	      	domainpre = "https";	
+	      	domainpre = scheme;	
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_DNSSEC_BOGUS);
               break;
 	    case this.tlsaModes.DANE_MODE_ACTION:
               	icon = "tlsa_action.png";
 	      	title = this.tlsaModes.DANE_TOOLTIP_ACTION;
-	      	domainpre = "https";	
+	      	domainpre = scheme;	
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_ACTION);
+              break;
+	    case this.tlsaModes.DANE_MODE_RESOLVER_FAILED:
+               icon = "tlsa_error.png";
+	       title = this.tlsaModes.DANE_TOOLTIP_FAILED_RESOLVER;
+	       domainpre = scheme;	
+               tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_FAILED_RESOLVER);
               break;
             default:
                icon = "tlsa_error.png";
-	       title = this.tlsaModes.DANE_MODE_RESOLVER_FAILED ;
-	       domainpre = "https";	
-               tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_MODE_RESOLVER_FAILED );
+	       title = this.tlsaModes.DANE_MODE_ERROR_GENERIC;
+	       domainpre = scheme;	
+               tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC);
      	} // switch
 
         chrome.pageAction.setTitle({tabId: tabId, title: tooltiptitle}); 
@@ -309,50 +310,50 @@ function getResolver() {
 //****************************************************************
 // SET TLSA status
 //****************************************************************
-function setTLSASecurityState(tabId, domain, status, changeInfo ) {
+function setTLSASecurityState(tabId, domain, status, scheme) {
 
 	var c = this.tlsaExtNPAPIConst;	
 
      	switch (status) {
 	    case c.DANE_VALID_TYPE0: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE0,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_VALID_TYPE1: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE1,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_VALID_TYPE2: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE1,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_VALID_TYPE3: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE3,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_DNSSEC_SECURED: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_DNSSEC_SECURED,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_OFF: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_OFF,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_ERROR_RESOLVER: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_RESOLVER_FAILED,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_NO_HTTPS: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_NO_HTTPS,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_NO_TLSA: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_NO_TLSA_RECORD,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_DNSSEC_UNSECURED: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_DNSSEC_UNSECURED,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_DNSSEC_BOGUS: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_DNSSEC_BOGUS,
@@ -360,47 +361,48 @@ function setTLSASecurityState(tabId, domain, status, changeInfo ) {
     		break;
 	    case c.DANE_NO_CERT_CHAIN: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_NO_CERT_CHAIN,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_CERT_ERROR: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_CERT_ERROR,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_TLSA_PARAM_ERR: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_TLSA_PARAM_WRONG,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_INVALID_TYPE0: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE0,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_INVALID_TYPE1: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE1,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_INVALID_TYPE2: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE2,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_INVALID_TYPE3: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE3,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    default:
-	        this.setModeTLSA(this.tlsaModes.DANE_MODE_RESOLVER_FAILED,
-			tabId, domain, status, changeInfo);
+	        this.setModeTLSA(this.tlsaModes.DANE_MODE_ERROR_GENERIC,
+			tabId, domain, status, scheme);
                 break;
 	    }
 };
 
 
 //****************************************************************
-// Get URL scheme (http/https/ftp)
+// Get URL scheme (http/https/ftp/ftps)
 //****************************************************************
 function httpscheme(taburl){
 
 	if (taburl.indexOf("https") != -1) return "https";
 	else if (taburl.indexOf("http") != -1) return "http";
+	else if (taburl.indexOf("ftps") != -1) return "ftps";
 	else if (taburl.indexOf("ftp") != -1) return "ftp";
 	else return "undefined";	
 };
@@ -410,9 +412,7 @@ function TLSAvalidate(scheme, domain, port){
 	console.log(DANE + "--------- Start of TLSA Validation ("+ scheme +":"+ domain +":"+ port +") ---------");	
 
 	var debug = localStorage["dnssecDebugOutput"];
-	     debug = (debug == "false") ? false : true;        	   
-
-        var resolver = this.getResolver();
+	debug = (debug == "false") ? false : true;        	   
 	// get domain filter status
 	var filteron = localStorage["domainfilteron"];
 	// validate thi domain?
@@ -448,23 +448,37 @@ function TLSAvalidate(scheme, domain, port){
 	var result = c.DANE_OFF;
 
      	if (validate) { 
-		if (scheme == "https") { 
-		        var tlsa = document.getElementById("tlsa-plugin");
+		if (scheme == "https" || scheme == "ftps") { 
+		        var resolver = this.getResolver();
 			var options = 0;
-			var c = this.tlsaExtNPAPIConst;
-			if (debug) options |= c.DNSSEC_FLAG_DEBUG;
-			if (resolver != "nofwd") options |= c.DNSSEC_FLAG_USEFWD;
+			if (debug) options |= c.DANE_FLAG_DEBUG;
+			if (resolver != "nofwd") options |= c.DANE_FLAG_USEFWD;
 			var certchain = new Array();
-		        certchain.push("xxx");
-			var len = certchain.length;
-			len = 0;
-			var daneMatch = tlsa.TLSAValidate(certchain, len, options, resolver, domain, port, "tcp", 1);
-			result = daneMatch[0];
+		        certchain.push("00FF");
+			var len = 0;
+			var protocol = "tcp";
+			var policy = 1;
+			console.log(DANE + "DANE plugin request: {certchain}, " + 
+					len +", "+ options +", "+ resolver 
+					+", "+ domain +", "+ port +", "+ protocol 
+					+", "+ policy); 
+
+			// Call NPAPI validation
+			try {
+				var tlsa = document.getElementById("tlsa-plugin");
+				var daneMatch = tlsa.TLSAValidate(certchain, len, options, 
+						resolver, domain, port, protocol, policy);
+				result = daneMatch[0];
+			} catch (ex) {
+				console.log(DANE + 'Error: DANE plugin call failed!');
+				result = c.DANE_ERROR_GENERIC;
+			}
 		}
 		else  result = c.DANE_NO_HTTPS;
         }	
-	console.log(DANE + "TLSA Validator result: " + result);
+	console.log(DANE + "DANE plugin result: " + result);
 	console.log(DANE + "--------- End of TLSA Validation ("+ scheme +":"+ domain +":"+ port +") ---------");
+
 	return result;
 };
 
@@ -496,8 +510,6 @@ function onUrlChange(tabId, changeInfo, tab) {
 		chrome.pageAction.hide(tabId);
 		return;
 	}//if
-
-
 	
 	if (changeInfo.status=="loading") {
 		console.log("\nBrowser: onUrlChange(TabID: " + tabId + ", URL: " + tab.url +");");
@@ -505,22 +517,29 @@ function onUrlChange(tabId, changeInfo, tab) {
 
 		chrome.pageAction.setPopup({tabId: tabId, popup: ""});
 		var scheme = httpscheme(tab.url);
-
+		var port = "80";
+		var port2 = "";
+		var ret = tlsaExtNPAPIConst.DANE_OFF; 
 		var tmp = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(:[0-9]+)*(:)?/);
 		var domain = tmp[1];
-		var port = (tmp[2] == undefined) ? 443 : tmp[2].substring(1);	
-		var port2 = (tmp[2] == undefined) ? "" : tmp[2];
+		if (scheme == "https" || scheme == "http") {
+			port = (tmp[2] == undefined) ? "443" : tmp[2].substring(1);	
+			port2 = (tmp[2] == undefined) ? "" : tmp[2];
+			ret = TLSAvalidate(scheme, domain, port);
+		}
+		else if (scheme == "ftps" || scheme == "ftp") {
+			port = (tmp[2] == undefined) ? "990" : tmp[2].substring(1);
+			port2 = (tmp[2] == undefined) ? "" : tmp[2];
+			ret = TLSAvalidate(scheme, domain, port);
+		}
 
-	        var ret = TLSAvalidate(scheme, domain, port);
-		setTLSASecurityState(tabId, domain+port2, ret, "xxx");
+		setTLSASecurityState(tabId, domain+port2, ret, scheme);
 	}
 
 	if (changeInfo.status=="complete") {		
 		currenturl = "null";
 
 	}
-
-
 }; // onUrlChange
 
 
@@ -554,13 +573,18 @@ function onBeforeRequest(tabId, url) {
 
 	// get scheme from URL
 	var scheme = httpscheme(url);
-
+	var port = "80";
+	var ret = tlsaExtNPAPIConst.DANE_OFF;
 	var tmp = url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(:[0-9]+)*(:)?/);
 	var domain = tmp[1];
-	var port = (tmp[2] == undefined) ? 443 : tmp[2].substring(1);
-
-	var ret = TLSAvalidate(scheme,domain,port);
-//	olddomain = domain;
+	if (scheme == "https") {
+		port = (tmp[2] == undefined) ? "443" : tmp[2].substring(1);
+		ret = TLSAvalidate(scheme, domain, port);
+	} else if (scheme == "ftps") {
+		port = (tmp[2] == undefined) ? "990" : tmp[2].substring(1);
+		ret = TLSAvalidate(scheme, domain, port);
+	}
+	//olddomain = domain;
 	return ret;
 }; // onUrlChange
 

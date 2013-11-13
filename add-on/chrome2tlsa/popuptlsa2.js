@@ -44,7 +44,7 @@ function TLSAicon2(icon){
 	domainpre = matches[5];
 	info = matches[6];
 	var domaintmp = domain;
-	if (domainpre == "https") domaintmp="https://"+domain;   
+	domaintmp=domainpre+"://"+domain;   
 	addText("domain-name-title-tlsa", domaintmp);
 	addText("long-text-tlsa", chrome.i18n.getMessage(statusString));
 	addText("tlsa-title", chrome.i18n.getMessage(status));
