@@ -84,6 +84,8 @@ ds_options opts;
 //----------------------------------------------------------------------------
 
 static struct ub_ctx *ctx = NULL; // ub context structure
+/* TODO -- Fixed size buffer. Writes don't check the buffer size. In some
+ * cases buffer overflow may occur. */
 char ip_validated[256]; // holds resolved and validated IP address(es)
 
 static
@@ -172,35 +174,102 @@ short ds_get_worse_case(const short a, const short b)
 	return (a <= b ? b : a);
 }
 
+#if 0
 //*****************************************************************************
-// safe string concatenation funciton
+// safe string concatenation function
+// Returns NULL on error or when both input parameters are NULL.
+// Returns newly allocated string containing concatenated input data.
 // ----------------------------------------------------------------------------
 static
-char * strconcat(const char *s1, const char *s2)
+char * strcat_clone(const char *s1, const char *s2)
 {
 	size_t s1_size = 0,
 	       s2_size = 0;
-	char *t = NULL;
+	char *cat = NULL;
 
 	if (s1 != NULL) {
 		s1_size = strlen(s1);
 	}
+
 	if (s2 != NULL) {
 		s2_size = strlen(s2);
 	}
-	if ((s1_size + s2_size) > 0) {
-		t = malloc(s1_size + s2_size + 1);
-		if (t == NULL) {
+
+	if ((s1 != NULL) || (s2 != NULL)) {
+		cat = malloc(s1_size + s2_size + 1);
+		if (cat == NULL) {
 			return NULL; /* Allocation error. */
 		}
-		if (s1 != NULL) {
-			strcpy(t, s1);
+
+		if (s1_size > 0) {
+			memcpy(cat, s1, s1_size);
 		}
-		if (s2 != NULL) {
-			strcpy(t + s1_size, s2);
+
+		if (s2_size > 0) {
+			memcpy(cat + s1_size, s2, s2_size);
 		}
+
+		cat[s1_size + s2_size] = '\0';
 	}
-	return t;
+
+	return cat;
+}
+#endif
+
+//*****************************************************************************
+// safe string concatenation function
+// Returns NULL on error or when both input parameters are NULL.
+// Returns newly allocated string containing concatenated input data.
+// If both strings are non-empty then a joiner character will be inserted
+// between them.
+// ----------------------------------------------------------------------------
+static
+char * strcat_join_clone(const char *s1, char joiner, const char *s2)
+{
+	size_t s1_size = 0,
+	       s2_size = 0;
+	char *cat = NULL;
+
+	assert(joiner != '\0');
+
+	if (s1 != NULL) {
+		s1_size = strlen(s1);
+	}
+
+	if (s2 != NULL) {
+		s2_size = strlen(s2);
+	}
+
+	if ((s1_size > 0) && (s2_size > 0)) {
+		/* Both strings. */
+		cat = malloc(s1_size + s2_size + 2);
+		if (cat == NULL) {
+			return NULL; /* Allocation error. */
+		}
+
+		memcpy(cat, s1, s1_size);
+		cat[s1_size] = joiner;
+		memcpy(cat + s1_size + 1, s2, s2_size);
+		cat[s1_size + s2_size + 1] = '\0';
+	} else if ((s1 != NULL) || (s2 != NULL)) {
+		/* Only one string. */
+		cat = malloc(s1_size + s2_size + 1);
+		if (cat == NULL) {
+			return NULL; /* Allocation error. */
+		}
+
+		if (s1_size > 0) {
+			memcpy(cat, s1, s1_size);
+		}
+
+		if (s2_size > 0) {
+			memcpy(cat + s1_size, s2, s2_size);
+		}
+
+		cat[s1_size + s2_size] = '\0';
+	}
+
+	return cat;
 }
 
 //*****************************************************************************
@@ -210,9 +279,9 @@ char * strconcat(const char *s1, const char *s2)
 // -1 : IP is not set or any error was detected
 // ----------------------------------------------------------------------------
 static
-short ipv6matches(const char *ipbrowser, const char *ipvalidator)
+short ipv6matches(const char *ipbrowser, const char *ipvalidator,
+    const char *delimiters)
 {
-	const char delimiters[] = " ";
 	char *token;
 	int isequal = 0;
 
@@ -263,11 +332,11 @@ short ipv6matches(const char *ipbrowser, const char *ipvalidator)
 // -1 : IP is not set or any error was detected
 // ----------------------------------------------------------------------------
 static
-short ipv4matches(const char *ipbrowser, const char *ipvalidator)
+short ipv4matches(const char *ipbrowser, const char *ipvalidator,
+    const char *delimiters)
 {
-	const char delimiters[] = " ";
 	char *token;
-	char* is = NULL;
+	char *is = NULL;
 
 	printf_debug("IP matches: %s %s\n", ipbrowser, ipvalidator);
 	strcpy(ip_validated, ipvalidator);
@@ -320,7 +389,7 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 	short retval;
 	char *ipv4;
 	char *ipvalidator = NULL,
-	     *ipvalidator_old = NULL;
+	     *aux_str = NULL;
 	retval = DNSSEC_ERROR_GENERIC;
 
 	printf_debug("Examine result: %s %i %i %i %s \n",
@@ -350,30 +419,26 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 					/* A examine result */
 					for (i=0; ub_res->data[i]; i++) {
 						ipv4 = inet_ntoa(*(const struct in_addr *) ub_res->data[i]);
-						ipvalidator_old = ipvalidator;
-						ipvalidator = strconcat(ipvalidator_old,ipv4);
-						free(ipvalidator_old);
-						ipvalidator_old = ipvalidator;
-						ipvalidator = strconcat(ipvalidator_old," ");
-						free(ipvalidator_old);
+						aux_str = ipvalidator;
+						ipvalidator =
+						    strcat_join_clone(aux_str, ' ', ipv4);
+						free(aux_str);
 					}
 					printf_debug("IPv4 address of validator: %s\n",
 					    ipvalidator);
-					retval = ipv4matches(ipbrowser, ipvalidator);
+					retval = ipv4matches(ipbrowser, ipvalidator, " ");
 				} else {
 					/* AAAA examine result */
 					for (i=0; ub_res->data[i]; i++) {
 						inet_ntop(AF_INET6, ((const struct in_addr *) ub_res->data[i]), ipv6, INET6_ADDRSTRLEN);
-						ipvalidator_old = ipvalidator;
-						ipvalidator = strconcat(ipvalidator_old,ipv6);
-						free(ipvalidator_old);
-						ipvalidator_old = ipvalidator;
-						ipvalidator = strconcat(ipvalidator_old," ");
-						free(ipvalidator_old);
+						aux_str = ipvalidator;
+						ipvalidator =
+						    strcat_join_clone(aux_str, ' ', ipv6);
+						free(aux_str);
 					}
 					printf_debug("IPv6 address of validator: %s\n",
 					    ipvalidator);
-					retval = ipv6matches(ipbrowser, ipvalidator);
+					retval = ipv6matches(ipbrowser, ipvalidator, " ");
 				} // ub_res->qtype
 				free(ipvalidator);
 				// free malloc ipvalidator

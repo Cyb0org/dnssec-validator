@@ -648,7 +648,7 @@ char * strcat_clone(const char *s1, const char *s2)
 		s2_size = strlen(s2);
 	}
 
-	if ((s1 != NULL) && (s2 != NULL)) {
+	if ((s1 != NULL) || (s2 != NULL)) {
 		cat = malloc(s1_size + s2_size + 1);
 		if (cat == NULL) {
 			return NULL; /* Allocation error. */
