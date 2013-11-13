@@ -249,7 +249,7 @@ int create_socket(char *url_str, const char *port_str)
 
 	port = atoi(portnum);
 	if ( (host = gethostbyname(hostname)) == NULL ) {
-		printf_debug(DEBUG_PREFIX,
+		printf_debug(DEBUG_PREFIX_CER,
 		    "Error: Cannot resolve hostname %s.\n", hostname);
 		abort();
 	}
@@ -257,7 +257,7 @@ int create_socket(char *url_str, const char *port_str)
 	//create the basic TCP socket                                
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd == -1) {
-		printf_debug(DEBUG_PREFIX, "error opening socket\n");
+		printf_debug(DEBUG_PREFIX_CER, "error opening socket\n");
 		return -1;
 	}
 
@@ -273,7 +273,7 @@ int create_socket(char *url_str, const char *port_str)
 	//Try to make the host connect here
 	if (connect(sockfd, (struct sockaddr *) &dest_addr,
 	        sizeof(struct sockaddr_in)) == -1) {
-		printf_debug(DEBUG_PREFIX,
+		printf_debug(DEBUG_PREFIX_CER,
 		    "Error: Cannot connect to host %s [%s] on port %d.\n",
 		    hostname, tmp_ptr, port);
 	}
@@ -727,7 +727,7 @@ int getcert(char *dest_url, const char *domain, const char *port,
 	method = SSLv23_client_method();
 	ssl_ctx = SSL_CTX_new(method);
 	if (ssl_ctx == NULL) {
-		printf_debug(NULL,
+		printf_debug(DEBUG_PREFIX_CER,
 		    "Unable to create a new SSL context structure.\n");
 		goto fail;
 	}
@@ -735,25 +735,25 @@ int getcert(char *dest_url, const char *domain, const char *port,
 	SSL_CTX_set_options(ssl_ctx, SSL_OP_NO_SSLv2);
 	ssl = SSL_new(ssl_ctx);
 	if (ssl == NULL) {
-		printf_debug(NULL, "Cannot create SSL structure.\n");
+		printf_debug(DEBUG_PREFIX_CER, "Cannot create SSL structure.\n");
 		goto fail;
 	}
 
 	server_fd = create_socket(dest_url, port);
 	if(server_fd == -1) {
-		printf_debug(NULL, "Error TCP connection to: %s.\n", dest_url);
+		printf_debug(DEBUG_PREFIX_CER, "Error TCP connection to: %s.\n", dest_url);
 		goto fail;
 	}
 
 	if (SSL_set_fd(ssl, server_fd) != 1) {
-		printf_debug(NULL, "Error: Cannot set server socket.\n");
+		printf_debug(DEBUG_PREFIX_CER, "Error: Cannot set server socket.\n");
 		goto fail;
 	}
 
 
 	if (domain != NULL) {
 		if (!SSL_set_tlsext_host_name(ssl, domain)) {
-			printf_debug(NULL,
+			printf_debug(DEBUG_PREFIX_CER,
 			    "Error: Unable to set TLS server-name extension: %s.\n",
 			    domain);
 			goto fail;
@@ -761,7 +761,7 @@ int getcert(char *dest_url, const char *domain, const char *port,
 	}
 
 	if (SSL_connect(ssl) != 1) {
-		printf_debug(NULL,
+		printf_debug(DEBUG_PREFIX_CER,
 		    "Error: Could not build a SSL session to: %s.\n",
 		    dest_url);
 		goto fail;
@@ -769,7 +769,7 @@ int getcert(char *dest_url, const char *domain, const char *port,
 
 	cert = SSL_get_peer_certificate(ssl);
 	if (cert == NULL) {
-		printf_debug(NULL,
+		printf_debug(DEBUG_PREFIX_CER,
 		    "Error: Could not get a certificate from: %s.\n",
 		    dest_url);
 		goto fail;
@@ -777,13 +777,13 @@ int getcert(char *dest_url, const char *domain, const char *port,
 
 	chain = SSL_get_peer_cert_chain(ssl);
 	if (chain == NULL) {
-		printf_debug(NULL,
+		printf_debug(DEBUG_PREFIX_CER,
 		    "Error: Could not get a certificate chain: %s.\n",
 		    dest_url);
 		goto fail;
 	}
 
-	printf_debug(NULL, "Number of certificates in chain: %i\n",
+	printf_debug(DEBUG_PREFIX_CER, "Number of certificates in chain: %i\n",
 	    sk_X509_num(chain));
 
 	for (i = 0; i < sk_X509_num(chain); ++i) {
@@ -791,7 +791,7 @@ int getcert(char *dest_url, const char *domain, const char *port,
 		cert2 = sk_X509_value(chain, i);
 		pkey = X509_get_pubkey(cert2);
 		if (pkey == NULL) {
-			printf_debug(NULL,
+			printf_debug(DEBUG_PREFIX_CER,
 			    "Error getting public key from certificate\n");
 			goto fail;
 		}
@@ -799,12 +799,12 @@ int getcert(char *dest_url, const char *domain, const char *port,
 		buf = NULL;
 		len = i2d_X509(cert2, &buf);
 		if (len < 0) {
-			printf_debug(NULL, "Error encoding into DER.\n");
+			printf_debug(DEBUG_PREFIX_CER, "Error encoding into DER.\n");
 			goto fail;
 		}
 		hex = bintohex((uint8_t *) buf, len);
 		if (hex == NULL) {
-			printf_debug(NULL, "Error converting DER to hex.\n");
+			printf_debug(DEBUG_PREFIX_CER, "Error converting DER to hex.\n");
 			goto fail;
 		}
 
@@ -812,12 +812,12 @@ int getcert(char *dest_url, const char *domain, const char *port,
 		len2 = i2d_PUBKEY(pkey, &buf2);
 		EVP_PKEY_free(pkey); pkey = NULL;
 		if (len2 < 0) {
-			printf_debug(NULL, "Error encoding into DER.\n");
+			printf_debug(DEBUG_PREFIX_CER, "Error encoding into DER.\n");
 			goto fail;
 		}
 		hex2 = bintohex((uint8_t *) buf2, len2);
 		if (hex2 == NULL) {
-			printf_debug(NULL, "Error converting DER to hex.\n");
+			printf_debug(DEBUG_PREFIX_CER, "Error converting DER to hex.\n");
 			goto fail;
 		}
 
@@ -848,7 +848,7 @@ int getcert(char *dest_url, const char *domain, const char *port,
 
 	SSL_CTX_free(ssl_ctx);
 
-	printf_debug(NULL, "Finished SSL/TLS connection with server: %s.\n",
+	printf_debug(DEBUG_PREFIX_CER, "Finished SSL/TLS connection with server: %s.\n",
 	    dest_url);
 
 	return 1;
@@ -953,7 +953,7 @@ char * opensslDigest(const EVP_MD *md, const char *data, int len)
 static
 char * sha256(const char *data, int len)
 {
-	printf_debug(DEBUG_PREFIX_DANE, "sha256\n");
+	printf_debug(DEBUG_PREFIX_DANE, "crypto: SHA-256\n");
 
 	return opensslDigest(EVP_sha256(), data, len);
 }
@@ -965,7 +965,7 @@ char * sha256(const char *data, int len)
 static
 char * sha512(const char *data, int len)
 {
-	printf_debug(DEBUG_PREFIX_DANE, "sha512\n");
+	printf_debug(DEBUG_PREFIX_DANE, "crypto: SHA-512\n");
 
 	return opensslDigest(EVP_sha512(), data, len);
 }
@@ -978,7 +978,7 @@ static
 const char * selectorData(uint8_t selector,
     const struct cert_store_ctx_st *cert_ctx)
 {
-	printf_debug(DEBUG_PREFIX_DANE, "selectorData->selector: %i \n",
+	printf_debug(DEBUG_PREFIX_DANE, "selector: %i \n",
 	    selector);
 	switch (selector) {
 	case FULL:
@@ -1051,7 +1051,7 @@ static
 int eeCertMatch1(const struct tlsa_store_ctx_st *tlsa_ctx,
     const struct cert_store_head *cert_list)
 {
-	printf_debug(DEBUG_PREFIX_DANE, "eeCertMatch1\n");
+	//printf_debug(DEBUG_PREFIX_DANE, "eeCertMatch1\n");
 
 	int ret_val = DANE_INVALID_TYPE1;
 	char *data = matchingData(tlsa_ctx->matching_type,
@@ -1066,8 +1066,8 @@ int eeCertMatch1(const struct tlsa_store_ctx_st *tlsa_ctx,
 		ret_val = DANE_VALID_TYPE1; 
 	}
 
-	printf_debug(DEBUG_PREFIX_DANE, "CERT: %s\n", data);
-	printf_debug(DEBUG_PREFIX_DANE, "TLSA: %s\n", tlsa_ctx->assochex);
+	printf_debug(DEBUG_PREFIX_DANE, "cert: %s\n", data);
+	printf_debug(DEBUG_PREFIX_DANE, "tlsa: %s\n", tlsa_ctx->assochex);
 
 	free(data);
 	return ret_val;
@@ -1084,7 +1084,7 @@ static
 int eeCertMatch3(const struct tlsa_store_ctx_st *tlsa_ctx,
     const struct cert_store_head *cert_list)
 {
-	printf_debug(DEBUG_PREFIX_DANE, "eeCertMatch3\n");
+	//printf_debug(DEBUG_PREFIX_DANE, "eeCertMatch3\n");
 
 	int ret_val = DANE_INVALID_TYPE3;
 	char *data = matchingData(tlsa_ctx->matching_type,
@@ -1099,8 +1099,8 @@ int eeCertMatch3(const struct tlsa_store_ctx_st *tlsa_ctx,
 		ret_val = DANE_VALID_TYPE3; 
 	}
 
-	printf_debug(DEBUG_PREFIX_DANE, "CERT: %s\n", data);
-	printf_debug(DEBUG_PREFIX_DANE, "TLSA: %s\n", tlsa_ctx->assochex);
+	printf_debug(DEBUG_PREFIX_DANE, "cert: %s\n", data);
+	printf_debug(DEBUG_PREFIX_DANE, "tlsa: %s\n", tlsa_ctx->assochex);
 
 	free(data);
 	return ret_val;
@@ -1117,7 +1117,7 @@ int caCertMatch(const struct tlsa_store_ctx_st *tlsa_ctx,
 {
 	const cert_store_ctx *aux_cert;
 
-	printf_debug(DEBUG_PREFIX_DANE, "caCertMatch0\n");
+	//printf_debug(DEBUG_PREFIX_DANE, "caCertMatch0\n");
 
 	int ret_val = DANE_INVALID_TYPE0;
 
@@ -1138,8 +1138,8 @@ int caCertMatch(const struct tlsa_store_ctx_st *tlsa_ctx,
 			return DANE_VALID_TYPE0;
 		}
 
-		printf_debug(DEBUG_PREFIX_DANE, "CERT: %s\n", data);
-		printf_debug(DEBUG_PREFIX_DANE, "TLSA: %s\n",
+		printf_debug(DEBUG_PREFIX_DANE, "cert: %s\n", data);
+		printf_debug(DEBUG_PREFIX_DANE, "tlsa: %s\n",
 		    tlsa_ctx->assochex);
 
 		free(data);
@@ -1160,7 +1160,7 @@ int chainCertMatch(const struct tlsa_store_ctx_st *tlsa_ctx,
 {
 	const cert_store_ctx *aux_cert;
 
-	printf_debug(DEBUG_PREFIX_DANE, "chainCertMatch2\n");
+	//printf_debug(DEBUG_PREFIX_DANE, "chainCertMatch2\n");
 
 	if (cert_list->first == NULL) {
 		return DANE_NO_CERT_CHAIN;
@@ -1181,8 +1181,8 @@ int chainCertMatch(const struct tlsa_store_ctx_st *tlsa_ctx,
 			return DANE_VALID_TYPE2;
 		}
 
-		printf_debug(DEBUG_PREFIX_DANE, "CERT: %s\n", data);
-		printf_debug(DEBUG_PREFIX_DANE, "TLSA: %s\n",
+		printf_debug(DEBUG_PREFIX_DANE, "cert: %s\n", data);
+		printf_debug(DEBUG_PREFIX_DANE, "tlsa: %s\n",
 		    tlsa_ctx->assochex);
 
 		free(data);
@@ -1214,7 +1214,7 @@ int tlsa_validate(const struct tlsa_store_head *tlsa_list,
 			return DANE_DNSSEC_BOGUS;
 		case 1:
 			printf_debug(DEBUG_PREFIX_DANE,
-			    "tlsa_validate->cert_usage: %i \n",
+			    "cert_usage: %i \n",
 			    aux_tlsa->cert_usage);
 			switch (aux_tlsa->cert_usage) {
 			case CA_CERT_PIN: //0
@@ -1238,11 +1238,8 @@ int tlsa_validate(const struct tlsa_store_head *tlsa_list,
 			break; // continue checking
 		} // switch
 
-		printf_debug(DEBUG_PREFIX_DANE, "Return: %i > %i\n", idx,
-		    DANE_NO_CERT_CHAIN);
-
 		aux_tlsa = aux_tlsa->next;
-		if (idx > DANE_NO_CERT_CHAIN) { /* TODO -- Get rid of the comparison! */
+		if ((idx >= DANE_VALID_TYPE0) && (idx <= DANE_VALID_TYPE3)) {
 			return idx;
 		}
 	} // while
@@ -1687,7 +1684,7 @@ int main(int argc, char **argv)
 	    DANE_FLAG_USEFWD;
 
 	res = CheckDane(certhex, 0, options, resolver_addresses, dname, port, "tcp", 1);
-	printf(DEBUG_PREFIX_DANE "Main final result: %i\n", res);
+	printf(DEBUG_PREFIX_DANE "Main result: %i\n", res);
 
 	ub_context_free();
 
