@@ -16,10 +16,13 @@ BOOST_FLAGS := -I$(FB_DIR)/src/3rdParty/boost -DBOOST_ALL_NO_LIB=1
 
 INCLUDES := -I$(OPENSSL_LIB)/include -I$(LDNS_LIB)/include -I$(UNBOUND_LIB)/include -I$(PLUGIN_SOURCE_DIR) $(FB_INCLUDE)
 LIBS := -L$(UNBOUND_LIB)/lib -L$(OPENSSL_LIB)/lib -L$(LDNS_LIB)/lib -lunbound -lldns -lssl -lcrypto -lpthread -ldl
+
+OPTFLAGS = -g -O0
+#OPTFLAGS = -g -O3
 CPPFLAGS += -DCMNDLINE_TEST
-CFLAGS += $(INCLUDES) $(BOOST_FLAGS) -Wall -pedantic -g -std=c99
-CFLAGS2 += $(INCLUDES) $(BOOST_FLAGS) -Wall -pedantic -g
-CXXFLAGS += $(INCLUDES) $(BOOST_FLAGS) -Wall -g
+CFLAGS += $(INCLUDES) $(BOOST_FLAGS) -Wall -Wextra -pedantic $(OPTFLAGS) -std=c99
+CFLAGS2 += $(INCLUDES) $(BOOST_FLAGS) -Wall -Wextra -pedantic $(OPTFLAGS)
+CXXFLAGS += $(INCLUDES) $(BOOST_FLAGS) -Wall -Westra -pedantic $(OPTFLAGS)
 LDFLAGS += $(DANE_CORE_LIB) $(LIBS)
 
 TARGETS := dane-plug unbound-test-dnssec ssl-test iptest dnssec-plug

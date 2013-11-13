@@ -28,7 +28,7 @@
 #define ERROR_PREFIX "DNSSEC error: "
 #define MAX_IPADDRLEN 40              /* max len of IPv4 and IPv6 addr notation */
 #define MAX_SRCHLSTLEN 6*256          /* max len of searchlist */
-#define FNAME "dnssecval.log"	        /* mane of output log file */
+#define FNAME "dnssecval.log"         /* mane of output log file */
             
 //----------------------------------------------------------------------------
 typedef struct {                     /* structure to save input options */
@@ -86,10 +86,10 @@ int ipv6str_equal_str(const char *lhs, const char *rhs)
 /* read input options into a structure */
 // ----------------------------------------------------------------------------
 void ds_init_opts(const uint16_t options) {
-  opts.debug = options & DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-  opts.usefwd = options & DNSSEC_INPUT_FLAG_USEFWD;
-  opts.resolvipv4 = options & DNSSEC_INPUT_FLAG_RESOLVIPV4;
-  opts.resolvipv6 = options & DNSSEC_INPUT_FLAG_RESOLVIPV6;
+  opts.debug = options & DNSSEC_FLAG_DEBUG;
+  opts.usefwd = options & DNSSEC_FLAG_USEFWD;
+  opts.resolvipv4 = options & DNSSEC_FLAG_RESOLVIPV4;
+  opts.resolvipv6 = options & DNSSEC_FLAG_RESOLVIPV6;
 }
 
 //*****************************************************************************
@@ -133,25 +133,25 @@ short ipv6matches(char *ipbrowser, char *ipvalidator)
       {
         token = strtok (ipvalidator, delimiters);
         if (token==NULL) {			
-		return DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP;
+		return DNSSEC_COT_DOMAIN_SECURED_BAD_IP;
 	}
         isequal = ipv6str_equal((const char*)ipbrowser,(const char*)token);
         if (isequal != 0) {
- 		return DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP;
+ 		return DNSSEC_COT_DOMAIN_SECURED;
 	}
         while (token != NULL) {                    
             token = strtok (NULL, delimiters);
             if (token==NULL) {
-       	        return DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP;
+       	        return DNSSEC_COT_DOMAIN_SECURED_BAD_IP;
 	    }
             isequal = ipv6str_equal((const char*)ipbrowser,(const char*)token);                       
             if (isequal != 0) {
-		return DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP;
+		return DNSSEC_COT_DOMAIN_SECURED;
 	    }                  
         }
-        return DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP;        
+        return DNSSEC_COT_DOMAIN_SECURED_BAD_IP;        
      }
-   return DNSSEC_EXIT_FAILED;
+   return DNSSEC_ERROR_GENERIC;
 }
 
 
@@ -175,25 +175,25 @@ short ipv4matches(char *ipbrowser, char *ipvalidator)
       {
         token = strtok (ipvalidator, delimiters);
         if (token==NULL) {			
-		return DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP;
+		return DNSSEC_COT_DOMAIN_SECURED_BAD_IP;
 		}
         is = strstr(ipbrowser,(const char*)token);
         if (is!=NULL) {
- 		return DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP;
+ 		return DNSSEC_COT_DOMAIN_SECURED;
 		}
         while (token != NULL) {                    
             token = strtok (NULL, delimiters);
             if (token==NULL) {
-       	        return DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP;
+       	        return DNSSEC_COT_DOMAIN_SECURED_BAD_IP;
 		}
             is = strstr(ipbrowser,(const char*)token);                       
             if (is!=NULL) {
-		return DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP;
+		return DNSSEC_COT_DOMAIN_SECURED;
 		}                  
         }
-        return DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP;        
+        return DNSSEC_COT_DOMAIN_SECURED_BAD_IP;        
      }
-   return DNSSEC_EXIT_FAILED;
+   return DNSSEC_ERROR_GENERIC;
 }
 
 //*****************************************************************************
@@ -207,7 +207,7 @@ short examine_result(struct ub_result *result, char* ipbrowser) {
   short retval;  
   char *ipv4;
   char *ipvalidator;
-  retval =  DNSSEC_EXIT_FAILED;
+  retval =  DNSSEC_ERROR_GENERIC;
   ipvalidator = "";
  
   // debug
@@ -226,7 +226,7 @@ short examine_result(struct ub_result *result, char* ipbrowser) {
               if (ws) fprintf(dfout, DEBUG_PREFIX "Has data\n");
                                                    
               if ((!result->secure) && (!result->bogus)) {            
-                    retval = DNSSEC_EXIT_DOMAIN_UNSECURED;          
+                    retval = DNSSEC_DOMAIN_UNSECURED;          
               } 
               else if ((result->secure) && (!result->bogus)) {
                     /* result is secured and bogus not was detected */ 
@@ -258,26 +258,26 @@ short examine_result(struct ub_result *result, char* ipbrowser) {
               else { 
                  if (opts.debug) printf(DEBUG_PREFIX "Why bogus?: %s\n", result->why_bogus);
                  if (ws) fprintf(dfout, DEBUG_PREFIX "Why bogus?: %s\n", result->why_bogus);
-			           retval = DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS; 
+			           retval = DNSSEC_COT_DOMAIN_BOGUS; 
 		          }
         } //result->havedata      
-        else retval = DNSSEC_EXIT_FAILED; // no data                             
+        else retval = DNSSEC_ERROR_GENERIC; // no data                             
       } // LDNS_RCODE_NOERROR
       else
       {
           if  (result->rcode != LDNS_RCODE_NXDOMAIN) {
                 /* response code is UNKNOWN */
-                retval = DNSSEC_EXIT_FAILED;
+                retval = DNSSEC_ERROR_GENERIC;
           }
           else  
           {  /* response code is NXDOMAIN */
               if ((!result->secure) && (!result->bogus)) {            
-                    retval = DNSSEC_EXIT_NODOMAIN_UNSECURED;          
+                    retval = DNSSEC_NXDOMAIN_UNSECURED;          
               } 
               else if ((result->secure) && (!result->bogus)) {
-                      retval = DNSSEC_EXIT_NODOMAIN_SIGNATURE_VALID;      
+                      retval = DNSSEC_NXDOMAIN_SIGNATURE_VALID;      
               }
-              else retval = DNSSEC_EXIT_NODOMAIN_SIGNATURE_INVALID;                                       
+              else retval = DNSSEC_NXDOMAIN_SIGNATURE_INVALID;                                       
           } // nxdomain                          
       } // not LDNS_RCODE_NOERROR      
   
@@ -290,7 +290,7 @@ short examine_result(struct ub_result *result, char* ipbrowser) {
   } // not LDNS_RCODE_SERVFAIL
   else {
     /* response code is SERVFAIL */
-    retval = DNSSEC_EXIT_FAILED;
+    retval = DNSSEC_ERROR_GENERIC;
   } // LDNS_RCODE_SERVFAIL
 
   return retval;
@@ -327,9 +327,9 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv, char *i
   char *fwd_addr;
   char delims[] = " ";
 
-  retval = DNSSEC_EXIT_FAILED;
-  retval_ipv4 = DNSSEC_EXIT_FAILED;
-  retval_ipv6 = DNSSEC_EXIT_FAILED;
+  retval = DNSSEC_ERROR_GENERIC;
+  retval_ipv4 = DNSSEC_ERROR_GENERIC;
+  retval_ipv6 = DNSSEC_ERROR_GENERIC;
   ub_retval = 0;
 
   char* x = "";
@@ -466,9 +466,9 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv, char *i
 int main(int argc, char **argv)
 {
 	short i;
-	char *tmp = NULL;	
+	char *tmp = NULL;
 	i = ds_validate(argv[1], 13, "nofwd", "2001:610:188:301:145::2:10", &tmp);
-	printf(DEBUG_PREFIX "Returned value: \"%d\" %s\n", i, tmp);				
+	printf(DEBUG_PREFIX "Returned value: \"%d\" %s\n", i, tmp);
 	return 1;
 }
 
