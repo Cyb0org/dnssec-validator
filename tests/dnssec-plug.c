@@ -587,10 +587,8 @@ short ds_validate(const char *domain, const uint16_t options,
 	    retval, retval_ipv4, retval_ipv6);
 
 	/* export resolved addrs buf as static */
-	if (ipvalidator) {
+	if (ipvalidator != NULL) {
 		*ipvalidator = ip_validator;
-	} else {
-		*ipvalidator = "n/a";
 	}
 
 	return retval;
