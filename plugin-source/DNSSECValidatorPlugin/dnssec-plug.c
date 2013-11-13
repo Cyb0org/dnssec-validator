@@ -210,7 +210,7 @@ char * strconcat(const char *s1, const char *s2)
 // -1 : IP is not set or any error was detected
 // ----------------------------------------------------------------------------
 static
-short ipv6matches(char *ipbrowser, char *ipvalidator)
+short ipv6matches(const char *ipbrowser, const char *ipvalidator)
 {
 	const char delimiters[] = " ";
 	char *token;
@@ -219,27 +219,37 @@ short ipv6matches(char *ipbrowser, char *ipvalidator)
 	printf_debug("IP matches: %s %s\n", ipbrowser, ipvalidator);
 	strcpy(ip_validator, ipvalidator);
 
-	if ((ipbrowser != NULL) && (ipvalidator != NULL)) {
-		token = strtok(ipvalidator, delimiters);
+	if ((ipbrowser != NULL) && (ipbrowser[0] != '\0') &&
+	    (ipvalidator != NULL) && (ipvalidator[0] != '\0')) {
+		size_t size = strlen(ipvalidator) + 1;
+		char *str_cpy = malloc(size);
+		if (str_cpy == NULL) {
+			return DNSSEC_ERROR_GENERIC;
+		}
+		memcpy(str_cpy, ipvalidator, size);
+		token = strtok(str_cpy, delimiters);
 		if (token == NULL) {
+			free(str_cpy);
 			return DNSSEC_COT_DOMAIN_SECURED_BAD_IP;
 		}
-		isequal = ipv6str_equal((const char*) ipbrowser,
-		    (const char*) token);
+		isequal = ipv6str_equal(ipbrowser, token);
 		if (isequal != 0) {
+			free(str_cpy);
 			return DNSSEC_COT_DOMAIN_SECURED;
 		}
 		while (token != NULL) {
 			token = strtok(NULL, delimiters);
 			if (token == NULL) {
+				free(str_cpy);
 				return DNSSEC_COT_DOMAIN_SECURED_BAD_IP;
 			}
-			isequal = ipv6str_equal((const char*) ipbrowser,
-			    (const char*) token);
+			isequal = ipv6str_equal(ipbrowser, token);
 			if (isequal != 0) {
+				free(str_cpy);
 				return DNSSEC_COT_DOMAIN_SECURED;
 			}
 		}
+		free(str_cpy);
 		return DNSSEC_COT_DOMAIN_SECURED_BAD_IP;
 	}
 	return DNSSEC_ERROR_GENERIC;
@@ -253,7 +263,7 @@ short ipv6matches(char *ipbrowser, char *ipvalidator)
 // -1 : IP is not set or any error was detected
 // ----------------------------------------------------------------------------
 static
-short ipv4matches(char *ipbrowser, char *ipvalidator)
+short ipv4matches(const char *ipbrowser, const char *ipvalidator)
 {
 	const char delimiters[] = " ";
 	char *token;
@@ -262,25 +272,37 @@ short ipv4matches(char *ipbrowser, char *ipvalidator)
 	printf_debug("IP matches: %s %s\n", ipbrowser, ipvalidator);
 	strcpy(ip_validator, ipvalidator);
 
-	if ((ipbrowser != NULL) && (ipvalidator != NULL)) {
-		token = strtok(ipvalidator, delimiters);
+	if ((ipbrowser != NULL) && (ipbrowser[0] != '\0') &&
+	    (ipvalidator != NULL) && (ipvalidator[0] != '\0')) {
+		size_t size = strlen(ipvalidator) + 1;
+		char *str_cpy = malloc(size);
+		if (str_cpy == NULL) {
+			return DNSSEC_ERROR_GENERIC;
+		}
+		memcpy(str_cpy, ipvalidator, size);
+		token = strtok(str_cpy, delimiters);
 		if (token == NULL) {
+			free(str_cpy);
 			return DNSSEC_COT_DOMAIN_SECURED_BAD_IP;
 		}
-		is = strstr(ipbrowser, (const char*) token);
+		is = strstr(ipbrowser, token);
 		if (is != NULL) {
+			free(str_cpy);
 			return DNSSEC_COT_DOMAIN_SECURED;
 		}
 		while (token != NULL) {
 			token = strtok(NULL, delimiters);
 			if (token == NULL) {
+				free(str_cpy);
 				return DNSSEC_COT_DOMAIN_SECURED_BAD_IP;
 			}
-			is = strstr(ipbrowser, (const char*) token);
+			is = strstr(ipbrowser, token);
 			if (is != NULL) {
+				free(str_cpy);
 				return DNSSEC_COT_DOMAIN_SECURED;
 			}
 		}
+		free(str_cpy);
 		return DNSSEC_COT_DOMAIN_SECURED_BAD_IP;
 	}
 	return DNSSEC_ERROR_GENERIC;
@@ -290,7 +312,7 @@ short ipv4matches(char *ipbrowser, char *ipvalidator)
 // return DNSSEC state from response A/AAAA
 // ----------------------------------------------------------------------------
 static
-short examine_result(struct ub_result *result, char *ipbrowser)
+short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 {
 	int i;
 	//struct sockaddr_in6 sa;
@@ -302,90 +324,90 @@ short examine_result(struct ub_result *result, char *ipbrowser)
 	retval = DNSSEC_ERROR_GENERIC;
 
 	printf_debug("Examine result: %s %i %i %i %s \n",
-	    result->qname, result->qtype, result->qclass,
-	    result->rcode, ipbrowser);
+	    ub_res->qname, ub_res->qtype, ub_res->qclass,
+	    ub_res->rcode, ipbrowser);
 
-	if (result->rcode != LDNS_RCODE_SERVFAIL) {
-		/* response code is not SERVFAIL */
+	if (ub_res->rcode == LDNS_RCODE_SERVFAIL) {
+		/* response code is SERVFAIL */
+		return DNSSEC_ERROR_RESOLVER;
+	}
 
-		if (result->rcode == LDNS_RCODE_NOERROR ) {
-			/* response code is NOERROR */
+	/* response code is not SERVFAIL */
+	if (ub_res->rcode == LDNS_RCODE_NOERROR ) {
+		/* response code is NOERROR */
 
-			if (result->havedata) {
+		if (ub_res->havedata) {
 
-				printf_debug("Has data\n");
+			printf_debug("Has data\n");
 
-				if ((!result->secure) && (!result->bogus)) {
-					retval = DNSSEC_DOMAIN_UNSECURED;
-				} else if ((result->secure) &&
-				           (!result->bogus)) {
-					/* Result is secured and bogus wasn't
-					 * detected. */
-					if (result->qtype == LDNS_RR_TYPE_A) {
-						/* A examine result */
-						for (i=0; result->data[i]; i++) {
-							ipv4 = inet_ntoa(*(struct in_addr*)result->data[i]);
-							ipvalidator_old = ipvalidator;
-							ipvalidator = strconcat(ipvalidator_old,ipv4);
-							free(ipvalidator_old);
-							ipvalidator_old = ipvalidator;
-							ipvalidator = strconcat(ipvalidator_old," ");
-							free(ipvalidator_old);
-						}
-						printf_debug("IPv4 address of validator: %s\n",
-						    ipvalidator);
-						retval = ipv4matches(ipbrowser,ipvalidator);
-					} else {
-						/* AAAA examine result */
-						for (i=0; result->data[i]; i++) {
-							inet_ntop(AF_INET6, ((struct in_addr*)result->data[i]), ipv6, INET6_ADDRSTRLEN);
-							ipvalidator_old = ipvalidator;
-							ipvalidator = strconcat(ipvalidator_old,ipv6);
-							free(ipvalidator_old);
-							ipvalidator_old = ipvalidator;
-							ipvalidator = strconcat(ipvalidator_old," ");
-							free(ipvalidator_old);
-						}
-						printf_debug("IPv6 address of validator: %s\n",
-						    ipvalidator);
-						retval = ipv6matches(ipbrowser,ipvalidator);
-					} // result->qtype
-					free(ipvalidator);
-					// free malloc ipvalidator
+			if ((!ub_res->secure) && (!ub_res->bogus)) {
+				retval = DNSSEC_DOMAIN_UNSECURED;
+			} else if ((ub_res->secure) &&
+			           (!ub_res->bogus)) {
+				/* Result is secured and bogus wasn't
+				 * detected. */
+				if (ub_res->qtype == LDNS_RR_TYPE_A) {
+					/* A examine result */
+					for (i=0; ub_res->data[i]; i++) {
+						ipv4 = inet_ntoa(*(const struct in_addr *) ub_res->data[i]);
+						ipvalidator_old = ipvalidator;
+						ipvalidator = strconcat(ipvalidator_old,ipv4);
+						free(ipvalidator_old);
+						ipvalidator_old = ipvalidator;
+						ipvalidator = strconcat(ipvalidator_old," ");
+						free(ipvalidator_old);
+					}
+					printf_debug("IPv4 address of validator: %s\n",
+					    ipvalidator);
+					retval = ipv4matches(ipbrowser, ipvalidator);
 				} else {
-					printf_debug("Why bogus?: %s\n",
-					    result->why_bogus);
-					retval = DNSSEC_COT_DOMAIN_BOGUS;
-				}
-
-				//result->havedata
+					/* AAAA examine result */
+					for (i=0; ub_res->data[i]; i++) {
+						inet_ntop(AF_INET6, ((const struct in_addr *) ub_res->data[i]), ipv6, INET6_ADDRSTRLEN);
+						ipvalidator_old = ipvalidator;
+						ipvalidator = strconcat(ipvalidator_old,ipv6);
+						free(ipvalidator_old);
+						ipvalidator_old = ipvalidator;
+						ipvalidator = strconcat(ipvalidator_old," ");
+						free(ipvalidator_old);
+					}
+					printf_debug("IPv6 address of validator: %s\n",
+					    ipvalidator);
+					retval = ipv6matches(ipbrowser, ipvalidator);
+				} // ub_res->qtype
+				free(ipvalidator);
+				// free malloc ipvalidator
 			} else {
-				retval = DNSSEC_ERROR_RESOLVER; // no data
+				printf_debug("Why bogus?: %s\n",
+				    ub_res->why_bogus);
+				retval = DNSSEC_COT_DOMAIN_BOGUS;
 			}
 
-			// LDNS_RCODE_NOERROR
+			//ub_res->havedata
 		} else {
-			if (result->rcode != LDNS_RCODE_NXDOMAIN) {
-				/* response code is UNKNOWN */
-				retval = DNSSEC_ERROR_RESOLVER;
-			} else { /* response code is NXDOMAIN */
-				if ((!result->secure) && (!result->bogus)) {
-					retval = DNSSEC_NXDOMAIN_UNSECURED;
-				} else if ((result->secure) &&
-				           (!result->bogus)) {
-					retval = DNSSEC_NXDOMAIN_SIGNATURE_VALID;
-				} else {
-					retval = DNSSEC_NXDOMAIN_SIGNATURE_INVALID;
-				}
-			} // nxdomain
-		} // not LDNS_RCODE_NOERROR
+			retval = DNSSEC_ERROR_RESOLVER; // no data
+		}
 
-		printf_debug("ub-secure: %i\n", result->secure);
-		printf_debug("ub-bogus: %i\n", result->bogus);
+		// LDNS_RCODE_NOERROR
 	} else {
-		/* response code is SERVFAIL */
-		retval = DNSSEC_ERROR_RESOLVER;
-	} // LDNS_RCODE_SERVFAIL
+		if (ub_res->rcode != LDNS_RCODE_NXDOMAIN) {
+			/* response code is UNKNOWN */
+			retval = DNSSEC_ERROR_RESOLVER;
+		} else { /* response code is NXDOMAIN */
+			if ((!ub_res->secure) && (!ub_res->bogus)) {
+				retval = DNSSEC_NXDOMAIN_UNSECURED;
+			} else if ((ub_res->secure) &&
+			           (!ub_res->bogus)) {
+				retval = DNSSEC_NXDOMAIN_SIGNATURE_VALID;
+			} else {
+				retval = DNSSEC_NXDOMAIN_SIGNATURE_INVALID;
+			}
+		} // nxdomain
+	} // not LDNS_RCODE_NOERROR
+
+	printf_debug("ub-secure: %i\n", ub_res->secure);
+	printf_debug("ub-bogus: %i\n", ub_res->bogus);
+
 	return retval;
 }
 
@@ -410,10 +432,10 @@ void ub_context_free(void)
 //        *ipbrowser - is IP address of browser which browser used to connection on the server
 // Out:   **ipvalidator - is IP address(es) of validator
 // ----------------------------------------------------------------------------
-short ds_validate(char *domain, const uint16_t options, char *optdnssrv,
-    char *ipbrowser, char **ipvalidator)
+short ds_validate(const char *domain, const uint16_t options,
+    const char *optdnssrv, const char *ipbrowser, char **ipvalidator)
 {
-	struct ub_result *result;
+	struct ub_result *ub_res;
 	int ub_retval;
 	short retval;
 	short retval_ipv4;
@@ -435,7 +457,7 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv,
 	printf_debug("Input parameters: \"%s; %u; %s; %s;\"\n",
 	    domain, options, optdnssrv, ipbrowser);
 
-	if (!domain) {
+	if ((domain == NULL) || (domain[0] == '\0')) {
 		printf_debug("Error: no domain...\n");
 		return retval;
 	}
@@ -452,21 +474,31 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv,
 		if (opts.usefwd) {
 
 			if (strcmp(optdnssrv, "") != 0) {
-				fwd_addr = strtok(optdnssrv, delims);
+				size_t size = strlen(optdnssrv) + 1;
+				char *str_cpy = malloc(size);
+				if (str_cpy == NULL) {
+					return DNSSEC_ERROR_GENERIC;
+				}
+				memcpy(str_cpy, optdnssrv, size);
+				fwd_addr = strtok(str_cpy, delims);
 				// set ip addresses of resolvers into ub context
 				while (fwd_addr != NULL) {
-					printf_debug("Adding resolver IP address: %s\n",
+					printf_debug("Adding resolver IP address '%s'\n",
 					    fwd_addr);
 					ub_retval = ub_ctx_set_fwd(ctx,
 					    fwd_addr);
 					if (ub_retval != 0) {
-						printf_debug("Error adding resolver IP address: %s\n",
+						printf_debug("Error adding resolver IP address '%s': %s\n",
+						    fwd_addr,
 						    ub_strerror(ub_retval));
+						free(str_cpy);
 						return retval; /* DNSSEC_ERROR_GENERIC */
 					}
 					fwd_addr = strtok(NULL, delims);
 				} //while
+				free(str_cpy);
 			} else {
+				printf_debug("Using system resolver.\n");
 				ub_retval = ub_ctx_resolvconf(ctx, NULL);
 				if (ub_retval != 0) {
 					printf_debug("Error reading resolv.conf: %s. errno says: %s\n",
@@ -506,49 +538,49 @@ short ds_validate(char *domain, const uint16_t options, char *optdnssrv,
 	if (opts.resolvipv6 && !opts.resolvipv4) {
 		/* query for AAAA only*/
 		ub_retval = ub_resolve(ctx, domain, LDNS_RR_TYPE_AAAA,
-		    LDNS_RR_CLASS_IN, &result);
+		    LDNS_RR_CLASS_IN, &ub_res);
 		if(ub_retval != 0) {
 			printf_debug("Resolve error AAAA: %s\n",
 			    ub_strerror(ub_retval));
 			return retval; /* DNSSEC_ERROR_GENERIC */
 		}
-		retval_ipv6 = examine_result(result, ipbrowser);
+		retval_ipv6 = examine_result(ub_res, ipbrowser);
 		retval = retval_ipv6;
-		ub_resolve_free(result);
+		ub_resolve_free(ub_res);
 	} else if (!opts.resolvipv6 && opts.resolvipv4) {
 		/* query for A only */
 		ub_retval = ub_resolve(ctx, domain, LDNS_RR_TYPE_A,
-		    LDNS_RR_CLASS_IN, &result);
+		    LDNS_RR_CLASS_IN, &ub_res);
 		if(ub_retval != 0) {
 			printf_debug("Resolve error A: %s\n",
 			    ub_strerror(ub_retval));
 			return retval; /* DNSSEC_ERROR_GENERIC */
 		}
-		retval_ipv4 = examine_result(result, ipbrowser);
+		retval_ipv4 = examine_result(ub_res, ipbrowser);
 		retval = retval_ipv4;
-		ub_resolve_free(result);
+		ub_resolve_free(ub_res);
 	} else {
 		/* query for A and AAAA */
 		ub_retval = ub_resolve(ctx, domain, LDNS_RR_TYPE_AAAA,
-		    LDNS_RR_CLASS_IN, &result);
+		    LDNS_RR_CLASS_IN, &ub_res);
 		if(ub_retval != 0) {
 			printf_debug("Resolve error AAAA: %s\n",
 			    ub_strerror(ub_retval));
 			return retval; /* DNSSEC_ERROR_GENERIC */
 		}
-		retval_ipv6 = examine_result(result, ipbrowser);
-		ub_resolve_free(result);
+		retval_ipv6 = examine_result(ub_res, ipbrowser);
+		ub_resolve_free(ub_res);
 
 		ub_retval = ub_resolve(ctx, domain, LDNS_RR_TYPE_A,
-		    LDNS_RR_CLASS_IN, &result);
+		    LDNS_RR_CLASS_IN, &ub_res);
 		if(ub_retval != 0) {
 			printf_debug("Resolve error A: %s\n",
 			    ub_strerror(ub_retval));
 			return retval; /* DNSSEC_ERROR_GENERIC */
 		}
-		retval_ipv4 = examine_result(result, ipbrowser);
+		retval_ipv4 = examine_result(ub_res, ipbrowser);
 		retval = ds_get_worse_case(retval_ipv4, retval_ipv6);
-		ub_resolve_free(result);
+		ub_resolve_free(ub_res);
 	}
 
 	printf_debug("Returned value (overall/ipv4/ipv6): \"%d/%d/%d\"\n",
@@ -578,7 +610,12 @@ int main(int argc, char **argv)
 	char resolver_addresses[256];
 	// Must be taken through writeable buffer.
 	// TODO -- Modify it so it can take constant string literals.
-	strcpy(resolver_addresses, "8.8.8.8 217.31.204.130");
+	strcpy(resolver_addresses,
+	    ""
+	    " 8.8.8.8"
+	    " 217.31.204.130"
+//	    " 193.29.206.206"
+	    );
 
 	if (argc != 2) {
 		fprintf(stderr, "Usage\n\t%s dname\n", argv[0]);
