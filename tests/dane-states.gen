@@ -31,7 +31,6 @@ OpenSSL used as well as that of the covered work.
 
 
 const short DANE_RESOLVER_NO_DNSSEC	= -10; /* resolver does not support DNSSEC */
-const short DANE_ERROR_NXDOMAIN		= -3; /* is https but domain name does not exists */
 const short DANE_ERROR_RESOLVER		= -2; /* bad resolver or wrong IP address of DNS*/
 const short DANE_ERROR_GENERIC		= -1; /* any except those listed above */
 const short DANE_OFF			= 0;  /* domain name validation disabled */

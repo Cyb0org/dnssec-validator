@@ -41,7 +41,7 @@ clean-tests:
 ## Separate test builds
 
 dane-plug: dane-plug.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
-	$(CC) $< -o $@ $(CFLAGS) $(LDFLAGS)
+	$(CC) $< -o $@ $(CPPFLAGS) $(CFLAGS) $(LDFLAGS)
 
 unbound-test-dnssec: unbound-test-dnssec.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
 	$(CC) $< -o $@ $(CFLAGS) $(LDFLAGS)
