@@ -83,6 +83,12 @@
 	 "nodomain": {
 		"message": "Neexistence doménového jména "
 		},
+         "dnssecgenericError": {
+		"message": " nelze ověřit pomocí DNSSEC technologie, protože došlo k selhání DNSSEC validátoru."
+		},
+         "dnssecgenericErrorInfo": {
+		"message": "Prosím, restartujte webový prohlížeč pro jeho opětovnou inicializaci..."
+		},
          "dnsseOff": {
 		"message": " nebylo ověřeno pomocí technologie DNSSEC."
 		},

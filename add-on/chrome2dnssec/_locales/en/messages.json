@@ -83,6 +83,12 @@
 	 "nodomain": {
 		"message": "Nonexistence of the domain name "
 		},
+         "dnssecgenericError": {
+		"message": " can not be verified by DNSSEC because an error occurred in DNSSEC validator core."
+		},
+         "dnssecgenericErrorInfo": {
+		"message": "Please, restart your web-browser..."
+		},
  	"dnssecwrongres": {
 		"message": "Resolver doesn't support DNSSEC"
 		},

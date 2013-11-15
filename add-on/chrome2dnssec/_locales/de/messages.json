@@ -83,6 +83,12 @@
 	 "nodomain": {
 		"message": "Die Nichtexistenz des Domänennamen "
 		},
+         "dnssecgenericError": {
+		"message": " kann nicht mit DNSSEC überprüft werden. Es kam zu einem Fehler während Erwerbs der DNSSEC Validator core."
+		},
+         "dnssecgenericErrorInfo": {
+		"message": "Bitte Neustart Sie Ihren Web-Browser..."
+		},
  	"dnssecwrongres": {
 		"message": "Resolver unterstützt DNSSEC nicht"
 		},
