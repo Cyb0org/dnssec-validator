@@ -360,6 +360,11 @@ BEGIN
 	IDS_STATE02_TEXT_TOOLTIP "DNSSEC status unknown"
 	IDS_STATE02_TEXT_DOMAIN  "can not be verified by DNSSEC."
 	IDS_STATE02_TEXT_MAIN	"Current DNS server or resolver does not support DNSSEC technology. Please, change the validator settings (choice 'Without resolver')."
+	
+	//state -1
+	IDS_DNSSEC_ERROR_GEN_TOOLTIP "DNSSEC status unknown"
+	IDS_DNSSEC_ERROR_GEN_DOMAIN  "can not be verified by DNSSEC because an error occurred in DNSSEC validator core."
+	IDS_DNSSEC_ERROR_GEN_MAIN	"Please, restart your web-browser..."
 
 		// state 10
 	IDS_DANE_STATE10_LABEL "Certificate corresponds to TLSA"
@@ -441,7 +446,10 @@ BEGIN
 	 IDS_DANE_STATEx99_LABEL "TLSA status unknown"	
 	 IDS_DANE_STATEx99_TEXT_MAIN "The remote server certificate for this domain name could not be verified by DANE protocol because actual DNS server or resolver does not support DNSSEC technology."	 
 	 IDS_DANE_STATEx99_TEXT_ADD	 "Current DNS server or resolver does not support DNSSEC technology. Please, change the validator settings (choice Without resolver)."	
-
+	 // state -1
+	 IDS_DANE_ERROR_GEN_LABEL	"TLSA status unknown"	
+	 IDS_DANE_ERROR_GEN_TEXT_MAIN	"The remote server certificate for this domain name could not be verified by DANE protocol because an error occurred in TLSA validator core."	 
+	 IDS_DANE_ERROR_GEN_TEXT_ADD	"Please, restart your web-browser..."
 
 	IDS_NONE                " "
     IDS_ADDON_INIT          "Add-on initialized"
@@ -642,6 +650,10 @@ BEGIN
 	IDS_STATE02_TEXT_DOMAIN  "nelze ovìøit pomocí DNSSEC technologie."
 	IDS_STATE02_TEXT_MAIN	"Aktuálnì nastavený resolver nepodporuje DNSSEC technologii. Prosím, zmìòte nastavení validátoru (nastavte volbu 'Bez resolveru')."
 
+		//state -1
+	IDS_DNSSEC_ERROR_GEN_TOOLTIP "Stav DNSSEC neznámý"
+	IDS_DNSSEC_ERROR_GEN_DOMAIN  "nelze ovìøit pomocí DNSSEC technologie, protože došlo k selhání DNSSEC validátoru."
+	IDS_DNSSEC_ERROR_GEN_MAIN	"Prosím, restartujte webový prohlížeè pro jeho opìtovnou inicializaci..."
 
 		// state 10
 	IDS_DANE_STATE10_LABEL "Certifikát odpovídá TLSA"
@@ -723,6 +735,10 @@ BEGIN
 	 IDS_DANE_STATEx99_LABEL "Stav TLSA neznámý"	
 	 IDS_DANE_STATEx99_TEXT_MAIN "Certifikát vzdáleného serveru pro toto doménové jméno nebyl ovìøen pomocí protokolu DANE, protože nastavený resolver nepodporuje DNSSEC technologii."	 
 	 IDS_DANE_STATEx99_TEXT_ADD	 "Aktuálnì nastavený DNS server nebo resolver nepodporuje DNSSEC technologii. Prosím, zmìòte nastavení validátoru (nastavte volbu Bez resolveru)."	
+	 	 // state -1
+	 IDS_DANE_ERROR_GEN_LABEL	"Stav TLSA neznámý"	
+	 IDS_DANE_ERROR_GEN_TEXT_MAIN	"Certifikát vzdáleného serveru pro toto doménové jméno nebyl ovìøen protokolem DANE, protože došlo k selhání TLSA validátoru."	 
+	 IDS_DANE_ERROR_GEN_TEXT_ADD	"Prosím, restartujte webový prohlížeè pro jeho opìtovnou inicializaci..."
 
 	IDS_NONE                " "
     IDS_ADDON_INIT          "Doplnìk inicializován"
@@ -1179,7 +1195,10 @@ BEGIN
 	IDS_STATE02_TEXT_TOOLTIP "DNSSEC-Zustand unbekannt"
 	IDS_STATE02_TEXT_DOMAIN  "kann nicht mit DNSSEC überprüft werden."
 	IDS_STATE02_TEXT_MAIN	"Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht. Ändern Sie bitte die Einstellungen des Resolvers (Wahl 'Ohne Resolver')."
-
+			//state -1
+	IDS_DNSSEC_ERROR_GEN_TOOLTIP "DNSSEC-Zustand unbekannt"
+	IDS_DNSSEC_ERROR_GEN_DOMAIN  "kann nicht mit DNSSEC überprüft werden. Es kam zu einem Fehler während Erwerbs der DNSSEC Validator core."
+	IDS_DNSSEC_ERROR_GEN_MAIN	"Bitte Neustart Sie Ihren Web-Browser..."
 			// state 10
 	IDS_DANE_STATE10_LABEL "Zertifikat entspricht TLSA"
 	IDS_DANE_STATE10_TEXT_MAIN "Das Serverzertifikat für diese Domäne wurde durch DANE Protokoll bestätigt. Das Zertifikat entspricht dem durch DNSSEC gesicherten TLSA Eintrag."
@@ -1260,6 +1279,10 @@ BEGIN
 	 IDS_DANE_STATEx99_LABEL "TLSA Status unbekannt"	
 	 IDS_DANE_STATEx99_TEXT_MAIN "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht."	 
 	 IDS_DANE_STATEx99_TEXT_ADD	 "Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht. Ändern Sie bitte die Einstellungen des Resolvers (Wahl 'Ohne Resolver')."	
+	 	 	 // state -1
+	 IDS_DANE_ERROR_GEN_LABEL	"TLSA Status unbekannt"	
+	 IDS_DANE_ERROR_GEN_TEXT_MAIN	"Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Es kam zu einem Fehler während Erwerbs der TLSA Validator core."	 
+	 IDS_DANE_ERROR_GEN_TEXT_ADD	"Bitte Neustart Sie Ihren Web-Browser..."
 
     IDS_NONE                " "
     IDS_ADDON_INIT          "Add-on initialisiert"

@@ -425,7 +425,7 @@ bool CKBToolBarCtrl::RepaintButtonTLSA(int bindex, int iconindex){
 	}
 	else {
 		if (!IsButtonHidden(ID_BUTTON2)) HideButton(ID_BUTTON2, TRUE);
-		tlsaresult = DANE_EXIT_VALIDATION_OFF;
+		tlsaresult = DANE_OFF;
 	}
 
   return true;
@@ -708,9 +708,9 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 					LoadStringA(GHins, IDS_DNSSECTEST_RUN, strbuf, STR_BUF_S);
 					::SetWindowText(::GetDlgItem(hwndDlg,IDC_DNSSEC_R),strbuf);					
 				    ub_context_free();					
-					options |= DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
+					options |= DNSSEC_FLAG_DEBUG;
 					if (::IsDlgButtonChecked(hwndDlg, IDC_R4)) dnsip = "nofwd";
-					else { options |= DNSSEC_INPUT_FLAG_USEFWD;
+					else { options |= DNSSEC_FLAG_USEFWD;
 						if (::IsDlgButtonChecked(hwndDlg, IDC_R1)) dnsip = "";
 						else if (::IsDlgButtonChecked(hwndDlg, IDC_R3)) {
 							TCHAR chText[100];
@@ -720,7 +720,7 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 							else wrongip=true;
 						}
 					}
-					options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;					
+					options |= DNSSEC_FLAG_RESOLVIPV4;					
 					//EnterCriticalSection(&cs);
 					if (!wrongip) {
 						//if (debug) ATLTRACE("\nTEST: www.nic.cz : %d : %s : 217.31.205.50\n", options, dnsip);

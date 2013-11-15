@@ -44,7 +44,7 @@ WORD statdnssecicon=IDI_DNSSEC_ICON_INIT;
 // for ICON KEY status - not used
 WORD dnsseciconBar;
 
-bool debug = false;
+bool debug = true;
 
 
 char * temp = "";
@@ -865,7 +865,7 @@ void CKBBarBand::SetSecurityTLSAStatus()
   switch (tlsaresult) {
 
 	// state 10
-	case DANE_EXIT_VALIDATION_SUCCESS_TYPE0:
+	case DANE_VALID_TYPE0:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_VALID);
 		tlsaiconresr = IDI_TLSA_ICON_VALID;
 		panel_label = IDS_DANE_STATE10_LABEL;
@@ -873,7 +873,7 @@ void CKBBarBand::SetSecurityTLSAStatus()
 		panel_text2 = IDS_DANE_STATE10_TEXT_ADD;
  		break;
     // state 11
-	case DANE_EXIT_VALIDATION_SUCCESS_TYPE1:
+	case DANE_VALID_TYPE1:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_VALID);
 		tlsaiconresr = IDI_TLSA_ICON_VALID;
 		panel_label = IDS_DANE_STATE11_LABEL;
@@ -881,7 +881,7 @@ void CKBBarBand::SetSecurityTLSAStatus()
 		panel_text2 = IDS_DANE_STATE11_TEXT_ADD;
  		break;
     // state 12
-	case DANE_EXIT_VALIDATION_SUCCESS_TYPE2:
+	case DANE_VALID_TYPE2:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_VALID);
 		tlsaiconresr = IDI_TLSA_ICON_VALID;
 		panel_label = IDS_DANE_STATE12_LABEL;
@@ -889,55 +889,47 @@ void CKBBarBand::SetSecurityTLSAStatus()
 		panel_text2 = IDS_DANE_STATE12_TEXT_ADD;
  		break;
     // state 13
-	case DANE_EXIT_VALIDATION_SUCCESS_TYPE3:
+	case DANE_VALID_TYPE3:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_VALID);
 		tlsaiconresr = IDI_TLSA_ICON_VALID;
 		panel_label = IDS_DANE_STATE13_LABEL;
 		panel_text1 = IDS_DANE_STATE13_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATE13_TEXT_ADD;
  		break;
-    // state -9
-	case DANE_EXIT_VALIDATION_FALSE:
-		daneicon = GetIconIndex(IDI_TLSA_ICON_INVALID);
-		tlsaiconresr = IDI_TLSA_ICON_INVALID;
-		panel_label = IDS_DANE_STATEx9_LABEL;
-		panel_text1 = IDS_DANE_STATEx9_TEXT_MAIN;
-		panel_text2 = IDS_DANE_STATEx9_TEXT_ADD;
- 		break;
-    // state -10
-	case DANE_EXIT_VALIDATION_FALSE_TYPE0:
+    // state 20
+	case DANE_INVALID_TYPE0:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_INVALID);
 		tlsaiconresr = IDI_TLSA_ICON_INVALID;
 		panel_label = IDS_DANE_STATEx10_LABEL;
 		panel_text1 = IDS_DANE_STATEx10_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx10_TEXT_ADD;
  		break;
-    // state -11
-	case DANE_EXIT_VALIDATION_FALSE_TYPE1:
+    // state 21
+	case DANE_INVALID_TYPE1:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_INVALID);
 		tlsaiconresr = IDI_TLSA_ICON_INVALID;
 		panel_label = IDS_DANE_STATEx11_LABEL;
 		panel_text1 = IDS_DANE_STATEx11_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx11_TEXT_ADD;
  		break;
-    // state -12
-	case DANE_EXIT_VALIDATION_FALSE_TYPE2:
+    // state 22
+	case DANE_INVALID_TYPE2:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_INVALID);
 		tlsaiconresr = IDI_TLSA_ICON_INVALID;
 		panel_label = IDS_DANE_STATEx12_LABEL;
 		panel_text1 = IDS_DANE_STATEx12_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx12_TEXT_ADD;
  		break;
-    // state -13
-	case DANE_EXIT_VALIDATION_FALSE_TYPE3:
+    // state 23
+	case DANE_INVALID_TYPE3:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_INVALID);
 		tlsaiconresr = IDI_TLSA_ICON_INVALID;
 		panel_label = IDS_DANE_STATEx13_LABEL;
 		panel_text1 = IDS_DANE_STATEx13_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx13_TEXT_ADD;
  		break;
-    // state 1
-	case DANE_EXIT_DNSSEC_SECURED:
+    // state 9
+	case DANE_DNSSEC_SECURED:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_INIT);
 		tlsaiconresr = IDI_TLSA_ICON_INIT;
 		panel_label = IDS_DANE_STATE1_LABEL;
@@ -945,86 +937,93 @@ void CKBBarBand::SetSecurityTLSAStatus()
 		panel_text2 = IDS_DANE_STATE1_TEXT_ADD;
  		break;
     // state 0
-	case DANE_EXIT_VALIDATION_OFF:
+	case DANE_OFF:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_OFF);
 		tlsaiconresr = IDI_TLSA_ICON_OFF;
 		panel_label = IDS_DANE_STATE0_LABEL;
 		panel_text1 = IDS_DANE_STATE0_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATE0_TEXT_ADD;
  		break;
-	// state -2
-	case DANE_EXIT_NO_HTTPS:
+	// state 1
+	case DANE_NO_HTTPS:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_NOHTTPS);
 		tlsaiconresr = IDI_TLSA_ICON_NOHTTPS;
 		panel_label = IDS_DANE_STATEx2_LABEL;
 		panel_text1 = IDS_DANE_STATEx2_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx2_TEXT_ADD;
  		break;
-	// state -3
-	case DANE_EXIT_NO_TLSA_RECORD:
+	// state 2
+	case DANE_NO_TLSA:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_NO);
 		tlsaiconresr = IDI_TLSA_ICON_NO;
 		panel_label = IDS_DANE_STATEx3_LABEL;
 		panel_text1 = IDS_DANE_STATEx3_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx3_TEXT_ADD;
  		break; 
-	// state -4
-	case DANE_EXIT_DNSSEC_UNSECURED:
+	// state 3
+	case DANE_DNSSEC_UNSECURED:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_NODNSSEC);
 		tlsaiconresr = IDI_TLSA_ICON_NODNSSEC;
 		panel_label = IDS_DANE_STATEx4_LABEL;
 		panel_text1 = IDS_DANE_STATEx4_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx4_TEXT_ADD;
  		break;
-	// state -5
-	case DANE_EXIT_DNSSEC_BOGUS:
+	// state 16
+	case DANE_DNSSEC_BOGUS:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_ORANGE);
 		tlsaiconresr = IDI_TLSA_ICON_ORANGE;
 		panel_label = IDS_DANE_STATEx5_LABEL;
 		panel_text1 = IDS_DANE_STATEx5_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx5_TEXT_ADD;
  		break;
-	// state -6
-	case DANE_EXIT_NO_CERT_CHAIN:
+	// state 17
+	case DANE_NO_CERT_CHAIN:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_INVALID);
 		tlsaiconresr = IDI_TLSA_ICON_INVALID;
 		panel_label = IDS_DANE_STATEx6_LABEL;
 		panel_text1 = IDS_DANE_STATEx6_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx6_TEXT_ADD;
  		break;
-	// state -7
-	case DANE_EXIT_CERT_ERROR:
+	// state 18
+	case DANE_CERT_ERROR:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_INVALID);
 		tlsaiconresr = IDI_TLSA_ICON_INVALID;
 		panel_label = IDS_DANE_STATEx7_LABEL;
 		panel_text1 = IDS_DANE_STATEx7_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx7_TEXT_ADD;
  		break;
-	// state -8
-	case DANE_EXIT_TLSA_PARAM_ERR:
+	// state 19
+	case DANE_TLSA_PARAM_ERR:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_INVALID);
 		tlsaiconresr = IDI_TLSA_ICON_INVALID;
 		panel_label = IDS_DANE_STATEx8_LABEL;
 		panel_text1 = IDS_DANE_STATEx8_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx8_TEXT_ADD;
  		break;
-	// state -99
-	case DANE_EXIT_WRONG_RESOLVER:
+	// state -3
+	case DANE_RESOLVER_NO_DNSSEC:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_ERROR);
 		tlsaiconresr = IDI_TLSA_ICON_ERROR;
 		panel_label = IDS_DANE_STATEx99_LABEL;
 		panel_text1 = IDS_DANE_STATEx99_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx99_TEXT_ADD;
- 		break;	
-    case DANE_EXIT_RESOLVER_FAILED:
-    default:
+ 		break;
+	// state -2
+    case DANE_ERROR_RESOLVER:
 		daneicon = GetIconIndex(IDI_TLSA_ICON_ERROR);
 		tlsaiconresr = IDI_TLSA_ICON_ERROR;
 		panel_label = IDS_DANE_STATEx1_LABEL;
 		panel_text1 = IDS_DANE_STATEx1_TEXT_MAIN;
 		panel_text2 = IDS_DANE_STATEx1_TEXT_ADD;
 		break;
-
+	// generic error -1
+    default:
+		daneicon = GetIconIndex(IDI_TLSA_ICON_ERROR);
+		tlsaiconresr = IDI_TLSA_ICON_ERROR;
+		panel_label = IDS_DANE_ERROR_GEN_LABEL;
+		panel_text1 = IDS_DANE_ERROR_GEN_TEXT_MAIN;
+		panel_text2 = IDS_DANE_ERROR_GEN_TEXT_ADD;
+		break;
 	}// switch
 
 	tlsaicon = daneicon;
@@ -1051,7 +1050,7 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 	switch (dnssecresult) {
 
 	// state 1
-	case DNSSEC_EXIT_DOMAIN_UNSECURED:
+	case DNSSEC_DOMAIN_UNSECURED:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_NO);
 		dnsseciconBar = IDI_DNSSEC_ICON_NO;
 		tiicon = TTI_INFO;
@@ -1061,7 +1060,7 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 		titext = IDS_STATE1_TEXT_MAIN;
  		break;		
 	// state 2
-	case DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_IP:
+	case DNSSEC_COT_DOMAIN_SECURED:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_VALID);
 		dnsseciconBar = IDI_DNSSEC_ICON_VALID;
 		tiicon = TTI_INFO;
@@ -1071,7 +1070,7 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 		titext = IDS_STATE2_TEXT_MAIN;
  		break;
 	// state 3
-	case DNSSEC_EXIT_CONNECTION_DOMAIN_SECURED_NOIP:
+	case DNSSEC_COT_DOMAIN_SECURED_BAD_IP:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_IP);
 		dnsseciconBar = IDI_DNSSEC_ICON_IP;
 		tiicon = TTI_INFO;
@@ -1081,7 +1080,7 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 		titext = IDS_STATE3_TEXT_MAIN;
  		break;
 	// state 4
-	case DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS:
+	case DNSSEC_COT_DOMAIN_BOGUS:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_BOGUS);
 		dnsseciconBar = IDI_DNSSEC_ICON_BOGUS;
 		tiicon = TTI_ERROR;
@@ -1091,7 +1090,7 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 		titext = IDS_STATE4_TEXT_MAIN;
  		break;
 	// state 5
-	case DNSSEC_EXIT_NODOMAIN_UNSECURED:
+	case DNSSEC_NXDOMAIN_UNSECURED:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_NO);
 		dnsseciconBar = IDI_DNSSEC_ICON_NO;
 		tiicon = TTI_WARNING;
@@ -1101,7 +1100,7 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 		titext = IDS_STATE5_TEXT_MAIN;
  		break;
    // state 6
-	case DNSSEC_EXIT_NODOMAIN_SIGNATURE_VALID:
+	case DNSSEC_NXDOMAIN_SIGNATURE_VALID:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_VALID);
 		dnsseciconBar = IDI_DNSSEC_ICON_VALID;
 		tiicon = TTI_INFO;
@@ -1111,7 +1110,7 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 		titext = IDS_STATE6_TEXT_MAIN;
  		break;
     // state 7
-	case DNSSEC_EXIT_NODOMAIN_SIGNATURE_INVALID:
+	case DNSSEC_NXDOMAIN_SIGNATURE_INVALID:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_BOGUS);
 		dnsseciconBar = IDI_DNSSEC_ICON_BOGUS;
 		tiicon = TTI_ERROR;
@@ -1120,8 +1119,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 		tistatus = IDS_STATE7_TEXT_DOMAIN;
 		titext = IDS_STATE7_TEXT_MAIN;
  		break;  
-    // state -1
-	case DNSSEC_EXIT_VALIDATOR_OFF:
+    // state 0
+	case DNSSEC_OFF:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_OFF);
 		dnsseciconBar = IDI_DNSSEC_ICON_OFF;
 		tiicon = TTI_INFO;
@@ -1130,8 +1129,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 		tistatus = IDS_STATE01_TEXT_DOMAIN;
 		titext = IDS_STATE01_TEXT_MAIN;
  		break;
-	//-2
-	case DNSSEC_EXIT_WRONG_RESOLVER:
+	//-3
+	case DNSSEC_RESOLVER_NO_DNSSEC:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_ERROR);
 		dnsseciconBar = IDI_DNSSEC_ICON_ERROR;
 		tiicon = TTI_INFO;
@@ -1140,9 +1139,8 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 		tistatus = IDS_STATE02_TEXT_DOMAIN;
 		titext = IDS_STATE02_TEXT_MAIN;
  		break;
-	// other states
-    case DNSSEC_EXIT_FAILED:
-    default:
+	// state -2
+    case DNSSEC_ERROR_RESOLVER:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_ERROR);
 		dnsseciconBar = IDI_DNSSEC_ICON_ERROR;
 		tiicon = TTI_ERROR;
@@ -1151,7 +1149,17 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 		tistatus = IDS_STATE0_TEXT_DOMAIN;
 		titext = IDS_STATE0_TEXT_MAIN;
 		break;
-
+	// generic error
+	default:
+		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_ERROR);
+		dnsseciconBar = IDI_DNSSEC_ICON_ERROR;
+		tiicon = TTI_ERROR;
+		tiicontitle = IDS_DNSSEC_ERROR_GEN_TOOLTIP;
+		tipref = IDS_PRE_TEXT_ERROR;
+		tistatus = IDS_DNSSEC_ERROR_GEN_DOMAIN;
+		titext = IDS_DNSSEC_ERROR_GEN_MAIN;
+		break;
+		
 	}// switch
 	err = dnssecicon;
 	keylogo2 = dnsseciconBar;
@@ -1283,10 +1291,10 @@ void CKBBarBand::CheckDomainStatus(char * url)
 		if (strcmp (ipbrowser4,"") != 0) {
 			resolvipv4 = true; 
 			resolvipv6 = false; 
-			if (debugoutput) options |= DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-			if (usedfwd) options |= DNSSEC_INPUT_FLAG_USEFWD;
-			if (resolvipv4) options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;
-			if (resolvipv6) options |= DNSSEC_INPUT_FLAG_RESOLVIPV6;
+			if (debugoutput) options |= DNSSEC_FLAG_DEBUG;
+			if (usedfwd) options |= DNSSEC_FLAG_USEFWD;
+			if (resolvipv4) options |= DNSSEC_FLAG_RESOLVIPV4;
+			if (resolvipv6) options |= DNSSEC_FLAG_RESOLVIPV6;
 
 				char* ipvalidator4tmp;
 				wrong = false;
@@ -1296,12 +1304,12 @@ void CKBBarBand::CheckDomainStatus(char * url)
 				resultipv4 = ds_validate(domaintmp, options, dnsip, ipbrowser4, &ipvalidator4tmp);	
 				if (debug) ATLTRACE("IPv4 result: %s: %d : %s\n", domaintmp, resultipv4, ipvalidator4tmp); 				
 				LeaveCriticalSection(&cs);
-				if (resultipv4==DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+				if (resultipv4==DNSSEC_COT_DOMAIN_BOGUS) {
 				  if (debug) ATLTRACE("Unbound return bogus state: Testing why?\n");
 				  ub_context_free();
 				  short res = 0 ;
 				  res = TestResolver(domaintmp, ipbrowser4, '4');
-				  if (res==DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+				  if (res==DNSSEC_COT_DOMAIN_BOGUS) {
 					  resultipv4 = 	res;
 					  if (debug) ATLTRACE("Yes, domain name has bogus\n");
 					  ub_context_free();
@@ -1311,7 +1319,7 @@ void CKBBarBand::CheckDomainStatus(char * url)
 					if (debug) ATLTRACE("Current resolver does not support DNSSEC!\n");
 					wrong = true;
 					if (debug) ATLTRACE("Results: FWD: %d NOFWD: %d\n", resultipv4, res);
-					resultipv4 = DNSSEC_EXIT_WRONG_RESOLVER;
+					resultipv4 = DNSSEC_RESOLVER_NO_DNSSEC;
 					ub_context_free();
 				  } // if bogus
 				
@@ -1325,10 +1333,10 @@ void CKBBarBand::CheckDomainStatus(char * url)
 			resolvipv4 = false; 
 			resolvipv6 = true;
 			options = 0;
-			if (debugoutput) options |= DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-			if (usedfwd) options |= DNSSEC_INPUT_FLAG_USEFWD;
-			if (resolvipv4) options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;
-			if (resolvipv6) options |= DNSSEC_INPUT_FLAG_RESOLVIPV6;
+			if (debugoutput) options |= DNSSEC_FLAG_DEBUG;
+			if (usedfwd) options |= DNSSEC_FLAG_USEFWD;
+			if (resolvipv4) options |= DNSSEC_FLAG_RESOLVIPV4;
+			if (resolvipv6) options |= DNSSEC_FLAG_RESOLVIPV6;
 			// Request ownership of the critical section
 
 				wrong = false;
@@ -1338,12 +1346,12 @@ void CKBBarBand::CheckDomainStatus(char * url)
 				resultipv6 = ds_validate(domaintmp, options, dnsip, ipbrowser6, &ipvalidator6);
 				if (debug) ATLTRACE("IPv6 result: %s: %d : %s\n", domaintmp, resultipv6, ipvalidator6); 
 				LeaveCriticalSection(&cs);
-				if (resultipv6==DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+				if (resultipv6==DNSSEC_COT_DOMAIN_BOGUS) {
 				  if (debug) ATLTRACE("Unbound return bogus state: Testing why?\n");
 				  ub_context_free();
 				  short res = 0 ;
 				  res = TestResolver(domaintmp, ipbrowser6, '6');
-				  if (res==DNSSEC_EXIT_CONNECTION_DOMAIN_BOGUS) {
+				  if (res==DNSSEC_COT_DOMAIN_BOGUS) {
 					  resultipv6 = 	res;
 					  if (debug) ATLTRACE("Yes, domain name has bogus\n");
 					  ub_context_free();
@@ -1355,7 +1363,7 @@ void CKBBarBand::CheckDomainStatus(char * url)
 					//set tooltip
 					//ShowFwdTooltip();
 					wrong = true;					
-					resultipv6 = DNSSEC_EXIT_WRONG_RESOLVER;
+					resultipv6 = DNSSEC_RESOLVER_NO_DNSSEC;
 					ub_context_free();
 				  } // if bogus
 				
@@ -1391,16 +1399,16 @@ void CKBBarBand::CheckDomainStatus(char * url)
 					if (debug) ATLTRACE("-------------- TLSA validation End ------------------\n\n");
 				} //if
 				else {
-					tlsaresult = DANE_EXIT_NO_HTTPS;
+					tlsaresult = DANE_NO_HTTPS;
 					if (debug) ATLTRACE("Scheme is http, TLSA validation will not start\n");
 				}
 			} 
-			else tlsaresult = DANE_EXIT_WRONG_RESOLVER;
+			else tlsaresult = DANE_RESOLVER_NO_DNSSEC;
 		} //if
 	}
 	else {
-		dnssecresult = DNSSEC_EXIT_VALIDATOR_OFF;
-		tlsaresult = DANE_EXIT_VALIDATION_OFF;
+		dnssecresult = DNSSEC_OFF;
+		tlsaresult = DANE_OFF;
 	}
 
 	//set DNSSEC security status
@@ -1429,9 +1437,9 @@ short CKBBarBand::TestResolver(char *domain, char *ipbrowser, char IPv)
 	short res = 0;
 	uint16_t options = 0;
 	char* ipvalidator;
-	if (debugoutput) options |= DNSSEC_INPUT_FLAG_DEBUGOUTPUT;
-	if (IPv == '4') options |= DNSSEC_INPUT_FLAG_RESOLVIPV4;
-	if (IPv == '6') options |= DNSSEC_INPUT_FLAG_RESOLVIPV6;
+	if (debugoutput) options |= DNSSEC_FLAG_DEBUG;
+	if (IPv == '4') options |= DNSSEC_FLAG_RESOLVIPV4;
+	if (IPv == '6') options |= DNSSEC_FLAG_RESOLVIPV6;
 	
 	EnterCriticalSection(&cs);
 	//if (debug) ATLTRACE("Critical section begin\n");

@@ -111,7 +111,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define IDS_STATE7_TEXT_TOOLTIP 124
 #define IDS_STATE7_TEXT_DOMAIN  125
 #define	IDS_STATE7_TEXT_MAIN	126
-	//state -1 - RED
+	//state -1
 #define	IDS_STATE01_TEXT_TOOLTIP 127
 #define	IDS_STATE01_TEXT_DOMAIN  128
 #define	IDS_STATE01_TEXT_MAIN	129
@@ -119,6 +119,10 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define IDS_STATE02_TEXT_TOOLTIP 130
 #define	IDS_STATE02_TEXT_DOMAIN  131
 #define	IDS_STATE02_TEXT_MAIN	132
+  // state -1
+#define IDS_DNSSEC_ERROR_GEN_TOOLTIP 197
+#define IDS_DNSSEC_ERROR_GEN_DOMAIN 198 
+#define IDS_DNSSEC_ERROR_GEN_MAIN 199
 
 
 	// state 10
@@ -201,6 +205,11 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define IDS_DANE_STATEx99_LABEL 190
 #define IDS_DANE_STATEx99_TEXT_MAIN 191 
 #define IDS_DANE_STATEx99_TEXT_ADD 192
+ // state -1
+#define IDS_DANE_ERROR_GEN_LABEL 193
+#define IDS_DANE_ERROR_GEN_TEXT_MAIN 194
+#define IDS_DANE_ERROR_GEN_TEXT_ADD 195
+
 
 	// init text for tooltip
 #define IDS_NONE                        533
