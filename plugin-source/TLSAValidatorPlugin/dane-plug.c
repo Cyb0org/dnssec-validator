@@ -1665,26 +1665,31 @@ const char *certhex[] = {"12345678"};
 // ----------------------------------------------------------------------------
 int main(int argc, char **argv) 
 {
-	char *dname = NULL, *port = NULL;
+	const char *dname = NULL, *port = NULL;
+	const char *resolver_addresses = NULL;
 	int res = DANE_ERROR_GENERIC;
 
 	uint16_t options;
 
-	const char *resolver_addresses =
-//	    "::1"
-	    " 8.8.8.8"
-	    " 217.31.204.130"
-//	    " 193.29.206.206"
-	    ;
-
-	if ((argc < 2) || (argc > 3)) {
-		fprintf(stderr, "Usage:\n\t%s dname [port]\n", argv[0]);
+	if ((argc < 2) || (argc > 4)) {
+		fprintf(stderr, "Usage:\n\t%s dname port [resolver_list]\n", argv[0]);
 		return 1;
 	}
 
 	dname = argv[1];
-	if (argc == 3) {
+	if (argc > 2) {
+		/* Default if 443. */
 		port = argv[2];
+	}
+	if (argc > 3) {
+		resolver_addresses = argv[3];
+	} else {
+		resolver_addresses =
+//		    "::1"
+		    " 8.8.8.8"
+		    " 217.31.204.130"
+//		    " 193.29.206.206"
+		    ;
 	}
 
 	options =
