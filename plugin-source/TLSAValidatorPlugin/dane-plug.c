@@ -36,6 +36,8 @@ OpenSSL used as well as that of the covered work.
 #include "ldns/wire2host.h"
 #include "openssl/x509.h"
 #include "openssl/evp.h"
+
+#include "dane-plug.h"
 #include "dane-states.gen"
 
 #ifdef RES_WIN

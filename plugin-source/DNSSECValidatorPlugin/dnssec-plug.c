@@ -39,6 +39,8 @@ OpenSSL used as well as that of the covered work.
 #include <stdbool.h>
 #include <errno.h>
 #include <assert.h>
+
+#include "dnssec-plug.h"
 #include "dnssec-states.gen"
 
 

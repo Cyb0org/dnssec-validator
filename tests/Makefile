@@ -25,7 +25,7 @@ CFLAGS2 += $(INCLUDES) $(BOOST_FLAGS) -Wall -Wextra -pedantic $(OPTFLAGS)
 CXXFLAGS += $(INCLUDES) $(BOOST_FLAGS) -Wall -Westra -pedantic $(OPTFLAGS)
 LDFLAGS += $(DANE_CORE_LIB) $(LIBS)
 
-TARGETS := dane-plug unbound-test-dnssec ssl-test iptest dnssec-plug
+TARGETS := dane-plug unbound-test-dnssec ssl-test dnssec-plug
 
 ## Generic targets
 
@@ -35,7 +35,6 @@ run-tests: build-tests
 	./dane-plug
 	./unbound-test-dnssec
 	./ssl-test
-	./iptest
 	./dnssec-plug
 
 clean-tests:
@@ -43,18 +42,15 @@ clean-tests:
 
 ## Separate test builds
 
-dane-plug: dane-plug.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
+dane-plug: ../plugin-source/TLSAValidatorPlugin/dane-plug.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
 	$(CC) $< -o $@ $(CPPFLAGS) $(CFLAGS) $(LDFLAGS)
 
 unbound-test-dnssec: unbound-test-dnssec.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
-	$(CC) $< -o $@ $(CFLAGS) $(LDFLAGS)
-
-iptest: iptest.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
 	$(CC) $< -o $@ $(CFLAGS) $(LDFLAGS)
 
 ssl-test: ssl-test.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
 	$(CC) $< -o $@ $(CFLAGS2) $(LDFLAGS) 
 #	gcc -Wall -pedantic -g -lssl -lcrypto -o ssl-test ssl-test.c  
 
-dnssec-plug: dnssec-plug.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
+dnssec-plug: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
 	$(CC) $< -o $@ $(CPPFLAGS) $(CFLAGS) $(LDFLAGS)
