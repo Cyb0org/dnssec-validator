@@ -67,14 +67,15 @@ OpenSSL used as well as that of the covered work.
 #define TA ". IN DS 19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32F24E8FB5"
 //DNSKEY of DLV register
 #define DLV "dlv.isc.org. IN DNSKEY 257 3 5 BEAAAAPHMu/5onzrEE7z1egmhg/WPO0+juoZrW3euWEn4MxDCE1+lLy2 brhQv5rN32RKtMzX6Mj70jdzeND4XknW58dnJNPCxn8+jAGl2FZLK8t+ 1uq4W+nnA3qO2+DL+k6BD4mewMLbIYFwe0PG73Te9fZ2kJb56dhgMde5 ymX4BI/oQ+ cAK50/xvJv00Frf8kw6ucMTwFlgPe+jnGxPPEmHAte/URk Y62ZfkLoBAADLHQ9IrS2tryAe7mbBZVcOwIeU/Rw/mRx/vwwMCTgNboM QKtUdvNXDrYJDSHZws3xiRXF1Rf+al9UmZfSav/4NWLKjHzpT59k/VSt TDN0YUuWrBNh"
-//debug prefixs
+// debugging related stuff
 #define DEBUG_PREFIX "TLSA: "        
 #define DEBUG_PREFIX_CER "CERT: "
 #define DEBUG_PREFIX_DANE "DANE: "
+#define DEBUG_OUTPUT stderr
 // define policy of browser
 #define ALLOW_TYPE_01 1
 #define ALLOW_TYPE_23 2
-// define DANE konstatnt
+// define DANE constants
 #define CA_CERT_PIN 0
 #define EE_CERT_PIN 1
 #define CA_TA_ADDED 2
@@ -160,11 +161,11 @@ int printf_debug(const char *pref, const char *fmt, ...)
 		va_start(argp, fmt);
 
 		if (pref != NULL) {
-			fputs(pref, stderr);
+			fputs(pref, DEBUG_OUTPUT);
 		} else {
-			fputs(DEBUG_PREFIX, stderr);
+			fputs(DEBUG_PREFIX, DEBUG_OUTPUT);
 		}
-		ret = vfprintf(stderr, fmt, argp);
+		ret = vfprintf(DEBUG_OUTPUT, fmt, argp);
 
 		va_end(argp);
 	}
@@ -1538,6 +1539,22 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 			} //if
 		} // if(usefwd)
 
+/*
+		// set debugging verbosity
+		ub_ctx_debugout(ctx, DEBUG_OUTPUT);
+		if (ub_retval != 0) {
+			printf_debug(DEBUG_PREFIX,
+			    "Error setting debugging output.\n");
+			return exitcode;
+		}
+		ub_retval = ub_ctx_debuglevel(ctx, 5);
+		if (ub_retval != 0) {
+			printf_debug(DEBUG_PREFIX,
+			    "Error setting verbosity level.\n");
+			return exitcode;
+		}
+*/
+
 		/* read public keys of root zone for DNSSEC verification */
 		// ds true = zone key will be set from file root.key
 		//    false = zone key will be set from TA constant
@@ -1672,31 +1689,35 @@ int main(int argc, char **argv)
 	uint16_t options;
 
 	if ((argc < 2) || (argc > 4)) {
-		fprintf(stderr, "Usage:\n\t%s dname port [resolver_list]\n", argv[0]);
+		fprintf(stderr, "Usage:\n\t%s dname port [resolver_list]\n",
+		    argv[0]);
 		return 1;
 	}
 
 	dname = argv[1];
 	if (argc > 2) {
-		/* Default if 443. */
+		/* Default is 443. */
 		port = argv[2];
 	}
 	if (argc > 3) {
 		resolver_addresses = argv[3];
 	} else {
+/*
 		resolver_addresses =
 //		    "::1"
 		    " 8.8.8.8"
 		    " 217.31.204.130"
 //		    " 193.29.206.206"
 		    ;
+*/
 	}
 
 	options =
 	    DANE_FLAG_DEBUG |
 	    DANE_FLAG_USEFWD;
 
-	res = CheckDane(certhex, 0, options, resolver_addresses, dname, port, "tcp", 1);
+	res = CheckDane(certhex, 0, options, resolver_addresses, dname, port,
+	    "tcp", 1);
 	printf(DEBUG_PREFIX_DANE "Main result: %i\n", res);
 
 	ub_context_free();
