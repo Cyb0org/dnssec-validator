@@ -799,7 +799,7 @@ check_tlsa_https: function (channel, cert, browser, domain, port, protocol, url)
 	}
 
 	var block = "no";
-   	if (daneMatch[0] >= c.DANE_DNSSEC_BOGUS) { 	   	
+   	if (daneMatch[0] >= c.DANE_TLSA_PARAM_ERR) { 	   	
 		if (channel) {
 			var tlsablock = dnssecExtPrefs.getBool("tlsablocking"); 
 			if (tlsablock) {      
