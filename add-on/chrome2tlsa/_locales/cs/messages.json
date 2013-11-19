@@ -20,6 +20,9 @@
 	"clearcachetext": {
 		"message": "Vymazat mezipaměť prohlížeče při každém spuštění"
 		},
+	"debugoutputtext": {
+		"message": "Vypisovat ladící informace do konzole"
+		},
 	"legend": {
 		"message": "Nastavení resolveru"
 		},
@@ -72,13 +75,13 @@
 		"message": "Resolver nepodporuje DNSSEC"
 		},
          "dnssecWrongResolver": {
-		"message": " nelze ověřit pomocí DNSSEC technologie."
+		"message": "Důvěryhodnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno nelze ověřit protokolem DANE."
 		},
          "dnssecWrongResolverInfo": {
 		"message": "Aktuálně nastavený resolver nepodporuje DNSSEC technologii. Prosím, změňte nastavení validátoru (nastavte volbu \"Bez resolveru\")."
 		},
 "dm_errgen": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno nebyl ověřen protokolem DANE, protože došlo k selhání TLSA validátoru."},
-"dm_errgenInfo": { "message":  "Prosím, restartujte webový prohlížeč pro jeho opětovnou inicializaci..."},
+"dm_errgenInfo": { "message":  "Prosím, restartujte webový prohlížeč pro jeho inicializaci..."},
 "dm_rfesolverfailed": { "message":  "Certifikát vzdáleného serveru pro toto doménové jméno nebyl ověřen protokolem DANE, protože pří získání TLSA záznamu pro toto doménové jméno došlo k chybě."},
 "dm_rfesolverfailedInfo": { "message":  "Při zjišťování TLSA záznamu pro toto doménové jméno došlo k chybě. Příčinou může být buď výpadek spojení ke vzdálenému serveru, nebo aktuálně nastavená IP adresa DNS serveru není platnou adresou serveru pro překlad doménového jména."},
 "dm_nohttps": { "message":  "Jelikož pro toto doménové jméno není navázáno zabezpečené spojení ke vzdálenému serveru protokolem HTTPS, není možné provést validaci TLSA záznamu."},

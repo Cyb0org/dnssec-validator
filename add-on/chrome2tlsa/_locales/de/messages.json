@@ -20,6 +20,9 @@
 	"clearcachetext": {
 		"message": "Lösche Browser-Cache beim Neustart"
 		},
+	"debugoutputtext": {
+		"message": "Schreibe Debuginformationen in die Entwicklerkonsole"
+		},
 	"legend": {
 		"message": "Resolver-Einstellungen"
 		},
@@ -93,7 +96,7 @@
 		"message": "Resolver unterstützt DNSSEC nicht"
 		},
          "dnssecWrongResolver": {
-		"message": " kann nicht mit DNSSEC überprüft werden."
+		"message": "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll bestätigt werden."
 		},
          "dnssecWrongResolverInfo": {
 		"message": "Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht. Ändern Sie bitte die Einstellungen des Resolvers (Wahl \"Ohne Resolver\")."

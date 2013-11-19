@@ -27,12 +27,13 @@ document.write("<body>");
 document.write("<object id=\"tlsa-plugin\" type=\"application/x-tlsavalidatorplugin\" width=\"0\" height=\"0\"></object>");
 document.write("<script>");
 
+// expirate time of one item in the cache [seconds]
+var CACHE_ITEM_EXPIR = 600; 
 // debug pretext
 var DANE = "DANE: ";
-var olddomain = "null";
-var currenturl = "null";
-var laststate = 0;
+var debuglogout = false;
 var initcache = true;
+var wrongresolver = false;
 
 /* TLSA Validator's internal cache - shared with all window tabs */
 var tlsaExtCache = {
@@ -46,23 +47,27 @@ var tlsaExtCache = {
 	},
 
 
-	record: function(tlsaresult, block) {
+	record: function(tlsaresult, block, expir) {
 		this.state = tlsaresult;  // tlsa result
 		this.block = block;    // blocked ?
+		this.expir = expir;    // expir time
 	},
 
 	addRecord: function(domain, tlsaresult, block) {	
-		delete this.data[domain];
-		this.data[domain] = new this.record(tlsaresult, block);
+		// Get current time
+			const cur_t = new Date().getTime();
+			var expir = cur_t + CACHE_ITEM_EXPIR * 1000;
+			delete this.data[domain];
+			this.data[domain] = new this.record(tlsaresult, block, expir);
 	},
 
 	getRecord: function(n) {
 		const c = this.data;
 
 		if (typeof c[n] != 'undefined') {
-			return [c[n].state, c[n].block];
+			return [c[n].state, c[n].block, c[n].expir];
 		}
-		return ['', ''];
+		return ['', '', ''];
 	},
 
 	printContent: function() {
@@ -71,25 +76,27 @@ var tlsaExtCache = {
 		var n;
 		const c = this.data;
 
-		if (true) { 
+		if (debuglogout) { 
 			console.log(DANE + 'Cache content:');
 		}
 	          
 		for (n in c) {
-			if (true) { 
-				console.log(DANE +'      r' + i + ': \"' + n + '\": \"' + c[n].state + '\"; ' + c[n].block);
+			if (debuglogout) { 
+				console.log(DANE +'      r' + i + ': \"' + n 
+				+ '\": \"' + c[n].state + '\"; ' + c[n].block 
+				+ '\"; ' + c[n].expir);
 			}
       			i++;
 		}
 
-		if (true) { 
+		if (debuglogout) {
 			console.log(DANE + 'Total records count: ' + i);
 		}
 	},
 
 	delAllRecords: function() {
 
-		if (true) { 
+		if (debuglogout) { 
 			console.log(DANE + 'Flushing all cache records...');
 		}
 		delete this.data;
@@ -152,6 +159,7 @@ var tlsaModes = {
 	DANE_MODE_VALIDATION_SUCCESS_TYPE2	: "dm_vs2",
 	DANE_MODE_VALIDATION_SUCCESS_TYPE3	: "dm_vs3",
 	DANE_MODE_ERROR_GENERIC			: "dm_errgen",
+	DANE_MODE_WRONG_RES			: "dnssecWrongResolver",
 
   //DANE/TLSA tooltip	
 	DANE_TOOLTIP_VALIDATION_SUCCESS 	: "dmvsTooltip",
@@ -166,6 +174,7 @@ var tlsaModes = {
 	DANE_TOOLTIP_DNSSEC_BOGUS     		: "dmdnssecbogusTooltip",
 	DANE_TOOLTIP_DNSSEC_UNSECURED 		: "dmdnssecunsecTooltip",
 	DANE_TOOLTIP_ERROR_GENERIC 		: "dmerrorgenericTooltip",
+	DANE_TOOLTIP_WRONG_RES			: "dnssecwrongres",
 };
 
 //****************************************************************
@@ -176,10 +185,12 @@ function setModeTLSA(newMode, tabId, domain, status, scheme) {
 	var title;
 	var domainpre;
 	var tooltiptitle;
-	    
-	console.log(DANE + "Set mode: " + newMode + "; TabId: " + tabId 
+
+	if (debuglogout) {	    
+		console.log(DANE + "Set mode: " + newMode + "; TabId: " + tabId 
 		+ "; Domain: " + domain + "; Status: " + status + "; Scheme: " 
 		+ scheme);
+	}
             
 	switch (newMode) {
             /* green icon */
@@ -253,16 +264,22 @@ function setModeTLSA(newMode, tabId, domain, status, scheme) {
         	tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_ACTION);
               break;
 	    case this.tlsaModes.DANE_MODE_RESOLVER_FAILED:
-               icon = "tlsa_error.png";
-	       title = this.tlsaModes.DANE_TOOLTIP_FAILED_RESOLVER;
-	       domainpre = scheme;	
-               tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_FAILED_RESOLVER);
+		icon = "tlsa_error.png";
+		title = this.tlsaModes.DANE_TOOLTIP_FAILED_RESOLVER;
+		domainpre = scheme;	
+		tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_FAILED_RESOLVER);
+              break;
+	    case this.tlsaModes.DANE_MODE_WRONG_RES:
+		icon = "tlsa_error.png";
+		title = this.tlsaModes.DANE_TOOLTIP_WRONG_RES;
+		domainpre = scheme;	
+		tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_WRONG_RES);
               break;
             default:
-               icon = "tlsa_error.png";
-	       title = this.tlsaModes.DANE_MODE_ERROR_GENERIC;
-	       domainpre = scheme;	
-               tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC);
+		icon = "tlsa_error.png";
+		title = this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC;
+		domainpre = scheme;	
+		tooltiptitle = chrome.i18n.getMessage(this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC);
      	} // switch
 
         chrome.pageAction.setTitle({tabId: tabId, title: tooltiptitle}); 
@@ -308,7 +325,7 @@ function getResolver() {
 
 
 //****************************************************************
-// SET TLSA status
+// SET TLSA state
 //****************************************************************
 function setTLSASecurityState(tabId, domain, status, scheme) {
 
@@ -357,7 +374,7 @@ function setTLSASecurityState(tabId, domain, status, scheme) {
     		break;
 	    case c.DANE_DNSSEC_BOGUS: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_DNSSEC_BOGUS,
-			tabId, domain, status, changeInfo);
+			tabId, domain, status, scheme);
     		break;
 	    case c.DANE_NO_CERT_CHAIN: 
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_NO_CERT_CHAIN,
@@ -387,13 +404,16 @@ function setTLSASecurityState(tabId, domain, status, scheme) {
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE3,
 			tabId, domain, status, scheme);
     		break;
+	    case c.DANE_RESOLVER_NO_DNSSEC: 
+		this.setModeTLSA(this.tlsaModes.DANE_MODE_WRONG_RES,
+			tabId, domain, status, scheme);
+    		break;
 	    default:
 	        this.setModeTLSA(this.tlsaModes.DANE_MODE_ERROR_GENERIC,
 			tabId, domain, status, scheme);
                 break;
 	    }
 };
-
 
 //****************************************************************
 // Get URL scheme (http/https/ftp/ftps)
@@ -407,18 +427,22 @@ function httpscheme(taburl){
 	else return "undefined";	
 };
 
-
+//****************************************************************
+// Main TLSA validation function, call NPAPI plugin, returns TLSA state
+//****************************************************************
 function TLSAvalidate(scheme, domain, port){	  	
-	console.log(DANE + "--------- Start of TLSA Validation ("+ scheme +":"+ domain +":"+ port +") ---------");	
 
-	var debug = localStorage["dnssecDebugOutput"];
-	debug = (debug == "false") ? false : true;        	   
+	if (debuglogout) {
+		console.log(DANE + "--------- Start of TLSA Validation ("+ scheme +":"+ domain +":"+ port +") ---------");	
+	}       	   
 	// get domain filter status
 	var filteron = localStorage["domainfilteron"];
 	// validate thi domain?
 	var validate = true;
     	if (filteron == "true") {
-		console.log(DANE + 'Domain filter: ON');
+		if (debuglogout) {
+			console.log(DANE + 'Domain filter: ON');
+		}
 		var urldomainsepar=/[.]+/;
 		var urldomainarray=domain.split(urldomainsepar);	
 		var domainlist = localStorage["domainlist"];
@@ -442,8 +466,16 @@ function TLSAvalidate(scheme, domain, port){
        	            }//for
 		}//if        
     	}//filteron
-	else console.log(DANE + 'Domain filter: OFF');
-	console.log(DANE + 'Validate this domain: ' + validate );
+	else {
+		if (debuglogout) {
+			console.log(DANE + 'Domain filter: OFF');
+		}
+	
+	}
+	if (debuglogout) {
+		console.log(DANE + 'Validate this domain: ' + validate );
+	}		
+
     	var c = this.tlsaExtNPAPIConst;
 	var result = c.DANE_OFF;
 
@@ -451,17 +483,19 @@ function TLSAvalidate(scheme, domain, port){
 		if (scheme == "https" || scheme == "ftps") { 
 		        var resolver = this.getResolver();
 			var options = 0;
-			if (debug) options |= c.DANE_FLAG_DEBUG;
+			if (debuglogout) options |= c.DANE_FLAG_DEBUG;
 			if (resolver != "nofwd") options |= c.DANE_FLAG_USEFWD;
 			var certchain = new Array();
 		        certchain.push("00FF");
 			var len = 0;
 			var protocol = "tcp";
 			var policy = 1;
-			console.log(DANE + "DANE plugin request: {certchain}, " + 
+			if (debuglogout) {
+				console.log(DANE + "DANE plugin inputs: {certchain}, " + 
 					len +", "+ options +", "+ resolver 
 					+", "+ domain +", "+ port +", "+ protocol 
 					+", "+ policy); 
+			}
 
 			// Call NPAPI validation
 			try {
@@ -469,92 +503,85 @@ function TLSAvalidate(scheme, domain, port){
 				var daneMatch = tlsa.TLSAValidate(certchain, len, options, 
 						resolver, domain, port, protocol, policy);
 				result = daneMatch[0];
+
+				if (wrongresolver) {
+					if (result != c.DANE_DNSSEC_BOGUS) {
+						tlsaExtCache.delAllRecords();
+						wrongresolver = false;
+					}
+					else {
+						result = c.DANE_RESOLVER_NO_DNSSEC;
+					}
+				}
+
+				
+				if (result == c.DANE_DNSSEC_BOGUS && !wrongresolver) {
+					if (debuglogout) {
+						console.log(DANE + "Plugin returns DNSSEC bogus state: Testing why?");
+					}
+
+					tlsa.TLSACacheFree();
+					options = 0;
+					if (debuglogout) options |= c.DANE_FLAG_DEBUG;
+
+					if (debuglogout) {
+						console.log(DANE + "   DANE plugin inputs: {certchain}, " + 
+						len +", "+ options +", "+ "nofwd" 
+						+", "+ domain +", "+ port +", "+ protocol 
+						+", "+ policy); 
+					}
+
+					var resultnofwd = tlsa.TLSAValidate(certchain, len, options, 
+						"nofwd", domain, port, protocol, policy);
+
+					if (debuglogout) {
+						console.log(DANE + "   DANE plugin result: " + resultnofwd[0]);
+					}
+	
+					if (resultnofwd[0] == c.DANE_DNSSEC_BOGUS) {
+						if (debuglogout) {
+							console.log(DANE + "   Yes, DNSSEC of domain is really bogus");
+						}
+						result = resultnofwd[0];
+						tlsa.TLSACacheFree();
+					}
+					else {
+						if (debuglogout) {
+							console.log(DANE + "   Current resolver does not support DNSSEC!");
+						}
+						result = c.DANE_RESOLVER_NO_DNSSEC;
+						wrongresolver = true;
+						tlsa.TLSACacheFree();
+					}	
+				}
 			} catch (ex) {
-				console.log(DANE + 'Error: DANE plugin call failed!');
-				result = c.DANE_ERROR_GENERIC;
+				if (debuglogout) {
+					console.log(DANE + 'Error: DANE plugin call failed!');
+					result = c.DANE_ERROR_GENERIC;
+				}
 			}
 		}
 		else  result = c.DANE_NO_HTTPS;
         }	
-	console.log(DANE + "DANE plugin result: " + result);
-	console.log(DANE + "--------- End of TLSA Validation ("+ scheme +":"+ domain +":"+ port +") ---------");
-
+	if (debuglogout) {
+		console.log(DANE + "DANE plugin result: " + result);
+		console.log(DANE + "--------- End of TLSA Validation ("+ scheme 
+				+":"+ domain +":"+ port +") ---------");
+	}
 	return result;
 };
 
 //****************************************************************
-// Called when the url of a tab changes.
+// Detection of valid url. 
 //****************************************************************
-function onUrlChange(tabId, changeInfo, tab) {                  	
-   	
-	if (changeInfo.status==undefined) return;
- 
-	// hide icon for chrome:// and chrome-extension:// urls
-	if (tab.url.match(/^chrome(?:-extension)?:\/\//)) {
-		if (tabId >= 0) {
-			chrome.pageAction.hide(tabId);
-		}
-		return;
-	}//if
+function IsValidUrl(tabId, url) {
 
-	// deactive other tabs
-	if (tab.url.match(/^chrome(?:-devtools)?:\/\//)) {
-		if (tabId >= 0) {
-			chrome.pageAction.hide(tabId);
-		}
-		return;
-	}//if
-
-	// deactive other tabs
-	if (tab.url.match(/^about:/)) {
-		chrome.pageAction.hide(tabId);
-		return;
-	}//if
-	
-	if (changeInfo.status=="loading") {
-		console.log("\nBrowser: onUrlChange(TabID: " + tabId + ", URL: " + tab.url +");");
-
-
-		chrome.pageAction.setPopup({tabId: tabId, popup: ""});
-		var scheme = httpscheme(tab.url);
-		var port = "80";
-		var port2 = "";
-		var ret = tlsaExtNPAPIConst.DANE_OFF; 
-		var tmp = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(:[0-9]+)*(:)?/);
-		var domain = tmp[1];
-		if (scheme == "https" || scheme == "http") {
-			port = (tmp[2] == undefined) ? "443" : tmp[2].substring(1);	
-			port2 = (tmp[2] == undefined) ? "" : tmp[2];
-			ret = TLSAvalidate(scheme, domain, port);
-		}
-		else if (scheme == "ftps" || scheme == "ftp") {
-			port = (tmp[2] == undefined) ? "990" : tmp[2].substring(1);
-			port2 = (tmp[2] == undefined) ? "" : tmp[2];
-			ret = TLSAvalidate(scheme, domain, port);
-		}
-
-		setTLSASecurityState(tabId, domain+port2, ret, scheme);
-	}
-
-	if (changeInfo.status=="complete") {		
-		currenturl = "null";
-
-	}
-}; // onUrlChange
-
-
-
-//****************************************************************
-// Called when the url of a tab changes.
-//****************************************************************
-function onBeforeRequest(tabId, url) {                  	
-       
 	// hide icon for chrome:// and chrome-extension:// urls
 	if (url.match(/^chrome(?:-extension)?:\/\//)) {
 		if (tabId >= 0) {
 			chrome.pageAction.hide(tabId);
 		}
-		return;
+		return 1;
 	}//if
 
 	// deactive other tabs
@@ -562,31 +589,200 @@ function onBeforeRequest(tabId, url) {
 		if (tabId >= 0) {
 			chrome.pageAction.hide(tabId);
 		}
-		return;
+		return 1;
 	}//if
 
 	// deactive other tabs
 	if (url.match(/^about:/)) {
 		chrome.pageAction.hide(tabId);
-		return;
+		return 1;
 	}//if
+	
+	return 0;
+};
 
-	// get scheme from URL
-	var scheme = httpscheme(url);
-	var port = "80";
-	var ret = tlsaExtNPAPIConst.DANE_OFF;
+
+//****************************************************************
+// return domain name and port number of url
+//****************************************************************
+function getDomainAndPort(url) {
 	var tmp = url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(:[0-9]+)*(:)?/);
-	var domain = tmp[1];
-	if (scheme == "https") {
-		port = (tmp[2] == undefined) ? "443" : tmp[2].substring(1);
-		ret = TLSAvalidate(scheme, domain, port);
-	} else if (scheme == "ftps") {
-		port = (tmp[2] == undefined) ? "990" : tmp[2].substring(1);
-		ret = TLSAvalidate(scheme, domain, port);
+	return [tmp[1], tmp[2]];
+};
+
+
+//****************************************************************
+// Called when TLSA is invalid, return value for web request blocking
+//****************************************************************
+function checkDaneResult(ret, domain) {
+	
+	var block = "no";
+
+	if (ret >= tlsaExtNPAPIConst.DANE_TLSA_PARAM_ERR) {				
+		var blockhttps = localStorage["blockhttps"];
+		blockhttps = (blockhttps == undefined || blockhttps == "false") ? false : true;	
+
+		if (blockhttps) {				
+			var alerttext = chrome.i18n.getMessage("warningpre") 
+			+ " " + domain + " " + chrome.i18n.getMessage("warningpost");
+			var choice = confirm(alerttext);
+			if (choice) {				
+				if (debuglogout) {
+					console.log(DANE + "Connection to this server was canceled by user...");
+				}
+				block = "yes";					
+			}
+			else {
+				if (debuglogout) {
+					console.log(DANE + "Connection to this server was permitted by user....");
+				}
+				block = "no";
+			}
+		}
 	}
-	//olddomain = domain;
-	return ret;
+	return block; 
+};
+
+//****************************************************************
+// Called when the url of a tab were changed.
+//****************************************************************
+function onUrlChange(tabId, changeInfo, tab) {                  	
+   	
+	if (changeInfo.status == undefined) return;
+ 
+	if (IsValidUrl(tabId, tab.url)) {
+		return;
+	}
+
+	var portplugin = "80";
+	var portpopup = "";
+	var domain = "";
+	var ret = tlsaExtNPAPIConst.DANE_NO_HTTPS; 
+	
+	if (changeInfo.status == "loading") {
+		if (debuglogout) {
+			console.log("\nBrowser: onUrlChange(TabID: " + tabId + ", URL: " + tab.url +");");
+		}
+
+		chrome.pageAction.setPopup({tabId: tabId, popup: ""});
+
+		var scheme = httpscheme(tab.url);
+		var domainandport = getDomainAndPort(tab.url);
+		domain = domainandport[0];
+
+		if (scheme == "https" || scheme == "http") {
+			portplugin = (domainandport[1] == undefined) ? "443" : domainandport[1].substring(1);	
+			portpopup = (domainandport[1] == undefined) ? "" : domainandport[1];
+		}
+		if (scheme == "ftps" || scheme == "ftp") {
+			portplugin = (domainandport[1] == undefined) ? "990" : domainandport[1].substring(1);
+			portpopup = (domainandport[1] == undefined) ? "" : domainandport[1];
+
+		}		
+
+		if (scheme == "https" || scheme == "ftps") {
+			var domainport = domain + portpopup;
+			var cacheitem = tlsaExtCache.getRecord(domainport);
+			if (cacheitem[0] == '' && cacheitem[1] == '') {
+				ret = TLSAvalidate(scheme, domain, portplugin);
+			}
+			else {
+				ret = cacheitem[0];
+			}
+		}
+		setTLSASecurityState(tabId, domain+portpopup, ret, scheme);
+	}
 }; // onUrlChange
+
+//****************************************************************
+// Fires when the (http) request was made
+//****************************************************************
+function onBeforeRequest(tabId, url) {                  	
+
+	var block = "no";	
+	var portplugin = "80";
+	var portcache = "80";
+	var domain = "";
+	var ret = tlsaExtNPAPIConst.DANE_OFF;
+       
+	if (IsValidUrl(tabId, url)) {
+		return block;
+	}
+
+	var scheme = httpscheme(url);
+
+	if (scheme == "https" || scheme == "ftps") {
+
+		if (debuglogout) {
+			console.log("\nBrowser: onBeforeRequest(TabID: " + 
+			tabId + ", URL: " + url +");");
+		}
+
+		var domainandport = getDomainAndPort(url);
+		domain = domainandport[0];
+
+		if (scheme == "https") {
+			portplugin = (domainandport[1] == undefined) ? "443" : domainandport[1].substring(1);
+			portcache = (domainandport[1] == undefined) ? "" : domainandport[1];
+		}
+		if (scheme == "ftps") {
+			portplugin = (domainandport[1] == undefined) ? "990" : domainandport[1].substring(1);
+			portcache = (domainandport[1] == undefined) ? "" : domainandport[1];
+		}
+
+		var domainport = domain + portcache;
+		var cacheitem = tlsaExtCache.getRecord(domainport);
+		if (cacheitem[0] == '' && cacheitem[1] == '') {
+
+			ret = TLSAvalidate(scheme, domain, portplugin);
+			block = checkDaneResult(ret, domain);
+			
+			if (portcache == "") {
+				tlsaExtCache.addRecord(domain, ret, block);			
+			}
+			else {
+				domain = domain + portcache;
+				tlsaExtCache.addRecord(domain, ret, block);
+			}
+			tlsaExtCache.printContent();
+		}
+		else {
+			var current_time = new Date().getTime();
+			if (cacheitem[2] < current_time) {
+				ret = TLSAvalidate(scheme, domain, portplugin);
+				block = checkDaneResult(ret, domain);
+				if (portcache == "") {
+					tlsaExtCache.addRecord(domain, ret, block);			
+				}
+				else {
+					domain = domain + portcache;
+					tlsaExtCache.addRecord(domain, ret, block);
+				}
+				tlsaExtCache.printContent();
+			}
+			else {
+				if (cacheitem[0] >= tlsaExtNPAPIConst.DANE_TLSA_PARAM_ERR) {
+					if (cacheitem[1] == "yes") {
+						ret = TLSAvalidate(scheme, domain, portplugin);
+						block = checkDaneResult(ret, domain);
+						if (portcache == "") {
+							tlsaExtCache.addRecord(domain, ret, block);			
+						}
+						else {
+							domain = domain + portcache;
+							tlsaExtCache.addRecord(domain, ret, block);
+						}
+						tlsaExtCache.printContent();
+					}
+					else {
+						ret = cacheitem[0];
+					}				
+				}
+			}
+		}
+	}
+	return block;
+}; 
 
 //****************************************************************
 // Listen for any changes to the URL of any tab or tab was switched
@@ -599,63 +795,41 @@ chrome.tabs.onUpdated.addListener(onUrlChange);
 //****************************************************************
 chrome.webRequest.onBeforeRequest.addListener(
   function(details) {
-	if (details.tabId >= 0) {
-		var domain = details.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];		
-		if (domain == olddomain) {						
-			var cacheitem = tlsaExtCache.getRecord(domain);
-			if (cacheitem[1] == 'no') {
-				return;
-			}
-			else if (cacheitem[0] == '' && cacheitem[1] == '') {
-				 return;
-			} else if (currenturl != "null") {
-					return;		
-			}
-		}
-		else {
-			olddomain = domain;
-			var cacheitem = tlsaExtCache.getRecord(domain);
-			if (cacheitem[1] == 'no') {
-				return;
-			}
-		}
-		console.log("\nBrowser: onBeforeRequest(TabID: " + details.tabId + ", URL: " + details.url +");");	
 
-   		var c = this.tlsaExtNPAPIConst;
-		var result = onBeforeRequest(details.tabId, details.url);
-		if (result >= c.DANE_DNSSEC_BOGUS) {
-			var block = "no";				
-			var blockhttps = localStorage["blockhttps"];
-	   		blockhttps = (blockhttps == undefined || blockhttps == "false") ? false : true;	
-		
-			if (blockhttps) {				
-				var alerttext = chrome.i18n.getMessage("warningpre") + " " + domain + " " + chrome.i18n.getMessage("warningpost");
-				var choice = confirm(alerttext);
-				if (choice) {				
-					console.log(DANE + "Connection to this server was canceled by user...");
-					block = "yes";
-					tlsaExtCache.addRecord(domain, result , block);
-					tlsaExtCache.printContent();
-					return {cancel: details.url.indexOf(domain) != -1};							
-				}
-				else {
-					block = "no";
-					tlsaExtCache.addRecord(domain, result , block);
-					tlsaExtCache.printContent();
-					console.log(DANE + "Connection to this server was permitted by user....");
-				}
-			}
+	debuglogout = localStorage["DebugOutput"];
+	debuglogout = (debuglogout == "false") ? false : true; 
+
+	if (details.tabId >= 0) {
+		var cachefree = localStorage["cachefree"];
+		if (cachefree == 1) {
+			tlsaExtCache.delAllRecords();
+			localStorage["cachefree"] = 0;
+			wrongresolver = false;
+		}
+		var domain = details.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];		
+		var block = onBeforeRequest(details.tabId, details.url);
+		if (block == "yes") {
+			return {cancel: details.url.indexOf(domain) != -1};		
 		}
 	}	
 }, {urls: ["<all_urls>"]}, ["blocking"]);
 
 
+//****************************************************************
+// Do something clever here once data has been removed.
+//****************************************************************
 var callback = function () {
-  // Do something clever here once data has been removed.
 };
 
 
+//****************************************************************
+// Interenal cache initialization when browser starts
+//****************************************************************
 if (initcache) {
+
+	debuglogout = localStorage["DebugOutput"];
+	debuglogout = (debuglogout == "false") ? false : true; 
+
 	tlsaExtCache.init();
 	var clearcache = localStorage["clearcache"];
 	clearcache = (clearcache == undefined || clearcache == "true") ? true : false;
@@ -663,7 +837,9 @@ if (initcache) {
 		// new API since Chrome Dev 19.0.1055.1
 		if( chrome['browsingData'] && chrome['browsingData']['removeCache'] ){
 			chrome.browsingData.removeCache( {'since': 0}, callback);
-			console.log(DANE + "Clear browser cache....");
+			if (debuglogout) {
+				console.log(DANE + "Clear browser cache....");
+			}
 		}	
 	}
 }

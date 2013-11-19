@@ -20,6 +20,9 @@
 	"clearcachetext": {
 		"message": "Clear browser cache at start-up"
 		},
+	"debugoutputtext": {
+		"message": "Print debugging information to developer tools console"
+		},
 	"legend": {
 		"message": "Resolver settings"
 		},
@@ -69,7 +72,7 @@
 		"message": "Resolver doesn't support DNSSEC"
 		},
          "dnssecWrongResolver": {
-		"message": " can not be verified by DNSSEC."
+		"message": "The authenticity of TLS/SSL remote server certificate for the domain name could not be verified by DANE protocol."
 		},
          "dnssecWrongResolverInfo": {
 		"message": "Current DNS server or resolver does not support DNSSEC technology. Please, change the validator settings (choice \"Without resolver\")."

@@ -27,14 +27,13 @@ DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
         body {
         font: 0.9em Verdana, Arial, Helvetica; max-width: 28em;
         }
-	      p {font-size: 90%;}
+	p {font-size: 90%;}
     </style>
 </head>
 
 <body>
 	<h2 id="preftitle"></h2>        
 	<form name="tlsaSettings">
-
 	<fieldset>
 		<legend id="legend"></legend>
 		<p id="prefresolver"></p>
@@ -59,7 +58,8 @@ DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
 	        <input type="checkbox" id="debugOutput" name="debugOutput" style="display: none;"/><br/>         
 		<input type="checkbox" id="blockhttps" name="blockhttps"/><label id="blockhttpstext"></label><br/>
 		<input type="checkbox" id="clearcache" name="clearcache"/><label id="clearcachetext"></label><br/><br/>
-
+		<input type="checkbox" id="DebugOutput" name="DebugOutput"/><label id="debugoutputtext"></label><br/><br/>
+		<input type="hidden"   id="cachefree" name="cachefree"/>
 		<input type="button" value="Save" id="savebutton"/>
 		<input type="button" value="Cancel" id="cancelbutton"/>
       </form>
