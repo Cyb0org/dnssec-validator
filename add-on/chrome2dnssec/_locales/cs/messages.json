@@ -14,6 +14,9 @@
 	"filtertext": {
 		"message": "Seznam vyřazených domén a TLD (oddělené čárkami)"
 		},
+	"debugoutputtext": {
+		"message": "Vypisovat ladící informace do konzole"
+		},
 	"legend": {
 		"message": "Nastavení resolveru"
 		},

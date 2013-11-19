@@ -14,6 +14,9 @@
 	"filtertext": {
 		"message": "Liste ausgeschlossener Domänen und TLDs (mit Komma abgetrennt)"
 		},
+	"debugoutputtext": {
+		"message": "Schreibe Debuginformationen in die Entwicklerkonsole"
+		},
 	"legend": {
 		"message": "Resolver-Einstellungen"
 		},

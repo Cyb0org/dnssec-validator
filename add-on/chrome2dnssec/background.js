@@ -30,7 +30,7 @@ document.write("<script>");
 // debug pretext
 var DNSSEC = "DNSSEC: ";
 // enable print debug info into debug console
-var debuglogout = true;
+var debuglogout = false;
 // variables for chrome IP API
 var currentIPList= new Array();
 var currentIPListDomain= new Array();
@@ -307,10 +307,7 @@ function dnssecvalidate(domain, tabId, tab) {
 	var resolver = this.getResolver();
 	var currentURL = tab.url;
 	var c = this.dnssecExtNPAPIConst;
-
-	var debug = localStorage["dnssecDebugOutput"];
-	debug = (debug == "false") ? false : true;        	   
-
+      	 
 	var resolvipv4 = false; // No IPv4 resolving as default
 	var resolvipv6 = false; // No IPv6 resolving as default
 
@@ -343,7 +340,7 @@ function dnssecvalidate(domain, tabId, tab) {
 	}//if
    
 	var options = 0;
-	if (debug) options |= c.DNSSEC_FLAG_DEBUG;
+	if (debuglogout) options |= c.DNSSEC_FLAG_DEBUG;
 	if (resolver != "nofwd") options |= c.DNSSEC_FLAG_USEFWD;
 	if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
 	if (resolvipv6) options |= c.DNSSEC_FLAG_RESOLVIPV6;
@@ -377,7 +374,7 @@ function dnssecvalidate(domain, tabId, tab) {
 			}
 			plugin.CacheFree();
 			options = 0;
-			if (debug) options |= c.DNSSEC_FLAG_DEBUG;
+			if (debuglogout) options |= c.DNSSEC_FLAG_DEBUG;
 			if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
 			if (resolvipv6) options |= c.DNSSEC_FLAG_RESOLVIPV6;
 			
@@ -431,7 +428,15 @@ function dnssecvalidate(domain, tabId, tab) {
 //****************************************************************
 function onUrlChange(tabId, changeInfo, tab) {                  	
 
-	if (changeInfo.status != "loading") return;
+	debuglogout = localStorage["DebugOutput"];
+	debuglogout = (debuglogout == "false") ? false : true;
+
+
+	if (changeInfo.status != "loading") {
+		if (changeInfo.status != "complete") {
+			return;
+		}
+	}
 
 	// reset any old popup
 	chrome.pageAction.setPopup({tabId: tabId, popup: ""});
