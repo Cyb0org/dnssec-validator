@@ -72,14 +72,14 @@ OpenSSL used as well as that of the covered work.
 #define DEBUG_PREFIX "DNSSEC: "
 #define ERROR_PREFIX "DNSSEC error: "
 #define MAX_IPADDRLEN 40          /* max len of IPv4 and IPv6 addr notation */
-#define MAX_SRCHLSTLEN (6 * 256)  /* max len of searchlist */
+#define MAX_SRCHLSTLEN (6 * 256)  /* max len of search list */
 
 //----------------------------------------------------------------------------
 typedef struct {                     /* structure to save input options */
 	bool debug;                        // debug output enable
 	bool usefwd;                       // use of resolver
 	bool resolvipv4;                   // IPv4 - validation of A record
-	bool resolvipv6;                   // IPv6 - valiadtion of AAAA record
+	bool resolvipv6;                   // IPv6 - validation of AAAA record
 	bool ds;  
 } ds_options;
 ds_options opts;
@@ -123,7 +123,7 @@ static
 int ipv6str_equal(const char *lhs, const char *rhs)
 {
 	int ret;
-	struct in6_addr la, ra; /* Left and gight address. */
+	struct in6_addr la, ra; /* Left and right address. */
 
 	ret = inet_pton(AF_INET6, lhs, &la);
 	assert(ret == 1);
@@ -496,7 +496,7 @@ void ub_context_free(void)
 // return status DNSSEC security
 // Input: *domain - domain name
 //        options - options of validator, IPv4, IPv6, usefwd, etc..
-//        *optdnssrv - IP address of resolver/forvarder
+//        *optdnssrv - IP address of resolver/forwarder
 //        *ipbrowser - is IP address of browser which browser used to connection on the server
 // Out:   **ipvalidator - is IP address(es) of validator
 // ----------------------------------------------------------------------------
@@ -521,8 +521,12 @@ short ds_validate(const char *domain, const uint16_t options,
 	/* options init - get integer values send from browser */
 	ds_init_opts(options);
 
-	printf_debug("Input parameters: \"%s; %u; %s; %s;\"\n",
-	    domain, options, optdnssrv, ipbrowser);
+	printf_debug("Input parameters: domain='%s'; options=%u; "
+	    "resolver_address='%s'; remote_address='%s';\n",
+	    (domain != NULL) ? domain : "(null)",
+	    options,
+	    (optdnssrv != NULL) ? optdnssrv : "(null)",
+	    (ipbrowser != NULL) ? ipbrowser : "(null)");
 
 	if ((domain == NULL) || (domain[0] == '\0')) {
 		printf_debug("Error: no domain...\n");
@@ -537,7 +541,7 @@ short ds_validate(const char *domain, const uint16_t options,
 			return retval; /* DNSSEC_ERROR_GENERIC */
 		}
 
-		// set resolver/forawarder if it was set in options
+		// set resolver/forwarder if it was set in options
 		if (opts.usefwd) {
 			if ((optdnssrv != NULL) && (optdnssrv[0] != '\0')) {
 				size_t size = strlen(optdnssrv) + 1;
@@ -679,7 +683,7 @@ short ds_validate(const char *domain, const uint16_t options,
 
 #ifdef CMNDLINE_TEST
 
-// for commadline testing
+// for command-line testing
 int main(int argc, char **argv)
 {
 	const char *dname = NULL;
