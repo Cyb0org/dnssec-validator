@@ -30,6 +30,7 @@ OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
 #include <stdarg.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -187,7 +188,37 @@ void ds_init_opts(const uint16_t options)
 
 
 //*****************************************************************************
-// Helper function (SSL conection)
+// Function checks whether supplied string contains a port number
+// Returns -1 if not a number in range <0-65535>
+// ----------------------------------------------------------------------------
+static
+int str_is_port_number(const char *port_str)
+{
+	unsigned i, length;
+	unsigned long port_num;
+
+	assert(port_str != NULL);
+
+	length = strlen(port_str);
+	if ((length == 0) || (length > 5)) {
+		return -1;
+	}
+	for (i = 0; i < length; ++i) {
+		if (!isdigit(port_str[0])) {
+			return -1;
+		}
+	}
+	port_num = strtoul(port_str, NULL, 10);
+	if (port_num > 65535) {
+		return -1;
+	}
+
+	return port_num;
+}
+
+
+//*****************************************************************************
+// Helper function (SSL connection)
 // create_socket() creates the socket & TCP-connect to server
 // url_str contains only domain name (+ optional port number)
 // ----------------------------------------------------------------------------
@@ -269,7 +300,7 @@ int create_socket(char *url_str, const char *port_str)
 	dest_addr.sin_addr.s_addr = 0;
 	dest_addr.sin_addr.s_addr = * (unsigned long*) host->h_addr_list[0];
 
-	//Zeroing the rest of the struct       
+	//Zeroing the rest of the structure
 	memset(&(dest_addr.sin_zero), '\0', 8);
 	tmp_ptr = inet_ntoa(dest_addr.sin_addr);
 
@@ -1047,7 +1078,7 @@ char * matchingData(uint8_t matching_type, uint8_t selector,
 //*****************************************************************************
 // TLSA validation of EE certificate (type 1)
 // Binary data codes EE certificate
-// Servers certificate must coresponde EE certificate in TLSA
+// Servers certificate must correspond EE certificate in TLSA
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
 static
@@ -1080,7 +1111,7 @@ int eeCertMatch1(const struct tlsa_store_ctx_st *tlsa_ctx,
 //*****************************************************************************
 // TLSA validation of EE certificate (type 3)
 // Binary data codes EE certificate
-// Servers certificate must corresponds EE certificate in TLSA
+// Servers certificate must correspond EE certificate in TLSA
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
 static
@@ -1452,6 +1483,7 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 	int tlsa_res = -1;
 	int tlsa_ret = 0;
 	int retval = 0;
+#define DEFAULT_PORT "443"
 #define HTTPS_PREF "https://"
 #define HTTPS_PREF_LEN 8
 #define MAX_URI_LEN (256 + 64) /*
@@ -1469,14 +1501,32 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 
 	ds_init_opts(options);
 
-	char port[6] = "443";
+	printf_debug(DEBUG_PREFIX, "Input parameters: domain='%s'; port='%s'; "
+	    "protocol='%s'; options=%u; resolver_address='%s';\n",
+	    (domain != NULL) ? domain : "(null)",
+	    (port_str != NULL) ? port_str : "(null)",
+	    (protocol != NULL) ? protocol : "(null)",
+	    options,
+	    (optdnssrv != NULL) ? optdnssrv : "(null)");
+
+	if ((domain == NULL) || (domain[0] == '\0')) {
+		printf_debug(DEBUG_PREFIX, "Error: no domain...\n");
+		return retval;
+	}
+
 	if ((port_str != NULL) && (port_str[0] != '\0')) {
 		/*
-		 * TODO -- Check whether port really contains an uint16_t in
-		 * decimal notation.
+		 * Check whether port really contains an uint16_t in
+		 * decimal notation without any additional characters.
 		 */
-		strncpy(port, port_str, 5);
-		port[5] = '\0';
+		if (str_is_port_number(port_str) < 0) {
+			printf_debug(DEBUG_PREFIX,
+			    "Error: Supplied an invalid port number '%s'.\n",
+			    port_str);
+			return exitcode;
+		}
+	} else {
+		port_str = DEFAULT_PORT;
 	}
 
 	/*
@@ -1588,7 +1638,7 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 	//------------------------------------------------------------
 
 	// create TLSA query 
-	dn = create_tlsa_qname(domain, port, protocol);
+	dn = create_tlsa_qname(domain, port_str, protocol);
 	retval = ub_resolve(ctx, dn, LDNS_RR_TYPE_TLSA, LDNS_RR_CLASS_IN,
 	    &ub_res);
 	free(dn);
@@ -1648,7 +1698,7 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 		    "External certificate chain is used\n");
 		memcpy(uri, "https://", HTTPS_PREF_LEN + 1);
 		strncat(uri, domain, MAX_URI_LEN - HTTPS_PREF_LEN - 1);
-		tlsa_ret = getcert(uri, domain, port, &cert_list);
+		tlsa_ret = getcert(uri, domain, port_str, &cert_list);
 		if (tlsa_ret == 0) {
 			free_tlsalist(&tlsa_list);
 			free_certlist(&cert_list);
