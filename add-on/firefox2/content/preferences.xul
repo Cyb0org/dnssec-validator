@@ -36,15 +36,16 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
     </html:div>
 <prefpane id="dnssec-pref-pane1" onpaneload="dnssecExtPrefs.pane1Load();">
     <preferences>
-      <preference id="debugoutput" name="extensions.dnssec.debugoutput" type="bool"/>
+      <preference id="dnssecdebug" name="extensions.dnssec.dnssecdebug" type="bool"/>
+      <preference id="tlsadebug" name="extensions.dnssec.tlsadebug" type="bool"/>
       <preference id="dnsserverchoose" name="extensions.dnssec.dnsserverchoose" type="int"/>
       <preference id="dnsserverpresetchoose" name="extensions.dnssec.dnsserverpresetchoose" type="int"/>
       <preference id="dnsserveraddr" name="extensions.dnssec.dnsserveraddr" type="string"/>
       <preference id="optdnsserveraddr" name="extensions.dnssec.optdnsserveraddr" type="string"/>
-      <preference id="domainfilteron" name="extensions.dnssec.domainfilteron" type="bool"/>
+      <preference id="domainfilter" name="extensions.dnssec.domainfilter" type="bool"/>
       <preference id="tlsablocking" name="extensions.dnssec.tlsablocking" type="bool"/>
       <preference id="clearcache" name="extensions.dnssec.clearcache" type="bool"/>
-      <preference id="tlsa" name="extensions.dnssec.tlsa" type="bool"/>
+      <preference id="tlsaenable" name="extensions.dnssec.tlsaenable" type="bool"/>
       <preference id="domainlist" name="extensions.dnssec.domainlist" type="string"/>
       <preference id="version" name="extensions.dnssec.version" type="string"/>
       <preference id="resolvingactive" name="extensions.dnssec.resolvingactive" type="bool"/>
@@ -57,19 +58,6 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
       <radiogroup id="dnssec-pref-dnsserverchoose" preference="dnsserverchoose" oncommand="dnssecExtPrefs.dnsserverchooseCommand();">
         <description value="&radiogroupdnsserver.label;"/>
         <radio id="dnssec-pref-usesysdnsserver" label="&radiodnsserversystem.label;" accesskey="&radiodnsserversystem.accesskey;" value="0"/>
-<!--
-        <hbox>
-          <radio id="dnssec-pref-usepresetdnsserver" label="&radiodnsserverpreset.label;" accesskey="&radiodnsserverpreset.accesskey;" value="1"/>
-          <menulist id="dnssec-pref-dnsserverpresetchoose" preference="dnsserverpresetchoose" oncommand="dnssecExtPrefs.dnsserverpresetchooseCommand();">
-            <menupopup>
-              <menuitem label="&menuitemdnsservercznic.label;" value="0"/>
-              <menuitem label="&menuitemdnsserveroarc.label;" value="1"/>
-            </menupopup>
-          </menulist>
-        </hbox>
-        <textbox id="dnssec-pref-cznicdnsserveraddr" value="217.31.204.130 2001:1488:800:400::130 193.29.206.206 2001:678:1::206" disabled="true" hidden="true"/>
-        <textbox id="dnssec-pref-oarcdnsserveraddr" value="149.20.64.20 2001:4f8:3:2bc:1::64:20 149.20.64.21 2001:4f8:3:2bc:1::64:21" disabled="true" hidden="true"/>
--->
         <hbox>
           <radio id="dnssec-pref-useoptdnsserver" label="&radiodnsserveropt.label;" accesskey="&radiodnsserveropt.accesskey;" value="2"/>
           <textbox id="dnssec-pref-optdnsserveraddr" preference="optdnsserveraddr" oninput="dnssecExtPrefs.optdnsserveraddrInput();"/>
@@ -87,14 +75,14 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
    <groupbox>
       <caption label="&groupboxfilter.label;"/>
-      <checkbox id="dnssec-pref-usefilter" label="&usefilter.label;" preference="domainfilteron" accesskey="&usefilter.accesskey;" checked="false" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
+      <checkbox id="dnssec-pref-usefilter" label="&usefilter.label;" preference="domainfilter" accesskey="&usefilter.accesskey;" checked="false" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
       <description value="&filtertext.label;"/>       
       <textbox id="dnssec-pref-domains" rows="3" multiline="true" disabled="true" preference="domainlist" oninput="dnssecExtPrefs.optdnsserveraddrInput();"/>               
    </groupbox>
 
    <groupbox>
       <caption label="&groupboxtlsa.label;"/>
-      <checkbox id="dnssec-pref-tlsaonoff" label="&tlsaonoff.label;" preference="tlsa" accesskey="&tlsaonoff.accesskey;" checked="true" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
+      <checkbox id="dnssec-pref-tlsaonoff" label="&tlsaonoff.label;" preference="tlsaenable" accesskey="&tlsaonoff.accesskey;" checked="true" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
       <checkbox id="dnssec-pref-tlsablock" label="&tlsablock.label;" preference="tlsablocking" accesskey="&tlsablock.accesskey;" checked="true" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
       <checkbox id="dnssec-pref-clearcache" label="&clearcache.label;" preference="clearcache" accesskey="&clearcache.accesskey;" checked="true" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
     </groupbox>

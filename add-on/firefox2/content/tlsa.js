@@ -22,27 +22,42 @@ DNSSEC/TLSA Validator 2 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 window.addEventListener("load", function() { daneExtension.init(); }, false);
 window.addEventListener("unload", function() { daneExtension.uninit(); }, false);
 
-// **********************************************************************
-/* onPageLoad: observe that page is completed in any tabs or window    */
-// **********************************************************************
-/*
-function onPageLoad(event) {
+/* Observe preference changes */
+var daneExtPrefObserver = {
 
-	if (daneExtension.debugOutput) dump("browser: +++PAGE WAS LOADED+++\n\n"); 
+  _branch: null,
 
-    var doc = aEvent.originalTarget; // doc is document that triggered the event        
-    if (daneExtension.debugOutput) dump(doc.location.href + ")+++");
- 	daneExtension.oldAsciiHost = null;
-		
-	if (event.originalTarget instanceof HTMLDocument) {
-		var win = event.originalTarget.defaultView;
-	    if (win.frameElement) {
-			win = win.top;
-	    }
-	}
+  register: function() {
+    var prefService = Components.classes["@mozilla.org/preferences-service;1"]
+                      .getService(Components.interfaces.nsIPrefService);
 
+    // Add the observer
+    this._branch = prefService.getBranch(dnssecExtPrefs.prefBranch);
+    this._branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
+    this._branch.addObserver("", this, false);
+  },
+
+  unregister: function() {
+    if (!this._branch) return;
+    this._branch.removeObserver("", this);
+  },
+
+  observe: function(aSubject, aTopic, aData) {    
+    if (aTopic != "nsPref:changed") return;
+
+    // aSubject is the nsIPrefBranch we're observing (after appropriate QI)
+    // aData is the name of the pref that's been changed (relative to aSubject)
+    switch (aData) {
+    case "danedebug":     // Change debugging to stdout
+      daneExtension.getDebugOutputFlag();
+      break;
+    case "popupfgcolor":   // Change popup-window fore/background color
+    case "popupbgcolor":
+      daneExtension.getPopupColors();
+      break;
+    }
+  }
 };
-*/
 
 // **********************************************************************
 /* TLSA Validator's internal cache - shared with all window tabs */
@@ -169,16 +184,18 @@ init: function() {
 
 	// Set inaction mode (no icon)
 	tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_INACTION);
-	
+
+	// Register preferences observer
+	daneExtPrefObserver.register();
 	// Change popup-window fore/background color if desired
 	this.getPopupColors();
 
 	this.registerObserver("http-on-examine-response");
-	this.registerObserver("http-on-examine-cached-response");
+	//this.registerObserver("http-on-examine-cached-response");
 
 	// Listen for webpage events
 	gBrowser.addProgressListener(daneExtUrlBarListener);
-	//gBrowser.addEventListener("load", onPageLoad, true);
+
 	tlsaExtCache.init();
 
 	var clearcache = dnssecExtPrefs.getBool("clearcache");
@@ -213,7 +230,7 @@ clearMFcache : function(cache) {
 },
 
 getDebugOutputFlag: function() {
-	this.debugOutput = dnssecExtPrefs.getBool("debugoutput");
+	this.debugOutput = dnssecExtPrefs.getBool("danedebug");
 },
 
 getPopupColors: function() {
@@ -234,8 +251,11 @@ uninit: function() {
 	gBrowser.removeProgressListener(daneExtUrlBarListener);
 	//gBrowser.removeEventListener("load", onPageLoad, true);
 
+	// Unregister preferences observer
+	daneExtPrefObserver.unregister();
+
 	this.unregisterObserver("http-on-examine-response");
-	this.unregisterObserver("http-on-examine-cached-response");
+	//this.unregisterObserver("http-on-examine-cached-response");
 
 	var dsp = document.getElementById("dane-tlsa-plugin");
 	dsp.TLSACacheFree();
@@ -273,7 +293,7 @@ observe: function(channel, topic, data) {
 
 	if (topic == "http-on-examine-response") {
 		
-		var tlsaonoff = dnssecExtPrefs.getBool("tlsa");
+		var tlsaonoff = dnssecExtPrefs.getBool("tlsaenable");
 		if (tlsaonoff) { 
 
 			var Cc = Components.classes, Ci = Components.interfaces;
@@ -386,7 +406,7 @@ var tlsaValidator = {
 //---------------------------------------------------------
 is_in_domain_list: function(dn) {
 
-	var filteron = dnssecExtPrefs.getBool("domainfilteron");
+	var filteron = dnssecExtPrefs.getBool("domainfilter");
 	var validate = true;
 	
 	if (filteron) {
@@ -459,7 +479,7 @@ processNewURL: function(aRequest, aLocationURI) {
 		}
 	}
 
-	var tlsaon = dnssecExtPrefs.getBool("tlsa");
+	var tlsaon = dnssecExtPrefs.getBool("tlsaenable");
 	if (tlsaon) {   
       	   
 		if (this.is_in_domain_list(asciiHost)) {
@@ -718,6 +738,7 @@ check_tlsa_tab_change: function (channel, domain, port, protocol) {
 	if (daneExtension.debugOutput) {
 		dump(this.DANE_DEBUG_PRE + "------------ TLSA validation end ------------------" + this.DANE_DEBUG_POST);
 	}
+	return null;
 },
 
 //--------------------------------------------------------------

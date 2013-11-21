@@ -132,19 +132,6 @@ var dnssecExtPrefs = {
 
   savePrefs : function() {  
   switch (document.getElementById("dnssec-pref-dnsserverchoose").value) {
-/*
-    case '1': // Preset resolvers
-      switch (document.getElementById("dnssec-pref-dnsserverpresetchoose").value) {
-      case '1': // OARC's ODVR
-        this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-oarcdnsserveraddr").value);
-        break;
-      case '0': // CZ.NIC's ODVR
-      default:
-        this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-cznicdnsserveraddr").value);
-        break;
-      }
-      break;
-*/
     case '2': // Custom resolver
       if (this.checkOptdnsserveraddr()) {
         this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-optdnsserveraddr").value);
@@ -181,20 +168,7 @@ var dnssecExtPrefs = {
         document.getElementById("dnssecerror").style.display = 'none';
 	document.getElementById("wrongip").style.display = 'none';
 	document.getElementById("space").style.display = 'block';
-/*     tmpCheck = document.getElementById("dnssec-pref-usesysdnsserver").selected;
-    tmpCheck2 = document.getElementById("dnssec-pref-useoptdnsserver").selected;
-   if (tmpCheck) {
-	document.getElementById("dnssec-pref-testbutton").disabled = !tmpCheck;
-        document.documentElement.getButton("accept").disabled = tmpCheck;
-	}
-    else if (tmpCheck2) {
-	document.getElementById("dnssec-pref-testbutton").disabled = !tmpCheck2;
-	document.documentElement.getButton("accept").disabled = tmpCheck2;
-	}
-*/
-    // enable preset DNS resolvers menulist only if appropriate radio button is selected
-    //tmpCheck = document.getElementById("dnssec-pref-usepresetdnsserver").selected;
-    //document.getElementById("dnssec-pref-dnsserverpresetchoose").disabled = !tmpCheck;
+
     
     // enable optional DNS address textbox only if appropriate radio button is selected
     tmpCheck = document.getElementById("dnssec-pref-useoptdnsserver").selected;

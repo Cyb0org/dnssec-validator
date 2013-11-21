@@ -79,7 +79,7 @@ var dnssecExtPrefObserver = {
     // aSubject is the nsIPrefBranch we're observing (after appropriate QI)
     // aData is the name of the pref that's been changed (relative to aSubject)
     switch (aData) {
-    case "debugoutput":     // Change debugging to stdout
+    case "dnssecdebug":     // Change debugging to stdout
       dnssecExtension.getDebugOutputFlag();
       break;
     case "asyncresolve":    // Change sync/async resolving
@@ -172,7 +172,7 @@ var dnssecExtension = {
   },
 
   getDebugOutputFlag: function() {
-    this.debugOutput = dnssecExtPrefs.getBool("debugoutput");
+    this.debugOutput = dnssecExtPrefs.getBool("dnssecdebug");
   },
 
   getAsyncResolveFlag: function() {
@@ -474,7 +474,7 @@ var dnssecExtResolver = {
   //*****************************************************
   onBrowserLookupComplete: function(dn, aRecord) {
 
-    var filteron = dnssecExtPrefs.getBool("domainfilteron");
+    var filteron = dnssecExtPrefs.getBool("domainfilter");
     var validate = true;
 	var c = dnssecExtNPAPIConst;
 	

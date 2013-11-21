@@ -23,8 +23,9 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 pref("extensions.dnssec@nic.cz.name", "chrome://dnssec/locale/dnssec.properties");
 pref("extensions.dnssec@nic.cz.description", "chrome://dnssec/locale/dnssec.properties");
 pref("extensions.dnssec.asyncresolve", true);
-pref("extensions.dnssec.debugoutput", false);
-pref("extensions.dnssec.domainfilteron", false);
+pref("extensions.dnssec.dnssecdebug", false);
+pref("extensions.dnssec.danedebug", false);
+pref("extensions.dnssec.domainfilter", false);
 pref("extensions.dnssec.domainlist", "");
 pref("extensions.dnssec.dnsserverchoose", 3);
 pref("extensions.dnssec.dnsserverpresetchoose", 0);
@@ -34,8 +35,6 @@ pref("extensions.dnssec.optdnsserveraddr", "8.8.8.8");
 pref("extensions.dnssec.version", "");
 pref("extensions.dnssec.popupfgcolor", "");
 pref("extensions.dnssec.popupbgcolor", "");
-pref("extensions.dnssec.tlsa", true);
+pref("extensions.dnssec.tlsaenable", true);
 pref("extensions.dnssec.tlsablocking", true);
 pref("extensions.dnssec.clearcache", true);
-// See http://kb.mozillazine.org/Localize_extension_descriptions
-// pref("extensions.dnssec@zbynek.michl.description", "chrome://dnssec/locale/dnssec.properties");
