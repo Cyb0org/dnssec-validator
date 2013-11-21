@@ -39,14 +39,12 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 //#include <CommCtrl.h>
 // size of buffer for URL parts save
 #define STR_BUF_SIZE	512
+#define SM_NAME_LOCAL "Local\\SharedCacheTLSADNSSEC" /* share memory name for Windows*/
 // default icon status 
 WORD statdnssecicon=IDI_DNSSEC_ICON_INIT;
 // for ICON KEY status - not used
 WORD dnsseciconBar;
-
 bool debug = true;
-
-
 char * temp = "";
 short textkey = KEYTEXT;
 short choice = RESOLVER;
@@ -110,39 +108,218 @@ bool csInitialized = false;
 char DefaultIniData[] = "[DNSSEC]\ntlsaenable=1\nkeytext=0\nchoice=3\nchoicedns=0\nuserip=8.8.8.8\nfilteron=0\nlisttld="; 
 char str[INET6_ADDRSTRLEN];
 
-typedef struct {   /* structure to save IPv4/IPv6 address from stub resolver */
+//----BEGIN of CACHE MEMORY ---------------------------------------------------
+#define CACHE_ITEMS_MAX 64          // max items in cache
+#define DOMAIN_NAME_LENGTH_MAX 270   // max lenght of domain name include port number
+#define PORT_LENGTH_MAX 6            // max lenght of port record
+#define NO_ITEM_IN_CACHE -99         // the item is not in cache           
+
+// cache item structure
+typedef struct Record {
+	char key[DOMAIN_NAME_LENGTH_MAX];
+	char port[PORT_LENGTH_MAX];
+	short tlsaresult;
+	bool block;
+	time_t expir;
+} CacheItemStruct;
+
+// shared cache array structure with controls
+// idex
+struct DaneCacheStruct {
+	short itemindex;
+	bool lock;
+	CacheItemStruct cacheitem[CACHE_ITEMS_MAX];
+}; 
+
+// share cache structure in all instances of IE (windows and tabs)
+HANDLE hFileMapping = CreateFileMapping (INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(struct DaneCacheStruct), SM_NAME_LOCAL);  
+DaneCacheStruct *DaneCache = (struct DaneCacheStruct *) MapViewOfFile(hFileMapping, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
+
+bool cache_get_block(struct DaneCacheStruct* DaneCache, int item)
+{
+	return DaneCache->cacheitem[item].block;
+}
+
+short cache_get_tlsaresult(struct DaneCacheStruct* DaneCache, int item)
+{
+	return DaneCache->cacheitem[item].tlsaresult;
+}
+
+time_t cache_get_expir(struct DaneCacheStruct* DaneCache, int item)
+{
+	return DaneCache->cacheitem[item].expir;
+}
+
+char* cache_get_port(struct DaneCacheStruct* DaneCache, int item)
+{
+	return DaneCache->cacheitem[item].port;
+}
+
+// update item in cache
+void cache_update_item(struct DaneCacheStruct* DaneCache, char* key, char *port, short tlsaresult, bool block, time_t expir, int item)
+{
+	strcpy_s(DaneCache->cacheitem[item].key, key);
+	strcpy_s(DaneCache->cacheitem[item].port, port);
+	DaneCache->cacheitem[item].tlsaresult = tlsaresult;
+	DaneCache->cacheitem[item].block = block;
+	DaneCache->cacheitem[item].expir = expir;
+}
+
+// write all items from cache to debug output
+void cache_view_all(struct DaneCacheStruct* DaneCache)
+{
+   int i = 0;
+   int cnt = 0;
+    ATLTRACE("Cache content: \n");
+   while  (i < CACHE_ITEMS_MAX) { 
+	   if (strcmp(DaneCache->cacheitem[i].key,"")!=0) {
+	     ATLTRACE("   r%i: ",i);
+	     ATLTRACE("%s, ",DaneCache->cacheitem[i].key);
+	     ATLTRACE("%s, ",DaneCache->cacheitem[i].port);
+	     ATLTRACE("%i, ",DaneCache->cacheitem[i].tlsaresult);
+	     //printf("%i, ",DaneCache->cacheitem[i].block);
+	     ATLTRACE("%i\n",DaneCache->cacheitem[i].expir);
+		 cnt++;
+	   } // if
+	   i++;
+   } // while
+  ATLTRACE("Cache items: %i\n",cnt);
+}
+
+// add item into cache
+void cache_add_item(struct DaneCacheStruct* DaneCache, char* key, char *port, short tlsaresult, bool block, time_t expir)
+{
+
+	if (DaneCache->itemindex < CACHE_ITEMS_MAX-1) {
+		DaneCache->itemindex++;
+	}
+	else {
+		DaneCache->itemindex = 0;
+	}
+	strcpy_s(DaneCache->cacheitem[DaneCache->itemindex].key, key);
+	if (port == NULL) {
+		strcpy_s(DaneCache->cacheitem[DaneCache->itemindex].port, "");
+	}
+	else {
+		strcpy_s(DaneCache->cacheitem[DaneCache->itemindex].port, port);
+	}
+	DaneCache->cacheitem[DaneCache->itemindex].tlsaresult = tlsaresult;
+	DaneCache->cacheitem[DaneCache->itemindex].block = block;
+	DaneCache->cacheitem[DaneCache->itemindex].expir = expir;
+}
+
+// find item in cache
+int cache_find_item(struct DaneCacheStruct* DaneCache, char* key)
+{ 
+   int up = 0;
+   int i;
+   int down = CACHE_ITEMS_MAX - 1;
+   char tmp[DOMAIN_NAME_LENGTH_MAX];
+   strcpy_s(tmp, key);   
+  
+   if (DaneCache->itemindex < (CACHE_ITEMS_MAX/2))
+   {     
+     for (i=up; i <CACHE_ITEMS_MAX; i++) if (strcmp(DaneCache->cacheitem[i].key,tmp)==0) return i;
+   }
+   else
+   {     
+     for (i=down; i >=0; i--) if (strcmp(DaneCache->cacheitem[i].key,tmp)==0) return i;
+   }
+   return NO_ITEM_IN_CACHE;
+}
+
+// delete one item from cache (not use here)
+void cache_delete_item(struct DaneCacheStruct* DaneCache, int item)
+{
+	strcpy_s(DaneCache->cacheitem[item].key, "");
+	strcpy_s(DaneCache->cacheitem[item].port, "");
+	DaneCache->cacheitem[item].tlsaresult = 0;
+	DaneCache->cacheitem[item].block = false;
+	DaneCache->cacheitem[item].expir = 0;
+}
+
+// delete all items from cache (internal call)
+void CKBBarBand::cache_delete_all(void)
+{
+   //struct DaneCacheStruct* DaneCache;
+	int i = 0;
+   while ((strcmp(DaneCache->cacheitem[i].key,"")!=0) && (i < CACHE_ITEMS_MAX))
+	{
+   	strcpy_s(DaneCache->cacheitem[i].key, "");
+  	strcpy_s(DaneCache->cacheitem[i].port, "");
+  	DaneCache->cacheitem[i].tlsaresult = 0;
+	  DaneCache->cacheitem[i].block = false;
+	  DaneCache->cacheitem[i].expir = 0;
+	  i++;	
+	}
+	DaneCache->itemindex = -1;
+	if (debug) ATLTRACE("Setting was changed: Cache clear...\n");
+}
+
+// delete all items from cache (external call)
+void CKBBarBand::cache_delete_all2(void)
+{
+    struct DaneCacheStruct* DaneCache;
+    
+    HANDLE hFileMapping = CreateFileMapping (INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(struct DaneCacheStruct), SM_NAME_LOCAL);
+    DaneCache = (struct DaneCacheStruct *) MapViewOfFile(hFileMapping, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
+   
+   int i = 0;
+   while ((strcmp(DaneCache->cacheitem[i].key,"")!=0) && (i < CACHE_ITEMS_MAX))
+	{
+   	strcpy_s(DaneCache->cacheitem[i].key, "");
+  	strcpy_s(DaneCache->cacheitem[i].port, "");
+  	DaneCache->cacheitem[i].tlsaresult = 0;
+	  DaneCache->cacheitem[i].block = false;
+	  DaneCache->cacheitem[i].expir = 0;
+	  i++;	
+	}
+  DaneCache->itemindex = -1;
+}
+//-- END of CACHE -------------------------------------------------------------
+
+// structure to save IPv4/IPv6 address from stub resolver
+typedef struct {   
   char* ipv4;
   char* ipv6;
-} ip64struct;
-ip64struct ip64buf;
+} ipv64struct;
+ipv64struct ip64buf;
 
-typedef struct {   /* structure to save IPv4/IPv6 address from stub resolver */
+// structure to save protocol, domain name and port from url
+typedef struct {
   char *protocol;
+  char *domainport;
   char *domain;
   char *port;
-} domstruct;
-//domstruct domainstruct;
+} urlstruct;
 
 /**************************************************************************/
-//to convert URL string on domain name and port, removed http:\\, https:\\ .. 
+//to convert URL string on protocol, domain name and port 
 /**************************************************************************/
-domstruct UrlToDomain(char *url) 
+urlstruct UrlToProtocolDomainPort(char *url) 
 {
-	//if (debug) ATLTRACE("UrlToDomain(%s);\n",url);
+	//if (debug) ATLTRACE("UrlToProtocolDomainPort(%s);\n",url);
 
-	static char separator[]   = "://";
-	domstruct domainstruct;
-	char *domainname=NULL;
+	static char separator1[]   = ":/";
+	static char separator2[]   = "/";
+	static char separator3[]   = ":";
+	urlstruct Urlstructure;
 	char *next_token=NULL;
+	char *domainport=NULL;
 	
-	domainstruct.protocol = strtok_s(url, separator, &next_token);
-	if (debug) ATLTRACE("UrlToDomain-Protocol(%s);\n",domainstruct.protocol);
-	domainstruct.domain = strtok_s(NULL,separator, &next_token);	
-	if (debug) ATLTRACE("UrlToDomain-Doamin(%s);\n",domainstruct.domain);
-	domainstruct.port = strtok_s(NULL,separator, &next_token);	
-	if (debug) ATLTRACE("UrlToDomain-Prot(%s);\n",domainstruct.port);
-
-	return domainstruct;
+	Urlstructure.protocol = strtok_s(url, separator1, &next_token);
+	//if (debug) ATLTRACE("protocol(%s);\n",Urlstructure.protocol);
+	domainport = strtok_s(NULL,separator2, &next_token);
+	//if (debug) ATLTRACE("domainport(%s);\n",domainport);
+	int size = strlen(domainport) + 1;
+	Urlstructure.domainport =(char*)malloc(size);
+	memcpy(Urlstructure.domainport, domainport, size);
+	Urlstructure.domain = strtok_s(domainport, separator3, &next_token);
+	//if (debug) ATLTRACE("domain(%s);\n",Urlstructure.domain);
+	Urlstructure.port = strtok_s(NULL,separator1, &next_token);	
+	//if (debug) ATLTRACE("port(%s);\n",Urlstructure.port);
+	
+	return Urlstructure;
 }
 
 /**************************************************************************/
@@ -174,7 +351,7 @@ const char *inet_ntop(int af, const void *src, char *dst, socklen_t cnt)
 /**************************************************************************/
 // get IPv4/IPv6 address from stub resolver for windows
 /**************************************************************************/
-ip64struct stub_resolve(const char *domain)
+ipv64struct stub_resolve(const char *domain)
 {
     DWORD dwRetval;   
     char retval4[1024];
@@ -481,7 +658,7 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 
 			// Fires if window or tab was changed 
 			case DISPID_WINDOWSTATECHANGED : {
-				if (debug) ATLTRACE("Invoke(): DISPID_WINDOWSTATECHANGED: ");
+				if (debug) ATLTRACE("Invoke(): DISPID_WINDOWSTATECHANGED\n");
 
 				if (pDispParams) {
 					 DWORD dwMask  = pDispParams->rgvarg[0].lVal;
@@ -493,7 +670,7 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 						LoadOptionsFromFile();					
 						HRESULT hrs = webBrowser2->get_LocationURL(&BURL);
 						tmpurl =_com_util::ConvertBSTRToString(BURL);
-						if (debug) ATLTRACE("%s", tmpurl);
+						if (debug) ATLTRACE("URL: %s", tmpurl);
 						if (strcmp(tmpurl,"")==0 || strcmp(tmpurl,"about:Tabs")==0 || strcmp(tmpurl,"about:Blank")==0 || strcmp(tmpurl,"about:blank")==0 || strcmp(tmpurl,"javascript:false;")==0 || strcmp(tmpurl,"res://ieframe.dll/dnserrordiagoff.htm")==0) {
 							if (debug) ATLTRACE("null\n");
 							dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_INIT);
@@ -510,10 +687,10 @@ STDMETHODIMP CKBBarBand::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WOR
 			} break;
 
 			case DISPID_BEFORENAVIGATE2 : {				
-				if (debug) ATLTRACE("Invoke(): DISPID_BEFORENAVIGATE2: ");	
+				if (debug) ATLTRACE("Invoke(): DISPID_BEFORENAVIGATE2\n");	
 				HRESULT hrs = webBrowser2->get_LocationURL(&BURL);
 				tmpurl =_com_util::ConvertBSTRToString(BURL);
-				if (debug) ATLTRACE("%s", tmpurl);
+				if (debug) ATLTRACE("URL: %s", tmpurl);
 				if (strcmp(tmpurl,"")==0 || strcmp(tmpurl,"about:Tabs")==0 || strcmp(tmpurl,"about:Blank")==0 || strcmp(tmpurl,"about:blank")==0 || strcmp(tmpurl,"javascript:false;")==0 || strcmp(tmpurl,"res://ieframe.dll/dnserrordiagoff.htm")==0) {
 					if (debug) ATLTRACE("null\n");
 					dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_INIT);
@@ -1177,23 +1354,21 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 /**************************************************************************/
 void CKBBarBand::CheckDomainStatus(char * url) 
 {   
-	if (debug) ATLTRACE("CheckDomainStatus(%s);\n", url);
+	//if (debug) ATLTRACE("CheckDomainStatus(%s);\n", url);
   
 	dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_ACTION);
 	tlsaicon = GetIconIndex(IDI_TLSA_ICON_ACTION);
 	RefreshIcons();
-	//temporal element that helps to fragment the given URL in a domain
+
 	bool resolvipv4 = true;
 	bool resolvipv6 = true;
-	bool cache_en = true;
-	bool cache_flush = false;	
 	uint16_t options = 0;
-	debugoutput = true; 
+	debugoutput = false; 
 	short resultipv4 = 0; //the DNSSEC validation result
 	short resultipv6 = 0; //the DNSSEC validation result	
-	domstruct tmpdomain=UrlToDomain(url);
-	char * domaintmp = (char*)malloc(2083*sizeof(char));
-	strcpy_s(domaintmp,2048,tmpdomain.domain);
+	urlstruct UrlStructData = UrlToProtocolDomainPort(url);
+	char * domaintmp = (char*)malloc(DOMAIN_NAME_LENGTH_MAX*sizeof(char));
+	strcpy_s(domaintmp, DOMAIN_NAME_LENGTH_MAX, UrlStructData.domain);
 
 	char* dnsip; 
 	LoadOptionsFromFile();
@@ -1277,13 +1452,13 @@ void CKBBarBand::CheckDomainStatus(char * url)
 	} // filteron
 
 	if (validated) {
-		if (debug) ATLTRACE("\n-------------- DNSSEC validation Start ---------------\n");
+		if (debug) ATLTRACE("\n*************** DNSSEC validation Start ***************\n");
 		usedfwd = true;
 		if (choice==2) dnsip = dnssecseradr;
 			else if (choice==1) if (choice2==0) dnsip = nic; else dnsip = oarc;
 			else if (choice==3) {dnsip = "nofwd"; usedfwd = false;}
 			else dnsip = "";
-		ip64struct ipv64;
+		ipv64struct ipv64;
 		ipv64=stub_resolve(domaintmp);
 		
 		// validation IPv4
@@ -1299,34 +1474,31 @@ void CKBBarBand::CheckDomainStatus(char * url)
 				char* ipvalidator4tmp;
 				wrong = false;
 				EnterCriticalSection(&cs);
-				//if (debug) ATLTRACE("Critical section begin\n");
-				if (debug) ATLTRACE("IPv4 request: %s : %d : %s : %s\n", domaintmp, options, dnsip, ipbrowser4);
+				if (debug) ATLTRACE("DNSSEC: IPv4 request: %s, %d, %s, %s\n", domaintmp, options, dnsip, ipbrowser4);
 				resultipv4 = ds_validate(domaintmp, options, dnsip, ipbrowser4, &ipvalidator4tmp);	
-				if (debug) ATLTRACE("IPv4 result: %s: %d : %s\n", domaintmp, resultipv4, ipvalidator4tmp); 				
+				if (debug) ATLTRACE("DNSSEC: IPv4 result: %s, %d, %s\n", domaintmp, resultipv4, ipvalidator4tmp); 				
 				LeaveCriticalSection(&cs);
 				if (resultipv4==DNSSEC_COT_DOMAIN_BOGUS) {
-				  if (debug) ATLTRACE("Unbound return bogus state: Testing why?\n");
+				  if (debug) ATLTRACE("DNSSEC: Unbound return bogus state: Testing why?\n");
 				  ub_context_free();
 				  short res = 0 ;
 				  res = TestResolver(domaintmp, ipbrowser4, '4');
 				  if (res==DNSSEC_COT_DOMAIN_BOGUS) {
 					  resultipv4 = 	res;
-					  if (debug) ATLTRACE("Yes, domain name has bogus\n");
+					  if (debug) ATLTRACE("DNSSEC: Yes, domain name has bogus\n");
 					  ub_context_free();
 				  }
 				  else 
 				  {					
-					if (debug) ATLTRACE("Current resolver does not support DNSSEC!\n");
+					if (debug) ATLTRACE("DNSSEC: Current resolver does not support DNSSEC!\n");
 					wrong = true;
-					if (debug) ATLTRACE("Results: FWD: %d NOFWD: %d\n", resultipv4, res);
 					resultipv4 = DNSSEC_RESOLVER_NO_DNSSEC;
 					ub_context_free();
 				  } // if bogus
 				
 				} // if bogus
-			
+		if (debug) ATLTRACE("-------------------------------------------------------\n");			
 		}
-		if (debug) ATLTRACE("----------------------------------------------------\n");
 		// validation IPv6
 		ipbrowser6=ipv64.ipv6;
 		if (strcmp (ipbrowser6,"") != 0) {
@@ -1337,96 +1509,130 @@ void CKBBarBand::CheckDomainStatus(char * url)
 			if (usedfwd) options |= DNSSEC_FLAG_USEFWD;
 			if (resolvipv4) options |= DNSSEC_FLAG_RESOLVIPV4;
 			if (resolvipv6) options |= DNSSEC_FLAG_RESOLVIPV6;
-			// Request ownership of the critical section
 
 				wrong = false;
 				EnterCriticalSection(&cs);
-				//if (debug) ATLTRACE("Critical section begin\n");
-				if (debug) ATLTRACE("IPv6 request: %s : %d : %s : %s\n", domaintmp, options, dnsip, ipbrowser6);
+				if (debug) ATLTRACE("DNSSEC: IPv6 request: %s, %d, %s, %s\n", domaintmp, options, dnsip, ipbrowser6);
 				resultipv6 = ds_validate(domaintmp, options, dnsip, ipbrowser6, &ipvalidator6);
-				if (debug) ATLTRACE("IPv6 result: %s: %d : %s\n", domaintmp, resultipv6, ipvalidator6); 
+				if (debug) ATLTRACE("DNSSEC: IPv6 result: %s, %d, %s\n", domaintmp, resultipv6, ipvalidator6); 
 				LeaveCriticalSection(&cs);
 				if (resultipv6==DNSSEC_COT_DOMAIN_BOGUS) {
-				  if (debug) ATLTRACE("Unbound return bogus state: Testing why?\n");
+				  if (debug) ATLTRACE("DNSSEC: Unbound return bogus state: Testing why?\n");
 				  ub_context_free();
 				  short res = 0 ;
 				  res = TestResolver(domaintmp, ipbrowser6, '6');
 				  if (res==DNSSEC_COT_DOMAIN_BOGUS) {
 					  resultipv6 = 	res;
-					  if (debug) ATLTRACE("Yes, domain name has bogus\n");
+					  if (debug) ATLTRACE("DNSSEC: Yes, domain name has bogus\n");
 					  ub_context_free();
 				  }
 				  else 
 				  {					
-					if (debug) ATLTRACE("Current resolver does not support DNSSEC!\n");
-					if (debug) ATLTRACE("Results: FWD: %d NOFWD: %d\n", resultipv6, res);
-					//set tooltip
-					//ShowFwdTooltip();
+					if (debug) ATLTRACE("DNSSEC: Current resolver does not support DNSSEC!\n");
 					wrong = true;					
 					resultipv6 = DNSSEC_RESOLVER_NO_DNSSEC;
 					ub_context_free();
 				  } // if bogus
 				
 				} // if bogus
-			
+		if (debug) ATLTRACE("-------------------------------------------------------\n");	
+		}
+		if (resultipv4 < 0 || resultipv6 < 0) {
+			(resultipv4 <= resultipv6 ?  dnssecresult = resultipv4 : dnssecresult = resultipv6);
+		}
+		else {
+			(resultipv4 <= resultipv6 ?  dnssecresult = resultipv6 : dnssecresult = resultipv4);
 		}
 
-		(resultipv4 <= resultipv6 ?  dnssecresult = resultipv6 : dnssecresult = resultipv4);
-		if (debug) ATLTRACE("DNSSEC result: %d\n", dnssecresult);
-		if (debug) ATLTRACE("-------------- DNSSEC validation End -----------------\n");
+		if (debug) ATLTRACE("DNSSEC: IPv4/IPv6/Overall: %d/%d/%d\n", resultipv4, resultipv6, dnssecresult);
+		if (debug) ATLTRACE("*************** DNSSEC validation End *****************\n");
 		
 		char * port = NULL;
-		if (tmpdomain.port==NULL) {
+		if (UrlStructData.port==NULL) {
 			port="443";
 		} else {
-			port=tmpdomain.port;
+			port=UrlStructData.port;
 		}
 
 		// tlsa validation
+		if (debug) ATLTRACE("\n+++++++++++++++ TLSA validation Start +++++++++++++++\n");
+
 		if (tlsaenable == 1) {
 			if (!wrong) {							
-				if (strcmp (tmpdomain.protocol,"https") == 0) {
-					if (debug) ATLTRACE("Scheme is https");
-					if (debug) ATLTRACE("\n-------------- TLSA validation Start -----------------\n");				
-					EnterCriticalSection(&cs);
-					short tlsares;
-					const char* certhex[] = {"FF"};
-					if (debug) ATLTRACE("DANE request: %s, %d, %d, %s, %s, %s, %s, %d\n", certhex[0], 0, options, dnsip, domaintmp, port, "tcp", 1);
-					tlsares = CheckDane(certhex, 0, options, dnsip, domaintmp, port, "tcp", 1);
-					if (debug) ATLTRACE("DANE result: %s: %d\n", domaintmp, tlsares);
-					tlsaresult = tlsares;
-					LeaveCriticalSection(&cs);
-					if (debug) ATLTRACE("-------------- TLSA validation End ------------------\n\n");
+				if (strcmp (UrlStructData.protocol,"https") == 0) {
+					if (debug) ATLTRACE("DANE: Connection is secured (https/ftps)\n");
+					time_t now = time(0);
+					int item = cache_find_item(DaneCache, UrlStructData.domainport);
+					if (item != NO_ITEM_IN_CACHE) {
+						time_t expir = cache_get_expir(DaneCache, item);
+						if (now < expir) {	
+							tlsaresult = cache_get_tlsaresult(DaneCache, item);
+							if (debug) ATLTRACE("DANE: TLSA result used from cache: %s, %i\n",domaintmp, tlsaresult);
+							cache_view_all(DaneCache);
+						}
+						else {
+							EnterCriticalSection(&cs);
+							const char* certhex[] = {"FF"};
+							if (debug) ATLTRACE("DANE: Plugin inputs: %s, %d, %d, %s, %s, %s, %s, %d\n", certhex[0], 0, options, dnsip, domaintmp, port, "tcp", 1);
+							tlsaresult = CheckDane(certhex, 0, options, dnsip, domaintmp, port, "tcp", 1);
+							if (debug) ATLTRACE("DANE: Plugin result: %s: %d\n", domaintmp, tlsaresult);
+							LeaveCriticalSection(&cs);
+							cache_update_item(DaneCache, UrlStructData.domainport, port, tlsaresult, false, now + CACHE_EXPIR_TIME, item);
+							if (debug) ATLTRACE("DANE: Record in cache was updated...\n");
+							cache_view_all(DaneCache);
+						}
+					}
+					else {
+						EnterCriticalSection(&cs);
+						const char* certhex[] = {"FF"};
+						if (debug) ATLTRACE("DANE: plugin inputs: %s, %d, %d, %s, %s, %s, %s, %d\n", certhex[0], 0, options, dnsip, domaintmp, port, "tcp", 1);
+						tlsaresult = CheckDane(certhex, 0, options, dnsip, domaintmp, port, "tcp", 1);
+						if (debug) ATLTRACE("DANE: plugin result: %s: %d\n", domaintmp, tlsaresult);
+						LeaveCriticalSection(&cs);
+						cache_add_item(DaneCache, UrlStructData.domainport, port, tlsaresult, false, now + CACHE_EXPIR_TIME);
+						if (debug) ATLTRACE("DANE: Result was added into cache...\n");
+						cache_view_all(DaneCache);
+					}
 				} //if
 				else {
 					tlsaresult = DANE_NO_HTTPS;
-					if (debug) ATLTRACE("Scheme is http, TLSA validation will not start\n");
+					if (debug) {
+						ATLTRACE("DANE: Connection is not secured...\n");
+						ATLTRACE("DANE: TLSA validation has not been performed...\n");
+					}
 				}
 			} 
-			else tlsaresult = DANE_RESOLVER_NO_DNSSEC;
-		} //if
+			else {
+				tlsaresult = DANE_RESOLVER_NO_DNSSEC;
+				if (debug) ATLTRACE("DANE: Current resolver does not support DNSSEC...\n");
+			}
+		} else {
+			if (debug) ATLTRACE("DANE: TLSA validation is disable...\n");		
+		}
+	if (debug) ATLTRACE("+++++++++++++++ TLSA validation End +++++++++++++++++\n\n");
 	}
 	else {
 		dnssecresult = DNSSEC_OFF;
 		tlsaresult = DANE_OFF;
 	}
+	
 
 	//set DNSSEC security status
 	strcpy_s(domain, domaintmp);
 	SetSecurityDNSSECStatus();
 	if (tlsaenable == 1) {
-		strcpy_s(tlsapaneldomainname, tmpdomain.protocol);
+		strcpy_s(tlsapaneldomainname, UrlStructData.protocol);
 		strcat_s(tlsapaneldomainname, "://");
-		strcat_s(tlsapaneldomainname, tmpdomain.domain);
-		if (tmpdomain.port != NULL) {
+		strcat_s(tlsapaneldomainname, UrlStructData.domain);
+		if (UrlStructData.port != NULL) {
 			strcat_s(tlsapaneldomainname, ":");
-			strcat_s(tlsapaneldomainname, tmpdomain.port);
+			strcat_s(tlsapaneldomainname, UrlStructData.port);
 		}
 		SetSecurityTLSAStatus();
 	}
 	RefreshIcons();
-	free(domaintmp);
-	
+	free(UrlStructData.domainport);
+	free(domaintmp);	
 }
 
 /**************************************************************************/
@@ -1445,7 +1651,7 @@ short CKBBarBand::TestResolver(char *domain, char *ipbrowser, char IPv)
 	//if (debug) ATLTRACE("Critical section begin\n");
 	if (debug) ATLTRACE("TEST DNSSEC: %s : %d : %s : %s\n", domain, options, "nowfd", ipbrowser);
 	res = ds_validate(domain, options, "nowfd", ipbrowser, &ipvalidator);
-	if (debug) ATLTRACE("TEST result: %d : %s\n", res, ipvalidator); 
+	if (debug) ATLTRACE("TEST DNSSEC result: %d : %s\n", res, ipvalidator); 
 	LeaveCriticalSection(&cs);
 	return res;
 }

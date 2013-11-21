@@ -630,8 +630,12 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 								*/					
 					EndDialog(hwndDlg, LOWORD(wParam));					
 					// flush all cache items
-					if (cache_del) ub_context_free();
+					if (cache_del) {
+						ub_context_free();						
+						m_pBarBand->cache_delete_all();
+					}
 					cache_del = 0;
+					
 					break;
 					}
 				case IDCANCEL:

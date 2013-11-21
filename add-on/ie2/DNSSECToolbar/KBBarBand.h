@@ -39,9 +39,13 @@ extern "C" {					// use C language linkage
 #include <shlguid.h>     // IID_IWebBrowser2, DIID_DWebBrowserEvents2, etc
 #include <exdispid.h> // DISPID_DOCUMENTCOMPLETE, etc.
 #include <shlobj.h>
-
+#include <ctime>
+#include <list>
 #include <shlwapi.h>
 #pragma comment(lib,"shlwapi.lib")
+using namespace std;
+
+#define CACHE_EXPIR_TIME 300 // seconds = 5 min is expir time of item in DANE cache
 
 #define TB_MIN_SIZE_X   100
 #define TB_MIN_SIZE_Y   22
@@ -177,6 +181,8 @@ END_COM_MAP()
 		return S_OK;
 	}
 	void FinalRelease() {
+		//CKBBarBand::cache_delete_all2();
+		//ATLTRACE("XXXXXXXXXXXXXXXXXXXXXXXx\n");
 	}
 // Interfaces
 public:
@@ -208,6 +214,7 @@ public:
 
 // Implementation:
 public:
+	void cache_delete_all2(void);
 	void FocusChange(bool bFocus);
 	bool CreateToolWindow(void);
 	// refresh icon
@@ -221,7 +228,7 @@ public:
 	// sets the security status icon
 	void SetSecurityDNSSECStatus(void);
 	void SetSecurityTLSAStatus();
-
+	void cache_delete_all(void);
 	// Index of Bitmap Button	
 	int GetIconIndex(int icon);
 	// version of IE broswer
