@@ -466,14 +466,34 @@ function onUrlChange(tabId, changeInfo, tab) {
                 return;
          }//if
 
-	// get domain name from URL
-	var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
 
+
+	// deactive other tabs
+        if (tab.url.match(/^(?:-devtools)?:\/\//)) {
+                chrome.pageAction.hide(tabId);
+                return;
+         }//if
+
+
+	// get domain name from URL
+	var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.\[\]\:-]+)\]?(?::)*(?::\d+)?/)[1];
+        //console.log("Browser: URL: " + domain);
+	//ipv6
+	if (domain.indexOf("]") != -1) {
+	      //console.log("Browser: URL: " + domain);
+              chrome.pageAction.hide(tabId);
+              return;
+        }//if
+
+	var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
+	// ipv4
         if (domain.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/)) {
 	      //console.log("Browser: URL: " + domain);
               chrome.pageAction.hide(tabId);
               return;
         }//if
+
+
  
         if (debuglogout) {
 		console.log("Browser: onUrlChange(TabID: " + tabId 

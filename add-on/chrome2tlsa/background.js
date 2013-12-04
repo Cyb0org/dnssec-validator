@@ -602,6 +602,16 @@ function IsValidUrl(tabId, url) {
 	
 
 	// get domain name from URL
+	var domain = url.match(/^(?:[\w-]+:\/+)?\[?([\w\.\[\]\:-]+)\]?(?::)*(?::\d+)?/)[1];
+        //console.log("Browser: URL: " + domain);
+	//ipv6
+	if (domain.indexOf("]") != -1) {
+	      //console.log("Browser: URL: " + domain);
+              chrome.pageAction.hide(tabId);
+              return;
+        }//if
+
+	// get domain name from URL
 	var domain = url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
 
 	if (domain.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/)) {
