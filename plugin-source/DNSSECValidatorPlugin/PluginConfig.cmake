@@ -39,7 +39,7 @@ set(MOZILLA_PLUGINID "nic.cz/DNSSECValidatorPlugin")
 # strings
 set(FBSTRING_CompanyName "CZ.NIC Labs")
 set(FBSTRING_PluginDescription "Plug-in used by DNSSEC Validator extension")
-set(FBSTRING_PLUGIN_VERSION "2.0")
+set(FBSTRING_PLUGIN_VERSION "2.1.0")
 set(FBSTRING_LegalCopyright "Copyright 2013 CZ.NIC Labs")
 set(FBSTRING_PluginFileName "np${PLUGIN_NAME}.dll")
 set(FBSTRING_ProductName "DNSSECValidatorPlugin")

@@ -145,7 +145,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
   <!-- TLSA NPAPI plugin -->
   <html:div>
-    <html:object id="dane-tlsa-plugin" type="application/x-tlsavalidatorplugin" width="0" height="0"></html:object>
+    <html:object id="dane-tlsa-plugin" type="application/x-tlsavalidator" width="0" height="0"></html:object>
   </html:div>
 
     <box id="urlbar-icons">

@@ -38,8 +38,8 @@ set(MOZILLA_PLUGINID "nic.cz/TLSAValidatorPlugin")
 
 # strings
 set(FBSTRING_CompanyName "CZ.NIC Labs")
-set(FBSTRING_PluginDescription "DANE/TLSA Validation")
-set(FBSTRING_PLUGIN_VERSION "1.0.0.0")
+set(FBSTRING_PluginDescription "Plug-in used by TLSA Validator extension")
+set(FBSTRING_PLUGIN_VERSION "2.1.0")
 set(FBSTRING_LegalCopyright "Copyright 2013 CZ.NIC Labs")
 set(FBSTRING_PluginFileName "np${PLUGIN_NAME}.dll")
 set(FBSTRING_ProductName "TLSAValidatorPlugin")
@@ -49,7 +49,7 @@ if ( FB_PLATFORM_ARCH_32 )
 else ( FB_PLATFORM_ARCH_32 )
     set(FBSTRING_PluginName "TLSAValidatorPlugin")
 endif ( FB_PLATFORM_ARCH_32 )
-set(FBSTRING_MIMEType "application/x-tlsavalidatorplugin")
+set(FBSTRING_MIMEType "application/x-tlsavalidator")
 
 # Uncomment this next line if you're not planning on your plugin doing
 # any drawing:
