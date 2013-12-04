@@ -57,8 +57,8 @@ function DNSSECicon2(icon){
 		document.getElementById("ip-info-v").style.display = 'block';
 	  	document.getElementById("ip-info-bh").style.display = 'block';
 		document.getElementById("ip-info-vh").style.display = 'block'; 
-	    	addText("ip-info-b", ipbrowser);
-		addText("ip-info-v", ipvalidator);
+	    	addText("ip-info-b", decodeURIComponent(ipbrowser));
+		addText("ip-info-v", decodeURIComponent(ipvalidator));
 		addText("ip-info-bh", chrome.i18n.getMessage("ipbrowsertext"));
 		addText("ip-info-vh", chrome.i18n.getMessage("ipvalidatortext"));
   	}
