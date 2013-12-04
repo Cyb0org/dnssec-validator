@@ -328,16 +328,24 @@ function dnssecvalidate(domain, tabId, tab) {
 		if (debuglogout) {
 			console.log(DNSSEC + "Browser Domain IP: " + addr);
 		}
-	}
+	} 
 
-	// Check IP version
-	if (addr.indexOf(":") != -1) {
-	// ipv6
+	if (addr == undefined) {
+
+		addr = "0.0.0.0";
 		resolvipv6 = true;
-	} else if (addr.indexOf(".") != -1) {
-	// ipv4
 		resolvipv4 = true;
-	}//if
+	}
+	else {
+		// Check IP version
+		if (addr.indexOf(":") != -1) {
+			// ipv6
+			resolvipv6 = true;
+		} else if (addr.indexOf(".") != -1) {
+			// ipv4
+			resolvipv4 = true;
+		}//if
+	}
    
 	var options = 0;
 	if (debuglogout) options |= c.DNSSEC_FLAG_DEBUG;
