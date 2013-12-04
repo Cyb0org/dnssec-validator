@@ -594,10 +594,25 @@ function IsValidUrl(tabId, url) {
 
 	// deactive other tabs
 	if (url.match(/^about:/)) {
-		chrome.pageAction.hide(tabId);
+		if (tabId >= 0) {
+			chrome.pageAction.hide(tabId);
+		}
 		return 1;
 	}//if
 	
+
+	// get domain name from URL
+	var domain = url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
+
+	if (domain.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/)) {
+		//console.log("Browser: URL: " + domain);
+		if (tabId >= 0) {
+			//chrome.pageAction.hide(tabId);
+		}
+		return 1;
+	}//if
+
+
 	return 0;
 };
 
@@ -713,11 +728,6 @@ function onBeforeRequest(tabId, url) {
 
 	if (scheme == "https" || scheme == "ftps") {
 
-		if (debuglogout) {
-			console.log("\nBrowser: onBeforeRequest(TabID: " + 
-			tabId + ", URL: " + url +");");
-		}
-
 		var domainandport = getDomainAndPort(url);
 		domain = domainandport[0];
 
@@ -733,6 +743,11 @@ function onBeforeRequest(tabId, url) {
 		var domainport = domain + portcache;
 		var cacheitem = tlsaExtCache.getRecord(domainport);
 		if (cacheitem[0] == '' && cacheitem[1] == '') {
+
+		if (debuglogout) {
+			console.log("\nBrowser: onBeforeRequest(TabID: " + 
+			tabId + ", URL: " + url +");");
+		}
 
 			ret = TLSAvalidate(scheme, domain, portplugin);
 			block = checkDaneResult(ret, domain);

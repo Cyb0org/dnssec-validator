@@ -439,9 +439,14 @@ function onUrlChange(tabId, changeInfo, tab) {
 	debuglogout = localStorage["DebugOutput"];
 	debuglogout = (debuglogout == "false") ? false : true;
 
+	if (changeInfo.status == "undefined") {
+		chrome.pageAction.hide(tabId);
+		return;		
+	}
 
 	if (changeInfo.status != "loading") {
 		if (changeInfo.status != "complete") {
+			chrome.pageAction.hide(tabId);
 			return;
 		}
 	}
@@ -460,15 +465,21 @@ function onUrlChange(tabId, changeInfo, tab) {
                 chrome.pageAction.hide(tabId);
                 return;
          }//if
+
+	// get domain name from URL
+	var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
+
+        if (domain.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/)) {
+	      //console.log("Browser: URL: " + domain);
+              chrome.pageAction.hide(tabId);
+              return;
+        }//if
  
         if (debuglogout) {
 		console.log("Browser: onUrlChange(TabID: " + tabId 
 		+ ", Action: " + changeInfo.status + ", Info: " + changeInfo.url + ");");
 	}
-
-	// get domain name from URL
-	var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
-  	  	
+	
 	if (debuglogout) {
 		console.log(DNSSEC + "--------- Start of DNSSEC Validation ("+ domain +") ---------");
 	}
