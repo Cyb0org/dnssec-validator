@@ -62,6 +62,8 @@ var daneExtPrefObserver = {
 // **********************************************************************
 /* TLSA Validator's internal cache - shared with all window tabs */
 // **********************************************************************
+// expirate time of one item in the cache [seconds]
+var CACHE_ITEM_EXPIR = 600; 
 var tlsaExtCache = {
 
 	data: null,
@@ -72,23 +74,27 @@ var tlsaExtCache = {
 	},
 
 
-	record: function(tlsaresult, block) {
+	record: function(tlsaresult, block, expir) {
 		this.state = tlsaresult;  // tlsa result
 		this.block = block;    // blocked ?
+		this.expir = expir;    // expir time
 	},
 
 	addRecord: function(domain, tlsaresult, block) {	
-		delete this.data[domain];
-		this.data[domain] = new this.record(tlsaresult, block);
+		// Get current time
+			const cur_t = new Date().getTime();
+			var expir = cur_t + CACHE_ITEM_EXPIR * 1000;
+			delete this.data[domain];
+			this.data[domain] = new this.record(tlsaresult, block, expir);
 	},
 
 	getRecord: function(n) {
 		const c = this.data;
 
 		if (typeof c[n] != 'undefined') {
-			return [c[n].state, c[n].block];
+			return [c[n].state, c[n].block, c[n].expir];
 		}
-		return ['', ''];
+		return ['', '', ''];
 	},
 
 	printContent: function() {
@@ -100,12 +106,12 @@ var tlsaExtCache = {
 		if (daneExtension.debugOutput) { 
 			dump(tlsaValidator.DANE_DEBUG_PRE + 'Cache content:\n');
 		}
-
+	          
 		for (n in c) {
 			if (daneExtension.debugOutput) { 
 				dump(tlsaValidator.DANE_DEBUG_PRE +'      r' + 
 				i + ': \"' + n + '\": \"' + c[n].state + '\"; ' + 
-				c[n].block + '\n');
+				c[n].block + '\": \"' + c[n].expir + '\"\n');
 			}
       			i++;
 		}
@@ -131,7 +137,10 @@ var tlsaExtCache = {
 var daneExtUrlBarListener = {
 
 	onLocationChange: function(aWebProgress, aRequest, aLocationURI) {
-		//dump('BrowserTLSA: onLocationChange()\n');  	
+		//dump('BrowserTLSA: onLocationChange()\n');
+		var uri = null;
+		uri = window.gBrowser.currentURI;
+		tlsaValidator.processNewURL(aRequest, uri); 	
 	},
 
 	onSecurityChange: function(aWebProgress, aRequest, aState) {
@@ -299,43 +308,36 @@ observe: function(channel, topic, data) {
 			var Cc = Components.classes, Ci = Components.interfaces;
 			channel.QueryInterface(Ci.nsIHttpChannel);	
 			var url = channel.URI.spec;
-			var host = channel.URI.hostPort;				
-
+			var host = channel.URI.host;
+			var hostport = channel.URI.hostPort;				
+					
 			var si = channel.securityInfo;
 			if (!si) return;
 
 			if (daneExtension.debugOutput) { 
 				dump(tlsaValidator.DANE_DEBUG_PRE + "http-on-examine-response -> " 
-				+ host + tlsaValidator.DANE_DEBUG_POST);	
+				+ hostport + tlsaValidator.DANE_DEBUG_POST);	
 			}
 										
 			if (tlsaValidator.is_in_domain_list(host)) {
+
+				var current_time = new Date().getTime();
+				var cacheitem = tlsaExtCache.getRecord(hostport);
+				if (cacheitem[0] != '') {
+					if (cacheitem[2] > current_time) {
+						return;							
+					}
+				} // je v cache
 
 				if (daneExtension.debugOutput) {
 		    		    	dump(this.DANE_DEBUG_PRE + 'Validate this domain: yes'+ this.DANE_DEBUG_POST);
 				}
 
 				if (daneExtension.debugOutput) {
-					dump(this.DANE_DEBUG_PRE + 'Scheme: https; ASCII domain name: "' + host + '"'); 
+					dump(this.DANE_DEBUG_PRE 
+					+ 'Scheme: https; ASCII domain name: "' + hostport + '"'+ this.DANE_DEBUG_POST); 
 				}
 
-				if (host == this.oldAsciiHost) {
-
-      					if (daneExtension.debugOutput) {
-						dump(' ...duplicated\n'+ this.DANE_DEBUG_POST);
-					}
-					var cacheitem = tlsaExtCache.getRecord(host);
-					if (cacheitem[1] == 'no') {
-						return;
-					}
-					else if (cacheitem[0] == '' && cacheitem[1] == '') return;
-			    	}
-		   		else {
-					if (daneExtension.debugOutput) {
-			   			dump(' ...valid\n'+ this.DANE_DEBUG_POST);
-					}
-		   			this.oldAsciiHost = host;
-		   		}
 			         
 				var nc = channel.notificationCallbacks;
 				if (!nc && channel.loadGroup)
@@ -368,7 +370,7 @@ observe: function(channel, topic, data) {
 				if (!cert) return;
 
 				var port = (channel.URI.port == -1) ? 443 : channel.URI.port;		
-				tlsaValidator.check_tlsa_https(channel, cert, browser, host, port, "tcp", url);
+				tlsaValidator.check_tlsa_https(channel, cert, browser, host, port, "tcp", url, hostport);
 
 			}	
 			else if (daneExtension.debugOutput) 
@@ -444,10 +446,12 @@ processNewURL: function(aRequest, aLocationURI) {
 
 	var scheme = null;
 	var asciiHost = null;
+
 	var c = tlsaExtNPAPIConst;
 
 	scheme = aLocationURI.scheme;             // Get URI scheme
 	asciiHost = aLocationURI.asciiHost;       // Get punycoded hostname
+
 
 	if (daneExtension.debugOutput) {
 		dump(this.DANE_DEBUG_PRE + 'Scheme: "' + scheme 
@@ -479,6 +483,8 @@ processNewURL: function(aRequest, aLocationURI) {
 		}
 	}
 
+
+
 	var tlsaon = dnssecExtPrefs.getBool("tlsaenable");
 	if (tlsaon) {   
       	   
@@ -498,10 +504,22 @@ processNewURL: function(aRequest, aLocationURI) {
 				if (daneExtension.debugOutput) {
 					dump(this.DANE_DEBUG_PRE + "Connection is secured (https)" + this.DANE_DEBUG_POST);
 				}
-
 				var port = (aLocationURI.port == -1) ? 443 : aLocationURI.port;
+				var portcache = (aLocationURI.port == -1) ? '' : ":"+aLocationURI.port;
+				var current_time = new Date().getTime();
+				var hostport = asciiHost + portcache;
+				var cacheitem = tlsaExtCache.getRecord(hostport);
+				if (cacheitem[0] != '') {
+					if (cacheitem[2] < current_time) {
+						tlsa = this.check_tlsa_tab_change(aRequest, asciiHost, port, "tcp");
+					} 
+					else {
+						tlsaExtHandler.setSecurityState(cacheitem[0]);	
+					}
+				} else {
+					tlsa = this.check_tlsa_tab_change(aRequest, asciiHost, port, "tcp");
+				}
 
-				var tlsa = this.check_tlsa_tab_change(aRequest, asciiHost, port, "tcp");
 			}
 		}	
 		else {
@@ -619,10 +637,11 @@ check_tlsa_tab_change: function (channel, domain, port, protocol) {
 		if (daneExtension.debugOutput) {
 			dump(this.DANE_DEBUG_PRE + "No certificate!" + this.DANE_DEBUG_POST);
 		}
-		tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_INIT);
 		if (daneExtension.debugOutput) {
 			dump(this.DANE_DEBUG_PRE + "------------- TLSA validation end ------------------" + this.DANE_DEBUG_POST); 
 		}
+		tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_INIT);
+
 		return null;
 	}
           
@@ -676,9 +695,9 @@ check_tlsa_tab_change: function (channel, domain, port, protocol) {
 			dump(this.DANE_DEBUG_PRE + 'Error: TLSA plugin call failed!' + this.DANE_DEBUG_POST);
 			dump(this.DANE_DEBUG_PRE + "----------- TLSA validation end --------------" + this.DANE_DEBUG_POST);
 		}
-		// Set error mode
 		tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_ERROR);
 	      	return null;
+
 	}
 
 	if (daneMatch[0] == c.DANE_DNSSEC_BOGUS) { 
@@ -733,18 +752,17 @@ check_tlsa_tab_change: function (channel, domain, port, protocol) {
 			}
 		}
 	}
-
-	tlsaExtHandler.setSecurityState(daneMatch[0]);
 	if (daneExtension.debugOutput) {
 		dump(this.DANE_DEBUG_PRE + "------------ TLSA validation end ------------------" + this.DANE_DEBUG_POST);
 	}
+	tlsaExtHandler.setSecurityState(cacheitem[0]);
 	return null;
 },
 
 //--------------------------------------------------------------
 // check TLSA records when new https request is create
 //--------------------------------------------------------------
-check_tlsa_https: function (channel, cert, browser, domain, port, protocol, url) {
+check_tlsa_https: function (channel, cert, browser, domain, port, protocol, url, hostport) {
 
 	if (daneExtension.debugOutput) {
 		dump(this.DANE_DEBUG_PRE + "---------- TLSA VALIDATION START -------------" + this.DANE_DEBUG_POST); 
@@ -849,11 +867,12 @@ check_tlsa_https: function (channel, cert, browser, domain, port, protocol, url)
     						domain + ") was CONFIRMED" + this.DANE_DEBUG_POST); 
 			    		}
 				}	
-				tlsaExtCache.addRecord(domain, daneMatch[0] , block);
-				tlsaExtCache.printContent();
 			}
 		}
 	}
+	tlsaExtCache.addRecord(hostport, daneMatch[0] , block);
+	tlsaExtCache.printContent();
+
 
 	if (daneExtension.debugOutput) {
 		dump(this.DANE_DEBUG_PRE + "----------- TLSA VALIDATION END --------------" + this.DANE_DEBUG_POST);
