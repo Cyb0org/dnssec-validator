@@ -38,3 +38,4 @@ pref("extensions.dnssec.popupbgcolor", "");
 pref("extensions.dnssec.tlsaenable", true);
 pref("extensions.dnssec.tlsablocking", true);
 pref("extensions.dnssec.clearcache", true);
+pref("extensions.dnssec.cacheexpir", 600);
