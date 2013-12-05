@@ -353,8 +353,8 @@ function dnssecvalidate(domain, tabId, tab) {
 	if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
 	if (resolvipv6) options |= c.DNSSEC_FLAG_RESOLVIPV6;
 	    
-	chrome.pageAction.setIcon({path: "dnssec_action.png", tabId: tabId});
- 	chrome.pageAction.show(tabId);
+	//chrome.pageAction.setIcon({path: "dnssec_action.png", tabId: tabId});
+ 	//chrome.pageAction.show(tabId);
 
 	if (resolver != "") {
 		if (debuglogout) {
