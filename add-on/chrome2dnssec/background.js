@@ -440,13 +440,13 @@ function onUrlChange(tabId, changeInfo, tab) {
 	debuglogout = (debuglogout == "false") ? false : true;
 
 	if (changeInfo.status == "undefined") {
-		chrome.pageAction.hide(tabId);
+		//chrome.pageAction.hide(tabId);
 		return;		
 	}
 
 	if (changeInfo.status != "loading") {
 		if (changeInfo.status != "complete") {
-			chrome.pageAction.hide(tabId);
+			//chrome.pageAction.hide(tabId);
 			return;
 		}
 	}
@@ -465,7 +465,6 @@ function onUrlChange(tabId, changeInfo, tab) {
                 chrome.pageAction.hide(tabId);
                 return;
          }//if
-
 
 
 	// deactive other tabs
@@ -493,8 +492,6 @@ function onUrlChange(tabId, changeInfo, tab) {
               return;
         }//if
 
-
- 
         if (debuglogout) {
 		console.log("Browser: onUrlChange(TabID: " + tabId 
 		+ ", Action: " + changeInfo.status + ", Info: " + changeInfo.url + ");");
