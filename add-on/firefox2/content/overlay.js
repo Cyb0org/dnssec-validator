@@ -880,7 +880,7 @@ var dnssecExtHandler = {
   checkSecurity : function(asciiHost, utf8Host) {
 
     // Set action state
-    this.setMode(this.DNSSEC_MODE_ACTION);
+    //this.setMode(this.DNSSEC_MODE_ACTION);
 
     // Detect if any resolving is already running...
     if (dnssecExtPrefs.getBool("resolvingactive")) {
