@@ -22,6 +22,7 @@ DNSSEC/TLSA Validator 2 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 // DNSSEC NPAPI constant returned by binary plugin	
 var dnssecExtNPAPIConst = {
 
+	DNSSEC_UNBOUND_NO_DATA		: -4, /* valdiator does not recived data */
 	DNSSEC_RESOLVER_NO_DNSSEC	: -3, /* resolver does not support DNSSEC */
 	DNSSEC_ERROR_RESOLVER		: -2, /* bad resolver or wrong IP address of DNS*/
 	DNSSEC_ERROR_GENERIC		: -1, /* any except those listed above */

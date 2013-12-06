@@ -562,6 +562,8 @@ var dnssecExtResolver = {
 var dnssecExtHandler = {
 
   // Mode strings used to control CSS display
+
+  DNSSEC_MODE_UNBOUND_NO_DATA			: "unboundnodata",
   // -3 .Current resolver does not support DNSSEC
   DNSSEC_MODE_WRONG_RESOLVER                    : "wrongresolver",
   // 1. No DNSSEC signature
@@ -681,6 +683,10 @@ var dnssecExtHandler = {
       this._stringBundle.getString("dnsseOff");
     this._securityText[this.DNSSEC_MODE_WRONG_RESOLVER] =
       this._stringBundle.getString("wrongres");
+	//-4
+    this._securityText[this.DNSSEC_MODE_UNBOUND_NO_DATA] =
+      this._stringBundle.getString("0dnssecError");
+
     return this._securityText;
   },
 
@@ -721,6 +727,10 @@ var dnssecExtHandler = {
 	// -2 .Current resolver does not support DNSSEC
     this._securityDetail[this.DNSSEC_MODE_WRONG_RESOLVER] =
       this._stringBundle.getString("wrongresInfo");
+	//-4
+    this._securityDetail[this.DNSSEC_MODE_UNBOUND_NO_DATA] =
+      this._stringBundle.getString("unboundnodataInfo");
+
     return this._securityDetail;
   },
 
@@ -859,6 +869,10 @@ var dnssecExtHandler = {
 	// 0
     case c.DNSSEC_OFF:
       this.setMode(this.DNSSEC_MODE_OFF);
+      break;
+      //-4
+    case c.DNSSEC_UNBOUND_NO_DATA:
+      this.setMode(this.DNSSEC_MODE_UNBOUND_NO_DATA);
       break;
       //-3
     case c.DNSSEC_RESOLVER_NO_DNSSEC:
@@ -1019,9 +1033,8 @@ var dnssecExtHandler = {
       break;
     // An error occured
     case this.DNSSEC_MODE_ERROR_GENERIC:
-      tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_ERROR];
-      break;
     case this.DNSSEC_MODE_ERROR:
+    case this.DNSSEC_MODE_UNBOUND_NO_DATA:
       tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_ERROR];
       break;
     case this.DNSSEC_MODE_OFF:

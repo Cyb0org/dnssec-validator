@@ -453,7 +453,7 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 
 			//ub_res->havedata
 		} else {
-			retval = DNSSEC_ERROR_RESOLVER; // no data
+			retval = DNSSEC_UNBOUND_NO_DATA; // no data
 		}
 
 		// LDNS_RCODE_NOERROR

@@ -38,6 +38,7 @@ var currentIPListDomain= new Array();
 // DNSSEC NPAPI constant returned by binary plugin	
 var dnssecExtNPAPIConst = {
 
+	DNSSEC_UNBOUND_NO_DATA		: -4, /* valdiator does not recived data */
 	DNSSEC_RESOLVER_NO_DNSSEC	: -3, /* resolver does not support DNSSEC */
 	DNSSEC_ERROR_RESOLVER		: -2, /* bad resolver or wrong IP address of DNS*/
 	DNSSEC_ERROR_GENERIC		: -1, /* any except those listed above */
@@ -58,6 +59,8 @@ var dnssecExtNPAPIConst = {
 };
 
 var dnssecModes = {
+	DNSSEC_MODE_UNBOUND_NO_DATA			: "unboundnodata",
+	DNSSEC_MODE_UNBOUND_NO_DATA_INFO		: "unboundnodataInfo",
 	// DNSSEC Validation OFF
 	DNSSEC_MODE_OFF					: "dnsseOff",
 	DNSSEC_MODE_OFF_INFO               		: "dnsseOffInfo",
@@ -103,7 +106,7 @@ var dnssecModes = {
 	DNSSEC_TOOLTIP_ERROR    : "dnssecfail",
 	DNSSEC_TOOLTIP_BOGUS    : "dnssecbogus",
 	DNSSEC_TOOLTIP_WRONG_RES: "dnssecwrongres",
-	DNSSEC_TOOLTIP_DNSSEC_OFF: "validatoroff",  
+	DNSSEC_TOOLTIP_DNSSEC_OFF: "validatoroff", 
 };
 
 //****************************************************************
@@ -183,6 +186,13 @@ function setModeDNSSEC(newMode, tabId, domain, status, addr, ipval) {
 		break;
 	// resolver does not support DNSSEC
 	case this.dnssecModes.DNSSEC_MODE_WRONG_RES:
+		icon = "dnssec_error.png";
+		domainpre = "domain";
+		title = this.dnssecModes.DNSSEC_TOOLTIP_WRONG_RES;
+		tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_WRONG_RES);
+		break;
+	// Unbound no data
+	case this.dnssecModes.DNSSEC_MODE_UNBOUND_NO_DATA:
 		icon = "dnssec_error.png";
 		domainpre = "domain";
 		title = this.dnssecModes.DNSSEC_TOOLTIP_WRONG_RES;
@@ -289,6 +299,10 @@ function setDNSSECSecurityState(tabId, domain, status, addr, ipval) {
 		break;
 	case c.DNSSEC_ERROR_RESOLVER:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_ERROR,
+					tabId, domain, status, addr, ipval);
+		break;
+	case c.DNSSEC_UNBOUND_NO_DATA:
+		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_UNBOUND_NO_DATA,
 					tabId, domain, status, addr, ipval);
 		break;
 	default:

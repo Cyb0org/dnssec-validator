@@ -28,6 +28,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
   list-style-image: url("chrome://dnssec/skin/dnssec_valid.png"); /* 35x16 */
 }
 
+#dnssec-box.unboundnodata > #dnssec-icon,
 #dnssec-box.wrongresolver > #dnssec-icon,
 #dnssec-box.errorDnssec > #dnssec-icon {
   width: 19px;
@@ -50,11 +51,6 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
   list-style-image: url("chrome://dnssec/skin/dnssec_off.png"); /* 35x16 */
 }
 
-#dnssec-box.wrongresolver > #dnssec-icon {
-  width: 19px;
-  height: 19px;
-  list-style-image: url("chrome://dnssec/skin/dnssec_error.png"); /* 35x16 */
-}
 
 #dnssec-box.actionDnssec > #dnssec-icon {
   width: 19px;
@@ -213,6 +209,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 /* grey with error */
+#dnssec-popup.unboundnodata > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.errorDnssec > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.wrongresolver > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon {
   list-style-image: url("chrome://dnssec/skin/dnssec_error.png"); 
@@ -327,6 +324,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 /* DNSSEC popup UI */
 #dnssec-popup-content-box > #dnssec-popup-content-box2.dnssecOff > #dnssec-popup-dnssecOffLabel,
+#dnssec-popup-content-box > #dnssec-popup-content-box2.unboundnodata > #dnssec-popup-wrongresLabel,
 #dnssec-popup-content-box > #dnssec-popup-content-box2.wrongresolver > #dnssec-popup-wrongresLabel,
 #dnssec-popup-content-box > #dnssec-popup-content-box2.errorDnssec > #dnssec-popup-errorLabel,
 #dnssec-popup-content-box > #dnssec-popup-content-box2.securedConnectionDomain > #dnssec-popup-securedLabel,

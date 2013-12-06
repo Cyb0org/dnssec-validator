@@ -92,6 +92,12 @@
          "dnssecgenericErrorInfo": {
 		"message": "Prosím, restartujte webový prohlížeč pro jeho opětovnou inicializaci..."
 		},
+        "unboundnodata": {
+		"message": " nelze ověřit pomocí DNSSEC technologie."
+		},
+         "unboundnodataInfo": {
+		"message": "Při zjišťování stavu zabezpečení doménového jména technologií DNSSEC došlo k chybě. Příčinou může být získání IP adresy proxy (cache) serveru mezi prohlížečem a vzdáleným serverem kdy se nepodařilo ověřit záznamy o IP adrese použité prohlížečem."
+		},
          "dnsseOff": {
 		"message": " nebylo ověřeno pomocí technologie DNSSEC."
 		},
