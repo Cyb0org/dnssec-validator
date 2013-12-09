@@ -493,7 +493,7 @@ function onUrlChange(tabId, changeInfo, tab) {
                 return;
          }//if
 
-	if (addr.indexOf("local-ntp") != -1) {
+	if (tab.url.indexOf("local-ntp") != -1) {
                 chrome.pageAction.hide(tabId);
                 return;
 	}

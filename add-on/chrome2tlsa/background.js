@@ -600,7 +600,7 @@ function IsValidUrl(tabId, url) {
 		return 1;
 	}//if
 	
-	if (addr.indexOf("local-ntp") != -1) {
+	if (url.indexOf("local-ntp") != -1) {
                 chrome.pageAction.hide(tabId);
                 return;
 	}
