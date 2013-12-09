@@ -487,6 +487,16 @@ function onUrlChange(tabId, changeInfo, tab) {
                 return;
          }//if
 
+	// deactive other tabs
+        if (tab.url.match(/^(?:-devtools)?:\/\//)) {
+                chrome.pageAction.hide(tabId);
+                return;
+         }//if
+
+	if (addr.indexOf("local-ntp") != -1) {
+                chrome.pageAction.hide(tabId);
+                return;
+	}
 
 	// get domain name from URL
 	var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.\[\]\:-]+)\]?(?::)*(?::\d+)?/)[1];
@@ -597,3 +607,4 @@ chrome.tabs.onUpdated.addListener(onUrlChange);
 document.write("</script>");
 document.write("</body>");
 document.write("</html>");
+

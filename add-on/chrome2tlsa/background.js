@@ -600,6 +600,10 @@ function IsValidUrl(tabId, url) {
 		return 1;
 	}//if
 	
+	if (addr.indexOf("local-ntp") != -1) {
+                chrome.pageAction.hide(tabId);
+                return;
+	}
 
 	// get domain name from URL
 	var domain = url.match(/^(?:[\w-]+:\/+)?\[?([\w\.\[\]\:-]+)\]?(?::)*(?::\d+)?/)[1];
@@ -673,7 +677,12 @@ function checkDaneResult(ret, domain) {
 //****************************************************************
 function onUrlChange(tabId, changeInfo, tab) {                  	
    	
-	if (changeInfo.status == undefined) return;
+	if (changeInfo.status != "loading") {
+		if (changeInfo.status != "complete") {
+			//chrome.pageAction.hide(tabId);
+			return;
+		}
+	}
  
 	if (IsValidUrl(tabId, tab.url)) {
 		return;
