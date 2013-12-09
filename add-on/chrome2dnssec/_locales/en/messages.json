@@ -105,7 +105,7 @@
 		"message": " nelze ověřit pomocí DNSSEC technologie."
 		},
          "unboundnodataInfo": {
-		"message": "Při zjišťování stavu zabezpečení doménového jména technologií DNSSEC došlo k chybě. Příčinou může být získání IP adresy proxy (cache) serveru mezi prohlížečem a vzdáleným serverem kdy se nepodařilo ověřit záznamy o IP adrese použité prohlížečem."
+		"message": "An error occurred while getting the DNSSEC status of this domain name. This may be caused by using a proxy server in your network. The validator is in such cases unable to prove the server's IP-address records."
 		},
          "dnsseOff": {
 		"message": " was not verified by DNSSEC."

@@ -195,8 +195,8 @@ function setModeDNSSEC(newMode, tabId, domain, status, addr, ipval) {
 	case this.dnssecModes.DNSSEC_MODE_UNBOUND_NO_DATA:
 		icon = "dnssec_error.png";
 		domainpre = "domain";
-		title = this.dnssecModes.DNSSEC_TOOLTIP_WRONG_RES;
-		tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_WRONG_RES);
+		title = this.dnssecModes.DNSSEC_TOOLTIP_ERROR;
+		tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_ERROR);
 		break;
 	// An error occured with resolver
 	case this.dnssecModes.DNSSEC_MODE_ERROR:
