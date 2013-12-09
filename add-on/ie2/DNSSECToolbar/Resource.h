@@ -83,6 +83,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define IDS_STATE0_TEXT_TOOLTIP 103
 #define	IDS_STATE0_TEXT_DOMAIN  104
 #define	IDS_STATE0_TEXT_MAIN	105
+#define IDS_STATEx4_TEXT_MAIN	196
 	//state 1 - GREEN	
 #define	IDS_STATE1_TEXT_TOOLTIP 106
 #define	IDS_STATE1_TEXT_DOMAIN  107
