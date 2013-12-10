@@ -6,8 +6,8 @@ SetCompressor /solid /final lzma
 !include MUI2.nsh
 !include "FileFunc.nsh"
 
-!define VERSION "2.1.0"
-!define QUADVERSION "2.1.0.0"
+!define VERSION "2.1.0-rc1"
+!define QUADVERSION "2.1.0.1"
 !define guid '{669695BC-A811-4A9D-8CDF-BA8C795F261C}'
 !define PROGRAM_NAME "DNSSEC-TLSA Validator"
 !define PROGRAM_NAME_OLD "DNSSEC Validator 2.0"
