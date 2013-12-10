@@ -1326,6 +1326,16 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 		tistatus = IDS_STATE0_TEXT_DOMAIN;
 		titext = IDS_STATE0_TEXT_MAIN;
 		break;
+	// state -4
+    case DNSSEC_UNBOUND_NO_DATA:
+		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_ERROR);
+		dnsseciconBar = IDI_DNSSEC_ICON_ERROR;
+		tiicon = TTI_ERROR;
+		tiicontitle = IDS_STATE0_TEXT_TOOLTIP;
+		tipref = IDS_PRE_TEXT_ERROR;
+		tistatus = IDS_STATE0_TEXT_DOMAIN;
+		titext = IDS_STATEx4_TEXT_MAIN;
+		break;
 	// generic error
 	default:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_ERROR);

@@ -175,7 +175,7 @@ BEGIN
 	GROUPBOX        "About plugin",IDC_STATIC,10,7,230,80
     LTEXT           "DNSSEC/TLSA Validator for Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Add-on plugin for DNSSEC and TLSA checking",IDC_STATIC,50,30,180,10
-    LTEXT           "Support browsers: 32-bit version of IE6 - IE10",IDC_STATIC,50,40,180,10
+    LTEXT           "Support browsers: 32-bit version of IE6 - IE11",IDC_STATIC,50,40,180,10
     LTEXT           "Version 2.1.0", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2013", IDC_STATIC,50,70,100,10
@@ -315,6 +315,8 @@ BEGIN
 	IDS_STATE0_TEXT_TOOLTIP "DNSSEC status unknown"
 	IDS_STATE0_TEXT_DOMAIN  "can not be verified by DNSSEC."
 	IDS_STATE0_TEXT_MAIN	"An error occurred while getting the DNSSEC status of this domain name. This may be caused by loss of connection to the DNS server or the user-chosen validating resolver IP address is not an address of a validating resolver."	
+
+	IDS_STATEx4_TEXT_MAIN "An error occurred while getting the DNSSEC status of this domain name. This may be caused by using a proxy server in your network. The validator is in such cases unable to prove the server's IP-address records."
 
 	//state 1 - GREY	
 	IDS_STATE1_TEXT_TOOLTIP "Not secured by DNSSEC"
@@ -605,6 +607,9 @@ BEGIN
 	IDS_STATE0_TEXT_DOMAIN  "nelze ovìøit pomocí DNSSEC technologie."
 	IDS_STATE0_TEXT_MAIN	"Pøi zjišování stavu zabezpeèení doménového jména technologií DNSSEC došlo k chybì. Pøíèinou mùe bıt buï vıpadek spojení ke vzdálenému serveru nebo aktuálnì nastavená IP adresa DNS serveru není platnou adresou serveru pro pøeklad doménového jména."	
 
+	IDS_STATEx4_TEXT_MAIN "Pøi zjišování stavu zabezpeèení doménového jména technologií DNSSEC došlo k chybì. Chyba mùe bıt zpùsobena pouitím proxy serveru ve vaší síti. DNSSEC validátor v tomto pøípadì není schopen ovìøit záznamy o IP adrese serveru."
+
+
 	//state 1 - GREY	
 	IDS_STATE1_TEXT_TOOLTIP "Nezabezpeèeno DNSSEC"
 	IDS_STATE1_TEXT_DOMAIN  "není zabezpeèeno DNSSEC technologií."
@@ -800,7 +805,7 @@ BEGIN
 	GROUPBOX        "O pluginu",IDC_STATIC,10,7,230,80
     LTEXT           "DNSSEC/TLSA Validátor pro Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Zásuvnı plugin pro kontrolu DNSSEC a TLSA",IDC_STATIC,50,30,180,10
-    LTEXT           "Podporované prohlíeèe: 32-bit verze IE6 - IE10",IDC_STATIC,50,40,180,10
+    LTEXT           "Podporované prohlíeèe: 32-bit verze IE6 - IE11",IDC_STATIC,50,40,180,10
     LTEXT           "Verze 2.1.0", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2013", IDC_STATIC,50,70,100,10
@@ -1007,7 +1012,7 @@ BEGIN
 	GROUPBOX        "Über plugin",IDC_STATIC,10,7,230,80
     LTEXT           "DNSSEC/TLSA Validator für Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Add-on für DNSSEC/TLSA Validierung",IDC_STATIC,50,30,180,10
-    LTEXT           "Unterstützte Versionen: 32-bit Versionen von IE6 - IE10",IDC_STATIC,50,40,180,10
+    LTEXT           "Unterstützte Versionen: 32-bit Versionen von IE6 - IE11",IDC_STATIC,50,40,180,10
     LTEXT           "Version 2.1.0", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2013", IDC_STATIC,50,70,100,10
@@ -1150,6 +1155,8 @@ BEGIN
 	IDS_STATE0_TEXT_TOOLTIP "DNSSEC-Zustand unbekannt"
 	IDS_STATE0_TEXT_DOMAIN  "kann nicht mit DNSSEC überprüft werden."
 	IDS_STATE0_TEXT_MAIN	"Während der Ermittlung des DNSSEC-Zustandes kam es zu einem Fehler. Dieser kann durch einen Anschlussausfall zum DNS-Server oder eine falsch angegebene IP-Adresse eines validierenden Resolvers verursacht sein."	
+
+	IDS_STATEx4_TEXT_MAIN "Die DNSSEC-Validierung wurde nicht ausgeführt. Dies kann durch eine Anwesenheit eines Proxy-Servers in ihrem Netzwerk verursacht werden. In diesem Fall können die IP-Adresseneinträge des Servers nicht bestätigt werden."
 
 	//state 1 - GREY	
 	IDS_STATE1_TEXT_TOOLTIP "Nicht durch DNSSEC gesichert"
