@@ -1,12 +1,13 @@
-v2.1.0 / 1.10.2013
+v2.1.0-rc1 / 12.12.2013
 
-- DANE/TLSA validation support (only MF and GC)
+- DANE/TLSA validation support for all browsers
+- User can cancel HTTPS connection when TLSA validation fail (only MF and GC)
 - New design, new icons for DNSSEC/TLSA status
 - Fix bug with IPv6 comparison - (RFC 5952)
 - Fix memory leaks
 - Fix loss TLSA settings when resolver test button was pressed
 - Popup with "resolver not support DNSSEC" was changed by new state of the icon
-- New build system (Makefiles), support for FreeBSD
+- New build system (Makefiles), support for BSD
 
 v2.0.1 / 23.4.2013
 

@@ -41,7 +41,7 @@ ADDON_PATH_CR = add-on/chrome2dnssec
 ADDON_PATH_CR_TLSA = add-on/chrome2tlsa
 #EXTENSION_VERSION = $(shell cat add-on/firefox2/install.rdf.template | sed -n 's/.*<em:version>\(.*\)<\/em:version>.*/\1/p')
 EXTENSION_VERSION = $(shell cat Version)
-
+EXTENSION_VERSION_CR = $(shell cut -c 1-5 Version)
 
 
 
@@ -82,8 +82,8 @@ xpi_x86:
 	cp $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_LIB) $(ADDON_PATH_CR_TLSA)
 	cp $(PLUGIN_TMP)/np$(PLUGIN_NAME_DNSSEC).dll $(ADDON_PATH_CR)
 	cp $(PLUGIN_TMP)/np$(PLUGIN_NAME_TLSA).dll $(ADDON_PATH_CR_TLSA)
-	sed -e 's/dnssecplugin/np$(PLUGIN_NAME_DNSSEC).dll/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
-	sed -e 's/tlsaplugin/np$(PLUGIN_NAME_TLSA).dll/g' -e 's/version-of-add-on/$(EXTENSION_VERSION)/g' $(ADDON_PATH_CR_TLSA)/manifest.json.template > $(ADDON_PATH_CR_TLSA)/manifest.json
+	sed -e 's/dnssecplugin/np$(PLUGIN_NAME_DNSSEC).dll/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
+	sed -e 's/tlsaplugin/np$(PLUGIN_NAME_TLSA).dll/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/manifest.json.template > $(ADDON_PATH_CR_TLSA)/manifest.json
 	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz chrome2dnssec && mv CR-dnssec_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz ../$(PLUGIN_ADD_ON)
 	cd add-on && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz chrome2tlsa && mv CR-tlsa_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz ../$(PLUGIN_ADD_ON)
 	cd $(ADDON_PATH_CR) && rm -rf np$(PLUGIN_NAME_DNSSEC).dll manifest.json $(PLUGIN_NAME_DNSSEC_LIB)

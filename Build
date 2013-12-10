@@ -33,7 +33,7 @@ Platform dependent stuff:
 = Build instructions
 ==================================
 
--- Linux-like systems --
+-- Linux-based systems --
 For compilation on the Linux just call cmake 
 and make without any extra parameters:
 -----------------------------------------------
@@ -41,7 +41,7 @@ $ cmake . && make
 -----------------------------------------------
 
 
--- FreeBSD-like systems --
+-- BSD-based systems --
 For compilation on the BSD just call cmake 
 and make without any extra parameters:
 -----------------------------------------------
@@ -49,7 +49,7 @@ $ cmake . && gmake
 -----------------------------------------------
 
 
--- MAC OSX-like systems --
+-- MAC OSX systems --
 For compilation on the MAC OS X is recommended 
 to set explicitly the target architecture, e.g.
 -----------------------------------------------
