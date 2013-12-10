@@ -96,7 +96,7 @@ xpi:
 	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86_64-gcc3<\/em:targetPlatform><em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/about.template > $(ADDON_PATH_FF)/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
-	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-macosx.xpi
+	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-macosx.xpi
 	@echo '### Package for Firefox MACOSX...Done. ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Chrome MACOSX ... ###'
@@ -120,7 +120,7 @@ xpi_x64:
 	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86_64-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/about.template > $(ADDON_PATH_FF)/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
-	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-macosx_x64.xpi
+	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-macosx_x64.xpi
 	@echo '### Package for Firefox MACOSX...Done. ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Chrome MACOSX ... ###'
@@ -145,7 +145,7 @@ xpi_x86:
 	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/about.template > $(ADDON_PATH_FF)/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
-	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/FF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-macosx_x86.xpi
+	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-macosx_x86.xpi
 	@echo '### Package for Firefox MACOSX...Done. ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Chrome MACOSX ... ###'
