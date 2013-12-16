@@ -29,11 +29,13 @@ such a combination shall include the source code for the parts of
 OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
+#define _POSIX_SOURCE
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <unistd.h>
 #include "ldns/wire2host.h"
 #include "openssl/x509.h"
 #include "openssl/evp.h"
@@ -52,14 +54,14 @@ OpenSSL used as well as that of the covered work.
   #include <winreg.h>
 #else
 /* Linux */
+  #include <sys/types.h>
+  #include <sys/socket.h>
+  #include <netdb.h>
   #include "unbound.h"
   #include "ldns/ldns.h"
   #include "ldns/packet.h"
   #include <arpa/inet.h>
   #include <netinet/in.h>
-  #include <netdb.h>
-  #include <sys/types.h>
-  #include <sys/socket.h>
 #endif
 
 //----------------------------------------------------------------------------
@@ -223,26 +225,12 @@ int str_is_port_number(const char *port_str)
 // url_str contains only domain name (+ optional port number)
 // ----------------------------------------------------------------------------
 static
-int create_socket(char *url_str, const char *port_str)
+int create_socket(const char *domain, const char *port_str)
 {
-	int sockfd;
-	char hostname[256] = "";
-	char    portnum[6] = "443";
-	char      proto[6] = "";
-	char      *tmp_ptr = NULL;
-	int           port;
 
-	struct hostent *host;
-	struct sockaddr_in dest_addr;
-
-	/*
-	 * TODO -- Add input sanity check.
-	 * Copy port number.
-	 */
-	if ((port_str != NULL) && (port_str[0] != '\0')) {
-		strncpy(portnum, port_str, 5);
-		portnum[5] = '\0';
-	}
+	struct addrinfo hints;
+	struct addrinfo *result, *rp;
+	int sfd, getaddrres;
 
 #ifdef WIN32
 	WSADATA wsaData;
@@ -262,6 +250,54 @@ int create_socket(char *url_str, const char *port_str)
 	}
 #endif
 
+	memset(&hints, 0, sizeof(struct addrinfo));
+	hints.ai_family = AF_UNSPEC;    /* Allow IPv4 or IPv6 */
+	hints.ai_socktype = SOCK_STREAM; /* Datagram socket */
+	hints.ai_flags = 0;
+	hints.ai_protocol = 0;          /* Any protocol */
+
+	getaddrres = getaddrinfo(domain, port_str, &hints, &result);
+	if (getaddrres != 0) {
+		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(getaddrres));
+		exit(EXIT_FAILURE);
+	}
+
+	for (rp = result; rp != NULL; rp = rp->ai_next) {
+		sfd = socket(rp->ai_family, rp->ai_socktype,rp->ai_protocol);
+		if (sfd == -1) {
+			continue;
+		}
+
+		if (connect(sfd, rp->ai_addr, rp->ai_addrlen) != -1) break; //Success
+
+		close(sfd);
+	}
+
+	if (rp == NULL) {               /* No address succeeded */
+		fprintf(stderr, "Could not connect\n");
+		exit(EXIT_FAILURE);
+	}
+
+	freeaddrinfo(result);           /* No longer needed */
+
+
+
+
+	/*
+	 * TODO -- Add input sanity check.
+	 * Copy port number.
+	 */
+//	if ((port_str != NULL) && (port_str[0] != '\0')) {
+//		strncpy(portnum, port_str, 5);
+//		portnum[5] = '\0';
+//	}
+
+
+
+
+
+
+/*
 	//Remove the final / from url_str, if there is one
 	if (url_str[strlen(url_str)] == '/') {
 		url_str[strlen(url_str)] = '\0';
@@ -276,7 +312,7 @@ int create_socket(char *url_str, const char *port_str)
 	//if the hostname contains a colon :, we got a port number
 	if(strchr(hostname, ':')) {
 		tmp_ptr = strchr(hostname, ':');
-		/* the last : starts the port number, if avail, i.e. 8443 */
+		// the last : starts the port number, if avail, i.e. 8443
 		strncpy(portnum, tmp_ptr+1,  sizeof(portnum));
 		*tmp_ptr = '\0';
 	}
@@ -311,8 +347,9 @@ int create_socket(char *url_str, const char *port_str)
 		    "Error: Cannot connect to host %s [%s] on port %d.\n",
 		    hostname, tmp_ptr, port);
 	}
+*/
 
-	return sockfd;
+	return sfd;
 }
 
 //*****************************************************************************
@@ -773,7 +810,7 @@ int getcert(char *dest_url, const char *domain, const char *port,
 		goto fail;
 	}
 
-	server_fd = create_socket(dest_url, port);
+	server_fd = create_socket(domain, port);
 	if(server_fd == -1) {
 		printf_debug(DEBUG_PREFIX_CER, "Error TCP connection to: %s.\n", dest_url);
 		goto fail;
@@ -1340,8 +1377,7 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 
 				if ((ldns_rdf_size(rdf_cert_usage) != 1) ||
 				    (ldns_rdf_size(rdf_selector) != 1) ||
-				    (ldns_rdf_size(rdf_matching_type) != 1) ||
-				    (ldns_rdf_size(rdf_association) < 0)) {
+				    (ldns_rdf_size(rdf_matching_type) != 1)) {
 
 					printf_debug(DEBUG_PREFIX,
 					    "Improperly formatted TLSA RR %d\n", i);
