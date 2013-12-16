@@ -222,7 +222,7 @@ int str_is_port_number(const char *port_str)
 //*****************************************************************************
 // Helper function (SSL connection)
 // create_socket() creates the socket & TCP-connect to server
-// url_str contains only domain name (+ optional port number)
+// domain contains only domain name, port_str contains port number
 // ----------------------------------------------------------------------------
 static
 int create_socket(const char *domain, const char *port_str)
@@ -258,7 +258,7 @@ int create_socket(const char *domain, const char *port_str)
 
 	getaddrres = getaddrinfo(domain, port_str, &hints, &result);
 	if (getaddrres != 0) {
-		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(getaddrres));
+		printf_debug(DEBUG_PREFIX_CER, "Error: getaddrinfo: %s\n", gai_strerror(getaddrres));
 		exit(EXIT_FAILURE);
 	}
 
@@ -274,80 +274,11 @@ int create_socket(const char *domain, const char *port_str)
 	}
 
 	if (rp == NULL) {               /* No address succeeded */
-		fprintf(stderr, "Could not connect\n");
+		printf_debug(DEBUG_PREFIX_CER, "Could not connect to remote server!\n");
 		exit(EXIT_FAILURE);
 	}
 
 	freeaddrinfo(result);           /* No longer needed */
-
-
-
-
-	/*
-	 * TODO -- Add input sanity check.
-	 * Copy port number.
-	 */
-//	if ((port_str != NULL) && (port_str[0] != '\0')) {
-//		strncpy(portnum, port_str, 5);
-//		portnum[5] = '\0';
-//	}
-
-
-
-
-
-
-/*
-	//Remove the final / from url_str, if there is one
-	if (url_str[strlen(url_str)] == '/') {
-		url_str[strlen(url_str)] = '\0';
-	}
-
-	//the first : ends the protocol string, i.e. http
-	strncpy(proto, url_str, (strchr(url_str, ':')-url_str));
-
-	//the hostname starts after the "://" part
-	strncpy(hostname, strstr(url_str, "://")+3, sizeof(hostname));
-
-	//if the hostname contains a colon :, we got a port number
-	if(strchr(hostname, ':')) {
-		tmp_ptr = strchr(hostname, ':');
-		// the last : starts the port number, if avail, i.e. 8443
-		strncpy(portnum, tmp_ptr+1,  sizeof(portnum));
-		*tmp_ptr = '\0';
-	}
-
-	port = atoi(portnum);
-	if ( (host = gethostbyname(hostname)) == NULL ) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error: Cannot resolve hostname %s.\n", hostname);
-		abort();
-	}
-
-	//create the basic TCP socket                                
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd == -1) {
-		printf_debug(DEBUG_PREFIX_CER, "error opening socket\n");
-		return -1;
-	}
-
-	dest_addr.sin_family=AF_INET;
-	dest_addr.sin_port=htons(port);
-	dest_addr.sin_addr.s_addr = 0;
-	dest_addr.sin_addr.s_addr = * (unsigned long*) host->h_addr_list[0];
-
-	//Zeroing the rest of the structure
-	memset(&(dest_addr.sin_zero), '\0', 8);
-	tmp_ptr = inet_ntoa(dest_addr.sin_addr);
-
-	//Try to make the host connect here
-	if (connect(sockfd, (struct sockaddr *) &dest_addr,
-	        sizeof(struct sockaddr_in)) == -1) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error: Cannot connect to host %s [%s] on port %d.\n",
-		    hostname, tmp_ptr, port);
-	}
-*/
 
 	return sfd;
 }
