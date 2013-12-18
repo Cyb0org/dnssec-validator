@@ -741,6 +741,7 @@ int getcert(char *dest_url, const char *domain, const char *port,
 		goto fail;
 	}
 
+
 	server_fd = create_socket(domain, port);
 	if(server_fd == -1) {
 		printf_debug(DEBUG_PREFIX_CER, "Error TCP connection to: %s.\n", dest_url);
@@ -1134,15 +1135,16 @@ int caCertMatch(const struct tlsa_store_ctx_st *tlsa_ctx,
 		if (data == NULL) {
 			return DANE_TLSA_PARAM_ERR;
 		}
+
+		printf_debug(DEBUG_PREFIX_DANE, "cert: %s\n", data);
+		printf_debug(DEBUG_PREFIX_DANE, "tlsa: %s\n",
+		    tlsa_ctx->assochex);
+
 		if (strcmp((const char *) data,
 		        (const char *) tlsa_ctx->assochex) == 0) {
 			free(data);
 			return DANE_VALID_TYPE0;
 		}
-
-		printf_debug(DEBUG_PREFIX_DANE, "cert: %s\n", data);
-		printf_debug(DEBUG_PREFIX_DANE, "tlsa: %s\n",
-		    tlsa_ctx->assochex);
 
 		free(data);
 		aux_cert = aux_cert->next;
@@ -1177,15 +1179,16 @@ int chainCertMatch(const struct tlsa_store_ctx_st *tlsa_ctx,
 		if (data == NULL) {
 			return DANE_TLSA_PARAM_ERR;
 		}
+
+		printf_debug(DEBUG_PREFIX_DANE, "cert: %s\n", data);
+		printf_debug(DEBUG_PREFIX_DANE, "tlsa: %s\n",
+		    tlsa_ctx->assochex);
+
 		if (strcmp((const char *) data,
 		        (const char *) tlsa_ctx->assochex) == 0) {
 			free(data);
 			return DANE_VALID_TYPE2;
 		}
-
-		printf_debug(DEBUG_PREFIX_DANE, "cert: %s\n", data);
-		printf_debug(DEBUG_PREFIX_DANE, "tlsa: %s\n",
-		    tlsa_ctx->assochex);
 
 		free(data);
 		aux_cert = aux_cert->next;
