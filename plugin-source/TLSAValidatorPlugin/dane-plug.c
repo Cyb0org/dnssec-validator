@@ -417,16 +417,18 @@ static
 void print_tlsalist_debug(const struct tlsa_store_head *tlsa_list)
 {
 	struct tlsa_store_ctx_st *tmp;
+	int num;
 
 	if (!opts.debug) {
 		/* Function prints only debugging information. */
 		return;
 	}
 
+	num = 1;
 	tmp = tlsa_list->first;
 	while (tmp != NULL) {
 		printf_debug(DEBUG_PREFIX,
-		    "---------------------------------------------\n");
+		    ">> %04d ---------------------------------------\n", num);
 		printf_debug(DEBUG_PREFIX,
 		    "%s: dnssec: %s (%d), cert usage: %d, selector: %d, "
 		    "matching type: %d, assoc.hex: %s, assoc.size: %zu \n",
@@ -434,11 +436,11 @@ void print_tlsalist_debug(const struct tlsa_store_head *tlsa_list)
 		    tmp->dnssec_status, tmp->cert_usage, tmp->selector,
 		    tmp->matching_type, tmp->assochex,
 		    tmp->association_size);
+		printf_debug(DEBUG_PREFIX,
+		    "<< %04d ---------------------------------------\n", num);
+		++num;
 		tmp = tmp->next;
 	}
-
-	printf_debug(DEBUG_PREFIX,
-	    "---------------------------------------------\n");
 } 
 
 //*****************************************************************************
@@ -448,25 +450,42 @@ static
 void print_certlist_debug(const struct cert_store_head *cert_list)
 {
 	struct cert_store_ctx_st *tmp;
+	unsigned num;
+	X509 *cert_x509 = NULL;
+	const unsigned char *cert_der;
 
 	if (!opts.debug) {
 		/* Function prints only debugging information. */
 		return;
 	}
 
+	num = 1;
 	tmp = cert_list->first;
 	while (tmp != NULL) {
 		printf_debug(DEBUG_PREFIX_CER,
-		    "---------------------------------------------\n");
+		    ">> %04d ---------------------------------------\n", num);
+		/* TODO -- Get rid of the explicit conversion. */
+		cert_der = (unsigned char *) tmp->cert_der;
+		cert_x509 = d2i_X509(NULL, &cert_der, tmp->cert_len);
+		if (cert_x509 != NULL) {
+			printf_debug(DEBUG_PREFIX_CER,
+			    "Certificate in text format:\n");
+			X509_print_ex_fp(DEBUG_OUTPUT, cert_x509,
+			    XN_FLAG_COMPAT, X509_FLAG_COMPAT);
+			X509_free(cert_x509); cert_x509 = NULL;
+		} else {
+			printf_debug(DEBUG_PREFIX_CER,
+			    "Cannot convert certificate into text format.\n");
+		}
 		printf_debug(DEBUG_PREFIX_CER, "certlen: %i\n%s\n",
 		    tmp->cert_len, tmp->cert_der_hex);
 		printf_debug(DEBUG_PREFIX_CER, "spkilen: %i\n%s\n",
 		     tmp->spki_len, tmp->spki_der_hex);
+		printf_debug(DEBUG_PREFIX_CER,
+		    "<< %04d ---------------------------------------\n", num);
+		++num;
 		tmp = tmp->next;
 	}
-
-	printf_debug(DEBUG_PREFIX_CER,
-	    "---------------------------------------------\n");
 }
 
 //*****************************************************************************
