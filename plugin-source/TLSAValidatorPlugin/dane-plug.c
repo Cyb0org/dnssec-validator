@@ -29,13 +29,16 @@ such a combination shall include the source code for the parts of
 OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
+#define _BSD_SOURCE /* S_IFREG */
 #define _POSIX_SOURCE
-#include <stdarg.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+
 #include <errno.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
+
 #include "ldns/wire2host.h"
 #include "openssl/x509.h"
 #include "openssl/evp.h"
@@ -45,23 +48,29 @@ OpenSSL used as well as that of the covered work.
 
 #ifdef RES_WIN
 /* Windows */
-  #include "ldns/config.h"
-  #include "ldns/ldns.h"
-  #include "libunbound/unbound.h"
+  #include <winreg.h>
   #include <winsock2.h>
   #include <ws2tcpip.h>
   #include <iphlpapi.h>
-  #include <winreg.h>
+
+  #include "ldns/config.h"
+  #include "ldns/ldns.h"
+  #include "libunbound/unbound.h"
 #else
 /* Linux */
+  #include <sys/stat.h> /* stat(2) */
   #include <sys/types.h>
   #include <sys/socket.h>
+
+  #include <arpa/inet.h>
+  #include <dirent.h> /* opendir(3) */
   #include <netdb.h>
-  #include "unbound.h"
+  #include <netinet/in.h>
+  #include <unistd.h> /* stat(3) */
+
   #include "ldns/ldns.h"
   #include "ldns/packet.h"
-  #include <arpa/inet.h>
-  #include <netinet/in.h>
+  #include "unbound.h"
 #endif
 
 //----------------------------------------------------------------------------
@@ -89,15 +98,20 @@ OpenSSL used as well as that of the covered work.
 #define FULL 0
 #define SPKI 1
 
+/* CA certificate directory. */
+#define MOZILLA_CA_DIR "/usr/share/ca-certificates/mozilla"
+static
+const char *ca_dirs[] = { MOZILLA_CA_DIR, NULL};
+
 //----------------------------------------------------------------------------
 
 /* structure to save input options of validator */
-typedef struct {     
+struct ds_options_st {
 	bool debug; // debug output enable
 	bool usefwd; // use of resolver
 	bool ds; // use root.key with DS record of root zone 
-} ds_options;
-ds_options opts;
+};
+struct ds_options_st opts;
 
 //----------------------------------------------------------------------------
 static struct ub_ctx* ctx = NULL;
@@ -105,7 +119,7 @@ static char byteMap[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A',
 static int byteMapLen = sizeof(byteMap);
 //----------------------------------------------------------------------------
 /* structure to save TLSA records */
-typedef struct tlsa_store_ctx_st {   
+struct tlsa_store_ctx {   
 	char *domain;
 	uint8_t dnssec_status;
 	uint8_t cert_usage;
@@ -114,36 +128,44 @@ typedef struct tlsa_store_ctx_st {
 	uint8_t *association;
 	size_t association_size;
 	unsigned char *assochex;
-	struct tlsa_store_ctx_st *next;
-} tlsa_store_ctx;
+	struct tlsa_store_ctx *next;
+};
 
 /* pointer structure to save TLSA records */
 struct tlsa_store_head {
-	struct tlsa_store_ctx_st *first;
+	struct tlsa_store_ctx *first;
 };
 
 /* structure to save certificate records */
-typedef struct cert_store_ctx_st {
+struct cert_store_ctx {
 	char *cert_der;
 	int cert_len;
 	char *cert_der_hex;
 	char *spki_der;
 	int spki_len;
 	char *spki_der_hex;
-	struct cert_store_ctx_st *next;
-} cert_store_ctx;
+	struct cert_store_ctx *next;
+};
 
 /* pointer structure to save certificate records */
 struct cert_store_head {
-	struct cert_store_ctx_st *first;
+	struct cert_store_ctx *first;
 };
 
-/* structure to save certificate records */
-typedef struct cert_tmp_st {
+/* Structure to save certificate records */
+struct cert_tmp_ctx {
 	char *spki_der;
 	int spki_len;
 	char *spki_der_hex;
-} cert_tmp_ctx;
+};
+
+
+/* DANE validation context. */
+struct dane_validation_ctx {
+	X509_STORE *cert_store;
+};
+static
+struct dane_validation_ctx glob_val_ctx;
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 
@@ -186,6 +208,119 @@ void ds_init_opts(const uint16_t options)
 	opts.debug = options & DANE_FLAG_DEBUG;
 	opts.usefwd = options & DANE_FLAG_USEFWD;
 	opts.ds = false;
+}
+
+
+//*****************************************************************************
+// Load certificate from file and add it to the certificate store
+// ----------------------------------------------------------------------------
+static
+int X509_store_add_cert_file(X509_STORE *store, const char *fname)
+{
+	FILE *fin = NULL;
+	X509 *x509 = NULL;
+
+	assert(store != NULL);
+	assert(fname != NULL);
+
+	fin = fopen(fname, "r");
+	if (fin == NULL) {
+		fprintf(stderr, "Cannot open certificate '%s'.\n", fname);
+		goto fail;
+	}
+
+	x509 = PEM_read_X509(fin, NULL, NULL, NULL);
+	if (x509 == NULL) {
+		fprintf(stderr, "Cannot parse certificate '%s'.\n", fname);
+		goto fail;
+	}
+
+	if (X509_STORE_add_cert(store, x509) == 0) {
+		fprintf(stderr, "Cannot store certificate '%s'.\n", fname);
+		goto fail;
+	}
+
+	X509_free(x509); x509 = NULL;
+	fclose(fin); fin = NULL;
+
+	return 0;
+
+fail:
+	if (fin != NULL) {
+		fclose(fin);
+	}
+	if (x509 != NULL) {
+		X509_free(x509);
+	}
+	return -1;
+}
+
+
+//*****************************************************************************
+// Load all available certificates from the browser CA certificate directory.
+// ----------------------------------------------------------------------------
+int X509_store_load_browser_ca_certificates(X509_STORE *store)
+{
+	const char **dirname_p;
+	DIR *dir = NULL;
+	struct dirent *ent;
+	struct stat s;
+#define MAX_PATH_LEN 256
+	char aux_path[MAX_PATH_LEN];
+	size_t prefix_len;
+
+	dirname_p = ca_dirs;
+	while (*dirname_p != NULL) {
+		/*
+		 * Assume that path is a directory.
+		 * TODO -- Check for it.
+		 */
+
+		fprintf(stderr, "Opening '%s'.\n", *dirname_p);
+		dir = opendir(*dirname_p);
+		if (dir == NULL) {
+			goto fail;
+		}
+
+		prefix_len = strlen(*dirname_p);
+		if ((prefix_len + 1) > (MAX_PATH_LEN - 1)) {
+			goto fail;
+		}
+		memcpy(aux_path, *dirname_p, MAX_PATH_LEN);
+		aux_path[prefix_len++] = '/';
+		aux_path[prefix_len] = '\0';
+
+		while ((ent = readdir(dir)) != NULL) {
+			if ((strlen(ent->d_name) + prefix_len) >
+			    (MAX_PATH_LEN - 1)) {
+				continue; /* Next entry. */
+			}
+
+			strncpy(aux_path + prefix_len, ent->d_name,
+			    MAX_PATH_LEN - prefix_len);
+			aux_path[MAX_PATH_LEN - 1] = '\0';
+
+			if((stat(aux_path, &s) == 0) &&
+			   (s.st_mode & S_IFREG)) {
+				/* Is file. */
+
+				X509_store_add_cert_file(store, aux_path);
+			}
+		}
+		closedir(dir); dir = NULL;
+
+		++dirname_p;
+	}
+
+	return 0;
+
+fail:
+	if (dir != NULL) {
+		closedir(dir);
+	}
+
+	return -1;
+#undef MAX_PATH_LEN
 }
 
 
@@ -307,11 +442,11 @@ void add_tlsarecord(struct tlsa_store_head *tlsa_list, const char *domain,
 	uint8_t matching_type, uint8_t *association, size_t association_size, 
 	const char *assochex)
 {
-	tlsa_store_ctx *field_tlsa;
+	struct tlsa_store_ctx *field_tlsa;
 	size_t size;
 
 	field_tlsa = tlsa_list->first;
-	field_tlsa = malloc(sizeof(tlsa_store_ctx));
+	field_tlsa = malloc(sizeof(struct tlsa_store_ctx));
 	size = strlen(domain) + 1;
 	field_tlsa->domain = malloc(size);
 	memcpy(field_tlsa->domain, domain, size);
@@ -339,10 +474,10 @@ void add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list,
 	uint8_t matching_type, uint8_t *association, size_t association_size, 
 	const char *assochex)
 {
-	tlsa_store_ctx *field_tlsa;
+	struct tlsa_store_ctx *field_tlsa;
 	size_t size;
 
-	field_tlsa = malloc(sizeof(tlsa_store_ctx));
+	field_tlsa = malloc(sizeof(struct tlsa_store_ctx));
 	size = strlen(domain) + 1;
 	field_tlsa->domain = malloc(size);
 	memcpy(field_tlsa->domain, domain, size);
@@ -358,7 +493,7 @@ void add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list,
 	field_tlsa->next = NULL;
 
 	if (tlsa_list->first != NULL) {
-		tlsa_store_ctx *tmp = tlsa_list->first;
+		struct tlsa_store_ctx *tmp = tlsa_list->first;
 		while (tmp->next != NULL) {
 			tmp = tmp->next;
 		}
@@ -378,7 +513,7 @@ struct tlsa_store_head policyFilter(struct tlsa_store_head *tlsa_list, int polic
 	struct tlsa_store_head tlsa_list_new;
 	tlsa_list_new.first = NULL;
     
-	struct tlsa_store_ctx_st *tmp;
+	struct tlsa_store_ctx *tmp;
 	tmp=tlsa_list->first;
 	
 	while (tmp != NULL) {
@@ -416,7 +551,7 @@ struct tlsa_store_head policyFilter(struct tlsa_store_head *tlsa_list, int polic
 static
 void print_tlsalist_debug(const struct tlsa_store_head *tlsa_list)
 {
-	struct tlsa_store_ctx_st *tmp;
+	struct tlsa_store_ctx *tmp;
 	int num;
 
 	if (!opts.debug) {
@@ -449,7 +584,7 @@ void print_tlsalist_debug(const struct tlsa_store_head *tlsa_list)
 static
 void print_certlist_debug(const struct cert_store_head *cert_list)
 {
-	struct cert_store_ctx_st *tmp;
+	struct cert_store_ctx *tmp;
 	unsigned num;
 	X509 *cert_x509 = NULL;
 	const unsigned char *cert_der;
@@ -494,7 +629,7 @@ void print_certlist_debug(const struct cert_store_head *cert_list)
 static
 void free_tlsalist(struct tlsa_store_head *tlsa_list)
 {
-	tlsa_store_ctx *aux;
+	struct tlsa_store_ctx *aux;
 
 	while (tlsa_list->first != NULL) {
 		aux = tlsa_list->first->next;
@@ -513,7 +648,7 @@ void free_tlsalist(struct tlsa_store_head *tlsa_list)
 static
 void free_certlist(struct cert_store_head *cert_list)
 {
-	cert_store_ctx *aux;
+	struct cert_store_ctx *aux;
 
 	while (cert_list->first != NULL) {
 		aux = cert_list->first->next;
@@ -537,9 +672,9 @@ void add_certrecord(struct cert_store_head *cert_list, char* cert_der,
     int cert_len, char* cert_der_hex,  char* spki_der, int spki_len,
     char* spki_der_hex)
 {
-	cert_store_ctx *field_cert;
+	struct cert_store_ctx *field_cert;
 	field_cert = cert_list->first;
-	field_cert = malloc(sizeof(cert_store_ctx));
+	field_cert = malloc(sizeof(struct cert_store_ctx));
 	field_cert->cert_der = malloc(cert_len + 1);
 	memcpy(field_cert->cert_der, cert_der, cert_len);
 	field_cert->cert_len = cert_len;
@@ -563,9 +698,9 @@ void add_certrecord_bottom(struct cert_store_head *cert_list,
     const char *cert_der, int cert_len, const char *cert_der_hex,
     const char *spki_der, int spki_len, const char *spki_der_hex)
 {
-	cert_store_ctx *field_cert;
+	struct cert_store_ctx *field_cert;
 
-	field_cert = malloc(sizeof(cert_store_ctx));
+	field_cert = malloc(sizeof(struct cert_store_ctx));
 
 	field_cert->cert_der = malloc(cert_len + 1);
 	memcpy(field_cert->cert_der, cert_der, cert_len);
@@ -580,7 +715,7 @@ void add_certrecord_bottom(struct cert_store_head *cert_list,
 	field_cert->next = NULL;
 
 	if (cert_list->first != NULL) {
-		cert_store_ctx *tmp = cert_list->first;
+		struct cert_store_ctx *tmp = cert_list->first;
 		while (tmp->next) {
 			tmp = tmp->next;
 		}
@@ -753,7 +888,49 @@ int getcert(char *dest_url, const char *domain, const char *port,
 		goto fail;
 	}
 
+#if 1
+	{
+		/* Add CA certificates. */
+		/* TODO -- Adds only Mozilla CA certificates. */
+		/*
+		 * TODO -- Add user-added certificates from browser.
+		 * Runtime browser detection?
+		 */
+
+		assert(glob_val_ctx.cert_store != NULL);
+
+		STACK_OF(X509_OBJECT) *roots;
+		int i;
+		X509_OBJECT *tmp_obj;
+		X509 *current_cert;
+
+		/* Get the stack of X509 objects out of the X509_STORE. */
+		roots = glob_val_ctx.cert_store->objs;
+		fprintf(stderr, "Certificates %d.\n",
+		    sk_X509_OBJECT_num(roots));
+		for (i = 0; i < sk_X509_OBJECT_num(roots); ++i) {
+			/* For each object. */
+			tmp_obj = sk_X509_OBJECT_value(roots, i);
+			if (X509_LU_X509 == tmp_obj->type) {
+				/*
+				 * Check if it's an X509 cert (could be a CRL
+				 * or a couple other things).
+				 */
+				current_cert = tmp_obj->data.x509;
+			}
+			if (X509_STORE_add_cert(SSL_CTX_get_cert_store(ssl_ctx),
+			        current_cert) == 0) {
+				fprintf(stderr, "Error adding certificate.\n");
+			}
+		}
+//		SSL_CTX_set_cert_store(ssl_ctx, glob_val_ctx.cert_store);
+	}
+#endif
+
 	SSL_CTX_set_options(ssl_ctx, SSL_OP_NO_SSLv2);
+
+//	exit(1);
+
 	ssl = SSL_new(ssl_ctx);
 	if (ssl == NULL) {
 		printf_debug(DEBUG_PREFIX_CER, "Cannot create SSL structure.\n");
@@ -804,6 +981,46 @@ int getcert(char *dest_url, const char *domain, const char *port,
 		    dest_url);
 		goto fail;
 	}
+
+#if 1
+	{
+		/* TODO -- This block leaks memory. */
+
+		X509_STORE_CTX *store_ctx;
+
+		/*
+		 * Initialize a store context with store (for root CA certs),
+		 * the peer's cert and the peer's chain with intermediate CA
+		 * certs.
+		 */
+
+		store_ctx = X509_STORE_CTX_new();
+		if (store_ctx == NULL) {
+			fprintf(stderr, "Cannot create store context.\n");
+			goto fail;
+		}
+
+		if (!X509_STORE_CTX_init(store_ctx,
+		         SSL_CTX_get_cert_store(ssl_ctx), cert, chain)) {
+			fprintf(stderr, "Cannot initialise store context.\n");
+			goto fail;
+		}
+
+		/*
+		 * Validate peer cert using its intermediate CA certs and the
+		 * context's root CA certs.
+		 */
+		if (X509_verify_cert(store_ctx) <= 0) {
+			fprintf(stderr, "Error validating certificates.\n");
+			goto fail;
+		}
+
+		/* Get chain from store context */
+		sk_X509_pop_free(chain, X509_free);
+		chain = X509_STORE_CTX_get1_chain(store_ctx);
+		X509_STORE_CTX_free(store_ctx);
+	}
+#endif
 
 	printf_debug(DEBUG_PREFIX_CER, "Number of certificates in chain: %i\n",
 	    sk_X509_num(chain));
@@ -918,9 +1135,9 @@ fail:
 // return struct (binary SPKI, SPKI length, SPKI in HEX format and its length 
 // ----------------------------------------------------------------------------
 static
-cert_tmp_ctx spkicert(const unsigned char *certder, int len)
+struct cert_tmp_ctx spkicert(const unsigned char *certder, int len)
 {
-	cert_tmp_ctx tmp;
+	struct cert_tmp_ctx tmp;
 	EVP_PKEY *pkey = NULL;
 	X509* cert;
 	cert = d2i_X509(NULL, &certder, len);
@@ -998,7 +1215,7 @@ char * sha512(const char *data, int len)
 // ----------------------------------------------------------------------------
 static
 const char * selectorData(uint8_t selector,
-    const struct cert_store_ctx_st *cert_ctx)
+    const struct cert_store_ctx *cert_ctx)
 {
 	printf_debug(DEBUG_PREFIX_DANE, "selector: %i \n",
 	    selector);
@@ -1021,7 +1238,7 @@ const char * selectorData(uint8_t selector,
 // ----------------------------------------------------------------------------
 static
 char * matchingData(uint8_t matching_type, uint8_t selector,
-    const struct cert_store_ctx_st *cert_ctx)
+    const struct cert_store_ctx *cert_ctx)
 {
 	printf_debug(DEBUG_PREFIX_DANE, "matching_type: %i \n", matching_type);
 
@@ -1070,7 +1287,7 @@ char * matchingData(uint8_t matching_type, uint8_t selector,
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
 static
-int eeCertMatch1(const struct tlsa_store_ctx_st *tlsa_ctx,
+int eeCertMatch1(const struct tlsa_store_ctx *tlsa_ctx,
     const struct cert_store_head *cert_list)
 {
 	//printf_debug(DEBUG_PREFIX_DANE, "eeCertMatch1\n");
@@ -1103,7 +1320,7 @@ int eeCertMatch1(const struct tlsa_store_ctx_st *tlsa_ctx,
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
 static
-int eeCertMatch3(const struct tlsa_store_ctx_st *tlsa_ctx,
+int eeCertMatch3(const struct tlsa_store_ctx *tlsa_ctx,
     const struct cert_store_head *cert_list)
 {
 	//printf_debug(DEBUG_PREFIX_DANE, "eeCertMatch3\n");
@@ -1134,10 +1351,10 @@ int eeCertMatch3(const struct tlsa_store_ctx_st *tlsa_ctx,
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
 static
-int caCertMatch(const struct tlsa_store_ctx_st *tlsa_ctx,
+int caCertMatch(const struct tlsa_store_ctx *tlsa_ctx,
     const struct cert_store_head *cert_list) 
 {
-	const cert_store_ctx *aux_cert;
+	const struct cert_store_ctx *aux_cert;
 
 	//printf_debug(DEBUG_PREFIX_DANE, "caCertMatch0\n");
 
@@ -1178,10 +1395,10 @@ int caCertMatch(const struct tlsa_store_ctx_st *tlsa_ctx,
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
 static
-int chainCertMatch(const struct tlsa_store_ctx_st *tlsa_ctx,
+int chainCertMatch(const struct tlsa_store_ctx *tlsa_ctx,
     const struct cert_store_head *cert_list)
 {
-	const cert_store_ctx *aux_cert;
+	const struct cert_store_ctx *aux_cert;
 
 	//printf_debug(DEBUG_PREFIX_DANE, "chainCertMatch2\n");
 
@@ -1225,7 +1442,7 @@ int tlsa_validate(const struct tlsa_store_head *tlsa_list,
     const struct cert_store_head *cert_list)
 {
 	int idx;
-	const tlsa_store_ctx *aux_tlsa;
+	const struct tlsa_store_ctx *aux_tlsa;
 
 	aux_tlsa = tlsa_list->first;
 	while (aux_tlsa != NULL) {
@@ -1444,6 +1661,32 @@ char * create_tlsa_qname(const char *domain, const char *port,
 	tlsa_query[offs] = '\0';
 
 	return tlsa_query;
+}
+
+
+//*****************************************************************************
+// Initialises global validation structures.
+// ----------------------------------------------------------------------------
+int dane_validation_init(void)
+{
+	glob_val_ctx.cert_store = X509_STORE_new();
+	if (glob_val_ctx.cert_store == NULL) {
+		goto fail;
+	}
+
+	if (X509_store_load_browser_ca_certificates(glob_val_ctx.cert_store) !=
+	    0) {
+		goto fail;
+	}
+
+	return 0;
+
+fail:
+	if (glob_val_ctx.cert_store != NULL) {
+		X509_STORE_free(glob_val_ctx.cert_store);
+		glob_val_ctx.cert_store = NULL;
+	}
+	return -1;
 }
 
 //*****************************************************************************
@@ -1671,7 +1914,7 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 			int certlen = strlen(certchain[i]) / 2;
 			unsigned char *certbin = (unsigned char *) hextobin(certchain[i]);
 			char *certbin2 = hextobin(certchain[i]);   
-			cert_tmp_ctx skpi = spkicert(certbin, certlen);
+			struct cert_tmp_ctx skpi = spkicert(certbin, certlen);
 
 			add_certrecord_bottom(&cert_list, certbin2, certlen,
 			    certchain[i], skpi.spki_der, skpi.spki_len,
@@ -1709,6 +1952,19 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 #undef HTTPS_PREF
 #undef HTTPS_PREF_LEN
 #undef MAX_URI_LEN
+}
+
+
+//*****************************************************************************
+// Initialises global validation structures.
+// ----------------------------------------------------------------------------
+int dane_validation_deinit(void)
+{
+	assert(glob_val_ctx.cert_store != NULL);
+
+	X509_STORE_free(glob_val_ctx.cert_store);
+
+	return 0;
 }
 
 
@@ -1755,11 +2011,20 @@ int main(int argc, char **argv)
 	    DANE_FLAG_DEBUG |
 	    DANE_FLAG_USEFWD;
 
+	if (dane_validation_init() != 0) {
+		printf(DEBUG_PREFIX_DANE "Error initialising context.\n");
+		return 1;
+	}
+
 	res = CheckDane(certhex, 0, options, resolver_addresses, dname, port,
 	    "tcp", 1);
 	printf(DEBUG_PREFIX_DANE "Main result: %i\n", res);
 
 	ub_context_free();
+
+	if (dane_validation_deinit() != 0) {
+		printf(DEBUG_PREFIX_DANE "Error de-initialising context.\n");
+	}
 
 	return 0;
 }
