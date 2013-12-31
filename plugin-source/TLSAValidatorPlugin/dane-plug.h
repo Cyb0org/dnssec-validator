@@ -48,6 +48,13 @@ OpenSSL used as well as that of the covered work.
 extern "C" {
 #endif
 
+
+//*****************************************************************************
+// Create validation context.
+// ----------------------------------------------------------------------------
+int dane_validation_init(void);
+
+
 //*****************************************************************************
 // Main DANE/TLSA validation function, external API
 // Input parmateers:
@@ -65,17 +72,6 @@ extern "C" {
 short CheckDane(const char* certchain[], int certcount, const uint16_t options,
     const char *optdnssrv, const char *domain, const char *port,
     const char *protocol, int policy);
-
-//*****************************************************************************
-// free ub context (erase cache data from ub-context of unbound)
-// ----------------------------------------------------------------------------
-void ub_context_free(void);
-
-
-//*****************************************************************************
-// Create validation context.
-// ----------------------------------------------------------------------------
-int dane_validation_init(void);
 
 
 //*****************************************************************************
