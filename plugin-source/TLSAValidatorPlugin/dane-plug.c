@@ -98,10 +98,10 @@ OpenSSL used as well as that of the covered work.
 #define FULL 0
 #define SPKI 1
 
-/* CA certificate directory. */
+/* CA certificate directories. */
 #define MOZILLA_CA_DIR "/usr/share/ca-certificates/mozilla"
 static
-const char *ca_dirs[] = { MOZILLA_CA_DIR, NULL};
+const char *ca_dirs[] = {MOZILLA_CA_DIR, NULL};
 
 //----------------------------------------------------------------------------
 
@@ -162,7 +162,7 @@ struct cert_tmp_ctx {
 
 /* DANE validation context. */
 struct dane_validation_ctx {
-	X509_STORE *cert_store;
+	X509_STORE *ca_cert_store;
 };
 static
 struct dane_validation_ctx glob_val_ctx;
@@ -855,7 +855,7 @@ char * hextobin(const char *data)
 // return success or error
 // ----------------------------------------------------------------------------
 static
-int getcert(char *dest_url, const char *domain, const char *port,
+int get_cert_list(char *dest_url, const char *domain, const char *port,
     struct cert_store_head *cert_list)
 {
 	int i;
@@ -888,7 +888,10 @@ int getcert(char *dest_url, const char *domain, const char *port,
 		goto fail;
 	}
 
-#if 1
+/* Define BROWSER_CA_STORE in order to add explicit CA certicicates. */
+#define BROWSER_CA_STORE
+
+#ifdef BROWSER_CA_STORE
 	{
 		/* Add CA certificates. */
 		/* TODO -- Adds only Mozilla CA certificates. */
@@ -897,7 +900,7 @@ int getcert(char *dest_url, const char *domain, const char *port,
 		 * Runtime browser detection?
 		 */
 
-		assert(glob_val_ctx.cert_store != NULL);
+		assert(glob_val_ctx.ca_cert_store != NULL);
 
 		STACK_OF(X509_OBJECT) *roots;
 		int i;
@@ -905,7 +908,7 @@ int getcert(char *dest_url, const char *domain, const char *port,
 		X509 *current_cert;
 
 		/* Get the stack of X509 objects out of the X509_STORE. */
-		roots = glob_val_ctx.cert_store->objs;
+		roots = glob_val_ctx.ca_cert_store->objs;
 		fprintf(stderr, "Certificates %d.\n",
 		    sk_X509_OBJECT_num(roots));
 		for (i = 0; i < sk_X509_OBJECT_num(roots); ++i) {
@@ -923,9 +926,8 @@ int getcert(char *dest_url, const char *domain, const char *port,
 				fprintf(stderr, "Error adding certificate.\n");
 			}
 		}
-//		SSL_CTX_set_cert_store(ssl_ctx, glob_val_ctx.cert_store);
 	}
-#endif
+#endif /* BROWSER_CA_STORE */
 
 	SSL_CTX_set_options(ssl_ctx, SSL_OP_NO_SSLv2);
 
@@ -982,11 +984,12 @@ int getcert(char *dest_url, const char *domain, const char *port,
 		goto fail;
 	}
 
-#if 1
+#ifdef BROWSER_CA_STORE
 	{
 		/* TODO -- This block leaks memory. */
 
 		X509_STORE_CTX *store_ctx;
+		STACK_OF(X509) *ca_chain = NULL;
 
 		/*
 		 * Initialize a store context with store (for root CA certs),
@@ -1000,8 +1003,8 @@ int getcert(char *dest_url, const char *domain, const char *port,
 			goto fail;
 		}
 
-		if (!X509_STORE_CTX_init(store_ctx,
-		         SSL_CTX_get_cert_store(ssl_ctx), cert, chain)) {
+		if (X509_STORE_CTX_init(store_ctx,
+		         SSL_CTX_get_cert_store(ssl_ctx), cert, chain) == 0) {
 			fprintf(stderr, "Cannot initialise store context.\n");
 			goto fail;
 		}
@@ -1016,11 +1019,14 @@ int getcert(char *dest_url, const char *domain, const char *port,
 		}
 
 		/* Get chain from store context */
-		sk_X509_pop_free(chain, X509_free);
-		chain = X509_STORE_CTX_get1_chain(store_ctx);
+		ca_chain = X509_STORE_CTX_get1_chain(store_ctx);
 		X509_STORE_CTX_free(store_ctx);
+//		sk_X509_pop_free(ca_chain, X509_free);
+		chain = ca_chain;
 	}
-#endif
+#endif /* BROWSER_CA_STORE */
+
+	X509_free(cert); cert = NULL;
 
 	printf_debug(DEBUG_PREFIX_CER, "Number of certificates in chain: %i\n",
 	    sk_X509_num(chain));
@@ -1068,12 +1074,10 @@ int getcert(char *dest_url, const char *domain, const char *port,
 		free(hex2); hex2 = NULL;
 	}
 
-	/* Chain does not have to be freed explicitly. */
-	/*
+#ifdef BROWSER_CA_STORE
+	/* Chain has to be freed explicitly if using CA store. */
 	sk_X509_pop_free(chain, X509_free);
-	*/
-
-	X509_free(cert);
+#endif /* BROWSER_CA_STORE */
 
 #ifdef WIN32
 	closesocket(server_fd);
@@ -1669,22 +1673,26 @@ char * create_tlsa_qname(const char *domain, const char *port,
 // ----------------------------------------------------------------------------
 int dane_validation_init(void)
 {
-	glob_val_ctx.cert_store = X509_STORE_new();
-	if (glob_val_ctx.cert_store == NULL) {
+	glob_val_ctx.ca_cert_store = X509_STORE_new();
+	if (glob_val_ctx.ca_cert_store == NULL) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Failed creating CA cerificate store.\n");
 		goto fail;
 	}
 
-	if (X509_store_load_browser_ca_certificates(glob_val_ctx.cert_store) !=
-	    0) {
+	if (X509_store_load_browser_ca_certificates(
+	        glob_val_ctx.ca_cert_store) != 0) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Failed loading browser CA cerificates.\n");
 		goto fail;
 	}
 
 	return 0;
 
 fail:
-	if (glob_val_ctx.cert_store != NULL) {
-		X509_STORE_free(glob_val_ctx.cert_store);
-		glob_val_ctx.cert_store = NULL;
+	if (glob_val_ctx.ca_cert_store != NULL) {
+		X509_STORE_free(glob_val_ctx.ca_cert_store);
+		glob_val_ctx.ca_cert_store = NULL;
 	}
 	return -1;
 }
@@ -1930,7 +1938,7 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 		    "External certificate chain is used\n");
 		memcpy(uri, "https://", HTTPS_PREF_LEN + 1);
 		strncat(uri, domain, MAX_URI_LEN - HTTPS_PREF_LEN - 1);
-		tlsa_ret = getcert(uri, domain, port_str, &cert_list);
+		tlsa_ret = get_cert_list(uri, domain, port_str, &cert_list);
 		if (tlsa_ret == 0) {
 			free_tlsalist(&tlsa_list);
 			free_certlist(&cert_list);
@@ -1960,9 +1968,9 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 // ----------------------------------------------------------------------------
 int dane_validation_deinit(void)
 {
-	assert(glob_val_ctx.cert_store != NULL);
+	assert(glob_val_ctx.ca_cert_store != NULL);
 
-	X509_STORE_free(glob_val_ctx.cert_store);
+	X509_STORE_free(glob_val_ctx.ca_cert_store);
 
 	return 0;
 }
