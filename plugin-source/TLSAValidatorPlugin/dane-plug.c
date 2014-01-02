@@ -150,6 +150,18 @@ struct cert_store_ctx {
 	struct cert_store_ctx *next;
 };
 
+
+#define cert_store_ctx_init(ptr) \
+	do { \
+		(ptr)->cert_der = NULL; \
+		(ptr)->cert_len = 0; \
+		(ptr)->cert_der_hex = NULL; \
+		(ptr)->spki_der = NULL; \
+		(ptr)->spki_len = 0; \
+		(ptr)->spki_der_hex = NULL; \
+		(ptr)->next = NULL; \
+	} while(0)
+
 /* pointer structure to save certificate records */
 struct cert_store_head {
 	struct cert_store_ctx *first;
@@ -779,6 +791,107 @@ char * bintohex(const uint8_t *bytes, size_t buflen)
 }
 
 //*****************************************************************************
+// Helper function (add new record in the certificate list - last)
+//
+// Retrun 0 on success -1 on failure.
+// ----------------------------------------------------------------------------
+static
+int add_certrecord_bottom_from_x509(struct cert_store_head *cert_list,
+    X509 *x509)
+{
+	struct cert_store_ctx *cert_entry = NULL;
+	EVP_PKEY *pkey = NULL;
+
+	assert(cert_list != NULL);
+	assert(x509 != NULL);
+
+	cert_entry = malloc(sizeof(struct cert_store_ctx));
+	if (cert_entry == NULL) {
+		goto fail;
+	}
+
+	cert_store_ctx_init(cert_entry);
+
+	cert_entry->cert_der = NULL;
+	cert_entry->cert_len = i2d_X509(x509,
+	    (unsigned char **) &cert_entry->cert_der);
+	if (cert_entry->cert_len < 0) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Error encoding into DER.\n");
+		goto fail;
+	}
+	cert_entry->cert_der_hex =
+	    bintohex((uint8_t *) cert_entry->cert_der,
+	        cert_entry->cert_len);
+	if (cert_entry->cert_der_hex == NULL) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Error converting DER to hex.\n");
+		goto fail;
+	}
+
+	pkey = X509_get_pubkey(x509);
+	if (pkey == NULL) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Error getting public key from certificate\n");
+		goto fail;
+	}
+
+	cert_entry->spki_der = NULL;
+	cert_entry->spki_len = i2d_PUBKEY(pkey,
+	    (unsigned char **) &cert_entry->spki_der);
+
+	EVP_PKEY_free(pkey); pkey = NULL;
+
+	if (cert_entry->spki_len < 0) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Error encoding into DER.\n");
+		goto fail;
+	}
+	cert_entry->spki_der_hex =
+	    bintohex((uint8_t *) cert_entry->spki_der,
+	        cert_entry->spki_len);
+	if (cert_entry->spki_der_hex == NULL) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Error converting DER to hex.\n");
+		goto fail;
+	}
+
+	/* Append to list. */
+	if (cert_list->first != NULL) {
+		struct cert_store_ctx *tmp = cert_list->first;
+		while (tmp->next) {
+			tmp = tmp->next;
+		}
+		tmp->next = cert_entry;
+	} else {
+		cert_list->first = cert_entry;
+	}
+
+	return 0;
+
+fail:
+	if (cert_entry != NULL) {
+		if (cert_entry->cert_der != NULL) {
+			free(cert_entry->cert_der);
+		}
+		if (cert_entry->cert_der_hex != NULL) {
+			free(cert_entry->cert_der_hex);
+		}
+		if (cert_entry->spki_der != NULL) {
+			free(cert_entry->spki_der);
+		}
+		if (cert_entry->spki_der_hex != NULL) {
+			free(cert_entry->spki_der_hex);
+		}
+		free(cert_entry);
+	}
+	if (pkey != NULL) {
+		EVP_PKEY_free(pkey);
+	}
+	return -1;
+}
+
+//*****************************************************************************
 // Helper function (hex to int)
 // ----------------------------------------------------------------------------
 static
@@ -883,13 +996,12 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 	int server_fd = -1;
 #ifdef BROWSER_CA_STORE
 	X509 *cert = NULL;
+	X509_STORE_CTX *store_ctx = NULL;
+	STACK_OF(X509) *ca_chain = NULL;
 #endif /* BROWSER_CA_STORE */
 	STACK_OF(X509) *chain;
 	X509 *cert2;
 	EVP_PKEY *pkey = NULL;
-	unsigned char *buf = NULL, *buf2 = NULL;
-	char *hex = NULL, *hex2 = NULL;
-	int len, len2;
 
 	assert(glob_val_ctx.ssl_ctx != NULL);
 
@@ -939,9 +1051,6 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 
 #ifdef BROWSER_CA_STORE
 	{
-		X509_STORE_CTX *store_ctx;
-		STACK_OF(X509) *ca_chain = NULL;
-
 		cert = SSL_get_peer_certificate(ssl);
 		if (cert == NULL) {
 			printf_debug(DEBUG_PREFIX_CER,
@@ -980,7 +1089,7 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 
 		/* Get chain from store context */
 		ca_chain = X509_STORE_CTX_get1_chain(store_ctx);
-		X509_STORE_CTX_free(store_ctx);
+		X509_STORE_CTX_free(store_ctx); store_ctx = NULL;
 		chain = ca_chain;
 
 		X509_free(cert); cert = NULL;
@@ -993,53 +1102,17 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 	for (i = 0; i < sk_X509_num(chain); ++i) {
 		//if (opts.debug) PEM_write_bio_X509(outbio, sk_X509_value(chain, i));
 		cert2 = sk_X509_value(chain, i);
-		pkey = X509_get_pubkey(cert2);
-		if (pkey == NULL) {
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Error getting public key from certificate\n");
-			goto fail;
-		}
 
-		buf = NULL;
-		len = i2d_X509(cert2, &buf);
-		if (len < 0) {
+		if (add_certrecord_bottom_from_x509(cert_list, cert2) != 0) {
 			printf_debug(DEBUG_PREFIX_CER,
-			    "Error encoding into DER.\n");
+			    "Error adding certificate into list.\n");
 			goto fail;
 		}
-		hex = bintohex((uint8_t *) buf, len);
-		if (hex == NULL) {
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Error converting DER to hex.\n");
-			goto fail;
-		}
-
-		buf2 = NULL;
-		len2 = i2d_PUBKEY(pkey, &buf2);
-		EVP_PKEY_free(pkey); pkey = NULL;
-		if (len2 < 0) {
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Error encoding into DER.\n");
-			goto fail;
-		}
-		hex2 = bintohex((uint8_t *) buf2, len2);
-		if (hex2 == NULL) {
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Error converting DER to hex.\n");
-			goto fail;
-		}
-
-		add_certrecord_bottom(cert_list, (char*) buf, len, hex,
-		    (char *) buf2, len2, hex2);
-		free(buf); buf = NULL;
-		free(buf2); buf2 = NULL;
-		free(hex); hex = NULL;
-		free(hex2); hex2 = NULL;
 	}
 
 #ifdef BROWSER_CA_STORE
 	/* Chain has to be freed explicitly if using CA store. */
-	sk_X509_pop_free(chain, X509_free);
+	sk_X509_pop_free(chain, X509_free); chain = ca_chain = NULL;
 #endif /* BROWSER_CA_STORE */
 
 #ifdef WIN32
@@ -1075,21 +1148,15 @@ fail:
 	if (cert != NULL) {
 		X509_free(cert);
 	}
+	if (store_ctx != NULL) {
+		X509_STORE_CTX_free(store_ctx);
+	}
+	if (ca_chain != NULL) {
+		sk_X509_pop_free(ca_chain, X509_free);
+	}
 #endif /* BROWSER_CA_STORE */
 	if (pkey != NULL) {
 		EVP_PKEY_free(pkey);
-	}
-	if (buf != NULL) {
-		free(buf);
-	}
-	if (buf2 != NULL) {
-		free(buf2);
-	}
-	if (hex != NULL) {
-		free(hex);
-	}
-	if (hex2 != NULL) {
-		free(hex2);
 	}
 	return -1;
 }
