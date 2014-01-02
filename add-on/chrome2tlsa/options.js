@@ -367,7 +367,7 @@ window.addEventListener('load',function() {
 	        document.tlsaSettings.domainlist.value = domainlist;
 		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;
 		blockhttps = (blockhttps == undefined || blockhttps == "true") ? true : false;
-		clearcache = (clearcache == undefined || clearcache == "true") ? true : false;
+		clearcache = (clearcache == undefined || clearcache == "false") ? false : true;
 	        document.tlsaSettings.domainfilteron.checked = domainfilteron;
 		document.tlsaSettings.blockhttps.checked = blockhttps;
 		document.tlsaSettings.clearcache.checked = clearcache;
@@ -395,7 +395,7 @@ window.addEventListener('load',function() {
 		document.tlsaSettings.domainfilteron.checked = domainfilteron;
    		blockhttps = (blockhttps == undefined || blockhttps == "true") ? true : false;
 		document.tlsaSettings.blockhttps.checked = blockhttps;	
-		clearcache = (clearcache == undefined || clearcache == "true") ? true : false;
+		clearcache = (clearcache == undefined || clearcache == "false") ? false : true;
 		document.tlsaSettings.clearcache.checked = clearcache;
 		DebugOutput = (DebugOutput == undefined || DebugOutput == "true") ? true : false;
 		document.tlsaSettings.DebugOutput.checked = DebugOutput;		
