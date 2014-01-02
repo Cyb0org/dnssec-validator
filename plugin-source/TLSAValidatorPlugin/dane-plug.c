@@ -171,16 +171,11 @@ struct dane_validation_ctx {
 	                    * Initialised outside the context initialisation
 	                    * procedure.
 	                    */
-#ifdef BROWSER_CA_STORE
-	X509_STORE *ca_cert_store; /* CA certificate store. */
-#endif /* BROWSER_CA_STORE */
+	SSL_CTX *ssl_ctx; /* SSL context. */
 };
 static
 struct dane_validation_ctx glob_val_ctx = {
-	{false, false, false}, NULL
-#ifdef BROWSER_CA_STORE
-	, NULL
-#endif /* BROWSER_CA_STORE */
+	{false, false, false}, NULL, NULL
 };
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
@@ -884,11 +879,11 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
     struct cert_store_head *cert_list)
 {
 	int i;
-	const SSL_METHOD *method;
-	SSL_CTX *ssl_ctx = NULL;
 	SSL *ssl = NULL;
 	int server_fd = -1;
+#ifdef BROWSER_CA_STORE
 	X509 *cert = NULL;
+#endif /* BROWSER_CA_STORE */
 	STACK_OF(X509) *chain;
 	X509 *cert2;
 	EVP_PKEY *pkey = NULL;
@@ -896,55 +891,9 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 	char *hex = NULL, *hex2 = NULL;
 	int len, len2;
 
-	method = SSLv23_client_method();
-	ssl_ctx = SSL_CTX_new(method);
-	if (ssl_ctx == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Unable to create a new SSL context structure.\n");
-		goto fail;
-	}
+	assert(glob_val_ctx.ssl_ctx != NULL);
 
-#ifdef BROWSER_CA_STORE
-	{
-		/* Add CA certificates. */
-		/* TODO -- Adds only Mozilla CA certificates. */
-		/*
-		 * TODO -- Add user-added certificates from browser.
-		 * Runtime browser detection?
-		 */
-
-		assert(glob_val_ctx.ca_cert_store != NULL);
-
-		STACK_OF(X509_OBJECT) *roots;
-		int i;
-		X509_OBJECT *tmp_obj;
-		X509 *current_cert;
-
-		/* Get the stack of X509 objects out of the X509_STORE. */
-		roots = glob_val_ctx.ca_cert_store->objs;
-		fprintf(stderr, "Certificates %d.\n",
-		    sk_X509_OBJECT_num(roots));
-		for (i = 0; i < sk_X509_OBJECT_num(roots); ++i) {
-			/* For each object. */
-			tmp_obj = sk_X509_OBJECT_value(roots, i);
-			if (X509_LU_X509 == tmp_obj->type) {
-				/*
-				 * Check if it's an X509 cert (could be a CRL
-				 * or a couple other things).
-				 */
-				current_cert = tmp_obj->data.x509;
-			}
-			if (X509_STORE_add_cert(SSL_CTX_get_cert_store(ssl_ctx),
-			        current_cert) == 0) {
-				fprintf(stderr, "Error adding certificate.\n");
-			}
-		}
-	}
-#endif /* BROWSER_CA_STORE */
-
-	SSL_CTX_set_options(ssl_ctx, SSL_OP_NO_SSLv2);
-
-	ssl = SSL_new(ssl_ctx);
+	ssl = SSL_new(glob_val_ctx.ssl_ctx);
 	if (ssl == NULL) {
 		printf_debug(DEBUG_PREFIX_CER,
 		    "Cannot create SSL structure.\n");
@@ -980,14 +929,6 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 		goto fail;
 	}
 
-	cert = SSL_get_peer_certificate(ssl);
-	if (cert == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error: Could not get a certificate from: %s.\n",
-		    dest_url);
-		goto fail;
-	}
-
 	chain = SSL_get_peer_cert_chain(ssl);
 	if (chain == NULL) {
 		printf_debug(DEBUG_PREFIX_CER,
@@ -1000,6 +941,14 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 	{
 		X509_STORE_CTX *store_ctx;
 		STACK_OF(X509) *ca_chain = NULL;
+
+		cert = SSL_get_peer_certificate(ssl);
+		if (cert == NULL) {
+			printf_debug(DEBUG_PREFIX_CER,
+			    "Error: Could not get a certificate from: %s.\n",
+			    dest_url);
+			goto fail;
+		}
 
 		/*
 		 * Initialize a store context with store (for root CA certs),
@@ -1014,7 +963,8 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 		}
 
 		if (X509_STORE_CTX_init(store_ctx,
-		         SSL_CTX_get_cert_store(ssl_ctx), cert, chain) == 0) {
+		         SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx),
+		         cert, chain) == 0) {
 			fprintf(stderr, "Cannot initialise store context.\n");
 			goto fail;
 		}
@@ -1031,12 +981,11 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 		/* Get chain from store context */
 		ca_chain = X509_STORE_CTX_get1_chain(store_ctx);
 		X509_STORE_CTX_free(store_ctx);
-//		sk_X509_pop_free(ca_chain, X509_free);
 		chain = ca_chain;
+
+		X509_free(cert); cert = NULL;
 	}
 #endif /* BROWSER_CA_STORE */
-
-	X509_free(cert); cert = NULL;
 
 	printf_debug(DEBUG_PREFIX_CER, "Number of certificates in chain: %i\n",
 	    sk_X509_num(chain));
@@ -1103,8 +1052,6 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 	SSL_shutdown(ssl);
 	SSL_free(ssl);
 
-	SSL_CTX_free(ssl_ctx);
-
 	printf_debug(DEBUG_PREFIX_CER,
 	    "Finished SSL/TLS connection with server: %s.\n",
 	    dest_url);
@@ -1112,9 +1059,6 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 	return 0;
 
 fail:
-	if (ssl_ctx != NULL) {
-		SSL_CTX_free(ssl_ctx);
-	}
 	if (ssl != NULL) {
 		SSL_shutdown(ssl);
 		SSL_free(ssl);
@@ -1127,9 +1071,11 @@ fail:
 		close(server_fd);
 #endif
 	}
+#ifdef BROWSER_CA_STORE
 	if (cert != NULL) {
 		X509_free(cert);
 	}
+#endif /* BROWSER_CA_STORE */
 	if (pkey != NULL) {
 		EVP_PKEY_free(pkey);
 	}
@@ -1801,6 +1747,8 @@ fail:
 // ----------------------------------------------------------------------------
 int dane_validation_init(void)
 {
+	const SSL_METHOD *method;
+
 	glob_val_ctx.ub = NULL; /* Has separate initialisation procedure. */
 
 	/* Initialise SSL. */
@@ -1811,18 +1759,20 @@ int dane_validation_init(void)
 	/* Always returns 1. */
 	SSL_library_init();
 
-#ifdef BROWSER_CA_STORE
-	/* Initialise CA certificate store. */
-
-	glob_val_ctx.ca_cert_store = X509_STORE_new();
-	if (glob_val_ctx.ca_cert_store == NULL) {
+	method = SSLv23_client_method();
+	glob_val_ctx.ssl_ctx = SSL_CTX_new(method);
+	if (glob_val_ctx.ssl_ctx == NULL) {
 		printf_debug(DEBUG_PREFIX_CER,
-		    "Failed creating CA cerificate store.\n");
+		    "Unable to create a SSL context structure.\n");
 		goto fail;
 	}
 
+	SSL_CTX_set_options(glob_val_ctx.ssl_ctx, SSL_OP_NO_SSLv2);
+
+#ifdef BROWSER_CA_STORE
+	/* Load certificates. */
 	if (X509_store_load_browser_ca_certificates(
-	        glob_val_ctx.ca_cert_store) != 0) {
+	        SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx)) != 0) {
 		printf_debug(DEBUG_PREFIX_CER,
 		    "Failed loading browser CA cerificates.\n");
 		goto fail;
@@ -1831,14 +1781,18 @@ int dane_validation_init(void)
 
 	return 0;
 
-#ifdef BROWSER_CA_STORE
 fail:
-	if (glob_val_ctx.ca_cert_store != NULL) {
-		X509_STORE_free(glob_val_ctx.ca_cert_store);
-		glob_val_ctx.ca_cert_store = NULL;
+	if (glob_val_ctx.ssl_ctx != NULL) {
+		SSL_CTX_free(glob_val_ctx.ssl_ctx);
+		glob_val_ctx.ssl_ctx = NULL;
 	}
-	return -1;
+#ifdef BROWSER_CA_STORE
+	if (glob_val_ctx.ssl_ctx != NULL) {
+		SSL_CTX_free(glob_val_ctx.ssl_ctx);
+		glob_val_ctx.ssl_ctx = NULL;
+	}
 #endif /* BROWSER_CA_STORE */
+	return -1;
 }
 
 //*****************************************************************************
@@ -2023,12 +1977,10 @@ int dane_validation_deinit(void)
 		glob_val_ctx.ub = NULL;
 	}
 
-#ifdef BROWSER_CA_STORE
-	if (glob_val_ctx.ca_cert_store != NULL) {
-		X509_STORE_free(glob_val_ctx.ca_cert_store);
-		glob_val_ctx.ca_cert_store = NULL;
+	if (glob_val_ctx.ssl_ctx != NULL) {
+		SSL_CTX_free(glob_val_ctx.ssl_ctx);
+		glob_val_ctx.ssl_ctx = NULL;
 	}
-#endif /* BROWSER_CA_STORE */
 
 	return 0;
 }
