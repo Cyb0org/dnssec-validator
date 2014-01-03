@@ -721,6 +721,7 @@ void add_certrecord(struct cert_store_head *cert_list, char* cert_der,
 }
 #endif
 
+#if 0
 //*****************************************************************************
 // Helper function (add new record in the certificate list - last)
 // ----------------------------------------------------------------------------
@@ -755,6 +756,7 @@ void add_certrecord_bottom(struct cert_store_head *cert_list,
 		cert_list->first = field_cert;
 	}
 }
+#endif
 
 //*****************************************************************************
 // Utility function to convert nibbles (4 bit values) into a hex character
@@ -788,6 +790,179 @@ char * bintohex(const uint8_t *bytes, size_t buflen)
 	}
 	retval[i * 2] = '\0';
 	return retval;
+}
+
+//*****************************************************************************
+// Helper function (hex to int)
+// ----------------------------------------------------------------------------
+static
+int hex_to_int(char c)
+{
+	if(c >=97) c=c-32;
+	int first = c / 16 - 3;
+	int second = c % 16;
+	int result = first*10 + second;
+	if (result > 9) result--;
+	return result;
+}
+
+//*****************************************************************************
+// Helper function (hex to char)
+// ----------------------------------------------------------------------------
+static
+int hex_to_ascii(char c, char d)
+{
+	int high = hex_to_int(c) * 16;
+	int low = hex_to_int(d);
+	return high+low;
+}
+
+//*****************************************************************************
+// HEX string to Binary data converter
+//
+// Return NULL on failure.
+// ----------------------------------------------------------------------------
+static
+char * hextobin(const char *data)
+{
+	size_t length = strlen(data);
+	unsigned i;
+	char *buf;
+
+	/* Two hex digits encode one byte. */
+	assert((length % 2) == 0);
+	buf = malloc(length >> 1);
+	if (buf == NULL) {
+		return NULL;
+	}
+
+	for(i = 0; i < length; i += 2){
+		buf[i >> 1] = hex_to_ascii(data[i], data[i + 1]);
+	}
+	return buf;
+}
+
+//*****************************************************************************
+// DANE algorithm (spkicert)
+// Get SPKI from binary data of certificate
+// return struct (binary SPKI, SPKI length, SPKI in HEX format and its length
+// ----------------------------------------------------------------------------
+static
+struct cert_tmp_ctx spkicert(const char *certder, int len)
+{
+	struct cert_tmp_ctx tmp;
+	EVP_PKEY *pkey = NULL;
+	X509* cert;
+	cert = d2i_X509(NULL, (const unsigned char **) &certder, len);
+
+	if ((pkey = X509_get_pubkey(cert)) == NULL) {
+		printf_debug(DEBUG_PREFIX_DANE,
+		    "Error getting public key from certificate\n");
+	}
+
+	int len2;
+	unsigned char *buf2;
+	char *hex2;
+	buf2 = NULL;
+	len2 = i2d_PUBKEY(pkey, &buf2);
+	hex2 = bintohex((uint8_t*)buf2, len2);
+	tmp.spki_der = (char*) buf2;
+	tmp.spki_len =len2;
+	tmp.spki_der_hex = hex2;
+	X509_free(cert);
+	EVP_PKEY_free(pkey);
+	//free(buf2);
+	return tmp;
+}
+
+//*****************************************************************************
+// Helper function (add new record in the certificate list - last)
+//
+// Retrun 0 on success -1 on failure.
+// ----------------------------------------------------------------------------
+static
+int add_certrecord_bottom_from_der_hex(struct cert_store_head *cert_list,
+    const char *der_hex)
+{
+	struct cert_store_ctx *cert_entry = NULL;
+	size_t hex_len;
+
+	assert(cert_list != NULL);
+	assert(der_hex != NULL);
+
+	cert_entry = malloc(sizeof(struct cert_store_ctx));
+	if (cert_entry == NULL) {
+		goto fail;
+	}
+
+	cert_store_ctx_init(cert_entry);
+
+	hex_len = strlen(der_hex);
+	assert(!(hex_len & 0x01)); /* Must be even number. */
+
+	cert_entry->cert_der = hextobin(der_hex);
+	if (cert_entry->cert_der == NULL) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Error converting hex DER to bin.\n");
+		goto fail;
+	}
+
+	cert_entry->cert_len = hex_len >> 1;
+
+	cert_entry->cert_der_hex = malloc(hex_len + 1);
+	if (cert_entry->cert_der_hex == NULL) {
+		printf_debug(DEBUG_PREFIX_CER, "Errror copying hex.\n");
+		goto fail;
+	}
+	memcpy(cert_entry->cert_der_hex, der_hex, hex_len + 1);
+
+	struct cert_tmp_ctx spki = spkicert(der_hex, hex_len);
+
+	cert_entry->spki_der = spki.spki_der;
+	if (cert_entry->spki_der == NULL) {
+		printf_debug(DEBUG_PREFIX_CER, "Error obtaining SPKI DER.\n");
+		goto fail;
+	}
+
+	cert_entry->spki_len = spki.spki_len;
+
+	cert_entry->spki_der_hex = spki.spki_der_hex;
+	if (cert_entry->spki_der == NULL) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Error obtaining SPKI DER hex.\n");
+		goto fail;
+	}
+
+	/* Append to list. */
+	if (cert_list->first != NULL) {
+		struct cert_store_ctx *tmp = cert_list->first;
+		while (tmp->next) {
+			tmp = tmp->next;
+		}
+		tmp->next = cert_entry;
+	} else {
+		cert_list->first = cert_entry;
+	}
+
+	return 0;
+
+fail:
+	if (cert_entry != NULL) {
+		if (cert_entry->cert_der != NULL) {
+			free(cert_entry->cert_der);
+		}
+		if (cert_entry->cert_der_hex != NULL) {
+			free(cert_entry->cert_der_hex);
+		}
+		if (cert_entry->spki_der != NULL) {
+			free(cert_entry->spki_der);
+		}
+		if (cert_entry->spki_der_hex != NULL) {
+			free(cert_entry->spki_der_hex);
+		}
+		free(cert_entry);
+	}
+	return -1;
 }
 
 //*****************************************************************************
@@ -891,31 +1066,6 @@ fail:
 	return -1;
 }
 
-//*****************************************************************************
-// Helper function (hex to int)
-// ----------------------------------------------------------------------------
-static
-int hex_to_int(char c)
-{
-	if(c >=97) c=c-32;
-	int first = c / 16 - 3;
-	int second = c % 16;
-	int result = first*10 + second;
-	if (result > 9) result--;
-	return result;
-}
-
-//*****************************************************************************
-// Helper function (hex to char)
-// ----------------------------------------------------------------------------
-static
-int hex_to_ascii(char c, char d) 
-{
-	int high = hex_to_int(c) * 16;
-	int low = hex_to_int(d);
-	return high+low;
-}
-
 #if 0
 //*****************************************************************************
 // safe string concatenation function
@@ -957,29 +1107,6 @@ char * strcat_clone(const char *s1, const char *s2)
 	return cat;
 }
 #endif
-
-//*****************************************************************************
-// HEX string to Binary data converter
-// ----------------------------------------------------------------------------
-static
-char * hextobin(const char *data)
-{
-	size_t length = strlen(data);
-	unsigned i;
-	char *buf;
-
-	/* Two hex digits encode one byte. */
-	assert((length % 2) == 0);
-	buf = malloc(length >> 1);
-	if (buf == NULL) {
-		return NULL;
-	}
-
-	for(i = 0; i < length; i += 2){
-		buf[i >> 1] = hex_to_ascii(data[i], data[i + 1]);
-	}
-	return buf;
-}
 
 //*****************************************************************************
 // Get certificates from SSL handshake
@@ -1028,8 +1155,8 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 	if (domain != NULL) {
 		if (!SSL_set_tlsext_host_name(ssl, domain)) {
 			printf_debug(DEBUG_PREFIX_CER,
-			    "Error: Unable to set TLS server-name extension: %s.\n",
-			    domain);
+			    "Error: Unable to set TLS server-name-indication "
+			    "extension: %s.\n", domain);
 			goto fail;
 		}
 	}
@@ -1100,7 +1227,6 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 	    sk_X509_num(chain));
 
 	for (i = 0; i < sk_X509_num(chain); ++i) {
-		//if (opts.debug) PEM_write_bio_X509(outbio, sk_X509_value(chain, i));
 		cert2 = sk_X509_value(chain, i);
 
 		if (add_certrecord_bottom_from_x509(cert_list, cert2) != 0) {
@@ -1159,39 +1285,6 @@ fail:
 		EVP_PKEY_free(pkey);
 	}
 	return -1;
-}
-
-//*****************************************************************************
-// DANE algorithm (spkicert)
-// Get SPKI from binary data of certificate
-// return struct (binary SPKI, SPKI length, SPKI in HEX format and its length 
-// ----------------------------------------------------------------------------
-static
-struct cert_tmp_ctx spkicert(const unsigned char *certder, int len)
-{
-	struct cert_tmp_ctx tmp;
-	EVP_PKEY *pkey = NULL;
-	X509* cert;
-	cert = d2i_X509(NULL, &certder, len);
-	
-	if ((pkey = X509_get_pubkey(cert)) == NULL) {
-		printf_debug(DEBUG_PREFIX_DANE,
-		    "Error getting public key from certificate\n");
-	}
-
-	int len2;
-	unsigned char *buf2;
-	char *hex2;
-	buf2 = NULL;
-	len2 = i2d_PUBKEY(pkey, &buf2);
-	hex2 = bintohex((uint8_t*)buf2, len2);
-	tmp.spki_der = (char*) buf2; 
-	tmp.spki_len =len2;
-	tmp.spki_der_hex = hex2; 
-	X509_free(cert);
-	EVP_PKEY_free(pkey);
-	//free(buf2);
-	return tmp;
 }
 
 //*****************************************************************************
@@ -1990,19 +2083,12 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 
 		int i;
 		for (i = 0; i < certcount; i++) {
-			int certlen = strlen(certchain[i]) / 2;
-			unsigned char *certbin = (unsigned char *) hextobin(certchain[i]);
-			char *certbin2 = hextobin(certchain[i]);   
-			struct cert_tmp_ctx skpi = spkicert(certbin, certlen);
-
-			add_certrecord_bottom(&cert_list, certbin2, certlen,
-			    certchain[i], skpi.spki_der, skpi.spki_len,
-			    skpi.spki_der_hex);
-
-			free(certbin);
-			free(certbin2);
-			free(skpi.spki_der_hex); /* Messy clean-up. Create a better one. */
-			free(skpi.spki_der);
+			if (add_certrecord_bottom_from_der_hex(&cert_list,
+			        certchain[i]) != 0) {
+				printf_debug(DEBUG_PREFIX_CER,
+				    "Error adding certificate into list.\n");
+				return DANE_ERROR_GENERIC;
+			}
 		}
 	} else {
 		printf_debug(DEBUG_PREFIX_CER,
