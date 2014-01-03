@@ -79,6 +79,7 @@ short CheckDane(const char* certchain[], int certcount, const uint16_t options,
 // ----------------------------------------------------------------------------
 int dane_validation_deinit(void);
 
+
 #ifdef __cplusplus
 }
 #endif

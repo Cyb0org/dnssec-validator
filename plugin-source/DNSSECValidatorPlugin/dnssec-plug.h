@@ -49,6 +49,13 @@ OpenSSL used as well as that of the covered work.
 extern "C" {
 #endif
 
+
+//*****************************************************************************
+// Create validation context.
+// ----------------------------------------------------------------------------
+int dnssec_validation_init(void);
+
+
 //*****************************************************************************
 /* main validating function */
 // return status DNSSEC security
@@ -61,10 +68,12 @@ extern "C" {
 short ds_validate(const char *domain, const uint16_t options,
     const char *optdnssrv, const char *ipbrowser, char **ipvalidator);
 
+
 //*****************************************************************************
-// free ub context (erase cache data from ub-context of unbound)
+// Destroy validation context.
 // ----------------------------------------------------------------------------
-void ub_context_free(void);
+int dnssec_validation_deinit(void);
+
 
 #ifdef __cplusplus
 }

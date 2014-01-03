@@ -546,7 +546,7 @@ void add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list,
 		tlsa_list->first = field_tlsa;
 	}
 }
-#endif 0
+#endif
 
 //*****************************************************************************
 // Helper function (add new record in the TLSA list - last)
@@ -561,7 +561,7 @@ int add_tlsarecord_bottom_eat_association(struct tlsa_store_head *tlsa_list,
 	const char *domain,
 	uint8_t dnssec_status, uint8_t cert_usage, uint8_t selector,
 	uint8_t matching_type,
-	uint8_t *association, size_t association_size, unsigned char *assochex)
+	uint8_t *association, size_t association_size, char *assochex)
 {
 	struct tlsa_store_ctx *tlsa_entry = NULL;
 	size_t size;
@@ -591,7 +591,7 @@ int add_tlsarecord_bottom_eat_association(struct tlsa_store_head *tlsa_list,
 	/* Just copy pointers. (This operation cannot fail.) */
 	tlsa_entry->association = association;
 	tlsa_entry->association_size = association_size;
-	tlsa_entry->assochex = assochex;
+	tlsa_entry->assochex = (unsigned char *) assochex;
 
 	tlsa_entry->next = NULL;
 
@@ -1774,8 +1774,8 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 				matching_type = ldns_rdf_data(rdf_matching_type)[0];
 				association = ldns_rdf_data(rdf_association);
 				association_size = ldns_rdf_size(rdf_association);
-				char *asshex; 
-				asshex = bintohex(association,association_size);
+				char *asshex;
+				asshex = bintohex(association, association_size);
 				if (add_tlsarecord_bottom_eat_association(
 				    tlsa_list, domain, 1,
 				    cert_usage, selector, matching_type,
@@ -1971,7 +1971,8 @@ struct ub_ctx * unbound_resolver_init(const struct ds_options_st *opts,
 		}
 	}
 
-	/* Set dlv-anchor. */
+	/* Set dlv-anchor.
+	 * (TODO -- This location differs from DNSSEC validation. Why?) */
 	ub_retval = ub_ctx_set_option(ub, "dlv-anchor:", DLV);
 	if (ub_retval != 0) {
 		printf_debug(DEBUG_PREFIX, "Error adding DLV keys: %s\n",
