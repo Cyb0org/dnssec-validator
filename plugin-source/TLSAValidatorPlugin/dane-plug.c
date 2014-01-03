@@ -134,6 +134,19 @@ struct tlsa_store_ctx {
 	struct tlsa_store_ctx *next;
 };
 
+#define tlsa_store_ctx_init(ptr) \
+	do { \
+		(ptr)->domain = NULL; \
+		(ptr)->dnssec_status = 0; \
+		(ptr)->cert_usage = 0; \
+		(ptr)->selector = 0; \
+		(ptr)->matching_type = 0; \
+		(ptr)->association = NULL; \
+		(ptr)->association_size = 0; \
+		(ptr)->assochex = NULL; \
+		(ptr)->next = NULL; \
+	} while(0)
+
 /* pointer structure to save TLSA records */
 struct tlsa_store_head {
 	struct tlsa_store_ctx *first;
@@ -149,7 +162,6 @@ struct cert_store_ctx {
 	char *spki_der_hex;
 	struct cert_store_ctx *next;
 };
-
 
 #define cert_store_ctx_init(ptr) \
 	do { \
@@ -468,9 +480,9 @@ const char * get_dnssec_status(uint8_t dnssec_status)
 // Helper function (add new record in the TLSA list - first)
 // ----------------------------------------------------------------------------
 static
-void add_tlsarecord(struct tlsa_store_head *tlsa_list, const char *domain, 
-	uint8_t dnssec_status, uint8_t cert_usage, uint8_t selector, 
-	uint8_t matching_type, uint8_t *association, size_t association_size, 
+void add_tlsarecord(struct tlsa_store_head *tlsa_list, const char *domain,
+	uint8_t dnssec_status, uint8_t cert_usage, uint8_t selector,
+	uint8_t matching_type, uint8_t *association, size_t association_size,
 	const char *assochex)
 {
 	struct tlsa_store_ctx *field_tlsa;
@@ -495,14 +507,15 @@ void add_tlsarecord(struct tlsa_store_head *tlsa_list, const char *domain,
 }
 #endif
 
+#if 0
 //*****************************************************************************
 // Helper function (add new record in the TLSA list - last)
 // ----------------------------------------------------------------------------
 static
 void add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list,
-	const char *domain, 
-	uint8_t dnssec_status, uint8_t cert_usage, uint8_t selector, 
-	uint8_t matching_type, uint8_t *association, size_t association_size, 
+	const char *domain,
+	uint8_t dnssec_status, uint8_t cert_usage, uint8_t selector,
+	uint8_t matching_type, uint8_t *association, size_t association_size,
 	const char *assochex)
 {
 	struct tlsa_store_ctx *field_tlsa;
@@ -532,6 +545,76 @@ void add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list,
 	} else {
 		tlsa_list->first = field_tlsa;
 	}
+}
+#endif 0
+
+//*****************************************************************************
+// Helper function (add new record in the TLSA list - last)
+//
+// Return 0 on success, -1 else.
+//
+// Note: Association related data are not copied, only pointer values are
+// copied.
+// ----------------------------------------------------------------------------
+static
+int add_tlsarecord_bottom_eat_association(struct tlsa_store_head *tlsa_list,
+	const char *domain,
+	uint8_t dnssec_status, uint8_t cert_usage, uint8_t selector,
+	uint8_t matching_type,
+	uint8_t *association, size_t association_size, unsigned char *assochex)
+{
+	struct tlsa_store_ctx *tlsa_entry = NULL;
+	size_t size;
+
+	assert(domain != NULL);
+	assert(assochex != NULL);
+
+	tlsa_entry = malloc(sizeof(struct tlsa_store_ctx));
+	if (tlsa_entry == NULL) {
+		goto fail;
+	}
+
+	tlsa_store_ctx_init(tlsa_entry);
+
+	size = strlen(domain) + 1;
+	tlsa_entry->domain = malloc(size);
+	if (tlsa_entry->domain == NULL) {
+		goto fail;
+	}
+	memcpy(tlsa_entry->domain, domain, size);
+
+	tlsa_entry->dnssec_status = dnssec_status;
+	tlsa_entry->cert_usage = cert_usage;
+	tlsa_entry->selector = selector;
+	tlsa_entry->matching_type = matching_type;
+
+	/* Just copy pointers. (This operation cannot fail.) */
+	tlsa_entry->association = association;
+	tlsa_entry->association_size = association_size;
+	tlsa_entry->assochex = assochex;
+
+	tlsa_entry->next = NULL;
+
+	if (tlsa_list->first != NULL) {
+		struct tlsa_store_ctx *tmp = tlsa_list->first;
+		while (tmp->next != NULL) {
+			tmp = tmp->next;
+		}
+		tmp->next = tlsa_entry;
+	} else {
+		tlsa_list->first = tlsa_entry;
+	}
+
+	return 0;
+
+fail:
+	if (tlsa_entry != NULL) {
+		if (tlsa_entry->domain != NULL) {
+			free(tlsa_entry->domain);
+		}
+		free(tlsa_entry);
+	}
+	return -1;
 }
 
 #if 0
@@ -1600,15 +1683,15 @@ int tlsa_validate(const struct tlsa_store_head *tlsa_list,
 				    "Wrong value of cert_usage parameter: %i \n",
 				    aux_tlsa->cert_usage);
 				idx = DANE_TLSA_PARAM_ERR; // unknown cert usage, skip
-			} // switch
+			}
 			break; // continue checking
-		} // switch
+		}
 
 		aux_tlsa = aux_tlsa->next;
 		if ((idx >= DANE_VALID_TYPE0) && (idx <= DANE_VALID_TYPE3)) {
 			return idx;
 		}
-	} // while
+	}
 
 	return idx;
 }
@@ -1650,16 +1733,21 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 				printf_debug(DEBUG_PREFIX,
 				     "Failed to parse response packet\n");
 				return DANE_ERROR_RESOLVER;
-			} //if
+			}
         
 			ldns_rr_list *rrs = ldns_pkt_rr_list_by_type(packet,
 			    LDNS_RR_TYPE_TLSA, LDNS_SECTION_ANSWER);
 
 			for (i = 0; i < ldns_rr_list_rr_count(rrs); i++) {
-				/* extract first rdf, which is the whole TLSA record */
+				/*
+				 * Extract first rdf, which is the whole TLSA
+				 * record.
+				 */
 				ldns_rr *rr = ldns_rr_list_rr(rrs, i);
-				// Since ldns 1.6.14, RR for TLSA is parsed into 4 RDFs 
-				// instead of 1 RDF in ldns 1.6.13.
+				/*
+				 * Since ldns 1.6.14, RR for TLSA is parsed
+				 * into 4 RDFs instead of 1 RDF in ldns 1.6.13.
+				 */
 				if (ldns_rr_rd_count(rr) < 4) {
 					printf_debug(DEBUG_PREFIX,
 					    "RR %d hasn't enough fields\n", i);
@@ -1673,11 +1761,10 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 				if ((ldns_rdf_size(rdf_cert_usage) != 1) ||
 				    (ldns_rdf_size(rdf_selector) != 1) ||
 				    (ldns_rdf_size(rdf_matching_type) != 1)) {
-
 					printf_debug(DEBUG_PREFIX,
 					    "Improperly formatted TLSA RR %d\n", i);
 					return DANE_TLSA_PARAM_ERR;
-				}//if
+				}
 
 				uint8_t cert_usage, selector, matching_type;
 				uint8_t *association;
@@ -1689,12 +1776,15 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 				association_size = ldns_rdf_size(rdf_association);
 				char *asshex; 
 				asshex = bintohex(association,association_size);
-				add_tlsarecord_bottom(tlsa_list, domain, 1,
+				if (add_tlsarecord_bottom_eat_association(
+				    tlsa_list, domain, 1,
 				    cert_usage, selector, matching_type,
-				    association, association_size, asshex);
-				free(asshex);
+				    association, association_size, asshex) != 0) {
+					free(association);
+					free(asshex);
+				}
 				ldns_rr_free(rr);
-			} //for
+			}
 
 			exitcode = DANE_DNSSEC_SECURED;                
 			if (packet) {
@@ -1709,7 +1799,7 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 			    "Unbound haven't received any TLSA data for %s.\n",
 			    domain);
 			exitcode = DANE_NO_TLSA;
-		} //if
+		}
 	} else if (ub_res->bogus) {
 		exitcode = DANE_DNSSEC_BOGUS;
 		printf_debug(DEBUG_PREFIX, "Domain is bogus: %s \n",
