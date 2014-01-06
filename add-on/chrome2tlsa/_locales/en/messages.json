@@ -13,6 +13,9 @@
 		},
 	"blockhttpstext": {
 		"message": "Cancel HTTPS connection when TLSA validation fail"
+		},
+	"AllHttpstext": {
+		"message": "Enable TLSA validation of all HTTPS requests on the page"
 		},			
 	"filtertext": {
 		"message": "List of domains or TLDs (separated by commas)"

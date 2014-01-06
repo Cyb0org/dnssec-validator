@@ -34,6 +34,11 @@ var DANE = "DANE: ";
 var debuglogout = false;
 var initcache = true;
 var wrongresolver = false;
+var checkall = false;
+//var urlnavigate = null;
+//var isfirst = true;
+//var processId = -1;
+//var frameId = -99;
 
 /* TLSA Validator's internal cache - shared with all window tabs */
 var tlsaExtCache = {
@@ -718,10 +723,36 @@ function onUrlChange(tabId, changeInfo, tab) {
 			var domainport = domain + portpopup;
 			var cacheitem = tlsaExtCache.getRecord(domainport);
 			if (cacheitem[0] == '' && cacheitem[1] == '') {
+
 				ret = TLSAvalidate(scheme, domain, portplugin);
+				block = "no";
+			
+				if (portpopup == "") {
+					tlsaExtCache.addRecord(domain, ret, block);			
+				}
+				else {
+					domain = domain + portcache;
+					tlsaExtCache.addRecord(domain, ret, block);
+				}
+				tlsaExtCache.printContent();
 			}
 			else {
-				ret = cacheitem[0];
+				var current_time = new Date().getTime();
+				if (cacheitem[2] < current_time) {
+					ret = TLSAvalidate(scheme, domain, portplugin);
+					block = "no";
+					if (portpopup == "") {
+						tlsaExtCache.addRecord(domain, ret, block);			
+					}
+					else {
+						domain = domain + portpopup;
+						tlsaExtCache.addRecord(domain, ret, block);
+					}
+					tlsaExtCache.printContent();
+				}
+				else {
+					ret = cacheitem[0];
+				}				
 			}
 		}
 		setTLSASecurityState(tabId, domain+portpopup, ret, scheme);
@@ -763,10 +794,10 @@ function onBeforeRequest(tabId, url) {
 		var cacheitem = tlsaExtCache.getRecord(domainport);
 		if (cacheitem[0] == '' && cacheitem[1] == '') {
 
-		if (debuglogout) {
-			console.log("\nBrowser: onBeforeRequest(TabID: " + 
-			tabId + ", URL: " + url +");");
-		}
+			if (debuglogout) {
+				console.log("\nBrowser: onBeforeRequest(TabID: " + 
+				tabId + ", URL: " + url + ");");
+			}
 
 			ret = TLSAvalidate(scheme, domain, portplugin);
 			block = checkDaneResult(ret, domain);
@@ -823,29 +854,73 @@ function onBeforeRequest(tabId, url) {
 //****************************************************************
 chrome.tabs.onUpdated.addListener(onUrlChange);
 
+//****************************************************************
+// Listen for any onCompleted event of any tab
+//****************************************************************
+/*
+chrome.webNavigation.onCompleted.addListener(function(details) {		
+
+
+	if (processId == details.processId) {
+		if (urlnavigate == details.url)  {
+			if (frameId == details.frameId) {
+				isfirst = true;
+				if (debuglogout) {
+					console.log("\nBrowser: onCompleted(TabID: " + 
+					details.tabId + ", url: " + details.url + ", processId: " + 
+					details.processId + ", frameId  : " + 	details.frameId  +");");
+				}
+			}
+		}
+	}
+});
+*/
+
+//****************************************************************
+// Listen for any onBeforeNavigate event of any tab
+//****************************************************************
+/*
+chrome.webNavigation.onBeforeNavigate.addListener(function(details) {
+	if (isfirst) {
+		urlnavigate = details.url;
+		processId = details.processId;
+		frameId = details.frameId;
+		isfirst = false;
+
+		if (debuglogout) {
+			console.log("\nBrowser: onBeforeNavigate(TabID: " + details.tabId 
+			+ ", url: " + details.url + ", processId: " + details.processId 
+			+ " Parent: " + details.parentFrameId  + ", frameId  : " + details.frameId  +");");
+		}
+	}
+});
+*/
 
 //****************************************************************
 // Listen for any webRequest of any tab
 //****************************************************************
-chrome.webRequest.onBeforeRequest.addListener(
-  function(details) {
+chrome.webRequest.onBeforeRequest.addListener(function(details) {
 
-	debuglogout = localStorage["DebugOutput"];
-	debuglogout = (debuglogout == "false") ? false : true; 
+	checkall = localStorage["AllHttps"]; 
+	checkall = (checkall == "false") ? false : true; 
+	if (checkall) {
 
-	if (details.tabId >= 0) {
-		var cachefree = localStorage["cachefree"];
-		if (cachefree == 1) {
-			tlsaExtCache.delAllRecords();
-			localStorage["cachefree"] = 0;
-			wrongresolver = false;
+		if (details.tabId >= 0) {
+
+			var cachefree = localStorage["cachefree"];
+			if (cachefree == 1) {
+				tlsaExtCache.delAllRecords();
+				localStorage["cachefree"] = 0;
+				wrongresolver = false;
+			}
+			var domain = details.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
+		
+			var block = onBeforeRequest(details.tabId, details.url);
+			if (block == "yes") {
+					return {cancel: details.url.indexOf(domain) != -1};		
+			}
 		}
-		var domain = details.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];		
-		var block = onBeforeRequest(details.tabId, details.url);
-		if (block == "yes") {
-			return {cancel: details.url.indexOf(domain) != -1};		
-		}
-	}	
+	}
 }, {urls: ["<all_urls>"]}, ["blocking"]);
 
 

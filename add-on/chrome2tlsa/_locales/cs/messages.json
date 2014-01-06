@@ -13,6 +13,9 @@
 		},
 	"blockhttpstext": {
 		"message": "Povolit blokování HTTPS spojení TLSA validátorem"
+		},
+	"AllHttpstext": {
+		"message": "Povolit TLSA validaci všech HTTPS spojení na stránce"
 		},		
 	"filtertext": {
 		"message": "Seznam vyřazených domén a TLD (oddělené čárkami)"

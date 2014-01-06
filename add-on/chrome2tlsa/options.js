@@ -156,6 +156,7 @@ function saveOptions() {
 	localStorage["domainfilteron"] = document.tlsaSettings.domainfilteron.checked;
 	localStorage["blockhttps"] = document.tlsaSettings.blockhttps.checked;
 	localStorage["clearcache"] = document.tlsaSettings.clearcache.checked;
+	localStorage["AllHttps"] = document.tlsaSettings.AllHttps.checked;
 	localStorage["domainlist"] = document.tlsaSettings.domainlist.value;
 	var plugin = document.getElementById("tlsa-plugin");
 	plugin.TLSACacheFree();
@@ -339,6 +340,7 @@ window.addEventListener('load',function() {
 	addText("blockhttpstext", chrome.i18n.getMessage("blockhttpstext"));
 	addText("clearcachetext", chrome.i18n.getMessage("clearcachetext"));
 	addText("debugoutputtext", chrome.i18n.getMessage("debugoutputtext"));
+	addText("AllHttpstext", chrome.i18n.getMessage("AllHttpstext"));
 	document.getElementById("testbutton").value=chrome.i18n.getMessage("testbutton");
 	document.getElementById("savebutton").value=chrome.i18n.getMessage("savebutton");
 	document.getElementById("cancelbutton").value=chrome.i18n.getMessage("cancelbutton");
@@ -352,6 +354,7 @@ window.addEventListener('load',function() {
 		var domainfilteron = localStorage["domainfilteron"];
 		var blockhttps = localStorage["blockhttps"];
 		var clearcache = localStorage["clearcache"];
+		var AllHttps = localStorage["AllHttps"];
 		var domainlist = localStorage["domainlist"];
 
 		if (dnssecResolver == undefined) {
@@ -368,9 +371,11 @@ window.addEventListener('load',function() {
 		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;
 		blockhttps = (blockhttps == undefined || blockhttps == "true") ? true : false;
 		clearcache = (clearcache == undefined || clearcache == "false") ? false : true;
+		AllHttps = (AllHttps == undefined || AllHttps == "false") ? false : true;
 	        document.tlsaSettings.domainfilteron.checked = domainfilteron;
 		document.tlsaSettings.blockhttps.checked = blockhttps;
 		document.tlsaSettings.clearcache.checked = clearcache;
+		document.tlsaSettings.AllHttps.checked = AllHttps;
 		var radiogroup = document.tlsaSettings.resolver;
 		for (var i = 0; i < radiogroup.length; i++) {
 			var child = radiogroup[i];
@@ -398,7 +403,9 @@ window.addEventListener('load',function() {
 		clearcache = (clearcache == undefined || clearcache == "false") ? false : true;
 		document.tlsaSettings.clearcache.checked = clearcache;
 		DebugOutput = (DebugOutput == undefined || DebugOutput == "true") ? true : false;
-		document.tlsaSettings.DebugOutput.checked = DebugOutput;		
+		document.tlsaSettings.DebugOutput.checked = DebugOutput;
+		AllHttps = (AllHttps == undefined || AllHttps == "false") ? false : true;
+		document.tlsaSettings.AllHttps.checked = AllHttps;		
 	}  //state
 });
 
