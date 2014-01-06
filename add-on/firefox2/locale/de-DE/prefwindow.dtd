@@ -42,5 +42,7 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY tlsaonoff.accesskey "T">
 <!ENTITY tlsablock.label "Blockiere HTTPS Verbingung wenn TLSA Validierung scheitert">
 <!ENTITY tlsablock.accesskey "H">
+<!ENTITY checkallhttps.label "Validiere mit TLSA alle HTTPS Verbindungen auf der Webpage">
+<!ENTITY checkallhttps.accesskey "A">
 <!ENTITY clearcache.label "Lösche Browser-Cache beim Neustart">
 <!ENTITY clearcache.accesskey "B">

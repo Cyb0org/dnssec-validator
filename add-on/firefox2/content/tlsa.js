@@ -22,7 +22,25 @@ DNSSEC/TLSA Validator 2 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 window.addEventListener("load", function() { daneExtension.init(); }, false);
 window.addEventListener("unload", function() { daneExtension.uninit(); }, false);
 
+
+// **********************************************************************
+/* onPageLoad: observe that page is completed in any tabs or window */
+// **********************************************************************
+function onPageLoad(event) {
+
+	//if (daneExtension.debugOutput)
+	//dump(tlsaValidator.DANE_DEBUG_PRE + "+++++++PAGE WAS LOADED++++++++++++" + tlsaValidator.DANE_DEBUG_POST);
+	if (event.originalTarget instanceof HTMLDocument) {
+		var win = event.originalTarget.defaultView;
+		if (win.frameElement) {
+			win = win.top;
+		}
+	}
+};
+
+// **********************************************
 /* Observe preference changes */
+// **********************************************
 var daneExtPrefObserver = {
 
   _branch: null,
@@ -139,14 +157,14 @@ var tlsaExtCache = {
 var daneExtUrlBarListener = {
 
 	onLocationChange: function(aWebProgress, aRequest, aLocationURI) {
-		//dump('BrowserTLSA: onLocationChange()\n');
+		dump('BrowserTLSA: onLocationChange()\n');
 		var uri = null;
 		uri = window.gBrowser.currentURI;
 		tlsaValidator.processNewURL(aRequest, uri); 	
 	},
 
 	onSecurityChange: function(aWebProgress, aRequest, aState) {
-		//dump('BrowserTLSA: onSecurityChange(' +aState + ')\n');
+		dump('BrowserTLSA: onSecurityChange(' +aState + ')\n');
 		var uri = null;
 		uri = window.gBrowser.currentURI;
 		tlsaValidator.processNewURL(aRequest, uri);
@@ -206,7 +224,7 @@ init: function() {
 
 	// Listen for webpage events
 	gBrowser.addProgressListener(daneExtUrlBarListener);
-
+	gBrowser.addEventListener("load", onPageLoad, true);
 	tlsaExtCache.init();
 
 	var clearcache = dnssecExtPrefs.getBool("clearcache");
@@ -273,6 +291,8 @@ uninit: function() {
     
 	tlsaExtCache.delAllRecords();
 
+	gBrowser.removeEventListener("load", onPageLoad, true);
+
 	if (this.debugOutput) {
 		dump(this.debugPrefix + 'Clear Cache...\n');
 	}
@@ -302,6 +322,9 @@ unregisterObserver: function(topic) {
 //---------------------------------------------------------
 observe: function(channel, topic, data) {
 
+	var checkall = dnssecExtPrefs.getBool("checkhttpsrequestsonpages");
+	if (checkall) {
+
 	if (topic == "http-on-examine-response") {
 		
 		var tlsaonoff = dnssecExtPrefs.getBool("tlsaenable");
@@ -311,7 +334,8 @@ observe: function(channel, topic, data) {
 			channel.QueryInterface(Ci.nsIHttpChannel);	
 			var url = channel.URI.spec;
 			var host = channel.URI.host;
-			var hostport = channel.URI.hostPort;				
+			var hostport = channel.URI.hostPort;
+			var xxx = channel.originalURI.host;				
 					
 			var si = channel.securityInfo;
 			if (!si) return;
@@ -389,6 +413,7 @@ observe: function(channel, topic, data) {
 			dump(tlsaValidator.DANE_DEBUG_POST);	
 		}
 	} //if
+	}//if
 },
 };//class
 
@@ -450,11 +475,11 @@ processNewURL: function(aRequest, aLocationURI) {
 
 	var scheme = null;
 	var asciiHost = null;
-
 	var c = tlsaExtNPAPIConst;
 
 	scheme = aLocationURI.scheme;             // Get URI scheme
 	asciiHost = aLocationURI.asciiHost;       // Get punycoded hostname
+
 
 	if (daneExtension.debugOutput) {
 		dump(this.DANE_DEBUG_PRE + 'Scheme: "' + scheme 
@@ -499,7 +524,7 @@ processNewURL: function(aRequest, aLocationURI) {
 				var cacheitem = tlsaExtCache.getRecord(hostport);
 				if (cacheitem[0] != '') {
 					if (cacheitem[2] < current_time) {
-						tlsa = this.check_tlsa_tab_change(aRequest, asciiHost, port, "tcp");
+						tlsa = this.check_tlsa_tab_change(aRequest, asciiHost, port, "tcp", hostport);
 					} 
 					else {
 						tlsaExtHandler.setSecurityState(cacheitem[0]);
@@ -509,7 +534,7 @@ processNewURL: function(aRequest, aLocationURI) {
 					}
 				} 
 				else {
-					tlsa = this.check_tlsa_tab_change(aRequest, asciiHost, port, "tcp");
+					tlsa = this.check_tlsa_tab_change(aRequest, asciiHost, port, "tcp", hostport);
 				}
 			}
 		}	
@@ -618,7 +643,7 @@ get_invalid_cert_SSLStatus: function(uri) {
 //---------------------------------------------------------
 // check TLSA records when tab or url is changed
 //---------------------------------------------------------
-check_tlsa_tab_change: function (channel, domain, port, protocol) {
+check_tlsa_tab_change: function (channel, domain, port, protocol, hostport) {
 
 	if (daneExtension.debugOutput) {
 		dump(this.DANE_DEBUG_PRE + "------------ TLSA validation start ----------------" + this.DANE_DEBUG_POST); 
@@ -739,8 +764,8 @@ check_tlsa_tab_change: function (channel, domain, port, protocol) {
 	    						domain+ ") was CONFIRMED" + this.DANE_DEBUG_POST); 
 				    		}
 					}	
-					tlsaExtCache.addRecord(domain, daneMatch[0] , block);
-					tlsaExtCache.printContent();
+					//tlsaExtCache.addRecord(domain, daneMatch[0] , block);
+					//tlsaExtCache.printContent();
 				}
 			}
 		}
@@ -748,6 +773,8 @@ check_tlsa_tab_change: function (channel, domain, port, protocol) {
 	if (daneExtension.debugOutput) {
 		dump(this.DANE_DEBUG_PRE + "------------ TLSA validation end ------------------" + this.DANE_DEBUG_POST);
 	}
+	tlsaExtCache.addRecord(hostport, daneMatch[0] , block);
+	tlsaExtCache.printContent();
 	tlsaExtHandler.setSecurityState(daneMatch[0]);
 	return null;
 },
