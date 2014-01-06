@@ -40,6 +40,7 @@ public:
         registerMethod("testEvent", make_method(this, &TLSAValidatorPluginAPI::testEvent));
 	registerMethod("TLSAValidate", make_method(this, &TLSAValidatorPluginAPI::TLSAValidate));
         registerMethod("TLSACacheFree", make_method(this, &TLSAValidatorPluginAPI::TLSACacheFree));
+        registerMethod("TLSACacheInit", make_method(this, &TLSAValidatorPluginAPI::TLSACacheInit));
    //     registerMethod("TLSAValidateAsync", make_method(this, &TLSAValidatorPluginAPI::TLSAValidateAsync));
    //     registerMethod("TLSAValidateAsync_thread", make_method(this, &TLSAValidatorPluginAPI::TLSAValidateAsync_thread));
 
@@ -103,8 +104,8 @@ public:
 
 
 */
-    void TLSACacheFree();
-
+	void TLSACacheFree();
+	void TLSACacheInit();
 
 private:
     TLSAValidatorPluginWeakPtr m_plugin;

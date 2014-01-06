@@ -117,6 +117,11 @@ var dnssecExtension = {
     if (this.debugOutput)
       dump(this.debugPrefix + 'Start of add-on\n');
 
+	var dsp = document.getElementById("dnssec-plugin");
+	dsp.DNSSECCacheInit();
+
+
+
     // Enable asynchronous resolving if desired
     this.getAsyncResolveFlag();
 
@@ -200,7 +205,7 @@ var dnssecExtension = {
 
     //validator.shutdown();
     var dsp = document.getElementById("dnssec-plugin");
-    dsp.CacheFree();
+    dsp.DNSSECCacheFree();
     if (this.debugOutput) 
 	dump(this.debugPrefix + 'Clear Cache...\n');
   },
@@ -351,7 +356,8 @@ var dnssecExtResolver = {
 	var resolvipv4 = true;
     var resolvipv6 = false;
 	var dsp = document.getElementById("dnssec-plugin");
-	dsp.CacheFree();
+	dsp.DNSSECCacheFree();
+	dsp.DNSSECCacheInit();
 	var options = 0;
 	
 	if (dnssecExtension.debugOutput) options |= c.DNSSEC_FLAG_DEBUG;
@@ -403,7 +409,8 @@ var dnssecExtResolver = {
 		if (ext.debugOutput) dump(ext.debugPrefix + "Current resolver does not support DNSSEC!\n");
 		if (ext.debugOutput) dump(ext.debugPrefix + "Results: FWD: " + res + "; NOFWD: " + restmp +"\n");
 		var dsp = document.getElementById("dnssec-plugin");
-		dsp.CacheFree();
+		dsp.DNSSECCacheFree();
+		dsp.DNSSECCacheInit();
 		res=c.DNSSEC_RESOLVER_NO_DNSSEC;
     }//if
 		

@@ -99,10 +99,13 @@ FB::VariantList TLSAValidatorPluginAPI::TLSAValidate(const std::vector<std::stri
 
 void TLSAValidatorPluginAPI::TLSACacheFree()
 {
-    ub_context_free();    
+    dane_validation_deinit();    
 }
 
-
+void TLSAValidatorPluginAPI::TLSACacheInit()
+{
+    dane_validation_init();    
+}
 
 
 

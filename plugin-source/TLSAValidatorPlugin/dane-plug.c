@@ -935,11 +935,15 @@ struct cert_tmp_ctx spkicert(const char *certder, int len)
 {
 	struct cert_tmp_ctx tmp;
 	EVP_PKEY *pkey = NULL;
-	X509* cert;
+	X509 *cert;
 	cert = d2i_X509(NULL, (const unsigned char **) &certder, len);
+	if (cert == NULL) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Error obtaining X509 from hex.\n");				
+	}
 
 	if ((pkey = X509_get_pubkey(cert)) == NULL) {
-		printf_debug(DEBUG_PREFIX_DANE,
+		printf_debug(DEBUG_PREFIX_CER,
 		    "Error getting public key from certificate\n");
 	}
 
@@ -999,7 +1003,8 @@ int add_certrecord_bottom_from_der_hex(struct cert_store_head *cert_list,
 	}
 	memcpy(cert_entry->cert_der_hex, der_hex, hex_len + 1);
 
-	struct cert_tmp_ctx spki = spkicert(der_hex, hex_len);
+	struct cert_tmp_ctx spki = spkicert(cert_entry->cert_der,
+	    cert_entry->cert_len);
 
 	cert_entry->spki_der = spki.spki_der;
 	if (cert_entry->spki_der == NULL) {
@@ -2000,6 +2005,8 @@ int dane_validation_init(void)
 {
 	const SSL_METHOD *method;
 
+	printf_debug(DEBUG_PREFIX_DANE, "Initialising DANE.\n");
+
 	glob_val_ctx.ub = NULL; /* Has separate initialisation procedure. */
 
 	/* Initialise SSL. */
@@ -2216,6 +2223,8 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 // ----------------------------------------------------------------------------
 int dane_validation_deinit(void)
 {
+	printf_debug(DEBUG_PREFIX_DANE, "Deinitialising DANE.\n");
+
 	if (glob_val_ctx.ub != NULL) {
 		ub_ctx_delete(glob_val_ctx.ub);
 		glob_val_ctx.ub = NULL;

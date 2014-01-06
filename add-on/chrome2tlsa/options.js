@@ -160,6 +160,7 @@ function saveOptions() {
 	localStorage["domainlist"] = document.tlsaSettings.domainlist.value;
 	var plugin = document.getElementById("tlsa-plugin");
 	plugin.TLSACacheFree();
+	plugin.TLSACacheInit();
 	document.write("<div>Settings were saved...</div>");
 	document.write("<div>Please, close this window...Thanks</div>");
 	localStorage["cachefree"] = 1;
@@ -221,6 +222,7 @@ function testdnssec() {
 			console.log('INIT parameters: \"'+ dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
 			var plugin = document.getElementById("tlsa-plugin");
 			plugin.TLSACacheFree();
+			plugin.TLSACacheInit();
 			var derCerts = new Array();
 			derCerts.push("XXX");
 			testnic = plugin.TLSAValidate(derCerts, 0, options, nameserver, dn, "443", "tcp", 1);     

@@ -158,7 +158,8 @@ function saveOptions() {
 	localStorage["domainlist"] = document.dnssecSettings.domainlist.value;
 	document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidator\" width=\"0\" height=\"0\"></object>");
         var plugin = document.getElementById("dnssec-plugin");
-	plugin.CacheFree();
+	plugin.DNSSECCacheFree();
+	plugin.DNSSECCacheInit();
 	document.write("<div>Settings were saved...</div>");
 	document.write("<div>Please, close this window...Thanks</div>");
 	window.close();
@@ -218,7 +219,8 @@ function testdnssec() {
 		try {
 			console.log('INIT parameters: \"'+ dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
 			var plugin = document.getElementById("dnssec-plugin");
-			plugin.CacheFree();
+			plugin.DNSSECCacheFree();
+			plugin.DNSSECCacheInit();
 			testnic = plugin.Validate(dn, options, nameserver, addr);	
 			testnic = testnic[0];
 			console.log('RETURN: '+ testnic);

@@ -96,10 +96,17 @@ FB::VariantList DNSSECValidatorPluginAPI::Validate(const std::string& domain, co
     return reslist;
 }
 
-void DNSSECValidatorPluginAPI::CacheFree()
+
+void DNSSECValidatorPluginAPI::DNSSECCacheFree()
 {
-    ub_context_free();    
+    dnssec_validation_deinit();    
 }
+
+void DNSSECValidatorPluginAPI::DNSSECCacheInit()
+{
+    dnssec_validation_init();    
+}
+
 
 bool DNSSECValidatorPluginAPI::ValidateAsync(const std::string& domain, const uint16_t options,
                                        const std::string& optdnssrv, const std::string& ipbrowser, const FB::JSObjectPtr &callback)

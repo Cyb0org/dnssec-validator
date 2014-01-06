@@ -632,6 +632,8 @@ int dnssec_validation_init(void)
 {
 	glob_val_ctx.ub = NULL; /* Has separate initialisation procedure. */
 
+	printf_debug(NULL, "Initialising DNSSEC.\n");
+
 	return 0;
 }
 
@@ -754,6 +756,8 @@ short ds_validate(const char *domain, const uint16_t options,
 // ----------------------------------------------------------------------------
 int dnssec_validation_deinit(void)
 {
+	printf_debug(NULL, "Deinitialising DNSSEC.\n");
+
 	if (glob_val_ctx.ub != NULL) {
 		ub_ctx_delete(glob_val_ctx.ub);
 		glob_val_ctx.ub = NULL;

@@ -40,6 +40,8 @@ var checkall = false;
 //var processId = -1;
 //var frameId = -99;
 
+var init = true;
+
 /* TLSA Validator's internal cache - shared with all window tabs */
 var tlsaExtCache = {
 
@@ -526,6 +528,7 @@ function TLSAvalidate(scheme, domain, port){
 					}
 
 					tlsa.TLSACacheFree();
+					tlsa.TLSACacheInit();
 					options = 0;
 					if (debuglogout) options |= c.DANE_FLAG_DEBUG;
 
@@ -549,6 +552,7 @@ function TLSAvalidate(scheme, domain, port){
 						}
 						result = resultnofwd[0];
 						tlsa.TLSACacheFree();
+						tlsa.TLSACacheInit();
 					}
 					else {
 						if (debuglogout) {
@@ -557,6 +561,7 @@ function TLSAvalidate(scheme, domain, port){
 						result = c.DANE_RESOLVER_NO_DNSSEC;
 						wrongresolver = true;
 						tlsa.TLSACacheFree();
+						tlsa.TLSACacheInit();
 					}	
 				}
 			} catch (ex) {
@@ -935,7 +940,7 @@ var callback = function () {
 // Interenal cache initialization when browser starts
 //****************************************************************
 if (initcache) {
-
+	
 	debuglogout = localStorage["DebugOutput"];
 	debuglogout = (debuglogout == "false") ? false : true; 
 
@@ -951,6 +956,13 @@ if (initcache) {
 			}
 		}	
 	}
+}
+
+
+if (init) {
+	var plugin = document.getElementById("tlsa-plugin");
+	plugin.TLSACacheInit();
+	init = false;
 }
 
 //****************************************************************

@@ -272,7 +272,8 @@ var dnssecExtPrefs = {
      try {
       // Get the binary plugin
       var dsp = document.getElementById("dnssec-plugin");
-      dsp.CacheFree(); 
+      dsp.DNSSECCacheFree(); 
+      dsp.DNSSECCacheInit();
       //dump('TEST parameters: \"'+ dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
       testnic = dsp.Validate(dn, options, nameserver, addr);
       testnic = testnic[0];
@@ -316,8 +317,10 @@ var dnssecExtPrefs = {
   onUnload : function(prefwindow) {      
       var dsp = document.getElementById("dnssec-plugin");
       var dsp2 = document.getElementById("dane-tlsa-plugin");
-      dsp.CacheFree();
+      dsp.DNSSECCacheFree();
       dsp2.TLSACacheFree();
+	dsp.DNSSECCacheInit();
+	dsp2.TLSACacheInit();
       return true;
   },
 

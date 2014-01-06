@@ -211,6 +211,9 @@ init: function() {
 		dump(this.debugPrefix + 'Start of add-on\n');
 	}
 
+	var dsp = document.getElementById("dane-tlsa-plugin");
+	dsp.TLSACacheInit();
+
 	// Set inaction mode (no icon)
 	tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_INACTION);
 
@@ -722,11 +725,13 @@ check_tlsa_tab_change: function (channel, domain, port, protocol, hostport) {
 
 		options = 0;
 		tlsa.TLSACacheFree();
+		tlsa.TLSACacheInit();	
 		var daneMatchnofwd = tlsa.TLSAValidate(derCerts, len, options, "nofwd", domain, port, protocol, policy);
 
 		if (daneMatchnofwd[0] != daneMatch[0]) {
 			daneMatch[0] = c.DANE_RESOLVER_NO_DNSSEC;
-			tlsa.TLSACacheFree();	
+			tlsa.TLSACacheFree();
+			tlsa.TLSACacheInit();		
 		}
 	}
 

@@ -27,6 +27,7 @@ document.write("<body>");
 document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidator\" width=\"0\" height=\"0\"></object>");
 document.write("<script>");
 
+
 // debug pretext
 var DNSSEC = "DNSSEC: ";
 // enable print debug info into debug console
@@ -34,6 +35,7 @@ var debuglogout = false;
 // variables for chrome IP API
 var currentIPList= new Array();
 var currentIPListDomain= new Array();
+var init = true;
 
 // DNSSEC NPAPI constant returned by binary plugin	
 var dnssecExtNPAPIConst = {
@@ -394,7 +396,8 @@ function dnssecvalidate(domain, tabId, tab) {
 			if (debuglogout) {
 				console.log(DNSSEC + "Plugin returns DNSSEC bogus state: Testing why?");
 			}
-			plugin.CacheFree();
+			plugin.DNSSECCacheFree();
+			plugin.DNSSECCacheInit();
 			options = 0;
 			if (debuglogout) options |= c.DNSSEC_FLAG_DEBUG;
 			if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
@@ -417,14 +420,16 @@ function dnssecvalidate(domain, tabId, tab) {
 					console.log(DNSSEC + "   Yes, DNSSEC of domain is really bogus");
 				}
 				result[0] = resultnofwd[0];
-				plugin.CacheFree();
+				plugin.DNSSECCacheFree();
+				plugin.DNSSECCacheInit();
 			}
 			else {
 				if (debuglogout) {
 					console.log(DNSSEC + "   Current resolver does not support DNSSEC!");
 				}
 				result[0] = c.DNSSEC_RESOLVER_NO_DNSSEC;
-				plugin.CacheFree();
+				plugin.DNSSECCacheFree();
+				plugin.DNSSECCacheInit();
 			}	
 		}
 	} catch (ex) {
@@ -599,6 +604,12 @@ chrome.webRequest.onResponseStarted.addListener(function(info) {
 { urls: [], types: [] },  []
 );
 
+
+if (init) {
+	var plugin = document.getElementById("dnssec-plugin");
+	plugin.DNSSECCacheInit();
+	init = false;
+}
 //****************************************************************
 // Listen for any changes to the URL of any tab.
 //****************************************************************

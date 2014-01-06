@@ -53,10 +53,11 @@ public:
     {
         registerMethod("echo",      make_method(this, &DNSSECValidatorPluginAPI::echo));
         registerMethod("testEvent", make_method(this, &DNSSECValidatorPluginAPI::testEvent));
-    registerMethod("CacheFree", make_method(this, &DNSSECValidatorPluginAPI::CacheFree));
-    registerMethod("Validate", make_method(this, &DNSSECValidatorPluginAPI::Validate));
-    registerMethod("ValidateAsync", make_method(this, &DNSSECValidatorPluginAPI::ValidateAsync));
-    registerMethod("ValidateAsync_thread", make_method(this, &DNSSECValidatorPluginAPI::ValidateAsync_thread));
+	registerMethod("DNSSECCacheFree", make_method(this, &DNSSECValidatorPluginAPI::DNSSECCacheFree));
+	registerMethod("DNSSECCacheInit", make_method(this, &DNSSECValidatorPluginAPI::DNSSECCacheInit));
+	registerMethod("Validate", make_method(this, &DNSSECValidatorPluginAPI::Validate));
+	registerMethod("ValidateAsync", make_method(this, &DNSSECValidatorPluginAPI::ValidateAsync));
+	registerMethod("ValidateAsync_thread", make_method(this, &DNSSECValidatorPluginAPI::ValidateAsync_thread));
 
    //     registerMethod("DNSSECValidateAsync", make_method(this, &DNSSECValidatorPluginAPI::DNSSECValidateAsync));
    //     registerMethod("DNSSECValidateAsync_thread", make_method(this, &DNSSECValidatorPluginAPI::DNSSECValidateAsync_thread));
@@ -126,7 +127,8 @@ public:
     bool ValidateAsync(const std::string& domain, const uint16_t options,
                        const std::string& optdnssrv, const std::string& ipbrowser, const FB::JSObjectPtr &callback);
 
-    void CacheFree();
+   void DNSSECCacheFree();
+   void DNSSECCacheInit();
 
 
 
