@@ -263,18 +263,21 @@ int X509_store_add_cert_file(X509_STORE *store, const char *fname)
 
 	fin = fopen(fname, "r");
 	if (fin == NULL) {
-		fprintf(stderr, "Cannot open certificate '%s'.\n", fname);
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Cannot open certificate '%s'.\n", fname);
 		goto fail;
 	}
 
 	x509 = PEM_read_X509(fin, NULL, NULL, NULL);
 	if (x509 == NULL) {
-		fprintf(stderr, "Cannot parse certificate '%s'.\n", fname);
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Cannot parse certificate '%s'.\n", fname);
 		goto fail;
 	}
 
 	if (X509_STORE_add_cert(store, x509) == 0) {
-		fprintf(stderr, "Cannot store certificate '%s'.\n", fname);
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Cannot store certificate '%s'.\n", fname);
 		goto fail;
 	}
 
@@ -315,7 +318,6 @@ int X509_store_load_browser_ca_certificates(X509_STORE *store)
 		 * TODO -- Check for it.
 		 */
 
-		fprintf(stderr, "Opening '%s'.\n", *dirname_p);
 		dir = opendir(*dirname_p);
 		if (dir == NULL) {
 			goto fail;
@@ -1282,14 +1284,16 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 
 		store_ctx = X509_STORE_CTX_new();
 		if (store_ctx == NULL) {
-			fprintf(stderr, "Cannot create store context.\n");
+			printf_debug(DEBUG_PREFIX_CER,
+			    "Cannot create store context.\n");
 			goto fail;
 		}
 
 		if (X509_STORE_CTX_init(store_ctx,
 		         SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx),
 		         cert, chain) == 0) {
-			fprintf(stderr, "Cannot initialise store context.\n");
+			printf_debug(DEBUG_PREFIX_CER,
+			    "Cannot initialise store context.\n");
 			goto fail;
 		}
 
@@ -1298,7 +1302,8 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 		 * context's root CA certs.
 		 */
 		if (X509_verify_cert(store_ctx) <= 0) {
-			fprintf(stderr, "Error validating certificates.\n");
+			printf_debug(DEBUG_PREFIX_CER,
+			    "Error validating certificates.\n");
 			goto fail;
 		}
 
