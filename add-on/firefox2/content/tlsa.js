@@ -157,14 +157,14 @@ var tlsaExtCache = {
 var daneExtUrlBarListener = {
 
 	onLocationChange: function(aWebProgress, aRequest, aLocationURI) {
-		dump('BrowserTLSA: onLocationChange()\n');
+		//dump('BrowserTLSA: onLocationChange()\n');
 		var uri = null;
 		uri = window.gBrowser.currentURI;
 		tlsaValidator.processNewURL(aRequest, uri); 	
 	},
 
 	onSecurityChange: function(aWebProgress, aRequest, aState) {
-		dump('BrowserTLSA: onSecurityChange(' +aState + ')\n');
+		//dump('BrowserTLSA: onSecurityChange(' +aState + ')\n');
 		var uri = null;
 		uri = window.gBrowser.currentURI;
 		tlsaValidator.processNewURL(aRequest, uri);
@@ -438,36 +438,39 @@ var tlsaValidator = {
 // return true if domain name or TLD is in the list of
 // exluded domains else false
 //---------------------------------------------------------
-is_in_domain_list: function(dn) {
+is_in_domain_list: function(domain) {
 
-	var filteron = dnssecExtPrefs.getBool("domainfilter");
-	var validate = true;
-	
-	if (filteron) {
-		var urldomainsepar=/[.]+/;
-		var urldomainarray=dn.split(urldomainsepar);
-		var domainlist = dnssecExtPrefs.getChar("domainlist");
-		var domainlistsepar=/[ ,;]+/;
-		var domainarraylist=domainlist.split(domainlistsepar);
-		var j=0;
-		// TLD
-        	for (j=0;j<domainarraylist.length;j++) { 
-			if (urldomainarray[urldomainarray.length-1] == domainarraylist[j]) {
-				validate=false;
-		            	break;
-			} //if
-		} //for
-
-		// domain.cz
-		if (validate) for (j=0;j<domainarraylist.length;j++) {
-			if (domainarraylist[j].indexOf(urldomainarray[urldomainarray.length-2]) !=-1) {
-				validate=false; 
-		   		break;
+	var result = true;
+ 	var DoaminFilter = dnssecExtPrefs.getBool("domainfilter");
+	if (DoaminFilter) {
+		var DomainSeparator = /[.]+/;
+		var DomainArray = domain.split(DomainSeparator);
+		//if (dnssecExtension.debugOutput) {
+        	//	dump(dnssecExtension.debugPrefix + 'DomainArray: ' + DomainArray + ' #: '+DomainArray.length +'\n');
+		//}
+		var DomainList = dnssecExtPrefs.getChar("domainlist");
+		var DomainListSeparators = /[ ,;]+/;
+		var DomainListArray = DomainList.split(DomainListSeparators);
+		//if (dnssecExtension.debugOutput) {
+        	//	dump(dnssecExtension.debugPrefix + 'domainarraylist: ' + DomainListArray + '\n');
+		//}
+		var i = 0;
+		var j = 0;
+		var domaintmp = DomainArray[DomainArray.length-1];
+		for (i = DomainArray.length-1; i >= 0; i--) {
+			for (j = 0; j < DomainListArray.length; j++) {
+				//if (dnssecExtension.debugOutput) {
+			        //	dump(dnssecExtension.debugPrefix + 'domaintmp: ' +
+				//	 domaintmp + ' == DomainListArray[j]: ' + DomainListArray[j] +'\n');
+				//}
+				if (domaintmp == DomainListArray[j]) {
+					return false;
+				}
 			}
-		}        
-	}//if
-	
-	return validate;
+			domaintmp = DomainArray[i-1] + "." + domaintmp;
+		}
+	}
+	return result;
 },
 
 //---------------------------------------------------------

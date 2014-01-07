@@ -476,42 +476,55 @@ var dnssecExtResolver = {
       dump(ext.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
   },
 
-  //*****************************************************
-  // Called when browser async host lookup completes
-  //*****************************************************
-  onBrowserLookupComplete: function(dn, aRecord) {
+//*****************************************************
+// Return true/false if domain name is in exclude domain list
+//*****************************************************
+ExcludeDomainList: function(domain) {
 
-    var filteron = dnssecExtPrefs.getBool("domainfilter");
-    var validate = true;
+	var result = true;
+ 	var DoaminFilter = dnssecExtPrefs.getBool("domainfilter");
+	if (DoaminFilter) {
+		var DomainSeparator = /[.]+/;
+		var DomainArray = domain.split(DomainSeparator);
+		//if (dnssecExtension.debugOutput) {
+        	//	dump(dnssecExtension.debugPrefix + 'DomainArray: ' + DomainArray + ' #: '+DomainArray.length +'\n');
+		//}
+		var DomainList = dnssecExtPrefs.getChar("domainlist");
+		var DomainListSeparators = /[ ,;]+/;
+		var DomainListArray = DomainList.split(DomainListSeparators);
+		//if (dnssecExtension.debugOutput) {
+        	//	dump(dnssecExtension.debugPrefix + 'domainarraylist: ' + DomainListArray + '\n');
+		//}
+		var i = 0;
+		var j = 0;
+		var domaintmp = DomainArray[DomainArray.length-1];
+		for (i = DomainArray.length-1; i >= 0; i--) {
+			for (j = 0; j < DomainListArray.length; j++) {
+				//if (dnssecExtension.debugOutput) {
+			        //	dump(dnssecExtension.debugPrefix + 'domaintmp: ' +
+				//	 domaintmp + ' == DomainListArray[j]: ' + DomainListArray[j] +'\n');
+				//}
+				if (domaintmp == DomainListArray[j]) {
+					return false;
+				}
+			}
+			domaintmp = DomainArray[i-1] + "." + domaintmp;
+		}
+	}
+	return result;
+},
+
+//*****************************************************
+// Called when browser async host lookup completes
+//*****************************************************
+onBrowserLookupComplete: function(dn, aRecord) {
+
 	var c = dnssecExtNPAPIConst;
-	
-    if (filteron) {
-		var urldomainsepar=/[.]+/;
-		var urldomainarray=dn.split(urldomainsepar);
-		var domainlist = dnssecExtPrefs.getChar("domainlist");
-		var domainlistsepar=/[ ,;]+/;
-		var domainarraylist=domainlist.split(domainlistsepar);
-		var j=0;
-		// TLD
-        for (j=0;j<domainarraylist.length;j++) { 
-            if (urldomainarray[urldomainarray.length-1] == domainarraylist[j]) {
-            	validate=false;
-            	break;
-            } //if
-        } //for
 
-		// xxx.yy
-	 	if (validate) for (j=0;j<domainarraylist.length;j++) {
-		   if (domainarraylist[j].indexOf(urldomainarray[urldomainarray.length-2]) !=-1) {
-		   		validate=false; 
-		   		break;
-		   	}
-        }
-        if (dnssecExtension.debugOutput) 
-        	dump(dnssecExtension.debugPrefix + 'Validate this domain? ' + validate + ';\n');
-    }//if
-
-    if (validate) {
+	if (this.ExcludeDomainList(dn)) {
+		if (dnssecExtension.debugOutput) {
+			dump(dnssecExtension.debugPrefix + 'Validate this domain? YES\n');
+		}
 
     	var resolvipv4 = false; // No IPv4 resolving as default
     	var resolvipv6 = false; // No IPv6 resolving as default
@@ -544,6 +557,9 @@ var dnssecExtResolver = {
 		 this.doNPAPIvalidation(dn, resolvipv4, resolvipv6, aRecord);
      }
      else {
+		if (dnssecExtension.debugOutput) {
+			dump(dnssecExtension.debugPrefix + 'Validate this domain? NO\n');
+		}
      // no DNSSEC validation resolve
         dnssecExtHandler.setSecurityState(c.DNSSEC_OFF);
         // Reset resolving flag
