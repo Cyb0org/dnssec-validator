@@ -449,7 +449,39 @@ function dnssecvalidate(domain, tabId, tab) {
 
 	return [result[0], ipval, addr];
 };
-        
+  
+
+//*****************************************************
+// Return true/false if domain name is in exclude domain list
+//*****************************************************
+function ExcludeDomainList(domain) {
+
+	var result = true;
+ 	var DoaminFilter = localStorage["domainfilteron"];
+	DoaminFilter = (DoaminFilter == "false") ? false : true;
+	if (DoaminFilter) {
+		var DomainSeparator = /[.]+/;
+		var DomainArray = domain.split(DomainSeparator);
+		var DomainList = localStorage["domainlist"];
+		var DomainListSeparators = /[ ,;]+/;
+		var DomainListArray = DomainList.split(DomainListSeparators);
+
+		var i = 0;
+		var j = 0;
+		var domaintmp = DomainArray[DomainArray.length-1];
+		for (i = DomainArray.length-1; i >= 0; i--) {
+			for (j = 0; j < DomainListArray.length; j++) {
+				if (domaintmp == DomainListArray[j]) {
+					return false;
+				}
+			}
+			domaintmp = DomainArray[i-1] + "." + domaintmp;
+		}
+	}
+	return result;
+};
+
+      
 //****************************************************************
 // Called when the url of a tab changes.
 //****************************************************************
@@ -530,54 +562,22 @@ function onUrlChange(tabId, changeInfo, tab) {
 		console.log(DNSSEC + "--------- Start of DNSSEC Validation ("+ domain +") ---------");
 	}
 
-	// get domain filter status
-	var filteron = localStorage["domainfilteron"];
-	// validate thi domain?
-	var validate = true;
-    	if (filteron == "true") {
+	if (ExcludeDomainList(domain)) {
 		if (debuglogout) {
-			console.log(DNSSEC + 'Exclude domain filter: on');
+			console.log(DNSSEC + 'Validate this domain: YES');
 		}
-		var urldomainsepar=/[.]+/;
-		var urldomainarray=domain.split(urldomainsepar);	
-		var domainlist = localStorage["domainlist"];
-		var domainlistsepar=/[ ,;]+/;
-		var domainarraylist=domainlist.split(domainlistsepar);
-		// first TLD
-	        for (j=0;j<domainarraylist.length;j++) { 
-	            if (urldomainarray[urldomainarray.length-1] == domainarraylist[j]) {
-			validate = false; 
-			break;
-		    }//if
-
-        	} // for
-		// domain in format xxx.yy
- 		if (validate) {
- 		   for (j=0;j<domainarraylist.length;j++) {
-		   	if (domainarraylist[j].indexOf(urldomainarray[urldomainarray.length-2]) !=-1) {
-				validate = false;
-				break;
-		   	}//if
-       	            }//for
-		}//if        
-    	}//filteron
-	else {
-		if (debuglogout) {
-			console.log(DNSSEC + 'Exclude domain filter: off');
-			console.log(DNSSEC + 'Validate this domain: ' + validate );
-		}
-		var c = this.dnssecExtNPAPIConst;
-		var statusdnssec = c.DNSSEC_OFF;
-	}
-
-	if (validate) {  
 		var data = dnssecvalidate(domain, tabId, tab);
 		statusdnssec = data[0];
 		var ipval = data[1];
 		var addrs = data[2];
 		setDNSSECSecurityState(tabId, domain, statusdnssec, addrs, ipval);
-        }
+	}
 	else {
+		if (debuglogout) {
+			console.log(DNSSEC + 'Validate this domain: NO');
+		}
+		var c = this.dnssecExtNPAPIConst;
+		var statusdnssec = c.DNSSEC_OFF;
 		setDNSSECSecurityState(tabId, domain, statusdnssec, "n/a", "n/a");
 	}
 

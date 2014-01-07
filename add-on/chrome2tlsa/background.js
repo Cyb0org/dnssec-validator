@@ -434,6 +434,37 @@ function httpscheme(taburl){
 	else return "undefined";	
 };
 
+
+//*****************************************************
+// Return true/false if domain name is in exclude domain list
+//*****************************************************
+function ExcludeDomainList(domain) {
+
+	var result = true;
+ 	var DoaminFilter = localStorage["domainfilteron"];
+	DoaminFilter = (DoaminFilter == "false") ? false : true;
+	if (DoaminFilter) {
+		var DomainSeparator = /[.]+/;
+		var DomainArray = domain.split(DomainSeparator);
+		var DomainList = localStorage["domainlist"];
+		var DomainListSeparators = /[ ,;]+/;
+		var DomainListArray = DomainList.split(DomainListSeparators);
+
+		var i = 0;
+		var j = 0;
+		var domaintmp = DomainArray[DomainArray.length-1];
+		for (i = DomainArray.length-1; i >= 0; i--) {
+			for (j = 0; j < DomainListArray.length; j++) {
+				if (domaintmp == DomainListArray[j]) {
+					return false;
+				}
+			}
+			domaintmp = DomainArray[i-1] + "." + domaintmp;
+		}
+	}
+	return result;
+};
+
 //****************************************************************
 // Main TLSA validation function, call NPAPI plugin, returns TLSA state
 //****************************************************************
@@ -442,51 +473,12 @@ function TLSAvalidate(scheme, domain, port){
 	if (debuglogout) {
 		console.log(DANE + "--------- Start of TLSA Validation ("+ scheme +":"+ domain +":"+ port +") ---------");	
 	}       	   
-	// get domain filter status
-	var filteron = localStorage["domainfilteron"];
-	// validate thi domain?
-	var validate = true;
-    	if (filteron == "true") {
-		if (debuglogout) {
-			console.log(DANE + 'Domain filter: ON');
-		}
-		var urldomainsepar=/[.]+/;
-		var urldomainarray=domain.split(urldomainsepar);	
-		var domainlist = localStorage["domainlist"];
-		var domainlistsepar=/[ ,;]+/;
-		var domainarraylist=domainlist.split(domainlistsepar);
-
-		// first TLD
-	        for (j=0;j<domainarraylist.length;j++) { 
-	            if (urldomainarray[urldomainarray.length-1] == domainarraylist[j]) {
-			validate=false; break;
-		    }//if
-
-        	} // for
-		// domain in format xxx.yy
- 		if (validate) {
- 		   for (j=0;j<domainarraylist.length;j++) {
-		   	if (domainarraylist[j].indexOf(urldomainarray[urldomainarray.length-2]) !=-1) {
-				validate=false;
-				break;
-		   	}//if
-       	            }//for
-		}//if        
-    	}//filteron
-	else {
-		if (debuglogout) {
-			console.log(DANE + 'Domain filter: OFF');
-		}
-	
-	}
-	if (debuglogout) {
-		console.log(DANE + 'Validate this domain: ' + validate );
-	}		
 
     	var c = this.tlsaExtNPAPIConst;
 	var result = c.DANE_OFF;
 
-     	if (validate) { 
+	if (ExcludeDomainList(domain)) {		
+
 		if (scheme == "https" || scheme == "ftps") { 
 		        var resolver = this.getResolver();
 			var options = 0;
