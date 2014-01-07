@@ -38,7 +38,7 @@ OpenSSL used as well as that of the covered work.
 #define NSS_CA_STORE 2 /* NSS built-in CA certificates. */
 
 /* Select which CA store to use. */
-#define CA_STORE NSS_CA_STORE
+#define CA_STORE NONE_CA_STORE
 
 
 #if CA_STORE == NSS_CA_STORE
