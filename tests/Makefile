@@ -23,9 +23,11 @@ OPTFLAGS = -g -O0
 #OPTFLAGS = -g -O3
 CPPFLAGS += -DCMNDLINE_TEST
 CFLAGS_NOSTD += $(INCLUDES) -Wall -Wextra -pedantic $(OPTFLAGS)
+CFLAGS_NOSTD += $(shell pkg-config --cflags nss)
 CFLAGS += $(CFLAGS_NOSTD) -std=c99
 CXXFLAGS += $(INCLUDES) -Wall -Westra -pedantic $(OPTFLAGS)
 LDFLAGS += $(LIBS)
+LDFLAGS += $(shell pkg-config --libs nss)
 
 TARGETS := dane-plug unbound-test-dnssec ssl-test dnssec-plug
 TARGETS_LOCLIBS := dane-plug-loclibs dnssec-plug-loclibs

@@ -32,6 +32,23 @@ OpenSSL used as well as that of the covered work.
 #define _BSD_SOURCE /* S_IFREG */
 #define _POSIX_SOURCE
 
+
+#define NONE_CA_STORE 0 /* No external CA store is loaded. */
+#define DIR_CA_STORE 1 /* CA certificates stored in directories. */
+#define NSS_CA_STORE 2 /* NSS built-in CA certificates. */
+
+/* Select which CA store to use. */
+#define CA_STORE NSS_CA_STORE
+
+
+#if CA_STORE == NSS_CA_STORE
+  #include <base64.h> /* NSS BTOA_DataToAscii() */
+  #include <cert.h> /* NSS CERT_DestroyCertList() */
+  #include <nss.h> /* NSS */
+  #include <pk11func.h> /* NSS ListCertsInSlot() */
+  #include <prlink.h> /* NSPR PR_GetLibraryName() */
+  #include <secmod.h> /* NSS slots, SECMOD_LoadUserModule() */
+#endif /* NSS_CA_STORE */
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -98,15 +115,14 @@ OpenSSL used as well as that of the covered work.
 #define FULL 0
 #define SPKI 1
 
-/* Define BROWSER_CA_STORE in order to add explicit CA certificates. */
-//#define BROWSER_CA_STORE
 
-#ifdef BROWSER_CA_STORE
+#if CA_STORE == DIR_CA_STORE
 /* CA certificate directories. */
 #define MOZILLA_CA_DIR "/usr/share/ca-certificates/mozilla"
 static
 const char *ca_dirs[] = {MOZILLA_CA_DIR, NULL};
-#endif /* BROWSER_CA_STORE */
+#endif /* DIR_CA_STORE */
+
 
 //----------------------------------------------------------------------------
 
@@ -196,10 +212,16 @@ struct dane_validation_ctx {
 	                    * procedure.
 	                    */
 	SSL_CTX *ssl_ctx; /* SSL context. */
+#if CA_STORE == NSS_CA_STORE
+	NSSInitContext *nss_ctx; /* NSS context. */
+#endif /* NSS_CA_STORE */
 };
 static
 struct dane_validation_ctx glob_val_ctx = {
 	{false, false, false}, NULL, NULL
+#if CA_STORE == NSS_CA_STORE
+	, NULL
+#endif /* NSS_CA_STORE */
 };
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
@@ -248,7 +270,7 @@ void ds_init_opts(struct ds_options_st *opts, const uint16_t options)
 }
 
 
-#ifdef BROWSER_CA_STORE
+#if CA_STORE == DIR_CA_STORE
 //*****************************************************************************
 // Load certificate from file and add it to the certificate store
 // ----------------------------------------------------------------------------
@@ -301,9 +323,8 @@ fail:
 // Load all available certificates from the browser CA certificate directory.
 // ----------------------------------------------------------------------------
 static
-int X509_store_load_browser_ca_certificates(X509_STORE *store)
+int X509_store_add_certs_from_dirs(X509_STORE *store, const char **dirname_p)
 {
-	const char **dirname_p;
 	DIR *dir = NULL;
 	struct dirent *ent;
 	struct stat s;
@@ -311,7 +332,11 @@ int X509_store_load_browser_ca_certificates(X509_STORE *store)
 	char aux_path[MAX_PATH_LEN];
 	size_t prefix_len;
 
-	dirname_p = ca_dirs;
+	assert(dirname_p != NULL);
+	if (dirname_p == NULL) {
+		goto fail;
+	}
+
 	while (*dirname_p != NULL) {
 		/*
 		 * Assume that path is a directory.
@@ -363,7 +388,80 @@ fail:
 	return -1;
 #undef MAX_PATH_LEN
 }
-#endif /* BROWSER_CA_STORE */
+#endif /* DIR_CA_STORE */
+
+
+#if CA_STORE == NSS_CA_STORE
+//*****************************************************************************
+// Load all available certificates from the browser CA certificate directory.
+// ----------------------------------------------------------------------------
+static
+int X509_store_add_certs_nssckbi(X509_STORE *store)
+{
+	SECMODModule *secmod = NULL;
+	CERTCertList *cert_list = NULL;
+	CERTCertListNode *cert_node;
+	X509 *x509 = NULL;
+	const unsigned char *der;
+
+//	char *cert_b64 = NULL;
+
+	secmod = SECMOD_LoadUserModule(
+	    "name=\"Root Certs\" library=\"libnssckbi.so\"",
+	    NULL, PR_FALSE);
+	if ((secmod == NULL) || (!secmod->loaded)) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Cannot access NSS builtin CA store.\n");
+		goto fail;
+	}
+
+	for (int i = 0; i < secmod->slotCount; ++i) {
+		cert_list = PK11_ListCertsInSlot(secmod->slots[i]);
+		for(cert_node = CERT_LIST_HEAD(cert_list);
+		    !CERT_LIST_END(cert_node, cert_list);
+		    cert_node = CERT_LIST_NEXT(cert_node)) {
+			der = cert_node->cert->derCert.data;
+
+			x509 = d2i_X509(NULL, &der,
+			    cert_node->cert->derCert.len);
+			if (x509 == NULL) {
+				printf_debug(DEBUG_PREFIX_CER,
+				    "Cannot create X509 from DER.\n");
+			}
+
+			if (X509_STORE_add_cert(store, x509) == 0) {
+				printf_debug(DEBUG_PREFIX_CER,
+				    "Cannot store certificate.\n");
+				goto fail;
+			}
+
+			X509_free(x509); x509 = NULL;
+		}
+		CERT_DestroyCertList(cert_list); cert_list = NULL;
+	}
+
+	if (SECMOD_UnloadUserModule(secmod) != SECSuccess) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Error unloading NSS module.\n");
+	}
+	SECMOD_DestroyModule(secmod); secmod = NULL;
+
+	return 0;
+
+fail:
+	if (secmod != NULL) {
+		SECMOD_UnloadUserModule(secmod);
+		SECMOD_DestroyModule(secmod);
+	}
+	if (cert_list != NULL) {
+		CERT_DestroyCertList(cert_list);
+	}
+	if (x509 != NULL) {
+		X509_free(x509);
+	}
+	return -1;
+}
+#endif /* NSS_CA_STORE */
 
 
 //*****************************************************************************
@@ -1211,11 +1309,11 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 	int i;
 	SSL *ssl = NULL;
 	int server_fd = -1;
-#ifdef BROWSER_CA_STORE
+#if CA_STORE != NONE_CA_STORE
 	X509 *cert = NULL;
 	X509_STORE_CTX *store_ctx = NULL;
 	STACK_OF(X509) *ca_chain = NULL;
-#endif /* BROWSER_CA_STORE */
+#endif /* !NONE_CA_STORE */
 	STACK_OF(X509) *chain;
 	X509 *cert2;
 	EVP_PKEY *pkey = NULL;
@@ -1266,7 +1364,7 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 		goto fail;
 	}
 
-#ifdef BROWSER_CA_STORE
+#if CA_STORE != NONE_CA_STORE
 	{
 		cert = SSL_get_peer_certificate(ssl);
 		if (cert == NULL) {
@@ -1314,7 +1412,7 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 
 		X509_free(cert); cert = NULL;
 	}
-#endif /* BROWSER_CA_STORE */
+#endif /* !NONE_CA_STORE */
 
 	printf_debug(DEBUG_PREFIX_CER, "Number of certificates in chain: %i\n",
 	    sk_X509_num(chain));
@@ -1329,10 +1427,10 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 		}
 	}
 
-#ifdef BROWSER_CA_STORE
+#if CA_STORE != NONE_CA_STORE
 	/* Chain has to be freed explicitly if using CA store. */
 	sk_X509_pop_free(chain, X509_free); chain = ca_chain = NULL;
-#endif /* BROWSER_CA_STORE */
+#endif /* !NONE_CA_STORE */
 
 #ifdef WIN32
 	closesocket(server_fd);
@@ -1363,7 +1461,7 @@ fail:
 		close(server_fd);
 #endif
 	}
-#ifdef BROWSER_CA_STORE
+#if CA_STORE != NONE_CA_STORE
 	if (cert != NULL) {
 		X509_free(cert);
 	}
@@ -1373,7 +1471,7 @@ fail:
 	if (ca_chain != NULL) {
 		sk_X509_pop_free(ca_chain, X509_free);
 	}
-#endif /* BROWSER_CA_STORE */
+#endif /* !NONE_CA_STORE */
 	if (pkey != NULL) {
 		EVP_PKEY_free(pkey);
 	}
@@ -2032,15 +2130,36 @@ int dane_validation_init(void)
 
 	SSL_CTX_set_options(glob_val_ctx.ssl_ctx, SSL_OP_NO_SSLv2);
 
-#ifdef BROWSER_CA_STORE
+#if CA_STORE == DIR_CA_STORE
 	/* Load certificates. */
-	if (X509_store_load_browser_ca_certificates(
-	        SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx)) != 0) {
+	if (X509_store_add_certs_from_dirs(
+	        SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx),
+	        ca_dirs) != 0) {
 		printf_debug(DEBUG_PREFIX_CER,
 		    "Failed loading browser CA cerificates.\n");
 		goto fail;
 	}
-#endif /* BROWSER_CA_STORE */
+#endif /* DIR_CA_STORE */
+
+#if CA_STORE == NSS_CA_STORE
+	NSSInitParameters initparams;
+	memset(&initparams, 0, sizeof(initparams));
+	initparams.length = sizeof(initparams);
+	glob_val_ctx.nss_ctx = NSS_InitContext("", "", "", "", &initparams,
+	    NSS_INIT_READONLY | NSS_INIT_NOCERTDB);
+	if (glob_val_ctx.nss_ctx == NULL) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Unable to create a NSS context structure.\n");
+		goto fail;
+	}
+
+	if (X509_store_add_certs_nssckbi(
+	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx)) != 0) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Failed loading NSS CA cerificates.\n");
+		goto fail;
+	}
+#endif /* NSS_CA_STORE */
 
 	return 0;
 
@@ -2049,12 +2168,12 @@ fail:
 		SSL_CTX_free(glob_val_ctx.ssl_ctx);
 		glob_val_ctx.ssl_ctx = NULL;
 	}
-#ifdef BROWSER_CA_STORE
-	if (glob_val_ctx.ssl_ctx != NULL) {
-		SSL_CTX_free(glob_val_ctx.ssl_ctx);
-		glob_val_ctx.ssl_ctx = NULL;
+#if CA_STORE == NSS_CA_STORE
+	if (glob_val_ctx.nss_ctx != NULL) {
+		NSS_ShutdownContext(glob_val_ctx.nss_ctx);
+		glob_val_ctx.nss_ctx = NULL;
 	}
-#endif /* BROWSER_CA_STORE */
+#endif /* NSS_CA_STORE */
 	return -1;
 }
 
@@ -2239,6 +2358,13 @@ int dane_validation_deinit(void)
 		SSL_CTX_free(glob_val_ctx.ssl_ctx);
 		glob_val_ctx.ssl_ctx = NULL;
 	}
+
+#if CA_STORE == NSS_CA_STORE
+	if (glob_val_ctx.nss_ctx != NULL) {
+		NSS_ShutdownContext(glob_val_ctx.nss_ctx);
+		glob_val_ctx.nss_ctx = NULL;
+	}
+#endif /* NSS_CA_STORE */
 
 	return 0;
 }
