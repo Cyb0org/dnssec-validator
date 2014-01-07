@@ -99,7 +99,7 @@ OpenSSL used as well as that of the covered work.
 #define SPKI 1
 
 /* Define BROWSER_CA_STORE in order to add explicit CA certificates. */
-#define BROWSER_CA_STORE
+//#define BROWSER_CA_STORE
 
 #ifdef BROWSER_CA_STORE
 /* CA certificate directories. */
