@@ -65,14 +65,15 @@ OpenSSL used as well as that of the covered work.
 
 #ifdef RES_WIN
 /* Windows */
-  #include <winreg.h>
-  #include <winsock2.h>
-  #include <ws2tcpip.h>
-  #include <iphlpapi.h>
-
   #include "ldns/config.h"
   #include "ldns/ldns.h"
   #include "libunbound/unbound.h"
+  
+  #include <winsock2.h>
+  #include <ws2tcpip.h>
+  #include <iphlpapi.h>
+  #include <winreg.h>
+  
 #else
 /* Linux */
   #include <sys/stat.h> /* stat(2) */
