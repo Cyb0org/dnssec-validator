@@ -808,6 +808,7 @@ bool CKBBarBand::CreateToolWindow()
 		return true;
 	}
 	*/
+	dnssec_validation_init(); dane_validation_init();
 	return true;
 }
 
@@ -1498,22 +1499,21 @@ void CKBBarBand::CheckDomainStatus(char * url)
 				LeaveCriticalSection(&cs);
 				if (resultipv4==DNSSEC_COT_DOMAIN_BOGUS) {
 				  if (debug) ATLTRACE("DNSSEC: Unbound return bogus state: Testing why?\n");
-				  //ub_context_free();
+				  dnssec_validation_deinit(); dnssec_validation_init(); dane_validation_deinit(); dane_validation_init();
 				  short res = 0 ;
 				  res = TestResolver(domaintmp, ipbrowser4, '4');
 				  if (res==DNSSEC_COT_DOMAIN_BOGUS) {
 					  resultipv4 = 	res;
 					  if (debug) ATLTRACE("DNSSEC: Yes, domain name has bogus\n");
-					  //ub_context_free();
+					  dnssec_validation_deinit(); dnssec_validation_init(); dane_validation_deinit(); dane_validation_init();
 				  }
 				  else 
 				  {					
 					if (debug) ATLTRACE("DNSSEC: Current resolver does not support DNSSEC!\n");
 					wrong = true;
 					resultipv4 = DNSSEC_RESOLVER_NO_DNSSEC;
-					//ub_context_free();
-				  } // if bogus
-				
+					dnssec_validation_deinit(); dnssec_validation_init(); dane_validation_deinit(); dane_validation_init();
+				  } // if bogus				
 				} // if bogus
 		if (debug) ATLTRACE("-------------------------------------------------------\n");			
 		}
@@ -1536,20 +1536,20 @@ void CKBBarBand::CheckDomainStatus(char * url)
 				LeaveCriticalSection(&cs);
 				if (resultipv6==DNSSEC_COT_DOMAIN_BOGUS) {
 				  if (debug) ATLTRACE("DNSSEC: Unbound return bogus state: Testing why?\n");
-				  //ub_context_free();
+				  dnssec_validation_deinit(); dnssec_validation_init(); dane_validation_deinit(); dane_validation_init();
 				  short res = 0 ;
 				  res = TestResolver(domaintmp, ipbrowser6, '6');
 				  if (res==DNSSEC_COT_DOMAIN_BOGUS) {
 					  resultipv6 = 	res;
 					  if (debug) ATLTRACE("DNSSEC: Yes, domain name has bogus\n");
-					  //ub_context_free();
+					  dnssec_validation_deinit(); dnssec_validation_init(); dane_validation_deinit(); dane_validation_init();
 				  }
 				  else 
 				  {					
 					if (debug) ATLTRACE("DNSSEC: Current resolver does not support DNSSEC!\n");
 					wrong = true;					
 					resultipv6 = DNSSEC_RESOLVER_NO_DNSSEC;
-					//ub_context_free();
+					dnssec_validation_deinit(); dnssec_validation_init(); dane_validation_deinit(); dane_validation_init();
 				  } // if bogus
 				
 				} // if bogus
