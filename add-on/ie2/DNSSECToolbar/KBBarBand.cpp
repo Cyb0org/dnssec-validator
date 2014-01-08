@@ -1359,6 +1359,89 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 	res=dnssecresult;
 }//
 
+
+
+/**************************************************************************/
+// Check domain name if is contain in the list of Exclude domain
+// return true if domain havent in the list else false
+// input: domain name from url, enable filter from ini, Excluded Doamin list
+/**************************************************************************/
+bool CKBBarBand::ExcludeDomainList(char *domain, short ExcludeOn, char domainlist[TLD_LIST_MLEN]){
+
+	const int DOMAINLEVEL = 10;
+	const int DOMAINLEN = 256;
+
+	if (domain == NULL) return false;
+	if (domainlist == NULL) return false;
+	int len = strlen(domain);
+	if (len > DOMAINLEN) return false;
+
+	bool validate = true;
+	char str2[TLD_LIST_MLEN] = "";
+	char str1[TLD_LIST_MLEN] = "";
+	char* pch1 = NULL; 
+	char* pch2 = NULL;
+	char* context = NULL;
+	char **text;
+	int i = 0;
+
+	if (ExcludeOn) {
+
+		if (debug) {	
+			ATLTRACE("DomainList: %s\n", domainlist);
+			ATLTRACE("DomainUrl: %s [%i]\n", domain, len);
+		}
+		
+		text = (char **)malloc(DOMAINLEVEL*sizeof(char*));
+		for (i = 0; i < DOMAINLEVEL; i++) {
+			text[i]=(char *) malloc(DOMAINLEN*sizeof(char));
+			strcpy_s(text[i], DOMAINLEN, "");
+		}
+		strncpy_s(str2, sizeof(str2), domainlist, sizeof(str2));
+		strncpy_s(str1, sizeof(str1), domain, sizeof(str1));
+
+		strcpy_s(text[0], DOMAINLEN, domain);
+		pch1 = strtok_s(str1,". ", &context);
+		int i = 1;
+		while (pch1 != NULL && i < 10) {
+			strcpy_s(text[i], DOMAINLEN, context);
+			pch1 = strtok_s (NULL, ". ", &context);
+			i++;
+		} //while	
+
+		int count = 0;
+		for (i = 0; i < DOMAINLEVEL; i++) {
+			if (strcmp (text[i],"") != 0) count = i;
+		}
+
+		for (i = count; i >= 0; i--) {
+			strncpy_s (str2, sizeof(str2), domainlist, sizeof(str2));
+			//if (debug) ATLTRACE("[%i]: %s\n",i, text[i]);
+			pch2 = strtok_s (str2," ,", &context);
+			while (pch2 != NULL) {
+				//if (debug) ATLTRACE("%s == %s\n",text[i],pch2);
+				if (strcmp (pch2,text[i]) == 0) {
+					validate = false;
+					goto cleanup;
+					break;
+				}
+				pch2 = strtok_s (NULL, " ,", &context);
+			} // while		
+		}
+		goto cleanup;
+
+cleanup: 
+		for (i=0; i<DOMAINLEVEL; i++) {
+			free(text[i]);
+		}
+		free(text);
+		goto exit;
+	}
+
+exit: return validate;
+}
+
+
 /**************************************************************************/
 // It checks whether a domain is a DNSSEC domain
 /**************************************************************************/
@@ -1384,82 +1467,7 @@ void CKBBarBand::CheckDomainStatus(char * url)
 	LoadOptionsFromFile();
 	bool validated = true;
 
-	if (filteron) {
-		char str2[TLD_LIST_MLEN] = "";
-		char str1[TLD_LIST_MLEN] = "";
-		//if (debug) ATLTRACE("Domain: %s \n", domain);
-		//if (debug) ATLTRACE("ListTLD: %s \n", listtld);
-		strncpy_s (str1, sizeof(str1), domaintmp, sizeof(str1));
-		strncpy_s (str2, sizeof(str2), listtld, sizeof(str2));
-		char* pch1; 
-		char* pch2;
-		char* context	= NULL;
-		//if (debug) ATLTRACE("%s\n",str1);
-		pch1 = strtok_s (str1,". ", &context);
-		char xxx[10] = "";
-		// ---- tld first --------------------------------
-		while (pch1 != NULL) {
-			//if (debug) ATLTRACE("%s\n",pch1);
-			strncpy_s (xxx, sizeof(xxx), pch1, sizeof(xxx));
-			pch1 = strtok_s (NULL, ". ", &context);		
-		} //while
-		//if (debug) ATLTRACE("-----------%s\n",xxx);
-		
-		pch2 = strtok_s (str2," ,", &context);
-		while (pch2 != NULL) {
-				//if (debug) ATLTRACE("%s\n",pch2);
-				if (strcmp (pch2,xxx) == 0) {
-					validated = false;
-					//if (debug) ATLTRACE("Find tld\n");
-					break;
-				}
-				pch2 = strtok_s (NULL, " ,", &context);
-		} // while
-		//---------------------------------------------------
-		// now xxx.yy format
-		if (validated) {
-		   strncpy_s (str1, sizeof(str1), domaintmp, sizeof(str1));
-		   strncpy_s (str2, sizeof(str2), listtld, sizeof(str2));
-		   //if (debug) ATLTRACE("%s\n",str1);
-		   char* newcontext	= NULL;
-		   char *pch = strstr (str1,"www.");
-		   if (pch != NULL) {
-				pch = strtok_s (str1," .", &newcontext);
-				//if (debug) ATLTRACE("......%s\n",newcontext);		   		   
-				pch2 = strtok_s (str2," ,", &context);	
-				while (pch2 != NULL) {
-					//if (debug) ATLTRACE("1. %s==%s\n",pch2,newcontext);
-					if (strcmp (pch2,newcontext) == 0) {
-						validated = false;
-						//if (debug) ATLTRACE("Find domain\n");
-						break;
-					} // if
-					strncpy_s (str1, sizeof(str1), domaintmp, sizeof(str1));
-					//if (debug) ATLTRACE("2. %s==%s\n",pch2,str1);
-					if (strcmp (pch2,str1) == 0) {
-						validated = false;
-						//if (debug) ATLTRACE("Find domain\n");
-						break;
-					} // if
-					pch2 = strtok_s (NULL, " ,", &context);
-				} //while
-		   }
-		   else {
-				pch2 = strtok_s (str2," ,", &context);	
-				while (pch2 != NULL) {
-					//if (debug) ATLTRACE("%s\n",pch2);
-					if (strcmp (pch2,str1) == 0) {
-						validated = false;
-						//if (debug) ATLTRACE("Find domain\n");
-						break;
-					} // if
-					pch2 = strtok_s (NULL, " ,", &context);
-				} //while
-			} // if
-		}//  now xxx.yy format
-
-
-	} // filteron
+	validated = ExcludeDomainList(domaintmp, filteron, listtld);
 
 	if (validated) {
 		if (debug) ATLTRACE("\n*************** DNSSEC validation Start ***************\n");
@@ -1490,20 +1498,20 @@ void CKBBarBand::CheckDomainStatus(char * url)
 				LeaveCriticalSection(&cs);
 				if (resultipv4==DNSSEC_COT_DOMAIN_BOGUS) {
 				  if (debug) ATLTRACE("DNSSEC: Unbound return bogus state: Testing why?\n");
-				  ub_context_free();
+				  //ub_context_free();
 				  short res = 0 ;
 				  res = TestResolver(domaintmp, ipbrowser4, '4');
 				  if (res==DNSSEC_COT_DOMAIN_BOGUS) {
 					  resultipv4 = 	res;
 					  if (debug) ATLTRACE("DNSSEC: Yes, domain name has bogus\n");
-					  ub_context_free();
+					  //ub_context_free();
 				  }
 				  else 
 				  {					
 					if (debug) ATLTRACE("DNSSEC: Current resolver does not support DNSSEC!\n");
 					wrong = true;
 					resultipv4 = DNSSEC_RESOLVER_NO_DNSSEC;
-					ub_context_free();
+					//ub_context_free();
 				  } // if bogus
 				
 				} // if bogus
@@ -1528,20 +1536,20 @@ void CKBBarBand::CheckDomainStatus(char * url)
 				LeaveCriticalSection(&cs);
 				if (resultipv6==DNSSEC_COT_DOMAIN_BOGUS) {
 				  if (debug) ATLTRACE("DNSSEC: Unbound return bogus state: Testing why?\n");
-				  ub_context_free();
+				  //ub_context_free();
 				  short res = 0 ;
 				  res = TestResolver(domaintmp, ipbrowser6, '6');
 				  if (res==DNSSEC_COT_DOMAIN_BOGUS) {
 					  resultipv6 = 	res;
 					  if (debug) ATLTRACE("DNSSEC: Yes, domain name has bogus\n");
-					  ub_context_free();
+					  //ub_context_free();
 				  }
 				  else 
 				  {					
 					if (debug) ATLTRACE("DNSSEC: Current resolver does not support DNSSEC!\n");
 					wrong = true;					
 					resultipv6 = DNSSEC_RESOLVER_NO_DNSSEC;
-					ub_context_free();
+					//ub_context_free();
 				  } // if bogus
 				
 				} // if bogus

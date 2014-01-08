@@ -631,7 +631,7 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 					EndDialog(hwndDlg, LOWORD(wParam));					
 					// flush all cache items
 					if (cache_del) {
-						ub_context_free();						
+						//ub_context_free();						
 						m_pBarBand->cache_delete_all();
 					}
 					cache_del = 0;
@@ -711,7 +711,7 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 					::EnableWindow(::GetDlgItem(hwndDlg,IDC_IDDNSSEC), FALSE);
 					LoadStringA(GHins, IDS_DNSSECTEST_RUN, strbuf, STR_BUF_S);
 					::SetWindowText(::GetDlgItem(hwndDlg,IDC_DNSSEC_R),strbuf);					
-				    ub_context_free();					
+				    //ub_context_free();					
 					options |= DNSSEC_FLAG_DEBUG;
 					if (::IsDlgButtonChecked(hwndDlg, IDC_R4)) dnsip = "nofwd";
 					else { options |= DNSSEC_FLAG_USEFWD;

@@ -52,7 +52,7 @@ using namespace std;
 #define TB_MAX_SIZE_Y   40
 #define MAX_STR_LEN		1024
 #define IPADDR_MLEN 256
-#define TLD_LIST_MLEN 1024
+#define TLD_LIST_MLEN 2048
 #define KEYTEXT				0
 #define RESOLVER			0
 #define RESOLVER2			0
@@ -248,7 +248,7 @@ public:
 	void CreateIniFile();
 	short TestResolver(char *domain, char *ipbrowser, char IPv);
 	void ShowFwdTooltip(void);
-
+	bool ExcludeDomainList(char *domain, short ExcludeOn, char domainlist[TLD_LIST_MLEN]);
 	static int position; //main position of the icon
 	bool m_bFocus;			
 	HWND hWndNewPane; //status bar pane element
