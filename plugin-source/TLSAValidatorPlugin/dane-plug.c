@@ -41,7 +41,9 @@ OpenSSL used as well as that of the covered work.
 #define WIN_CA_STORE 4 /* Windows CA store. */
 
 /* Select which CA store to use. */
-#define CA_STORE NONE_CA_STORE
+#ifndef CA_STORE
+   #define CA_STORE NONE_CA_STORE
+#endif /* !CA_STORE */
 
 
 #if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
@@ -620,6 +622,7 @@ fail:
 // cert context lenght is in pCertContext->cbCertEncoded
 /**************************************************************************/
 #if defined WIN32 && (CA_STORE == WIN_CA_STORE)
+static
 int X509_store_add_certs_from_win_store(X509_STORE *store)
 {
 #define CERT_NAME_LEN 256
