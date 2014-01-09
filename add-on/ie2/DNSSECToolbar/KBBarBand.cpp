@@ -114,6 +114,56 @@ char str[INET6_ADDRSTRLEN];
 #define PORT_LENGTH_MAX 6            // max lenght of port record
 #define NO_ITEM_IN_CACHE -99         // the item is not in cache           
 
+
+
+
+
+
+//----------------------------------------------------------------------------
+static char byteMap[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+static int byteMapLen = sizeof(byteMap);
+
+
+//*****************************************************************************
+// Utility function to convert nibbles (4 bit values) into a hex character
+// representation.
+// ----------------------------------------------------------------------------
+static
+char nibbleToChar(uint8_t nibble)
+{
+	if (nibble < byteMapLen) return byteMap[nibble];
+	return '*';
+}
+
+//*****************************************************************************
+// Helper function (binary data to hex string conversion)
+// ----------------------------------------------------------------------------
+static
+char * bintohex(const uint8_t *bytes, size_t buflen)
+{
+	char *retval = NULL;
+	unsigned i;
+
+	retval =(char*)malloc(buflen * 2 + 1);
+
+	if (retval == NULL) {
+		return NULL;
+	}
+
+	for (i = 0; i < buflen; ++i) {
+		retval[i * 2] = nibbleToChar(bytes[i] >> 4);
+		retval[i * 2 + 1] = nibbleToChar(bytes[i] & 0x0f);
+	}
+	retval[i * 2] = '\0';
+	return retval;
+}
+
+
+
+
+
+
+
 // cache item structure
 typedef struct Record {
 	char key[DOMAIN_NAME_LENGTH_MAX];
@@ -1449,7 +1499,7 @@ exit: return validate;
 void CKBBarBand::CheckDomainStatus(char * url) 
 {   
 	//if (debug) ATLTRACE("CheckDomainStatus(%s);\n", url);
-  
+	bool x = LoadCaCertFromStore();
 	dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_ACTION);
 	tlsaicon = GetIconIndex(IDI_TLSA_ICON_ACTION);
 	RefreshIcons();
@@ -1697,6 +1747,97 @@ void CKBBarBand::ShowFwdTooltip()
 	SendMessage(hwndTT, TTM_SETTITLE, TTI_WARNING, (LPARAM) tibuf);
 	SendMessage(hwndTT, TTM_UPDATETIPTEXT, 0, (LPARAM) (LPTOOLINFO) &ti);
 }
+
+/**************************************************************************/
+// Load settings from the Windows registry
+/**************************************************************************/
+bool CKBBarBand::LoadCaCertFromStore() {
+
+	if (debug) ATLTRACE("\n----------------------------------------------------\n");	
+	if (debug) ATLTRACE("LoadCaCertFromStore() call\n");	
+
+	HCERTSTORE hSysStore = NULL;
+	if (hSysStore = CertOpenStore(
+		CERT_STORE_PROV_SYSTEM,          // The store provider type
+		0,                               // The encoding type is not needed
+		NULL,                            // Use the default HCRYPTPROV
+		CERT_SYSTEM_STORE_CURRENT_USER,  // Set the store location in a registry location
+		L"Root"                            // The store name as a Unicode string
+   ))
+	{
+		ATLTRACE("The system store was created successfully.\n");
+	}
+	else {
+		ATLTRACE("An error occurred during creation of the system store!\n");
+		return false;
+	}
+
+/*
+	PCCERT_CONTEXT  pDesiredCert = NULL;
+	LPCSTR lpszCertSubject = (LPCSTR) "Microsoft Root Certificate Authority";
+
+	if (pDesiredCert=CertFindCertificateInStore(
+      hSysStore,
+      MY_ENCODING_TYPE,           // Use X509_ASN_ENCODING.
+      0,                          // No dwFlags needed. 
+      CERT_FIND_SUBJECT_STR,      // Find a certificate with a
+                                  // subject that matches the string
+                                  // in the next parameter.
+      lpszCertSubject ,           // The Unicode string to be found
+                                  // in a certificate's subject.
+      NULL))                      // NULL for the first call to the
+                                  // function. In all subsequent
+                                  // calls, it is the last pointer
+                                  // returned by the function.
+{
+  ATLTRACE("The desired certificate was found. \n");
+}
+else
+{
+   ATLTRACE("Could not find the desired certificate.\n");
+}
+
+*/
+	int i = 0;
+	PCCERT_CONTEXT  pCertContext = NULL; 
+	//CRYPT_BIT_BLOB  SubjectUniqueId;
+	while(pCertContext= CertEnumCertificatesInStore(
+      hSysStore,
+      pCertContext)) // on the first call to the function,
+                     // this parameter is NULL 
+                     // on all subsequent calls, 
+                     // this parameter is the last pointer 
+                     // returned by the function
+{
+    //----------------------------------------------------------------
+    // Do whatever is needed for a current certificate.
+	char * cerhex = bintohex(pCertContext->pbCertEncoded, pCertContext->cbCertEncoded);
+	i++;
+	LPTSTR outtext = new TCHAR[256];
+	CertNameToStr(X509_ASN_ENCODING,&pCertContext->pCertInfo->Subject,CERT_SIMPLE_NAME_STR,outtext,256); 
+	ATLTRACE("%i) %s |%lu|\n%s",i, outtext, pCertContext->cbCertEncoded, cerhex);
+	ATLTRACE("'\n\n");
+} // End of while.
+
+	if(CertCloseStore(
+        hSysStore, 
+        CERT_CLOSE_STORE_CHECK_FLAG))
+{
+     ATLTRACE("The file store was closed successfully.\n");
+}
+else
+{
+     ATLTRACE("An error occurred during closing of the file store.\n");
+}
+
+if (pCertContext)
+    CertFreeCertificateContext(pCertContext);
+
+if (debug) ATLTRACE("----------------------------------------------------\n\n");
+return true;
+}
+
+
 
 /**************************************************************************/
 // Load settings from the Windows registry
