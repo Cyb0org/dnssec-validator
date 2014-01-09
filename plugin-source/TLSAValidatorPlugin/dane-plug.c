@@ -36,8 +36,9 @@ OpenSSL used as well as that of the covered work.
 #define NONE_CA_STORE 0 /* No external CA store is loaded. */
 #define DIR_CA_STORE 1 /* CA certificates stored in directories. */
 #define NSS_CA_STORE 2 /* NSS built-in CA certificates. */
-#define NSS_CERT8_CA_STORE 3 /* NSS builtin-in CA certificates + directories
+#define NSS_CERT8_CA_STORE 3 /* NSS built-in CA certificates + directories
                                 with cert8.db, key3.db, secmod.db */
+#define WIN_CA_STORE 4 /* Windows CA store. */
 
 /* Select which CA store to use. */
 #define CA_STORE NONE_CA_STORE
@@ -571,10 +572,6 @@ int X509_store_add_certs_from_cert8_dirs(X509_STORE *store,
 					    "Cannot create X509 from DER.\n");
 				}
 
-				/* 4E:0B:EF:1A:A4:40:5B:A5:17:69:87:30:CA:34:68:43:D0:41:AE:F2 */
-				X509_print_ex_fp(DEBUG_OUTPUT, x509,
-				    XN_FLAG_COMPAT, X509_FLAG_COMPAT);
-
 				if (X509_STORE_add_cert(store, x509) == 0) {
 					printf_debug(DEBUG_PREFIX_CER,
 					    "Cannot store certificate.\n");
@@ -615,6 +612,109 @@ fail:
 #undef MAX_MODSPEC_LEN
 }
 #endif /* NSS_CERT8_CA_STORE */
+
+
+/**************************************************************************/
+// Load settings from the Windows registry
+// cert context in DER format is in pCertContext->pbCertEncoded
+// cert context lenght is in pCertContext->cbCertEncoded
+/**************************************************************************/
+#if defined WIN32 && (CA_STORE == WIN_CA_STORE)
+int X509_store_add_certs_from_win_store(X509_STORE *store)
+{
+#define CERT_NAME_LEN 256
+	HCERTSTORE hSysStore = NULL;
+	PCCERT_CONTEXT pCertContext = NULL;
+	const unsigned char *der;
+	int certcnt = 0;
+	X509 *x509 = NULL;
+
+	printf_debug(DEBUG_PREFIX_CER,
+	    "\n>>------------%s----------------------\n", __func__);
+
+	hSysStore = CertOpenStore(
+		CERT_STORE_PROV_SYSTEM,
+		0,
+		NULL,
+		CERT_SYSTEM_STORE_CURRENT_USER,
+		L"Root"
+		);
+	if (hSysStore == NULL) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Error during accessing Windows CA store.\n");
+		goto fail;
+	}
+	printf_debug(DEBUG_PREFIX_CER,
+	    "The system store was created successfully.\n");
+
+	while ((pCertContext = CertEnumCertificatesInStore(
+	                          hSysStore, pCertContext)) != NULL) {
+#if 0
+		char * cerhex = bintohex(pCertContext->pbCertEncoded,
+		    pCertContext->cbCertEncoded);
+		LPTSTR outtext = (LPTSTR)
+		    malloc(CERT_NAME_LEN * sizeof(TCHAR)+1);
+		CertNameToStr(X509_ASN_ENCODING,
+		    &pCertContext->pCertInfo->Subject, CERT_SIMPLE_NAME_STR,
+		    outtext, CERT_NAME_LEN);
+		printf_debug("","%i) %s |%lu|\n%s",
+		    certcnt, outtext, pCertContext->cbCertEncoded, cerhex);
+		printf_debug("", "\n\n");
+		free(cerhex);
+		free(outtext);
+#endif
+		der = pCertContext->pbCertEncoded;
+
+		x509 = d2i_X509(NULL, &der, pCertContext->cbCertEncoded);
+		if (x509 == NULL) {
+			printf_debug(DEBUG_PREFIX_CER,
+			    "Cannot create X509 from DER.\n");
+		}
+
+		if (X509_STORE_add_cert(store, x509) == 0) {
+			printf_debug(DEBUG_PREFIX_CER,
+			    "Cannot store certificate.\n");
+			goto fail;
+		}
+
+		++certcnt;
+
+		X509_free(x509); x509 = NULL;
+	}
+
+	if (pCertContext) {
+		CertFreeCertificateContext(pCertContext);
+	}
+
+	if (CertCloseStore(hSysStore, CERT_CLOSE_STORE_CHECK_FLAG)) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Win CA store was closed successfully.\n");
+	} else {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Error during closing Win CA store.\n");
+		return -1;
+	}
+
+	printf_debug(DEBUG_PREFIX_CER,
+	    "<<------------%s----------------------\n", __func__);
+
+	return 0;
+
+fail:
+	if (hSysStore != NULL) {
+		CertCloseStore(hSysStore, CERT_CLOSE_STORE_CHECK_FLAG);
+	}
+	if (pCertContext != NULL) {
+		CertFreeCertificateContext(pCertContext);
+	}
+	if (x509 != NULL) {
+		X509_free(x509);
+	}
+	return -1;
+#undef CERT_NAME_LEN
+}
+#endif /* WIN32 && WIN_CA_STORE */
+
 
 
 //*****************************************************************************
@@ -675,7 +775,7 @@ int create_socket(const char *domain, const char *port_str)
 		WSACleanup();
 		return -1;
 	}
-#endif
+#endif /* WIN32 */
 
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_family = AF_UNSPEC;    /* Allow IPv4 or IPv6 */
@@ -1214,64 +1314,6 @@ struct cert_tmp_ctx spkicert(const char *certder, int len)
 	//free(buf2);
 	return tmp;
 }
-
-/**************************************************************************/
-// Load settings from the Windows registry
-// cert context in DER format is in pCertContext->pbCertEncoded
-// cert context lenght is in pCertContext->cbCertEncoded
-/**************************************************************************/
-#ifdef WIN32
-int LoadCaCertFromStore() {
-
-	printf_debug(DEBUG_PREFIX_CER, "\n--------------LoadCaCertFromStore()----------------------\n");	
-
-	const int CERT_NAME_LEN = 256;
-
-	HCERTSTORE hSysStore = NULL;
-	if (hSysStore = CertOpenStore(
-		CERT_STORE_PROV_SYSTEM,
-		0,
-		NULL,
-		CERT_SYSTEM_STORE_CURRENT_USER,
-		L"Root"
-		)) {
-		printf_debug(DEBUG_PREFIX_CER, "The system store was created successfully.\n");
-	} else {
-		printf_debug(DEBUG_PREFIX_CER, "An error occurred during creation of the system store!\n");
-		return -1;
-	}
-
-	int i = 0;
-	PCCERT_CONTEXT  pCertContext = NULL; 
-	while (pCertContext = CertEnumCertificatesInStore(
-					hSysStore, pCertContext
-	)) {
-
-		char * cerhex = bintohex(pCertContext->pbCertEncoded, pCertContext->cbCertEncoded);
-		i++;
-		LPTSTR outtext = (LPTSTR) malloc(CERT_NAME_LEN*sizeof(TCHAR)+1);
-		CertNameToStr(X509_ASN_ENCODING, &pCertContext->pCertInfo->Subject, CERT_SIMPLE_NAME_STR, outtext, CERT_NAME_LEN); 
-		printf_debug("","%i) %s |%lu|\n%s", i, outtext, pCertContext->cbCertEncoded, cerhex);
-		printf_debug("", "\n\n");
-		free(cerhex);
-		free(outtext);
-	}
-
-	if (pCertContext) {
-		CertFreeCertificateContext(pCertContext);
-	}
-
-	if (CertCloseStore(hSysStore, CERT_CLOSE_STORE_CHECK_FLAG)) {
-	     printf_debug(DEBUG_PREFIX_CER, "The file store was closed successfully.\n");
-	} else {
-		printf_debug(DEBUG_PREFIX_CER, "An error occurred during closing of the file store.\n");
-		return -1;
-	}
-
-	printf_debug(DEBUG_PREFIX_CER, "-------------------------------------------------------\n");	
-	return 0;
-}
-#endif
 
 //*****************************************************************************
 // Helper function (add new record in the certificate list - last)
@@ -2384,6 +2426,15 @@ int dane_validation_init(void)
 	}
 #endif /* NSS_CERT8_CA_STORE */
 
+#if defined WIN32 && (CA_STORE == WIN_CA_STORE)
+	if (X509_store_add_certs_from_win_store(
+	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx)) != 0) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Failed loading Windows CA cerificates.\n");
+		goto fail;
+	}
+#endif /* WIN32 && WIN_CA_STORE */
+
 	return 0;
 
 fail:
@@ -2646,10 +2697,6 @@ int main(int argc, char **argv)
 	res = CheckDane(certhex, 0, options, resolver_addresses, dname, port,
 	    "tcp", 1);
 	printf(DEBUG_PREFIX_DANE "Main result: %i\n", res);
-
-#ifdef WIN32
-	int x = LoadCaCertFromStore();
-#endif
 
 	if (dane_validation_deinit() != 0) {
 		printf(DEBUG_PREFIX_DANE "Error de-initialising context.\n");
