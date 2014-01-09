@@ -36,19 +36,21 @@ OpenSSL used as well as that of the covered work.
 #define NONE_CA_STORE 0 /* No external CA store is loaded. */
 #define DIR_CA_STORE 1 /* CA certificates stored in directories. */
 #define NSS_CA_STORE 2 /* NSS built-in CA certificates. */
+#define NSS_CERT8_CA_STORE 3 /* NSS builtin-in CA certificates + directories
+                                with cert8.db, key3.db, secmod.db */
 
 /* Select which CA store to use. */
 #define CA_STORE NONE_CA_STORE
 
 
-#if CA_STORE == NSS_CA_STORE
+#if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
   #include <base64.h> /* NSS BTOA_DataToAscii() */
   #include <cert.h> /* NSS CERT_DestroyCertList() */
   #include <nss.h> /* NSS */
   #include <pk11func.h> /* NSS ListCertsInSlot() */
   #include <prlink.h> /* NSPR PR_GetLibraryName() */
   #include <secmod.h> /* NSS slots, SECMOD_LoadUserModule() */
-#endif /* NSS_CA_STORE */
+#endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -119,10 +121,18 @@ OpenSSL used as well as that of the covered work.
 
 #if CA_STORE == DIR_CA_STORE
 /* CA certificate directories. */
+/* TODO -- These location should be given at configuration time. */
 #define MOZILLA_CA_DIR "/usr/share/ca-certificates/mozilla"
 static
 const char *ca_dirs[] = {MOZILLA_CA_DIR, NULL};
 #endif /* DIR_CA_STORE */
+
+#if CA_STORE == NSS_CERT8_CA_STORE
+/* Directories containing cert8.db. */
+/* TODO -- These directories should be detected automatically (somehow). */
+static
+const char * cert8_ca_dirs[] = {NULL};
+#endif /* NSS_CERT8_CA_STORE */
 
 
 //----------------------------------------------------------------------------
@@ -213,16 +223,16 @@ struct dane_validation_ctx {
 	                    * procedure.
 	                    */
 	SSL_CTX *ssl_ctx; /* SSL context. */
-#if CA_STORE == NSS_CA_STORE
+#if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
 	NSSInitContext *nss_ctx; /* NSS context. */
-#endif /* NSS_CA_STORE */
+#endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
 };
 static
 struct dane_validation_ctx glob_val_ctx = {
 	{false, false, false}, NULL, NULL
-#if CA_STORE == NSS_CA_STORE
+#if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
 	, NULL
-#endif /* NSS_CA_STORE */
+#endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
 };
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
@@ -332,6 +342,7 @@ int X509_store_add_certs_from_dirs(X509_STORE *store, const char **dirname_p)
 #define MAX_PATH_LEN 256
 	char aux_path[MAX_PATH_LEN];
 	size_t prefix_len;
+	int certcnt = 0;
 
 	assert(dirname_p != NULL);
 	if (dirname_p == NULL) {
@@ -343,6 +354,8 @@ int X509_store_add_certs_from_dirs(X509_STORE *store, const char **dirname_p)
 		 * Assume that path is a directory.
 		 * TODO -- Check for it.
 		 */
+
+		certcnt = 0;
 
 		dir = opendir(*dirname_p);
 		if (dir == NULL) {
@@ -372,10 +385,15 @@ int X509_store_add_certs_from_dirs(X509_STORE *store, const char **dirname_p)
 				/* Is file. */
 
 				X509_store_add_cert_file(store, aux_path);
+				++certcnt;
 			}
 		}
-		closedir(dir); dir = NULL;
 
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Added %d certificates from directory '%s'.\n",
+		    certcnt, *dirname_p);
+
+		closedir(dir); dir = NULL;
 		++dirname_p;
 	}
 
@@ -385,25 +403,25 @@ fail:
 	if (dir != NULL) {
 		closedir(dir);
 	}
-
 	return -1;
 #undef MAX_PATH_LEN
 }
 #endif /* DIR_CA_STORE */
 
 
-#if CA_STORE == NSS_CA_STORE
+#if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
 //*****************************************************************************
-// Load all available certificates from the browser CA certificate directory.
+// Load all available certificates from NSS built-in certificates.
 // ----------------------------------------------------------------------------
 static
-int X509_store_add_certs_nssckbi(X509_STORE *store)
+int X509_store_add_certs_from_nssckbi(X509_STORE *store)
 {
 	SECMODModule *secmod = NULL;
 	CERTCertList *cert_list = NULL;
 	CERTCertListNode *cert_node;
 	X509 *x509 = NULL;
 	const unsigned char *der;
+	int certcnt = 0;
 
 //	char *cert_b64 = NULL;
 
@@ -436,6 +454,8 @@ int X509_store_add_certs_nssckbi(X509_STORE *store)
 				goto fail;
 			}
 
+			++certcnt;
+
 			X509_free(x509); x509 = NULL;
 		}
 		CERT_DestroyCertList(cert_list); cert_list = NULL;
@@ -446,6 +466,9 @@ int X509_store_add_certs_nssckbi(X509_STORE *store)
 		    "Error unloading NSS module.\n");
 	}
 	SECMOD_DestroyModule(secmod); secmod = NULL;
+
+	printf_debug(DEBUG_PREFIX_CER, "Added %d built-in NSS certificates.\n",
+	    certcnt);
 
 	return 0;
 
@@ -462,7 +485,125 @@ fail:
 	}
 	return -1;
 }
-#endif /* NSS_CA_STORE */
+#endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
+
+
+#if CA_STORE == NSS_CERT8_CA_STORE
+//*****************************************************************************
+// Load all available certificates from directories containing cert8.db files.
+// ----------------------------------------------------------------------------
+static
+int X509_store_add_certs_from_cert8_dirs(X509_STORE *store,
+    const char **dirname_p)
+{
+	struct stat s;
+#define MAX_MODSPEC_LEN 512
+	char aux_modspec[MAX_MODSPEC_LEN];
+	PK11SlotInfo *slot = NULL;
+	CERTCertList *cert_list = NULL;
+	CERTCertListNode *cert_node;
+	X509 *x509 = NULL;
+	const unsigned char *der;
+	int certcnt = 0;
+
+	assert(dirname_p != NULL);
+	if (dirname_p == NULL) {
+		goto fail;
+	}
+
+	while (*dirname_p != NULL) {
+		/*
+		 * Assume that path is a directory.
+		 * TODO -- Check for it.
+		 */
+
+		certcnt = 0;
+
+		if((stat(*dirname_p, &s) != 0) || !(s.st_mode & S_IFDIR)) {
+			printf_debug(DEBUG_PREFIX_CER,
+			    "Cannot access directory '%s'.\n", *dirname_p);
+			continue;
+		}
+		/* Is directory. */
+
+		if (snprintf(aux_modspec, MAX_MODSPEC_LEN,
+		        " name=\"Directory Certs\" " \
+		        " configdir='%s' " \
+		        " certPrefix='' " \
+		        " keyPrefix='' " \
+		        " flags=readOnly,noKeyDB ", *dirname_p) >=
+		    MAX_MODSPEC_LEN) {
+			/* Output truncated. */
+			printf_debug(DEBUG_PREFIX_CER,
+			    "Cannot work with directory '%s'.\n", *dirname_p);
+			continue;
+		}
+
+		slot = SECMOD_OpenUserDB(aux_modspec);
+		if (slot == NULL) {
+			printf_debug(DEBUG_PREFIX_CER,
+			    "Error loading user database.\n");
+			goto fail;
+		}
+
+		cert_list = PK11_ListCertsInSlot(slot);
+		if (cert_list != NULL) {
+			for(cert_node = CERT_LIST_HEAD(cert_list);
+		    !CERT_LIST_END(cert_node, cert_list);
+		    cert_node = CERT_LIST_NEXT(cert_node)) {
+				der = cert_node->cert->derCert.data;
+
+				x509 = d2i_X509(NULL, &der,
+				    cert_node->cert->derCert.len);
+				if (x509 == NULL) {
+					printf_debug(DEBUG_PREFIX_CER,
+					    "Cannot create X509 from DER.\n");
+				}
+
+				/* 4E:0B:EF:1A:A4:40:5B:A5:17:69:87:30:CA:34:68:43:D0:41:AE:F2 */
+				X509_print_ex_fp(DEBUG_OUTPUT, x509,
+				    XN_FLAG_COMPAT, X509_FLAG_COMPAT);
+
+				if (X509_STORE_add_cert(store, x509) == 0) {
+					printf_debug(DEBUG_PREFIX_CER,
+					    "Cannot store certificate.\n");
+					goto fail;
+				}
+
+				++certcnt;
+
+				X509_free(x509); x509 = NULL;
+			}
+			CERT_DestroyCertList(cert_list); cert_list = NULL;
+		}
+
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Added %d NSS certificates from directory '%s'.\n",
+		    certcnt, *dirname_p);
+
+		SECMOD_CloseUserDB(slot);
+		PK11_FreeSlot(slot); slot = NULL;
+
+		++dirname_p;
+	}
+
+	return 0;
+
+fail:
+	if (slot != NULL) {
+		SECMOD_CloseUserDB(slot);
+		PK11_FreeSlot(slot);
+	}
+	if (cert_list != NULL) {
+		CERT_DestroyCertList(cert_list);
+	}
+	if (x509 != NULL) {
+		X509_free(x509);
+	}
+	return -1;
+#undef MAX_MODSPEC_LEN
+}
+#endif /* NSS_CERT8_CA_STORE */
 
 
 //*****************************************************************************
@@ -2142,7 +2283,7 @@ int dane_validation_init(void)
 	}
 #endif /* DIR_CA_STORE */
 
-#if CA_STORE == NSS_CA_STORE
+#if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
 	NSSInitParameters initparams;
 	memset(&initparams, 0, sizeof(initparams));
 	initparams.length = sizeof(initparams);
@@ -2153,14 +2294,26 @@ int dane_validation_init(void)
 		    "Unable to create a NSS context structure.\n");
 		goto fail;
 	}
+#endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
 
-	if (X509_store_add_certs_nssckbi(
+#if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
+	if (X509_store_add_certs_from_nssckbi(
 	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx)) != 0) {
 		printf_debug(DEBUG_PREFIX_CER,
-		    "Failed loading NSS CA cerificates.\n");
+		    "Failed loading NSS built-in CA cerificates.\n");
 		goto fail;
 	}
-#endif /* NSS_CA_STORE */
+#endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
+
+#if CA_STORE == NSS_CERT8_CA_STORE
+	if (X509_store_add_certs_from_cert8_dirs(
+	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx),
+	    cert8_ca_dirs) != 0) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Failed loading NSS CA cerificates from cert8.db.\n");
+		goto fail;
+	}
+#endif /* NSS_CERT8_CA_STORE */
 
 	return 0;
 
@@ -2169,12 +2322,12 @@ fail:
 		SSL_CTX_free(glob_val_ctx.ssl_ctx);
 		glob_val_ctx.ssl_ctx = NULL;
 	}
-#if CA_STORE == NSS_CA_STORE
+#if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
 	if (glob_val_ctx.nss_ctx != NULL) {
 		NSS_ShutdownContext(glob_val_ctx.nss_ctx);
 		glob_val_ctx.nss_ctx = NULL;
 	}
-#endif /* NSS_CA_STORE */
+#endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
 	return -1;
 }
 
@@ -2360,12 +2513,12 @@ int dane_validation_deinit(void)
 		glob_val_ctx.ssl_ctx = NULL;
 	}
 
-#if CA_STORE == NSS_CA_STORE
+#if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
 	if (glob_val_ctx.nss_ctx != NULL) {
 		NSS_ShutdownContext(glob_val_ctx.nss_ctx);
 		glob_val_ctx.nss_ctx = NULL;
 	}
-#endif /* NSS_CA_STORE */
+#endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
 
 	return 0;
 }
@@ -2413,6 +2566,9 @@ int main(int argc, char **argv)
 	options =
 	    DANE_FLAG_DEBUG |
 	    DANE_FLAG_USEFWD;
+
+	/* Apply options. */
+	ds_init_opts(&glob_val_ctx.opts, options);
 
 	if (dane_validation_init() != 0) {
 		printf(DEBUG_PREFIX_DANE "Error initialising context.\n");

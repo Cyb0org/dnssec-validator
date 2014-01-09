@@ -804,6 +804,9 @@ int main(int argc, char **argv)
 	    DNSSEC_FLAG_RESOLVIPV4 |
 	    DNSSEC_FLAG_RESOLVIPV6;
 
+	/* Apply options. */
+	ds_init_opts(&glob_val_ctx.opts, options);
+
 	if (dnssec_validation_init() != 0) {
 		printf(DEBUG_PREFIX "Error initialising context.\n");
 		return 1;
