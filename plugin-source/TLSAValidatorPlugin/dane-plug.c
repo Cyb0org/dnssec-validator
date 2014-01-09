@@ -1220,6 +1220,7 @@ struct cert_tmp_ctx spkicert(const char *certder, int len)
 // cert context in DER format is in pCertContext->pbCertEncoded
 // cert context lenght is in pCertContext->cbCertEncoded
 /**************************************************************************/
+#ifdef WIN32
 int LoadCaCertFromStore() {
 
 	printf_debug(DEBUG_PREFIX_CER, "\n--------------LoadCaCertFromStore()----------------------\n");	
@@ -1270,6 +1271,7 @@ int LoadCaCertFromStore() {
 	printf_debug(DEBUG_PREFIX_CER, "-------------------------------------------------------\n");	
 	return 0;
 }
+#endif
 
 //*****************************************************************************
 // Helper function (add new record in the certificate list - last)
@@ -2645,7 +2647,9 @@ int main(int argc, char **argv)
 	    "tcp", 1);
 	printf(DEBUG_PREFIX_DANE "Main result: %i\n", res);
 
+#ifdef WIN32
 	int x = LoadCaCertFromStore();
+#endif
 
 	if (dane_validation_deinit() != 0) {
 		printf(DEBUG_PREFIX_DANE "Error de-initialising context.\n");
