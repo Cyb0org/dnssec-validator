@@ -70,12 +70,23 @@ OpenSSL used as well as that of the covered work.
   #include "ldns/config.h"
   #include "ldns/ldns.h"
   #include "libunbound/unbound.h"
-  
+
+  #include <wincrypt.h>
   #include <winsock2.h>
   #include <ws2tcpip.h>
   #include <iphlpapi.h>
   #include <winreg.h>
-  
+
+  #define MY_ENCODING_TYPE  (PKCS_7_ASN_ENCODING | X509_ASN_ENCODING)  
+
+  #ifndef CERT_SYSTEM_STORE_CURRENT_USER
+    #define CERT_SYSTEM_STORE_CURRENT_USER 0x00010000
+  #endif 
+
+  #ifndef CCERT_CLOSE_STORE_CHECK_FLAG
+    #define CERT_CLOSE_STORE_CHECK_FLAG 0x00000002
+  #endif
+
 #else
 /* Linux */
   #include <sys/stat.h> /* stat(2) */
@@ -1202,6 +1213,62 @@ struct cert_tmp_ctx spkicert(const char *certder, int len)
 	EVP_PKEY_free(pkey);
 	//free(buf2);
 	return tmp;
+}
+
+/**************************************************************************/
+// Load settings from the Windows registry
+// cert context in DER format is in pCertContext->pbCertEncoded
+// cert context lenght is in pCertContext->cbCertEncoded
+/**************************************************************************/
+int LoadCaCertFromStore() {
+
+	printf_debug(DEBUG_PREFIX_CER, "\n--------------LoadCaCertFromStore()----------------------\n");	
+
+	const int CERT_NAME_LEN = 256;
+
+	HCERTSTORE hSysStore = NULL;
+	if (hSysStore = CertOpenStore(
+		CERT_STORE_PROV_SYSTEM,
+		0,
+		NULL,
+		CERT_SYSTEM_STORE_CURRENT_USER,
+		L"Root"
+		)) {
+		printf_debug(DEBUG_PREFIX_CER, "The system store was created successfully.\n");
+	} else {
+		printf_debug(DEBUG_PREFIX_CER, "An error occurred during creation of the system store!\n");
+		return -1;
+	}
+
+	int i = 0;
+	PCCERT_CONTEXT  pCertContext = NULL; 
+	while (pCertContext = CertEnumCertificatesInStore(
+					hSysStore, pCertContext
+	)) {
+
+		char * cerhex = bintohex(pCertContext->pbCertEncoded, pCertContext->cbCertEncoded);
+		i++;
+		LPTSTR outtext = (LPTSTR) malloc(CERT_NAME_LEN*sizeof(TCHAR)+1);
+		CertNameToStr(X509_ASN_ENCODING, &pCertContext->pCertInfo->Subject, CERT_SIMPLE_NAME_STR, outtext, CERT_NAME_LEN); 
+		printf_debug("","%i) %s |%lu|\n%s", i, outtext, pCertContext->cbCertEncoded, cerhex);
+		printf_debug("", "\n\n");
+		free(cerhex);
+		free(outtext);
+	}
+
+	if (pCertContext) {
+		CertFreeCertificateContext(pCertContext);
+	}
+
+	if (CertCloseStore(hSysStore, CERT_CLOSE_STORE_CHECK_FLAG)) {
+	     printf_debug(DEBUG_PREFIX_CER, "The file store was closed successfully.\n");
+	} else {
+		printf_debug(DEBUG_PREFIX_CER, "An error occurred during closing of the file store.\n");
+		return -1;
+	}
+
+	printf_debug(DEBUG_PREFIX_CER, "-------------------------------------------------------\n");	
+	return 0;
 }
 
 //*****************************************************************************
@@ -2523,7 +2590,6 @@ int dane_validation_deinit(void)
 	return 0;
 }
 
-
 #ifdef CMNDLINE_TEST
 
 const char *certhex[] = {"12345678"};
@@ -2578,6 +2644,8 @@ int main(int argc, char **argv)
 	res = CheckDane(certhex, 0, options, resolver_addresses, dname, port,
 	    "tcp", 1);
 	printf(DEBUG_PREFIX_DANE "Main result: %i\n", res);
+
+	int x = LoadCaCertFromStore();
 
 	if (dane_validation_deinit() != 0) {
 		printf(DEBUG_PREFIX_DANE "Error de-initialising context.\n");
