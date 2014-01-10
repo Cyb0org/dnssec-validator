@@ -115,10 +115,6 @@ char str[INET6_ADDRSTRLEN];
 #define NO_ITEM_IN_CACHE -99         // the item is not in cache           
 
 
-
-
-
-
 //----------------------------------------------------------------------------
 static char byteMap[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 static int byteMapLen = sizeof(byteMap);
@@ -157,12 +153,6 @@ char * bintohex(const uint8_t *bytes, size_t buflen)
 	retval[i * 2] = '\0';
 	return retval;
 }
-
-
-
-
-
-
 
 // cache item structure
 typedef struct Record {
@@ -816,12 +806,18 @@ LRESULT CKBBarBand::WndProc(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lPar
 bool CKBBarBand::CreateToolWindow()
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState()); // Needed for any MFC usage in DLL
-	//if (debug) ATLTRACE("CreateToolWindow():\n");
+	if (debug) ATLTRACE("CreateToolWindow():\n");
 	CRect rcClientParent;
 	rcClientParent2=rcClientParent;
 	CWnd* pWndParent = CWnd::FromHandle(m_hWndParent);
 	pWndParent->GetClientRect(&rcClientParent);
 	
+	int ret;
+	ret = dnssec_validation_init(); 
+	if (debug) ATLTRACE("dnssec_validation_init(%d):\n",ret);
+
+	ret =  dane_validation_init();
+	if (debug) ATLTRACE("dane_validation_init(%d):\n",ret);
 	// Create ini file if not exists
 	CreateIniFile();
 
@@ -858,7 +854,7 @@ bool CKBBarBand::CreateToolWindow()
 		return true;
 	}
 	*/
-	dnssec_validation_init(); dane_validation_init();
+
 	return true;
 }
 
@@ -1410,8 +1406,6 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 	res=dnssecresult;
 }//
 
-
-
 /**************************************************************************/
 // Check domain name if is contain in the list of Exclude domain
 // return true if domain havent in the list else false
@@ -1492,14 +1486,12 @@ cleanup:
 exit: return validate;
 }
 
-
 /**************************************************************************/
 // It checks whether a domain is a DNSSEC domain
 /**************************************************************************/
 void CKBBarBand::CheckDomainStatus(char * url) 
 {   
 	//if (debug) ATLTRACE("CheckDomainStatus(%s);\n", url);
-	bool x = LoadCaCertFromStore();
 	dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_ACTION);
 	tlsaicon = GetIconIndex(IDI_TLSA_ICON_ACTION);
 	RefreshIcons();
@@ -1749,7 +1741,7 @@ void CKBBarBand::ShowFwdTooltip()
 }
 
 /**************************************************************************/
-// Load settings from the Windows registry
+// Load CA certificate from windows cet store - not used since 2.1.0
 /**************************************************************************/
 bool CKBBarBand::LoadCaCertFromStore() {
 
@@ -1772,32 +1764,6 @@ bool CKBBarBand::LoadCaCertFromStore() {
 		return false;
 	}
 
-/*
-	PCCERT_CONTEXT  pDesiredCert = NULL;
-	LPCSTR lpszCertSubject = (LPCSTR) "Microsoft Root Certificate Authority";
-
-	if (pDesiredCert=CertFindCertificateInStore(
-      hSysStore,
-      MY_ENCODING_TYPE,           // Use X509_ASN_ENCODING.
-      0,                          // No dwFlags needed. 
-      CERT_FIND_SUBJECT_STR,      // Find a certificate with a
-                                  // subject that matches the string
-                                  // in the next parameter.
-      lpszCertSubject ,           // The Unicode string to be found
-                                  // in a certificate's subject.
-      NULL))                      // NULL for the first call to the
-                                  // function. In all subsequent
-                                  // calls, it is the last pointer
-                                  // returned by the function.
-{
-  ATLTRACE("The desired certificate was found. \n");
-}
-else
-{
-   ATLTRACE("Could not find the desired certificate.\n");
-}
-
-*/
 	int i = 0;
 	PCCERT_CONTEXT  pCertContext = NULL; 
 	//CRYPT_BIT_BLOB  SubjectUniqueId;
@@ -1836,8 +1802,6 @@ if (pCertContext)
 if (debug) ATLTRACE("----------------------------------------------------\n\n");
 return true;
 }
-
-
 
 /**************************************************************************/
 // Load settings from the Windows registry
