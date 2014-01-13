@@ -38,7 +38,8 @@ OpenSSL used as well as that of the covered work.
 #define NSS_CA_STORE 2 /* NSS built-in CA certificates. */
 #define NSS_CERT8_CA_STORE 3 /* NSS built-in CA certificates + directories
                                 with cert8.db, key3.db, secmod.db */
-#define WIN_CA_STORE 4 /* Windows CA store. */
+#define OSX_CA_STORE 4 /* Mac OS X CA store. */
+#define WIN_CA_STORE 5 /* Windows CA store. */
 
 /* Select which CA store to use. */
 #ifndef CA_STORE
@@ -68,7 +69,7 @@ OpenSSL used as well as that of the covered work.
 #include "dane-plug.h"
 #include "dane-states.gen"
 
-#ifdef RES_WIN
+#if defined RES_WIN
 /* Windows */
   #include "ldns/config.h"
   #include "ldns/ldns.h"
@@ -89,6 +90,24 @@ OpenSSL used as well as that of the covered work.
   #ifndef CCERT_CLOSE_STORE_CHECK_FLAG
     #define CERT_CLOSE_STORE_CHECK_FLAG 0x00000002
   #endif
+
+#elif defined RES_OSX
+/* OS X */
+  #include <sys/stat.h> /* stat(2) */
+  #include <sys/types.h>
+  #include <sys/socket.h>
+  
+  #include <arpa/inet.h>
+  #include <dirent.h> /* opendir(3) */
+  #include <netdb.h>
+  #include <netinet/in.h>
+  #include <unistd.h> /* stat(3) */
+
+  #include "ldns/ldns.h"
+  #include "ldns/packet.h"
+  #include "unbound.h"
+
+  int X509_store_add_certs_from_osx_store(X509_STORE *store);
 
 #else
 /* Linux */
@@ -2428,6 +2447,15 @@ int dane_validation_init(void)
 		goto fail;
 	}
 #endif /* NSS_CERT8_CA_STORE */
+
+#if CA_STORE == OSX_CA_STORE
+	if (X509_store_add_certs_from_osx_store(
+	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx)) != 0) {
+		printf_debug(DEBUG_PREFIX_CER,
+		    "Failed loading OS X CA cerificates.\n");
+		goto fail;
+	}
+#endif /* OSX_CA_STORE */
 
 #if defined WIN32 && (CA_STORE == WIN_CA_STORE)
 	if (X509_store_add_certs_from_win_store(
