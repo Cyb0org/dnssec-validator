@@ -1536,7 +1536,7 @@ void CKBBarBand::CheckDomainStatus(char * url)
 				wrong = false;
 				EnterCriticalSection(&cs);
 				if (debug) ATLTRACE("DNSSEC: IPv4 request: %s, %d, %s, %s\n", domaintmp, options, dnsip, ipbrowser4);
-				resultipv4 = ds_validate(domaintmp, options, dnsip, ipbrowser4, &ipvalidator4tmp);	
+				resultipv4 = dnssec_validate(domaintmp, options, dnsip, ipbrowser4, &ipvalidator4tmp);	
 				if (debug) ATLTRACE("DNSSEC: IPv4 result: %s, %d, %s\n", domaintmp, resultipv4, ipvalidator4tmp); 				
 				LeaveCriticalSection(&cs);
 				if (resultipv4==DNSSEC_COT_DOMAIN_BOGUS) {
@@ -1573,7 +1573,7 @@ void CKBBarBand::CheckDomainStatus(char * url)
 				wrong = false;
 				EnterCriticalSection(&cs);
 				if (debug) ATLTRACE("DNSSEC: IPv6 request: %s, %d, %s, %s\n", domaintmp, options, dnsip, ipbrowser6);
-				resultipv6 = ds_validate(domaintmp, options, dnsip, ipbrowser6, &ipvalidator6);
+				resultipv6 = dnssec_validate(domaintmp, options, dnsip, ipbrowser6, &ipvalidator6);
 				if (debug) ATLTRACE("DNSSEC: IPv6 result: %s, %d, %s\n", domaintmp, resultipv6, ipvalidator6); 
 				LeaveCriticalSection(&cs);
 				if (resultipv6==DNSSEC_COT_DOMAIN_BOGUS) {
@@ -1634,7 +1634,7 @@ void CKBBarBand::CheckDomainStatus(char * url)
 							EnterCriticalSection(&cs);
 							const char* certhex[] = {"FF"};
 							if (debug) ATLTRACE("DANE: Plugin inputs: %s, %d, %d, %s, %s, %s, %s, %d\n", certhex[0], 0, options, dnsip, domaintmp, port, "tcp", 1);
-							tlsaresult = CheckDane(certhex, 0, options, dnsip, domaintmp, port, "tcp", 1);
+							tlsaresult = dane_validate(certhex, 0, options, dnsip, domaintmp, port, "tcp", 1);
 							if (debug) ATLTRACE("DANE: Plugin result: %s: %d\n", domaintmp, tlsaresult);
 							LeaveCriticalSection(&cs);
 							cache_update_item(DaneCache, UrlStructData.domainport, port, tlsaresult, false, now + CACHE_EXPIR_TIME, item);
@@ -1646,7 +1646,7 @@ void CKBBarBand::CheckDomainStatus(char * url)
 						EnterCriticalSection(&cs);
 						const char* certhex[] = {"FF"};
 						if (debug) ATLTRACE("DANE: plugin inputs: %s, %d, %d, %s, %s, %s, %s, %d\n", certhex[0], 0, options, dnsip, domaintmp, port, "tcp", 1);
-						tlsaresult = CheckDane(certhex, 0, options, dnsip, domaintmp, port, "tcp", 1);
+						tlsaresult = dane_validate(certhex, 0, options, dnsip, domaintmp, port, "tcp", 1);
 						if (debug) ATLTRACE("DANE: plugin result: %s: %d\n", domaintmp, tlsaresult);
 						LeaveCriticalSection(&cs);
 						cache_add_item(DaneCache, UrlStructData.domainport, port, tlsaresult, false, now + CACHE_EXPIR_TIME);
@@ -1710,7 +1710,7 @@ short CKBBarBand::TestResolver(char *domain, char *ipbrowser, char IPv)
 	EnterCriticalSection(&cs);
 	//if (debug) ATLTRACE("Critical section begin\n");
 	if (debug) ATLTRACE("TEST DNSSEC: %s : %d : %s : %s\n", domain, options, "nowfd", ipbrowser);
-	res = ds_validate(domain, options, "nowfd", ipbrowser, &ipvalidator);
+	res = dnssec_validate(domain, options, "nowfd", ipbrowser, &ipvalidator);
 	if (debug) ATLTRACE("TEST DNSSEC result: %d : %s\n", res, ipvalidator); 
 	LeaveCriticalSection(&cs);
 	return res;

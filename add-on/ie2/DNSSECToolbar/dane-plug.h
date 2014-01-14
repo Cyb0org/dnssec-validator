@@ -69,7 +69,7 @@ int dane_validation_init(void);
 // Return: DANE/TLSA validation status (x<0=valfail or error, x>0 = success)
 //         return values: dane-state.gen file
 // ----------------------------------------------------------------------------
-short CheckDane(const char* certchain[], int certcount, const uint16_t options,
+short dane_validate(const char* certchain[], int certcount, const uint16_t options,
     const char *optdnssrv, const char *domain, const char *port,
     const char *protocol, int policy);
 

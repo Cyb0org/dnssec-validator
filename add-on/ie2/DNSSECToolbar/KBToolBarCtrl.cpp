@@ -728,7 +728,7 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 					//EnterCriticalSection(&cs);
 					if (!wrongip) {
 						//if (debug) ATLTRACE("\nTEST: www.nic.cz : %d : %s : 217.31.205.50\n", options, dnsip);
-						resultipv4 = ds_validate("www.nic.cz", options, dnsip,  "217.31.205.50", &ipvalidator);
+						resultipv4 = dnssec_validate("www.nic.cz", options, dnsip,  "217.31.205.50", &ipvalidator);
 						//if (debug) ATLTRACE("TEST: www.nic.cz : %d : %s\n", resultipv4, ipvalidator);
 						if (resultipv4==0) LoadStringA(GHins, IDS_DNSSECTEST_ERROR, strbuf, STR_BUF_S);
 						else if ((resultipv4==4)) LoadStringA(GHins, IDS_DNSSECTEST_BOGUS, strbuf, STR_BUF_S);

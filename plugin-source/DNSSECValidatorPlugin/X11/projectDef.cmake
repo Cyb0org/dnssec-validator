@@ -67,7 +67,8 @@ endif ()
 # set header file directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/openssl/include
                     ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/ldns/include
-                    ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/unbound/include)
+                    ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/unbound/include
+                    ${CMAKE_CURRENT_SOURCE_DIR}/../../../plugin-source/common)
 
 # set static library paths
 add_library(unbound STATIC IMPORTED)

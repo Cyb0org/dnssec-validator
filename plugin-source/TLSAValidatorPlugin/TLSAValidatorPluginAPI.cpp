@@ -90,7 +90,7 @@ FB::VariantList TLSAValidatorPluginAPI::TLSAValidate(const std::vector<std::stri
 
     FB::VariantList reslist;
     short rv;
-    rv = CheckDane(vc, certcount, options, optdnssrv.c_str(), domain.c_str(), port.c_str(), protocol.c_str(), policy);    
+    rv = dane_validate(vc, certcount, options, optdnssrv.c_str(), domain.c_str(), port.c_str(), protocol.c_str(), policy);    
     reslist.push_back(rv);
     free(vc);
     return reslist;
