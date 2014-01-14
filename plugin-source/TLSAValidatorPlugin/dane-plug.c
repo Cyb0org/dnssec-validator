@@ -66,6 +66,7 @@ OpenSSL used as well as that of the covered work.
 #include "openssl/x509.h"
 #include "openssl/evp.h"
 
+#include "common.h"
 #include "dane-plug.h"
 #include "dane-states.gen"
 
@@ -269,35 +270,6 @@ struct dane_validation_ctx glob_val_ctx = {
 };
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-
-static
-int printf_debug(const char *pref, const char *fmt, ...)
-  __attribute__((format(printf, 2, 3)));
-
-//*****************************************************************************
-/* debug output function */
-// ----------------------------------------------------------------------------
-static
-int printf_debug(const char *pref, const char *fmt, ...)
-{
-	va_list argp;
-	int ret = 0;
-
-	if (glob_val_ctx.opts.debug && (fmt != NULL)) {
-		va_start(argp, fmt);
-
-		if (pref != NULL) {
-			fputs(pref, DEBUG_OUTPUT);
-		} else {
-			fputs(DEBUG_PREFIX, DEBUG_OUTPUT);
-		}
-		ret = vfprintf(DEBUG_OUTPUT, fmt, argp);
-
-		va_end(argp);
-	}
-
-	return ret;
-}
 
 
 //*****************************************************************************
@@ -826,8 +798,8 @@ int create_socket(const char *domain, const char *port_str)
 	}
 
 	if (rp == NULL) {               /* No address succeeded */
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Could not connect to remote server!\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Could not connect to remote server!");
 		exit(EXIT_FAILURE);
 	}
 
@@ -1092,14 +1064,14 @@ void print_certlist_debug(const struct cert_store_head *cert_list)
 		cert_der = (unsigned char *) tmp->cert_der;
 		cert_x509 = d2i_X509(NULL, &cert_der, tmp->cert_len);
 		if (cert_x509 != NULL) {
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Certificate in text format:\n");
+			printf_debug(DEBUG_PREFIX_CER, "%s\n",
+			    "Certificate in text format:");
 			X509_print_ex_fp(DEBUG_OUTPUT, cert_x509,
 			    XN_FLAG_COMPAT, X509_FLAG_COMPAT);
 			X509_free(cert_x509); cert_x509 = NULL;
 		} else {
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Cannot convert certificate into text format.\n");
+			printf_debug(DEBUG_PREFIX_CER, "%s\n",
+			    "Cannot convert certificate into text format.");
 		}
 		printf_debug(DEBUG_PREFIX_CER, "certlen: %i\n%s\n",
 		    tmp->cert_len, tmp->cert_der_hex);
@@ -1313,13 +1285,13 @@ struct cert_tmp_ctx spkicert(const char *certder, int len)
 	X509 *cert;
 	cert = d2i_X509(NULL, (const unsigned char **) &certder, len);
 	if (cert == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error obtaining X509 from hex.\n");				
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Error obtaining X509 from hex.");
 	}
 
 	if ((pkey = X509_get_pubkey(cert)) == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error getting public key from certificate\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Error getting public key from certificate");
 	}
 
 	int len2;
@@ -1364,8 +1336,8 @@ int add_certrecord_bottom_from_der_hex(struct cert_store_head *cert_list,
 
 	cert_entry->cert_der = hextobin(der_hex);
 	if (cert_entry->cert_der == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error converting hex DER to bin.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Error converting hex DER to bin.");
 		goto fail;
 	}
 
@@ -1373,7 +1345,7 @@ int add_certrecord_bottom_from_der_hex(struct cert_store_head *cert_list,
 
 	cert_entry->cert_der_hex = malloc(hex_len + 1);
 	if (cert_entry->cert_der_hex == NULL) {
-		printf_debug(DEBUG_PREFIX_CER, "Errror copying hex.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n", "Errror copying hex.");
 		goto fail;
 	}
 	memcpy(cert_entry->cert_der_hex, der_hex, hex_len + 1);
@@ -1383,7 +1355,8 @@ int add_certrecord_bottom_from_der_hex(struct cert_store_head *cert_list,
 
 	cert_entry->spki_der = spki.spki_der;
 	if (cert_entry->spki_der == NULL) {
-		printf_debug(DEBUG_PREFIX_CER, "Error obtaining SPKI DER.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Error obtaining SPKI DER.");
 		goto fail;
 	}
 
@@ -1391,8 +1364,8 @@ int add_certrecord_bottom_from_der_hex(struct cert_store_head *cert_list,
 
 	cert_entry->spki_der_hex = spki.spki_der_hex;
 	if (cert_entry->spki_der == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error obtaining SPKI DER hex.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Error obtaining SPKI DER hex.");
 		goto fail;
 	}
 
@@ -1454,23 +1427,23 @@ int add_certrecord_bottom_from_x509(struct cert_store_head *cert_list,
 	cert_entry->cert_len = i2d_X509(x509,
 	    (unsigned char **) &cert_entry->cert_der);
 	if (cert_entry->cert_len < 0) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error encoding into DER.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Error encoding into DER.");
 		goto fail;
 	}
 	cert_entry->cert_der_hex =
 	    bintohex((uint8_t *) cert_entry->cert_der,
 	        cert_entry->cert_len);
 	if (cert_entry->cert_der_hex == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error converting DER to hex.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Error converting DER to hex.");
 		goto fail;
 	}
 
 	pkey = X509_get_pubkey(x509);
 	if (pkey == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error getting public key from certificate\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Error getting public key from certificate");
 		goto fail;
 	}
 
@@ -1481,16 +1454,16 @@ int add_certrecord_bottom_from_x509(struct cert_store_head *cert_list,
 	EVP_PKEY_free(pkey); pkey = NULL;
 
 	if (cert_entry->spki_len < 0) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error encoding into DER.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Error encoding into DER.");
 		goto fail;
 	}
 	cert_entry->spki_der_hex =
 	    bintohex((uint8_t *) cert_entry->spki_der,
 	        cert_entry->spki_len);
 	if (cert_entry->spki_der_hex == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error converting DER to hex.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Error converting DER to hex.");
 		goto fail;
 	}
 
@@ -1597,8 +1570,8 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 
 	ssl = SSL_new(glob_val_ctx.ssl_ctx);
 	if (ssl == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Cannot create SSL structure.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Cannot create SSL structure.");
 		goto fail;
 	}
 
@@ -1610,8 +1583,8 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 	}
 
 	if (SSL_set_fd(ssl, server_fd) != 1) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error: Cannot set server socket.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Error: Cannot set server socket.");
 		goto fail;
 	}
 
@@ -1657,16 +1630,16 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 
 		store_ctx = X509_STORE_CTX_new();
 		if (store_ctx == NULL) {
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Cannot create store context.\n");
+			printf_debug(DEBUG_PREFIX_CER, "%s\n",
+			    "Cannot create store context.");
 			goto fail;
 		}
 
 		if (X509_STORE_CTX_init(store_ctx,
 		         SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx),
 		         cert, chain) == 0) {
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Cannot initialise store context.\n");
+			printf_debug(DEBUG_PREFIX_CER, "%s\n",
+			    "Cannot initialise store context.");
 			goto fail;
 		}
 
@@ -1675,8 +1648,8 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 		 * context's root CA certs.
 		 */
 		if (X509_verify_cert(store_ctx) <= 0) {
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Error validating certificates.\n");
+			printf_debug(DEBUG_PREFIX_CER, "%s\n",
+			    "Error validating certificates.");
 			goto fail;
 		}
 
@@ -1696,7 +1669,7 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 		cert2 = sk_X509_value(chain, i);
 
 		if (add_certrecord_bottom_from_x509(cert_list, cert2) != 0) {
-			printf_debug(DEBUG_PREFIX_CER,
+			printf_debug(DEBUG_PREFIX_CER, "%s\n",
 			    "Error adding certificate into list.\n");
 			goto fail;
 		}
@@ -1783,7 +1756,7 @@ char * opensslDigest(const EVP_MD *md, const char *data, int len)
 static
 char * sha256(const char *data, int len)
 {
-	printf_debug(DEBUG_PREFIX_DANE, "crypto: SHA-256\n");
+	printf_debug(DEBUG_PREFIX_DANE, "%s\n", "crypto: SHA-256");
 
 	return opensslDigest(EVP_sha256(), data, len);
 }
@@ -1795,7 +1768,7 @@ char * sha256(const char *data, int len)
 static
 char * sha512(const char *data, int len)
 {
-	printf_debug(DEBUG_PREFIX_DANE, "crypto: SHA-512\n");
+	printf_debug(DEBUG_PREFIX_DANE, "%s\n", "crypto: SHA-512");
 
 	return opensslDigest(EVP_sha512(), data, len);
 }
@@ -2104,8 +2077,9 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 		/* show tlsa_first result */
 		if (ub_res->havedata) {
 
-			printf_debug(DEBUG_PREFIX,
-			    "Domain is secured by DNSSEC ... found TLSA record(s).\n");
+			printf_debug(DEBUG_PREFIX, "%s\n",
+			    "Domain is secured by DNSSEC ... "
+			    "found TLSA record(s).");
 
 			ldns_pkt *packet;
 			ldns_status parse_status = ldns_wire2pkt(&packet,
@@ -2113,7 +2087,7 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 			    ub_res->answer_len);
         
 			if (parse_status != LDNS_STATUS_OK) {
-				printf_debug(DEBUG_PREFIX,
+				printf_debug(DEBUG_PREFIX, "%s\n",
 				     "Failed to parse response packet\n");
 				return DANE_ERROR_RESOLVER;
 			}
@@ -2189,7 +2163,7 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 		    ub_res->why_bogus);
 	} else {
 		exitcode = DANE_DNSSEC_UNSECURED;
-		printf_debug(DEBUG_PREFIX, "Domain is insecure...\n");
+		printf_debug(DEBUG_PREFIX, "%s\n", "Domain is insecure...");
 	}
 
 	return exitcode;
@@ -2269,8 +2243,8 @@ struct ub_ctx * unbound_resolver_init(const struct ds_options_st *opts,
 
 	ub = ub_ctx_create();
 	if(ub == NULL) {
-		printf_debug(DEBUG_PREFIX,
-		    "Error: could not create unbound context\n");
+		printf_debug(DEBUG_PREFIX, "%s\n",
+		    "Error: could not create unbound context.");
 		goto fail;
 	}
 
@@ -2304,34 +2278,19 @@ struct ub_ctx * unbound_resolver_init(const struct ds_options_st *opts,
 			}
 			free(str_cpy);
 		} else {
-			printf_debug(DEBUG_PREFIX,
-			    "Using system resolver.\n");
+			printf_debug(DEBUG_PREFIX, "%s\n",
+			    "Using system resolver.");
 			ub_retval = ub_ctx_resolvconf(ub, NULL);
 			if (ub_retval != 0) {
 				printf_debug(DEBUG_PREFIX,
-				    "Error reading resolv.conf: %s. errno says: %s\n",
+				    "Error reading resolv.conf: %s. "
+				    "errno says: %s\n",
 				    ub_strerror(ub_retval),
 				    strerror(errno));
 				goto fail;
 			}
 		}
 	}
-
-	/*
-	// set debugging verbosity
-	ub_ctx_debugout(ub, DEBUG_OUTPUT);
-	if (ub_retval != 0) {
-		printf_debug(DEBUG_PREFIX,
-		    "Error setting debugging output.\n");
-		goto fail;
-	}
-	ub_retval = ub_ctx_debuglevel(ub, 5);
-	if (ub_retval != 0) {
-		printf_debug(DEBUG_PREFIX,
-		    "Error setting verbosity level.\n");
-		goto fail;
-	}
-	*/
 
 	/*
 	 * Read public keys of root zone for DNSSEC verification.
@@ -2383,7 +2342,7 @@ int dane_validation_init(void)
 {
 	const SSL_METHOD *method;
 
-	printf_debug(DEBUG_PREFIX_DANE, "Initialising DANE.\n");
+	printf_debug(DEBUG_PREFIX_DANE, "%s\n", "Initialising DANE.");
 
 	glob_val_ctx.ub = NULL; /* Has separate initialisation procedure. */
 
@@ -2398,8 +2357,8 @@ int dane_validation_init(void)
 	method = SSLv23_client_method();
 	glob_val_ctx.ssl_ctx = SSL_CTX_new(method);
 	if (glob_val_ctx.ssl_ctx == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Unable to create a SSL context structure.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Unable to create a SSL context structure.");
 		goto fail;
 	}
 
@@ -2410,8 +2369,8 @@ int dane_validation_init(void)
 	if (X509_store_add_certs_from_dirs(
 	        SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx),
 	        ca_dirs) != 0) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Failed loading browser CA cerificates.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Failed loading browser CA cerificates.");
 		goto fail;
 	}
 #endif /* DIR_CA_STORE */
@@ -2423,8 +2382,8 @@ int dane_validation_init(void)
 	glob_val_ctx.nss_ctx = NSS_InitContext("", "", "", "", &initparams,
 	    NSS_INIT_READONLY | NSS_INIT_NOCERTDB);
 	if (glob_val_ctx.nss_ctx == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Unable to create a NSS context structure.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Unable to create a NSS context structure.");
 		goto fail;
 	}
 #endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
@@ -2432,8 +2391,8 @@ int dane_validation_init(void)
 #if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
 	if (X509_store_add_certs_from_nssckbi(
 	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx)) != 0) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Failed loading NSS built-in CA cerificates.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Failed loading NSS built-in CA cerificates.");
 		goto fail;
 	}
 #endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
@@ -2442,8 +2401,8 @@ int dane_validation_init(void)
 	if (X509_store_add_certs_from_cert8_dirs(
 	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx),
 	    cert8_ca_dirs) != 0) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Failed loading NSS CA cerificates from cert8.db.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Failed loading NSS CA cerificates from cert8.db.");
 		goto fail;
 	}
 #endif /* NSS_CERT8_CA_STORE */
@@ -2451,8 +2410,8 @@ int dane_validation_init(void)
 #if CA_STORE == OSX_CA_STORE
 	if (X509_store_add_certs_from_osx_store(
 	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx)) != 0) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Failed loading OS X CA cerificates.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Failed loading OS X CA cerificates.");
 		goto fail;
 	}
 #endif /* OSX_CA_STORE */
@@ -2460,8 +2419,8 @@ int dane_validation_init(void)
 #if defined WIN32 && (CA_STORE == WIN_CA_STORE)
 	if (X509_store_add_certs_from_win_store(
 	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx)) != 0) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Failed loading Windows CA cerificates.\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Failed loading Windows CA cerificates.");
 		goto fail;
 	}
 #endif /* WIN32 && WIN_CA_STORE */
@@ -2496,7 +2455,7 @@ fail:
 // Return: DANE/TLSA validation status (x<0 = error, <0-13> = success, x>16 = fail)
 //         return values: dane-state.gen file
 // ----------------------------------------------------------------------------
-short CheckDane(const char *certchain[], int certcount, const uint16_t options,
+int dane_validate(const char *certchain[], int certcount, uint16_t options,
     const char *optdnssrv, const char *domain,  const char *port_str,
     const char *protocol, int policy)
 {
@@ -2530,7 +2489,7 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 	    (optdnssrv != NULL) ? optdnssrv : "(null)");
 
 	if ((domain == NULL) || (domain[0] == '\0')) {
-		printf_debug(DEBUG_PREFIX, "Error: no domain...\n");
+		printf_debug(DEBUG_PREFIX, "%s\n", "Error: no domain...");
 		return DANE_ERROR_GENERIC;
 	}
 
@@ -2561,8 +2520,8 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 		glob_val_ctx.ub = unbound_resolver_init(&glob_val_ctx.opts,
 		    optdnssrv, &exitcode);
 		if(glob_val_ctx.ub == NULL) {
-			printf_debug(DEBUG_PREFIX,
-			    "Error: could not create unbound context\n");
+			printf_debug(DEBUG_PREFIX, "%s\n",
+			    "Error: could not create unbound context.");
 			return exitcode;
 		}
 	}
@@ -2605,21 +2564,21 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 
 	if (certcount > 0) {
 
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Browser's certificate chain is used\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "Browser's certificate chain is used.");
 
 		int i;
 		for (i = 0; i < certcount; i++) {
 			if (add_certrecord_bottom_from_der_hex(&cert_list,
 			        certchain[i]) != 0) {
-				printf_debug(DEBUG_PREFIX_CER,
-				    "Error adding certificate into list.\n");
+				printf_debug(DEBUG_PREFIX_CER, "%s\n",
+				    "Error adding certificate into list.");
 				return DANE_ERROR_GENERIC;
 			}
 		}
 	} else {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "External certificate chain is used\n");
+		printf_debug(DEBUG_PREFIX_CER, "%s\n",
+		    "External certificate chain is used.");
 		memcpy(uri, "https://", HTTPS_PREF_LEN + 1);
 		strncat(uri, domain, MAX_URI_LEN - HTTPS_PREF_LEN - 1);
 		retval = get_cert_list(uri, domain, port_str, &cert_list);
@@ -2652,7 +2611,7 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 // ----------------------------------------------------------------------------
 int dane_validation_deinit(void)
 {
-	printf_debug(DEBUG_PREFIX_DANE, "Deinitialising DANE.\n");
+	printf_debug(DEBUG_PREFIX_DANE, "%s\n", "Deinitialising DANE.");
 
 	if (glob_val_ctx.ub != NULL) {
 		ub_ctx_delete(glob_val_ctx.ub);
@@ -2725,8 +2684,8 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	res = CheckDane(certhex, 0, options, resolver_addresses, dname, port,
-	    "tcp", 1);
+	res = dane_validate(certhex, 0, options, resolver_addresses, dname,
+	    port, "tcp", 1);
 	printf(DEBUG_PREFIX_DANE "Main result: %i\n", res);
 
 	if (dane_validation_deinit() != 0) {

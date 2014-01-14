@@ -65,7 +65,7 @@ int dnssec_validation_init(void);
 //        *ipbrowser - is IP address of browser which browser used fo connection of the server
 // Out:   **ipvalidator - is IP address(es) of validator
 // ----------------------------------------------------------------------------
-short ds_validate(const char *domain, const uint16_t options,
+int dnssec_validate(const char *domain, uint16_t options,
     const char *optdnssrv, const char *ipbrowser, char **ipvalidator);
 
 

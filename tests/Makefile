@@ -9,10 +9,11 @@ UNBOUND_LIB := ../libs/unbound
 #DANE_CORE_LIB := ../FireBreath/build/projects/TLSAfetcher/libDANECore.a
 
 FB_DIR := ../FireBreath
+COMMON_INCLUDE := -I../plugin-source/common
 FB_INCLUDE := -I$(FB_DIR)/src/ScriptingCore -I$(FB_DIR)/src/config
 BOOST_FLAGS := -I$(FB_DIR)/src/3rdParty/boost -DBOOST_ALL_NO_LIB=1
 
-PLUGIN_INCLUDES := -I$(OPENSSL_LIB)/include -I$(LDNS_LIB)/include -I$(UNBOUND_LIB)/include $(FB_INCLUDE)
+PLUGIN_INCLUDES := -I$(OPENSSL_LIB)/include -I$(LDNS_LIB)/include -I$(UNBOUND_LIB)/include $(FB_INCLUDE) $(COMMON_INCLUDE)
 PLUGIN_LIBS := -L$(UNBOUND_LIB)/lib -L$(OPENSSL_LIB)/lib -L$(LDNS_LIB)/lib -lunbound -lldns -lssl -lcrypto -lpthread -ldl
 
 LOC_LOCATION := $(shell echo ${HOME})/third_party/built
@@ -22,14 +23,15 @@ LOC_LIBS := -L$(LOC_LOCATION)/lib -Wl,-rpath,$(LOC_LOCATION)/lib -lunbound -lldn
 OPTFLAGS = -g -O0
 #OPTFLAGS = -g -O3
 CPPFLAGS += -DCMNDLINE_TEST
-CPPFLAGS += -DRES_OSX -DCA_STORE=OSX_CA_STORE
+CPPFLAGS += -DRES_OSX
+#CPPFLAGS += -DCA_STORE=OSX_CA_STORE
 CFLAGS_NOSTD += $(INCLUDES) -Wall -Wextra -pedantic $(OPTFLAGS)
 CFLAGS_NOSTD += $(shell pkg-config --cflags nss)
 CFLAGS += $(CFLAGS_NOSTD) -std=c99
 CXXFLAGS += $(INCLUDES) -Wall -Westra -pedantic $(OPTFLAGS)
 LDFLAGS += $(LIBS)
 LDFLAGS += $(shell pkg-config --libs nss)
-LDFLAGS += -framework Cocoa -framework Security
+#LDFLAGS += -framework Cocoa -framework Security
 
 TARGETS := dane-plug unbound-test-dnssec ssl-test dnssec-plug
 TARGETS_LOCLIBS := dane-plug-loclibs dnssec-plug-loclibs
@@ -54,7 +56,10 @@ clean:
 #dane-plug: ../plugin-source/TLSAValidatorPlugin/dane-plug.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
 #	$(CC) $< -o $@ $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(PLUGIN_INCLUDES) $(PLUGIN_LIBS)
 
-dane-plug: dane-plug.o ca_store_osx.o
+#dane-plug: dane-plug.o ca_store_osx.o
+#	$(CC) $^ -o $@ $(LDFLAGS) $(PLUGIN_LIBS)
+
+dane-plug: dane-plug.o
 	$(CC) $^ -o $@ $(LDFLAGS) $(PLUGIN_LIBS)
 
 dane-plug.o: ../plugin-source/TLSAValidatorPlugin/dane-plug.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
