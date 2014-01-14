@@ -59,7 +59,10 @@ clean:
 #dane-plug: dane-plug.o ca_store_osx.o
 #	$(CC) $^ -o $@ $(LDFLAGS) $(PLUGIN_LIBS)
 
-dane-plug: dane-plug.o
+common.o: ../plugin-source/common/common.c ../plugin-source/common/common.h
+	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(PLUGIN_INCLUDES)
+
+dane-plug: dane-plug.o common.o
 	$(CC) $^ -o $@ $(LDFLAGS) $(PLUGIN_LIBS)
 
 dane-plug.o: ../plugin-source/TLSAValidatorPlugin/dane-plug.c $(UNBOUND_LIB) $(DANE_CORE_LIB)

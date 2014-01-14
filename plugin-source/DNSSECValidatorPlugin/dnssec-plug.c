@@ -67,21 +67,18 @@ OpenSSL used as well as that of the covered work.
 #endif
 
 //----------------------------------------------------------------------------
-#define TA ". IN DS 19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32F24E8FB5"    // DS record of root domain
-#define DLV "dlv.isc.org. IN DNSKEY 257 3 5 BEAAAAPHMu/5onzrEE7z1egmhg/WPO0+juoZrW3euWEn4MxDCE1+lLy2 brhQv5rN32RKtMzX6Mj70jdzeND4XknW58dnJNPCxn8+jAGl2FZLK8t+ 1uq4W+nnA3qO2+DL+k6BD4mewMLbIYFwe0PG73Te9fZ2kJb56dhgMde5 ymX4BI/oQ+ cAK50/xvJv00Frf8kw6ucMTwFlgPe+jnGxPPEmHAte/URk Y62ZfkLoBAADLHQ9IrS2tryAe7mbBZVcOwIeU/Rw/mRx/vwwMCTgNboM QKtUdvNXDrYJDSHZws3xiRXF1Rf+al9UmZfSav/4NWLKjHzpT59k/VSt TDN0YUuWrBNh" //DNSKEY DLV register
-#define DEBUG_OUTPUT stderr
 #define DEBUG_PREFIX "DNSSEC: "
 #define ERROR_PREFIX "DNSSEC error: "
 #define MAX_IPADDRLEN 40          /* max len of IPv4 and IPv6 addr notation */
 #define MAX_SRCHLSTLEN (6 * 256)  /* max len of search list */
 
 //----------------------------------------------------------------------------
-struct ds_options_st { /* structure to save input options */
-	bool debug;                        // debug output enable
-	bool usefwd;                       // use of resolver
-	bool resolvipv4;                   // IPv4 - validation of A record
-	bool resolvipv6;                   // IPv6 - validation of AAAA record
-	bool ds;  
+struct dnssec_options_st { /* structure to save input options */
+	bool debug; // debug output enable
+	bool usefwd; // use of resolver
+	bool ds; // use root.key with DS record of root zone
+	bool resolvipv4; // IPv4 - validation of A record
+	bool resolvipv6; // IPv6 - validation of AAAA record
 };
 
 //----------------------------------------------------------------------------
@@ -92,7 +89,7 @@ char ip_validated[256]; // holds resolved and validated IP address(es)
 
 /* DANE validation context. */
 struct dnssec_validation_ctx {
-	struct ds_options_st opts; /* Options. */
+	struct dnssec_options_st opts; /* Options. */
 	struct ub_ctx *ub; /*
 	                    * Unbound context.
 	                    * Initialised outside the context initialisation
@@ -147,14 +144,16 @@ int ipv6str_equal_str(const char *lhs, const char *rhs)
 //*****************************************************************************
 /* read input options into a structure */
 // ----------------------------------------------------------------------------
-static
-void ds_init_opts(struct ds_options_st *opts, const uint16_t options)
+void dnssec_set_validation_options(struct dnssec_options_st *opts,
+    uint16_t options)
 {
+	assert(opts != NULL);
+
 	opts->debug = options & DNSSEC_FLAG_DEBUG;
 	opts->usefwd = options & DNSSEC_FLAG_USEFWD;
+	opts->ds = false;
 	opts->resolvipv4 = options & DNSSEC_FLAG_RESOLVIPV4;
 	opts->resolvipv6 = options & DNSSEC_FLAG_RESOLVIPV6;
-	opts->ds = false;
 }
 
 //*****************************************************************************
@@ -484,7 +483,7 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 // If NULL returned then err_code is set if given
 // ----------------------------------------------------------------------------
 static
-struct ub_ctx * unbound_resolver_init(const struct ds_options_st *opts,
+struct ub_ctx * unbound_resolver_init(const struct dnssec_options_st *opts,
     const char *optdnssrv, int *err_code_ptr)
 {
 	struct ub_ctx *ub = NULL;
@@ -624,7 +623,7 @@ int dnssec_validate(const char *domain, uint16_t options,
 	ip_validated[0] = '\0';
 
 	/* options init - get integer values send from browser */
-	ds_init_opts(&glob_val_ctx.opts, options);
+	dnssec_set_validation_options(&glob_val_ctx.opts, options);
 
 	printf_debug(DEBUG_PREFIX,
 	    "Input parameters: domain='%s'; options=%u; "
@@ -766,7 +765,7 @@ int main(int argc, char **argv)
 	    DNSSEC_FLAG_RESOLVIPV6;
 
 	/* Apply options. */
-	ds_init_opts(&glob_val_ctx.opts, options);
+	dnssec_set_validation_options(&glob_val_ctx.opts, options);
 
 	if (dnssec_validation_init() != 0) {
 		printf(DEBUG_PREFIX "Error initialising context.\n");

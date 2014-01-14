@@ -50,6 +50,17 @@ extern "C" {
 #endif
 
 
+/* Forward structure declaration. */
+struct dnssec_options_st;
+
+
+//*****************************************************************************
+// read input options into a structure
+// ----------------------------------------------------------------------------
+void dnssec_set_validation_options(struct dnssec_options_st *opts,
+    uint16_t options);
+
+
 //*****************************************************************************
 // Create validation context.
 // ----------------------------------------------------------------------------

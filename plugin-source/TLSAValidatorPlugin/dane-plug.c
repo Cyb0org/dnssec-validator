@@ -129,15 +129,10 @@ OpenSSL used as well as that of the covered work.
 
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-//DS record of root zone
-#define TA ". IN DS 19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32F24E8FB5"
-//DNSKEY of DLV register
-#define DLV "dlv.isc.org. IN DNSKEY 257 3 5 BEAAAAPHMu/5onzrEE7z1egmhg/WPO0+juoZrW3euWEn4MxDCE1+lLy2 brhQv5rN32RKtMzX6Mj70jdzeND4XknW58dnJNPCxn8+jAGl2FZLK8t+ 1uq4W+nnA3qO2+DL+k6BD4mewMLbIYFwe0PG73Te9fZ2kJb56dhgMde5 ymX4BI/oQ+ cAK50/xvJv00Frf8kw6ucMTwFlgPe+jnGxPPEmHAte/URk Y62ZfkLoBAADLHQ9IrS2tryAe7mbBZVcOwIeU/Rw/mRx/vwwMCTgNboM QKtUdvNXDrYJDSHZws3xiRXF1Rf+al9UmZfSav/4NWLKjHzpT59k/VSt TDN0YUuWrBNh"
 // debugging related stuff
 #define DEBUG_PREFIX "TLSA: "        
 #define DEBUG_PREFIX_CER "CERT: "
 #define DEBUG_PREFIX_DANE "DANE: "
-#define DEBUG_OUTPUT stderr
 // define policy of browser
 #define ALLOW_TYPE_01 1
 #define ALLOW_TYPE_23 2
@@ -172,10 +167,10 @@ const char * cert8_ca_dirs[] = {NULL};
 //----------------------------------------------------------------------------
 
 /* structure to save input options of validator */
-struct ds_options_st {
+struct dane_options_st {
 	bool debug; // debug output enable
 	bool usefwd; // use of resolver
-	bool ds; // use root.key with DS record of root zone 
+	bool ds; // use root.key with DS record of root zone
 };
 
 //----------------------------------------------------------------------------
@@ -250,7 +245,7 @@ struct cert_tmp_ctx {
 
 /* DANE validation context. */
 struct dane_validation_ctx {
-	struct ds_options_st opts; /* Options. */
+	struct dane_options_st opts; /* Options. */
 	struct ub_ctx *ub; /*
 	                    * Unbound context.
 	                    * Initialised outside the context initialisation
@@ -275,8 +270,8 @@ struct dane_validation_ctx glob_val_ctx = {
 //*****************************************************************************
 // read input options into a structure
 // ----------------------------------------------------------------------------
-static
-void ds_init_opts(struct ds_options_st *opts, const uint16_t options) 
+void dane_set_validation_options(struct global_options_st *opts,
+    uint16_t options)
 {
 	assert(opts != NULL);
 
@@ -2234,7 +2229,7 @@ char * create_tlsa_qname(const char *domain, const char *port,
 // If NULL returned then err_code is set if given
 // ----------------------------------------------------------------------------
 static
-struct ub_ctx * unbound_resolver_init(const struct ds_options_st *opts,
+struct ub_ctx * unbound_resolver_init(const struct dane_options_st *opts,
     const char *optdnssrv, int *err_code_ptr)
 {
 	struct ub_ctx *ub = NULL;
@@ -2478,7 +2473,7 @@ int dane_validate(const char *certchain[], int certcount, uint16_t options,
 	int exitcode = DANE_ERROR_RESOLVER;
 	char *dn = NULL;
 
-	ds_init_opts(&glob_val_ctx.opts, options);
+	dane_set_validation_options(&glob_val_ctx.opts, options);
 
 	printf_debug(DEBUG_PREFIX, "Input parameters: domain='%s'; port='%s'; "
 	    "protocol='%s'; options=%u; resolver_address='%s';\n",
@@ -2677,7 +2672,7 @@ int main(int argc, char **argv)
 	    DANE_FLAG_USEFWD;
 
 	/* Apply options. */
-	ds_init_opts(&glob_val_ctx.opts, options);
+	dane_set_validation_options(&glob_val_ctx.opts, options);
 
 	if (dane_validation_init() != 0) {
 		printf(DEBUG_PREFIX_DANE "Error initialising context.\n");
