@@ -24,7 +24,7 @@ OPTFLAGS = -g -O0
 #OPTFLAGS = -g -O3
 CPPFLAGS += -DCMNDLINE_TEST
 CPPFLAGS += -DRES_OSX
-#CPPFLAGS += -DCA_STORE=OSX_CA_STORE
+CPPFLAGS += -DCA_STORE=NONE_CA_STORE
 CFLAGS_NOSTD += $(INCLUDES) -Wall -Wextra -pedantic $(OPTFLAGS)
 CFLAGS_NOSTD += $(shell pkg-config --cflags nss)
 CFLAGS += $(CFLAGS_NOSTD) -std=c99
@@ -62,10 +62,16 @@ clean:
 common.o: ../plugin-source/common/common.c ../plugin-source/common/common.h
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(PLUGIN_INCLUDES)
 
-dane-plug: dane-plug.o common.o
+dane-plug: dane-plug.o common.o ca_store_directory.o ca_store_nss.o
 	$(CC) $^ -o $@ $(LDFLAGS) $(PLUGIN_LIBS)
 
 dane-plug.o: ../plugin-source/TLSAValidatorPlugin/dane-plug.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
+	$(CC) -c $^ -o $@ $(CPPFLAGS) $(CFLAGS) $(PLUGIN_INCLUDES)
+
+ca_store_directory.o: ../plugin-source/TLSAValidatorPlugin/ca_store_directory.c
+	$(CC) -c $^ -o $@ $(CPPFLAGS) $(CFLAGS) $(PLUGIN_INCLUDES)
+
+ca_store_nss.o: ../plugin-source/TLSAValidatorPlugin/ca_store_nss.c
 	$(CC) -c $^ -o $@ $(CPPFLAGS) $(CFLAGS) $(PLUGIN_INCLUDES)
 
 ca_store_osx.o: ../plugin-source/TLSAValidatorPlugin/ca_store_osx.m

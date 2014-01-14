@@ -67,8 +67,6 @@ OpenSSL used as well as that of the covered work.
 #endif
 
 //----------------------------------------------------------------------------
-#define DEBUG_PREFIX "DNSSEC: "
-#define ERROR_PREFIX "DNSSEC error: "
 #define MAX_IPADDRLEN 40          /* max len of IPv4 and IPv6 addr notation */
 #define MAX_SRCHLSTLEN (6 * 256)  /* max len of search list */
 
@@ -277,7 +275,7 @@ short ipv6matches(const char *ipbrowser, const char *ipvalidator,
 	char *token;
 	int isequal = 0;
 
-	printf_debug(DEBUG_PREFIX, "IP matches: %s %s\n",
+	printf_debug(DEBUG_PREFIX_DNSSEC, "IP matches: %s %s\n",
 	    ipbrowser, ipvalidator);
 	strcpy(ip_validated, ipvalidator);
 
@@ -331,7 +329,7 @@ short ipv4matches(const char *ipbrowser, const char *ipvalidator,
 	char *token;
 	char *is = NULL;
 
-	printf_debug(DEBUG_PREFIX, "IP matches: %s %s\n",
+	printf_debug(DEBUG_PREFIX_DNSSEC, "IP matches: %s %s\n",
 	    ipbrowser, ipvalidator);
 	strcpy(ip_validated, ipvalidator);
 
@@ -386,7 +384,7 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 	     *aux_str = NULL;
 	retval = DNSSEC_ERROR_GENERIC;
 
-	printf_debug(DEBUG_PREFIX, "Examine result: %s %i %i %i %s \n",
+	printf_debug(DEBUG_PREFIX_DNSSEC, "Examine result: %s %i %i %i %s \n",
 	    ub_res->qname, ub_res->qtype, ub_res->qclass,
 	    ub_res->rcode, ipbrowser);
 
@@ -401,7 +399,7 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 
 		if (ub_res->havedata) {
 
-			printf_debug(DEBUG_PREFIX, "%s\n", "Has data.");
+			printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n", "Has data.");
 
 			if ((!ub_res->secure) && (!ub_res->bogus)) {
 				retval = DNSSEC_DOMAIN_UNSECURED;
@@ -418,7 +416,7 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 						    strcat_join_clone(aux_str, ' ', ipv4);
 						free(aux_str);
 					}
-					printf_debug(DEBUG_PREFIX,
+					printf_debug(DEBUG_PREFIX_DNSSEC,
 					    "IPv4 address of validator: %s\n",
 					    ipvalidator);
 					retval = ipv4matches(ipbrowser, ipvalidator, " ");
@@ -431,7 +429,7 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 						    strcat_join_clone(aux_str, ' ', ipv6);
 						free(aux_str);
 					}
-					printf_debug(DEBUG_PREFIX,
+					printf_debug(DEBUG_PREFIX_DNSSEC,
 					    "IPv6 address of validator: %s\n",
 					    ipvalidator);
 					retval = ipv6matches(ipbrowser, ipvalidator, " ");
@@ -439,7 +437,7 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 				free(ipvalidator);
 				// free malloc ipvalidator
 			} else {
-				printf_debug(DEBUG_PREFIX, "Why bogus?: %s\n",
+				printf_debug(DEBUG_PREFIX_DNSSEC, "Why bogus?: %s\n",
 				    ub_res->why_bogus);
 				retval = DNSSEC_COT_DOMAIN_BOGUS;
 			}
@@ -466,8 +464,8 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 		} // nxdomain
 	} // not LDNS_RCODE_NOERROR
 
-	printf_debug(DEBUG_PREFIX, "ub-secure: %i\n", ub_res->secure);
-	printf_debug(DEBUG_PREFIX, "ub-bogus: %i\n", ub_res->bogus);
+	printf_debug(DEBUG_PREFIX_DNSSEC, "ub-secure: %i\n", ub_res->secure);
+	printf_debug(DEBUG_PREFIX_DNSSEC, "ub-bogus: %i\n", ub_res->bogus);
 
 	return retval;
 }
@@ -480,7 +478,7 @@ int dnssec_validation_init(void)
 {
 	glob_val_ctx.ub = NULL; /* Has separate initialisation procedure. */
 
-	printf_debug(DEBUG_PREFIX, "%s\n", "Initialising DNSSEC.");
+	printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n", "Initialising DNSSEC.");
 
 	return 0;
 }
@@ -514,7 +512,7 @@ int dnssec_validate(const char *domain, uint16_t options,
 	/* options init - get integer values send from browser */
 	dnssec_set_validation_options(&glob_val_ctx.opts, options);
 
-	printf_debug(DEBUG_PREFIX,
+	printf_debug(DEBUG_PREFIX_DNSSEC,
 	    "Input parameters: domain='%s'; options=%u; "
 	    "resolver_address='%s'; remote_address='%s';\n",
 	    (domain != NULL) ? domain : "(null)",
@@ -523,7 +521,7 @@ int dnssec_validate(const char *domain, uint16_t options,
 	    (ipbrowser != NULL) ? ipbrowser : "(null)");
 
 	if ((domain == NULL) || (domain[0] == '\0')) {
-		printf_debug(DEBUG_PREFIX, "%s\n", "Error: no domain...");
+		printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n", "Error: no domain...");
 		return exitcode;
 	}
 
@@ -531,9 +529,9 @@ int dnssec_validate(const char *domain, uint16_t options,
 	if (glob_val_ctx.ub == NULL) {
 		glob_val_ctx.ub = unbound_resolver_init(optdnssrv, &exitcode,
 		    glob_val_ctx.opts.usefwd, glob_val_ctx.opts.ds,
-		    DEBUG_PREFIX);
+		    DEBUG_PREFIX_DNSSEC);
 		if(glob_val_ctx.ub == NULL) {
-			printf_debug(DEBUG_PREFIX, "%s\n",
+			printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n",
 			    "Error: could not create unbound context.");
 			switch (exitcode) {
 			case ERROR_RESOLVER:
@@ -551,7 +549,7 @@ int dnssec_validate(const char *domain, uint16_t options,
 		ub_retval = ub_resolve(glob_val_ctx.ub, domain,
 		    LDNS_RR_TYPE_AAAA, LDNS_RR_CLASS_IN, &ub_res);
 		if(ub_retval != 0) {
-			printf_debug(DEBUG_PREFIX, "Resolve error AAAA: %s\n",
+			printf_debug(DEBUG_PREFIX_DNSSEC, "Resolve error AAAA: %s\n",
 			    ub_strerror(ub_retval));
 			return exitcode; /* DNSSEC_ERROR_GENERIC */
 		}
@@ -564,7 +562,7 @@ int dnssec_validate(const char *domain, uint16_t options,
 		ub_retval = ub_resolve(glob_val_ctx.ub, domain, LDNS_RR_TYPE_A,
 		    LDNS_RR_CLASS_IN, &ub_res);
 		if(ub_retval != 0) {
-			printf_debug(DEBUG_PREFIX, "Resolve error A: %s\n",
+			printf_debug(DEBUG_PREFIX_DNSSEC, "Resolve error A: %s\n",
 			    ub_strerror(ub_retval));
 			return exitcode; /* DNSSEC_ERROR_GENERIC */
 		}
@@ -576,7 +574,7 @@ int dnssec_validate(const char *domain, uint16_t options,
 		ub_retval = ub_resolve(glob_val_ctx.ub, domain,
 		    LDNS_RR_TYPE_AAAA, LDNS_RR_CLASS_IN, &ub_res);
 		if(ub_retval != 0) {
-			printf_debug(DEBUG_PREFIX, "Resolve error AAAA: %s\n",
+			printf_debug(DEBUG_PREFIX_DNSSEC, "Resolve error AAAA: %s\n",
 			    ub_strerror(ub_retval));
 			return exitcode; /* DNSSEC_ERROR_GENERIC */
 		}
@@ -586,7 +584,7 @@ int dnssec_validate(const char *domain, uint16_t options,
 		ub_retval = ub_resolve(glob_val_ctx.ub, domain, LDNS_RR_TYPE_A,
 		    LDNS_RR_CLASS_IN, &ub_res);
 		if(ub_retval != 0) {
-			printf_debug(DEBUG_PREFIX, "Resolve error A: %s\n",
+			printf_debug(DEBUG_PREFIX_DNSSEC, "Resolve error A: %s\n",
 			    ub_strerror(ub_retval));
 			return exitcode; /* DNSSEC_ERROR_GENERIC */
 		}
@@ -595,7 +593,7 @@ int dnssec_validate(const char *domain, uint16_t options,
 		ub_resolve_free(ub_res);
 	}
 
-	printf_debug(DEBUG_PREFIX,
+	printf_debug(DEBUG_PREFIX_DNSSEC,
 	    "Returned value (overall/ipv4/ipv6): \"%d/%d/%d\"\n",
 	    exitcode, retval_ipv4, retval_ipv6);
 
@@ -613,7 +611,7 @@ int dnssec_validate(const char *domain, uint16_t options,
 // ----------------------------------------------------------------------------
 int dnssec_validation_deinit(void)
 {
-	printf_debug(DEBUG_PREFIX, "%s\n", "Deinitialising DNSSEC.");
+	printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n", "Deinitialising DNSSEC.");
 
 	if (glob_val_ctx.ub != NULL) {
 		ub_ctx_delete(glob_val_ctx.ub);
@@ -665,16 +663,16 @@ int main(int argc, char **argv)
 	dnssec_set_validation_options(&glob_val_ctx.opts, options);
 
 	if (dnssec_validation_init() != 0) {
-		printf(DEBUG_PREFIX "Error initialising context.\n");
+		printf(DEBUG_PREFIX_DNSSEC "Error initialising context.\n");
 		return 1;
 	}
 
 	i = dnssec_validate(dname, options, resolver_addresses,
 	    "2001:610:188:301:145::2:10", &tmp);
-	printf(DEBUG_PREFIX "Returned value: \"%d\" %s\n", i, tmp);
+	printf(DEBUG_PREFIX_DNSSEC "Returned value: \"%d\" %s\n", i, tmp);
 
 	if (dnssec_validation_deinit() != 0) {
-		printf(DEBUG_PREFIX "Error de-initialising context.\n");
+		printf(DEBUG_PREFIX_DNSSEC "Error de-initialising context.\n");
 	}
 
 	return 0;

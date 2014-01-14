@@ -44,6 +44,13 @@ extern "C" {
 #endif
 
 
+/* Debugging related prefixes. */
+#define DEBUG_PREFIX_CERT "CERT: "
+#define DEBUG_PREFIX_DANE "DANE: "
+#define DEBUG_PREFIX_DNSSEC "DNSSEC: "
+#define DEBUG_PREFIX_TLSA "TLSA: "        
+
+
 /* Global flag, used for generating debugging information. */
 extern int global_debug;
 
