@@ -44,6 +44,10 @@ extern "C" {
 #endif
 
 
+/* Global flag, used for generating debugging information. */
+extern int global_debug;
+
+
 /* DS record of root zone. */
 #define TA \
 	". IN DS 19036 8 2 " \
@@ -75,7 +79,7 @@ extern "C" {
  */
 #define printf_debug(pref, fmt, ...) \
 	do { \
-		if (glob_val_ctx.opts.debug && (fmt != NULL)) { \
+		if (global_debug && (fmt != NULL)) { \
 			if (pref != NULL) { \
 				fputs(pref, DEBUG_OUTPUT); \
 			} \

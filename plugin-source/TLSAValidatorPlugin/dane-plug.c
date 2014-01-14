@@ -168,7 +168,6 @@ const char * cert8_ca_dirs[] = {NULL};
 
 /* structure to save input options of validator */
 struct dane_options_st {
-	bool debug; // debug output enable
 	bool usefwd; // use of resolver
 	bool ds; // use root.key with DS record of root zone
 };
@@ -258,7 +257,7 @@ struct dane_validation_ctx {
 };
 static
 struct dane_validation_ctx glob_val_ctx = {
-	{false, false, false}, NULL, NULL
+	{false, false}, NULL, NULL
 #if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
 	, NULL
 #endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
@@ -270,12 +269,14 @@ struct dane_validation_ctx glob_val_ctx = {
 //*****************************************************************************
 // read input options into a structure
 // ----------------------------------------------------------------------------
-void dane_set_validation_options(struct global_options_st *opts,
+void dane_set_validation_options(struct dane_options_st *opts,
     uint16_t options)
 {
 	assert(opts != NULL);
 
-	opts->debug = options & DANE_FLAG_DEBUG;
+	/* TODO -- Not really a structure member. */
+	global_debug = options & DANE_FLAG_DEBUG;
+
 	opts->usefwd = options & DANE_FLAG_USEFWD;
 	opts->ds = false;
 }
@@ -1010,7 +1011,7 @@ void print_tlsalist_debug(const struct tlsa_store_head *tlsa_list)
 	struct tlsa_store_ctx *tmp;
 	int num;
 
-	if (!glob_val_ctx.opts.debug) {
+	if (!global_debug) {
 		/* Function prints only debugging information. */
 		return;
 	}
@@ -1045,7 +1046,7 @@ void print_certlist_debug(const struct cert_store_head *cert_list)
 	X509 *cert_x509 = NULL;
 	const unsigned char *cert_der;
 
-	if (!glob_val_ctx.opts.debug) {
+	if (!global_debug) {
 		/* Function prints only debugging information. */
 		return;
 	}

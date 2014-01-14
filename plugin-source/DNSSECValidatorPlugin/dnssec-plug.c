@@ -74,7 +74,6 @@ OpenSSL used as well as that of the covered work.
 
 //----------------------------------------------------------------------------
 struct dnssec_options_st { /* structure to save input options */
-	bool debug; // debug output enable
 	bool usefwd; // use of resolver
 	bool ds; // use root.key with DS record of root zone
 	bool resolvipv4; // IPv4 - validation of A record
@@ -98,7 +97,7 @@ struct dnssec_validation_ctx {
 };
 static
 struct dnssec_validation_ctx glob_val_ctx = {
-	{false, false, false, false, false}, NULL
+	{false, false, false, false}, NULL
 };
 
 
@@ -149,7 +148,9 @@ void dnssec_set_validation_options(struct dnssec_options_st *opts,
 {
 	assert(opts != NULL);
 
-	opts->debug = options & DNSSEC_FLAG_DEBUG;
+	/* TODO -- Not really a structure member. */
+	global_debug = options & DNSSEC_FLAG_DEBUG;
+
 	opts->usefwd = options & DNSSEC_FLAG_USEFWD;
 	opts->ds = false;
 	opts->resolvipv4 = options & DNSSEC_FLAG_RESOLVIPV4;

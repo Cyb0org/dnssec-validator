@@ -32,3 +32,10 @@ OpenSSL used as well as that of the covered work.
 
 
 #include "common.h"
+
+
+/*
+ * Global flag, used for generating debugging information.
+ * Default is off.
+ */
+int global_debug = 0;

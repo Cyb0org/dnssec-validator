@@ -49,6 +49,10 @@ extern "C" {
 #endif
 
 
+/* Forward structure declaration. */
+struct dane_options_st;
+
+
 //*****************************************************************************
 // read input options into a structure
 // ----------------------------------------------------------------------------

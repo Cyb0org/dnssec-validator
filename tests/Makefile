@@ -79,10 +79,13 @@ unbound-test-dnssec: unbound-test-dnssec.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
 
 ssl-test: ssl-test.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
 	$(CC) $< -o $@ $(CPPFLAGS) $(CFLAGS_NOSTD) $(LDFLAGS) $(PLUGIN_INCLUDES) $(PLUGIN_LIBS)
-#	gcc -Wall -pedantic -g -lssl -lcrypto -o ssl-test ssl-test.c  
+#	gcc -Wall -pedantic -g -lssl -lcrypto -o ssl-test ssl-test.c
 
-dnssec-plug: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
-	$(CC) $< -o $@ $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(PLUGIN_INCLUDES) $(PLUGIN_LIBS)
+dnssec-plug: dnssec-plug.o common.o
+	$(CC) $^ -o $@ $(LDFLAGS) $(PLUGIN_LIBS)
+
+dnssec-plug.o: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
+	$(CC) -c $^ -o $@ $(CPPFLAGS) $(CFLAGS) $(PLUGIN_INCLUDES)
 
 dnssec-plug-loclibs: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c
 	$(CC) $< -o $@ $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(LOC_INCLUDES) $(LOC_LIBS)
