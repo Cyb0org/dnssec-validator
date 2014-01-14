@@ -38,7 +38,9 @@ OpenSSL used as well as that of the covered work.
 
 #include <assert.h>
 #include <dirent.h> /* opendir(3) */
+#include <openssl/err.h>
 #include <openssl/pem.h>
+#include <openssl/ssl.h> /* SSL_CTX_load_verify_locations() */
 #include <openssl/x509.h>
 #include <string.h>
 #include <unistd.h> /* stat(2) */
@@ -48,10 +50,20 @@ OpenSSL used as well as that of the covered work.
 
 
 /* TODO -- These location should be given at configuration time. */
+#define OPENSSL_CA_FILE "/etc/ssl/certs/ca-certificates.crt"
 #define MOZILLA_CA_DIR "/usr/share/ca-certificates/mozilla"
+#define OPENSSL_CA_DIR "/etc/ssl/certs"
+
+/* CA certificate files. */
+const char *ca_files[] = {
+	OPENSSL_CA_FILE,
+	NULL};
 
 /* CA certificate directories. */
-const char *ca_dirs[] = {MOZILLA_CA_DIR, NULL};
+const char *ca_dirs[] = {
+//	MOZILLA_CA_DIR,
+	OPENSSL_CA_DIR,
+	NULL};
 
 
 /*!
@@ -66,10 +78,78 @@ int X509_store_add_cert_file(X509_STORE *store, const char *fname);
 
 
 /*
+ * Try to load CA certificates from supplied files and/or directories.
+ */
+int X509_store_add_certs_from_files_and_dirs(SSL_CTX *ssl_ctx,
+    const char **fname_p, const char **dirname_p)
+{
+	struct stat s;
+	unsigned long err;
+	int ret = -1;
+
+	assert(ssl_ctx != NULL);
+
+	if (fname_p != NULL) {
+		while (*fname_p != NULL) {
+			if ((stat(*fname_p, &s) == 0) &&
+			   (s.st_mode & S_IFREG)) {
+				/* Is file. */
+				if (SSL_CTX_load_verify_locations(ssl_ctx,
+				        *fname_p, NULL) == 0) {
+					err = ERR_get_error();
+					printf_debug(DEBUG_PREFIX_CERT,
+					    "Cannot load certificate file "
+					    "'%s'. Error: %s.\n", *fname_p,
+					    ERR_error_string(err, NULL));
+				}
+				ret = 0; /* At least one success. */
+			} else {
+				printf_debug(DEBUG_PREFIX_CERT,
+				    "'%s' is not a file.", *fname_p);
+			}
+
+			++fname_p;
+		}
+	}
+
+	if (dirname_p != NULL) {
+		while (*dirname_p != NULL) {
+			if ((stat(*dirname_p, &s) == 0) &&
+			   (s.st_mode & S_IFDIR)) {
+				/* Is directory. */
+				if (SSL_CTX_load_verify_locations(ssl_ctx,
+				        NULL, *dirname_p) == 0) {
+					err = ERR_get_error();
+					printf_debug(DEBUG_PREFIX_CERT,
+					    "Cannot load certificate "
+					    "directory '%s'. Error: %s.\n",
+					    *dirname_p,
+					    ERR_error_string(err, NULL));
+				}
+				ret = 0; /* At least one success. */
+			} else {
+				printf_debug(DEBUG_PREFIX_CERT,
+				    "'%s' is not a directory.", *dirname_p);
+			}
+
+			++dirname_p;
+		}
+	}
+
+	return ret;
+}
+
+
+/*
  * Access directories containing CA certificates and store them.
  */
 int X509_store_add_certs_from_dirs(X509_STORE *store, const char **dirname_p)
 {
+	/*
+	 * TODO -- Can a CA bundle as //etc/ssl/certs/ca-certificates.crt
+	 * be read at once?
+	 */
+
 	DIR *dir = NULL;
 	struct dirent *ent;
 	struct stat s;
@@ -114,8 +194,8 @@ int X509_store_add_certs_from_dirs(X509_STORE *store, const char **dirname_p)
 			    MAX_PATH_LEN - prefix_len);
 			aux_path[MAX_PATH_LEN - 1] = '\0';
 
-			if((stat(aux_path, &s) == 0) &&
-			   (s.st_mode & S_IFREG)) {
+			if ((stat(aux_path, &s) == 0) &&
+			    (s.st_mode & S_IFREG)) {
 				/* Is file. */
 
 				X509_store_add_cert_file(store, aux_path);
@@ -150,6 +230,7 @@ int X509_store_add_cert_file(X509_STORE *store, const char *fname)
 {
 	FILE *fin = NULL;
 	X509 *x509 = NULL;
+	unsigned long err;
 
 	assert(store != NULL);
 	assert(fname != NULL);
@@ -169,8 +250,10 @@ int X509_store_add_cert_file(X509_STORE *store, const char *fname)
 	}
 
 	if (X509_STORE_add_cert(store, x509) == 0) {
+		err = ERR_get_error();
 		printf_debug(DEBUG_PREFIX_CERT,
-		    "Cannot store certificate '%s'.\n", fname);
+		    "Cannot store certificate '%s'. Error: %s.\n", fname,
+		    ERR_error_string(err, NULL));
 		goto fail;
 	}
 

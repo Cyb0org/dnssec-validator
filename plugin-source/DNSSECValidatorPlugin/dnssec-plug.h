@@ -70,7 +70,7 @@ int dnssec_validation_init(void);
 //*****************************************************************************
 /* main validating function */
 // return status DNSSEC security
-// Input: *domain - domain name 
+// Input: *domain - domain name
 //        options - options of validator, IPv4, IPv6, usefwd, etc..
 //        *optdnssrv - IP address of resolver/forvarder
 //        *ipbrowser - is IP address of browser which browser used fo connection of the server

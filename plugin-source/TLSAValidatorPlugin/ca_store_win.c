@@ -52,6 +52,7 @@ int X509_store_add_certs_from_win_store(X509_STORE *store)
 	const unsigned char *der;
 	int certcnt = 0;
 	X509 *x509 = NULL;
+	unsigned long err;
 
 	printf_debug(DEBUG_PREFIX_CERT,
 	    "\n>>------------%s----------------------\n", __func__);
@@ -96,8 +97,11 @@ int X509_store_add_certs_from_win_store(X509_STORE *store)
 		}
 
 		if (X509_STORE_add_cert(store, x509) == 0) {
+			err = ERR_get_error();
 			printf_debug(DEBUG_PREFIX_CERT,
-			    "Cannot store certificate.\n");
+				    "Cannot store certificate. "
+				    "Error: %s.\n",
+				    ERR_error_string(err, NULL))
 			goto fail;
 		}
 

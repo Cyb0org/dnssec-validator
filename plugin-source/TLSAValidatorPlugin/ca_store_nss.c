@@ -41,6 +41,7 @@ OpenSSL used as well as that of the covered work.
 #include <cert.h> /* NSS CERT_DestroyCertList() */
 #include <dirent.h> /* opendir(3) */
 #include <nss.h> /* NSS */
+#include <openssl/err.h>
 #include <openssl/x509.h>
 #include <pk11func.h> /* NSS ListCertsInSlot() */
 #include <prlink.h> /* NSPR PR_GetLibraryName() */
@@ -69,6 +70,7 @@ int X509_store_add_certs_from_nssckbi(X509_STORE *store)
 	X509 *x509 = NULL;
 	const unsigned char *der;
 	int certcnt = 0;
+	unsigned long err;
 
 	memset(&initparams, 0, sizeof(initparams));
 	initparams.length = sizeof(initparams);
@@ -104,8 +106,11 @@ int X509_store_add_certs_from_nssckbi(X509_STORE *store)
 			}
 
 			if (X509_STORE_add_cert(store, x509) == 0) {
-				printf_debug(DEBUG_PREFIX_CERT, "%s\n",
-				    "Cannot store certificate.\n");
+				err = ERR_get_error();
+				printf_debug(DEBUG_PREFIX_CERT,
+				    "Cannot store certificate. "
+				    "Error: %s.\n",
+				    ERR_error_string(err, NULL));
 				goto fail;
 			}
 
@@ -165,6 +170,7 @@ int X509_store_add_certs_from_cert8_dirs(X509_STORE *store,
 	X509 *x509 = NULL;
 	const unsigned char *der;
 	int certcnt = 0;
+	unsigned long err;
 
 	assert(dirname_p != NULL);
 	if (dirname_p == NULL) {
@@ -189,7 +195,7 @@ int X509_store_add_certs_from_cert8_dirs(X509_STORE *store,
 
 		certcnt = 0;
 
-		if((stat(*dirname_p, &s) != 0) || !(s.st_mode & S_IFDIR)) {
+		if ((stat(*dirname_p, &s) != 0) || !(s.st_mode & S_IFDIR)) {
 			printf_debug(DEBUG_PREFIX_CERT,
 			    "Cannot access directory '%s'.\n", *dirname_p);
 			continue;
@@ -231,8 +237,11 @@ int X509_store_add_certs_from_cert8_dirs(X509_STORE *store,
 				}
 
 				if (X509_STORE_add_cert(store, x509) == 0) {
-					printf_debug(DEBUG_PREFIX_CERT, "%s\n",
-					    "Cannot store certificate.\n");
+					err = ERR_get_error();
+					printf_debug(DEBUG_PREFIX_CERT,
+					    "Cannot store certificate. "
+					    "Error: %s.\n",
+					    ERR_error_string(err, NULL));
 					goto fail;
 				}
 

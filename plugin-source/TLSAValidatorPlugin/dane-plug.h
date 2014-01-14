@@ -68,7 +68,7 @@ int dane_validation_init(void);
 
 //*****************************************************************************
 // Main DANE/TLSA validation function, external API
-// Input parmateers:
+// Input parameters:
 //        char* certchain[] - array of derCert in HEX (certificate chain)
 //        int certcount - number of cert in array - count(array)
 //        const uint16_t options - TLSA validator option (debug,IPv4,IPv6)

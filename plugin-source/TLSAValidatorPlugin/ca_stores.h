@@ -43,16 +43,34 @@ extern "C" {
 #endif
 
 
+/* CA certificate files. */
+extern const char *ca_files[];
+
 /* CA certificate directories. */
 extern const char *ca_dirs[];
+
+
+/*!
+ * @brief Try to load CA certificates from supplied files and/or directories.
+ *
+ * @param[in,out] ssl_ctx SSL context.
+ * @param[in]     fname_p NULL-terminated list of file names.
+ * @param[in]     dirname_p NULL-terminated list of directories.
+ * @return 0 on success, -1 else.
+ */
+int X509_store_add_certs_from_files_and_dirs(SSL_CTX *ssl_ctx,
+    const char **fname_p, const char **dirname_p);
 
 
 /*!
  * @brief Access directories containing CA certificates and store them.
  *
  * @param[in,out] store     X509 certificate store.
- * @param[in]     dirname_p NULL terminated list of directory names.
+ * @param[in]     dirname_p NULL-terminated list of directory names.
  * @return 0 on success, -1 else.
+ *
+ * @note The function iterates over all files in the directories ans tries to
+ * store the certificates.
  */
 int X509_store_add_certs_from_dirs(X509_STORE *store, const char **dirname_p);
 
@@ -74,7 +92,7 @@ extern const char * cert8_ca_dirs[];
  * @brief Access user managed cert8.db files in specified directories.
  *
  * @param[in,out] store     X509 certificate store.
- * @param[in]     dirname_p NULL terminated list of directory names.
+ * @param[in]     dirname_p NULL-terminated list of directory names.
  * @return 0 on success, -1 else.
  */
 int X509_store_add_certs_from_cert8_dirs(X509_STORE *store,

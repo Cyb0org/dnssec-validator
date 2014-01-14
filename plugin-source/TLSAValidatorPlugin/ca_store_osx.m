@@ -42,7 +42,7 @@ OpenSSL used as well as that of the covered work.
 
 #define VRCFRelease(object) \
 	do { \
-		if(object) CFRelease(object); \
+		if (object) CFRelease(object); \
 	} while(0)
 
 
@@ -59,7 +59,7 @@ int X509_store_add_certs_from_osx_store(X509_STORE *store)
 	status = SecKeychainOpen(
 	    "/System/Library/Keychains/SystemRootCertificates.keychain",
 	    &keychain);
-	if(status) {
+	if (status) {
 		VRCFRelease(keychain);
 		return -1;
 	}
@@ -106,6 +106,7 @@ int X509_store_add_certs_from_osx_store(X509_STORE *store)
 
 		const unsigned char *der;
 		X509 *x509 = NULL;
+		unsigned long err;
 		der = certData.Data;
 		x509 = d2i_X509(NULL, &der, certData.Length);
 		if (x509 == NULL) {
@@ -113,8 +114,11 @@ int X509_store_add_certs_from_osx_store(X509_STORE *store)
 			    "Cannot create DER.\n");
 		}
 		if (X509_STORE_add_cert(store, x509) == 0) {
-			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
-			    "Cannot store x509.\n");
+			err = ERR_get_error();
+			printf_debug(DEBUG_PREFIX_CERT,
+			    "Cannot store certificate. "
+			    "Error: %s.\n",
+			    ERR_error_string(err, NULL));
 		}
 		X509_free(x509); x509 = NULL;
 

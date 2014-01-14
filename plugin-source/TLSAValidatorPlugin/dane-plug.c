@@ -1786,9 +1786,8 @@ int dane_validation_init(void)
 
 #if CA_STORE == DIR_CA_STORE
 	/* Load certificates. */
-	if (X509_store_add_certs_from_dirs(
-	        SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx),
-	        ca_dirs) != 0) {
+	if (X509_store_add_certs_from_files_and_dirs(glob_val_ctx.ssl_ctx,
+	        ca_files, ca_dirs) != 0) {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 		    "Failed loading browser CA cerificates.");
 		goto fail;
