@@ -88,11 +88,25 @@ extern int global_debug;
 	} while (0)
 
 
+/* Error codes. */
 #define ERROR_RESOLVER -2 /* Resolver error. */
 #define ERROR_GENERIC -1 /*
                           * Any error except of those which have their own
                           * codes.
                           */
+
+
+/*!
+ * @brief Initialise unbound resolver context.
+ *
+ * @param[in]  optdnssrv    Space-separated list of resolver IP addresses.
+ * @param[out] err_code_ptr Location to which to write the error code.
+ * @param[in]  usefwd       Use exrernal resolvers.
+ * @param[in]  userootds    Use root key with DS record of root zone.
+ * @return Pointer to newly created unbound context or NULL on failure.
+ */
+struct ub_ctx * unbound_resolver_init(const char *optdnssrv,
+    int *err_code_ptr, int usefwd, int userootds, const char *debug_prefix);
 
 
 #ifdef __cplusplus

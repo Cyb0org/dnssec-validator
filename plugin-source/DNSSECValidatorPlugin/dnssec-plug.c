@@ -474,118 +474,6 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 
 
 //*****************************************************************************
-// Initialises Unbound resolver
-//
-// opts         - options
-// optdnssrv    - list of IP resolver addresses separated by space
-// err_code_ptr - error code
-//
-// Returns pointer to new resolver context, NULL if fails.
-// If NULL returned then err_code is set if given
-// ----------------------------------------------------------------------------
-static
-struct ub_ctx * unbound_resolver_init(const struct dnssec_options_st *opts,
-    const char *optdnssrv, int *err_code_ptr)
-{
-	struct ub_ctx *ub = NULL;
-	int err_code = DNSSEC_ERROR_RESOLVER;
-	int ub_retval;
-
-	ub = ub_ctx_create();
-	if(ub == NULL) {
-		printf_debug(DEBUG_PREFIX, "%s\n",
-		    "Error: could not create unbound context.");
-		goto fail;
-	}
-
-	/* Set resolver/forwarder if it was set in options. */
-	if (opts->usefwd) {
-		if ((optdnssrv != NULL) && (optdnssrv[0] != '\0')) {
-			size_t size = strlen(optdnssrv) + 1;
-			char *str_cpy = malloc(size);
-			const char *fwd_addr;
-			const char *delims = " ";
-			if (str_cpy == NULL) {
-				err_code = DNSSEC_ERROR_GENERIC;
-				goto fail;
-			}
-			memcpy(str_cpy, optdnssrv, size);
-			fwd_addr = strtok(str_cpy, delims);
-			/* Set IP addresses of resolvers into ub context. */
-			while (fwd_addr != NULL) {
-				printf_debug(DEBUG_PREFIX,
-				    "Adding resolver IP address '%s'\n",
-				    fwd_addr);
-				ub_retval = ub_ctx_set_fwd(ub, fwd_addr);
-				if (ub_retval != 0) {
-					printf_debug(DEBUG_PREFIX,
-					    "Error adding resolver IP address '%s': %s\n",
-					    fwd_addr, ub_strerror(ub_retval));
-					free(str_cpy);
-					goto fail;
-				}
-				fwd_addr = strtok(NULL, delims);
-			}
-			free(str_cpy);
-		} else {
-			printf_debug(DEBUG_PREFIX, "%s\n",
-			    "Using system resolver.");
-			ub_retval = ub_ctx_resolvconf(ub, NULL);
-			if (ub_retval != 0) {
-				printf_debug(DEBUG_PREFIX,
-				    "Error reading resolv.conf: %s. errno says: %s\n",
-				    ub_strerror(ub_retval),
-				    strerror(errno));
-				goto fail;
-			}
-		}
-	}
-
-	/*
-	 * Read public keys of root zone for DNSSEC verification.
-	 * ds true = zone key will be set from file root.key
-	 *    false = zone key will be set from TA constant
-	 */
-	if (opts->ds) {
-		ub_retval = ub_ctx_add_ta_file(ub, "root.key");
-		if (ub_retval != 0) {
-			printf_debug(DEBUG_PREFIX, "Error adding keys: %s\n",
-			    ub_strerror(ub_retval));
-			goto fail;
-		}
-	} else {
-		ub_retval = ub_ctx_add_ta(ub, TA);
-		if (ub_retval != 0) {
-			printf_debug(DEBUG_PREFIX, "Error adding keys: %s\n",
-			    ub_strerror(ub_retval));
-			goto fail;
-		}
-		/* Set dlv-anchor.
-		 * (TODO -- This location differs from DANE validation.
-		 * Why?) */
-		ub_retval = ub_ctx_set_option(ub, "dlv-anchor:", DLV);
-		if (ub_retval != 0) {
-			printf_debug(DEBUG_PREFIX,
-			    "Error adding DLV keys: %s\n",
-			    ub_strerror(ub_retval));
-			goto fail;
-		}
-	}
-
-	return ub;
-
-fail:
-	if (ub != NULL) {
-		ub_ctx_delete(ub);
-	}
-	if (err_code_ptr != NULL) {
-		*err_code_ptr = err_code;
-	}
-	return NULL;
-}
-
-
-//*****************************************************************************
 // Initialises global validation structures.
 // ----------------------------------------------------------------------------
 int dnssec_validation_init(void)
@@ -641,12 +529,20 @@ int dnssec_validate(const char *domain, uint16_t options,
 
 	// if context is not created
 	if (glob_val_ctx.ub == NULL) {
-		glob_val_ctx.ub = unbound_resolver_init(&glob_val_ctx.opts,
-		    optdnssrv, &exitcode);
+		glob_val_ctx.ub = unbound_resolver_init(optdnssrv, &exitcode,
+		    glob_val_ctx.opts.usefwd, glob_val_ctx.opts.ds,
+		    DEBUG_PREFIX);
 		if(glob_val_ctx.ub == NULL) {
 			printf_debug(DEBUG_PREFIX, "%s\n",
 			    "Error: could not create unbound context.");
-			return exitcode;
+			switch (exitcode) {
+			case ERROR_RESOLVER:
+				return DNSSEC_ERROR_RESOLVER;
+			case ERROR_GENERIC:
+				return DNSSEC_ERROR_GENERIC;
+			default:
+				return exitcode;
+			}
 		}
 	}
 
