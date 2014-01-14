@@ -54,8 +54,6 @@ int X509_store_add_certs_from_osx_store(X509_STORE *store)
 
 	SecKeychainRef keychain = NULL;
 
-	printf_debug();
-
 	status = SecKeychainOpen(
 	    "/System/Library/Keychains/SystemRootCertificates.keychain",
 	    &keychain);

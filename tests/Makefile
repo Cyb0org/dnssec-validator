@@ -23,15 +23,15 @@ LOC_LIBS := -L$(LOC_LOCATION)/lib -Wl,-rpath,$(LOC_LOCATION)/lib -lunbound -lldn
 OPTFLAGS = -g -O0
 #OPTFLAGS = -g -O3
 CPPFLAGS += -DCMNDLINE_TEST
-CPPFLAGS += -DRES_OSX
-CPPFLAGS += -DCA_STORE=DIR_CA_STORE
+CPPFLAGS += -DRES_OSX -DCA_STORE=OSX_CA_STORE
+#CPPFLAGS += -DCA_STORE=DIR_CA_STORE
 CFLAGS_NOSTD += $(INCLUDES) -Wall -Wextra -pedantic $(OPTFLAGS)
 CFLAGS_NOSTD += $(shell pkg-config --cflags nss)
 CFLAGS += $(CFLAGS_NOSTD) -std=c99
 CXXFLAGS += $(INCLUDES) -Wall -Westra -pedantic $(OPTFLAGS)
 LDFLAGS += $(LIBS)
 LDFLAGS += $(shell pkg-config --libs nss)
-#LDFLAGS += -framework Cocoa -framework Security
+LDFLAGS += -framework Cocoa -framework Security
 
 TARGETS := dane-plug unbound-test-dnssec ssl-test dnssec-plug
 TARGETS_LOCLIBS := dane-plug-loclibs dnssec-plug-loclibs
@@ -62,7 +62,7 @@ clean:
 common.o: ../plugin-source/common/common.c ../plugin-source/common/common.h
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(PLUGIN_INCLUDES)
 
-dane-plug: dane-plug.o common.o ca_store_directory.o ca_store_nss.o
+dane-plug: dane-plug.o common.o ca_store_osx.o
 	$(CC) $^ -o $@ $(LDFLAGS) $(PLUGIN_LIBS)
 
 dane-plug.o: ../plugin-source/TLSAValidatorPlugin/dane-plug.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
