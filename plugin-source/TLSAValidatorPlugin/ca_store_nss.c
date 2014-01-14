@@ -1,7 +1,7 @@
 /* ***** BEGIN LICENSE BLOCK *****
 Copyright 2013 CZ.NIC, z.s.p.o.
 File: DANE/TLSA library
-Authors: Martin Straka <martin.straka@nic.cz> 
+Authors: Martin Straka <martin.straka@nic.cz>
          Karel Slany <karel.slany@nic.cz>
 
 This file is part of TLSA Validator 2 Add-on.

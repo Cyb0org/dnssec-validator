@@ -1,7 +1,7 @@
 /* ***** BEGIN LICENSE BLOCK *****
 Copyright 2013 CZ.NIC, z.s.p.o.
 File: DANE/TLSA library
-Authors: Martin Straka <martin.straka@nic.cz> 
+Authors: Martin Straka <martin.straka@nic.cz>
 
 This file is part of TLSA Validator 2 Add-on.
 
@@ -74,11 +74,11 @@ OpenSSL used as well as that of the covered work.
   #include <iphlpapi.h>
   #include <winreg.h>
 
-  #define MY_ENCODING_TYPE  (PKCS_7_ASN_ENCODING | X509_ASN_ENCODING)  
+  #define MY_ENCODING_TYPE  (PKCS_7_ASN_ENCODING | X509_ASN_ENCODING)
 
   #ifndef CERT_SYSTEM_STORE_CURRENT_USER
     #define CERT_SYSTEM_STORE_CURRENT_USER 0x00010000
-  #endif 
+  #endif
 
   #ifndef CCERT_CLOSE_STORE_CHECK_FLAG
     #define CERT_CLOSE_STORE_CHECK_FLAG 0x00000002
@@ -88,7 +88,7 @@ OpenSSL used as well as that of the covered work.
 /* OS X */
   #include <sys/types.h>
   #include <sys/socket.h>
-  
+
   #include <arpa/inet.h>
   #include <netdb.h>
   #include <netinet/in.h>
@@ -144,7 +144,7 @@ static const char byteMap[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
 static int byteMapLen = sizeof(byteMap);
 //----------------------------------------------------------------------------
 /* structure to save TLSA records */
-struct tlsa_store_ctx {   
+struct tlsa_store_ctx {
 	char *domain;
 	uint8_t dnssec_status;
 	uint8_t cert_usage;
@@ -420,7 +420,7 @@ void add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list,
 		while (tmp->next != NULL) {
 			tmp = tmp->next;
 		}
-		tmp->next = field_tlsa; 
+		tmp->next = field_tlsa;
 	} else {
 		tlsa_list->first = field_tlsa;
 	}
@@ -505,28 +505,28 @@ struct tlsa_store_head policyFilter(struct tlsa_store_head *tlsa_list, int polic
 {
 	struct tlsa_store_head tlsa_list_new;
 	tlsa_list_new.first = NULL;
-    
+
 	struct tlsa_store_ctx *tmp;
 	tmp=tlsa_list->first;
-	
+
 	while (tmp != NULL) {
 		switch (tmp->cert_usage) {
 		case CA_CERT_PIN:
 		case EE_CERT_PIN:
 			if (policy & ALLOW_TYPE_01) {
-				add_tlsarecord_bottom(&tlsa_list_new, 
+				add_tlsarecord_bottom(&tlsa_list_new,
 				tmp->domain, tmp->dnssec_status, tmp->cert_usage,
-				tmp->selector, tmp->matching_type, tmp->association, 
-				tmp->association_size, (char*)tmp->assochex); 
+				tmp->selector, tmp->matching_type, tmp->association,
+				tmp->association_size, (char*)tmp->assochex);
 			}
 			break;
 		case CA_TA_ADDED:
 		case EE_TA_ADDED:
 			if (policy & ALLOW_TYPE_23) {
-				add_tlsarecord_bottom(&tlsa_list_new, 
+				add_tlsarecord_bottom(&tlsa_list_new,
 				tmp->domain, tmp->dnssec_status, tmp->cert_usage,
 				tmp->selector, tmp->matching_type, tmp->association,
-				tmp->association_size, (char*)tmp->assochex); 
+				tmp->association_size, (char*)tmp->assochex);
 			}
 			break;
 		default:
@@ -569,7 +569,7 @@ void print_tlsalist_debug(const struct tlsa_store_head *tlsa_list)
 		++num;
 		tmp = tmp->next;
 	}
-} 
+}
 
 //*****************************************************************************
 // Helper function (print certificate list)
@@ -661,7 +661,7 @@ void free_certlist(struct cert_store_head *cert_list)
 // Helper function (add new record in the certificate list - first)
 // ----------------------------------------------------------------------------
 static
-void add_certrecord(struct cert_store_head *cert_list, char* cert_der, 
+void add_certrecord(struct cert_store_head *cert_list, char* cert_der,
     int cert_len, char* cert_der_hex,  char* spki_der, int spki_len,
     char* spki_der_hex)
 {
@@ -713,7 +713,7 @@ void add_certrecord_bottom(struct cert_store_head *cert_list,
 		while (tmp->next) {
 			tmp = tmp->next;
 		}
-		tmp->next = field_cert; 
+		tmp->next = field_cert;
 	} else {
 		cert_list->first = field_cert;
 	}
@@ -1079,7 +1079,7 @@ char * strcat_clone(const char *s1, const char *s2)
 //*****************************************************************************
 // Get certificates from SSL handshake
 // Add certificate into structure
-// Helper function 
+// Helper function
 // return 0 success or -1 on error
 // ----------------------------------------------------------------------------
 static
@@ -1398,7 +1398,7 @@ int eeCertMatch1(const struct tlsa_store_ctx *tlsa_ctx,
 
 	if (strcmp((const char *) data,
 	        (const char *) tlsa_ctx->assochex) == 0) {
-		ret_val = DANE_VALID_TYPE1; 
+		ret_val = DANE_VALID_TYPE1;
 	}
 
 	printf_debug(DEBUG_PREFIX_DANE, "cert: %s\n", data);
@@ -1431,7 +1431,7 @@ int eeCertMatch3(const struct tlsa_store_ctx *tlsa_ctx,
 
 	if (strcmp((const char *) data,
 	        (const char *) tlsa_ctx->assochex) == 0) {
-		ret_val = DANE_VALID_TYPE3; 
+		ret_val = DANE_VALID_TYPE3;
 	}
 
 	printf_debug(DEBUG_PREFIX_DANE, "cert: %s\n", data);
@@ -1448,7 +1448,7 @@ int eeCertMatch3(const struct tlsa_store_ctx *tlsa_ctx,
 // ----------------------------------------------------------------------------
 static
 int caCertMatch(const struct tlsa_store_ctx *tlsa_ctx,
-    const struct cert_store_head *cert_list) 
+    const struct cert_store_head *cert_list)
 {
 	const struct cert_store_ctx *aux_cert;
 
@@ -1617,13 +1617,13 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 			ldns_status parse_status = ldns_wire2pkt(&packet,
 			    (uint8_t *)(ub_res->answer_packet),
 			    ub_res->answer_len);
-        
+
 			if (parse_status != LDNS_STATUS_OK) {
 				printf_debug(DEBUG_PREFIX_TLSA, "%s\n",
 				     "Failed to parse response packet\n");
 				return DANE_ERROR_RESOLVER;
 			}
-        
+
 			ldns_rr_list *rrs = ldns_pkt_rr_list_by_type(packet,
 			    LDNS_RR_TYPE_TLSA, LDNS_SECTION_ANSWER);
 
@@ -1675,7 +1675,7 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 				ldns_rr_free(rr);
 			}
 
-			exitcode = DANE_DNSSEC_SECURED;                
+			exitcode = DANE_DNSSEC_SECURED;
 			if (packet) {
 				ldns_pkt_free(packet);
 			}
@@ -1847,11 +1847,11 @@ fail:
 // Input parmateers:
 //        char* certchain[] - array of derCert in HEX (certificate chain)
 //        int certcount - number of cert in array - count(array)
-//        const uint16_t options - TLSA validator option (debug,IPv4,IPv6) 
+//        const uint16_t options - TLSA validator option (debug,IPv4,IPv6)
 //        char *optdnssrv - list of IP resolver addresses separated by space
 //        char* domain - domain name (e.g.: wwww.nic.cz, torproject.org, ...)
 //        char* port_str - number of port for SSL (443, 25)
-//        char* protocol - "tcp" only 
+//        char* protocol - "tcp" only
 //        int policy - certificate policy from browser
 // Return: DANE/TLSA validation status (x<0 = error, <0-13> = success, x>16 = fail)
 //         return values: dane-state.gen file
@@ -2006,7 +2006,7 @@ int dane_validate(const char *certchain[], int certcount, uint16_t options,
 
 	free_tlsalist(&tlsa_list);
 	free_certlist(&cert_list);
-  
+
 	return retval;
 
 #undef HTTPS_PREF
@@ -2042,7 +2042,7 @@ const char *certhex[] = {"12345678"};
 //*****************************************************************************
 // Main function for testing of lib, input: domain name
 // ----------------------------------------------------------------------------
-int main(int argc, char **argv) 
+int main(int argc, char **argv)
 {
 	const char *dname = NULL, *port = NULL;
 	const char *resolver_addresses = NULL;

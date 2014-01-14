@@ -1,7 +1,7 @@
 /* ***** BEGIN LICENSE BLOCK *****
 Copyright 2013 CZ.NIC, z.s.p.o.
 File: DANE/TLSA library
-Authors: Martin Straka <martin.straka@nic.cz> 
+Authors: Martin Straka <martin.straka@nic.cz>
          Karel Slany <karel.slany@nic.cz>
 
 This file is part of TLSA Validator 2 Add-on.
@@ -48,7 +48,7 @@ extern "C" {
 #define DEBUG_PREFIX_CERT "CERT: "
 #define DEBUG_PREFIX_DANE "DANE: "
 #define DEBUG_PREFIX_DNSSEC "DNSSEC: "
-#define DEBUG_PREFIX_TLSA "TLSA: "        
+#define DEBUG_PREFIX_TLSA "TLSA: "
 
 
 /* Global flag, used for generating debugging information. */
