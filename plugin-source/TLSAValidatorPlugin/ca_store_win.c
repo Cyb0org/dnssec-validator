@@ -34,7 +34,25 @@ OpenSSL used as well as that of the covered work.
 #include "ca_stores.h"
 #include "common.h"
 
+#include "openssl/err.h"
+#include "openssl/x509.h"
+#include "openssl/evp.h"
 
+#include "ldns/config.h"
+//#include "ldns/ldns.h"
+//#include "libunbound/unbound.h"
+
+#include <wincrypt.h>
+
+#define MY_ENCODING_TYPE  (PKCS_7_ASN_ENCODING | X509_ASN_ENCODING)
+
+#ifndef CERT_SYSTEM_STORE_CURRENT_USER
+	#define CERT_SYSTEM_STORE_CURRENT_USER 0x00010000
+#endif
+
+#ifndef CCERT_CLOSE_STORE_CHECK_FLAG
+	#define CERT_CLOSE_STORE_CHECK_FLAG 0x00000002
+#endif
 /*
  * Access Windows CA store and store the certificates.
  */
@@ -65,12 +83,12 @@ int X509_store_add_certs_from_win_store(X509_STORE *store)
 		L"Root"
 		);
 	if (hSysStore == NULL) {
-		printf_debug(DEBUG_PREFIX_CERT,
-		    "Error during accessing Windows CA store.\n");
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+			"Error during accessing Windows CA store.\n");
 		goto fail;
 	}
-	printf_debug(DEBUG_PREFIX_CERT,
-	    "The system store was created successfully.\n");
+	printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		"The system store was created successfully.\n");
 
 	while ((pCertContext = CertEnumCertificatesInStore(
 	                          hSysStore, pCertContext)) != NULL) {
@@ -92,16 +110,15 @@ int X509_store_add_certs_from_win_store(X509_STORE *store)
 
 		x509 = d2i_X509(NULL, &der, pCertContext->cbCertEncoded);
 		if (x509 == NULL) {
-			printf_debug(DEBUG_PREFIX_CERT,
-			    "Cannot create X509 from DER.\n");
+			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+				"Cannot create X509 from DER.\n");
 		}
 
 		if (X509_STORE_add_cert(store, x509) == 0) {
 			err = ERR_get_error();
 			printf_debug(DEBUG_PREFIX_CERT,
-				    "Cannot store certificate. "
-				    "Error: %s.\n",
-				    ERR_error_string(err, NULL))
+				"Cannot store certificate. Error: %s.\n",
+				ERR_error_string(err, NULL));
 			goto fail;
 		}
 
@@ -115,10 +132,10 @@ int X509_store_add_certs_from_win_store(X509_STORE *store)
 	}
 
 	if (CertCloseStore(hSysStore, CERT_CLOSE_STORE_CHECK_FLAG)) {
-		printf_debug(DEBUG_PREFIX_CERT,
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 		    "Win CA store was closed successfully.\n");
 	} else {
-		printf_debug(DEBUG_PREFIX_CERT,
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 		    "Error during closing Win CA store.\n");
 		return -1;
 	}
