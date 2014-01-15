@@ -43,6 +43,7 @@ OpenSSL used as well as that of the covered work.
 /* Select which CA store to use. */
 #ifndef CA_STORE
    #define CA_STORE NONE_CA_STORE
+   #warning "No CA store is being used."
 #endif /* !CA_STORE */
 
 
