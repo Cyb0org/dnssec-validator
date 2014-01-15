@@ -50,13 +50,17 @@ OpenSSL used as well as that of the covered work.
 
 
 /* TODO -- These location should be given at configuration time. */
-#define OPENSSL_CA_FILE "/etc/ssl/certs/ca-certificates.crt"
+#define OPENSSL1_CA_FILE "/etc/ssl/certs/ca-certificates.crt"
+#define OPENSSL2_CA_FILE "/etc/ssl/certs/ca-bundle.crt" /* Fedora. */
+#define OPENSSL3_CA_FILE "/etc/ssl/certs/ca-bundle.trust.crt" /* Fedora. */
 #define MOZILLA_CA_DIR "/usr/share/ca-certificates/mozilla"
 #define OPENSSL_CA_DIR "/etc/ssl/certs"
 
 /* CA certificate files. */
 const char *ca_files[] = {
-	OPENSSL_CA_FILE,
+	OPENSSL1_CA_FILE,
+	OPENSSL2_CA_FILE,
+	OPENSSL3_CA_FILE,
 	NULL};
 
 /* CA certificate directories. */

@@ -1791,7 +1791,7 @@ int dane_validation_init(void)
 	        ca_files, ca_dirs) != 0) {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 		    "Failed loading browser CA cerificates.");
-		goto fail;
+		//goto fail; /* Failure is not desired, ingore return value. */
 	}
 #endif /* DIR_CA_STORE */
 
@@ -1800,7 +1800,7 @@ int dane_validation_init(void)
 	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx)) != 0) {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 		    "Failed loading NSS built-in CA cerificates.");
-		goto fail;
+		//goto fail; /* Failure is not desired, ingore return value. */
 	}
 #endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
 
@@ -1810,7 +1810,7 @@ int dane_validation_init(void)
 	    cert8_ca_dirs) != 0) {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 		    "Failed loading NSS CA cerificates from cert8.db.");
-		goto fail;
+		//goto fail; /* Failure is not desired, ingore return value. */
 	}
 #endif /* NSS_CERT8_CA_STORE */
 
@@ -1819,7 +1819,7 @@ int dane_validation_init(void)
 	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx)) != 0) {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 		    "Failed loading OS X CA cerificates.");
-		goto fail;
+		//goto fail; /* Failure is not desired, ingore return value. */
 	}
 #endif /* OSX_CA_STORE */
 
@@ -1828,7 +1828,7 @@ int dane_validation_init(void)
 	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx)) != 0) {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 		    "Failed loading Windows CA cerificates.");
-		goto fail;
+		//goto fail; /* Failure is not desired, ingore return value. */
 	}
 #endif /* WIN32 && WIN_CA_STORE */
 
