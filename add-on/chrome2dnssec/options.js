@@ -355,7 +355,9 @@ window.addEventListener('load',function(){
 
 		var domainfilteron = localStorage["domainfilteron"];
 		var domainlist = localStorage["domainlist"];
-
+		if (domainlist == undefined) {
+			domainlist = "";
+		}
 		if (dnssecResolver == undefined) {
 			dnssecResolver = defaultResolver;
 		}
@@ -387,6 +389,9 @@ window.addEventListener('load',function(){
 		child.checked = "true";
 		var domainfilteron = localStorage["domainfilteron"];
 		var domainlist = localStorage["domainlist"];
+		if (domainlist == undefined) {
+			domainlist = "";
+		}
 		var DebugOutput = localStorage["DebugOutput"];
 		document.dnssecSettings.domainlist.value = domainlist;
 		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;

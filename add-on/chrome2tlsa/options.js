@@ -358,7 +358,9 @@ window.addEventListener('load',function() {
 		var clearcache = localStorage["clearcache"];
 		var AllHttps = localStorage["AllHttps"];
 		var domainlist = localStorage["domainlist"];
-
+		if (domainlist == undefined) {
+			domainlist = "";
+		}
 		if (dnssecResolver == undefined) {
 			dnssecResolver = defaultResolver;
 		}
@@ -394,6 +396,9 @@ window.addEventListener('load',function() {
 		child.checked = "true";
 		var domainfilteron = localStorage["domainfilteron"];
 		var domainlist = localStorage["domainlist"];
+		if (domainlist == undefined) {
+			domainlist = "";
+		}
 		var blockhttps = localStorage["blockhttps"];
 		var clearcache = localStorage["clearcache"];
 		var DebugOutput = localStorage["DebugOutput"];

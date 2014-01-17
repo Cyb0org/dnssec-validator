@@ -463,6 +463,9 @@ function ExcludeDomainList(domain) {
 		var DomainSeparator = /[.]+/;
 		var DomainArray = domain.split(DomainSeparator);
 		var DomainList = localStorage["domainlist"];
+		if (DomainList == undefined) {
+			return result;
+		}
 		var DomainListSeparators = /[ ,;]+/;
 		var DomainListArray = DomainList.split(DomainListSeparators);
 
