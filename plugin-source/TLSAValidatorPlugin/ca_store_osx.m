@@ -46,7 +46,6 @@ OpenSSL used as well as that of the covered work.
 	} while(0)
 
 
-#ifdef RES_OSX
 int X509_store_add_certs_from_osx_store(X509_STORE *store)
 {
 	OSStatus status;
@@ -158,4 +157,3 @@ int X509_store_add_certs_from_osx_store(X509_STORE *store)
 
 	return 0;
 }
-#endif /* RES_OSX */

@@ -85,19 +85,6 @@ OpenSSL used as well as that of the covered work.
     #define CERT_CLOSE_STORE_CHECK_FLAG 0x00000002
   #endif
 
-#elif defined RES_OSX
-/* OS X */
-  #include <sys/types.h>
-  #include <sys/socket.h>
-
-  #include <arpa/inet.h>
-  #include <netdb.h>
-  #include <netinet/in.h>
-
-  #include "ldns/ldns.h"
-  #include "ldns/packet.h"
-  #include "unbound.h"
-
 #else
 /* Linux */
   #include <sys/stat.h> /* stat(2) */

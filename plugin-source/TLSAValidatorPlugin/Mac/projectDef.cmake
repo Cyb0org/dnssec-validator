@@ -15,7 +15,7 @@ file (GLOB PLATFORM RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
 # use this to add preprocessor definitions
 add_definitions(
-    
+  -DCA_STORE=OSX_CA_STORE
 )
 
 
@@ -23,6 +23,7 @@ SOURCE_GROUP(Mac FILES ${PLATFORM})
 
 set (SOURCES
     ${SOURCES}
+    ca_store_osx.m
     ${PLATFORM}
     )
 
@@ -55,6 +56,9 @@ add_library(crypto STATIC IMPORTED)
 set_property(TARGET crypto PROPERTY IMPORTED_LOCATION
              ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/openssl/lib/libcrypto.a)
 
+FIND_LIBRARY(COCOA_FRAMEWORK Cocoa)
+FIND_LIBRARY(SECURITY_FRAMEWORK Security)
+
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
 target_link_libraries(${PROJNAME}
     ${PLUGIN_INTERNAL_DEPS}
@@ -62,4 +66,6 @@ target_link_libraries(${PROJNAME}
     ldns
     ssl
     crypto
+    ${COCOA_FRAMEWORK}
+    ${SECURITY_FRAMEWORK}
     )
