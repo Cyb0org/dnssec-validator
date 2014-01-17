@@ -458,6 +458,9 @@ function ExcludeDomainList(domain) {
 
 	var result = true;
  	var DoaminFilter = localStorage["domainfilteron"];
+	if (DoaminFilter == undefined) {
+		DoaminFilter = false;
+	}
 	DoaminFilter = (DoaminFilter == "false") ? false : true;
 	if (DoaminFilter) {
 		var DomainSeparator = /[.]+/;
@@ -491,7 +494,11 @@ function ExcludeDomainList(domain) {
 function onUrlChange(tabId, changeInfo, tab) {                  	
 
 	debuglogout = localStorage["DebugOutput"];
-	debuglogout = (debuglogout == "false") ? false : true;
+	if (debuglogout == undefined) {
+		debuglogout = false;
+	} else {
+		debuglogout = (debuglogout == "false") ? false : true;
+	}
 
 	if (changeInfo.status == "undefined") {
 		//chrome.pageAction.hide(tabId);

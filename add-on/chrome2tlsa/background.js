@@ -442,7 +442,11 @@ function ExcludeDomainList(domain) {
 
 	var result = true;
  	var DoaminFilter = localStorage["domainfilteron"];
-	DoaminFilter = (DoaminFilter == "false") ? false : true;
+	if (DoaminFilter == undefined) {
+		DoaminFilter = false;
+	} else {
+		DoaminFilter = (DoaminFilter == "false") ? false : true;
+	}
 	if (DoaminFilter) {
 		var DomainSeparator = /[.]+/;
 		var DomainArray = domain.split(DomainSeparator);
@@ -476,6 +480,14 @@ function TLSAvalidate(scheme, domain, port){
 	if (debuglogout) {
 		console.log(DANE + "--------- Start of TLSA Validation ("+ scheme +":"+ domain +":"+ port +") ---------");	
 	}       	   
+
+	debuglogout = localStorage["DebugOutput"];
+	if (debuglogout == undefined) {
+		debuglogout = false;
+	} else {
+		debuglogout = (debuglogout == "false") ? false : true;
+	}
+
 
     	var c = this.tlsaExtNPAPIConst;
 	var result = c.DANE_OFF;
@@ -902,12 +914,20 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(details) {
 chrome.webRequest.onBeforeRequest.addListener(function(details) {
 
 	checkall = localStorage["AllHttps"]; 
-	checkall = (checkall == "false") ? false : true; 
+	if (checkall == undefined) {
+		checkall = false;
+	} else {
+		checkall = (checkall == "false") ? false : true;
+	}
+
 	if (checkall) {
 
 		if (details.tabId >= 0) {
 
 			var cachefree = localStorage["cachefree"];
+			if (cachefree == undefined) {
+				cachefree = 0;
+			}
 			if (cachefree == 1) {
 				tlsaExtCache.delAllRecords();
 				localStorage["cachefree"] = 0;
@@ -937,7 +957,11 @@ var callback = function () {
 if (initcache) {
 	
 	debuglogout = localStorage["DebugOutput"];
-	debuglogout = (debuglogout == "false") ? false : true; 
+	if (debuglogout == undefined) {
+		debuglogout = false;
+	} else {
+		debuglogout = (debuglogout == "false") ? false : true;
+	}
 
 	tlsaExtCache.init();
 	var clearcache = localStorage["clearcache"];
