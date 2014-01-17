@@ -23,44 +23,48 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 // DNSSEC preferences functions
 var dnssecExtAbout = {
 
-  prefObj : Components.classes["@mozilla.org/preferences-service;1"]
-            .getService(Components.interfaces.nsIPrefBranch),
-  prefBranch : "extensions.dnssec.",
+prefObj :
+	Components.classes["@mozilla.org/preferences-service;1"]
+	.getService(Components.interfaces.nsIPrefBranch),
+prefBranch : "extensions.dnssec."
+	,
 
-  isInstantApply : function() {
-    try {
-      return Components.classes["@mozilla.org/preferences-service;1"]
-             .getService(Components.interfaces.nsIPrefBranch)
-             .getBoolPref("browser.preferences.instantApply", false);
-    } catch (ex) {
-      return null;
-    }
-  },
+isInstantApply :
+	function() {
+		try {
+			return Components.classes["@mozilla.org/preferences-service;1"]
+			.getService(Components.interfaces.nsIPrefBranch)
+			.getBoolPref("browser.preferences.instantApply", false);
+		} catch (ex) {
+			return null;
+		}
+	},
 
 
-  showAboutWindow : function() {
-    var about = "chrome://dnssec/content/about.xul";
+showAboutWindow :
+	function() {
+		var about = "chrome://dnssec/content/about.xul";
 
-    // Check if the pref window is not already opened
-    var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-                       .getService(Components.interfaces.nsIWindowMediator);
-    var enumerator = wm.getEnumerator(null);
-    while(enumerator.hasMoreElements()) {
-      var win = enumerator.getNext();
-      if (win.document.documentURI == about) {
-        win.focus();
-        return;
-      }
-    }
+		// Check if the pref window is not already opened
+		var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+		         .getService(Components.interfaces.nsIWindowMediator);
+		var enumerator = wm.getEnumerator(null);
+		while(enumerator.hasMoreElements()) {
+			var win = enumerator.getNext();
+			if (win.document.documentURI == about) {
+				win.focus();
+				return;
+			}
+		}
 
-    // Open the pref window
-    var features = "chrome,titlebar,toolbar,centerscreen";
-    try {
-      features += this.isInstantApply() ? ",dialog=yes" : ",modal";
-    } catch (e) {
-      features += ",modal";
-    }    
-    window.openDialog(about, "", features);
-  },
+		// Open the pref window
+		var features = "chrome,titlebar,toolbar,centerscreen";
+		try {
+			features += this.isInstantApply() ? ",dialog=yes" : ",modal";
+		} catch (e) {
+			features += ",modal";
+		}
+		window.openDialog(about, "", features);
+	},
 
 };
