@@ -84,14 +84,14 @@ int X509_store_add_certs_from_win_store(X509_STORE *store)
 		);
 	if (hSysStore == NULL) {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
-			"Error during accessing Windows CA store.\n");
+		    "Error while accessing Windows CA store.\n");
 		goto fail;
 	}
 	printf_debug(DEBUG_PREFIX_CERT, "%s\n",
-		"The system store was created successfully.\n");
+	    "The system store accessed successfully.\n");
 
-	while ((pCertContext = CertEnumCertificatesInStore(
-	                          hSysStore, pCertContext)) != NULL) {
+	while ((pCertContext = CertEnumCertificatesInStore(hSysStore,
+	                           pCertContext)) != NULL) {
 #if 0
 		char * cerhex = bintohex(pCertContext->pbCertEncoded,
 		    pCertContext->cbCertEncoded);
@@ -111,18 +111,18 @@ int X509_store_add_certs_from_win_store(X509_STORE *store)
 		x509 = d2i_X509(NULL, &der, pCertContext->cbCertEncoded);
 		if (x509 == NULL) {
 			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
-				"Cannot create X509 from DER.\n");
+			    "Cannot create X509 from DER.\n");
+			continue;
 		}
 
 		if (X509_STORE_add_cert(store, x509) == 0) {
 			err = ERR_get_error();
 			printf_debug(DEBUG_PREFIX_CERT,
-				"Cannot store certificate. Error: %s.\n",
-				ERR_error_string(err, NULL));
-			goto fail;
+			    "Cannot store certificate. Error: %s.\n",
+			    ERR_error_string(err, NULL));
+		} else {
+			++certcnt;
 		}
-
-		++certcnt;
 
 		X509_free(x509); x509 = NULL;
 	}
@@ -137,7 +137,6 @@ int X509_store_add_certs_from_win_store(X509_STORE *store)
 	} else {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 		    "Error during closing Win CA store.\n");
-		return -1;
 	}
 
 	printf_debug(DEBUG_PREFIX_CERT,
