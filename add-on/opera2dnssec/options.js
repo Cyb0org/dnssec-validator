@@ -34,89 +34,28 @@ function addText(id, str){
 }
 
 //--------------------------------------------------------
-// Helper function from stackeoverflow
+// check correct format of IP addresses in the textarea
 //--------------------------------------------------------
-function substr_count(haystack, needle, offset, length) {
+function test_ip(ip) {
+		var expression = /((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(@\d{1,5})?\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?(@\d{1,5})?\s*$))/;
 
-	var pos = 0, cnt = 0;
-
-	haystack += '';
-	needle += '';
-	if (isNaN(offset)) {offset = 0;}
-	if (isNaN(length)) {length = 0;}
-	offset--;
-
-	while ((offset = haystack.indexOf(needle, offset+1)) != -1) {
-		if (length > 0 && (offset+needle.length) > length) {
-			return false;
-		} else {
-			cnt++;
-		}
-	}
-	return cnt;
-}
-
-
-//--------------------------------------------------------
-// Test if the input is a valid IPv4 address
-//--------------------------------------------------------
-function  test_ipv4(ip) {
-	var match = ip.match(/^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/);
-	return match != null;
-
-}
-
-//--------------------------------------------------------
-// Test if the input is a valid IPv6 address
-//--------------------------------------------------------
-function test_ipv6(ip) {
-
-	// Test for empty address
-	if (ip.length<3) {
-		return ip == "::";
-	}
-
-	// Check if part is in IPv4 format
-	if (ip.indexOf('.')>0) {
-		var lastcolon = ip.lastIndexOf(':');
-		if (!(lastcolon && this.test_ipv4(ip.substr(lastcolon + 1)))) {
-		        return false;
-		}
-		// replace IPv4 part with dummy
-		ip = ip.substr(0, lastcolon) + ':0:0';
-	} 
-
-	// Check uncompressed
-	if (ip.indexOf('::')<0) {
-		var match = ip.match(/^(?:[a-f0-9]{1,4}:){7}[a-f0-9]{1,4}$/i);
+		var match = ip.match(expression);
 		return match != null;
-	}
-
-	// Check colon-count for compressed format
-	if (substr_count(ip, ':')<8) {
-		var match = ip.match(/^(?::|(?:[a-f0-9]{1,4}:)+):(?:(?:[a-f0-9]{1,4}:)*[a-f0-9]{1,4})?$/i);
-		return match != null;
-	} 
-
-	// Not a valid IPv6 address
-	return false;
 }
 
 //--------------------------------------------------------
 // check correct format of IP addresses in the textarea
 //--------------------------------------------------------
 function checkOptdnsserveraddr(str) {
+	
 	var n = str.split(" ");
-	var result = 0;
+	var c = 0;
 	for(c = 0; c < n.length; c++) {
-		if (test_ipv4(n[c]) || test_ipv6(n[c])) {
-		result = 0;
-		} else {
-		result = 1;
+		if (!test_ip(n[c])) {
+			return false;
 		} //if
 	} //for
-	if (result == 1) return false;
-	else return true;
+	return true;
 }
 
 //--------------------------------------------------------
@@ -158,7 +97,8 @@ function saveOptions() {
 	localStorage["domainlist"] = document.dnssecSettings.domainlist.value;
 	document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidator\" width=\"0\" height=\"0\"></object>");
         var plugin = document.getElementById("dnssec-plugin");
-	plugin.CacheFree();
+	plugin.DNSSECCacheFree();
+	plugin.DNSSECCacheInit();
 	document.write("<div>Settings were saved...</div>");
 	document.write("<div>Please, close this window...Thanks</div>");
 	window.close();
@@ -218,7 +158,8 @@ function testdnssec() {
 		try {
 			console.log('INIT parameters: \"'+ dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
 			var plugin = document.getElementById("dnssec-plugin");
-			plugin.CacheFree();
+			plugin.DNSSECCacheFree();
+			plugin.DNSSECCacheInit();
 			testnic = plugin.Validate(dn, options, nameserver, addr);	
 			testnic = testnic[0];
 			console.log('RETURN: '+ testnic);
@@ -353,7 +294,9 @@ window.addEventListener('load',function(){
 
 		var domainfilteron = localStorage["domainfilteron"];
 		var domainlist = localStorage["domainlist"];
-
+		if (domainlist == undefined) {
+			domainlist = "";
+		}
 		if (dnssecResolver == undefined) {
 			dnssecResolver = defaultResolver;
 		}
@@ -385,6 +328,9 @@ window.addEventListener('load',function(){
 		child.checked = "true";
 		var domainfilteron = localStorage["domainfilteron"];
 		var domainlist = localStorage["domainlist"];
+		if (domainlist == undefined) {
+			domainlist = "";
+		}
 		var DebugOutput = localStorage["DebugOutput"];
 		document.dnssecSettings.domainlist.value = domainlist;
 		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;

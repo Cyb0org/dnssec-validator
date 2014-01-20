@@ -14,6 +14,9 @@
 	"blockhttpstext": {
 		"message": "Blockiere HTTPS Verbingung wenn TLSA Validierung scheitert"
 		},	
+	"AllHttpstext": {
+		"message": "Validiere mit TLSA alle HTTPS Verbindungen auf der Webpage"
+		},	
 	"filtertext": {
 		"message": "Liste ausgeschlossener Domänen und TLDs (mit Komma abgetrennt)"
 		},

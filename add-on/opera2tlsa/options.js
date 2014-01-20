@@ -34,89 +34,28 @@ function addText(id, str){
 }
 
 //--------------------------------------------------------
-// Helper function from stackeoverflow
+// check correct format of IP addresses in the textarea
 //--------------------------------------------------------
-function substr_count(haystack, needle, offset, length) {
+function test_ip(ip) {
+		var expression = /((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(@\d{1,5})?\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?(@\d{1,5})?\s*$))/;
 
-	var pos = 0, cnt = 0;
-
-	haystack += '';
-	needle += '';
-	if (isNaN(offset)) {offset = 0;}
-	if (isNaN(length)) {length = 0;}
-	offset--;
-
-	while ((offset = haystack.indexOf(needle, offset+1)) != -1) {
-		if (length > 0 && (offset+needle.length) > length) {
-			return false;
-		} else {
-			cnt++;
-		}
-	}
-	return cnt;
-}
-
-
-//--------------------------------------------------------
-// Test if the input is a valid IPv4 address
-//--------------------------------------------------------
-function  test_ipv4(ip) {
-	var match = ip.match(/^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/);
-	return match != null;
-
-}
-
-//--------------------------------------------------------
-// Test if the input is a valid IPv6 address
-//--------------------------------------------------------
-function test_ipv6(ip) {
-
-	// Test for empty address
-	if (ip.length<3) {
-		return ip == "::";
-	}
-
-	// Check if part is in IPv4 format
-	if (ip.indexOf('.')>0) {
-		var lastcolon = ip.lastIndexOf(':');
-		if (!(lastcolon && this.test_ipv4(ip.substr(lastcolon + 1)))) {
-		        return false;
-		}
-		// replace IPv4 part with dummy
-		ip = ip.substr(0, lastcolon) + ':0:0';
-	} 
-
-	// Check uncompressed
-	if (ip.indexOf('::')<0) {
-		var match = ip.match(/^(?:[a-f0-9]{1,4}:){7}[a-f0-9]{1,4}$/i);
+		var match = ip.match(expression);
 		return match != null;
-	}
-
-	// Check colon-count for compressed format
-	if (substr_count(ip, ':')<8) {
-		var match = ip.match(/^(?::|(?:[a-f0-9]{1,4}:)+):(?:(?:[a-f0-9]{1,4}:)*[a-f0-9]{1,4})?$/i);
-		return match != null;
-	} 
-
-	// Not a valid IPv6 address
-	return false;
 }
 
 //--------------------------------------------------------
 // check correct format of IP addresses in the textarea
 //--------------------------------------------------------
 function checkOptdnsserveraddr(str) {
+	
 	var n = str.split(" ");
-	var result = 0;
+	var c = 0;
 	for(c = 0; c < n.length; c++) {
-		if (test_ipv4(n[c]) || test_ipv6(n[c])) {
-		result = 0;
-		} else {
-		result = 1;
+		if (!test_ip(n[c])) {
+			return false;
 		} //if
 	} //for
-	if (result == 1) return false;
-	else return true;
+	return true;
 }
 
 //--------------------------------------------------------
@@ -156,9 +95,11 @@ function saveOptions() {
 	localStorage["domainfilteron"] = document.tlsaSettings.domainfilteron.checked;
 	localStorage["blockhttps"] = document.tlsaSettings.blockhttps.checked;
 	localStorage["clearcache"] = document.tlsaSettings.clearcache.checked;
+	localStorage["AllHttps"] = document.tlsaSettings.AllHttps.checked;
 	localStorage["domainlist"] = document.tlsaSettings.domainlist.value;
 	var plugin = document.getElementById("tlsa-plugin");
 	plugin.TLSACacheFree();
+	plugin.TLSACacheInit();
 	document.write("<div>Settings were saved...</div>");
 	document.write("<div>Please, close this window...Thanks</div>");
 	localStorage["cachefree"] = 1;
@@ -220,6 +161,7 @@ function testdnssec() {
 			console.log('INIT parameters: \"'+ dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
 			var plugin = document.getElementById("tlsa-plugin");
 			plugin.TLSACacheFree();
+			plugin.TLSACacheInit();
 			var derCerts = new Array();
 			derCerts.push("XXX");
 			testnic = plugin.TLSAValidate(derCerts, 0, options, nameserver, dn, "443", "tcp", 1);     
@@ -339,6 +281,7 @@ window.addEventListener('load',function() {
 	addText("blockhttpstext", chrome.i18n.getMessage("blockhttpstext"));
 	addText("clearcachetext", chrome.i18n.getMessage("clearcachetext"));
 	addText("debugoutputtext", chrome.i18n.getMessage("debugoutputtext"));
+	addText("AllHttpstext", chrome.i18n.getMessage("AllHttpstext"));
 	document.getElementById("testbutton").value=chrome.i18n.getMessage("testbutton");
 	document.getElementById("savebutton").value=chrome.i18n.getMessage("savebutton");
 	document.getElementById("cancelbutton").value=chrome.i18n.getMessage("cancelbutton");
@@ -352,8 +295,11 @@ window.addEventListener('load',function() {
 		var domainfilteron = localStorage["domainfilteron"];
 		var blockhttps = localStorage["blockhttps"];
 		var clearcache = localStorage["clearcache"];
+		var AllHttps = localStorage["AllHttps"];
 		var domainlist = localStorage["domainlist"];
-
+		if (domainlist == undefined) {
+			domainlist = "";
+		}
 		if (dnssecResolver == undefined) {
 			dnssecResolver = defaultResolver;
 		}
@@ -367,10 +313,12 @@ window.addEventListener('load',function() {
 	        document.tlsaSettings.domainlist.value = domainlist;
 		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;
 		blockhttps = (blockhttps == undefined || blockhttps == "true") ? true : false;
-		clearcache = (clearcache == undefined || clearcache == "true") ? true : false;
+		clearcache = (clearcache == undefined || clearcache == "false") ? false : true;
+		AllHttps = (AllHttps == undefined || AllHttps == "false") ? false : true;
 	        document.tlsaSettings.domainfilteron.checked = domainfilteron;
 		document.tlsaSettings.blockhttps.checked = blockhttps;
 		document.tlsaSettings.clearcache.checked = clearcache;
+		document.tlsaSettings.AllHttps.checked = AllHttps;
 		var radiogroup = document.tlsaSettings.resolver;
 		for (var i = 0; i < radiogroup.length; i++) {
 			var child = radiogroup[i];
@@ -387,6 +335,9 @@ window.addEventListener('load',function() {
 		child.checked = "true";
 		var domainfilteron = localStorage["domainfilteron"];
 		var domainlist = localStorage["domainlist"];
+		if (domainlist == undefined) {
+			domainlist = "";
+		}
 		var blockhttps = localStorage["blockhttps"];
 		var clearcache = localStorage["clearcache"];
 		var DebugOutput = localStorage["DebugOutput"];
@@ -395,10 +346,12 @@ window.addEventListener('load',function() {
 		document.tlsaSettings.domainfilteron.checked = domainfilteron;
    		blockhttps = (blockhttps == undefined || blockhttps == "true") ? true : false;
 		document.tlsaSettings.blockhttps.checked = blockhttps;	
-		clearcache = (clearcache == undefined || clearcache == "true") ? true : false;
+		clearcache = (clearcache == undefined || clearcache == "false") ? false : true;
 		document.tlsaSettings.clearcache.checked = clearcache;
 		DebugOutput = (DebugOutput == undefined || DebugOutput == "true") ? true : false;
-		document.tlsaSettings.DebugOutput.checked = DebugOutput;		
+		document.tlsaSettings.DebugOutput.checked = DebugOutput;
+		AllHttps = (AllHttps == undefined || AllHttps == "false") ? false : true;
+		document.tlsaSettings.AllHttps.checked = AllHttps;		
 	}  //state
 });
 

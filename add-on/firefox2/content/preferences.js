@@ -122,18 +122,15 @@ isInstantApply :
 
 checkOptdnsserveraddr :
 	function() {
-		var str=document.getElementById("dnssec-pref-optdnsserveraddr").value;
-		var n=str.split(" ");
-		var result=0;
-		for(c= 0; c<n.length; c++) {
-			if (dnssecExtCheckIPaddr.test_ipv4(n[c]) || dnssecExtCheckIPaddr.test_ipv6(n[c])) {
-				//result=0;
-			} else {
-				result=1;
+		var str = document.getElementById("dnssec-pref-optdnsserveraddr").value;
+		var n = str.split(" ");
+		var c = 0;
+		for(c = 0; c < n.length; c++) {
+			if (!dnssecExtCheckIPaddr.test_ip(n[c])) {
+				return false;
 			} //if
 		} //for
-		if (result==1) return false;
-		else return true;
+		return true;
 	},
 
 
@@ -267,6 +264,7 @@ testdnssec :
 		var testnic = 0;
 		var dn = "www.nic.cz";
 		var addr = "217.31.205.50";
+		var nameserver = "";
 		switch (document.getElementById("dnssec-pref-dnsserverchoose").value) {
 		case '0': // System setting
 			nameserver = "";
@@ -382,87 +380,14 @@ showPrefWindow :
 	},
 };
 
-
-// Functions for IP address notation validation
+// Functions for IP address with port notation validation
 var dnssecExtCheckIPaddr = {
 
-	// Used from http://ipv6blog.net/ipv6-validation-javascript/
-
-	// Support function
-substr_count :
-	function(haystack, needle, offset, length) {
-
-		var pos = 0, cnt = 0;
-
-		haystack += '';
-		needle += '';
-		if (isNaN(offset)) {
-			offset = 0;
-		}
-		if (isNaN(length)) {
-			length = 0;
-		}
-		offset--;
-
-		while ((offset = haystack.indexOf(needle, offset+1)) != -1) {
-			if (length > 0 && (offset+needle.length) > length) {
-				return false;
-			} else {
-				cnt++;
-			}
-		}
-
-		return cnt;
-	},
-
-	// Test for a valid dotted IPv4 address
-test_ipv4 :
+test_ip :
 	function(ip) {
+		var expression = /((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(@\d{1,5})?\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?(@\d{1,5})?\s*$))/;
 
-		var match = ip.match(/^(([1-9]?[0-9]|1[0-9] {2}|2[0-4][0-9]|25[0-5])\.) {3}([1-9]?[0-9]|1[0-9] {2}|2[0-4][0-9]|25[0-5])$/);
+		var match = ip.match(expression);
 		return match != null;
-
 	},
-
-	// Test if the input is a valid IPv6 address
-test_ipv6 :
-	function(ip) {
-
-		// Test for empty address
-		if (ip.length<3)
-		{
-			return ip == "::";
-		}
-
-		// Check if part is in IPv4 format
-		if (ip.indexOf('.')>0)
-		{
-			var lastcolon = ip.lastIndexOf(':');
-
-			if (!(lastcolon && this.test_ipv4(ip.substr(lastcolon + 1))))
-				return false;
-
-			// replace IPv4 part with dummy
-			ip = ip.substr(0, lastcolon) + ':0:0';
-		}
-
-		// Check uncompressed
-		if (ip.indexOf('::')<0)
-		{
-			var match = ip.match(/^(?:[a-f0-9] {1,4}:) {7}[a-f0-9] {1,4}$/i);
-			return match != null;
-		}
-
-		// Check colon-count for compressed format
-		if (this.substr_count(ip, ':')<8)
-		{
-			var match = ip.match(/^(?::|(?:[a-f0-9] {1,4}:)+):(?:(?:[a-f0-9] {1,4}:)*[a-f0-9] {1,4})?$/i);
-			return match != null;
-		}
-
-		// Not a valid IPv6 address
-		return false;
-
-	},
-
 }

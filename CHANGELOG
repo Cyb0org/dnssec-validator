@@ -1,3 +1,16 @@
+v2.1.0 / 25.1.2014
+
+- Port DNSSEC/TLSA validator on the Opera browser
+- Plugins: add and fix validation of DNSSEC/TLSA records for IPv6-only or IPv4-only host -> now based on getaddrinfo();
+- Plugins: fix DNSSEC/TLSA validation performance
+- GC,OP,IE: fix default settings when localstore was not created
+- GC,OP,IE: fix CA cert can missing in the cert chain obtained from remote server
+- GC,OP,MF: add checkbox for enable the validation of every HTTPS request into settings
+- All: it can add port number behind IP address in the custom resolver/forwarder
+- Source codes refactoring
+- Update build system (Makefiles update)
+- Fixed some another bugs
+
 v2.1.0-rc1 / 12.12.2013
 
 - DANE/TLSA validation support for all browsers
