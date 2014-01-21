@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidator\" width=\"0\" height=\"0\"></object>");
+document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidatorplugin\" width=\"0\" height=\"0\"></object>");
 var defaultResolver = "nofwd"; // LDNS will use system resolver if empty string is passed
 var defaultCustomResolver = "8.8.8.8";
 
@@ -95,7 +95,7 @@ function saveOptions() {
 	localStorage["DebugOutput"] = document.dnssecSettings.DebugOutput.checked;
 	localStorage["domainfilteron"] = document.dnssecSettings.domainfilteron.checked;
 	localStorage["domainlist"] = document.dnssecSettings.domainlist.value;
-	document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidator\" width=\"0\" height=\"0\"></object>");
+	document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidatorplugin\" width=\"0\" height=\"0\"></object>");
         var plugin = document.getElementById("dnssec-plugin");
 	plugin.DNSSECCacheFree();
 	plugin.DNSSECCacheInit();

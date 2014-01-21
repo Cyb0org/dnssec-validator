@@ -24,7 +24,7 @@ document.write("<html>");
 document.write("<head>");
 document.write("</head>");
 document.write("<body>");
-document.write("<object id=\"tlsa-plugin\" type=\"application/x-tlsavalidator\" width=\"0\" height=\"0\"></object>");
+document.write("<object id=\"tlsa-plugin\" type=\"application/x-tlsavalidatorplugin\" width=\"0\" height=\"0\"></object>");
 document.write("<script>");
 
 // expirate time of one item in the cache [seconds]

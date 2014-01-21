@@ -24,7 +24,7 @@ document.write("<html>");
 document.write("<head>");
 document.write("</head>");
 document.write("<body>");
-document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidator\" width=\"0\" height=\"0\"></object>");
+document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidatorplugin\" width=\"0\" height=\"0\"></object>");
 document.write("<script>");
 
 
