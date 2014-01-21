@@ -1,35 +1,19 @@
-# ***** BEGIN LICENSE BLOCK *****
-# Copyright 2012 CZ.NIC, z.s.p.o.
-#
-# Authors: Martin Straka <martin.straka@nic.cz>
-#
-# This file is part of DNSSEC Validator Add-on.
-#
-# DNSSEC Validator Add-on is free software: you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# DNSSEC Validator Add-on is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-# more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
-# ***** END LICENSE BLOCK *****
+#/**********************************************************\ 
+# Auto-generated X11 project definition file for the
+# DNSSECValidatorPlugin project
+#\**********************************************************/
 
 # X11 template platform definition CMake file
 # Included from ../CMakeLists.txt
 
-# remember that the current source dir is the project root; this file is in ${PLATFORM_NAME}/
+# remember that the current source dir is the project root; this file is in X11/
 file (GLOB PLATFORM RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    ${PLATFORM_NAME}/[^.]*.cpp
-    ${PLATFORM_NAME}/[^.]*.h
-    ${PLATFORM_NAME}/[^.]*.cmake
+    X11/[^.]*.cpp
+    X11/[^.]*.h
+    X11/[^.]*.cmake
     )
 
-SOURCE_GROUP(${PLATFORM_NAME} FILES ${PLATFORM})
+SOURCE_GROUP(X11 FILES ${PLATFORM})
 
 # use this to add preprocessor definitions
 add_definitions(
@@ -40,7 +24,7 @@ set (SOURCES
     ${PLATFORM}
     )
 
-add_x11_plugin(${PROJNAME} SOURCES)
+add_x11_plugin(${PROJECT_NAME} SOURCES)
 
 # detect 32/64 bit system
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -89,10 +73,6 @@ set_property(TARGET crypto PROPERTY IMPORTED_LOCATION
 
 
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
-target_link_libraries(${PROJNAME}
+target_link_libraries(${PROJECT_NAME}
     ${PLUGIN_INTERNAL_DEPS}
-    unbound
-    ldns
-    ssl    	
-    crypto
     )

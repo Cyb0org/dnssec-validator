@@ -5,5 +5,5 @@
 .Set Compress=on
 .Set MaxDiskSize=0
 %OUTDIR%/${PROJECT_NAME}.exe
-${CMAKE_CURRENT_BINARY_DIR}/TLSAValidatorPlugin.inf
+${CMAKE_CURRENT_BINARY_DIR}/DNSSECValidatorPlugin.inf
 ;

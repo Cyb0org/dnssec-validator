@@ -11,11 +11,6 @@
 #include "BrowserHost.h"
 #include "TLSAValidatorPlugin.h"
 
-extern "C" {   /* use C language linkage */
-  #include "dane-plug.h"
-}
-
-
 #ifndef H_TLSAValidatorPluginAPI
 #define H_TLSAValidatorPluginAPI
 
@@ -38,13 +33,7 @@ public:
     {
         registerMethod("echo",      make_method(this, &TLSAValidatorPluginAPI::echo));
         registerMethod("testEvent", make_method(this, &TLSAValidatorPluginAPI::testEvent));
-	registerMethod("TLSAValidate", make_method(this, &TLSAValidatorPluginAPI::TLSAValidate));
-        registerMethod("TLSACacheFree", make_method(this, &TLSAValidatorPluginAPI::TLSACacheFree));
-        registerMethod("TLSACacheInit", make_method(this, &TLSAValidatorPluginAPI::TLSACacheInit));
-   //     registerMethod("TLSAValidateAsync", make_method(this, &TLSAValidatorPluginAPI::TLSAValidateAsync));
-   //     registerMethod("TLSAValidateAsync_thread", make_method(this, &TLSAValidatorPluginAPI::TLSAValidateAsync_thread));
-
-
+        
         // Read-write property
         registerProperty("testString",
                          make_property(this,
@@ -79,41 +68,16 @@ public:
     FB::variant echo(const FB::variant& msg);
     
     // Event helpers
-    //FB_JSAPI_EVENT(test, 0, ());
-    //FB_JSAPI_EVENT(echo, 2, (const FB::variant&, const int));
+    FB_JSAPI_EVENT(test, 0, ());
+    FB_JSAPI_EVENT(echo, 2, (const FB::variant&, const int));
 
     // Method test-event
     void testEvent();
 
-
-
-    // Synchronous validation method
-    // INPUTS:
-    // domain - domain name to validate
-    // options - XPCOM input options (each bit represents one option)
-    // optdnssrv - IPv4 or IPv6 address(es) of the optional DNS server
-    // OUTPUTS - array of:
-    // [0] - security state
-    FB::VariantList TLSAValidate(const std::vector<std::string>& certchain, const int certcount, const uint16_t options, const std::string& optdnssrv, const std::string& domain, const std::string& port,
-			      const std::string& protocol, const int policy);
-/*
-    // Asynchronous validation method
-    bool TLSAValidateAsync(const std::vector<std::string> &certchain, const int certcount, const uint16_t options,
-                              const std::string& optdnssrv, const std::string& domain, const std::string& port,
-			      const std::string& protocol, const int policy, const FB::JSObjectPtr &callback);
-
-
-*/
-	void TLSACacheFree();
-	void TLSACacheInit();
-
 private:
     TLSAValidatorPluginWeakPtr m_plugin;
     FB::BrowserHostPtr m_host;
-/*
-    void TLSAValidateAsync_thread(const std::vector<std::string> &certchain, const int certcount, const uint16_t options, const std::string& optdnssrv, const std::string& domain, const std::string& port,
-			      const std::string& protocol, const int policy, const FB::JSObjectPtr &callback);
-*/
+
     std::string m_testString;
 };
 

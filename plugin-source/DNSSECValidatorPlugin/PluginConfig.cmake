@@ -7,7 +7,7 @@
 
 set(PLUGIN_NAME "DNSSECValidatorPlugin")
 set(PLUGIN_PREFIX "DVP")
-set(COMPANY_NAME "CZNICLabs")
+set(COMPANY_NAME "CZNIC")
 
 # ActiveX constants:
 set(FBTYPELIB_NAME DNSSECValidatorPluginLib)
@@ -32,24 +32,29 @@ else ( FB_PLATFORM_ARCH_32 )
     set(FBControl_WixUpgradeCode_GUID 5f5c05c7-95ed-593b-b71c-073e02f67564)
 endif ( FB_PLATFORM_ARCH_32 )
 
+
 # these are the pieces that are relevant to using it from Javascript
-set(ACTIVEX_PROGID "CZNICLabs.DNSSECValidatorPlugin")
-set(MOZILLA_PLUGINID "nic.cz/DNSSECValidatorPlugin")
+set(ACTIVEX_PROGID "CZNIC.DNSSECValidatorPlugin")
+if ( FB_PLATFORM_ARCH_32 )
+    set(MOZILLA_PLUGINID "nic.cz/DNSSECValidatorPlugin")  # No 32bit postfix to maintain backward compatability.
+else ( FB_PLATFORM_ARCH_32 )
+    set(MOZILLA_PLUGINID "nic.cz/DNSSECValidatorPlugin_${FB_PLATFORM_ARCH_NAME}")
+endif ( FB_PLATFORM_ARCH_32 )
 
 # strings
-set(FBSTRING_CompanyName "CZ.NIC Labs")
+set(FBSTRING_CompanyName "CZ.NIC")
 set(FBSTRING_PluginDescription "Plug-in used by DNSSEC Validator extension")
 set(FBSTRING_PLUGIN_VERSION "2.1.0")
-set(FBSTRING_LegalCopyright "Copyright 2013 CZ.NIC Labs")
-set(FBSTRING_PluginFileName "np${PLUGIN_NAME}.dll")
+set(FBSTRING_LegalCopyright "Copyright 2014 CZ.NIC")
+set(FBSTRING_PluginFileName "np${PLUGIN_NAME}")
 set(FBSTRING_ProductName "DNSSECValidatorPlugin")
 set(FBSTRING_FileExtents "")
 if ( FB_PLATFORM_ARCH_32 )
     set(FBSTRING_PluginName "DNSSECValidatorPlugin")  # No 32bit postfix to maintain backward compatability.
 else ( FB_PLATFORM_ARCH_32 )
-    set(FBSTRING_PluginName "DNSSECValidatorPlugin")
+    set(FBSTRING_PluginName "DNSSECValidatorPlugin_${FB_PLATFORM_ARCH_NAME}")
 endif ( FB_PLATFORM_ARCH_32 )
-set(FBSTRING_MIMEType "application/x-dnssecvalidator")
+set(FBSTRING_MIMEType "application/x-dnssecvalidatorplugin")
 
 # Uncomment this next line if you're not planning on your plugin doing
 # any drawing:
