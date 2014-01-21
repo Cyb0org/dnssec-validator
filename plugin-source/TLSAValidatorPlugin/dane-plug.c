@@ -1080,7 +1080,7 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 #if CA_STORE != NONE_CA_STORE
 	X509 *cert = NULL;
 	X509_STORE_CTX *store_ctx = NULL;
-	STACK_OF(X509) *ca_chain = NULL;
+	STACK_OF(X509) *verified_chain = NULL;
 #endif /* !NONE_CA_STORE */
 	STACK_OF(X509) *chain;
 	X509 *cert2;
@@ -1132,8 +1132,14 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 		goto fail;
 	}
 
+	printf_debug(DEBUG_PREFIX_CERT,
+	    "There are %d certificates in the peer chain.\n",
+	    sk_X509_num(chain));
+
 #if CA_STORE != NONE_CA_STORE
 	{
+//		printf_debug()
+
 		cert = SSL_get_peer_certificate(ssl);
 		if (cert == NULL) {
 			printf_debug(DEBUG_PREFIX_CERT,
@@ -1169,21 +1175,23 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 		 */
 		if (X509_verify_cert(store_ctx) <= 0) {
 			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
-			    "Error validating certificates.");
-			goto fail;
+			    "Error verifying certificates using current "
+			    "CA store.");
+			/* verified_chain is NULL, use chain */
+		} else {
+			/* Get chain from store context */
+			verified_chain = X509_STORE_CTX_get1_chain(store_ctx);
+			printf_debug(DEBUG_PREFIX_CERT,
+			    "There are %d certificates in the verified "
+			    "certificate chain.\n",
+			    sk_X509_num(verified_chain));
+			chain = verified_chain;
+			/* Use verified_chain. */
 		}
-
-		/* Get chain from store context */
-		ca_chain = X509_STORE_CTX_get1_chain(store_ctx);
 		X509_STORE_CTX_free(store_ctx); store_ctx = NULL;
-		chain = ca_chain;
-
 		X509_free(cert); cert = NULL;
 	}
 #endif /* !NONE_CA_STORE */
-
-	printf_debug(DEBUG_PREFIX_CERT, "Number of certificates in chain: %i\n",
-	    sk_X509_num(chain));
 
 	for (i = 0; i < sk_X509_num(chain); ++i) {
 		cert2 = sk_X509_value(chain, i);
@@ -1196,8 +1204,14 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 	}
 
 #if CA_STORE != NONE_CA_STORE
-	/* Chain has to be freed explicitly if using CA store. */
-	sk_X509_pop_free(chain, X509_free); chain = ca_chain = NULL;
+	if (verified_chain != NULL) {
+		/*
+		 * Verified chain has to be freed explicitly if successfully
+		 * verified in the CA store.
+		 */
+		sk_X509_pop_free(verified_chain, X509_free);
+		    verified_chain = NULL;
+	}
 #endif /* !NONE_CA_STORE */
 
 #ifdef WIN32
@@ -1236,8 +1250,8 @@ fail:
 	if (store_ctx != NULL) {
 		X509_STORE_CTX_free(store_ctx);
 	}
-	if (ca_chain != NULL) {
-		sk_X509_pop_free(ca_chain, X509_free);
+	if (verified_chain != NULL) {
+		sk_X509_pop_free(verified_chain, X509_free);
 	}
 #endif /* !NONE_CA_STORE */
 	if (pkey != NULL) {
