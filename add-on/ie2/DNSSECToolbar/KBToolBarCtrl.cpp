@@ -1063,19 +1063,22 @@ bool CKBToolBarCtrl::isip6(char *ipadd){
 	else return 0;
 }
 
+
 /**************************************************************************/
-// Validation of IPv4 
+// Validation of IPv4 @port-number
 /**************************************************************************/
 bool CKBToolBarCtrl::ValidateIP4(char *ipadd)
 {
-		// IPv4
-		unsigned b1, b2, b3, b4;
-		unsigned char c;
-		if (sscanf_s(ipadd, "%3u.%3u.%3u.%3u%c", &b1, &b2, &b3, &b4, &c) != 4) return 0;
-		if ((b1 | b2 | b3 | b4) > 255) return 0;
-		if (strspn(ipadd, "0123456789.") < strlen(ipadd)) return 0;
-		return 1;
+	unsigned b1, b2, b3, b4, port = 0;
+	int rc;
+	unsigned char c;
+	rc = sscanf_s(ipadd, "%3u.%3u.%3u.%3u@%u%c", &b1, &b2, &b3, &b4, &port, &c);
+	if (rc != 4 && rc != 5) return 0;
+	if ((b1 | b2 | b3 | b4) > 255 || port > 65535) return 0;
+	if (strspn(ipadd, "0123456789.@") < strlen(ipadd)) return 0;
+	return 1;
 }
+
 
 /**************************************************************************/
 // Simple validation of IPv6
@@ -1086,7 +1089,8 @@ bool CKBToolBarCtrl::ValidateIP6(char *ipadd)
 	strcpy_s(tmp, ipadd);
 
 	if (strlen(tmp) < 3) return 0;
-	if (strlen(tmp) > 40) return 0;
+	if (strlen(tmp) > 48) return 0;
+	if (strspn(ipadd, "0123456789:@") < strlen(ipadd)) return 0;
 	return 1;
 }
 
