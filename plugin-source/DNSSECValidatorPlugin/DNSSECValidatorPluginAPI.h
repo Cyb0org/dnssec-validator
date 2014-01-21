@@ -113,7 +113,6 @@ private:
 
     std::string m_testString;
 
-    std::string m_testString;
     void ValidateAsync_thread(const std::string& domain, const uint16_t options,
                               const std::string& optdnssrv, const std::string& ipbrowser, const FB::JSObjectPtr &callback);
 
