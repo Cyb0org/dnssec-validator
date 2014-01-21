@@ -15,7 +15,7 @@ include_directories(${PLUGIN_INCLUDE_DIRS})
 # add validating library to build on UNIX
 if (NOT WIN32)
     set(COMLIB ../common/common.c)
-    set(DSLIB dnssec-plug.c)
+    set(DSLIB dane-plug.c)
 endif ()
 
 file (GLOB GENERAL RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
