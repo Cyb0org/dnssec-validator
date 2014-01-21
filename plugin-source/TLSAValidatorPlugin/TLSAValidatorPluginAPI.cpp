@@ -64,3 +64,31 @@ void TLSAValidatorPluginAPI::testEvent()
 {
     fire_test();
 }
+
+FB::VariantList TLSAValidatorPluginAPI::TLSAValidate(const std::vector<std::string> &certchain, const int certcount, const uint16_t options, const std::string& optdnssrv, const std::string& domain, const std::string& port,
+			      const std::string& protocol, const int policy)
+{    
+
+    const char **vc = (const char **) malloc(sizeof(char *) * certcount);
+    for (int i = 0; i < certcount; ++i) {
+      vc[i] = certchain[i].c_str();
+    }
+
+    FB::VariantList reslist;
+    short rv;
+    rv = dane_validate(vc, certcount, options, optdnssrv.c_str(), domain.c_str(), port.c_str(), protocol.c_str(), policy);    
+    reslist.push_back(rv);
+    free(vc);
+    return reslist;
+}
+
+
+void TLSAValidatorPluginAPI::TLSACacheFree()
+{
+    dane_validation_deinit();    
+}
+
+void TLSAValidatorPluginAPI::TLSACacheInit()
+{
+    dane_validation_init();    
+}

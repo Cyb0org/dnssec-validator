@@ -11,6 +11,10 @@
 #include "BrowserHost.h"
 #include "TLSAValidatorPlugin.h"
 
+extern "C" {   /* use C language linkage */
+  #include "dane-plug.h"
+}
+
 #ifndef H_TLSAValidatorPluginAPI
 #define H_TLSAValidatorPluginAPI
 
@@ -33,7 +37,9 @@ public:
     {
         registerMethod("echo",      make_method(this, &TLSAValidatorPluginAPI::echo));
         registerMethod("testEvent", make_method(this, &TLSAValidatorPluginAPI::testEvent));
-        
+	registerMethod("TLSAValidate", make_method(this, &TLSAValidatorPluginAPI::TLSAValidate));
+        registerMethod("TLSACacheFree", make_method(this, &TLSAValidatorPluginAPI::TLSACacheFree));
+        registerMethod("TLSACacheInit", make_method(this, &TLSAValidatorPluginAPI::TLSACacheInit));        
         // Read-write property
         registerProperty("testString",
                          make_property(this,
@@ -73,6 +79,21 @@ public:
 
     // Method test-event
     void testEvent();
+
+
+    FB::VariantList TLSAValidate(const std::vector<std::string>& certchain, const int certcount, const uint16_t options, const std::string& optdnssrv, const std::string& domain, const std::string& port,
+			      const std::string& protocol, const int policy);
+/*
+    // Asynchronous validation method
+    bool TLSAValidateAsync(const std::vector<std::string> &certchain, const int certcount, const uint16_t options,
+                              const std::string& optdnssrv, const std::string& domain, const std::string& port,
+			      const std::string& protocol, const int policy, const FB::JSObjectPtr &callback);
+
+
+*/
+	void TLSACacheFree();
+	void TLSACacheInit();
+
 
 private:
     TLSAValidatorPluginWeakPtr m_plugin;

@@ -10,12 +10,6 @@ set (CMAKE_BACKWARDS_COMPATIBILITY 2.6)
 
 Project(${PLUGIN_NAME})
 
-file (GLOB GENERAL RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    [^.]*.cpp
-    [^.]*.h
-    [^.]*.cmake
-    )
-
 include_directories(${PLUGIN_INCLUDE_DIRS})
 
 # add validating library to build on UNIX

@@ -43,7 +43,7 @@ endif ( FB_PLATFORM_ARCH_32 )
 # strings
 set(FBSTRING_CompanyName "CZ.NIC")
 set(FBSTRING_PluginDescription "Plug-in used by TLSA Validator extension")
-set(FBSTRING_PLUGIN_VERSION "1.0.0.0")
+set(FBSTRING_PLUGIN_VERSION "2.1.0")
 set(FBSTRING_LegalCopyright "Copyright 2014 CZ.NIC")
 set(FBSTRING_PluginFileName "np${PLUGIN_NAME}")
 set(FBSTRING_ProductName "TLSAValidatorPlugin")

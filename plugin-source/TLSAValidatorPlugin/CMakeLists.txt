@@ -10,13 +10,21 @@ set (CMAKE_BACKWARDS_COMPATIBILITY 2.6)
 
 Project(${PLUGIN_NAME})
 
+include_directories(${PLUGIN_INCLUDE_DIRS})
+
+# add validating library to build on UNIX
+if (NOT WIN32)
+    set(COMLIB ../common/common.c)
+    set(DSLIB dnssec-plug.c)
+endif ()
+
 file (GLOB GENERAL RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     [^.]*.cpp
     [^.]*.h
     [^.]*.cmake
+    ${COMLIB}
+    ${DSLIB}
     )
-
-include_directories(${PLUGIN_INCLUDE_DIRS})
 
 # Generated files are stored in ${GENERATED} by the project configuration
 SET_SOURCE_FILES_PROPERTIES(
