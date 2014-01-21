@@ -109,7 +109,7 @@ int X509_store_add_certs_from_files_and_dirs(SSL_CTX *ssl_ctx,
 				ret = 0; /* At least one success. */
 			} else {
 				printf_debug(DEBUG_PREFIX_CERT,
-				    "'%s' is not a file.", *fname_p);
+				    "'%s' is not a file.\n", *fname_p);
 			}
 
 			++fname_p;
@@ -133,7 +133,7 @@ int X509_store_add_certs_from_files_and_dirs(SSL_CTX *ssl_ctx,
 				ret = 0; /* At least one success. */
 			} else {
 				printf_debug(DEBUG_PREFIX_CERT,
-				    "'%s' is not a directory.", *dirname_p);
+				    "'%s' is not a directory.\n", *dirname_p);
 			}
 
 			++dirname_p;
