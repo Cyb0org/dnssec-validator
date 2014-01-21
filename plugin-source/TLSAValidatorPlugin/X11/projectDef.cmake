@@ -17,10 +17,12 @@ SOURCE_GROUP(X11 FILES ${PLATFORM})
 
 # use this to add preprocessor definitions
 add_definitions(
+  -DCA_STORE=DIR_CA_STORE
 )
 
 set (SOURCES
     ${SOURCES}
+    ca_store_directory.c
     ${PLATFORM}
     )
 
