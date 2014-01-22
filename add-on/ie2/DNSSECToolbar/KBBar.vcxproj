@@ -364,7 +364,7 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg" </Command>
       <SubSystem>Windows</SubSystem>
       <OutputFile>.\ReleaseMinSize\IEdnssec.dll</OutputFile>
       <ImportLibrary>.\ReleaseMinSize\KBBar.lib</ImportLibrary>
-      <AdditionalDependencies>shlwapi.lib;DNSSECcore-windows-x86.lib;DANEcore-windows-x86.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;DNSSECcore-windows-x86.lib;DANEcore-windows-x86.lib;Crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\KBBar.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>.\</AdditionalLibraryDirectories>
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
@@ -541,7 +541,7 @@ echo Warning : Cannot register Unicode DLL on Windows 95
       <ObjectFileName>.\Debug\</ObjectFileName>
       <ProgramDataBaseFileName>.\Debug\</ProgramDataBaseFileName>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Midl>
@@ -565,7 +565,7 @@ echo Warning : Cannot register Unicode DLL on Windows 95
       <ImportLibrary>.\Debug\KBBar.lib</ImportLibrary>
       <AdditionalDependencies>shlwapi.lib;DNSSECcore-windows-x86.lib;DANEcore-windows-x86.lib;Crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\KBBar.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>C:\VirtualData\GIT\dnssec-validator\ie2\dll;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <CustomBuildStep>

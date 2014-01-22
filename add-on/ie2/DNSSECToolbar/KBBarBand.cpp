@@ -1597,13 +1597,27 @@ void CKBBarBand::CheckDomainStatus(char * url)
 				} // if bogus
 		if (debug) ATLTRACE("-------------------------------------------------------\n");	
 		}
+		if (resultipv4 < 0 && resultipv6 >= 0) {
+			dnssecresult = resultipv6;
+		} else if (resultipv6 < 0 && resultipv4 >= 0) {
+			dnssecresult = resultipv4;
+		} else {
+			if (resultipv4 <= resultipv6) {
+				dnssecresult = resultipv6;
+			}
+			else {
+				dnssecresult = resultipv4;
+			}
+		}
+
+/*
 		if (resultipv4 < 0 || resultipv6 < 0) {
 			(resultipv4 <= resultipv6 ?  dnssecresult = resultipv4 : dnssecresult = resultipv6);
 		}
 		else {
 			(resultipv4 <= resultipv6 ?  dnssecresult = resultipv6 : dnssecresult = resultipv4);
 		}
-
+*/
 		if (debug) ATLTRACE("DNSSEC: IPv4/IPv6/Overall: %d/%d/%d\n", resultipv4, resultipv6, dnssecresult);
 		if (debug) ATLTRACE("*************** DNSSEC validation End *****************\n");
 		
