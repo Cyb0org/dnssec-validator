@@ -50,9 +50,15 @@ OpenSSL used as well as that of the covered work.
 	#define CERT_SYSTEM_STORE_CURRENT_USER 0x00010000
 #endif
 
+#ifndef CERT_STORE_READONLY_FLAG
+	#define CERT_STORE_READONLY_FLAG 0x00008000
+#endif
+
 #ifndef CCERT_CLOSE_STORE_CHECK_FLAG
 	#define CERT_CLOSE_STORE_CHECK_FLAG 0x00000002
 #endif
+
+
 /*
  * Access Windows CA store and store the certificates.
  */
@@ -79,7 +85,7 @@ int X509_store_add_certs_from_win_store(X509_STORE *store)
 		CERT_STORE_PROV_SYSTEM,
 		0,
 		NULL,
-		CERT_SYSTEM_STORE_CURRENT_USER,
+		CERT_SYSTEM_STORE_CURRENT_USER | CERT_STORE_READONLY_FLAG,
 		L"Root"
 		);
 	if (hSysStore == NULL) {
