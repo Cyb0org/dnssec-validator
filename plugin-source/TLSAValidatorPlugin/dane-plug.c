@@ -1071,7 +1071,8 @@ char * strcat_clone(const char *s1, const char *s2)
 // return 0 success or -1 on error
 // ----------------------------------------------------------------------------
 static
-int get_cert_list(char *dest_url, const char *domain, const char *port,
+int get_cert_list(SSL_CTX *ssl_ctx, char *dest_url,
+    const char *domain, const char *port,
     struct cert_store_head *cert_list)
 {
 	int i;
@@ -1086,9 +1087,9 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 	X509 *cert2;
 	EVP_PKEY *pkey = NULL;
 
-	assert(glob_val_ctx.ssl_ctx != NULL);
+	assert(ssl_ctx != NULL);
 
-	ssl = SSL_new(glob_val_ctx.ssl_ctx);
+	ssl = SSL_new(ssl_ctx);
 	if (ssl == NULL) {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 		    "Cannot create SSL structure.");
@@ -1162,8 +1163,7 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 		}
 
 		if (X509_STORE_CTX_init(store_ctx,
-		         SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx),
-		         cert, chain) == 0) {
+		         SSL_CTX_get_cert_store(ssl_ctx), cert, chain) == 0) {
 			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 			    "Cannot initialise store context.");
 			goto fail;
@@ -1758,15 +1758,15 @@ char * create_tlsa_qname(const char *domain, const char *port,
 
 
 //*****************************************************************************
-// Initialises global validation structures.
+// Initialises SSL context
 // ----------------------------------------------------------------------------
-int dane_validation_init(void)
+static
+SSL_CTX * ssl_context_init(void)
 {
 	const SSL_METHOD *method;
+	SSL_CTX *ssl_ctx = NULL;
 
-	printf_debug(DEBUG_PREFIX_DANE, "%s\n", "Initialising DANE.");
-
-	glob_val_ctx.ub = NULL; /* Has separate initialisation procedure. */
+	printf_debug(DEBUG_PREFIX_CERT, "%s\n", "Initialising SSL context.");
 
 	/* Initialise SSL. */
 	OpenSSL_add_all_algorithms();
@@ -1777,70 +1777,87 @@ int dane_validation_init(void)
 	SSL_library_init();
 
 	method = SSLv23_client_method();
-	glob_val_ctx.ssl_ctx = SSL_CTX_new(method);
-	if (glob_val_ctx.ssl_ctx == NULL) {
+	ssl_ctx = SSL_CTX_new(method);
+	if (ssl_ctx == NULL) {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 		    "Unable to create a SSL context structure.");
 		goto fail;
 	}
 
-	SSL_CTX_set_options(glob_val_ctx.ssl_ctx, SSL_OP_NO_SSLv2);
+	SSL_CTX_set_options(ssl_ctx, SSL_OP_NO_SSLv2);
 
 #if CA_STORE == DIR_CA_STORE
 	/* Load certificates. */
-	if (X509_store_add_certs_from_files_and_dirs(glob_val_ctx.ssl_ctx,
+	if (X509_store_add_certs_from_files_and_dirs(ssl_ctx,
 	        ca_files, ca_dirs) != 0) {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
-		    "Failed loading browser CA cerificates.");
-		//goto fail; /* Failure is not desired, ingore return value. */
+		    "Failed loading browser CA certificates.");
+		//goto fail; /* Failure is not desired, ignore return value. */
 	}
 #endif /* DIR_CA_STORE */
 
 #if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
 	if (X509_store_add_certs_from_nssckbi(
-	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx)) != 0) {
+	        SSL_CTX_get_cert_store(ssl_ctx)) != 0) {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
-		    "Failed loading NSS built-in CA cerificates.");
-		//goto fail; /* Failure is not desired, ingore return value. */
+		    "Failed loading NSS built-in CA certificates.");
+		//goto fail; /* Failure is not desired, ignore return value. */
 	}
 #endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
 
 #if CA_STORE == NSS_CERT8_CA_STORE
 	if (X509_store_add_certs_from_cert8_dirs(
-	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx),
-	    cert8_ca_dirs) != 0) {
+	    SSL_CTX_get_cert_store(ssl_ctx), cert8_ca_dirs) != 0) {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
-		    "Failed loading NSS CA cerificates from cert8.db.");
-		//goto fail; /* Failure is not desired, ingore return value. */
+		    "Failed loading NSS CA certificates from cert8.db.");
+		//goto fail; /* Failure is not desired, ignore return value. */
 	}
 #endif /* NSS_CERT8_CA_STORE */
 
 #if CA_STORE == OSX_CA_STORE
 	if (X509_store_add_certs_from_osx_store(
-	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx)) != 0) {
+	    SSL_CTX_get_cert_store(ssl_ctx)) != 0) {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
-		    "Failed loading OS X CA cerificates.");
-		//goto fail; /* Failure is not desired, ingore return value. */
+		    "Failed loading OS X CA certificates.");
+		//goto fail; /* Failure is not desired, ignore return value. */
 	}
 #endif /* OSX_CA_STORE */
 
 #if defined WIN32 && (CA_STORE == WIN_CA_STORE)
 	if (X509_store_add_certs_from_win_store(
-	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx)) != 0) {
+	    SSL_CTX_get_cert_store(ssl_ctx)) != 0) {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
-		    "Failed loading Windows CA cerificates.");
-		//goto fail; /* Failure is not desired, ingore return value. */
+		    "Failed loading Windows CA certificates.");
+		//goto fail; /* Failure is not desired, ignore return value. */
 	}
 #endif /* WIN32 && WIN_CA_STORE */
 
-	return 0;
+	printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+	    "Initialisation of SSL context succeeded.");
+
+	return ssl_ctx;
 
 fail:
-	if (glob_val_ctx.ssl_ctx != NULL) {
-		SSL_CTX_free(glob_val_ctx.ssl_ctx);
-		glob_val_ctx.ssl_ctx = NULL;
+	if (ssl_ctx != NULL) {
+		SSL_CTX_free(ssl_ctx);
 	}
-	return -1;
+	printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+	    "Initialisation of SSL context failed.");
+	return NULL;
+}
+
+
+//*****************************************************************************
+// Initialises global validation structures.
+// ----------------------------------------------------------------------------
+int dane_validation_init(void)
+{
+	printf_debug(DEBUG_PREFIX_DANE, "%s\n", "Initialising DANE.");
+
+	glob_val_ctx.ub = NULL; /* Has separate initialisation procedure. */
+	glob_val_ctx.ssl_ctx = ssl_context_init();
+
+	return (glob_val_ctx.ssl_ctx != NULL) ? 0 : -1;
 }
 
 //*****************************************************************************
@@ -1991,7 +2008,8 @@ int dane_validate(const char *certchain[], int certcount, uint16_t options,
 		    "External certificate chain is used.");
 		memcpy(uri, "https://", HTTPS_PREF_LEN + 1);
 		strncat(uri, domain, MAX_URI_LEN - HTTPS_PREF_LEN - 1);
-		retval = get_cert_list(uri, domain, port_str, &cert_list);
+		retval = get_cert_list(glob_val_ctx.ssl_ctx,
+		    uri, domain, port_str, &cert_list);
 		if (retval != 0) {
 			free_tlsalist(&tlsa_list);
 			free_certlist(&cert_list);
