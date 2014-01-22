@@ -31,6 +31,7 @@ OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
 
+#include <openssl/err.h>
 #include <openssl/x509.h>
 
 #import <Foundation/Foundation.h>
