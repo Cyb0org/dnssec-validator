@@ -51,7 +51,10 @@ CFLAGS += -I../plugin-source/common
 CFLAGS_STD = -std=c99
 
 LDFLAGS += $(UNBOUND_LDFLAGS) $(LDNS_LDFLAGS) $(OPENSSL_LDFLAGS)
-LDFLAGS += -lpthread -ldl
+LDFLAGS += -lpthread
+ifneq ($(KERNEL),freebsd)
+  LDFLAGS += -ldl
+endif
 
 
 # Which CA store to use.

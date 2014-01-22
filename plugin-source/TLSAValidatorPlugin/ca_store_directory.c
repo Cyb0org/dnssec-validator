@@ -49,10 +49,14 @@ OpenSSL used as well as that of the covered work.
 #include "common.h"
 
 
-/* TODO -- These location should be given at configuration time. */
+/*
+ * TODO -- These locations should be given at configuration time.
+ * Or better, is there a way how to get it directly from OpenSSL?
+ */
 #define OPENSSL1_CA_FILE "/etc/ssl/certs/ca-certificates.crt"
 #define OPENSSL2_CA_FILE "/etc/ssl/certs/ca-bundle.crt" /* Fedora. */
 #define OPENSSL3_CA_FILE "/etc/ssl/certs/ca-bundle.trust.crt" /* Fedora. */
+#define OPENSSL4_CA_FILE "/usr/local/share/certs/ca-root-nss.crt" /* FreeBSD */
 #define MOZILLA_CA_DIR "/usr/share/ca-certificates/mozilla"
 #define OPENSSL_CA_DIR "/etc/ssl/certs"
 
@@ -61,6 +65,7 @@ const char *ca_files[] = {
 	OPENSSL1_CA_FILE,
 	OPENSSL2_CA_FILE,
 	OPENSSL3_CA_FILE,
+	OPENSSL4_CA_FILE,
 	NULL};
 
 /* CA certificate directories. */
