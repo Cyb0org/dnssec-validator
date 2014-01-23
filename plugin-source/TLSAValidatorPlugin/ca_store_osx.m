@@ -65,9 +65,11 @@ OpenSSL used as well as that of the covered work.
 #if IMPLEMENTATION == OLD
 int X509_store_add_certs_from_osx_store(X509_STORE *store)
 {
-	OSStatus status;
-	SecKeychainSearchRef search = NULL;
 	SecKeychainRef keychain = NULL;
+	CFArrayRef searchList = NULL;
+
+	SecKeychainSearchRef search = NULL;
+	OSStatus status;
 	int certcnt = 0;
 
 	printf_debug(DEBUG_PREFIX_CERT, "%s\n",
@@ -75,16 +77,19 @@ int X509_store_add_certs_from_osx_store(X509_STORE *store)
 
 	status = SecKeychainOpen(CA_KEYCHAIN_PATH, &keychain);
 	if (status != errSecSuccess) {
-		VRCFRelease(keychain);
+		VRCFRelease(keychain); keychain = NULL;
 		CFStringRef str_ref = SecCopyErrorMessageString(status, NULL);
 		printf_debug(DEBUG_PREFIX_CERT, "Error: %s\n",
 		    CFStringGetCStringPtr(str_ref, kCFStringEncodingMacRoman));
 		CFRelease(str_ref);
-		return -1;
+		goto fail;
 	}
 
-	CFArrayRef searchList = CFArrayCreate(kCFAllocatorDefault,
+	searchList = CFArrayCreate(kCFAllocatorDefault,
 	    (const void **) &keychain, 1, &kCFTypeArrayCallBacks);
+	if (searchList == NULL) {
+		goto fail;
+	}
 
 #ifndef __OBJC_GC__
 	VRCFRelease(keychain); keychain = NULL;
@@ -99,7 +104,7 @@ int X509_store_add_certs_from_osx_store(X509_STORE *store)
 	if (status != errSecSuccess) {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 		    "Error retrieving keychain.");
-		return -1;
+		goto fail;
 	}
 
 	SecKeychainItemRef searchItem = NULL;
@@ -115,23 +120,28 @@ int X509_store_add_certs_from_osx_store(X509_STORE *store)
 		status = SecKeychainItemCopyContent(searchItem, NULL,
 		    &attrList, (UInt32 *) (&certData.Length),
 		    (void **) (&certData.Data));
-
 		if (status != errSecSuccess) {
 			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 			    "Error accessing keychain.");
 			CFRelease(searchItem);
 			continue;
 		}
+		CFRelease(searchItem); searchItem = NULL;
 
 		const unsigned char *der;
 		X509 *x509 = NULL;
 		unsigned long err;
+
 		der = certData.Data;
 		x509 = d2i_X509(NULL, &der, certData.Length);
 		if (x509 == NULL) {
 			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 			    "Cannot create DER.\n");
+			SecKeychainItemFreeContent(&attrList, certData.Data);
+			continue;
 		}
+		SecKeychainItemFreeContent(&attrList, certData.Data);
+
 		if (X509_STORE_add_cert(store, x509) == 0) {
 			err = ERR_get_error();
 			printf_debug(DEBUG_PREFIX_CERT,
@@ -142,47 +152,27 @@ int X509_store_add_certs_from_osx_store(X509_STORE *store)
 			++certcnt;
 		}
 		X509_free(x509); x509 = NULL;
-
-#if 0
-		/*
-		 * At this point you should have a valid CSSM_DATA structure
-		 * representing the certificate.
-		 */
-
-		SecCertificateRef certificate;
-		status = SecCertificateCreateFromData(&certData,
-		    CSSM_CERT_X_509v3, CSSM_CERT_ENCODING_BER, &certificate);
-		if (status != errSecSuccess) {
-			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
-			    "Error accessing certificate.");
-			SecKeychainItemFreeContent(&attrList, certData.Data);
-			CFRelease(searchItem);
-			continue;
-		}
-
-		/*
-		 * Do whatever you want to do with the certificate.
-		 * For instance, print its common name (if there's one).
-		 */
-
-		CFStringRef commonName = NULL;
-		SecCertificateCopyCommonName(certificate, &commonName);
-		NSLog(@"common name = %@", (NSString *) commonName);
-		if (commonName) {
-			CFRelease(commonName);
-		}
-#endif
-
-		SecKeychainItemFreeContent(&attrList, certData.Data);
-		CFRelease(searchItem);
 	}
 
-	CFRelease(search);
+	CFRelease(searchList); searchList = NULL;
+	CFRelease(search); search = NULL;
 
 	printf_debug(DEBUG_PREFIX_CERT,
 	    "Loaded %d certificates from CA store.\n", certcnt);
 
 	return 0;
+
+fail:
+	if (keychain != NULL) {
+		CFRelease(keychain);
+	}
+	if (searchList != NULL) {
+		CFRelease(searchList);
+	}
+	if (search != NULL) {
+		CFRelease(search);
+	}
+	return -1;
 }
 #endif /* OLD */
 
@@ -275,6 +265,7 @@ int X509_store_add_certs_from_osx_store(X509_STORE *store)
 			continue;
 		}
 		CFRelease(cert_data); cert_data = NULL;
+
 		if (X509_STORE_add_cert(store, x509) == 0) {
 		        err = ERR_get_error();
 		        printf_debug(DEBUG_PREFIX_CERT,
