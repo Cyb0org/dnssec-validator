@@ -103,6 +103,7 @@ int X509_store_add_certs_from_nssckbi(X509_STORE *store)
 			if (x509 == NULL) {
 				printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 				    "Cannot create X509 from DER.\n");
+				continue;
 			}
 
 			if (X509_STORE_add_cert(store, x509) == 0) {
@@ -111,10 +112,9 @@ int X509_store_add_certs_from_nssckbi(X509_STORE *store)
 				    "Cannot store certificate. "
 				    "Error: %s.\n",
 				    ERR_error_string(err, NULL));
-				goto fail;
+			} else {
+				++certcnt;
 			}
-
-			++certcnt;
 
 			X509_free(x509); x509 = NULL;
 		}
@@ -219,14 +219,14 @@ int X509_store_add_certs_from_cert8_dirs(X509_STORE *store,
 		if (slot == NULL) {
 			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 			    "Error loading user database.\n");
-			goto fail;
+			continue;
 		}
 
 		cert_list = PK11_ListCertsInSlot(slot);
 		if (cert_list != NULL) {
 			for(cert_node = CERT_LIST_HEAD(cert_list);
-		    !CERT_LIST_END(cert_node, cert_list);
-		    cert_node = CERT_LIST_NEXT(cert_node)) {
+			    !CERT_LIST_END(cert_node, cert_list);
+			    cert_node = CERT_LIST_NEXT(cert_node)) {
 				der = cert_node->cert->derCert.data;
 
 				x509 = d2i_X509(NULL, &der,
@@ -234,6 +234,7 @@ int X509_store_add_certs_from_cert8_dirs(X509_STORE *store,
 				if (x509 == NULL) {
 					printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 					    "Cannot create X509 from DER.\n");
+					continue;
 				}
 
 				if (X509_STORE_add_cert(store, x509) == 0) {
@@ -242,10 +243,9 @@ int X509_store_add_certs_from_cert8_dirs(X509_STORE *store,
 					    "Cannot store certificate. "
 					    "Error: %s.\n",
 					    ERR_error_string(err, NULL));
-					goto fail;
+				} else {
+					++certcnt;
 				}
-
-				++certcnt;
 
 				X509_free(x509); x509 = NULL;
 			}
