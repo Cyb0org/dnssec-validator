@@ -47,18 +47,39 @@ OpenSSL used as well as that of the covered work.
 	} while(0)
 
 
+#define OLD 0 /* Uses deprecated constructions. */
+#define NEW 1
+
+#define IMPLEMENTATION OLD
+//#define IMPLEMENTATION NEW
+
+#ifndef IMPLEMENTATION
+  #define IMPLEMEMENTATION OLD
+#endif /* !IMPLEMENTATION */
+
+
+#define CA_KEYCHAIN_PATH \
+	"/System/Library/Keychains/SystemRootCertificates.keychain"
+
+
+#if IMPLEMENTATION == OLD
 int X509_store_add_certs_from_osx_store(X509_STORE *store)
 {
 	OSStatus status;
 	SecKeychainSearchRef search = NULL;
-
 	SecKeychainRef keychain = NULL;
+	int certcnt = 0;
 
-	status = SecKeychainOpen(
-	    "/System/Library/Keychains/SystemRootCertificates.keychain",
-	    &keychain);
-	if (status) {
+	printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+	    "Accesssing CA store via SecKeychainSearchCreateFromAttributes().");
+
+	status = SecKeychainOpen(CA_KEYCHAIN_PATH, &keychain);
+	if (status != errSecSuccess) {
 		VRCFRelease(keychain);
+		CFStringRef str_ref = SecCopyErrorMessageString(status, NULL);
+		printf_debug(DEBUG_PREFIX_CERT, "Error: %s\n",
+		    CFStringGetCStringPtr(str_ref, kCFStringEncodingMacRoman));
+		CFRelease(str_ref);
 		return -1;
 	}
 
@@ -66,7 +87,7 @@ int X509_store_add_certs_from_osx_store(X509_STORE *store)
 	    (const void **) &keychain, 1, &kCFTypeArrayCallBacks);
 
 #ifndef __OBJC_GC__
-	VRCFRelease(keychain);
+	VRCFRelease(keychain); keychain = NULL;
 #endif
 
 	/*
@@ -117,6 +138,8 @@ int X509_store_add_certs_from_osx_store(X509_STORE *store)
 			    "Cannot store certificate. "
 			    "Error: %s.\n",
 			    ERR_error_string(err, NULL));
+		} else {
+			++certcnt;
 		}
 		X509_free(x509); x509 = NULL;
 
@@ -156,5 +179,135 @@ int X509_store_add_certs_from_osx_store(X509_STORE *store)
 
 	CFRelease(search);
 
+	printf_debug(DEBUG_PREFIX_CERT,
+	    "Loaded %d certificates from CA store.\n", certcnt);
+
 	return 0;
 }
+#endif /* OLD */
+
+
+#if IMPLEMENTATION == NEW
+int X509_store_add_certs_from_osx_store(X509_STORE *store)
+{
+	SecKeychainRef keychain = NULL;
+	CFArrayRef search_list = NULL;
+
+	CFMutableDictionaryRef cfquery = NULL;
+	CFArrayRef cfcerts = NULL;
+	OSStatus status;
+	int certcnt = 0;
+
+	printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+	    "Accesssing CA store via SecItemCopyMatching().");
+
+	status = SecKeychainOpen(CA_KEYCHAIN_PATH, &keychain);
+	if (status != errSecSuccess) {
+		VRCFRelease(keychain); keychain = NULL;
+		CFStringRef str_ref = SecCopyErrorMessageString(status, NULL);
+		printf_debug(DEBUG_PREFIX_CERT, "Error: %s\n",
+		    CFStringGetCStringPtr(str_ref, kCFStringEncodingMacRoman));
+		CFRelease(str_ref);
+		goto fail;
+	}
+
+	search_list = CFArrayCreate(kCFAllocatorDefault,
+	    (const void **) &keychain, 1, &kCFTypeArrayCallBacks);
+	if (search_list == NULL) {
+		goto fail;
+	}
+
+	SecKeychainSetSearchList(search_list);
+	/* SecKeychainSetDefault(keychain); */
+
+#ifndef __OBJC_GC__
+	VRCFRelease(keychain); keychain = NULL;
+#endif
+
+	cfquery = CFDictionaryCreateMutable(NULL, 0,
+	        &kCFTypeDictionaryKeyCallBacks,
+	        &kCFTypeDictionaryValueCallBacks);
+	if (cfquery == NULL) {
+		/* Failure. */
+		goto fail;
+	}
+	CFDictionarySetValue(cfquery, kSecClass, kSecClassCertificate);
+	CFDictionarySetValue(cfquery, kSecReturnRef, kCFBooleanTrue);
+	CFDictionarySetValue(cfquery, kSecMatchLimit, kSecMatchLimitAll);
+	CFDictionarySetValue(cfquery, kSecMatchTrustedOnly, kCFBooleanTrue);
+	CFDictionarySetValue(cfquery, kSecMatchValidOnDate, kCFNull);
+
+
+	status = SecItemCopyMatching((CFDictionaryRef) cfquery,
+	     (CFTypeRef *) &cfcerts);
+	CFRelease(cfquery); cfquery = NULL;
+	if (status != errSecSuccess) {
+		CFStringRef str_ref = SecCopyErrorMessageString(status, NULL);
+		printf_debug(DEBUG_PREFIX_CERT, "Error: %s\n",
+		    CFStringGetCStringPtr(str_ref, kCFStringEncodingMacRoman));
+		CFRelease(str_ref);
+		goto fail;
+	}
+
+	printf_debug(DEBUG_PREFIX_CERT, "%ld certificates in keyring\n",
+	    CFArrayGetCount(cfcerts));
+
+	NSArray *certificates = CFBridgingRelease(cfcerts);
+	for (id value in certificates) {
+//		SecCertificateRef cfcertificate =
+//		    (SecCertificateRef) CFBridgingRetain(value);
+
+		CFDataRef cert_data = NULL;
+		const unsigned char *der;
+		unsigned long length;
+		X509 *x509 = NULL;
+		unsigned long err;
+
+		cert_data = SecCertificateCopyData(
+		    (SecCertificateRef) CFBridgingRetain(value));
+		der = CFDataGetBytePtr(cert_data);
+		length = CFDataGetLength(cert_data);
+		x509 = d2i_X509(NULL, &der, length);
+		if (x509 == NULL) {
+			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+			    "Cannot create DER.\n");
+			CFRelease(cert_data); cert_data = NULL;
+			continue;
+		}
+		CFRelease(cert_data); cert_data = NULL;
+		if (X509_STORE_add_cert(store, x509) == 0) {
+		        err = ERR_get_error();
+		        printf_debug(DEBUG_PREFIX_CERT,
+		            "Cannot store certificate. "
+		            "Error: %s.\n",
+		            ERR_error_string(err, NULL));
+		} else {
+		        ++certcnt;
+		}
+		X509_free(x509); x509 = NULL;
+	}
+
+	CFRelease(search_list); search_list = NULL;
+	CFRelease(cfcerts); cfcerts = NULL;
+
+	printf_debug(DEBUG_PREFIX_CERT,
+	    "Loaded %d certificates from CA store.\n", certcnt);
+
+	return 0;
+
+fail:
+	if (keychain != NULL) {
+		CFRelease(keychain);
+	}
+	if (search_list) {
+		CFRelease(search_list);
+	}
+	if (cfquery != NULL) {
+		CFRelease(cfquery);
+	}
+	if (cfcerts != NULL) {
+		CFRelease(cfcerts);
+	}
+	return -1;
+}
+#endif /* NEW */
