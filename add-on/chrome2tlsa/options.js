@@ -111,7 +111,6 @@ function testdnssec() {
 
 	var nameserver = "8.8.8.8";
 	var options = 0;
-	if (false) options |= 1;
 	var testnic = 0;
 	var ip = false;
 	var dn = "www.nic.cz";
@@ -141,7 +140,7 @@ function testdnssec() {
 				case 2: // NOFWD
 					chioce=2;
 					nameserver = "nofwd";
-					options |= 5;
+					options = 5;
 					break;
 			} //switch
 		} // if

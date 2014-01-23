@@ -782,7 +782,7 @@ check_tlsa_tab_change:
 		}
 
 		var block = "no";
-		if (daneMatch[0] >= c.DANE_DNSSEC_BOGUS) {
+/*		if (daneMatch[0] >= c.DANE_DNSSEC_BOGUS) {
 
 			var cacheitem = tlsaExtCache.getRecord(domain);
 			if (cacheitem[1] == "no" || cacheitem[1] == "yes") {
@@ -821,6 +821,7 @@ check_tlsa_tab_change:
 				}
 			}
 		}
+*/
 		if (daneExtension.debugOutput) {
 			dump(this.DANE_DEBUG_PRE + "------------ TLSA validation end ------------------" + this.DANE_DEBUG_POST);
 		}
