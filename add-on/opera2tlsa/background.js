@@ -666,7 +666,11 @@ function checkDaneResult(ret, domain) {
 
 	if (ret >= tlsaExtNPAPIConst.DANE_TLSA_PARAM_ERR) {				
 		var blockhttps = localStorage["blockhttps"];
-		blockhttps = (blockhttps == undefined || blockhttps == "false") ? false : true;	
+		if (blockhttps == undefined) {
+			blockhttps = false;
+		} else {
+			blockhttps = (blockhttps == "false") ? false : true;
+		}	
 
 		if (blockhttps) {				
 			var alerttext = chrome.i18n.getMessage("warningpre") 
@@ -965,7 +969,11 @@ if (initcache) {
 
 	tlsaExtCache.init();
 	var clearcache = localStorage["clearcache"];
-	clearcache = (clearcache == undefined || clearcache == "true") ? true : false;
+	if (clearcache == undefined) {
+		clearcache = false;
+	} else {
+		clearcache = (clearcache == "false") ? false : true;
+	}
 	if (clearcache) {
 		// new API since Chrome Dev 19.0.1055.1
 		if( chrome['browsingData'] && chrome['browsingData']['removeCache'] ){

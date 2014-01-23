@@ -71,7 +71,7 @@ function checkdomainlist() {
 // Cancel settings without saving on the localstorage
 //--------------------------------------------------------
 function cancelOptions() {
-	console.log("CLOSE:");
+
 	window.close();
 }
 
@@ -80,7 +80,7 @@ function cancelOptions() {
 // Save settings on the localstorage
 //--------------------------------------------------------
 function saveOptions() {
-	console.log("SAVE:");
+
 	var radiogroup = document.dnssecSettings.resolver;
 	var resolver;
 	for (var i = 0; i < radiogroup.length; i++) {
@@ -109,7 +109,6 @@ function saveOptions() {
 //--------------------------------------------------------
 function testdnssec() {
 
-	//console.log("TEST:");
 	var nameserver = "8.8.8.8";
 	var options = 7;
 	var testnic = 0;
@@ -121,8 +120,7 @@ function testdnssec() {
 	var radiogroup = document.dnssecSettings.resolver;
       
 	for (var i = 0; i < radiogroup.length; i++) {
-		var child = radiogroup[i];
-		console.log('CHOICE: \"'+ i + '; ' + child.checked + '\"\n');
+		var child = radiogroup[i];		
 		if (child.checked == true) {
 			switch (i) {
 				case 0: // System setting
@@ -156,14 +154,11 @@ function testdnssec() {
 	}
 	else {
 		try {
-			console.log('INIT parameters: \"'+ dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
 			var plugin = document.getElementById("dnssec-plugin");
 			plugin.DNSSECCacheFree();
 			plugin.DNSSECCacheInit();
 			testnic = plugin.Validate(dn, options, nameserver, addr);	
 			testnic = testnic[0];
-			console.log('RETURN: '+ testnic);
-
 			if (testnic == 2) {
 				document.getElementById("messageok").style.display = 'block';
 				document.getElementById("messagebogus").style.display = 'none';
@@ -199,11 +194,24 @@ function testdnssec() {
 // help function for clear DNSSEC localestorage
 //--------------------------------------------------------
 function eraseOptions() {
-	console.log("ERASE:");
 	localStorage.removeItem("dnssecResolver");
 	localStorage.removeItem("dnssecCustomResolver");
 	localStorage.removeItem("DebugOutput");
 	location.reload();
+}
+
+function RefreshExclude() {
+
+	var ischecked = document.getElementById("domainfilteron").checked;
+	document.getElementById("domainlist").disabled = !ischecked;
+	if (ischecked) {
+		document.getElementById("domainlist").style.color = 'black';
+		document.getElementById("filtertext").style.color = 'black';
+	} else {
+		document.getElementById("domainlist").style.color = 'grey';
+		document.getElementById("filtertext").style.color = 'grey';
+	}
+	//location.reload();
 }
 
 //--------------------------------------------------------
@@ -213,6 +221,8 @@ window.onload = function(){
 	document.querySelector('input[id="savebutton"]').onclick=saveOptions;
 	document.querySelector('input[id="testbutton"]').onclick=testdnssec;
 	document.querySelector('input[id="cancelbutton"]').onclick=cancelOptions;
+	var domainfilteron = document.querySelectorAll('input[type=checkbox][id=domainfilteron]');
+	domainfilteron[0].onchange = RefreshExclude; 
 }
 
 //--------------------------------------------------------
@@ -262,10 +272,6 @@ window.addEventListener('load',function(){
         choice = matches[2];
         resolver = matches[3];
 	unescape(resolver);
-	console.log(state);
-	console.log(choice);
-	console.log(resolver);
-	console.log("LOAD:");
 	testinfodisplay(state);
       	addText("preftitle", chrome.i18n.getMessage("preftitle"));
       	addText("prefresolver", chrome.i18n.getMessage("prefresolver"));
@@ -310,7 +316,14 @@ window.addEventListener('load',function(){
 	        document.dnssecSettings.domainlist.value = domainlist;
 		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;
 	        document.dnssecSettings.domainfilteron.checked = domainfilteron;
-
+		document.getElementById("domainlist").disabled = !domainfilteron;
+		if (domainfilteron) {
+			document.getElementById("domainlist").style.color = 'black';
+			document.getElementById("filtertext").style.color = 'black';
+		} else {
+			document.getElementById("domainlist").style.color = 'grey';
+			document.getElementById("filtertext").style.color = 'grey';
+		}
 		var radiogroup = document.dnssecSettings.resolver;
 		for (var i = 0; i < radiogroup.length; i++) {
 			var child = radiogroup[i];
@@ -335,7 +348,16 @@ window.addEventListener('load',function(){
 		document.dnssecSettings.domainlist.value = domainlist;
 		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;
 		document.dnssecSettings.domainfilteron.checked = domainfilteron;
-		DebugOutput = (DebugOutput == undefined || DebugOutput == "true") ? true : false;
+		document.getElementById("domainlist").disabled = !domainfilteron;
+		if (domainfilteron) {
+			document.getElementById("domainlist").style.color = 'black';
+			document.getElementById("filtertext").style.color = 'black';
+		} else {
+			document.getElementById("domainlist").style.color = 'grey';
+			document.getElementById("filtertext").style.color = 'grey';
+		}
+
+		DebugOutput = (DebugOutput == undefined || DebugOutput == "false") ? false : true;
 		document.dnssecSettings.DebugOutput.checked = DebugOutput;
 	}  //state
 });

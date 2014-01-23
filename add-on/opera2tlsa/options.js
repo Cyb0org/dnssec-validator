@@ -71,7 +71,6 @@ function checkdomainlist() {
 // Cancel settings without saving on the localstorage
 //--------------------------------------------------------
 function cancelOptions() {
-	console.log("CLOSE:");
 	window.close();
 }
 
@@ -79,7 +78,6 @@ function cancelOptions() {
 // Save settings on the localstorage
 //--------------------------------------------------------
 function saveOptions() {
-	console.log("SAVE:");
 	var radiogroup = document.tlsaSettings.resolver;
 	var resolver;
 	for (var i = 0; i < radiogroup.length; i++) {
@@ -111,7 +109,6 @@ function saveOptions() {
 //--------------------------------------------------------
 function testdnssec() {
 
-	//console.log("TEST:");
 	var nameserver = "8.8.8.8";
 	var options = 7;
 	var testnic = 0;
@@ -124,7 +121,6 @@ function testdnssec() {
       
 	for (var i = 0; i < radiogroup.length; i++) {
 		var child = radiogroup[i];
-		console.log('CHOICE: \"'+ i + '; ' + child.checked + '\"\n');
 		if (child.checked == true) {
 			switch (i) {
 				case 0: // System setting
@@ -158,7 +154,6 @@ function testdnssec() {
 	}
 	else {
 		try {
-			console.log('INIT parameters: \"'+ dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
 			var plugin = document.getElementById("tlsa-plugin");
 			plugin.TLSACacheFree();
 			plugin.TLSACacheInit();
@@ -197,7 +192,6 @@ function testdnssec() {
 // help function for clear TLSA localestorage
 //--------------------------------------------------------
 function eraseOptions() {
-	console.log("ERASE:");
 	localStorage.removeItem("dnssecResolver");
 	localStorage.removeItem("dnssecCustomResolver");
 	localStorage.removeItem("DebugOutput");
@@ -205,13 +199,47 @@ function eraseOptions() {
 }
 
 
+function AllHttpscheckbox() {
+
+	var ischecked = document.getElementById("AllHttps").checked;
+	document.getElementById("blockhttps").disabled = !ischecked;
+	document.getElementById("clearcache").disabled = !ischecked;
+	if (ischecked) {
+		document.getElementById("blockhttpstext").style.color = 'black';
+		document.getElementById("clearcachetext").style.color = 'black';
+	} else {
+		document.getElementById("blockhttpstext").style.color = 'grey';
+		document.getElementById("clearcachetext").style.color = 'grey';
+	}
+	//location.reload();
+}
+
+function RefreshExclude() {
+
+	var ischecked = document.getElementById("domainfilteron").checked;
+	document.getElementById("domainlist").disabled = !ischecked;
+	if (ischecked) {
+		document.getElementById("domainlist").style.color = 'black';
+		document.getElementById("filtertext").style.color = 'black';
+	} else {
+		document.getElementById("domainlist").style.color = 'grey';
+		document.getElementById("filtertext").style.color = 'grey';
+	}
+	//location.reload();
+}
+
+
 //--------------------------------------------------------
 // Replaces onclick for the option buttons
 //--------------------------------------------------------
 window.onload = function(){
-	document.querySelector('input[id="savebutton"]').onclick=saveOptions;
-	document.querySelector('input[id="testbutton"]').onclick=testdnssec;
-	document.querySelector('input[id="cancelbutton"]').onclick=cancelOptions;
+	document.querySelector('input[id="savebutton"]').onclick = saveOptions;
+	document.querySelector('input[id="testbutton"]').onclick = testdnssec;
+	document.querySelector('input[id="cancelbutton"]').onclick = cancelOptions;
+	var AllHttps = document.querySelectorAll('input[type=checkbox][id=AllHttps]');
+	AllHttps[0].onchange = AllHttpscheckbox;
+	var domainfilteron = document.querySelectorAll('input[type=checkbox][id=domainfilteron]');
+	domainfilteron[0].onchange = RefreshExclude; 
 }
 
 
@@ -312,13 +340,34 @@ window.addEventListener('load',function() {
 	        document.tlsaSettings.DebugOutput.checked = DebugOutput;
 	        document.tlsaSettings.domainlist.value = domainlist;
 		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;
-		blockhttps = (blockhttps == undefined || blockhttps == "true") ? true : false;
+		blockhttps = (blockhttps == undefined || blockhttps == "false") ? false : true;
 		clearcache = (clearcache == undefined || clearcache == "false") ? false : true;
 		AllHttps = (AllHttps == undefined || AllHttps == "false") ? false : true;
 	        document.tlsaSettings.domainfilteron.checked = domainfilteron;
+
+		document.getElementById("domainlist").disabled = !domainfilteron;
+		if (domainfilteron) {
+			document.getElementById("domainlist").style.color = 'black';
+			document.getElementById("filtertext").style.color = 'black';
+		} else {
+			document.getElementById("domainlist").style.color = 'grey';
+			document.getElementById("filtertext").style.color = 'grey';
+		}
+
+
 		document.tlsaSettings.blockhttps.checked = blockhttps;
 		document.tlsaSettings.clearcache.checked = clearcache;
 		document.tlsaSettings.AllHttps.checked = AllHttps;
+		document.getElementById("blockhttps").disabled = !AllHttps;
+		document.getElementById("clearcache").disabled = !AllHttps;
+		if (AllHttps) {
+			document.getElementById("blockhttpstext").style.color = 'black';
+			document.getElementById("clearcachetext").style.color = 'black';
+		} else {
+			document.getElementById("blockhttpstext").style.color = 'grey';
+			document.getElementById("clearcachetext").style.color = 'grey';
+		}
+
 		var radiogroup = document.tlsaSettings.resolver;
 		for (var i = 0; i < radiogroup.length; i++) {
 			var child = radiogroup[i];
@@ -344,14 +393,34 @@ window.addEventListener('load',function() {
 		document.tlsaSettings.domainlist.value = domainlist;
 		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;
 		document.tlsaSettings.domainfilteron.checked = domainfilteron;
-   		blockhttps = (blockhttps == undefined || blockhttps == "true") ? true : false;
+
+		document.getElementById("domainlist").disabled = !domainfilteron;
+		if (domainfilteron) {
+			document.getElementById("domainlist").style.color = 'black';
+			document.getElementById("filtertext").style.color = 'black';
+		} else {
+			document.getElementById("domainlist").style.color = 'grey';
+			document.getElementById("filtertext").style.color = 'grey';
+		}
+
+
+		AllHttps = (AllHttps == undefined || AllHttps == "false") ? false : true;
+		document.tlsaSettings.AllHttps.checked = AllHttps;
+		blockhttps = (blockhttps == undefined || blockhttps == "false") ? false : true;
 		document.tlsaSettings.blockhttps.checked = blockhttps;	
 		clearcache = (clearcache == undefined || clearcache == "false") ? false : true;
 		document.tlsaSettings.clearcache.checked = clearcache;
-		DebugOutput = (DebugOutput == undefined || DebugOutput == "true") ? true : false;
-		document.tlsaSettings.DebugOutput.checked = DebugOutput;
-		AllHttps = (AllHttps == undefined || AllHttps == "false") ? false : true;
-		document.tlsaSettings.AllHttps.checked = AllHttps;		
+		document.getElementById("blockhttps").disabled = !AllHttps;
+		document.getElementById("clearcache").disabled = !AllHttps;
+		if (AllHttps) {
+			document.getElementById("blockhttpstext").style.color = 'black';
+			document.getElementById("clearcachetext").style.color = 'black';
+		} else {
+			document.getElementById("blockhttpstext").style.color = 'grey';
+			document.getElementById("clearcachetext").style.color = 'grey';
+		}
+		DebugOutput = (DebugOutput == undefined || DebugOutput == "false") ? false : true;
+		document.tlsaSettings.DebugOutput.checked = DebugOutput;		
 	}  //state
 });
 

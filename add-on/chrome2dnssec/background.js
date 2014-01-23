@@ -460,8 +460,9 @@ function ExcludeDomainList(domain) {
  	var DoaminFilter = localStorage["domainfilteron"];
 	if (DoaminFilter == undefined) {
 		DoaminFilter = false;
+	} else {
+		DoaminFilter = (DoaminFilter == "false") ? false : true;
 	}
-	DoaminFilter = (DoaminFilter == "false") ? false : true;
 	if (DoaminFilter) {
 		var DomainSeparator = /[.]+/;
 		var DomainArray = domain.split(DomainSeparator);
