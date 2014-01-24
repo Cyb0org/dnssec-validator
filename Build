@@ -59,26 +59,38 @@ $ make
 -----------------------------------------------
 
 
--- Windows systems --
+-- Windows system --
 Part 1 - build libs and dll, to be built on Linux:
 --------------------------------------------------
 $ make -f Makefile.libwin
-$ make -f Makefile.win sys_windows_pre
+$ make -f Makefile.win
 --------------------------------------------------
 
 Part 2 - to be built on Windows:
-copy .dll into plugin directory
+copy all files from (dll_build) to "dll_build" directory on windows
 ---------------------------------------
-> plugin\FireBreath\prep2010.cmd plugin\projects plugin\build
+> MSVS-build.bat
+or
+> MKDIR builds
+> FireBreath\prep2010.cmd plugin-source builds
 
-run VC++, open plugin/build/FireBreath.sln, select "MinSizeRel"
+run MSVS, open "builds/FireBreath.sln", select "MinSizeRel"
 configuration (Build -> Configuration Manager...) and build it
 ---------------------------------------
 
 Part 3 - to be built on Linux:
+copy np*.dll files from "builds/bin/..." directory back to dll_build directori on Linux. 
 ---------------------------------------
 $ make -f Makefile.win xpi_x86
 ---------------------------------------
+
+*Part4 - build plugin for IE - on windows (MSVS):
+------------------------------------------------
+copy all files from windows "dll_build" directory to add-on/IE2/DNSSECToolbar
+run MSVS, open "IEdnssec.sln", select "MinSizeRel"
+configuration (Build -> Configuration Manager...) and build it
+Copy all *.dll files to "NSIS installer" dir and run "dnssec-setup.nsi" by NSIS.
+-------------------------------------------------
 
 ===============================================
 = Clean project (libs, FireBreath, cmake files)
@@ -86,3 +98,35 @@ $ make -f Makefile.win xpi_x86
 $ make -f Makefile.main clean
 ----------------------------------------------
 
+
+* DNSSEC/TLSA Validator for Internet Explorer add-on - another build dependencies and build instructions.
+====================================================================
+### GENERAL REQUIREMENTS ###
+  - OS: GNU/Linux | MS Windows
+  - compilers:	MinGW on Linux | MSVS on Windows
+  
+### BUILD ###
+
+Part 1 - to be built on Linux (build libs and dll plugins):
+	# apt-get install gcc-mingw32 make git sed
+	$ make -f Makefile.libwin
+	$ make -f Makefile.win
+	- copy *.dll files from linux to Windows into "ie2\NSIS installer" folder
+	- copy *.dll and *.def files from Linux to Windows "ie2\DNSSECToolbar" and try to Part 2 
+
+Part 2 - to be built on Windows (build IEdnssec project -> "IEdnssec.dll"):
+	- install Microsoft Visual Studio 2010 Professional Edition or Visual Studio Exppress
+	      <http://www.microsoft.com/visualstudio/en-us/home>
+	- run "Visual Studio Command Prompt" (Start -> Programs -> Microsoft Visual Studio -> Visual Studio Tools)
+		1. set Command Prompt path into folder "ie2\DNSSECToolbar" 
+		2a. enter: "lib.exe /DEF:DANEcore-windows-x86.def /MACHINE:x86" for generating "DANEcore-windows-x86.lib"
+		2b. enter: "lib.exe /DEF:DNSSECcore-windows-x86.def /MACHINE:x86" for generating "DNSSECcore-windows-x86.lib"  
+	- run VS and open project ie2\DNSSECToolbar\IEdnssec.sln, select "Release MinSize" configuration (Build -> Configuration Manager...) and build it 
+	- copy new file "ie2\DNSSECToolbar\ReleaseMinSize\IEdnssec.dll" to "..\ie2\NSIS installer" and try to Part 3
+
+  Part 3 - to be built on Windows (create NSIS installer):
+     - install NSIS (Nullsoft Scriptable Install System)
+       <http://nsis.sourceforge.net/Download>
+     - run NSIS and open file "ie2\NSIS installer\dnssec-setup.nsi" and build it 
+     - run "IE-dnssec-tlsa-validator-${VERSION}-windows-x86.exe" and install plugin on your computer
+====================================================================
