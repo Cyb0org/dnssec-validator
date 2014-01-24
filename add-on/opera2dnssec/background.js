@@ -112,6 +112,16 @@ var dnssecModes = {
 };
 
 //****************************************************************
+// text bool value from LocalStorage to bool
+//****************************************************************
+function StringToBool(value) {
+	if (value == undefined) return false;
+	else if (value == "false") return false;
+	else if (value == "true") return true;
+	else return false;
+}
+
+//****************************************************************
 // this function sets DNSSEC mode. status ICON and popup text
 //****************************************************************
 function setModeDNSSEC(newMode, tabId, domain, status, addr, ipval) {
@@ -457,13 +467,8 @@ function dnssecvalidate(domain, tabId, tab) {
 function ExcludeDomainList(domain) {
 
 	var result = true;
- 	var DoaminFilter = localStorage["domainfilteron"];
-	if (DoaminFilter == undefined) {
-		DoaminFilter = false;
-	} else {
-		DoaminFilter = (DoaminFilter == "false") ? false : true;
-	}
-	if (DoaminFilter) {
+ 
+	if (StringToBool(localStorage["domainfilteron"])) {
 		var DomainSeparator = /[.]+/;
 		var DomainArray = domain.split(DomainSeparator);
 		var DomainList = localStorage["domainlist"];
@@ -494,12 +499,7 @@ function ExcludeDomainList(domain) {
 //****************************************************************
 function onUrlChange(tabId, changeInfo, tab) {                  	
 
-	debuglogout = localStorage["DebugOutput"];
-	if (debuglogout == undefined) {
-		debuglogout = false;
-	} else {
-		debuglogout = (debuglogout == "false") ? false : true;
-	}
+	debuglogout = StringToBool(localStorage["DebugOutput"]);
 
 	if (changeInfo.status == "undefined") {
 		//chrome.pageAction.hide(tabId);
