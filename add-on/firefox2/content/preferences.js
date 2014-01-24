@@ -341,6 +341,7 @@ windowDialogaccept :
 
 onUnload :
 	function(prefwindow) {
+		this.setBool("cachefree", true);
 		var dsp = document.getElementById("dnssec-plugin");
 		var dsp2 = document.getElementById("dane-tlsa-plugin");
 		dsp.DNSSECCacheFree();

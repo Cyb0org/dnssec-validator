@@ -50,6 +50,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 		<preference id="domainlist" name="extensions.dnssec.domainlist" type="string"/>
 		<preference id="version" name="extensions.dnssec.version" type="string"/>
 		<preference id="resolvingactive" name="extensions.dnssec.resolvingactive" type="bool"/>
+		<preference id="cachefree" name="extensions.dnssec.cachefree" type="bool"/>
 		<preference id="popupfgcolor" name="extensions.dnssec.popupfgcolor" type="string"/>
 		<preference id="popupbgcolor" name="extensions.dnssec.popupbgcolor" type="string"/>
 	</preferences>

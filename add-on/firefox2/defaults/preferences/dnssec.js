@@ -23,6 +23,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 pref("extensions.dnssec@nic.cz.name", "chrome://dnssec/locale/dnssec.properties");
 pref("extensions.dnssec@nic.cz.description", "chrome://dnssec/locale/dnssec.properties");
 pref("extensions.dnssec.asyncresolve", true);
+pref("extensions.dnssec.cachefree", false);
 pref("extensions.dnssec.dnssecdebug", false);
 pref("extensions.dnssec.danedebug", false);
 pref("extensions.dnssec.domainfilter", false);

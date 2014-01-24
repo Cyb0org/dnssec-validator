@@ -70,7 +70,7 @@ unregister:
 observe:
 	function(aSubject, aTopic, aData) {
 		if (aTopic != "nsPref:changed") return;
-
+	
 		// aSubject is the nsIPrefBranch we're observing (after appropriate QI)
 		// aData is the name of the pref that's been changed (relative to aSubject)
 		switch (aData) {
@@ -213,16 +213,11 @@ onStatusChange:
 // **************************************************************
 var daneExtension = {
 
-debugOutput:
-	false,
-debugPrefix: "  dane: "
-	,
-DANE_DEBUG_PRE: "  dane: "
-	,
-DANE_DEBUG_POST: "\n"
-	,
-oldAsciiHost:
-	null,
+debugOutput: false,
+debugPrefix: "  dane: ",
+DANE_DEBUG_PRE: "  dane: ",
+DANE_DEBUG_POST: "\n",
+oldAsciiHost: null,
 
 //---------------------------------------------------------
 // initialization of TLSA plugin
@@ -359,6 +354,12 @@ unregisterObserver:
 observe:
 	function(channel, topic, data) {
 
+		var freecache = dnssecExtPrefs.getBool("cachefree");
+		if (freecache) {
+			tlsaExtCache.delAllRecords();
+			dnssecExtPrefs.setBool("cachefree", false);
+		}
+
 		var checkall = dnssecExtPrefs.getBool("checkhttpsrequestsonpages");
 		if (checkall) {
 
@@ -458,12 +459,10 @@ observe:
 // **************************************************************
 var tlsaValidator = {
 
-	ALLOW_TYPE_01: 1,
-	ALLOW_TYPE_23: 2,
-DANE_DEBUG_PRE: "  dane: "
-	,
-DANE_DEBUG_POST: "\n"
-	,
+ALLOW_TYPE_01: 1,
+ALLOW_TYPE_23: 2,
+DANE_DEBUG_PRE: "  dane: ",
+DANE_DEBUG_POST: "\n",
 
 overrideService:
 	Components.classes["@mozilla.org/security/certoverride;1"]
@@ -545,6 +544,12 @@ processNewURL:
 			if (daneExtension.debugOutput) {
 				dump(' ...valid\n');
 			}
+		}
+
+		var freecache = dnssecExtPrefs.getBool("cachefree");
+		if (freecache) {
+			tlsaExtCache.delAllRecords();
+			dnssecExtPrefs.setBool("cachefree", false);
 		}
 
 		var tlsaon = dnssecExtPrefs.getBool("tlsaenable");
