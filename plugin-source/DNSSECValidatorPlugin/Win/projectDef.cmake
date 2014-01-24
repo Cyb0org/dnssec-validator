@@ -1,23 +1,7 @@
-# ***** BEGIN LICENSE BLOCK *****
-# Copyright 2012 CZ.NIC, z.s.p.o.
-#
-# Authors: Martin Straka <martin.straka@nic.cz>
-#
-# This file is part of DNSSEC Validator Add-on.
-#
-# DNSSEC Validator Add-on is free software: you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# DNSSEC Validator Add-on is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-# more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
-# ***** END LICENSE BLOCK *****
+#/**********************************************************\ 
+# Auto-generated Windows project definition file for the
+# DNSSECValidatorPlugin project
+#\**********************************************************/
 
 # Windows template platform definition CMake file
 # Included from ../CMakeLists.txt
@@ -26,6 +10,7 @@
 file (GLOB PLATFORM RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     Win/[^.]*.cpp
     Win/[^.]*.h
+    Win/[^.]*.rc
     Win/[^.]*.cmake
     )
 
@@ -41,18 +26,40 @@ set (SOURCES
     ${PLATFORM}
     )
 
-add_windows_plugin(${PROJNAME} SOURCES)
+add_windows_plugin(${PROJECT_NAME} SOURCES)
 
 # generate .lib from the validating library compiled by mingw
 add_custom_command(TARGET ${PROJNAME} PRE_LINK
                    COMMAND lib.exe /machine:x86 /def:DNSSECcore-windows-x86.def
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../../ub_tmp_build
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../dll_build
     )
 
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
 target_link_libraries(${PROJNAME}
     ${PLUGIN_INTERNAL_DEPS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../ub_tmp_build/DNSSECcore-windows-x86.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../dll_build/DNSSECcore-windows-x86.lib
+    )
+
+# This is an example of how to add a build step to sign the plugin DLL before
+# the WiX installer builds.  The first filename (certificate.pfx) should be
+# the path to your pfx file.  If it requires a passphrase, the passphrase
+# should be located inside the second file. If you don't need a passphrase
+# then set the second filename to "".  If you don't want signtool to timestamp
+# your DLL then make the last parameter "".
+#
+# Note that this will not attempt to sign if the certificate isn't there --
+# that's so that you can have development machines without the cert and it'll
+# still work. Your cert should only be on the build machine and shouldn't be in
+# source control!
+# -- uncomment lines below this to enable signing --
+#firebreath_sign_plugin(${PROJECT_NAME}
+#    "${CMAKE_CURRENT_SOURCE_DIR}/sign/certificate.pfx"
+#    "${CMAKE_CURRENT_SOURCE_DIR}/sign/passphrase.txt"
+#    "http://timestamp.verisign.com/scripts/timestamp.dll")
+
+# add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
+target_link_libraries(${PROJECT_NAME}
+    ${PLUGIN_INTERNAL_DEPS}
     )
 
 set(WIX_HEAT_FLAGS
@@ -65,7 +72,24 @@ set(WIX_HEAT_FLAGS
 add_wix_installer( ${PLUGIN_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/Win/WiX/DNSSECValidatorPluginInstaller.wxs
     PluginDLLGroup
-    ${BIN_DIR}/${PLUGIN_NAME}/${CMAKE_CFG_INTDIR}/
-    ${BIN_DIR}/${PLUGIN_NAME}/${CMAKE_CFG_INTDIR}/np${PLUGIN_NAME}.dll
-    ${PROJNAME}
+    ${FB_BIN_DIR}/${PLUGIN_NAME}/${CMAKE_CFG_INTDIR}/
+    ${FB_BIN_DIR}/${PLUGIN_NAME}/${CMAKE_CFG_INTDIR}/${FBSTRING_PluginFileName}.dll
+    ${PROJECT_NAME}
     )
+
+# This is an example of how to add a build step to sign the WiX installer
+# -- uncomment lines below this to enable signing --
+#firebreath_sign_file("${PLUGIN_NAME}_WiXInstall"
+#    "${FB_BIN_DIR}/${PLUGIN_NAME}/${CMAKE_CFG_INTDIR}/${PLUGIN_NAME}.msi"
+#    "${CMAKE_CURRENT_SOURCE_DIR}/sign/certificate.pfx"
+#    "${CMAKE_CURRENT_SOURCE_DIR}/sign/passphrase.txt"
+#    "http://timestamp.verisign.com/scripts/timestamp.dll")
+
+# This is an example of how to create a cab
+# -- uncomment lines below this to enable signing --
+#create_cab(${PLUGIN_NAME}
+#    ${CMAKE_CURRENT_SOURCE_DIR}/Win/Wix/DNSSECValidatorPlugin.ddf
+#    ${CMAKE_CURRENT_SOURCE_DIR}/Win/Wix/DNSSECValidatorPlugin.inf
+#    ${FB_BIN_DIR}/${PLUGIN_NAME}/${CMAKE_CFG_INTDIR}/
+#    ${PROJECT_NAME}_WiXInstallExe
+#    )

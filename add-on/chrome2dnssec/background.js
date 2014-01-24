@@ -24,7 +24,7 @@ document.write("<html>");
 document.write("<head>");
 document.write("</head>");
 document.write("<body>");
-document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidator\" width=\"0\" height=\"0\"></object>");
+document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidatorplugin\" width=\"0\" height=\"0\"></object>");
 document.write("<script>");
 
 
@@ -110,6 +110,16 @@ var dnssecModes = {
 	DNSSEC_TOOLTIP_WRONG_RES: "dnssecwrongres",
 	DNSSEC_TOOLTIP_DNSSEC_OFF: "validatoroff", 
 };
+
+//****************************************************************
+// text bool value from LocalStorage to bool
+//****************************************************************
+function StringToBool(value) {
+	if (value == undefined) return false;
+	else if (value == "false") return false;
+	else if (value == "true") return true;
+	else return false;
+}
 
 //****************************************************************
 // this function sets DNSSEC mode. status ICON and popup text
@@ -457,12 +467,14 @@ function dnssecvalidate(domain, tabId, tab) {
 function ExcludeDomainList(domain) {
 
 	var result = true;
- 	var DoaminFilter = localStorage["domainfilteron"];
-	DoaminFilter = (DoaminFilter == "false") ? false : true;
-	if (DoaminFilter) {
+ 
+	if (StringToBool(localStorage["domainfilteron"])) {
 		var DomainSeparator = /[.]+/;
 		var DomainArray = domain.split(DomainSeparator);
 		var DomainList = localStorage["domainlist"];
+		if (DomainList == undefined) {
+			return result;
+		}
 		var DomainListSeparators = /[ ,;]+/;
 		var DomainListArray = DomainList.split(DomainListSeparators);
 
@@ -487,8 +499,7 @@ function ExcludeDomainList(domain) {
 //****************************************************************
 function onUrlChange(tabId, changeInfo, tab) {                  	
 
-	debuglogout = localStorage["DebugOutput"];
-	debuglogout = (debuglogout == "false") ? false : true;
+	debuglogout = StringToBool(localStorage["DebugOutput"]);
 
 	if (changeInfo.status == "undefined") {
 		//chrome.pageAction.hide(tabId);

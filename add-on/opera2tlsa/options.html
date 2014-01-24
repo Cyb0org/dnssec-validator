@@ -37,10 +37,9 @@ DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
 	<fieldset>
 		<legend id="legend"></legend>
 		<p id="prefresolver"></p>
-		<input type="radio" name="resolver" value=""/>
-		<label id="resolver0"></label><br/>
-		<input type="radio" name="resolver" value="custom"/><label id="resolver3"></label><input name="customResolver" value="8.8.8.8" /><br/>
-		<input type="radio" name="resolver" value="nofwd" checked="true"/><label id="resolver4"></label><br/><br/>
+		<label id="resolver0"><input type="radio" name="resolver" value=""/></label><br/>
+		<label id="resolver3"><input type="radio" name="resolver" value="custom"/></label><input name="customResolver" value="8.8.8.8" /><br/>
+		<label id="resolver4"><input type="radio" name="resolver" value="nofwd" checked="true"/></label><br/><br/>
 		<input type="button" value="Test" id="testbutton"/><br/>
 		<p id="messageok" style="display: none;"></p>
 		<p id="messagebogus" style="display: none;"></p>
@@ -49,16 +48,15 @@ DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
 	</fieldset><br/>
 	<fieldset>
 		<legend id="groupboxfilter"></legend>
-		<input type="checkbox" id="domainfilteron" name="domainfilteron"/>
-		<label id="usefilter"></label><br/>
+		<label id="usefilter"><input type="checkbox" id="domainfilteron" name="domainfilteron"/></label><br/>
 		<p id="filtertext"></p>  		
 		<textarea name="domainlist" id="domainlist" cols="42" rows="3"></textarea>
 	</fieldset>
-		<legend id="groupboxfilter"></legend>
-	        <input type="checkbox" id="debugOutput" name="debugOutput" style="display: none;"/><br/>         
-		<input type="checkbox" id="blockhttps" name="blockhttps"/><label id="blockhttpstext"></label><br/>
-		<input type="checkbox" id="clearcache" name="clearcache"/><label id="clearcachetext"></label><br/><br/>
-		<input type="checkbox" id="DebugOutput" name="DebugOutput"/><label id="debugoutputtext"></label><br/><br/>
+	        <input type="checkbox" id="debugOutput" name="debugOutput" style="display: none;"/><br/>
+		<label id="AllHttpstext"><input type="checkbox" id="AllHttps" name="AllHttps"/></label><br/>         
+		<label id="blockhttpstext"><input type="checkbox" id="blockhttps" name="blockhttps"/></label><br/>
+		<label id="clearcachetext"><input type="checkbox" id="clearcache" name="clearcache"/></label><br/><br/>
+		<label id="debugoutputtext"><input type="checkbox" id="DebugOutput" name="DebugOutput"/></label><br/><br/>
 		<input type="hidden"   id="cachefree" name="cachefree"/>
 		<input type="button" value="Save" id="savebutton"/>
 		<input type="button" value="Cancel" id="cancelbutton"/>

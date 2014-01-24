@@ -6,7 +6,7 @@
 		<em:name>DNSSECValidatorPlugin</em:name>
 		<em:version>${FBSTRING_PLUGIN_VERSION}</em:version>
 		<!--<em:iconURL></em:iconURL>-->
-		<!--em:updateURL>http://www.nic.cz/update.rdf</em:updateURL>
+		<!--em:updateURL>http://nic.cz/update.rdf</em:updateURL>
 		<em:updateKey></em:updateKey-->
 		<em:unpack>true</em:unpack>
 
@@ -14,9 +14,9 @@
 			<Description>
 				<em:locale>en-US</em:locale>
 				<em:name>DNSSECValidatorPlugin</em:name>
-				<em:description>Check DNSSEC status</em:description>
-				<em:creator>CZ.NIC Labs</em:creator>
-				<em:homepageURL>http://www.nic.cz</em:homepageURL>
+				<em:description>Plug-in used by DNSSEC Validator extension</em:description>
+				<em:creator>CZ.NIC</em:creator>
+				<em:homepageURL>http://nic.cz</em:homepageURL>
 			</Description>
 		</em:localized> 
 

@@ -1,7 +1,7 @@
 /* ***** BEGIN LICENSE BLOCK *****
 Copyright 2013 CZ.NIC, z.s.p.o.
 File: DANE/TLSA library
-Authors: Martin Straka <martin.straka@nic.cz> 
+Authors: Martin Straka <martin.straka@nic.cz>
 
 This file is part of TLSA Validator 2 Add-on.
 
@@ -29,28 +29,24 @@ such a combination shall include the source code for the parts of
 OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
-#define _BSD_SOURCE /* S_IFREG */
 #define _POSIX_SOURCE
 
 
 #define NONE_CA_STORE 0 /* No external CA store is loaded. */
 #define DIR_CA_STORE 1 /* CA certificates stored in directories. */
 #define NSS_CA_STORE 2 /* NSS built-in CA certificates. */
-#define NSS_CERT8_CA_STORE 3 /* NSS builtin-in CA certificates + directories
+#define NSS_CERT8_CA_STORE 3 /* NSS built-in CA certificates + directories
                                 with cert8.db, key3.db, secmod.db */
+#define OSX_CA_STORE 4 /* Mac OS X CA store. */
+#define WIN_CA_STORE 5 /* Windows CA store. */
 
 /* Select which CA store to use. */
-#define CA_STORE NONE_CA_STORE
+#ifndef CA_STORE
+   #define CA_STORE NONE_CA_STORE
+   #warning "No CA store is being used."
+#endif /* !CA_STORE */
 
 
-#if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
-  #include <base64.h> /* NSS BTOA_DataToAscii() */
-  #include <cert.h> /* NSS CERT_DestroyCertList() */
-  #include <nss.h> /* NSS */
-  #include <pk11func.h> /* NSS ListCertsInSlot() */
-  #include <prlink.h> /* NSPR PR_GetLibraryName() */
-  #include <secmod.h> /* NSS slots, SECMOD_LoadUserModule() */
-#endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -62,20 +58,33 @@ OpenSSL used as well as that of the covered work.
 #include "openssl/x509.h"
 #include "openssl/evp.h"
 
+#include "ca_stores.h"
+#include "common.h"
 #include "dane-plug.h"
 #include "dane-states.gen"
 
-#ifdef RES_WIN
+#if defined RES_WIN
 /* Windows */
   #include "ldns/config.h"
   #include "ldns/ldns.h"
   #include "libunbound/unbound.h"
-  
+
+  #include <wincrypt.h>
   #include <winsock2.h>
   #include <ws2tcpip.h>
   #include <iphlpapi.h>
   #include <winreg.h>
-  
+
+  #define MY_ENCODING_TYPE  (PKCS_7_ASN_ENCODING | X509_ASN_ENCODING)
+
+  #ifndef CERT_SYSTEM_STORE_CURRENT_USER
+    #define CERT_SYSTEM_STORE_CURRENT_USER 0x00010000
+  #endif
+
+  #ifndef CCERT_CLOSE_STORE_CHECK_FLAG
+    #define CERT_CLOSE_STORE_CHECK_FLAG 0x00000002
+  #endif
+
 #else
 /* Linux */
   #include <sys/stat.h> /* stat(2) */
@@ -95,15 +104,6 @@ OpenSSL used as well as that of the covered work.
 
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-//DS record of root zone
-#define TA ". IN DS 19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32F24E8FB5"
-//DNSKEY of DLV register
-#define DLV "dlv.isc.org. IN DNSKEY 257 3 5 BEAAAAPHMu/5onzrEE7z1egmhg/WPO0+juoZrW3euWEn4MxDCE1+lLy2 brhQv5rN32RKtMzX6Mj70jdzeND4XknW58dnJNPCxn8+jAGl2FZLK8t+ 1uq4W+nnA3qO2+DL+k6BD4mewMLbIYFwe0PG73Te9fZ2kJb56dhgMde5 ymX4BI/oQ+ cAK50/xvJv00Frf8kw6ucMTwFlgPe+jnGxPPEmHAte/URk Y62ZfkLoBAADLHQ9IrS2tryAe7mbBZVcOwIeU/Rw/mRx/vwwMCTgNboM QKtUdvNXDrYJDSHZws3xiRXF1Rf+al9UmZfSav/4NWLKjHzpT59k/VSt TDN0YUuWrBNh"
-// debugging related stuff
-#define DEBUG_PREFIX "TLSA: "        
-#define DEBUG_PREFIX_CER "CERT: "
-#define DEBUG_PREFIX_DANE "DANE: "
-#define DEBUG_OUTPUT stderr
 // define policy of browser
 #define ALLOW_TYPE_01 1
 #define ALLOW_TYPE_23 2
@@ -119,37 +119,20 @@ OpenSSL used as well as that of the covered work.
 #define SPKI 1
 
 
-#if CA_STORE == DIR_CA_STORE
-/* CA certificate directories. */
-/* TODO -- These location should be given at configuration time. */
-#define MOZILLA_CA_DIR "/usr/share/ca-certificates/mozilla"
-static
-const char *ca_dirs[] = {MOZILLA_CA_DIR, NULL};
-#endif /* DIR_CA_STORE */
-
-#if CA_STORE == NSS_CERT8_CA_STORE
-/* Directories containing cert8.db. */
-/* TODO -- These directories should be detected automatically (somehow). */
-static
-const char * cert8_ca_dirs[] = {NULL};
-#endif /* NSS_CERT8_CA_STORE */
-
-
 //----------------------------------------------------------------------------
 
 /* structure to save input options of validator */
-struct ds_options_st {
-	bool debug; // debug output enable
+struct dane_options_st {
 	bool usefwd; // use of resolver
-	bool ds; // use root.key with DS record of root zone 
+	bool ds; // use root.key with DS record of root zone
 };
 
 //----------------------------------------------------------------------------
-static char byteMap[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+static const char byteMap[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 static int byteMapLen = sizeof(byteMap);
 //----------------------------------------------------------------------------
 /* structure to save TLSA records */
-struct tlsa_store_ctx {   
+struct tlsa_store_ctx {
 	char *domain;
 	uint8_t dnssec_status;
 	uint8_t cert_usage;
@@ -216,394 +199,36 @@ struct cert_tmp_ctx {
 
 /* DANE validation context. */
 struct dane_validation_ctx {
-	struct ds_options_st opts; /* Options. */
+	struct dane_options_st opts; /* Options. */
 	struct ub_ctx *ub; /*
 	                    * Unbound context.
 	                    * Initialised outside the context initialisation
 	                    * procedure.
 	                    */
 	SSL_CTX *ssl_ctx; /* SSL context. */
-#if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
-	NSSInitContext *nss_ctx; /* NSS context. */
-#endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
 };
 static
 struct dane_validation_ctx glob_val_ctx = {
-	{false, false, false}, NULL, NULL
-#if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
-	, NULL
-#endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
+	{false, false}, NULL, NULL
 };
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-
-static
-int printf_debug(const char *pref, const char *fmt, ...)
-  __attribute__((format(printf, 2, 3)));
-
-//*****************************************************************************
-/* debug output function */
-// ----------------------------------------------------------------------------
-static
-int printf_debug(const char *pref, const char *fmt, ...)
-{
-	va_list argp;
-	int ret = 0;
-
-	if (glob_val_ctx.opts.debug && (fmt != NULL)) {
-		va_start(argp, fmt);
-
-		if (pref != NULL) {
-			fputs(pref, DEBUG_OUTPUT);
-		} else {
-			fputs(DEBUG_PREFIX, DEBUG_OUTPUT);
-		}
-		ret = vfprintf(DEBUG_OUTPUT, fmt, argp);
-
-		va_end(argp);
-	}
-
-	return ret;
-}
 
 
 //*****************************************************************************
 // read input options into a structure
 // ----------------------------------------------------------------------------
-static
-void ds_init_opts(struct ds_options_st *opts, const uint16_t options) 
+void dane_set_validation_options(struct dane_options_st *opts,
+    uint16_t options)
 {
 	assert(opts != NULL);
 
-	opts->debug = options & DANE_FLAG_DEBUG;
+	/* TODO -- Not really a structure member. */
+	global_debug = options & DANE_FLAG_DEBUG;
+
 	opts->usefwd = options & DANE_FLAG_USEFWD;
 	opts->ds = false;
 }
-
-
-#if CA_STORE == DIR_CA_STORE
-//*****************************************************************************
-// Load certificate from file and add it to the certificate store
-// ----------------------------------------------------------------------------
-static
-int X509_store_add_cert_file(X509_STORE *store, const char *fname)
-{
-	FILE *fin = NULL;
-	X509 *x509 = NULL;
-
-	assert(store != NULL);
-	assert(fname != NULL);
-
-	fin = fopen(fname, "r");
-	if (fin == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Cannot open certificate '%s'.\n", fname);
-		goto fail;
-	}
-
-	x509 = PEM_read_X509(fin, NULL, NULL, NULL);
-	if (x509 == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Cannot parse certificate '%s'.\n", fname);
-		goto fail;
-	}
-
-	if (X509_STORE_add_cert(store, x509) == 0) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Cannot store certificate '%s'.\n", fname);
-		goto fail;
-	}
-
-	X509_free(x509); x509 = NULL;
-	fclose(fin); fin = NULL;
-
-	return 0;
-
-fail:
-	if (fin != NULL) {
-		fclose(fin);
-	}
-	if (x509 != NULL) {
-		X509_free(x509);
-	}
-	return -1;
-}
-
-
-//*****************************************************************************
-// Load all available certificates from the browser CA certificate directory.
-// ----------------------------------------------------------------------------
-static
-int X509_store_add_certs_from_dirs(X509_STORE *store, const char **dirname_p)
-{
-	DIR *dir = NULL;
-	struct dirent *ent;
-	struct stat s;
-#define MAX_PATH_LEN 256
-	char aux_path[MAX_PATH_LEN];
-	size_t prefix_len;
-	int certcnt = 0;
-
-	assert(dirname_p != NULL);
-	if (dirname_p == NULL) {
-		goto fail;
-	}
-
-	while (*dirname_p != NULL) {
-		/*
-		 * Assume that path is a directory.
-		 * TODO -- Check for it.
-		 */
-
-		certcnt = 0;
-
-		dir = opendir(*dirname_p);
-		if (dir == NULL) {
-			goto fail;
-		}
-
-		prefix_len = strlen(*dirname_p);
-		if ((prefix_len + 1) > (MAX_PATH_LEN - 1)) {
-			goto fail;
-		}
-		memcpy(aux_path, *dirname_p, MAX_PATH_LEN);
-		aux_path[prefix_len++] = '/';
-		aux_path[prefix_len] = '\0';
-
-		while ((ent = readdir(dir)) != NULL) {
-			if ((strlen(ent->d_name) + prefix_len) >
-			    (MAX_PATH_LEN - 1)) {
-				continue; /* Next entry. */
-			}
-
-			strncpy(aux_path + prefix_len, ent->d_name,
-			    MAX_PATH_LEN - prefix_len);
-			aux_path[MAX_PATH_LEN - 1] = '\0';
-
-			if((stat(aux_path, &s) == 0) &&
-			   (s.st_mode & S_IFREG)) {
-				/* Is file. */
-
-				X509_store_add_cert_file(store, aux_path);
-				++certcnt;
-			}
-		}
-
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Added %d certificates from directory '%s'.\n",
-		    certcnt, *dirname_p);
-
-		closedir(dir); dir = NULL;
-		++dirname_p;
-	}
-
-	return 0;
-
-fail:
-	if (dir != NULL) {
-		closedir(dir);
-	}
-	return -1;
-#undef MAX_PATH_LEN
-}
-#endif /* DIR_CA_STORE */
-
-
-#if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
-//*****************************************************************************
-// Load all available certificates from NSS built-in certificates.
-// ----------------------------------------------------------------------------
-static
-int X509_store_add_certs_from_nssckbi(X509_STORE *store)
-{
-	SECMODModule *secmod = NULL;
-	CERTCertList *cert_list = NULL;
-	CERTCertListNode *cert_node;
-	X509 *x509 = NULL;
-	const unsigned char *der;
-	int certcnt = 0;
-
-//	char *cert_b64 = NULL;
-
-	secmod = SECMOD_LoadUserModule(
-	    "name=\"Root Certs\" library=\"libnssckbi.so\"",
-	    NULL, PR_FALSE);
-	if ((secmod == NULL) || (!secmod->loaded)) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Cannot access NSS builtin CA store.\n");
-		goto fail;
-	}
-
-	for (int i = 0; i < secmod->slotCount; ++i) {
-		cert_list = PK11_ListCertsInSlot(secmod->slots[i]);
-		for(cert_node = CERT_LIST_HEAD(cert_list);
-		    !CERT_LIST_END(cert_node, cert_list);
-		    cert_node = CERT_LIST_NEXT(cert_node)) {
-			der = cert_node->cert->derCert.data;
-
-			x509 = d2i_X509(NULL, &der,
-			    cert_node->cert->derCert.len);
-			if (x509 == NULL) {
-				printf_debug(DEBUG_PREFIX_CER,
-				    "Cannot create X509 from DER.\n");
-			}
-
-			if (X509_STORE_add_cert(store, x509) == 0) {
-				printf_debug(DEBUG_PREFIX_CER,
-				    "Cannot store certificate.\n");
-				goto fail;
-			}
-
-			++certcnt;
-
-			X509_free(x509); x509 = NULL;
-		}
-		CERT_DestroyCertList(cert_list); cert_list = NULL;
-	}
-
-	if (SECMOD_UnloadUserModule(secmod) != SECSuccess) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error unloading NSS module.\n");
-	}
-	SECMOD_DestroyModule(secmod); secmod = NULL;
-
-	printf_debug(DEBUG_PREFIX_CER, "Added %d built-in NSS certificates.\n",
-	    certcnt);
-
-	return 0;
-
-fail:
-	if (secmod != NULL) {
-		SECMOD_UnloadUserModule(secmod);
-		SECMOD_DestroyModule(secmod);
-	}
-	if (cert_list != NULL) {
-		CERT_DestroyCertList(cert_list);
-	}
-	if (x509 != NULL) {
-		X509_free(x509);
-	}
-	return -1;
-}
-#endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
-
-
-#if CA_STORE == NSS_CERT8_CA_STORE
-//*****************************************************************************
-// Load all available certificates from directories containing cert8.db files.
-// ----------------------------------------------------------------------------
-static
-int X509_store_add_certs_from_cert8_dirs(X509_STORE *store,
-    const char **dirname_p)
-{
-	struct stat s;
-#define MAX_MODSPEC_LEN 512
-	char aux_modspec[MAX_MODSPEC_LEN];
-	PK11SlotInfo *slot = NULL;
-	CERTCertList *cert_list = NULL;
-	CERTCertListNode *cert_node;
-	X509 *x509 = NULL;
-	const unsigned char *der;
-	int certcnt = 0;
-
-	assert(dirname_p != NULL);
-	if (dirname_p == NULL) {
-		goto fail;
-	}
-
-	while (*dirname_p != NULL) {
-		/*
-		 * Assume that path is a directory.
-		 * TODO -- Check for it.
-		 */
-
-		certcnt = 0;
-
-		if((stat(*dirname_p, &s) != 0) || !(s.st_mode & S_IFDIR)) {
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Cannot access directory '%s'.\n", *dirname_p);
-			continue;
-		}
-		/* Is directory. */
-
-		if (snprintf(aux_modspec, MAX_MODSPEC_LEN,
-		        " name=\"Directory Certs\" " \
-		        " configdir='%s' " \
-		        " certPrefix='' " \
-		        " keyPrefix='' " \
-		        " flags=readOnly,noKeyDB ", *dirname_p) >=
-		    MAX_MODSPEC_LEN) {
-			/* Output truncated. */
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Cannot work with directory '%s'.\n", *dirname_p);
-			continue;
-		}
-
-		slot = SECMOD_OpenUserDB(aux_modspec);
-		if (slot == NULL) {
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Error loading user database.\n");
-			goto fail;
-		}
-
-		cert_list = PK11_ListCertsInSlot(slot);
-		if (cert_list != NULL) {
-			for(cert_node = CERT_LIST_HEAD(cert_list);
-		    !CERT_LIST_END(cert_node, cert_list);
-		    cert_node = CERT_LIST_NEXT(cert_node)) {
-				der = cert_node->cert->derCert.data;
-
-				x509 = d2i_X509(NULL, &der,
-				    cert_node->cert->derCert.len);
-				if (x509 == NULL) {
-					printf_debug(DEBUG_PREFIX_CER,
-					    "Cannot create X509 from DER.\n");
-				}
-
-				/* 4E:0B:EF:1A:A4:40:5B:A5:17:69:87:30:CA:34:68:43:D0:41:AE:F2 */
-				X509_print_ex_fp(DEBUG_OUTPUT, x509,
-				    XN_FLAG_COMPAT, X509_FLAG_COMPAT);
-
-				if (X509_STORE_add_cert(store, x509) == 0) {
-					printf_debug(DEBUG_PREFIX_CER,
-					    "Cannot store certificate.\n");
-					goto fail;
-				}
-
-				++certcnt;
-
-				X509_free(x509); x509 = NULL;
-			}
-			CERT_DestroyCertList(cert_list); cert_list = NULL;
-		}
-
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Added %d NSS certificates from directory '%s'.\n",
-		    certcnt, *dirname_p);
-
-		SECMOD_CloseUserDB(slot);
-		PK11_FreeSlot(slot); slot = NULL;
-
-		++dirname_p;
-	}
-
-	return 0;
-
-fail:
-	if (slot != NULL) {
-		SECMOD_CloseUserDB(slot);
-		PK11_FreeSlot(slot);
-	}
-	if (cert_list != NULL) {
-		CERT_DestroyCertList(cert_list);
-	}
-	if (x509 != NULL) {
-		X509_free(x509);
-	}
-	return -1;
-#undef MAX_MODSPEC_LEN
-}
-#endif /* NSS_CERT8_CA_STORE */
 
 
 //*****************************************************************************
@@ -664,7 +289,7 @@ int create_socket(const char *domain, const char *port_str)
 		WSACleanup();
 		return -1;
 	}
-#endif
+#endif /* WIN32 */
 
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_family = AF_UNSPEC;    /* Allow IPv4 or IPv6 */
@@ -674,7 +299,7 @@ int create_socket(const char *domain, const char *port_str)
 
 	getaddrres = getaddrinfo(domain, port_str, &hints, &result);
 	if (getaddrres != 0) {
-		printf_debug(DEBUG_PREFIX_CER, "Error: getaddrinfo: %s\n",
+		printf_debug(DEBUG_PREFIX_CERT, "Error: getaddrinfo: %s\n",
 		    gai_strerror(getaddrres));
 		exit(EXIT_FAILURE);
 	}
@@ -693,8 +318,8 @@ int create_socket(const char *domain, const char *port_str)
 	}
 
 	if (rp == NULL) {               /* No address succeeded */
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Could not connect to remote server!\n");
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Could not connect to remote server!");
 		exit(EXIT_FAILURE);
 	}
 
@@ -783,7 +408,7 @@ void add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list,
 		while (tmp->next != NULL) {
 			tmp = tmp->next;
 		}
-		tmp->next = field_tlsa; 
+		tmp->next = field_tlsa;
 	} else {
 		tlsa_list->first = field_tlsa;
 	}
@@ -868,28 +493,28 @@ struct tlsa_store_head policyFilter(struct tlsa_store_head *tlsa_list, int polic
 {
 	struct tlsa_store_head tlsa_list_new;
 	tlsa_list_new.first = NULL;
-    
+
 	struct tlsa_store_ctx *tmp;
 	tmp=tlsa_list->first;
-	
+
 	while (tmp != NULL) {
 		switch (tmp->cert_usage) {
 		case CA_CERT_PIN:
 		case EE_CERT_PIN:
 			if (policy & ALLOW_TYPE_01) {
-				add_tlsarecord_bottom(&tlsa_list_new, 
+				add_tlsarecord_bottom(&tlsa_list_new,
 				tmp->domain, tmp->dnssec_status, tmp->cert_usage,
-				tmp->selector, tmp->matching_type, tmp->association, 
-				tmp->association_size, (char*)tmp->assochex); 
+				tmp->selector, tmp->matching_type, tmp->association,
+				tmp->association_size, (char*)tmp->assochex);
 			}
 			break;
 		case CA_TA_ADDED:
 		case EE_TA_ADDED:
 			if (policy & ALLOW_TYPE_23) {
-				add_tlsarecord_bottom(&tlsa_list_new, 
+				add_tlsarecord_bottom(&tlsa_list_new,
 				tmp->domain, tmp->dnssec_status, tmp->cert_usage,
 				tmp->selector, tmp->matching_type, tmp->association,
-				tmp->association_size, (char*)tmp->assochex); 
+				tmp->association_size, (char*)tmp->assochex);
 			}
 			break;
 		default:
@@ -910,7 +535,7 @@ void print_tlsalist_debug(const struct tlsa_store_head *tlsa_list)
 	struct tlsa_store_ctx *tmp;
 	int num;
 
-	if (!glob_val_ctx.opts.debug) {
+	if (!global_debug) {
 		/* Function prints only debugging information. */
 		return;
 	}
@@ -918,21 +543,21 @@ void print_tlsalist_debug(const struct tlsa_store_head *tlsa_list)
 	num = 1;
 	tmp = tlsa_list->first;
 	while (tmp != NULL) {
-		printf_debug(DEBUG_PREFIX,
+		printf_debug(DEBUG_PREFIX_TLSA,
 		    ">> %04d ---------------------------------------\n", num);
-		printf_debug(DEBUG_PREFIX,
+		printf_debug(DEBUG_PREFIX_TLSA,
 		    "%s: dnssec: %s (%d), cert usage: %d, selector: %d, "
 		    "matching type: %d, assoc.hex: %s, assoc.size: %zu \n",
 		    tmp->domain, get_dnssec_status(tmp->dnssec_status),
 		    tmp->dnssec_status, tmp->cert_usage, tmp->selector,
 		    tmp->matching_type, tmp->assochex,
 		    tmp->association_size);
-		printf_debug(DEBUG_PREFIX,
+		printf_debug(DEBUG_PREFIX_TLSA,
 		    "<< %04d ---------------------------------------\n", num);
 		++num;
 		tmp = tmp->next;
 	}
-} 
+}
 
 //*****************************************************************************
 // Helper function (print certificate list)
@@ -945,7 +570,7 @@ void print_certlist_debug(const struct cert_store_head *cert_list)
 	X509 *cert_x509 = NULL;
 	const unsigned char *cert_der;
 
-	if (!glob_val_ctx.opts.debug) {
+	if (!global_debug) {
 		/* Function prints only debugging information. */
 		return;
 	}
@@ -953,26 +578,26 @@ void print_certlist_debug(const struct cert_store_head *cert_list)
 	num = 1;
 	tmp = cert_list->first;
 	while (tmp != NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
+		printf_debug(DEBUG_PREFIX_CERT,
 		    ">> %04d ---------------------------------------\n", num);
 		/* TODO -- Get rid of the explicit conversion. */
 		cert_der = (unsigned char *) tmp->cert_der;
 		cert_x509 = d2i_X509(NULL, &cert_der, tmp->cert_len);
 		if (cert_x509 != NULL) {
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Certificate in text format:\n");
+			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+			    "Certificate in text format:");
 			X509_print_ex_fp(DEBUG_OUTPUT, cert_x509,
 			    XN_FLAG_COMPAT, X509_FLAG_COMPAT);
 			X509_free(cert_x509); cert_x509 = NULL;
 		} else {
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Cannot convert certificate into text format.\n");
+			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+			    "Cannot convert certificate into text format.");
 		}
-		printf_debug(DEBUG_PREFIX_CER, "certlen: %i\n%s\n",
+		printf_debug(DEBUG_PREFIX_CERT, "certlen: %i\n%s\n",
 		    tmp->cert_len, tmp->cert_der_hex);
-		printf_debug(DEBUG_PREFIX_CER, "spkilen: %i\n%s\n",
+		printf_debug(DEBUG_PREFIX_CERT, "spkilen: %i\n%s\n",
 		     tmp->spki_len, tmp->spki_der_hex);
-		printf_debug(DEBUG_PREFIX_CER,
+		printf_debug(DEBUG_PREFIX_CERT,
 		    "<< %04d ---------------------------------------\n", num);
 		++num;
 		tmp = tmp->next;
@@ -1024,7 +649,7 @@ void free_certlist(struct cert_store_head *cert_list)
 // Helper function (add new record in the certificate list - first)
 // ----------------------------------------------------------------------------
 static
-void add_certrecord(struct cert_store_head *cert_list, char* cert_der, 
+void add_certrecord(struct cert_store_head *cert_list, char* cert_der,
     int cert_len, char* cert_der_hex,  char* spki_der, int spki_len,
     char* spki_der_hex)
 {
@@ -1076,7 +701,7 @@ void add_certrecord_bottom(struct cert_store_head *cert_list,
 		while (tmp->next) {
 			tmp = tmp->next;
 		}
-		tmp->next = field_cert; 
+		tmp->next = field_cert;
 	} else {
 		cert_list->first = field_cert;
 	}
@@ -1180,13 +805,13 @@ struct cert_tmp_ctx spkicert(const char *certder, int len)
 	X509 *cert;
 	cert = d2i_X509(NULL, (const unsigned char **) &certder, len);
 	if (cert == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error obtaining X509 from hex.\n");				
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Error obtaining X509 from hex.");
 	}
 
 	if ((pkey = X509_get_pubkey(cert)) == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error getting public key from certificate\n");
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Error getting public key from certificate");
 	}
 
 	int len2;
@@ -1231,8 +856,8 @@ int add_certrecord_bottom_from_der_hex(struct cert_store_head *cert_list,
 
 	cert_entry->cert_der = hextobin(der_hex);
 	if (cert_entry->cert_der == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error converting hex DER to bin.\n");
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Error converting hex DER to bin.");
 		goto fail;
 	}
 
@@ -1240,7 +865,7 @@ int add_certrecord_bottom_from_der_hex(struct cert_store_head *cert_list,
 
 	cert_entry->cert_der_hex = malloc(hex_len + 1);
 	if (cert_entry->cert_der_hex == NULL) {
-		printf_debug(DEBUG_PREFIX_CER, "Errror copying hex.\n");
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n", "Errror copying hex.");
 		goto fail;
 	}
 	memcpy(cert_entry->cert_der_hex, der_hex, hex_len + 1);
@@ -1250,7 +875,8 @@ int add_certrecord_bottom_from_der_hex(struct cert_store_head *cert_list,
 
 	cert_entry->spki_der = spki.spki_der;
 	if (cert_entry->spki_der == NULL) {
-		printf_debug(DEBUG_PREFIX_CER, "Error obtaining SPKI DER.\n");
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Error obtaining SPKI DER.");
 		goto fail;
 	}
 
@@ -1258,8 +884,8 @@ int add_certrecord_bottom_from_der_hex(struct cert_store_head *cert_list,
 
 	cert_entry->spki_der_hex = spki.spki_der_hex;
 	if (cert_entry->spki_der == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error obtaining SPKI DER hex.\n");
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Error obtaining SPKI DER hex.");
 		goto fail;
 	}
 
@@ -1321,23 +947,23 @@ int add_certrecord_bottom_from_x509(struct cert_store_head *cert_list,
 	cert_entry->cert_len = i2d_X509(x509,
 	    (unsigned char **) &cert_entry->cert_der);
 	if (cert_entry->cert_len < 0) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error encoding into DER.\n");
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Error encoding into DER.");
 		goto fail;
 	}
 	cert_entry->cert_der_hex =
 	    bintohex((uint8_t *) cert_entry->cert_der,
 	        cert_entry->cert_len);
 	if (cert_entry->cert_der_hex == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error converting DER to hex.\n");
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Error converting DER to hex.");
 		goto fail;
 	}
 
 	pkey = X509_get_pubkey(x509);
 	if (pkey == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error getting public key from certificate\n");
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Error getting public key from certificate");
 		goto fail;
 	}
 
@@ -1348,16 +974,16 @@ int add_certrecord_bottom_from_x509(struct cert_store_head *cert_list,
 	EVP_PKEY_free(pkey); pkey = NULL;
 
 	if (cert_entry->spki_len < 0) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error encoding into DER.\n");
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Error encoding into DER.");
 		goto fail;
 	}
 	cert_entry->spki_der_hex =
 	    bintohex((uint8_t *) cert_entry->spki_der,
 	        cert_entry->spki_len);
 	if (cert_entry->spki_der_hex == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error converting DER to hex.\n");
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Error converting DER to hex.");
 		goto fail;
 	}
 
@@ -1441,11 +1067,12 @@ char * strcat_clone(const char *s1, const char *s2)
 //*****************************************************************************
 // Get certificates from SSL handshake
 // Add certificate into structure
-// Helper function 
+// Helper function
 // return 0 success or -1 on error
 // ----------------------------------------------------------------------------
 static
-int get_cert_list(char *dest_url, const char *domain, const char *port,
+int get_cert_list(SSL_CTX *ssl_ctx, char *dest_url,
+    const char *domain, const char *port,
     struct cert_store_head *cert_list)
 {
 	int i;
@@ -1454,37 +1081,37 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 #if CA_STORE != NONE_CA_STORE
 	X509 *cert = NULL;
 	X509_STORE_CTX *store_ctx = NULL;
-	STACK_OF(X509) *ca_chain = NULL;
+	STACK_OF(X509) *verified_chain = NULL;
 #endif /* !NONE_CA_STORE */
 	STACK_OF(X509) *chain;
 	X509 *cert2;
 	EVP_PKEY *pkey = NULL;
 
-	assert(glob_val_ctx.ssl_ctx != NULL);
+	assert(ssl_ctx != NULL);
 
-	ssl = SSL_new(glob_val_ctx.ssl_ctx);
+	ssl = SSL_new(ssl_ctx);
 	if (ssl == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Cannot create SSL structure.\n");
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Cannot create SSL structure.");
 		goto fail;
 	}
 
 	server_fd = create_socket(domain, port);
 	if(server_fd == -1) {
-		printf_debug(DEBUG_PREFIX_CER,
+		printf_debug(DEBUG_PREFIX_CERT,
 		    "Error TCP connection to: %s.\n", dest_url);
 		goto fail;
 	}
 
 	if (SSL_set_fd(ssl, server_fd) != 1) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Error: Cannot set server socket.\n");
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Error: Cannot set server socket.");
 		goto fail;
 	}
 
 	if (domain != NULL) {
 		if (!SSL_set_tlsext_host_name(ssl, domain)) {
-			printf_debug(DEBUG_PREFIX_CER,
+			printf_debug(DEBUG_PREFIX_CERT,
 			    "Error: Unable to set TLS server-name-indication "
 			    "extension: %s.\n", domain);
 			goto fail;
@@ -1492,7 +1119,7 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 	}
 
 	if (SSL_connect(ssl) != 1) {
-		printf_debug(DEBUG_PREFIX_CER,
+		printf_debug(DEBUG_PREFIX_CERT,
 		    "Error: Could not build a SSL session to: %s.\n",
 		    dest_url);
 		goto fail;
@@ -1500,17 +1127,23 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 
 	chain = SSL_get_peer_cert_chain(ssl);
 	if (chain == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
+		printf_debug(DEBUG_PREFIX_CERT,
 		    "Error: Could not get a certificate chain: %s.\n",
 		    dest_url);
 		goto fail;
 	}
 
+	printf_debug(DEBUG_PREFIX_CERT,
+	    "There are %d certificates in the peer chain.\n",
+	    sk_X509_num(chain));
+
 #if CA_STORE != NONE_CA_STORE
 	{
+//		printf_debug()
+
 		cert = SSL_get_peer_certificate(ssl);
 		if (cert == NULL) {
-			printf_debug(DEBUG_PREFIX_CER,
+			printf_debug(DEBUG_PREFIX_CERT,
 			    "Error: Could not get a certificate from: %s.\n",
 			    dest_url);
 			goto fail;
@@ -1524,16 +1157,15 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 
 		store_ctx = X509_STORE_CTX_new();
 		if (store_ctx == NULL) {
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Cannot create store context.\n");
+			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+			    "Cannot create store context.");
 			goto fail;
 		}
 
 		if (X509_STORE_CTX_init(store_ctx,
-		         SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx),
-		         cert, chain) == 0) {
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Cannot initialise store context.\n");
+		         SSL_CTX_get_cert_store(ssl_ctx), cert, chain) == 0) {
+			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+			    "Cannot initialise store context.");
 			goto fail;
 		}
 
@@ -1542,36 +1174,44 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 		 * context's root CA certs.
 		 */
 		if (X509_verify_cert(store_ctx) <= 0) {
-			printf_debug(DEBUG_PREFIX_CER,
-			    "Error validating certificates.\n");
-			goto fail;
+			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+			    "Error verifying certificates using current "
+			    "CA store.");
+			/* verified_chain is NULL, use chain */
+		} else {
+			/* Get chain from store context */
+			verified_chain = X509_STORE_CTX_get1_chain(store_ctx);
+			printf_debug(DEBUG_PREFIX_CERT,
+			    "There are %d certificates in the verified "
+			    "certificate chain.\n",
+			    sk_X509_num(verified_chain));
+			chain = verified_chain;
+			/* Use verified_chain. */
 		}
-
-		/* Get chain from store context */
-		ca_chain = X509_STORE_CTX_get1_chain(store_ctx);
 		X509_STORE_CTX_free(store_ctx); store_ctx = NULL;
-		chain = ca_chain;
-
 		X509_free(cert); cert = NULL;
 	}
 #endif /* !NONE_CA_STORE */
-
-	printf_debug(DEBUG_PREFIX_CER, "Number of certificates in chain: %i\n",
-	    sk_X509_num(chain));
 
 	for (i = 0; i < sk_X509_num(chain); ++i) {
 		cert2 = sk_X509_value(chain, i);
 
 		if (add_certrecord_bottom_from_x509(cert_list, cert2) != 0) {
-			printf_debug(DEBUG_PREFIX_CER,
+			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 			    "Error adding certificate into list.\n");
 			goto fail;
 		}
 	}
 
 #if CA_STORE != NONE_CA_STORE
-	/* Chain has to be freed explicitly if using CA store. */
-	sk_X509_pop_free(chain, X509_free); chain = ca_chain = NULL;
+	if (verified_chain != NULL) {
+		/*
+		 * Verified chain has to be freed explicitly if successfully
+		 * verified in the CA store.
+		 */
+		sk_X509_pop_free(verified_chain, X509_free);
+		    verified_chain = NULL;
+	}
 #endif /* !NONE_CA_STORE */
 
 #ifdef WIN32
@@ -1584,7 +1224,7 @@ int get_cert_list(char *dest_url, const char *domain, const char *port,
 	SSL_shutdown(ssl);
 	SSL_free(ssl);
 
-	printf_debug(DEBUG_PREFIX_CER,
+	printf_debug(DEBUG_PREFIX_CERT,
 	    "Finished SSL/TLS connection with server: %s.\n",
 	    dest_url);
 
@@ -1610,8 +1250,8 @@ fail:
 	if (store_ctx != NULL) {
 		X509_STORE_CTX_free(store_ctx);
 	}
-	if (ca_chain != NULL) {
-		sk_X509_pop_free(ca_chain, X509_free);
+	if (verified_chain != NULL) {
+		sk_X509_pop_free(verified_chain, X509_free);
 	}
 #endif /* !NONE_CA_STORE */
 	if (pkey != NULL) {
@@ -1650,7 +1290,7 @@ char * opensslDigest(const EVP_MD *md, const char *data, int len)
 static
 char * sha256(const char *data, int len)
 {
-	printf_debug(DEBUG_PREFIX_DANE, "crypto: SHA-256\n");
+	printf_debug(DEBUG_PREFIX_DANE, "%s\n", "crypto: SHA-256");
 
 	return opensslDigest(EVP_sha256(), data, len);
 }
@@ -1662,7 +1302,7 @@ char * sha256(const char *data, int len)
 static
 char * sha512(const char *data, int len)
 {
-	printf_debug(DEBUG_PREFIX_DANE, "crypto: SHA-512\n");
+	printf_debug(DEBUG_PREFIX_DANE, "%s\n", "crypto: SHA-512");
 
 	return opensslDigest(EVP_sha512(), data, len);
 }
@@ -1760,7 +1400,7 @@ int eeCertMatch1(const struct tlsa_store_ctx *tlsa_ctx,
 
 	if (strcmp((const char *) data,
 	        (const char *) tlsa_ctx->assochex) == 0) {
-		ret_val = DANE_VALID_TYPE1; 
+		ret_val = DANE_VALID_TYPE1;
 	}
 
 	printf_debug(DEBUG_PREFIX_DANE, "cert: %s\n", data);
@@ -1793,7 +1433,7 @@ int eeCertMatch3(const struct tlsa_store_ctx *tlsa_ctx,
 
 	if (strcmp((const char *) data,
 	        (const char *) tlsa_ctx->assochex) == 0) {
-		ret_val = DANE_VALID_TYPE3; 
+		ret_val = DANE_VALID_TYPE3;
 	}
 
 	printf_debug(DEBUG_PREFIX_DANE, "cert: %s\n", data);
@@ -1810,7 +1450,7 @@ int eeCertMatch3(const struct tlsa_store_ctx *tlsa_ctx,
 // ----------------------------------------------------------------------------
 static
 int caCertMatch(const struct tlsa_store_ctx *tlsa_ctx,
-    const struct cert_store_head *cert_list) 
+    const struct cert_store_head *cert_list)
 {
 	const struct cert_store_ctx *aux_cert;
 
@@ -1971,20 +1611,21 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 		/* show tlsa_first result */
 		if (ub_res->havedata) {
 
-			printf_debug(DEBUG_PREFIX,
-			    "Domain is secured by DNSSEC ... found TLSA record(s).\n");
+			printf_debug(DEBUG_PREFIX_TLSA, "%s\n",
+			    "Domain is secured by DNSSEC ... "
+			    "found TLSA record(s).");
 
 			ldns_pkt *packet;
 			ldns_status parse_status = ldns_wire2pkt(&packet,
 			    (uint8_t *)(ub_res->answer_packet),
 			    ub_res->answer_len);
-        
+
 			if (parse_status != LDNS_STATUS_OK) {
-				printf_debug(DEBUG_PREFIX,
+				printf_debug(DEBUG_PREFIX_TLSA, "%s\n",
 				     "Failed to parse response packet\n");
 				return DANE_ERROR_RESOLVER;
 			}
-        
+
 			ldns_rr_list *rrs = ldns_pkt_rr_list_by_type(packet,
 			    LDNS_RR_TYPE_TLSA, LDNS_SECTION_ANSWER);
 
@@ -1999,7 +1640,7 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 				 * into 4 RDFs instead of 1 RDF in ldns 1.6.13.
 				 */
 				if (ldns_rr_rd_count(rr) < 4) {
-					printf_debug(DEBUG_PREFIX,
+					printf_debug(DEBUG_PREFIX_TLSA,
 					    "RR %d hasn't enough fields\n", i);
 					return DANE_TLSA_PARAM_ERR;
 				}
@@ -2011,7 +1652,7 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 				if ((ldns_rdf_size(rdf_cert_usage) != 1) ||
 				    (ldns_rdf_size(rdf_selector) != 1) ||
 				    (ldns_rdf_size(rdf_matching_type) != 1)) {
-					printf_debug(DEBUG_PREFIX,
+					printf_debug(DEBUG_PREFIX_TLSA,
 					    "Improperly formatted TLSA RR %d\n", i);
 					return DANE_TLSA_PARAM_ERR;
 				}
@@ -2036,7 +1677,7 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 				ldns_rr_free(rr);
 			}
 
-			exitcode = DANE_DNSSEC_SECURED;                
+			exitcode = DANE_DNSSEC_SECURED;
 			if (packet) {
 				ldns_pkt_free(packet);
 			}
@@ -2045,18 +1686,18 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 			}
 
 		} else {
-			printf_debug(DEBUG_PREFIX,
+			printf_debug(DEBUG_PREFIX_TLSA,
 			    "Unbound haven't received any TLSA data for %s.\n",
 			    domain);
 			exitcode = DANE_NO_TLSA;
 		}
 	} else if (ub_res->bogus) {
 		exitcode = DANE_DNSSEC_BOGUS;
-		printf_debug(DEBUG_PREFIX, "Domain is bogus: %s \n",
+		printf_debug(DEBUG_PREFIX_TLSA, "Domain is bogus: %s \n",
 		    ub_res->why_bogus);
 	} else {
 		exitcode = DANE_DNSSEC_UNSECURED;
-		printf_debug(DEBUG_PREFIX, "Domain is insecure...\n");
+		printf_debug(DEBUG_PREFIX_TLSA, "%s\n", "Domain is insecure...");
 	}
 
 	return exitcode;
@@ -2117,142 +1758,15 @@ char * create_tlsa_qname(const char *domain, const char *port,
 
 
 //*****************************************************************************
-// Initialises Unbound resolver
-//
-// opts         - options
-// optdnssrv    - list of IP resolver addresses separated by space
-// err_code_ptr - error code
-//
-// Returns pointer to new resolver context, NULL if fails.
-// If NULL returned then err_code is set if given
+// Initialises SSL context
 // ----------------------------------------------------------------------------
 static
-struct ub_ctx * unbound_resolver_init(const struct ds_options_st *opts,
-    const char *optdnssrv, int *err_code_ptr)
-{
-	struct ub_ctx *ub = NULL;
-	int err_code = DANE_ERROR_RESOLVER;
-	int ub_retval;
-
-	ub = ub_ctx_create();
-	if(ub == NULL) {
-		printf_debug(DEBUG_PREFIX,
-		    "Error: could not create unbound context\n");
-		goto fail;
-	}
-
-	/* Set resolver/forwarder if it was set in options. */
-	if (opts->usefwd) {
-		if ((optdnssrv != NULL) && (optdnssrv[0] != '\0')) {
-			size_t size = strlen(optdnssrv) + 1;
-			char *str_cpy = malloc(size);
-			const char *fwd_addr;
-			const char *delims = " ";
-			if (str_cpy == NULL) {
-				err_code = DANE_ERROR_GENERIC;
-				goto fail;
-			}
-			memcpy(str_cpy, optdnssrv, size);
-			fwd_addr = strtok(str_cpy, delims);
-			/* Set IP addresses of resolvers into ub context. */
-			while (fwd_addr != NULL) {
-				printf_debug(DEBUG_PREFIX,
-				    "Adding resolver IP address '%s'\n",
-				    fwd_addr);
-				ub_retval = ub_ctx_set_fwd(ub, fwd_addr);
-				if (ub_retval != 0) {
-					printf_debug(DEBUG_PREFIX,
-					    "Error adding resolver IP address '%s': %s\n",
-					    fwd_addr, ub_strerror(ub_retval));
-					free(str_cpy);
-					goto fail;
-				}
-				fwd_addr = strtok(NULL, delims);
-			}
-			free(str_cpy);
-		} else {
-			printf_debug(DEBUG_PREFIX,
-			    "Using system resolver.\n");
-			ub_retval = ub_ctx_resolvconf(ub, NULL);
-			if (ub_retval != 0) {
-				printf_debug(DEBUG_PREFIX,
-				    "Error reading resolv.conf: %s. errno says: %s\n",
-				    ub_strerror(ub_retval),
-				    strerror(errno));
-				goto fail;
-			}
-		}
-	}
-
-	/*
-	// set debugging verbosity
-	ub_ctx_debugout(ub, DEBUG_OUTPUT);
-	if (ub_retval != 0) {
-		printf_debug(DEBUG_PREFIX,
-		    "Error setting debugging output.\n");
-		goto fail;
-	}
-	ub_retval = ub_ctx_debuglevel(ub, 5);
-	if (ub_retval != 0) {
-		printf_debug(DEBUG_PREFIX,
-		    "Error setting verbosity level.\n");
-		goto fail;
-	}
-	*/
-
-	/*
-	 * Read public keys of root zone for DNSSEC verification.
-	 * ds true = zone key will be set from file root.key
-	 *    false = zone key will be set from TA constant
-	 */
-	if (opts->ds) {
-		ub_retval = ub_ctx_add_ta_file(ub, "root.key");
-		if (ub_retval != 0) {
-			printf_debug(DEBUG_PREFIX, "Error adding keys: %s\n",
-			    ub_strerror(ub_retval));
-			goto fail;
-		}
-	} else {
-		ub_retval = ub_ctx_add_ta(ub, TA);
-		if (ub_retval != 0) {
-			printf_debug(DEBUG_PREFIX, "Error adding keys: %s\n",
-			    ub_strerror(ub_retval));
-			goto fail;
-		}
-	}
-
-	/* Set dlv-anchor.
-	 * (TODO -- This location differs from DNSSEC validation. Why?) */
-	ub_retval = ub_ctx_set_option(ub, "dlv-anchor:", DLV);
-	if (ub_retval != 0) {
-		printf_debug(DEBUG_PREFIX, "Error adding DLV keys: %s\n",
-		    ub_strerror(ub_retval));
-		goto fail;
-	}
-
-	return ub;
-
-fail:
-	if (ub != NULL) {
-		ub_ctx_delete(ub);
-	}
-	if (err_code_ptr != NULL) {
-		*err_code_ptr = err_code;
-	}
-	return NULL;
-}
-
-
-//*****************************************************************************
-// Initialises global validation structures.
-// ----------------------------------------------------------------------------
-int dane_validation_init(void)
+SSL_CTX * ssl_context_init(void)
 {
 	const SSL_METHOD *method;
+	SSL_CTX *ssl_ctx = NULL;
 
-	printf_debug(DEBUG_PREFIX_DANE, "Initialising DANE.\n");
-
-	glob_val_ctx.ub = NULL; /* Has separate initialisation procedure. */
+	printf_debug(DEBUG_PREFIX_CERT, "%s\n", "Initialising SSL context.");
 
 	/* Initialise SSL. */
 	OpenSSL_add_all_algorithms();
@@ -2263,72 +1777,87 @@ int dane_validation_init(void)
 	SSL_library_init();
 
 	method = SSLv23_client_method();
-	glob_val_ctx.ssl_ctx = SSL_CTX_new(method);
-	if (glob_val_ctx.ssl_ctx == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Unable to create a SSL context structure.\n");
+	ssl_ctx = SSL_CTX_new(method);
+	if (ssl_ctx == NULL) {
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Unable to create a SSL context structure.");
 		goto fail;
 	}
 
-	SSL_CTX_set_options(glob_val_ctx.ssl_ctx, SSL_OP_NO_SSLv2);
+	SSL_CTX_set_options(ssl_ctx, SSL_OP_NO_SSLv2);
 
 #if CA_STORE == DIR_CA_STORE
 	/* Load certificates. */
-	if (X509_store_add_certs_from_dirs(
-	        SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx),
-	        ca_dirs) != 0) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Failed loading browser CA cerificates.\n");
-		goto fail;
+	if (X509_store_add_certs_from_files_and_dirs(ssl_ctx,
+	        ca_files, ca_dirs) != 0) {
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Failed loading browser CA certificates.");
+		//goto fail; /* Failure is not desired, ignore return value. */
 	}
 #endif /* DIR_CA_STORE */
 
 #if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
-	NSSInitParameters initparams;
-	memset(&initparams, 0, sizeof(initparams));
-	initparams.length = sizeof(initparams);
-	glob_val_ctx.nss_ctx = NSS_InitContext("", "", "", "", &initparams,
-	    NSS_INIT_READONLY | NSS_INIT_NOCERTDB);
-	if (glob_val_ctx.nss_ctx == NULL) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Unable to create a NSS context structure.\n");
-		goto fail;
-	}
-#endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
-
-#if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
 	if (X509_store_add_certs_from_nssckbi(
-	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx)) != 0) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Failed loading NSS built-in CA cerificates.\n");
-		goto fail;
+	        SSL_CTX_get_cert_store(ssl_ctx)) != 0) {
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Failed loading NSS built-in CA certificates.");
+		//goto fail; /* Failure is not desired, ignore return value. */
 	}
 #endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
 
 #if CA_STORE == NSS_CERT8_CA_STORE
 	if (X509_store_add_certs_from_cert8_dirs(
-	    SSL_CTX_get_cert_store(glob_val_ctx.ssl_ctx),
-	    cert8_ca_dirs) != 0) {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Failed loading NSS CA cerificates from cert8.db.\n");
-		goto fail;
+	    SSL_CTX_get_cert_store(ssl_ctx), cert8_ca_dirs) != 0) {
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Failed loading NSS CA certificates from cert8.db.");
+		//goto fail; /* Failure is not desired, ignore return value. */
 	}
 #endif /* NSS_CERT8_CA_STORE */
 
-	return 0;
+#if CA_STORE == OSX_CA_STORE
+	if (X509_store_add_certs_from_osx_store(
+	    SSL_CTX_get_cert_store(ssl_ctx)) != 0) {
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Failed loading OS X CA certificates.");
+		//goto fail; /* Failure is not desired, ignore return value. */
+	}
+#endif /* OSX_CA_STORE */
+
+#if defined WIN32 && (CA_STORE == WIN_CA_STORE)
+	if (X509_store_add_certs_from_win_store(
+	    SSL_CTX_get_cert_store(ssl_ctx)) != 0) {
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Failed loading Windows CA certificates.");
+		//goto fail; /* Failure is not desired, ignore return value. */
+	}
+#endif /* WIN32 && WIN_CA_STORE */
+
+	printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+	    "Initialisation of SSL context succeeded.");
+
+	return ssl_ctx;
 
 fail:
-	if (glob_val_ctx.ssl_ctx != NULL) {
-		SSL_CTX_free(glob_val_ctx.ssl_ctx);
-		glob_val_ctx.ssl_ctx = NULL;
+	if (ssl_ctx != NULL) {
+		SSL_CTX_free(ssl_ctx);
 	}
-#if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
-	if (glob_val_ctx.nss_ctx != NULL) {
-		NSS_ShutdownContext(glob_val_ctx.nss_ctx);
-		glob_val_ctx.nss_ctx = NULL;
-	}
-#endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
-	return -1;
+	printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+	    "Initialisation of SSL context failed.");
+	return NULL;
+}
+
+
+//*****************************************************************************
+// Initialises global validation structures.
+// ----------------------------------------------------------------------------
+int dane_validation_init(void)
+{
+	printf_debug(DEBUG_PREFIX_DANE, "%s\n", "Initialising DANE.");
+
+	glob_val_ctx.ub = NULL; /* Has separate initialisation procedure. */
+	glob_val_ctx.ssl_ctx = ssl_context_init();
+
+	return (glob_val_ctx.ssl_ctx != NULL) ? 0 : -1;
 }
 
 //*****************************************************************************
@@ -2336,16 +1865,16 @@ fail:
 // Input parmateers:
 //        char* certchain[] - array of derCert in HEX (certificate chain)
 //        int certcount - number of cert in array - count(array)
-//        const uint16_t options - TLSA validator option (debug,IPv4,IPv6) 
+//        const uint16_t options - TLSA validator option (debug,IPv4,IPv6)
 //        char *optdnssrv - list of IP resolver addresses separated by space
 //        char* domain - domain name (e.g.: wwww.nic.cz, torproject.org, ...)
 //        char* port_str - number of port for SSL (443, 25)
-//        char* protocol - "tcp" only 
+//        char* protocol - "tcp" only
 //        int policy - certificate policy from browser
 // Return: DANE/TLSA validation status (x<0 = error, <0-13> = success, x>16 = fail)
 //         return values: dane-state.gen file
 // ----------------------------------------------------------------------------
-short CheckDane(const char *certchain[], int certcount, const uint16_t options,
+int dane_validate(const char *certchain[], int certcount, uint16_t options,
     const char *optdnssrv, const char *domain,  const char *port_str,
     const char *protocol, int policy)
 {
@@ -2368,9 +1897,9 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 	int exitcode = DANE_ERROR_RESOLVER;
 	char *dn = NULL;
 
-	ds_init_opts(&glob_val_ctx.opts, options);
+	dane_set_validation_options(&glob_val_ctx.opts, options);
 
-	printf_debug(DEBUG_PREFIX, "Input parameters: domain='%s'; port='%s'; "
+	printf_debug(DEBUG_PREFIX_TLSA, "Input parameters: domain='%s'; port='%s'; "
 	    "protocol='%s'; options=%u; resolver_address='%s';\n",
 	    (domain != NULL) ? domain : "(null)",
 	    (port_str != NULL) ? port_str : "(null)",
@@ -2379,7 +1908,7 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 	    (optdnssrv != NULL) ? optdnssrv : "(null)");
 
 	if ((domain == NULL) || (domain[0] == '\0')) {
-		printf_debug(DEBUG_PREFIX, "Error: no domain...\n");
+		printf_debug(DEBUG_PREFIX_TLSA, "%s\n", "Error: no domain...");
 		return DANE_ERROR_GENERIC;
 	}
 
@@ -2389,7 +1918,7 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 		 * decimal notation without any additional characters.
 		 */
 		if (str_is_port_number(port_str) < 0) {
-			printf_debug(DEBUG_PREFIX,
+			printf_debug(DEBUG_PREFIX_TLSA,
 			    "Error: Supplied an invalid port number '%s'.\n",
 			    port_str);
 			return exitcode;
@@ -2407,12 +1936,20 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 	/* ----------------------------------------------- */
 	/* Unbound resolver initialization, set forwarder. */
 	if (glob_val_ctx.ub == NULL) {
-		glob_val_ctx.ub = unbound_resolver_init(&glob_val_ctx.opts,
-		    optdnssrv, &exitcode);
+		glob_val_ctx.ub = unbound_resolver_init(optdnssrv, &exitcode,
+		    glob_val_ctx.opts.usefwd, glob_val_ctx.opts.ds,
+		    DEBUG_PREFIX_TLSA);
 		if(glob_val_ctx.ub == NULL) {
-			printf_debug(DEBUG_PREFIX,
-			    "Error: could not create unbound context\n");
-			return exitcode;
+			printf_debug(DEBUG_PREFIX_TLSA, "%s\n",
+			    "Error: could not create unbound context.");
+			switch (exitcode) {
+			case ERROR_RESOLVER:
+				return DANE_ERROR_RESOLVER;
+			case ERROR_GENERIC:
+				return DANE_ERROR_GENERIC;
+			default:
+				return exitcode;
+			}
 		}
 	}
 	/* ----------------------------------------------- */
@@ -2424,7 +1961,7 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 	free(dn); dn = NULL;
 
 	if (retval != 0) {
-		printf_debug(DEBUG_PREFIX, "resolver error: %s\n",
+		printf_debug(DEBUG_PREFIX_TLSA, "resolver error: %s\n",
 		    ub_strerror(retval));
 		return exitcode;
 	}
@@ -2454,24 +1991,25 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 
 	if (certcount > 0) {
 
-		printf_debug(DEBUG_PREFIX_CER,
-		    "Browser's certificate chain is used\n");
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "Browser's certificate chain is used.");
 
 		int i;
 		for (i = 0; i < certcount; i++) {
 			if (add_certrecord_bottom_from_der_hex(&cert_list,
 			        certchain[i]) != 0) {
-				printf_debug(DEBUG_PREFIX_CER,
-				    "Error adding certificate into list.\n");
+				printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+				    "Error adding certificate into list.");
 				return DANE_ERROR_GENERIC;
 			}
 		}
 	} else {
-		printf_debug(DEBUG_PREFIX_CER,
-		    "External certificate chain is used\n");
+		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+		    "External certificate chain is used.");
 		memcpy(uri, "https://", HTTPS_PREF_LEN + 1);
 		strncat(uri, domain, MAX_URI_LEN - HTTPS_PREF_LEN - 1);
-		retval = get_cert_list(uri, domain, port_str, &cert_list);
+		retval = get_cert_list(glob_val_ctx.ssl_ctx,
+		    uri, domain, port_str, &cert_list);
 		if (retval != 0) {
 			free_tlsalist(&tlsa_list);
 			free_certlist(&cert_list);
@@ -2487,7 +2025,7 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 
 	free_tlsalist(&tlsa_list);
 	free_certlist(&cert_list);
-  
+
 	return retval;
 
 #undef HTTPS_PREF
@@ -2501,7 +2039,7 @@ short CheckDane(const char *certchain[], int certcount, const uint16_t options,
 // ----------------------------------------------------------------------------
 int dane_validation_deinit(void)
 {
-	printf_debug(DEBUG_PREFIX_DANE, "Deinitialising DANE.\n");
+	printf_debug(DEBUG_PREFIX_DANE, "%s\n", "Deinitialising DANE.");
 
 	if (glob_val_ctx.ub != NULL) {
 		ub_ctx_delete(glob_val_ctx.ub);
@@ -2513,16 +2051,8 @@ int dane_validation_deinit(void)
 		glob_val_ctx.ssl_ctx = NULL;
 	}
 
-#if (CA_STORE == NSS_CA_STORE) || (CA_STORE == NSS_CERT8_CA_STORE)
-	if (glob_val_ctx.nss_ctx != NULL) {
-		NSS_ShutdownContext(glob_val_ctx.nss_ctx);
-		glob_val_ctx.nss_ctx = NULL;
-	}
-#endif /* NSS_CA_STORE || NSS_CERT8_CA_STORE */
-
 	return 0;
 }
-
 
 #ifdef CMNDLINE_TEST
 
@@ -2531,7 +2061,7 @@ const char *certhex[] = {"12345678"};
 //*****************************************************************************
 // Main function for testing of lib, input: domain name
 // ----------------------------------------------------------------------------
-int main(int argc, char **argv) 
+int main(int argc, char **argv)
 {
 	const char *dname = NULL, *port = NULL;
 	const char *resolver_addresses = NULL;
@@ -2568,15 +2098,15 @@ int main(int argc, char **argv)
 	    DANE_FLAG_USEFWD;
 
 	/* Apply options. */
-	ds_init_opts(&glob_val_ctx.opts, options);
+	dane_set_validation_options(&glob_val_ctx.opts, options);
 
 	if (dane_validation_init() != 0) {
 		printf(DEBUG_PREFIX_DANE "Error initialising context.\n");
 		return 1;
 	}
 
-	res = CheckDane(certhex, 0, options, resolver_addresses, dname, port,
-	    "tcp", 1);
+	res = dane_validate(certhex, 0, options, resolver_addresses, dname,
+	    port, "tcp", 1);
 	printf(DEBUG_PREFIX_DANE "Main result: %i\n", res);
 
 	if (dane_validation_deinit() != 0) {

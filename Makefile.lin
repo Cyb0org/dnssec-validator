@@ -41,7 +41,7 @@ sys_linux_x86:
 	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)
 	mkdir $(PLUGIN_NAME_LIB)
 	cd FireBreath && mkdir projects && cd ..
-	cp -r plugin-source/* $(PLUGIN_FB_S)	
+	cp -r plugin-source/* $(PLUGIN_FB_S)
 	./FireBreath/prepmake.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m32  -DCMAKE_CXX_FLAGS=-m32  -DCMAKE_BUILD_TYPE=MinSizeRel
 	make -C $(PLUGIN_FB_B)
 	cp $(PLUGIN_FB_B)/bin/$(PLUGIN_NAME_DNSSEC)/np$(PLUGIN_NAME_DNSSEC).so $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x86.so
@@ -49,8 +49,9 @@ sys_linux_x86:
 	strip $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x86.so
 	strip $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x86.so
 	rm -rf $(PLUGIN_FB_B)
-	rm -rf $(PLUGIN_FB_S)	
+	rm -rf $(PLUGIN_FB_S)
 	@echo '### ...Plugin x86 Linux ... Done. ###'
+
 xpi_x86:
 	@echo '### Creating packages for Firefox Linux x86... ###'
 	rm -rf $(ADDON_PATH_FF)/plugins
@@ -73,7 +74,7 @@ xpi_x86:
 	cd add-on && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz chrome2tlsa && mv CR-tlsa_validator-$(EXTENSION_VERSION)-linux-x86.tar.gz ../$(PLUGIN_ADD_ON)
 	cd $(ADDON_PATH_CR) && rm -rf np$(PLUGIN_NAME_DNSSEC)_x86.so manifest.json
 	cd $(ADDON_PATH_CR_TLSA) && rm -rf manifest.json np$(PLUGIN_NAME_TLSA)_x86.so
-	@echo '### DONE... ###'  
+	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Opera Linux x86... ###'
 	cp $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x86.so $(ADDON_PATH_OP_DNSSEC)
@@ -86,15 +87,12 @@ xpi_x86:
 	cd $(ADDON_PATH_OP_TLSA) && rm -rf manifest.json np$(PLUGIN_NAME_TLSA)_x86.so
 	@echo '### DONE... ###'
 
-
-
-
 sys_linux_x64:
 	@echo '### ...Creating plugins library for Linux x64... ###'
 	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)
 	mkdir $(PLUGIN_NAME_LIB)
 	cd FireBreath && mkdir projects && cd ..
-	cp -r plugin-source/* $(PLUGIN_FB_S)	
+	cp -r plugin-source/* $(PLUGIN_FB_S)
 	./FireBreath/prepmake.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m64  -DCMAKE_CXX_FLAGS=-m64  -DCMAKE_BUILD_TYPE=MinSizeRel
 	make -C $(PLUGIN_FB_B)
 	cp $(PLUGIN_FB_B)/bin/$(PLUGIN_NAME_DNSSEC)/np$(PLUGIN_NAME_DNSSEC).so $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x64.so
@@ -102,9 +100,9 @@ sys_linux_x64:
 	strip $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA)_x64.so
 	strip $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC)_x64.so
 	rm -rf $(PLUGIN_FB_B)
-	rm -rf $(PLUGIN_FB_S)	
+	rm -rf $(PLUGIN_FB_S)
 	@echo '### ...Plugin x64 Linux ... Done. ###'
-	
+
 xpi_x64:
 	@echo '### Creating package for Firefox Linux x64... ###'
 	rm -rf $(ADDON_PATH_FF)/plugins
@@ -138,6 +136,7 @@ xpi_x64:
 	cd add-on && tar -czf OP-tlsa_validator-$(EXTENSION_VERSION)-linux-x64.tar.gz opera2tlsa && mv OP-tlsa_validator-$(EXTENSION_VERSION)-linux-x64.tar.gz ../$(PLUGIN_ADD_ON)
 	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf np$(PLUGIN_NAME_DNSSEC)_x64.so manifest.json
 	cd $(ADDON_PATH_OP_TLSA) && rm -rf manifest.json np$(PLUGIN_NAME_TLSA)_x64.so
-	@echo '### DONE... ###'      
-  
+	@echo '### DONE... ###'
+
 clean:
+	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)

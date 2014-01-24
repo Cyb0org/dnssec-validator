@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-document.write("<object id=\"tlsa-plugin\" type=\"application/x-tlsavalidator\" width=\"0\" height=\"0\"></object>");
+document.write("<object id=\"tlsa-plugin\" type=\"application/x-tlsavalidatorplugin\" width=\"0\" height=\"0\"></object>");
 var defaultResolver = "nofwd"; // LDNS will use system resolver if empty string is passed
 var defaultCustomResolver = "8.8.8.8";
 
@@ -34,89 +34,28 @@ function addText(id, str){
 }
 
 //--------------------------------------------------------
-// Helper function from stackeoverflow
+// check correct format of IP addresses in the textarea
 //--------------------------------------------------------
-function substr_count(haystack, needle, offset, length) {
+function test_ip(ip) {
+	var expression = /((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(@\d{1,5})?\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?(@\d{1,5})?\s*$))/;
 
-	var pos = 0, cnt = 0;
-
-	haystack += '';
-	needle += '';
-	if (isNaN(offset)) {offset = 0;}
-	if (isNaN(length)) {length = 0;}
-	offset--;
-
-	while ((offset = haystack.indexOf(needle, offset+1)) != -1) {
-		if (length > 0 && (offset+needle.length) > length) {
-			return false;
-		} else {
-			cnt++;
-		}
-	}
-	return cnt;
-}
-
-
-//--------------------------------------------------------
-// Test if the input is a valid IPv4 address
-//--------------------------------------------------------
-function  test_ipv4(ip) {
-	var match = ip.match(/^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/);
+	var match = ip.match(expression);
 	return match != null;
-
-}
-
-//--------------------------------------------------------
-// Test if the input is a valid IPv6 address
-//--------------------------------------------------------
-function test_ipv6(ip) {
-
-	// Test for empty address
-	if (ip.length<3) {
-		return ip == "::";
-	}
-
-	// Check if part is in IPv4 format
-	if (ip.indexOf('.')>0) {
-		var lastcolon = ip.lastIndexOf(':');
-		if (!(lastcolon && this.test_ipv4(ip.substr(lastcolon + 1)))) {
-		        return false;
-		}
-		// replace IPv4 part with dummy
-		ip = ip.substr(0, lastcolon) + ':0:0';
-	} 
-
-	// Check uncompressed
-	if (ip.indexOf('::')<0) {
-		var match = ip.match(/^(?:[a-f0-9]{1,4}:){7}[a-f0-9]{1,4}$/i);
-		return match != null;
-	}
-
-	// Check colon-count for compressed format
-	if (substr_count(ip, ':')<8) {
-		var match = ip.match(/^(?::|(?:[a-f0-9]{1,4}:)+):(?:(?:[a-f0-9]{1,4}:)*[a-f0-9]{1,4})?$/i);
-		return match != null;
-	} 
-
-	// Not a valid IPv6 address
-	return false;
 }
 
 //--------------------------------------------------------
 // check correct format of IP addresses in the textarea
 //--------------------------------------------------------
 function checkOptdnsserveraddr(str) {
+	
 	var n = str.split(" ");
-	var result = 0;
+	var c = 0;
 	for(c = 0; c < n.length; c++) {
-		if (test_ipv4(n[c]) || test_ipv6(n[c])) {
-		result = 0;
-		} else {
-		result = 1;
+		if (!test_ip(n[c])) {
+			return false;
 		} //if
 	} //for
-	if (result == 1) return false;
-	else return true;
+	return true;
 }
 
 //--------------------------------------------------------
@@ -132,7 +71,6 @@ function checkdomainlist() {
 // Cancel settings without saving on the localstorage
 //--------------------------------------------------------
 function cancelOptions() {
-	console.log("CLOSE:");
 	window.close();
 }
 
@@ -140,7 +78,6 @@ function cancelOptions() {
 // Save settings on the localstorage
 //--------------------------------------------------------
 function saveOptions() {
-	console.log("SAVE:");
 	var radiogroup = document.tlsaSettings.resolver;
 	var resolver;
 	for (var i = 0; i < radiogroup.length; i++) {
@@ -163,7 +100,7 @@ function saveOptions() {
 	plugin.TLSACacheInit();
 	document.write("<div>Settings were saved...</div>");
 	document.write("<div>Please, close this window...Thanks</div>");
-	localStorage["cachefree"] = 1;
+	localStorage["cachefree"] = true;
 	window.close();
 }
 
@@ -172,9 +109,8 @@ function saveOptions() {
 //--------------------------------------------------------
 function testdnssec() {
 
-	//console.log("TEST:");
 	var nameserver = "8.8.8.8";
-	var options = 7;
+	var options = 0;
 	var testnic = 0;
 	var ip = false;
 	var dn = "www.nic.cz";
@@ -185,7 +121,6 @@ function testdnssec() {
       
 	for (var i = 0; i < radiogroup.length; i++) {
 		var child = radiogroup[i];
-		console.log('CHOICE: \"'+ i + '; ' + child.checked + '\"\n');
 		if (child.checked == true) {
 			switch (i) {
 				case 0: // System setting
@@ -205,7 +140,7 @@ function testdnssec() {
 				case 2: // NOFWD
 					chioce=2;
 					nameserver = "nofwd";
-					options = 5; ;
+					options = 5;
 					break;
 			} //switch
 		} // if
@@ -219,7 +154,6 @@ function testdnssec() {
 	}
 	else {
 		try {
-			console.log('INIT parameters: \"'+ dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
 			var plugin = document.getElementById("tlsa-plugin");
 			plugin.TLSACacheFree();
 			plugin.TLSACacheInit();
@@ -258,7 +192,6 @@ function testdnssec() {
 // help function for clear TLSA localestorage
 //--------------------------------------------------------
 function eraseOptions() {
-	console.log("ERASE:");
 	localStorage.removeItem("dnssecResolver");
 	localStorage.removeItem("dnssecCustomResolver");
 	localStorage.removeItem("DebugOutput");
@@ -266,13 +199,47 @@ function eraseOptions() {
 }
 
 
+function AllHttpscheckbox() {
+
+	var ischecked = document.getElementById("AllHttps").checked;
+	document.getElementById("blockhttps").disabled = !ischecked;
+	document.getElementById("clearcache").disabled = !ischecked;
+	if (ischecked) {
+		document.getElementById("blockhttpstext").style.color = 'black';
+		document.getElementById("clearcachetext").style.color = 'black';
+	} else {
+		document.getElementById("blockhttpstext").style.color = 'grey';
+		document.getElementById("clearcachetext").style.color = 'grey';
+	}
+	//location.reload();
+}
+
+function RefreshExclude() {
+
+	var ischecked = document.getElementById("domainfilteron").checked;
+	document.getElementById("domainlist").disabled = !ischecked;
+	if (ischecked) {
+		document.getElementById("domainlist").style.color = 'black';
+		document.getElementById("filtertext").style.color = 'black';
+	} else {
+		document.getElementById("domainlist").style.color = 'grey';
+		document.getElementById("filtertext").style.color = 'grey';
+	}
+	//location.reload();
+}
+
+
 //--------------------------------------------------------
 // Replaces onclick for the option buttons
 //--------------------------------------------------------
 window.onload = function(){
-	document.querySelector('input[id="savebutton"]').onclick=saveOptions;
-	document.querySelector('input[id="testbutton"]').onclick=testdnssec;
-	document.querySelector('input[id="cancelbutton"]').onclick=cancelOptions;
+	document.querySelector('input[id="savebutton"]').onclick = saveOptions;
+	document.querySelector('input[id="testbutton"]').onclick = testdnssec;
+	document.querySelector('input[id="cancelbutton"]').onclick = cancelOptions;
+	var AllHttps = document.querySelectorAll('input[type=checkbox][id=AllHttps]');
+	AllHttps[0].onchange = AllHttpscheckbox;
+	var domainfilteron = document.querySelectorAll('input[type=checkbox][id=domainfilteron]');
+	domainfilteron[0].onchange = RefreshExclude; 
 }
 
 
@@ -358,7 +325,9 @@ window.addEventListener('load',function() {
 		var clearcache = localStorage["clearcache"];
 		var AllHttps = localStorage["AllHttps"];
 		var domainlist = localStorage["domainlist"];
-
+		if (domainlist == undefined) {
+			domainlist = "";
+		}
 		if (dnssecResolver == undefined) {
 			dnssecResolver = defaultResolver;
 		}
@@ -371,13 +340,34 @@ window.addEventListener('load',function() {
 	        document.tlsaSettings.DebugOutput.checked = DebugOutput;
 	        document.tlsaSettings.domainlist.value = domainlist;
 		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;
-		blockhttps = (blockhttps == undefined || blockhttps == "true") ? true : false;
+		blockhttps = (blockhttps == undefined || blockhttps == "false") ? false : true;
 		clearcache = (clearcache == undefined || clearcache == "false") ? false : true;
 		AllHttps = (AllHttps == undefined || AllHttps == "false") ? false : true;
 	        document.tlsaSettings.domainfilteron.checked = domainfilteron;
+
+		document.getElementById("domainlist").disabled = !domainfilteron;
+		if (domainfilteron) {
+			document.getElementById("domainlist").style.color = 'black';
+			document.getElementById("filtertext").style.color = 'black';
+		} else {
+			document.getElementById("domainlist").style.color = 'grey';
+			document.getElementById("filtertext").style.color = 'grey';
+		}
+
+
 		document.tlsaSettings.blockhttps.checked = blockhttps;
 		document.tlsaSettings.clearcache.checked = clearcache;
 		document.tlsaSettings.AllHttps.checked = AllHttps;
+		document.getElementById("blockhttps").disabled = !AllHttps;
+		document.getElementById("clearcache").disabled = !AllHttps;
+		if (AllHttps) {
+			document.getElementById("blockhttpstext").style.color = 'black';
+			document.getElementById("clearcachetext").style.color = 'black';
+		} else {
+			document.getElementById("blockhttpstext").style.color = 'grey';
+			document.getElementById("clearcachetext").style.color = 'grey';
+		}
+
 		var radiogroup = document.tlsaSettings.resolver;
 		for (var i = 0; i < radiogroup.length; i++) {
 			var child = radiogroup[i];
@@ -394,20 +384,43 @@ window.addEventListener('load',function() {
 		child.checked = "true";
 		var domainfilteron = localStorage["domainfilteron"];
 		var domainlist = localStorage["domainlist"];
+		if (domainlist == undefined) {
+			domainlist = "";
+		}
 		var blockhttps = localStorage["blockhttps"];
 		var clearcache = localStorage["clearcache"];
 		var DebugOutput = localStorage["DebugOutput"];
 		document.tlsaSettings.domainlist.value = domainlist;
 		domainfilteron = (domainfilteron == undefined || domainfilteron == "false") ? false : true;
 		document.tlsaSettings.domainfilteron.checked = domainfilteron;
-   		blockhttps = (blockhttps == undefined || blockhttps == "true") ? true : false;
+
+		document.getElementById("domainlist").disabled = !domainfilteron;
+		if (domainfilteron) {
+			document.getElementById("domainlist").style.color = 'black';
+			document.getElementById("filtertext").style.color = 'black';
+		} else {
+			document.getElementById("domainlist").style.color = 'grey';
+			document.getElementById("filtertext").style.color = 'grey';
+		}
+
+
+		AllHttps = (AllHttps == undefined || AllHttps == "false") ? false : true;
+		document.tlsaSettings.AllHttps.checked = AllHttps;
+		blockhttps = (blockhttps == undefined || blockhttps == "false") ? false : true;
 		document.tlsaSettings.blockhttps.checked = blockhttps;	
 		clearcache = (clearcache == undefined || clearcache == "false") ? false : true;
 		document.tlsaSettings.clearcache.checked = clearcache;
-		DebugOutput = (DebugOutput == undefined || DebugOutput == "true") ? true : false;
-		document.tlsaSettings.DebugOutput.checked = DebugOutput;
-		AllHttps = (AllHttps == undefined || AllHttps == "false") ? false : true;
-		document.tlsaSettings.AllHttps.checked = AllHttps;		
+		document.getElementById("blockhttps").disabled = !AllHttps;
+		document.getElementById("clearcache").disabled = !AllHttps;
+		if (AllHttps) {
+			document.getElementById("blockhttpstext").style.color = 'black';
+			document.getElementById("clearcachetext").style.color = 'black';
+		} else {
+			document.getElementById("blockhttpstext").style.color = 'grey';
+			document.getElementById("clearcachetext").style.color = 'grey';
+		}
+		DebugOutput = (DebugOutput == undefined || DebugOutput == "false") ? false : true;
+		document.tlsaSettings.DebugOutput.checked = DebugOutput;		
 	}  //state
 });
 

@@ -24,8 +24,9 @@ document.write("<html>");
 document.write("<head>");
 document.write("</head>");
 document.write("<body>");
-document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidator\" width=\"0\" height=\"0\"></object>");
+document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidatorplugin\" width=\"0\" height=\"0\"></object>");
 document.write("<script>");
+
 
 // debug pretext
 var DNSSEC = "DNSSEC: ";
@@ -34,6 +35,7 @@ var debuglogout = false;
 // variables for chrome IP API
 var currentIPList= new Array();
 var currentIPListDomain= new Array();
+var init = true;
 
 // DNSSEC NPAPI constant returned by binary plugin	
 var dnssecExtNPAPIConst = {
@@ -108,6 +110,16 @@ var dnssecModes = {
 	DNSSEC_TOOLTIP_WRONG_RES: "dnssecwrongres",
 	DNSSEC_TOOLTIP_DNSSEC_OFF: "validatoroff", 
 };
+
+//****************************************************************
+// text bool value from LocalStorage to bool
+//****************************************************************
+function StringToBool(value) {
+	if (value == undefined) return false;
+	else if (value == "false") return false;
+	else if (value == "true") return true;
+	else return false;
+}
 
 //****************************************************************
 // this function sets DNSSEC mode. status ICON and popup text
@@ -394,7 +406,8 @@ function dnssecvalidate(domain, tabId, tab) {
 			if (debuglogout) {
 				console.log(DNSSEC + "Plugin returns DNSSEC bogus state: Testing why?");
 			}
-			plugin.CacheFree();
+			plugin.DNSSECCacheFree();
+			plugin.DNSSECCacheInit();
 			options = 0;
 			if (debuglogout) options |= c.DNSSEC_FLAG_DEBUG;
 			if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
@@ -417,14 +430,16 @@ function dnssecvalidate(domain, tabId, tab) {
 					console.log(DNSSEC + "   Yes, DNSSEC of domain is really bogus");
 				}
 				result[0] = resultnofwd[0];
-				plugin.CacheFree();
+				plugin.DNSSECCacheFree();
+				plugin.DNSSECCacheInit();
 			}
 			else {
 				if (debuglogout) {
 					console.log(DNSSEC + "   Current resolver does not support DNSSEC!");
 				}
 				result[0] = c.DNSSEC_RESOLVER_NO_DNSSEC;
-				plugin.CacheFree();
+				plugin.DNSSECCacheFree();
+				plugin.DNSSECCacheInit();
 			}	
 		}
 	} catch (ex) {
@@ -444,14 +459,47 @@ function dnssecvalidate(domain, tabId, tab) {
 
 	return [result[0], ipval, addr];
 };
-        
+  
+
+//*****************************************************
+// Return true/false if domain name is in exclude domain list
+//*****************************************************
+function ExcludeDomainList(domain) {
+
+	var result = true;
+ 
+	if (StringToBool(localStorage["domainfilteron"])) {
+		var DomainSeparator = /[.]+/;
+		var DomainArray = domain.split(DomainSeparator);
+		var DomainList = localStorage["domainlist"];
+		if (DomainList == undefined) {
+			return result;
+		}
+		var DomainListSeparators = /[ ,;]+/;
+		var DomainListArray = DomainList.split(DomainListSeparators);
+
+		var i = 0;
+		var j = 0;
+		var domaintmp = DomainArray[DomainArray.length-1];
+		for (i = DomainArray.length-1; i >= 0; i--) {
+			for (j = 0; j < DomainListArray.length; j++) {
+				if (domaintmp == DomainListArray[j]) {
+					return false;
+				}
+			}
+			domaintmp = DomainArray[i-1] + "." + domaintmp;
+		}
+	}
+	return result;
+};
+
+      
 //****************************************************************
 // Called when the url of a tab changes.
 //****************************************************************
 function onUrlChange(tabId, changeInfo, tab) {                  	
 
-	debuglogout = localStorage["DebugOutput"];
-	debuglogout = (debuglogout == "false") ? false : true;
+	debuglogout = StringToBool(localStorage["DebugOutput"]);
 
 	if (changeInfo.status == "undefined") {
 		//chrome.pageAction.hide(tabId);
@@ -525,54 +573,22 @@ function onUrlChange(tabId, changeInfo, tab) {
 		console.log(DNSSEC + "--------- Start of DNSSEC Validation ("+ domain +") ---------");
 	}
 
-	// get domain filter status
-	var filteron = localStorage["domainfilteron"];
-	// validate thi domain?
-	var validate = true;
-    	if (filteron == "true") {
+	if (ExcludeDomainList(domain)) {
 		if (debuglogout) {
-			console.log(DNSSEC + 'Exclude domain filter: on');
+			console.log(DNSSEC + 'Validate this domain: YES');
 		}
-		var urldomainsepar=/[.]+/;
-		var urldomainarray=domain.split(urldomainsepar);	
-		var domainlist = localStorage["domainlist"];
-		var domainlistsepar=/[ ,;]+/;
-		var domainarraylist=domainlist.split(domainlistsepar);
-		// first TLD
-	        for (j=0;j<domainarraylist.length;j++) { 
-	            if (urldomainarray[urldomainarray.length-1] == domainarraylist[j]) {
-			validate = false; 
-			break;
-		    }//if
-
-        	} // for
-		// domain in format xxx.yy
- 		if (validate) {
- 		   for (j=0;j<domainarraylist.length;j++) {
-		   	if (domainarraylist[j].indexOf(urldomainarray[urldomainarray.length-2]) !=-1) {
-				validate = false;
-				break;
-		   	}//if
-       	            }//for
-		}//if        
-    	}//filteron
-	else {
-		if (debuglogout) {
-			console.log(DNSSEC + 'Exclude domain filter: off');
-			console.log(DNSSEC + 'Validate this domain: ' + validate );
-		}
-		var c = this.dnssecExtNPAPIConst;
-		var statusdnssec = c.DNSSEC_OFF;
-	}
-
-	if (validate) {  
 		var data = dnssecvalidate(domain, tabId, tab);
 		statusdnssec = data[0];
 		var ipval = data[1];
 		var addrs = data[2];
 		setDNSSECSecurityState(tabId, domain, statusdnssec, addrs, ipval);
-        }
+	}
 	else {
+		if (debuglogout) {
+			console.log(DNSSEC + 'Validate this domain: NO');
+		}
+		var c = this.dnssecExtNPAPIConst;
+		var statusdnssec = c.DNSSEC_OFF;
 		setDNSSECSecurityState(tabId, domain, statusdnssec, "n/a", "n/a");
 	}
 
@@ -599,6 +615,12 @@ chrome.webRequest.onResponseStarted.addListener(function(info) {
 { urls: [], types: [] },  []
 );
 
+
+if (init) {
+	var plugin = document.getElementById("dnssec-plugin");
+	plugin.DNSSECCacheInit();
+	init = false;
+}
 //****************************************************************
 // Listen for any changes to the URL of any tab.
 //****************************************************************

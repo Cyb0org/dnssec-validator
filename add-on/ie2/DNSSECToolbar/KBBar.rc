@@ -176,7 +176,7 @@ BEGIN
     LTEXT           "DNSSEC/TLSA Validator for Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Add-on plugin for DNSSEC and TLSA checking",IDC_STATIC,50,30,180,10
     LTEXT           "Support browsers: 32-bit version of IE6 - IE11",IDC_STATIC,50,40,180,10
-    LTEXT           "Version 2.1.0-rc1", IDC_STATIC,50,50,180,10
+    LTEXT           "Version 2.1.0", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2013", IDC_STATIC,50,70,100,10
 	LTEXT           "http://www.dnssec-validator.cz/", IDC_LINK,10,95,120,10
@@ -806,7 +806,7 @@ BEGIN
     LTEXT           "DNSSEC/TLSA Validátor pro Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Zásuvný plugin pro kontrolu DNSSEC a TLSA",IDC_STATIC,50,30,180,10
     LTEXT           "Podporované prohlížeèe: 32-bit verze IE6 - IE11",IDC_STATIC,50,40,180,10
-    LTEXT           "Verze 2.1.0-rc1", IDC_STATIC,50,50,180,10
+    LTEXT           "Verze 2.1.0", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2013", IDC_STATIC,50,70,100,10
 	LTEXT           "http://www.dnssec-validator.cz/", IDC_LINK,10,95,120,10
@@ -1013,7 +1013,7 @@ BEGIN
     LTEXT           "DNSSEC/TLSA Validator für Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
     LTEXT           "Add-on für DNSSEC/TLSA Validierung",IDC_STATIC,50,30,180,10
     LTEXT           "Unterstützte Versionen: 32-bit Versionen von IE6 - IE11",IDC_STATIC,50,40,180,10
-    LTEXT           "Version 2.1.0-rc1", IDC_STATIC,50,50,180,10
+    LTEXT           "Version 2.1.0", IDC_STATIC,50,50,180,10
     LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
 	LTEXT           "2013", IDC_STATIC,50,70,100,10
 	LTEXT           "http://www.dnssec-validator.cz/", IDC_LINK,10,95,120,10

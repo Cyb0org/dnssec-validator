@@ -27,6 +27,7 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #ifndef __KBBarBAND_H_
 #define __KBBarBAND_H_
 #include "Winuser.h"
+#include "Wincrypt.h"
 #include "resource.h"       // main symbols
 #include "hyperlink.h"
 #include "dnssec-states.gen"		// DNSSEC state constants
@@ -43,8 +44,9 @@ extern "C" {					// use C language linkage
 #include <list>
 #include <shlwapi.h>
 #pragma comment(lib,"shlwapi.lib")
+#pragma comment(lib, "crypt32.lib")
 using namespace std;
-
+#define MY_ENCODING_TYPE  (PKCS_7_ASN_ENCODING | X509_ASN_ENCODING)
 #define CACHE_EXPIR_TIME 300 // seconds = 5 min is expir time of item in DANE cache
 
 #define TB_MIN_SIZE_X   100
@@ -249,6 +251,9 @@ public:
 	short TestResolver(char *domain, char *ipbrowser, char IPv);
 	void ShowFwdTooltip(void);
 	bool ExcludeDomainList(char *domain, short ExcludeOn, char domainlist[TLD_LIST_MLEN]);
+	bool LoadCaCertFromStore(void);
+
+
 	static int position; //main position of the icon
 	bool m_bFocus;			
 	HWND hWndNewPane; //status bar pane element

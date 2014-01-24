@@ -114,6 +114,46 @@ char str[INET6_ADDRSTRLEN];
 #define PORT_LENGTH_MAX 6            // max lenght of port record
 #define NO_ITEM_IN_CACHE -99         // the item is not in cache           
 
+
+//----------------------------------------------------------------------------
+static char byteMap[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+static int byteMapLen = sizeof(byteMap);
+
+
+//*****************************************************************************
+// Utility function to convert nibbles (4 bit values) into a hex character
+// representation.
+// ----------------------------------------------------------------------------
+static
+char nibbleToChar(uint8_t nibble)
+{
+	if (nibble < byteMapLen) return byteMap[nibble];
+	return '*';
+}
+
+//*****************************************************************************
+// Helper function (binary data to hex string conversion)
+// ----------------------------------------------------------------------------
+static
+char * bintohex(const uint8_t *bytes, size_t buflen)
+{
+	char *retval = NULL;
+	unsigned i;
+
+	retval =(char*)malloc(buflen * 2 + 1);
+
+	if (retval == NULL) {
+		return NULL;
+	}
+
+	for (i = 0; i < buflen; ++i) {
+		retval[i * 2] = nibbleToChar(bytes[i] >> 4);
+		retval[i * 2 + 1] = nibbleToChar(bytes[i] & 0x0f);
+	}
+	retval[i * 2] = '\0';
+	return retval;
+}
+
 // cache item structure
 typedef struct Record {
 	char key[DOMAIN_NAME_LENGTH_MAX];
@@ -766,12 +806,18 @@ LRESULT CKBBarBand::WndProc(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lPar
 bool CKBBarBand::CreateToolWindow()
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState()); // Needed for any MFC usage in DLL
-	//if (debug) ATLTRACE("CreateToolWindow():\n");
+	if (debug) ATLTRACE("CreateToolWindow():\n");
 	CRect rcClientParent;
 	rcClientParent2=rcClientParent;
 	CWnd* pWndParent = CWnd::FromHandle(m_hWndParent);
 	pWndParent->GetClientRect(&rcClientParent);
 	
+	int ret;
+	ret = dnssec_validation_init(); 
+	if (debug) ATLTRACE("dnssec_validation_init(%d):\n",ret);
+
+	ret =  dane_validation_init();
+	if (debug) ATLTRACE("dane_validation_init(%d):\n",ret);
 	// Create ini file if not exists
 	CreateIniFile();
 
@@ -808,7 +854,7 @@ bool CKBBarBand::CreateToolWindow()
 		return true;
 	}
 	*/
-	dnssec_validation_init(); dane_validation_init();
+
 	return true;
 }
 
@@ -1360,8 +1406,6 @@ void CKBBarBand::SetSecurityDNSSECStatus()
 	res=dnssecresult;
 }//
 
-
-
 /**************************************************************************/
 // Check domain name if is contain in the list of Exclude domain
 // return true if domain havent in the list else false
@@ -1442,14 +1486,12 @@ cleanup:
 exit: return validate;
 }
 
-
 /**************************************************************************/
 // It checks whether a domain is a DNSSEC domain
 /**************************************************************************/
 void CKBBarBand::CheckDomainStatus(char * url) 
 {   
 	//if (debug) ATLTRACE("CheckDomainStatus(%s);\n", url);
-  
 	dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_ACTION);
 	tlsaicon = GetIconIndex(IDI_TLSA_ICON_ACTION);
 	RefreshIcons();
@@ -1494,7 +1536,7 @@ void CKBBarBand::CheckDomainStatus(char * url)
 				wrong = false;
 				EnterCriticalSection(&cs);
 				if (debug) ATLTRACE("DNSSEC: IPv4 request: %s, %d, %s, %s\n", domaintmp, options, dnsip, ipbrowser4);
-				resultipv4 = ds_validate(domaintmp, options, dnsip, ipbrowser4, &ipvalidator4tmp);	
+				resultipv4 = dnssec_validate(domaintmp, options, dnsip, ipbrowser4, &ipvalidator4tmp);	
 				if (debug) ATLTRACE("DNSSEC: IPv4 result: %s, %d, %s\n", domaintmp, resultipv4, ipvalidator4tmp); 				
 				LeaveCriticalSection(&cs);
 				if (resultipv4==DNSSEC_COT_DOMAIN_BOGUS) {
@@ -1531,7 +1573,7 @@ void CKBBarBand::CheckDomainStatus(char * url)
 				wrong = false;
 				EnterCriticalSection(&cs);
 				if (debug) ATLTRACE("DNSSEC: IPv6 request: %s, %d, %s, %s\n", domaintmp, options, dnsip, ipbrowser6);
-				resultipv6 = ds_validate(domaintmp, options, dnsip, ipbrowser6, &ipvalidator6);
+				resultipv6 = dnssec_validate(domaintmp, options, dnsip, ipbrowser6, &ipvalidator6);
 				if (debug) ATLTRACE("DNSSEC: IPv6 result: %s, %d, %s\n", domaintmp, resultipv6, ipvalidator6); 
 				LeaveCriticalSection(&cs);
 				if (resultipv6==DNSSEC_COT_DOMAIN_BOGUS) {
@@ -1555,11 +1597,17 @@ void CKBBarBand::CheckDomainStatus(char * url)
 				} // if bogus
 		if (debug) ATLTRACE("-------------------------------------------------------\n");	
 		}
-		if (resultipv4 < 0 || resultipv6 < 0) {
-			(resultipv4 <= resultipv6 ?  dnssecresult = resultipv4 : dnssecresult = resultipv6);
-		}
-		else {
-			(resultipv4 <= resultipv6 ?  dnssecresult = resultipv6 : dnssecresult = resultipv4);
+		if (resultipv4 < 0 && resultipv6 >= 0) {
+			dnssecresult = resultipv6;
+		} else if (resultipv6 < 0 && resultipv4 >= 0) {
+			dnssecresult = resultipv4;
+		} else {
+			if (resultipv4 <= resultipv6) {
+				dnssecresult = resultipv6;
+			}
+			else {
+				dnssecresult = resultipv4;
+			}
 		}
 
 		if (debug) ATLTRACE("DNSSEC: IPv4/IPv6/Overall: %d/%d/%d\n", resultipv4, resultipv6, dnssecresult);
@@ -1592,7 +1640,7 @@ void CKBBarBand::CheckDomainStatus(char * url)
 							EnterCriticalSection(&cs);
 							const char* certhex[] = {"FF"};
 							if (debug) ATLTRACE("DANE: Plugin inputs: %s, %d, %d, %s, %s, %s, %s, %d\n", certhex[0], 0, options, dnsip, domaintmp, port, "tcp", 1);
-							tlsaresult = CheckDane(certhex, 0, options, dnsip, domaintmp, port, "tcp", 1);
+							tlsaresult = dane_validate(certhex, 0, options, dnsip, domaintmp, port, "tcp", 1);
 							if (debug) ATLTRACE("DANE: Plugin result: %s: %d\n", domaintmp, tlsaresult);
 							LeaveCriticalSection(&cs);
 							cache_update_item(DaneCache, UrlStructData.domainport, port, tlsaresult, false, now + CACHE_EXPIR_TIME, item);
@@ -1604,7 +1652,7 @@ void CKBBarBand::CheckDomainStatus(char * url)
 						EnterCriticalSection(&cs);
 						const char* certhex[] = {"FF"};
 						if (debug) ATLTRACE("DANE: plugin inputs: %s, %d, %d, %s, %s, %s, %s, %d\n", certhex[0], 0, options, dnsip, domaintmp, port, "tcp", 1);
-						tlsaresult = CheckDane(certhex, 0, options, dnsip, domaintmp, port, "tcp", 1);
+						tlsaresult = dane_validate(certhex, 0, options, dnsip, domaintmp, port, "tcp", 1);
 						if (debug) ATLTRACE("DANE: plugin result: %s: %d\n", domaintmp, tlsaresult);
 						LeaveCriticalSection(&cs);
 						cache_add_item(DaneCache, UrlStructData.domainport, port, tlsaresult, false, now + CACHE_EXPIR_TIME);
@@ -1668,7 +1716,7 @@ short CKBBarBand::TestResolver(char *domain, char *ipbrowser, char IPv)
 	EnterCriticalSection(&cs);
 	//if (debug) ATLTRACE("Critical section begin\n");
 	if (debug) ATLTRACE("TEST DNSSEC: %s : %d : %s : %s\n", domain, options, "nowfd", ipbrowser);
-	res = ds_validate(domain, options, "nowfd", ipbrowser, &ipvalidator);
+	res = dnssec_validate(domain, options, "nowfd", ipbrowser, &ipvalidator);
 	if (debug) ATLTRACE("TEST DNSSEC result: %d : %s\n", res, ipvalidator); 
 	LeaveCriticalSection(&cs);
 	return res;
@@ -1696,6 +1744,69 @@ void CKBBarBand::ShowFwdTooltip()
 	ti.lpszText = tibuf2;
 	SendMessage(hwndTT, TTM_SETTITLE, TTI_WARNING, (LPARAM) tibuf);
 	SendMessage(hwndTT, TTM_UPDATETIPTEXT, 0, (LPARAM) (LPTOOLINFO) &ti);
+}
+
+/**************************************************************************/
+// Load CA certificate from windows cet store - not used since 2.1.0
+/**************************************************************************/
+bool CKBBarBand::LoadCaCertFromStore() {
+
+	if (debug) ATLTRACE("\n----------------------------------------------------\n");	
+	if (debug) ATLTRACE("LoadCaCertFromStore() call\n");	
+
+	HCERTSTORE hSysStore = NULL;
+	if (hSysStore = CertOpenStore(
+		CERT_STORE_PROV_SYSTEM,          // The store provider type
+		0,                               // The encoding type is not needed
+		NULL,                            // Use the default HCRYPTPROV
+		CERT_SYSTEM_STORE_CURRENT_USER,  // Set the store location in a registry location
+		L"Root"                            // The store name as a Unicode string
+   ))
+	{
+		ATLTRACE("The system store was created successfully.\n");
+	}
+	else {
+		ATLTRACE("An error occurred during creation of the system store!\n");
+		return false;
+	}
+
+	int i = 0;
+	PCCERT_CONTEXT  pCertContext = NULL; 
+	//CRYPT_BIT_BLOB  SubjectUniqueId;
+	while(pCertContext= CertEnumCertificatesInStore(
+      hSysStore,
+      pCertContext)) // on the first call to the function,
+                     // this parameter is NULL 
+                     // on all subsequent calls, 
+                     // this parameter is the last pointer 
+                     // returned by the function
+{
+    //----------------------------------------------------------------
+    // Do whatever is needed for a current certificate.
+	char * cerhex = bintohex(pCertContext->pbCertEncoded, pCertContext->cbCertEncoded);
+	i++;
+	LPTSTR outtext = new TCHAR[256];
+	CertNameToStr(X509_ASN_ENCODING,&pCertContext->pCertInfo->Subject,CERT_SIMPLE_NAME_STR,outtext,256); 
+	ATLTRACE("%i) %s |%lu|\n%s",i, outtext, pCertContext->cbCertEncoded, cerhex);
+	ATLTRACE("'\n\n");
+} // End of while.
+
+	if(CertCloseStore(
+        hSysStore, 
+        CERT_CLOSE_STORE_CHECK_FLAG))
+{
+     ATLTRACE("The file store was closed successfully.\n");
+}
+else
+{
+     ATLTRACE("An error occurred during closing of the file store.\n");
+}
+
+if (pCertContext)
+    CertFreeCertificateContext(pCertContext);
+
+if (debug) ATLTRACE("----------------------------------------------------\n\n");
+return true;
 }
 
 /**************************************************************************/

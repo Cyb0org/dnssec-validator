@@ -24,7 +24,7 @@ document.write("<html>");
 document.write("<head>");
 document.write("</head>");
 document.write("<body>");
-document.write("<object id=\"tlsa-plugin\" type=\"application/x-tlsavalidator\" width=\"0\" height=\"0\"></object>");
+document.write("<object id=\"tlsa-plugin\" type=\"application/x-tlsavalidatorplugin\" width=\"0\" height=\"0\"></object>");
 document.write("<script>");
 
 // expirate time of one item in the cache [seconds]
@@ -32,15 +32,9 @@ var CACHE_ITEM_EXPIR = 600;
 // debug pretext
 var DANE = "DANE: ";
 var debuglogout = false;
-var initcache = true;
+var init = true;
 var wrongresolver = false;
 var checkall = false;
-//var urlnavigate = null;
-//var isfirst = true;
-//var processId = -1;
-//var frameId = -99;
-
-var init = true;
 
 /* TLSA Validator's internal cache - shared with all window tabs */
 var tlsaExtCache = {
@@ -50,7 +44,7 @@ var tlsaExtCache = {
 	init: function() {
 		// Create new array for caching
 		this.data = new Array();
-		initcache = false;
+		init = false;
 	},
 
 
@@ -183,6 +177,17 @@ var tlsaModes = {
 	DANE_TOOLTIP_ERROR_GENERIC 		: "dmerrorgenericTooltip",
 	DANE_TOOLTIP_WRONG_RES			: "dnssecwrongres",
 };
+
+
+//****************************************************************
+// text bool value from LocalStorage to bool
+//****************************************************************
+function StringToBool(value) {
+	if (value == undefined) return false;
+	else if (value == "false") return false;
+	else if (value == "true") return true;
+	else return false;
+}
 
 //****************************************************************
 // this function sets TLSA mode. status ICON and popup text
@@ -441,12 +446,14 @@ function httpscheme(taburl){
 function ExcludeDomainList(domain) {
 
 	var result = true;
- 	var DoaminFilter = localStorage["domainfilteron"];
-	DoaminFilter = (DoaminFilter == "false") ? false : true;
-	if (DoaminFilter) {
+
+	if (StringToBool(localStorage["domainfilteron"])) {
 		var DomainSeparator = /[.]+/;
 		var DomainArray = domain.split(DomainSeparator);
 		var DomainList = localStorage["domainlist"];
+		if (DomainList == undefined) {
+			return result;
+		}
 		var DomainListSeparators = /[ ,;]+/;
 		var DomainListArray = DomainList.split(DomainListSeparators);
 
@@ -649,11 +656,9 @@ function checkDaneResult(ret, domain) {
 	
 	var block = "no";
 
-	if (ret >= tlsaExtNPAPIConst.DANE_TLSA_PARAM_ERR) {				
-		var blockhttps = localStorage["blockhttps"];
-		blockhttps = (blockhttps == undefined || blockhttps == "false") ? false : true;	
+	if (ret >= tlsaExtNPAPIConst.DANE_TLSA_PARAM_ERR) {
 
-		if (blockhttps) {				
+		if (StringToBool(localStorage["blockhttps"])) {				
 			var alerttext = chrome.i18n.getMessage("warningpre") 
 			+ " " + domain + " " + chrome.i18n.getMessage("warningpost");
 			var choice = confirm(alerttext);
@@ -678,6 +683,8 @@ function checkDaneResult(ret, domain) {
 // Called when the url of a tab were changed.
 //****************************************************************
 function onUrlChange(tabId, changeInfo, tab) {                  	
+
+	debuglogout = StringToBool(localStorage["DebugOutput"]);
    	
 	if (changeInfo.status != "loading") {
 		if (changeInfo.status != "complete") {
@@ -698,6 +705,12 @@ function onUrlChange(tabId, changeInfo, tab) {
 	if (changeInfo.status == "loading") {
 		if (debuglogout) {
 			console.log("\nBrowser: onUrlChange(TabID: " + tabId + ", URL: " + tab.url +");");
+		}
+
+		if (StringToBool(localStorage["cachefree"])) {
+			tlsaExtCache.delAllRecords();
+			localStorage["cachefree"] = false;
+			wrongresolver = false;
 		}
 
 		chrome.pageAction.setPopup({tabId: tabId, popup: ""});
@@ -898,23 +911,24 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(details) {
 //****************************************************************
 chrome.webRequest.onBeforeRequest.addListener(function(details) {
 
-	checkall = localStorage["AllHttps"]; 
-	checkall = (checkall == "false") ? false : true; 
+	debuglogout = StringToBool(localStorage["DebugOutput"]);	
+	checkall = StringToBool(localStorage["AllHttps"]);
+
 	if (checkall) {
 
 		if (details.tabId >= 0) {
 
-			var cachefree = localStorage["cachefree"];
-			if (cachefree == 1) {
+			if (StringToBool(localStorage["cachefree"])) {
 				tlsaExtCache.delAllRecords();
-				localStorage["cachefree"] = 0;
+				localStorage["cachefree"] = false;
 				wrongresolver = false;
 			}
+
 			var domain = details.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
 		
 			var block = onBeforeRequest(details.tabId, details.url);
 			if (block == "yes") {
-					return {cancel: details.url.indexOf(domain) != -1};		
+				return {cancel: details.url.indexOf(domain) != -1};		
 			}
 		}
 	}
@@ -927,34 +941,25 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 var callback = function () {
 };
 
+//****************************************************************
+// Interenal initialization of plugin when browser starts
+//****************************************************************
+if (init) {
 
-//****************************************************************
-// Interenal cache initialization when browser starts
-//****************************************************************
-if (initcache) {
-	
-	debuglogout = localStorage["DebugOutput"];
-	debuglogout = (debuglogout == "false") ? false : true; 
+	var plugin = document.getElementById("tlsa-plugin");
+	plugin.TLSACacheInit();
 
 	tlsaExtCache.init();
-	var clearcache = localStorage["clearcache"];
-	clearcache = (clearcache == undefined || clearcache == "true") ? true : false;
-	if (clearcache) {
+
+	if (StringToBool(localStorage["clearcache"])) {
 		// new API since Chrome Dev 19.0.1055.1
 		if( chrome['browsingData'] && chrome['browsingData']['removeCache'] ){
 			chrome.browsingData.removeCache( {'since': 0}, callback);
-			if (debuglogout) {
+			if (StringToBool(localStorage["DebugOutput"])) {
 				console.log(DANE + "Clear browser cache....");
 			}
 		}	
 	}
-}
-
-
-if (init) {
-	var plugin = document.getElementById("tlsa-plugin");
-	plugin.TLSACacheInit();
-	init = false;
 }
 
 //****************************************************************
