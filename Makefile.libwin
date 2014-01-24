@@ -21,7 +21,7 @@
 
 .PHONY: all libs-build sys_windows_openssl sys_windows_ldns_pre sys_windows_ldns_post sys_windows_unbound_pre sys_windows_unbound_post
 
-OPENSSL = openssl-1.0.1e
+OPENSSL = openssl-1.0.1f
 LDNS = ldns-1.6.17
 UNBOUND = unbound-1.4.21
 
@@ -32,7 +32,7 @@ UNBOUND_TARBALL = $(LIBS_SOURCE)/unbound.tar.gz
 
 BASEDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
-OPENSSL_DIR := $(BASEDIR)/libswin/openssl-1.0.1e
+OPENSSL_DIR := $(BASEDIR)/libswin/openssl-1.0.1f
 LDNS_DIR := $(BASEDIR)/libswin/ldns-1.6.17
 UNBOUND_DIR := $(BASEDIR)/libswin/unbound-1.4.21
 
