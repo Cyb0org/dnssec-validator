@@ -32,10 +32,10 @@ v2.0.1 / 23.4.2013
   - Fixed problem that asynchronous Validate method may block the main thread until it receives a network reply
 
 v2.0 / 3.4.2013
-                                                      
-- Validator core is based on libunbound library       
+
+- Validator core is based on libunbound library
 - Unifies the look and functionality for all the affected browsers
-- User-friendly validator preferences                 
+- User-friendly validator preferences
 - Possibility to select specific TLDs and zones which will not be validated
 - Shows IP addresses of browser and validator when the IP address which the browser is using differs from the address obtained by the DNSSEC
 - Warning pop-up is displayed when resolver does not support DNSSEC
@@ -43,28 +43,3 @@ v2.0 / 3.4.2013
 
 v2.0.beta1 / 5.12.2012
 - First technical preview.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 1Pomoc        2Uložit       3Označ        4Nahraď       5Kopie        6Přesun       7Hledat       8Smazat       9H.Menu      10Konec
-
