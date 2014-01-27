@@ -741,7 +741,7 @@ function onUrlChange(tabId, changeInfo, tab) {
 					tlsaExtCache.addRecord(domain, ret, block);			
 				}
 				else {
-					domain = domain + portcache;
+					domain = domain + portpopup;
 					tlsaExtCache.addRecord(domain, ret, block);
 				}
 				tlsaExtCache.printContent();
