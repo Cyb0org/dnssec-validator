@@ -613,6 +613,13 @@ getCertificate:
 		var uri = browser.currentURI;
 		var ui = browser.securityUI;
 		var cert = this.get_valid_cert(ui);
+
+		// If the port is -1 then the browseer tends to return any
+		// certificate chain related to the given URI.
+		if (uri.port == -1) {
+			uri.port = 443;
+		}
+
 		if (!cert) {
 			cert = this.get_invalid_cert_SSLStatus(uri);
 		}
