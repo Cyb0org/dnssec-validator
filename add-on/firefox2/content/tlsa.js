@@ -611,17 +611,26 @@ getCertificate:
 	function(browser) {
 
 		var uri = browser.currentURI;
+
+		// This construction uses some strange behaviour of the constructs.
+		// The browser may return any certificate chain when port is -1.
+		//if (uri.port == -1) {
+		//	uri.port = 443;
+		//}
+
 		var ui = browser.securityUI;
+
 		var cert = this.get_valid_cert(ui);
 
-		// If the port is -1 then the browseer tends to return any
-		// certificate chain related to the given URI.
-		if (uri.port == -1) {
-			uri.port = 443;
-		}
-
 		if (!cert) {
-			cert = this.get_invalid_cert_SSLStatus(uri);
+			if (uri.port == -1) {
+				// Ask for 443 if not specified.
+				uri.port == 443;
+				cert = this.get_invalid_cert_SSLStatus(uri);
+				uri.port == -1;
+			} else {
+				cert = this.get_invalid_cert_SSLStatus(uri);
+			}
 		}
 
 		if (!cert) {
