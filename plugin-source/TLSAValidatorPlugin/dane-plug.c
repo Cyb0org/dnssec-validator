@@ -1687,7 +1687,7 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 
 		} else {
 			printf_debug(DEBUG_PREFIX_TLSA,
-			    "Unbound haven't received any TLSA data for %s.\n",
+			    "Unbound hasn't received any TLSA data for %s.\n",
 			    domain);
 			exitcode = DANE_NO_TLSA;
 		}
@@ -1697,7 +1697,8 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 		    ub_res->why_bogus);
 	} else {
 		exitcode = DANE_DNSSEC_UNSECURED;
-		printf_debug(DEBUG_PREFIX_TLSA, "%s\n", "Domain is insecure...");
+		printf_debug(DEBUG_PREFIX_TLSA, "%s\n",
+		    "Domain is insecure...");
 	}
 
 	return exitcode;
