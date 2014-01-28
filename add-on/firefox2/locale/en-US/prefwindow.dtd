@@ -40,7 +40,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY groupboxtlsa.label "TLSA validator settings">
 <!ENTITY tlsaonoff.label "Enable TLSA validation">
 <!ENTITY tlsaonoff.accesskey "T">
-<!ENTITY tlsablock.label "Cancel HTTPS connection when TLSA validation fail">
+<!ENTITY tlsablock.label "Cancel HTTPS connection when TLSA validation fails">
 <!ENTITY tlsablock.accesskey "H">
 <!ENTITY checkallhttps.label "Enable TLSA validation of all HTTPS requests on the page">
 <!ENTITY checkallhttps.accesskey "A">

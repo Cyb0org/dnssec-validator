@@ -12,7 +12,7 @@
 		"message": "Exclude domains in list"
 		},
 	"blockhttpstext": {
-		"message": "Cancel HTTPS connection when TLSA validation fail"
+		"message": "Cancel HTTPS connection when TLSA validation fails"
 		},
 	"AllHttpstext": {
 		"message": "Enable TLSA validation of all HTTPS requests on the page"
@@ -129,7 +129,7 @@
            "dmnohttpsTooltip": {"message": "No HTTPS connection"},
            "dmdnssecbogusTooltip": {"message": "Bogus DNSSEC signature"},
            "dmdnssecunsecTooltip": {"message": "Not secured by DNSSEC"},
-           "dmerrorgenericTooltip": {"message": "Validator fail"},
+           "dmerrorgenericTooltip": {"message": "Validator fails"},
 	   "warningpre" : {"message": "TLSA validator warning!\n\nThe remote server certificate for https://"},
 	   "warningpost" : {"message": "\ndoes not correspond to the TLSA record. This can be caused by:\n- trying to connect to untrusted remote server\n- invalid or untrusted server certificate\n\nDo you want close the connection to this server?"}
 }
