@@ -623,14 +623,15 @@ getCertificate:
 		var cert = this.get_valid_cert(ui);
 
 		if (!cert) {
-			if (uri.port == -1) {
-				// Ask for 443 if not specified.
-				uri.port == 443;
-				cert = this.get_invalid_cert_SSLStatus(uri);
-				uri.port == -1;
-			} else {
-				cert = this.get_invalid_cert_SSLStatus(uri);
-			}
+			//if (uri.port == -1) {
+			//	// Ask for 443 if not specified.
+			//	uri.port == 443;
+			//	cert = this.get_invalid_cert_SSLStatus(uri);
+			//	uri.port == -1;
+			//} else {
+			//	cert = this.get_invalid_cert_SSLStatus(uri);
+			//}
+			cert = this.get_invalid_cert_SSLStatus(uri);
 		}
 
 		if (!cert) {
