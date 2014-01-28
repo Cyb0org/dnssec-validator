@@ -374,46 +374,95 @@ void add_tlsarecord(struct tlsa_store_head *tlsa_list, const char *domain,
 }
 #endif
 
-#if 0
+
 //*****************************************************************************
-// Helper function (add new record in the TLSA list - last)
+// Utility function to convert nibbles (4 bit values) into a hex character
+// representation.
 // ----------------------------------------------------------------------------
 static
-void add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list,
-	const char *domain,
-	uint8_t dnssec_status, uint8_t cert_usage, uint8_t selector,
-	uint8_t matching_type, uint8_t *association, size_t association_size,
-	const char *assochex)
+char nibbleToChar(uint8_t nibble)
 {
-	struct tlsa_store_ctx *field_tlsa;
-	size_t size;
-
-	field_tlsa = malloc(sizeof(struct tlsa_store_ctx));
-	size = strlen(domain) + 1;
-	field_tlsa->domain = malloc(size);
-	memcpy(field_tlsa->domain, domain, size);
-	field_tlsa->dnssec_status = dnssec_status;
-	field_tlsa->cert_usage = cert_usage;
-	field_tlsa->selector = selector;
-	field_tlsa->matching_type = matching_type;
-	field_tlsa->association = association;
-	field_tlsa->association_size = association_size;
-	size = strlen(assochex) + 1;
-	field_tlsa->assochex = malloc(size);
-	memcpy(field_tlsa->assochex, assochex, size);
-	field_tlsa->next = NULL;
-
-	if (tlsa_list->first != NULL) {
-		struct tlsa_store_ctx *tmp = tlsa_list->first;
-		while (tmp->next != NULL) {
-			tmp = tmp->next;
-		}
-		tmp->next = field_tlsa;
-	} else {
-		tlsa_list->first = field_tlsa;
-	}
+	if (nibble < byteMapLen) return byteMap[nibble];
+	return '*';
 }
-#endif
+
+
+//*****************************************************************************
+// Helper function (binary data to hex string conversion)
+// ----------------------------------------------------------------------------
+static
+char * bintohex(const uint8_t *bytes, size_t buflen)
+{
+	char *retval = NULL;
+	unsigned i;
+
+	retval = malloc(buflen * 2 + 1);
+
+	if (retval == NULL) {
+		return NULL;
+	}
+
+	for (i = 0; i < buflen; ++i) {
+		retval[i * 2] = nibbleToChar(bytes[i] >> 4);
+		retval[i * 2 + 1] = nibbleToChar(bytes[i] & 0x0f);
+	}
+	retval[i * 2] = '\0';
+	return retval;
+}
+
+
+//*****************************************************************************
+// Helper function (hex to int)
+// ----------------------------------------------------------------------------
+static
+int hex_to_int(char c)
+{
+	if(c >=97) c=c-32;
+	int first = c / 16 - 3;
+	int second = c % 16;
+	int result = first*10 + second;
+	if (result > 9) result--;
+	return result;
+}
+
+
+//*****************************************************************************
+// Helper function (hex to char)
+// ----------------------------------------------------------------------------
+static
+int hex_to_ascii(char c, char d)
+{
+	int high = hex_to_int(c) * 16;
+	int low = hex_to_int(d);
+	return high+low;
+}
+
+
+//*****************************************************************************
+// HEX string to Binary data converter
+//
+// Return NULL on failure.
+// ----------------------------------------------------------------------------
+static
+char * hextobin(const char *data)
+{
+	size_t length = strlen(data);
+	unsigned i;
+	char *buf;
+
+	/* Two hex digits encode one byte. */
+	assert((length % 2) == 0);
+	buf = malloc(length >> 1);
+	if (buf == NULL) {
+		return NULL;
+	}
+
+	for(i = 0; i < length; i += 2){
+		buf[i >> 1] = hex_to_ascii(data[i], data[i + 1]);
+	}
+	return buf;
+}
+
 
 //*****************************************************************************
 // Helper function (add new record in the TLSA list - last)
@@ -424,17 +473,17 @@ void add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list,
 // copied.
 // ----------------------------------------------------------------------------
 static
-int add_tlsarecord_bottom_eat_association(struct tlsa_store_head *tlsa_list,
-	const char *domain,
-	uint8_t dnssec_status, uint8_t cert_usage, uint8_t selector,
-	uint8_t matching_type,
-	uint8_t *association, size_t association_size, char *assochex)
+int add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list,
+	const char *domain, uint8_t dnssec_status, uint8_t cert_usage,
+	uint8_t selector, uint8_t matching_type,
+	const uint8_t *association, size_t association_size)
 {
 	struct tlsa_store_ctx *tlsa_entry = NULL;
 	size_t size;
 
 	assert(domain != NULL);
-	assert(assochex != NULL);
+	assert(association != NULL);
+	assert(association_size > 0);
 
 	tlsa_entry = malloc(sizeof(struct tlsa_store_ctx));
 	if (tlsa_entry == NULL) {
@@ -455,10 +504,17 @@ int add_tlsarecord_bottom_eat_association(struct tlsa_store_head *tlsa_list,
 	tlsa_entry->selector = selector;
 	tlsa_entry->matching_type = matching_type;
 
-	/* Just copy pointers. (This operation cannot fail.) */
-	tlsa_entry->association = association;
+	tlsa_entry->association = malloc(association_size);
+	if (tlsa_entry->association == NULL) {
+		goto fail;
+	}
+	memcpy(tlsa_entry->association, association, association_size);
 	tlsa_entry->association_size = association_size;
-	tlsa_entry->assochex = (unsigned char *) assochex;
+	tlsa_entry->assochex = (unsigned char *) bintohex(association,
+	    association_size);
+	if (tlsa_entry->assochex == NULL) {
+		goto fail;
+	}
 
 	tlsa_entry->next = NULL;
 
@@ -478,6 +534,12 @@ fail:
 	if (tlsa_entry != NULL) {
 		if (tlsa_entry->domain != NULL) {
 			free(tlsa_entry->domain);
+		}
+		if (tlsa_entry->association != NULL) {
+			free(tlsa_entry->association);
+		}
+		if (tlsa_entry->assochex != NULL) {
+			free(tlsa_entry->assochex);
 		}
 		free(tlsa_entry);
 	}
@@ -616,6 +678,7 @@ void free_tlsalist(struct tlsa_store_head *tlsa_list)
 		aux = tlsa_list->first->next;
 
 		free(tlsa_list->first->domain);
+		free(tlsa_list->first->association);
 		free(tlsa_list->first->assochex);
 		free(tlsa_list->first);
 
@@ -708,89 +771,6 @@ void add_certrecord_bottom(struct cert_store_head *cert_list,
 }
 #endif
 
-//*****************************************************************************
-// Utility function to convert nibbles (4 bit values) into a hex character
-// representation.
-// ----------------------------------------------------------------------------
-static
-char nibbleToChar(uint8_t nibble)
-{
-	if (nibble < byteMapLen) return byteMap[nibble];
-	return '*';
-}
-
-//*****************************************************************************
-// Helper function (binary data to hex string conversion)
-// ----------------------------------------------------------------------------
-static
-char * bintohex(const uint8_t *bytes, size_t buflen)
-{
-	char *retval = NULL;
-	unsigned i;
-
-	retval = malloc(buflen * 2 + 1);
-
-	if (retval == NULL) {
-		return NULL;
-	}
-
-	for (i = 0; i < buflen; ++i) {
-		retval[i * 2] = nibbleToChar(bytes[i] >> 4);
-		retval[i * 2 + 1] = nibbleToChar(bytes[i] & 0x0f);
-	}
-	retval[i * 2] = '\0';
-	return retval;
-}
-
-//*****************************************************************************
-// Helper function (hex to int)
-// ----------------------------------------------------------------------------
-static
-int hex_to_int(char c)
-{
-	if(c >=97) c=c-32;
-	int first = c / 16 - 3;
-	int second = c % 16;
-	int result = first*10 + second;
-	if (result > 9) result--;
-	return result;
-}
-
-//*****************************************************************************
-// Helper function (hex to char)
-// ----------------------------------------------------------------------------
-static
-int hex_to_ascii(char c, char d)
-{
-	int high = hex_to_int(c) * 16;
-	int low = hex_to_int(d);
-	return high+low;
-}
-
-//*****************************************************************************
-// HEX string to Binary data converter
-//
-// Return NULL on failure.
-// ----------------------------------------------------------------------------
-static
-char * hextobin(const char *data)
-{
-	size_t length = strlen(data);
-	unsigned i;
-	char *buf;
-
-	/* Two hex digits encode one byte. */
-	assert((length % 2) == 0);
-	buf = malloc(length >> 1);
-	if (buf == NULL) {
-		return NULL;
-	}
-
-	for(i = 0; i < length; i += 2){
-		buf[i >> 1] = hex_to_ascii(data[i], data[i + 1]);
-	}
-	return buf;
-}
 
 //*****************************************************************************
 // DANE algorithm (spkicert)
@@ -1542,6 +1522,7 @@ int tlsa_validate(const struct tlsa_store_head *tlsa_list,
 	int idx;
 	const struct tlsa_store_ctx *aux_tlsa;
 
+	idx = DANE_NO_TLSA;
 	aux_tlsa = tlsa_list->first;
 	while (aux_tlsa != NULL) {
 		idx = DANE_NO_TLSA;
@@ -1595,6 +1576,8 @@ static
 int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
     const struct ub_result *ub_res, const char *domain)
 {
+	ldns_pkt *packet = NULL;
+	ldns_rr_list *rrs = NULL;
 	unsigned i = 0;
 	int exitcode = DANE_ERROR_RESOLVER;
 
@@ -1615,26 +1598,34 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 			    "Domain is secured by DNSSEC ... "
 			    "found TLSA record(s).");
 
-			ldns_pkt *packet;
 			ldns_status parse_status = ldns_wire2pkt(&packet,
 			    (uint8_t *)(ub_res->answer_packet),
 			    ub_res->answer_len);
 
 			if (parse_status != LDNS_STATUS_OK) {
 				printf_debug(DEBUG_PREFIX_TLSA, "%s\n",
-				     "Failed to parse response packet\n");
-				return DANE_ERROR_RESOLVER;
+				     "Failed to parse response packet.");
+				exitcode = DANE_ERROR_RESOLVER;
+				goto fail;
 			}
 
-			ldns_rr_list *rrs = ldns_pkt_rr_list_by_type(packet,
+			rrs = ldns_pkt_rr_list_by_type(packet,
 			    LDNS_RR_TYPE_TLSA, LDNS_SECTION_ANSWER);
+			if (rrs == NULL) {
+				printf_debug(DEBUG_PREFIX_TLSA, "%s\n",
+				    "Packet has no resource recors.");
+				exitcode = DANE_ERROR_RESOLVER;
+				goto fail;
+			}
+			ldns_pkt_free(packet); packet = NULL;
 
-			for (i = 0; i < ldns_rr_list_rr_count(rrs); i++) {
+			for (i = 0; i < ldns_rr_list_rr_count(rrs); ++i) {
 				/*
 				 * Extract first rdf, which is the whole TLSA
 				 * record.
 				 */
 				ldns_rr *rr = ldns_rr_list_rr(rrs, i);
+				assert(rr != NULL);
 				/*
 				 * Since ldns 1.6.14, RR for TLSA is parsed
 				 * into 4 RDFs instead of 1 RDF in ldns 1.6.13.
@@ -1642,19 +1633,21 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 				if (ldns_rr_rd_count(rr) < 4) {
 					printf_debug(DEBUG_PREFIX_TLSA,
 					    "RR %d hasn't enough fields\n", i);
-					return DANE_TLSA_PARAM_ERR;
+					exitcode = DANE_TLSA_PARAM_ERR;
+					goto fail;
 				}
 				ldns_rdf *rdf_cert_usage = ldns_rr_rdf(rr, 0),
-				*rdf_selector      = ldns_rr_rdf(rr, 1),
-				*rdf_matching_type = ldns_rr_rdf(rr, 2),
-				*rdf_association   = ldns_rr_rdf(rr, 3);
+				    *rdf_selector      = ldns_rr_rdf(rr, 1),
+				    *rdf_matching_type = ldns_rr_rdf(rr, 2),
+				    *rdf_association   = ldns_rr_rdf(rr, 3);
 
 				if ((ldns_rdf_size(rdf_cert_usage) != 1) ||
 				    (ldns_rdf_size(rdf_selector) != 1) ||
 				    (ldns_rdf_size(rdf_matching_type) != 1)) {
 					printf_debug(DEBUG_PREFIX_TLSA,
 					    "Improperly formatted TLSA RR %d\n", i);
-					return DANE_TLSA_PARAM_ERR;
+					exitcode = DANE_TLSA_PARAM_ERR;
+					goto fail;
 				}
 
 				uint8_t cert_usage, selector, matching_type;
@@ -1665,25 +1658,16 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 				matching_type = ldns_rdf_data(rdf_matching_type)[0];
 				association = ldns_rdf_data(rdf_association);
 				association_size = ldns_rdf_size(rdf_association);
-				char *asshex;
-				asshex = bintohex(association, association_size);
-				if (add_tlsarecord_bottom_eat_association(
-				    tlsa_list, domain, 1,
+				if (add_tlsarecord_bottom(tlsa_list, domain, 1,
 				    cert_usage, selector, matching_type,
-				    association, association_size, asshex) != 0) {
-					free(association);
-					free(asshex);
+				    association, association_size) != 0) {
+					exitcode = DANE_ERROR_GENERIC;
+					goto fail;
 				}
-				ldns_rr_free(rr);
 			}
 
 			exitcode = DANE_DNSSEC_SECURED;
-			if (packet) {
-				ldns_pkt_free(packet);
-			}
-			if (rrs) {
-				ldns_rr_list_free(rrs);
-			}
+			ldns_rr_list_deep_free(rrs); rrs = NULL;
 
 		} else {
 			printf_debug(DEBUG_PREFIX_TLSA,
@@ -1701,6 +1685,15 @@ int parse_tlsa_record(struct tlsa_store_head *tlsa_list,
 		    "Domain is insecure...");
 	}
 
+	return exitcode;
+
+fail:
+	if (packet != NULL) {
+		ldns_pkt_free(packet);
+	}
+	if (rrs != NULL) {
+		ldns_rr_list_free(rrs);
+	}
 	return exitcode;
 }
 
