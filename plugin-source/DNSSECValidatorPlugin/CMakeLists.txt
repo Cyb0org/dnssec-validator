@@ -8,18 +8,13 @@
 cmake_minimum_required (VERSION 2.6)
 set (CMAKE_BACKWARDS_COMPATIBILITY 2.6)
 
-if (NOT WIN32)
 Project(${PLUGIN_NAME})
-endif ()
 
-if (WIN32)
-include(${CMAKE_DIR}/common.cmake)
-set (PROJNAME ${PLUGIN_NAME})
-browserplugin_project(${PROJNAME})
-endif ()
+include_directories(${PLUGIN_INCLUDE_DIRS})
 
 # add validating library to build on UNIX
 if (NOT WIN32)
+    set(COMLIB ../common/common.c)
     set(DSLIB dnssec-plug.c)
 endif ()
 
@@ -27,12 +22,10 @@ file (GLOB GENERAL RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     [^.]*.cpp
     [^.]*.h
     [^.]*.cmake
+    ${COMLIB}
     ${DSLIB}
     )
 
-if (NOT WIN32)
-    include_directories(${PLUGIN_INCLUDE_DIRS})
-endif ()
 
 # Generated files are stored in ${GENERATED} by the project configuration
 SET_SOURCE_FILES_PROPERTIES(

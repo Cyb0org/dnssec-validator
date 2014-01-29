@@ -49,22 +49,42 @@ OpenSSL used as well as that of the covered work.
 extern "C" {
 #endif
 
+
+/* Forward structure declaration. */
+struct dnssec_options_st;
+
+
+//*****************************************************************************
+// read input options into a structure
+// ----------------------------------------------------------------------------
+void dnssec_set_validation_options(struct dnssec_options_st *opts,
+    uint16_t options);
+
+
+//*****************************************************************************
+// Create validation context.
+// ----------------------------------------------------------------------------
+int dnssec_validation_init(void);
+
+
 //*****************************************************************************
 /* main validating function */
 // return status DNSSEC security
-// Input: *domain - domain name 
+// Input: *domain - domain name
 //        options - options of validator, IPv4, IPv6, usefwd, etc..
 //        *optdnssrv - IP address of resolver/forvarder
 //        *ipbrowser - is IP address of browser which browser used fo connection of the server
 // Out:   **ipvalidator - is IP address(es) of validator
 // ----------------------------------------------------------------------------
-short ds_validate(const char *domain, const uint16_t options,
+int dnssec_validate(const char *domain, uint16_t options,
     const char *optdnssrv, const char *ipbrowser, char **ipvalidator);
 
+
 //*****************************************************************************
-// free ub context (erase cache data from ub-context of unbound)
+// Destroy validation context.
 // ----------------------------------------------------------------------------
-void ub_context_free(void);
+int dnssec_validation_deinit(void);
+
 
 #ifdef __cplusplus
 }

@@ -15,7 +15,7 @@ file (GLOB PLATFORM RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
 # use this to add preprocessor definitions
 add_definitions(
-    
+  -DCA_STORE=OSX_CA_STORE
 )
 
 
@@ -23,6 +23,7 @@ SOURCE_GROUP(Mac FILES ${PLATFORM})
 
 set (SOURCES
     ${SOURCES}
+    ca_store_osx.m
     ${PLATFORM}
     )
 
@@ -35,7 +36,8 @@ add_mac_plugin(${PROJECT_NAME} ${PLIST} ${STRINGS} ${LOCALIZED} SOURCES)
 # set header file directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/openssl/include
                     ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/ldns/include
-                    ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/unbound/include)
+                    ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/unbound/include
+                    ${CMAKE_CURRENT_SOURCE_DIR}/../../../plugin-source/common)
 
 # set static library paths
 add_library(unbound STATIC IMPORTED)
@@ -54,11 +56,19 @@ add_library(crypto STATIC IMPORTED)
 set_property(TARGET crypto PROPERTY IMPORTED_LOCATION
              ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/openssl/lib/libcrypto.a)
 
+FIND_LIBRARY(COCOA_FRAMEWORK Cocoa)
+FIND_LIBRARY(SECURITY_FRAMEWORK Security)
+
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
-target_link_libraries(${PROJNAME}
+target_link_libraries(${PROJECT_NAME}
     ${PLUGIN_INTERNAL_DEPS}
     unbound
     ldns
     ssl
     crypto
+    ${COCOA_FRAMEWORK}
+    ${SECURITY_FRAMEWORK}
     )
+
+#To create a DMG, include the following file
+#include(Mac/installer.cmake)

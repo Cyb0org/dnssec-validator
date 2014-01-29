@@ -48,28 +48,48 @@ OpenSSL used as well as that of the covered work.
 extern "C" {
 #endif
 
+
+/* Forward structure declaration. */
+struct dane_options_st;
+
+
+//*****************************************************************************
+// read input options into a structure
+// ----------------------------------------------------------------------------
+void dane_set_validation_options(struct dane_options_st *opts,
+    uint16_t options);
+
+
+//*****************************************************************************
+// Create validation context.
+// ----------------------------------------------------------------------------
+int dane_validation_init(void);
+
+
 //*****************************************************************************
 // Main DANE/TLSA validation function, external API
-// Input parmateers:
+// Input parameters:
 //        char* certchain[] - array of derCert in HEX (certificate chain)
 //        int certcount - number of cert in array - count(array)
-//        const uint16_t options - TLSA validator option (debug,IPv4,IPv6) 
+//        const uint16_t options - TLSA validator option (debug,IPv4,IPv6)
 //        char *optdnssrv - list of IP resolver addresses separated by space
 //        char* domain - domain name (e.g.: wwww.nic.cz, torproject.org, ...)
 //        char* port - number of port for SSL (443, 25)
-//        char* protocol - "tcp" only 
+//        char* protocol - "tcp" only
 //        int policy - certificate policy from browser
 // Return: DANE/TLSA validation status (x<0=valfail or error, x>0 = success)
 //         return values: dane-state.gen file
 // ----------------------------------------------------------------------------
-short CheckDane(const char* certchain[], int certcount, const uint16_t options,
+int dane_validate(const char* certchain[], int certcount, uint16_t options,
     const char *optdnssrv, const char *domain, const char *port,
     const char *protocol, int policy);
 
+
 //*****************************************************************************
-// free ub context (erase cache data from ub-context of unbound)
+// Destroy validation context.
 // ----------------------------------------------------------------------------
-void ub_context_free(void);
+int dane_validation_deinit(void);
+
 
 #ifdef __cplusplus
 }

@@ -14,8 +14,8 @@
 			<Description>
 				<em:locale>en-US</em:locale>
 				<em:name>TLSAValidatorPlugin</em:name>
-				<em:description>DANE/TLSA Validation</em:description>
-				<em:creator>CZ.NIC Labs</em:creator>
+				<em:description>Plug-in used by TLSA Validator extension</em:description>
+				<em:creator>CZ.NIC</em:creator>
 				<em:homepageURL>http://nic.cz</em:homepageURL>
 			</Description>
 		</em:localized> 

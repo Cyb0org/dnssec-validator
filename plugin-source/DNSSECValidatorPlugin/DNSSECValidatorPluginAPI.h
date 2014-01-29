@@ -1,23 +1,8 @@
-/* ***** BEGIN LICENSE BLOCK *****
-Copyright 2012 CZ.NIC, z.s.p.o.
+/**********************************************************\
 
-Authors: Martin Straka <martin.straka@nic.cz>
+  Auto-generated DNSSECValidatorPluginAPI.h
 
-This file is part of DNSSEC Validator Add-on.
-
-DNSSEC Validator Add-on is free software: you can redistribute it and/or
-modify it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or (at your
-option) any later version.
-
-DNSSEC Validator Add-on is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-more details.
-
-You should have received a copy of the GNU General Public License along with
-DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
-***** END LICENSE BLOCK ***** */
+\**********************************************************/
 
 #include <string>
 #include <sstream>
@@ -29,7 +14,6 @@ DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 extern "C" {   /* use C language linkage */
   #include "dnssec-plug.h"
 }
-
 
 #ifndef H_DNSSECValidatorPluginAPI
 #define H_DNSSECValidatorPluginAPI
@@ -53,15 +37,11 @@ public:
     {
         registerMethod("echo",      make_method(this, &DNSSECValidatorPluginAPI::echo));
         registerMethod("testEvent", make_method(this, &DNSSECValidatorPluginAPI::testEvent));
-    registerMethod("CacheFree", make_method(this, &DNSSECValidatorPluginAPI::CacheFree));
-    registerMethod("Validate", make_method(this, &DNSSECValidatorPluginAPI::Validate));
-    registerMethod("ValidateAsync", make_method(this, &DNSSECValidatorPluginAPI::ValidateAsync));
-    registerMethod("ValidateAsync_thread", make_method(this, &DNSSECValidatorPluginAPI::ValidateAsync_thread));
-
-   //     registerMethod("DNSSECValidateAsync", make_method(this, &DNSSECValidatorPluginAPI::DNSSECValidateAsync));
-   //     registerMethod("DNSSECValidateAsync_thread", make_method(this, &DNSSECValidatorPluginAPI::DNSSECValidateAsync_thread));
-
-
+	registerMethod("DNSSECCacheFree", make_method(this, &DNSSECValidatorPluginAPI::DNSSECCacheFree));
+	registerMethod("DNSSECCacheInit", make_method(this, &DNSSECValidatorPluginAPI::DNSSECCacheInit));
+	registerMethod("Validate", make_method(this, &DNSSECValidatorPluginAPI::Validate));
+	registerMethod("ValidateAsync", make_method(this, &DNSSECValidatorPluginAPI::ValidateAsync));
+	registerMethod("ValidateAsync_thread", make_method(this, &DNSSECValidatorPluginAPI::ValidateAsync_thread));        
         // Read-write property
         registerProperty("testString",
                          make_property(this,
@@ -96,13 +76,11 @@ public:
     FB::variant echo(const FB::variant& msg);
     
     // Event helpers
-    //FB_JSAPI_EVENT(test, 0, ());
-    //FB_JSAPI_EVENT(echo, 2, (const FB::variant&, const int));
+    FB_JSAPI_EVENT(test, 0, ());
+    FB_JSAPI_EVENT(echo, 2, (const FB::variant&, const int));
 
     // Method test-event
     void testEvent();
-
-
 
     // Synchronous validation method
     // INPUTS:
@@ -126,21 +104,17 @@ public:
     bool ValidateAsync(const std::string& domain, const uint16_t options,
                        const std::string& optdnssrv, const std::string& ipbrowser, const FB::JSObjectPtr &callback);
 
-    void CacheFree();
-
-
+   void DNSSECCacheFree();
+   void DNSSECCacheInit();
 
 private:
     DNSSECValidatorPluginWeakPtr m_plugin;
     FB::BrowserHostPtr m_host;
-/*
-    void DNSSECValidateAsync_thread(const std::vector<std::string> &certchain, const int certcount, const uint16_t options, const std::string& optdnssrv, const std::string& domain, const std::string& port,
-			      const std::string& protocol, const int policy, const FB::JSObjectPtr &callback);
-*/
+
     std::string m_testString;
+
     void ValidateAsync_thread(const std::string& domain, const uint16_t options,
                               const std::string& optdnssrv, const std::string& ipbrowser, const FB::JSObjectPtr &callback);
-
 
 };
 

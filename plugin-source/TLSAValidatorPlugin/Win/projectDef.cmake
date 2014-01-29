@@ -10,6 +10,7 @@
 file (GLOB PLATFORM RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     Win/[^.]*.cpp
     Win/[^.]*.h
+    Win/[^.]*.rc
     Win/[^.]*.cmake
     )
 
@@ -27,17 +28,19 @@ set (SOURCES
 
 add_windows_plugin(${PROJECT_NAME} SOURCES)
 
+
 # generate .lib from the validating library compiled by mingw
 add_custom_command(TARGET ${PROJNAME} PRE_LINK
                    COMMAND lib.exe /machine:x86 /def:DANEcore-windows-x86.def
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../../ub_tmp_build
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../dll_build
     )
 
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
 target_link_libraries(${PROJNAME}
     ${PLUGIN_INTERNAL_DEPS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../ub_tmp_build/DANEcore-windows-x86.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../dll_build/DANEcore-windows-x86.lib
     )
+
 
 # This is an example of how to add a build step to sign the plugin DLL before
 # the WiX installer builds.  The first filename (certificate.pfx) should be

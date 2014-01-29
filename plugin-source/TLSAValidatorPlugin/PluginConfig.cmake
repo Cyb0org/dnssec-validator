@@ -7,7 +7,7 @@
 
 set(PLUGIN_NAME "TLSAValidatorPlugin")
 set(PLUGIN_PREFIX "TVP")
-set(COMPANY_NAME "CZNICLabs")
+set(COMPANY_NAME "CZNIC")
 
 # ActiveX constants:
 set(FBTYPELIB_NAME TLSAValidatorPluginLib)
@@ -33,28 +33,32 @@ else ( FB_PLATFORM_ARCH_32 )
 endif ( FB_PLATFORM_ARCH_32 )
 
 # these are the pieces that are relevant to using it from Javascript
-set(ACTIVEX_PROGID "CZNICLabs.TLSAValidatorPlugin")
-set(MOZILLA_PLUGINID "nic.cz/TLSAValidatorPlugin")
+set(ACTIVEX_PROGID "CZNIC.TLSAValidatorPlugin")
+if ( FB_PLATFORM_ARCH_32 )
+    set(MOZILLA_PLUGINID "nic.cz/TLSAValidatorPlugin")  # No 32bit postfix to maintain backward compatability.
+else ( FB_PLATFORM_ARCH_32 )
+    set(MOZILLA_PLUGINID "nic.cz/TLSAValidatorPlugin_${FB_PLATFORM_ARCH_NAME}")
+endif ( FB_PLATFORM_ARCH_32 )
 
 # strings
-set(FBSTRING_CompanyName "CZ.NIC Labs")
+set(FBSTRING_CompanyName "CZ.NIC")
 set(FBSTRING_PluginDescription "Plug-in used by TLSA Validator extension")
 set(FBSTRING_PLUGIN_VERSION "2.1.0")
-set(FBSTRING_LegalCopyright "Copyright 2013 CZ.NIC Labs")
-set(FBSTRING_PluginFileName "np${PLUGIN_NAME}.dll")
+set(FBSTRING_LegalCopyright "Copyright 2014 CZ.NIC")
+set(FBSTRING_PluginFileName "np${PLUGIN_NAME}")
 set(FBSTRING_ProductName "TLSAValidatorPlugin")
 set(FBSTRING_FileExtents "")
 if ( FB_PLATFORM_ARCH_32 )
     set(FBSTRING_PluginName "TLSAValidatorPlugin")  # No 32bit postfix to maintain backward compatability.
 else ( FB_PLATFORM_ARCH_32 )
-    set(FBSTRING_PluginName "TLSAValidatorPlugin")
+    set(FBSTRING_PluginName "TLSAValidatorPlugin_${FB_PLATFORM_ARCH_NAME}")
 endif ( FB_PLATFORM_ARCH_32 )
-set(FBSTRING_MIMEType "application/x-tlsavalidator")
+set(FBSTRING_MIMEType "application/x-tlsavalidatorplugin")
 
 # Uncomment this next line if you're not planning on your plugin doing
 # any drawing:
 
-#set (FB_GUI_DISABLED 1)
+set (FB_GUI_DISABLED 1)
 
 # Mac plugin settings. If your plugin does not draw, set these all to 0
 set(FBMAC_USE_QUICKDRAW 0)

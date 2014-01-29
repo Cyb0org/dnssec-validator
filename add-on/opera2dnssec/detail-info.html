@@ -1,0 +1,55 @@
+<!-- ***** BEGIN LICENSE BLOCK *****
+Copyright 2012 CZ.NIC, z.s.p.o.
+
+Authors: Martin Straka <martin.straka@nic.cz>
+
+This file is part of DNSSEC Validator 2.0 Add-on.
+
+DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC Validator 2.0 Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** -->
+
+<!doctype html>
+<html>
+
+<head>
+    <style>
+        body {
+        font: 0.9em Verdana, Arial, Helvetica; max-width: 43em;
+        min-width:350px;
+        overflow-x:hidden;
+        }
+	td {vertical-align: top; padding-right: 8px; padding-bottom: 10px}
+	.divright {text-align: right}
+	p {font-size: 90%;}
+    </style>
+</head>
+
+<body>	
+    <table>
+    	<tr>
+	  <td><img onclick='DNSSECicon2()' id='dnssec-icon2' src='icon.png' /></td>
+	 <td><strong id="domain-name-title"></strong><br/><strong id="dnssec-title"></strong></td>
+    	</tr>
+    </table>
+    <span id="long-text-domain"></span><span id="domain-name-text"></span><span id="long-text"></span>
+    <p id="dnssec-info"></p>
+    <span id="ip-info-bh" style="font-size: 80%;"></span>
+    <strong><span id="ip-info-b" style="font-size: 70%;"></span></strong>
+    <span id="ip-info-vh" style="font-size: 80%;"></span>
+    <strong><span id="ip-info-v" style="font-size: 70%;"></span></strong>
+    <p><a href="http://www.dnssec-validator.cz/" target="blank" id='homepage'></a></p>
+    <script src="popup2.js"></script>
+</body>
+
+</html>
