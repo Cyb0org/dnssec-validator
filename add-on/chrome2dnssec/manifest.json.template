@@ -11,7 +11,7 @@
       "48": "icon.png"
    },
    "name": "DNSSEC Validator",
-   "options_page": "options.html?4,0,8.8.8.8",
+   "options_page": "options.html?4,0,217.31.204.130",
    "page_action": {
       "default_icon": "dnssec_init.png",
       "default_title": "DNSSEC Validator",

@@ -32,7 +32,7 @@ pref("extensions.dnssec.dnsserverchoose", 3);
 pref("extensions.dnssec.dnsserverpresetchoose", 0);
 pref("extensions.dnssec.dnsserveraddr", "nofwd");
 pref("extensions.dnssec.usefwd", true);
-pref("extensions.dnssec.optdnsserveraddr", "8.8.8.8");
+pref("extensions.dnssec.optdnsserveraddr", "217.31.204.130");
 pref("extensions.dnssec.version", "");
 pref("extensions.dnssec.popupfgcolor", "");
 pref("extensions.dnssec.popupbgcolor", "");

@@ -703,7 +703,7 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 					{					
 					const int STR_BUF_S = 512;
 					char strbuf[STR_BUF_S] = TEXT("");
-					char* dnsip = "8.8.8.8";
+					char* dnsip = "217.31.204.130";
 					uint16_t options = 0;
 					bool wrongip = false;
 					char* ipvalidator;
