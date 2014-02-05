@@ -431,7 +431,8 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 					    ipvalidator);
 					retval = ipv4matches(ipbrowser,
 					    ipvalidator, " ");
-				} else {
+				} else if (ub_res->qtype ==
+				           LDNS_RR_TYPE_AAAA) {
 					/* AAAA examine result */
 					for (i=0; ub_res->data[i]; i++) {
 						inet_ntop(AF_INET6, ((const struct in_addr *) ub_res->data[i]), ipv6, INET6_ADDRSTRLEN);
@@ -445,7 +446,11 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 					    ipvalidator);
 					retval = ipv6matches(ipbrowser,
 					    ipvalidator, " ");
-				} // ub_res->qtype
+				} else {
+					printf_debug(DEBUG_PREFIX_DNSSEC,
+					    "%s\n", "Unsupported query type.");
+					retval = DNSSEC_ERROR_GENERIC;
+				}
 				free(ipvalidator);
 			} else {
 				printf_debug(DEBUG_PREFIX_DNSSEC,
