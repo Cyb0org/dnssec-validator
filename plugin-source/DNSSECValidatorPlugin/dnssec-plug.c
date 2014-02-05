@@ -403,11 +403,21 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 
 			if ((!ub_res->secure) && (!ub_res->bogus)) {
 				retval = DNSSEC_DOMAIN_UNSECURED;
-			} else if ((ub_res->secure) &&
-			           (!ub_res->bogus)) {
+			} else if ((ub_res->secure) && (!ub_res->bogus)) {
 				/* Result is secured and bogus wasn't
 				 * detected. */
-				if (ub_res->qtype == LDNS_RR_TYPE_A) {
+				if (ipbrowser == NULL) {
+					/*
+					 * The browser had not provided a list
+					 * of IP addresses.
+					 *
+					 * Let's pretend everything is OK.
+					 */
+					printf_debug(DEBUG_PREFIX_DNSSEC,
+					    "%s\n", "Browser did not provide "
+					    "remote IP addresses.");
+					retval = DNSSEC_COT_DOMAIN_SECURED;
+				} else if (ub_res->qtype == LDNS_RR_TYPE_A) {
 					/* A examine result */
 					for (i=0; ub_res->data[i]; i++) {
 						ipv4 = inet_ntoa(*(const struct in_addr *) ub_res->data[i]);
@@ -419,7 +429,8 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 					printf_debug(DEBUG_PREFIX_DNSSEC,
 					    "IPv4 address of validator: %s\n",
 					    ipvalidator);
-					retval = ipv4matches(ipbrowser, ipvalidator, " ");
+					retval = ipv4matches(ipbrowser,
+					    ipvalidator, " ");
 				} else {
 					/* AAAA examine result */
 					for (i=0; ub_res->data[i]; i++) {
@@ -432,13 +443,13 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 					printf_debug(DEBUG_PREFIX_DNSSEC,
 					    "IPv6 address of validator: %s\n",
 					    ipvalidator);
-					retval = ipv6matches(ipbrowser, ipvalidator, " ");
+					retval = ipv6matches(ipbrowser,
+					    ipvalidator, " ");
 				} // ub_res->qtype
 				free(ipvalidator);
-				// free malloc ipvalidator
 			} else {
-				printf_debug(DEBUG_PREFIX_DNSSEC, "Why bogus?: %s\n",
-				    ub_res->why_bogus);
+				printf_debug(DEBUG_PREFIX_DNSSEC,
+				    "Why bogus?: %s\n", ub_res->why_bogus);
 				retval = DNSSEC_COT_DOMAIN_BOGUS;
 			}
 
@@ -490,8 +501,8 @@ int dnssec_validation_init(void)
 // Input: *domain - domain name
 //        options - options of validator, IPv4, IPv6, usefwd, etc..
 //        *optdnssrv - IP address of resolver/forwarder
-//        *ipbrowser - is IP address of browser which browser used to
-//                     connection on the server
+//        *ipbrowser - IP address of remote which browser uses to
+//                     connect to the server
 // Out:   **ipvalidator - is IP address(es) of validator
 // ----------------------------------------------------------------------------
 int dnssec_validate(const char *domain, uint16_t options,
@@ -549,7 +560,8 @@ int dnssec_validate(const char *domain, uint16_t options,
 		ub_retval = ub_resolve(glob_val_ctx.ub, domain,
 		    LDNS_RR_TYPE_AAAA, LDNS_RR_CLASS_IN, &ub_res);
 		if(ub_retval != 0) {
-			printf_debug(DEBUG_PREFIX_DNSSEC, "Resolve error AAAA: %s\n",
+			printf_debug(DEBUG_PREFIX_DNSSEC,
+			    "Resolver error AAAA: %s\n",
 			    ub_strerror(ub_retval));
 			return exitcode; /* DNSSEC_ERROR_GENERIC */
 		}
@@ -562,7 +574,8 @@ int dnssec_validate(const char *domain, uint16_t options,
 		ub_retval = ub_resolve(glob_val_ctx.ub, domain, LDNS_RR_TYPE_A,
 		    LDNS_RR_CLASS_IN, &ub_res);
 		if(ub_retval != 0) {
-			printf_debug(DEBUG_PREFIX_DNSSEC, "Resolve error A: %s\n",
+			printf_debug(DEBUG_PREFIX_DNSSEC,
+			    "Resolver error A: %s\n",
 			    ub_strerror(ub_retval));
 			return exitcode; /* DNSSEC_ERROR_GENERIC */
 		}
@@ -574,7 +587,8 @@ int dnssec_validate(const char *domain, uint16_t options,
 		ub_retval = ub_resolve(glob_val_ctx.ub, domain,
 		    LDNS_RR_TYPE_AAAA, LDNS_RR_CLASS_IN, &ub_res);
 		if(ub_retval != 0) {
-			printf_debug(DEBUG_PREFIX_DNSSEC, "Resolve error AAAA: %s\n",
+			printf_debug(DEBUG_PREFIX_DNSSEC,
+			    "Resolver error AAAA: %s\n",
 			    ub_strerror(ub_retval));
 			return exitcode; /* DNSSEC_ERROR_GENERIC */
 		}
@@ -584,7 +598,8 @@ int dnssec_validate(const char *domain, uint16_t options,
 		ub_retval = ub_resolve(glob_val_ctx.ub, domain, LDNS_RR_TYPE_A,
 		    LDNS_RR_CLASS_IN, &ub_res);
 		if(ub_retval != 0) {
-			printf_debug(DEBUG_PREFIX_DNSSEC, "Resolve error A: %s\n",
+			printf_debug(DEBUG_PREFIX_DNSSEC,
+			    "Resolver error A: %s\n",
 			    ub_strerror(ub_retval));
 			return exitcode; /* DNSSEC_ERROR_GENERIC */
 		}
@@ -667,8 +682,11 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+//#define REMOTE_IPS "2001:610:188:301:145::2:10"
+#define REMOTE_IPS NULL
+
 	i = dnssec_validate(dname, options, resolver_addresses,
-	    "2001:610:188:301:145::2:10", &tmp);
+	    REMOTE_IPS, &tmp);
 	printf(DEBUG_PREFIX_DNSSEC "Returned value: \"%d\" %s\n", i, tmp);
 
 	if (dnssec_validation_deinit() != 0) {
