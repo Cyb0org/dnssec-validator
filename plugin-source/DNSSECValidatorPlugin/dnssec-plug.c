@@ -101,6 +101,36 @@ struct dnssec_validation_ctx glob_val_ctx = {
 
 //*****************************************************************************
 /*
+ * comparison of IPv4 addresses as structure
+ *
+ * Returns:
+ *       1 when IPv6 addresses match,
+ *       0 when they do not match
+ *      -1 on error.
+ */
+// ----------------------------------------------------------------------------
+static
+int ipv4str_equal(const char *lhs, const char *rhs)
+{
+	int ret;
+	struct in_addr la, ra; /* Left and right address. */
+
+	ret = inet_pton(AF_INET, lhs, &la);
+	if (ret != 1) {
+		return -1;
+	}
+
+	ret = inet_pton(AF_INET, rhs, &ra);
+	if (ret != 1) {
+		return -1;
+	}
+
+	return (memcmp(&la, &ra, sizeof(struct in_addr)) == 0) ? 1 : 0;
+}
+
+
+//*****************************************************************************
+/*
  * comparison of IPv6 addresses as structure
  *
  * Returns:
@@ -125,7 +155,7 @@ int ipv6str_equal(const char *lhs, const char *rhs)
 		return -1;
 	}
 
-	return memcmp(&la, &ra, sizeof(struct in6_addr)) == 0;
+	return (memcmp(&la, &ra, sizeof(struct in6_addr)) == 0) ? 1 : 0;
 }
 
 #if 0
@@ -286,7 +316,7 @@ short ipv6matches(const char *ipbrowser, const char *ipvalidator,
 	char *token;
 	int isequal = 0;
 
-	printf_debug(DEBUG_PREFIX_DNSSEC, "IP matches: %s %s\n",
+	printf_debug(DEBUG_PREFIX_DNSSEC, "Comparing IP addresses: %s %s\n",
 	    ipbrowser, ipvalidator);
 	strcpy(ip_validated, ipvalidator);
 
@@ -304,7 +334,7 @@ short ipv6matches(const char *ipbrowser, const char *ipvalidator,
 			return DNSSEC_COT_DOMAIN_SECURED_BAD_IP;
 		}
 		isequal = ipv6str_equal(ipbrowser, token);
-		if (isequal != 0) {
+		if (isequal > 0) {
 			free(str_cpy);
 			return DNSSEC_COT_DOMAIN_SECURED;
 		}
@@ -315,7 +345,7 @@ short ipv6matches(const char *ipbrowser, const char *ipvalidator,
 				return DNSSEC_COT_DOMAIN_SECURED_BAD_IP;
 			}
 			isequal = ipv6str_equal(ipbrowser, token);
-			if (isequal != 0) {
+			if (isequal > 0) {
 				free(str_cpy);
 				return DNSSEC_COT_DOMAIN_SECURED;
 			}
@@ -338,7 +368,7 @@ short ipv4matches(const char *ipbrowser, const char *ipvalidator,
     const char *delimiters)
 {
 	char *token;
-	char *is = NULL;
+	int isequal = 0;
 
 	printf_debug(DEBUG_PREFIX_DNSSEC, "IP matches: %s %s\n",
 	    ipbrowser, ipvalidator);
@@ -357,8 +387,8 @@ short ipv4matches(const char *ipbrowser, const char *ipvalidator,
 			free(str_cpy);
 			return DNSSEC_COT_DOMAIN_SECURED_BAD_IP;
 		}
-		is = strstr(ipbrowser, token);
-		if (is != NULL) {
+		isequal = ipv4str_equal(ipbrowser, token);
+		if (isequal > 0) {
 			free(str_cpy);
 			return DNSSEC_COT_DOMAIN_SECURED;
 		}
@@ -368,8 +398,8 @@ short ipv4matches(const char *ipbrowser, const char *ipvalidator,
 				free(str_cpy);
 				return DNSSEC_COT_DOMAIN_SECURED_BAD_IP;
 			}
-			is = strstr(ipbrowser, token);
-			if (is != NULL) {
+			isequal = ipv4str_equal(ipbrowser, token);
+			if (isequal > 0) {
 				free(str_cpy);
 				return DNSSEC_COT_DOMAIN_SECURED;
 			}
@@ -699,10 +729,10 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-#define REMOTE_IPS "8.8.8.8"
+//#define REMOTE_IPS "217.31.205.50"
 //#define REMOTE_IPS "2001:610:188:301:145::2:10"
 //#define REMOTE_IPS NULL
-//#define REMOTE_IPS ""
+#define REMOTE_IPS ""
 
 	i = dnssec_validate(dname, options, resolver_addresses,
 	    REMOTE_IPS, &tmp);
