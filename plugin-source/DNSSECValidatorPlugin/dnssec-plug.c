@@ -406,7 +406,8 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 			} else if ((ub_res->secure) && (!ub_res->bogus)) {
 				/* Result is secured and bogus wasn't
 				 * detected. */
-				if (ipbrowser == NULL) {
+				if ((ipbrowser == NULL) ||
+				    (ipbrowser[0] == '\0')) {
 					/*
 					 * The browser had not provided a list
 					 * of IP addresses.
