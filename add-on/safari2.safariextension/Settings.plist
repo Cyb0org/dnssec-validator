@@ -26,7 +26,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<real>3</real>
+		<real>1</real>
 		<key>Key</key>
 		<string>resolverchoice</string>
 		<key>Title</key>
@@ -41,9 +41,9 @@
 		<string>RadioButtons</string>
 		<key>Values</key>
 		<array>
-			<real>3</real>
 			<real>1</real>
 			<real>2</real>
+			<real>3</real>
 		</array>
 	</dict>
 	<dict>
@@ -126,7 +126,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<true/>
+		<false/>
 		<key>Key</key>
 		<string>blocking</string>
 		<key>Title</key>
@@ -143,6 +143,22 @@
 	<dict>
 		<key>Type</key>
 		<string>Separator</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string>vv</string>
+		<key>Key</key>
+		<string>vv</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>debuglogout</string>
+		<key>Title</key>
+		<string>Print debug infos into error console</string>
+		<key>Type</key>
+		<string>CheckBox</string>
 	</dict>
 </array>
 </plist>

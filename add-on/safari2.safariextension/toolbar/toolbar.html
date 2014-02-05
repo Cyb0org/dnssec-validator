@@ -33,8 +33,12 @@ DNSSEC/TLSA Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <script type="text/javascript">
 
 var defaultresolver = "217.31.204.130";
+var blankstate = -99;
+
 var dnssecobj= InitDnssecPlugin("dnssec");
 var tlsaobj = InitTlsaPlugin("tlsa");
+
+
 
 //*****************************************************
 // Return true/false if domain name is in exclude domain list
@@ -84,7 +88,21 @@ function getHttpSheme(taburl){
 	else if (taburl.indexOf("http") != -1) return "http";
 	else if (taburl.indexOf("ftps") != -1) return "ftps";
 	else if (taburl.indexOf("ftp") != -1) return "ftp";
-	else return "undefined";	
+	else return null;	
+};
+
+
+//****************************************************************
+// return domain name and port number of url
+//****************************************************************
+function getDomainAndPort(taburl) {
+
+	if (taburl == undefined) return null;
+	if (taburl == null) return null;
+	if (taburl == "") return null;
+
+	var tmp = taburl.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(:[0-9]+)*(:)?/);
+	return [tmp[1], tmp[2]];
 };
 
 //****************************************************************
@@ -165,6 +183,9 @@ function setDnssecMode(dresult) {
 	case c.DNSSEC_UNBOUND_NO_DATA:
 		file = "dnssec_error.png";
 		break;
+	case c.DNSSEC_ERROR_GENERIC:
+		file = "dnssec_error.png";
+		break;
 	default:
 		file = "dnssec_init.png";
 		break;
@@ -208,8 +229,7 @@ function setTlsaMode(tresult) {
 	case c.DANE_NO_TLSA: 
 		file = "tlsa_no.png";
 		break;
-	case c.DANE_DNSSEC_UNSECURED: 
-		console.log("tresult: " + tresult + " UNSECURED ");
+	case c.DANE_DNSSEC_UNSECURED:
 		file = "tlsa_nodnssec.png";
 		break;
 	case c.DANE_DNSSEC_BOGUS: 
@@ -239,8 +259,11 @@ function setTlsaMode(tresult) {
 	case c.DANE_RESOLVER_NO_DNSSEC: 
 		file = "tlsa_error.png";
 		break;
-	default:
+	case c.DANE_ERROR_GENERIC:
 		file = "tlsa_error.png";
+		break;
+	default:
+		file = "tlsa_init.png";
 		break;
 	}
 	setIcon(file,"tlsaicon");
@@ -259,75 +282,117 @@ function getResolver() {
 }; // getResolver
 
 
-function xxx(){
-	var res = safari.extension.settings.resolverchoice;
-	console.log("res: " + res);
-	var res = safari.extension.settings.resolverip;
-
-
-	var res = safari.extension.settings.filteron;
-	var res = safari.extension.settings.domainlist;
-	var res = safari.extension.settings.tlsaon;
+function tmp(){
 	var res = safari.extension.settings.blocking;
-
-	console.log("res: " + res);
-	return res;
 };
-
 
 //****************************************************************
 // check DNSSEC status
 //****************************************************************
-function checkDnssec(domain) {
+function checkDnssec(url) {
 
-	var resolver = this.getResolver();
-	var options = 5;	
-	var result = DnssecValidate(domain, options, resolver);
-	if (result != null) {
-		setDnssecMode(result);
+	var domain = getDomainFromUrl(url);
+
+	if (domain == null) {
+		setDnssecMode(blankstate);
+		return;		
+	}
+
+    	var c = this.dnssecExtNPAPIConst;
+	var result = c.DNSSEC_OFF;
+
+	if (this.ExcludeDomainList(domain)) {
+
+		var resolver = this.getResolver();
+		var options = 0;
+		var reschoice = safari.extension.settings.resolverchoice;
+
+		if (debugout) options |= c.DNSSEC_FLAG_DEBUG;
+		if (reschoice == 3) options |= c.DNSSEC_FLAG_USEFWD;
+		if (true) options |= c.DNSSEC_FLAG_RESOLVIPV4;
+		if (true) options |= c.DNSSEC_FLAG_RESOLVIPV6;
+		
+		var ipbrowser = "";
+		if (debugout) {
+			console.log("DNSSECplugin request: " +domain+", "+options+", "+resolver+", "+ipbrowser);
+		}
+
+		result = DnssecValidate(domain, options, resolver, ipbrowser);
+		if (result != null) {
+			setDnssecMode(result);
+		} else {
+			setDnssecMode(c.DNSSEC_ERROR_GENERIC);
+		}
 	} else {
-		setDnssecMode(-99);
+		setDnssecMode(result);
 	}
 };
 
 //****************************************************************
 // check TLSA status
 //****************************************************************
-function checkTlsa(domain) {
+function checkTlsa(url) {
 
-	var resolver = this.getResolver();
-	var options = 2;
-	var cert = new Array();
-	cert.push("00FF");
-	var result = TlsaValidate(cert, 1, options, resolver, domain, "443", "tcp", 1);
-	if (result != null) {
-		setTlsaMode(result);
+    	var c = this.tlsaExtNPAPIConst;
+	var result = c.DANE_OFF;
+
+	if (safari.extension.settings.tlsaon) {
+
+		var domain = getDomainFromUrl(url);
+		if (domain == null) {
+			setTlsaMode(blankstate);
+			return;		
+		}
+
+		if (ExcludeDomainList(domain)) {
+
+			var scheme = getHttpSheme(url);
+			if (scheme == "https" || scheme == "ftps") {
+
+				var resolver = this.getResolver();
+				var reschoice = safari.extension.settings.resolverchoice;
+				var options = 0;
+				if (debugout) options |= c.DANE_FLAG_DEBUG;
+				if (reschoice == 3) options |= c.DANE_FLAG_USEFWD;
+				var cert = new Array();
+				cert.push("00FF");
+				var port = "443";
+				var protocol = "tcp";
+				if (debugout) {
+					console.log("TLSAplugin request: {certchain}, 1, " +options+", "+resolver+", "+domain+", "+port+", "+protocol+", 1");
+				}
+
+				result = TlsaValidate(cert, 1, options, resolver, domain, port, protocol, 1);
+				if (result != null) {
+					setTlsaMode(result);
+				} else {
+					setTlsaMode(c.DANE_ERROR_GENERIC);
+				}
+
+			} else {
+				setTlsaMode(c.DANE_NO_HTTPS);
+			}
+		} else {
+			setTlsaMode(result);
+		}
 	} else {
-		setTlsaMode(-99);
+		setTlsaMode(result);	
 	}
 };
 
 //****************************************************************
 // fires when tab or windows has changed
 //****************************************************************
-var OnActivate = function(event) {
+var OnTabActivate = function(event) {
 
 	var taburl = safari.application.activeBrowserWindow.activeTab.url;
-
+	debugout = safari.extension.settings.debuglogout;
 	if (debugout) {
-		console.log("EVENT: " + event);
-		console.log("  URL: " + taburl);
+		console.log("\nBrowser: OnTabActivate("+taburl+")");
 	}
 
-	var domain = getDomainFromUrl(taburl);
-	if (domain != null) {
-		checkDnssec(domain);
-		checkTlsa(domain);
-	}
-	else {
-		setDnssecMode(-99);
-		setTlsaMode(-99);
-	}		
+	checkDnssec(taburl);
+	checkTlsa(taburl);
 };
 
 //****************************************************************
@@ -335,26 +400,22 @@ var OnActivate = function(event) {
 //****************************************************************
 var OnBeforeNavigate = function(event) {
 
+	debugout = safari.extension.settings.debuglogout;
 	if (debugout) {
-		console.log("EVENT: " + event);
-		console.log("  URL: " + event.url);
+		console.log("\nBrowser: OnBeforeNavigate("+event.url+")");
 	}
 
-	var domain = getDomainFromUrl(event.url);
-	if (domain != null) {
-		//checkDnssec(domain);
-		checkTlsa(domain);
-	}
+	checkDnssec(event.url);
+	checkTlsa(event.url);
 };
 
 //****************************************************************
 // events listener
 //****************************************************************
-safari.application.addEventListener("activate", OnActivate, true);
+safari.application.addEventListener("activate", OnTabActivate, true);
 safari.application.addEventListener("beforeNavigate", OnBeforeNavigate, true);
 
 </script>
-
 
 
 <span style="vertical-align: top;">DNSSEC: </span> <a href="#" onclick="alert('Helou')"><img id="dnssecicon" src="dnssec_init.png" alt="DNSSEC state" width="20" height="20"></a>
@@ -363,4 +424,3 @@ safari.application.addEventListener("beforeNavigate", OnBeforeNavigate, true);
 
 </body>
 </html>
-

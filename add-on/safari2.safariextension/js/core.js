@@ -20,8 +20,10 @@ DNSSEC/TLSA Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
 var debugout = true;
-var ip = "217.31.205.50";
 
+//****************************************************************
+// Initialize DNSSEC binary plugin after start of Safari
+//****************************************************************
 function InitDnssecPlugin(objectid) {
 
         var DNSSECPlugin = document.getElementById(objectid);
@@ -38,6 +40,9 @@ function InitDnssecPlugin(objectid) {
 	}
 };
 
+//****************************************************************
+// Initialize TLSA binary plugin after start of Safari
+//****************************************************************
 function InitTlsaPlugin(objectid) {
 
         var TLSAPlugin = document.getElementById(objectid);
@@ -54,27 +59,32 @@ function InitTlsaPlugin(objectid) {
 	}
 };
 
-function DnssecValidate(domain, options, resolver) {
+//****************************************************************
+// Call DNSSEC binary plugin when any validation request was fired 
+//****************************************************************
+function DnssecValidate(domain, options, resolver, ip) {
 
 	if (dnssecobj != null) {
 		var result = dnssecobj.Validate(domain, options, resolver, ip);
 		if (debugout) {
-	       		console.log("DNSSECplugin return: " + result[0] + "; " + result[1]);
+	       		console.log("DNSSECplugin return: " + result[0]);
 		}
 		return result[0];		
 	}
 	else return null;
 };
 
+//****************************************************************
+// Call TLSA binary plugin when any validation request was fired
+//****************************************************************
 function TlsaValidate(cert, len, options, resolver, domain, port, protocol, policy) {
 
 	if (tlsaobj != null) {
 		var result = tlsaobj.TLSAValidate(cert, len, options, resolver, domain, port, protocol, policy);
 		if (debugout) {
-		       	console.log("TLSAplugin return: " + result);
+		       	console.log("TLSAplugin return: " + result[0]);
 		}
 		return result[0];
 	}
-	else return null; 
-	
+	else return null; 	
 };
