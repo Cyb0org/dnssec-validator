@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Author</key>
+	<string>CZ.NIC Labs</string>
+	<key>Builder Version</key>
+	<string>9537.73.11</string>
+	<key>CFBundleDisplayName</key>
+	<string>DNSSEC/TLSA Validator</string>
+	<key>CFBundleIdentifier</key>
+	<string>cz.nic.labs.dnssec</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>Chrome</key>
+	<dict>
+		<key>Bars</key>
+		<array>
+			<dict>
+				<key>Filename</key>
+				<string>toolbar/toolbar.html</string>
+				<key>Identifier</key>
+				<string>dnssec-tlsa-bar</string>
+				<key>Label</key>
+				<string>DNSSEC/TLSA Validator</string>
+			</dict>
+		</array>
+		<key>Context Menu Items</key>
+		<array>
+			<dict>
+				<key>Command</key>
+				<string>onAbout</string>
+				<key>Identifier</key>
+				<string>IDabout</string>
+				<key>Title</key>
+				<string>About</string>
+			</dict>
+			<dict>
+				<key>Command</key>
+				<string>onHomepage</string>
+				<key>Identifier</key>
+				<string>IDhomepage</string>
+				<key>Title</key>
+				<string>Homepage</string>
+			</dict>
+			<dict>
+				<key>Command</key>
+				<string>OnSettings</string>
+				<key>Identifier</key>
+				<string>IDsettings</string>
+				<key>Title</key>
+				<string>Settings</string>
+			</dict>
+		</array>
+		<key>Database Quota</key>
+		<real>10485760</real>
+		<key>Global Page</key>
+		<string>global.html</string>
+		<key>Menus</key>
+		<array>
+			<dict>
+				<key>Identifier</key>
+				<string>DNSSEC Menu</string>
+				<key>Menu Items</key>
+				<array>
+					<dict>
+						<key>Command</key>
+						<string>onAboutClick</string>
+						<key>Identifier</key>
+						<string>DNSSECAboutMenu</string>
+						<key>Title</key>
+						<string>About...</string>
+					</dict>
+					<dict>
+						<key>Command</key>
+						<string>onHomepageClick</string>
+						<key>Identifier</key>
+						<string>DNSSECHomepageMenu</string>
+						<key>Title</key>
+						<string>Homepage...</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>Identifier</key>
+				<string>TLSA Menu</string>
+				<key>Menu Items</key>
+				<array>
+					<dict>
+						<key>Command</key>
+						<string>onAboutClick</string>
+						<key>Identifier</key>
+						<string>TLSAAboutMenu</string>
+						<key>Title</key>
+						<string>About</string>
+					</dict>
+					<dict>
+						<key>Command</key>
+						<string>onHomepageClick</string>
+						<key>Identifier</key>
+						<string>TLSAHomepageMenu</string>
+						<key>Title</key>
+						<string>Homepage...</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+		<key>Popovers</key>
+		<array>
+			<dict>
+				<key>Filename</key>
+				<string>popups/dnssecpopup.html</string>
+				<key>Height</key>
+				<real>240</real>
+				<key>Identifier</key>
+				<string>DNSSEC Status Popup</string>
+				<key>Width</key>
+				<real>320</real>
+			</dict>
+			<dict>
+				<key>Filename</key>
+				<string>popups/tlsapopup.html</string>
+				<key>Height</key>
+				<real>240</real>
+				<key>Identifier</key>
+				<string>TLSA Status Popup</string>
+				<key>Width</key>
+				<real>320</real>
+			</dict>
+		</array>
+		<key>Toolbar Items</key>
+		<array>
+			<dict>
+				<key>Command</key>
+				<string>onClickDNSSECbutton</string>
+				<key>Identifier</key>
+				<string>DNSSECbutton</string>
+				<key>Image</key>
+				<string>dnssec_icons/icon_green.png</string>
+				<key>Label</key>
+				<string>DNSSEC Button</string>
+				<key>Menu</key>
+				<string>DNSSEC Menu</string>
+				<key>Palette Label</key>
+				<string>DNSSEC button</string>
+				<key>Popover</key>
+				<string>DNSSEC Status Popup</string>
+				<key>Tool Tip</key>
+				<string>Shows DNSSEC status</string>
+			</dict>
+			<dict>
+				<key>Command</key>
+				<string>onClickTLSAbutton</string>
+				<key>Identifier</key>
+				<string>TLSAbutton</string>
+				<key>Image</key>
+				<string>tlsa_icons/tlsagreen.png</string>
+				<key>Label</key>
+				<string>TLSA Button</string>
+				<key>Menu</key>
+				<string>TLSA Menu</string>
+				<key>Palette Label</key>
+				<string>TLSA Button</string>
+				<key>Popover</key>
+				<string>TLSA Status Popup</string>
+				<key>Tool Tip</key>
+				<string>Shows TLSA status</string>
+			</dict>
+		</array>
+	</dict>
+	<key>Content</key>
+	<dict>
+		<key>Scripts</key>
+		<dict/>
+	</dict>
+	<key>Description</key>
+	<string>Checks whether domain names are secured by DNSSEC and checks certificate via TLSA records</string>
+	<key>ExtensionInfoDictionaryVersion</key>
+	<string>1.0</string>
+	<key>Permissions</key>
+	<dict>
+		<key>Website Access</key>
+		<dict>
+			<key>Include Secure Pages</key>
+			<true/>
+			<key>Level</key>
+			<string>All</string>
+		</dict>
+	</dict>
+	<key>Update Manifest URL</key>
+	<string>http://www.dnssec-validator.cz</string>
+	<key>Website</key>
+	<string>http://www.dnssec-validator.cz</string>
+</dict>
+</plist>
