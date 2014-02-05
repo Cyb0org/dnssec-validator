@@ -100,7 +100,14 @@ struct dnssec_validation_ctx glob_val_ctx = {
 
 
 //*****************************************************************************
-/* comparison of IPv6 addresses as structure */
+/*
+ * comparison of IPv6 addresses as structure
+ *
+ * Returns:
+ *       1 when IPv6 addresses match,
+ *       0 when they do not match
+ *      -1 on error.
+ */
 // ----------------------------------------------------------------------------
 static
 int ipv6str_equal(const char *lhs, const char *rhs)
@@ -109,10 +116,14 @@ int ipv6str_equal(const char *lhs, const char *rhs)
 	struct in6_addr la, ra; /* Left and right address. */
 
 	ret = inet_pton(AF_INET6, lhs, &la);
-	assert(ret == 1);
+	if (ret != 1) {
+		return -1;
+	}
 
 	ret = inet_pton(AF_INET6, rhs, &ra);
-	assert(ret == 1);
+	if (ret != 1) {
+		return -1;
+	}
 
 	return memcmp(&la, &ra, sizeof(struct in6_addr)) == 0;
 }
@@ -688,8 +699,10 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+#define REMOTE_IPS "8.8.8.8"
 //#define REMOTE_IPS "2001:610:188:301:145::2:10"
-#define REMOTE_IPS NULL
+//#define REMOTE_IPS NULL
+//#define REMOTE_IPS ""
 
 	i = dnssec_validate(dname, options, resolver_addresses,
 	    REMOTE_IPS, &tmp);
