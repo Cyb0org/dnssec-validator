@@ -35,6 +35,9 @@ OpenSSL used as well as that of the covered work.
 #define _CA_STORES_H_
 
 
+#include "config_related.h"
+
+
 #include <openssl/x509.h>
 
 

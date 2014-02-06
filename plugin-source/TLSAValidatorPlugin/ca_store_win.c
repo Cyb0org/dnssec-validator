@@ -31,6 +31,9 @@ OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
 
+#include "config_related.h"
+
+
 #include "ca_stores.h"
 #include "common.h"
 
