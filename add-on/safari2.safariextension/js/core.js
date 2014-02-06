@@ -28,6 +28,7 @@ function InitDnssecPlugin(objectid) {
 
         var DNSSECPlugin = document.getElementById(objectid);
 	if (DNSSECPlugin) {
+		DNSSECPlugin.DNSSECCacheInit();
 		if (debugout) {
 			console.log("DNSSECplugin init ... DONE");
 		}
@@ -47,6 +48,7 @@ function InitTlsaPlugin(objectid) {
 
         var TLSAPlugin = document.getElementById(objectid);
 	if (TLSAPlugin) {
+		TLSAPlugin.TLSACacheInit();
 		if (debugout) {
 			console.log("TLSAplugin init ... DONE");
 		}

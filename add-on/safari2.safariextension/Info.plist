@@ -117,7 +117,7 @@
 				<key>Height</key>
 				<real>240</real>
 				<key>Identifier</key>
-				<string>DNSSEC Status Popup</string>
+				<string>DNSSECPopup</string>
 				<key>Width</key>
 				<real>320</real>
 			</dict>
@@ -127,7 +127,7 @@
 				<key>Height</key>
 				<real>240</real>
 				<key>Identifier</key>
-				<string>TLSA Status Popup</string>
+				<string>TLSAPopup</string>
 				<key>Width</key>
 				<real>320</real>
 			</dict>
@@ -135,40 +135,16 @@
 		<key>Toolbar Items</key>
 		<array>
 			<dict>
-				<key>Command</key>
-				<string>onClickDNSSECbutton</string>
 				<key>Identifier</key>
-				<string>DNSSECbutton</string>
+				<string>infos</string>
 				<key>Image</key>
-				<string>dnssec_icons/icon_green.png</string>
+				<string>icon.png</string>
 				<key>Label</key>
-				<string>DNSSEC Button</string>
-				<key>Menu</key>
-				<string>DNSSEC Menu</string>
-				<key>Palette Label</key>
-				<string>DNSSEC button</string>
+				<string>Validator info</string>
 				<key>Popover</key>
-				<string>DNSSEC Status Popup</string>
+				<string>DNSSECPopup</string>
 				<key>Tool Tip</key>
-				<string>Shows DNSSEC status</string>
-			</dict>
-			<dict>
-				<key>Command</key>
-				<string>onClickTLSAbutton</string>
-				<key>Identifier</key>
-				<string>TLSAbutton</string>
-				<key>Image</key>
-				<string>tlsa_icons/tlsagreen.png</string>
-				<key>Label</key>
-				<string>TLSA Button</string>
-				<key>Menu</key>
-				<string>TLSA Menu</string>
-				<key>Palette Label</key>
-				<string>TLSA Button</string>
-				<key>Popover</key>
-				<string>TLSA Status Popup</string>
-				<key>Tool Tip</key>
-				<string>Shows TLSA status</string>
+				<string>Validator</string>
 			</dict>
 		</array>
 	</dict>

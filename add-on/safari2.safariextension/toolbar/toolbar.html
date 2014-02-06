@@ -25,6 +25,25 @@ DNSSEC/TLSA Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 	<title>DNSSEC/TLSA Validator</title>
 	<script src="../js/npapi.js"></script> 
 	<script src="../js/core.js"></script>
+    	<style>
+.dnssec-button {
+	background-color: transparent;
+	background-repeat: no-repeat;
+	border: none; 
+	cursor: pointer;
+	vertical-align: middle;
+	padding : 0px;
+}
+
+.tlsa-button {
+	background-color: transparent;
+	background-repeat: no-repeat;
+	border: none; 
+	cursor: pointer;
+	vertical-align: middle;
+	padding : 0 0 0 10px;
+}
+	</style>
 </head>
 <body>
 
@@ -32,12 +51,37 @@ DNSSEC/TLSA Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <object id="tlsa" type="application/x-tlsavalidatorplugin" width="0" height="0">TLSAPlugin FAILED to load</object> 
 <script type="text/javascript">
 
+// default settings
 var defaultresolver = "217.31.204.130";
 var blankstate = -99;
 
+// TLSA validator settings
+var https_default_port = "443";
+var ftps_default_port = "990";
+var protocol = "tcp";
+var certlen = 0;
+
+// Plugins initialization
 var dnssecobj= InitDnssecPlugin("dnssec");
 var tlsaobj = InitTlsaPlugin("tlsa");
 
+
+//*****************************************************
+// Show popup dialog when DNSSEC/TLSA icon was click
+//*****************************************************
+function showPopover(popoverId) {
+
+	if (debugout) {
+		console.log("DNSSEC Window opne");
+	}
+
+	var toolbarItemId = "infos";
+	var toolbarItem = safari.extension.toolbarItems.filter(function (tbi) {
+	return tbi.identifier == toolbarItemId && tbi.browserWindow == safari.application.activeBrowserWindow;})[0];
+	var popover = safari.extension.popovers.filter(function (po) { return po.identifier == popoverId;})[0];
+	toolbarItem.popover = popover;
+	toolbarItem.showPopover();  
+};
 
 
 //*****************************************************
@@ -84,6 +128,10 @@ function ExcludeDomainList(domain) {
 //****************************************************************
 function getHttpSheme(taburl){
 
+	if (taburl == undefined) return null;
+	if (taburl == null) return null;
+	if (taburl == "") return null;
+
 	if (taburl.indexOf("https") != -1) return "https";
 	else if (taburl.indexOf("http") != -1) return "http";
 	else if (taburl.indexOf("ftps") != -1) return "ftps";
@@ -104,19 +152,6 @@ function getDomainAndPort(taburl) {
 	var tmp = taburl.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(:[0-9]+)*(:)?/);
 	return [tmp[1], tmp[2]];
 };
-
-//****************************************************************
-// get port number from url
-//****************************************************************
-function getPortFromUrl(taburl){
-
-	if (taburl == undefined) return null;
-	if (taburl == null) return null;
-	if (taburl == "") return null;
-
-	var port = taburl.match(/^(?:[\w-]+:\/+)?\[?([\w\.\[\]\:-]+)\]?(?::)*(?::\d+)?/)[1];
-	return port;
-}
 
 //****************************************************************
 // get domain name from url
@@ -142,13 +177,21 @@ function setIcon(file, object){
 };
 
 //****************************************************************
+// set icon tooltip
+//****************************************************************
+function UpdateTooltip(text, object) {
+	
+	document.getElementById(object).title = text;
+};
+
+//****************************************************************
 // set DNSSEC mode - icon, text, tooltip etc..
 //****************************************************************
 function setDnssecMode(dresult) {
 
 	var c = dnssecExtNPAPIConst;
 	var file = "dnssec_init.png";
-
+	var tooltip = "XXX";
 	switch (dresult) {
 	case c.DNSSEC_COT_DOMAIN_SECURED: 
 		file = "dnssec_valid.png";
@@ -191,15 +234,17 @@ function setDnssecMode(dresult) {
 		break;
 	}
 	setIcon(file,"dnssecicon");
+	UpdateTooltip(tooltip, "dnssecbutton");
 };
 
 //****************************************************************
 // set TLSA mode - icon, text, tooltip etc..
 //****************************************************************
-function setTlsaMode(tresult) {
+function setTlsaMode(tresult, scheme, domain, ports) {
 
 	var c = tlsaExtNPAPIConst;
 	var file = "tlsa_init.png";
+	var tooltip = "ZZZ";
 
 	switch (tresult) {
 	case c.DANE_VALID_TYPE0:
@@ -267,6 +312,7 @@ function setTlsaMode(tresult) {
 		break;
 	}
 	setIcon(file,"tlsaicon");
+	UpdateTooltip(tooltip, "tlsabutton");
 };
 
 
@@ -291,13 +337,12 @@ function tmp(){
 //****************************************************************
 function checkDnssec(url) {
 
-	var domain = getDomainFromUrl(url);
-
-	if (domain == null) {
+	var domainport = getDomainAndPort(url);
+	if (domainport == null) {
 		setDnssecMode(blankstate);
 		return;		
 	}
-
+	var domain = domainport[0];
     	var c = this.dnssecExtNPAPIConst;
 	var result = c.DNSSEC_OFF;
 
@@ -329,6 +374,25 @@ function checkDnssec(url) {
 };
 
 //****************************************************************
+// return correct port number for plugin and popup text
+//****************************************************************
+function getCorrectPorts(scheme, tmpport){
+
+	var portplugin;
+	var portpopup;
+
+	if (scheme == "https" || scheme == "http") {
+		portplugin = (tmpport == undefined) ? https_default_port : tmpport.substring(1);	
+		portpopup = (tmpport == undefined) ? "" : tmpport;
+	}
+	if (scheme == "ftps" || scheme == "ftp") {
+		portplugin = (tmpport == undefined) ? ftps_default_port : tmpport.substring(1);
+		portpopup = (tmpport == undefined) ? "" : tmpport;
+	}
+	return [portplugin, portpopup];
+};
+
+//****************************************************************
 // check TLSA status
 //****************************************************************
 function checkTlsa(url) {
@@ -336,17 +400,22 @@ function checkTlsa(url) {
     	var c = this.tlsaExtNPAPIConst;
 	var result = c.DANE_OFF;
 
+	var scheme = getHttpSheme(url);
+	if (scheme == null) {
+		setTlsaMode(blankstate, null, null, null);
+		return;		
+	}
+	var domainport = getDomainAndPort(url);
+	if (domainport == null) {
+		setTlsaMode(blankstate, null, null, null);
+		return;		
+	}
+	var domain = domainport[0];
+	var ports = getCorrectPorts(scheme, domainport[1]);
+
 	if (safari.extension.settings.tlsaon) {
-
-		var domain = getDomainFromUrl(url);
-		if (domain == null) {
-			setTlsaMode(blankstate);
-			return;		
-		}
-
 		if (ExcludeDomainList(domain)) {
 
-			var scheme = getHttpSheme(url);
 			if (scheme == "https" || scheme == "ftps") {
 
 				var resolver = this.getResolver();
@@ -356,27 +425,25 @@ function checkTlsa(url) {
 				if (reschoice == 3) options |= c.DANE_FLAG_USEFWD;
 				var cert = new Array();
 				cert.push("00FF");
-				var port = "443";
-				var protocol = "tcp";
 				if (debugout) {
-					console.log("TLSAplugin request: {certchain}, 1, " +options+", "+resolver+", "+domain+", "+port+", "+protocol+", 1");
+					console.log("TLSAplugin request: {certchain}, 1, " +options+", "+resolver+", "+domain+", "+ports[0]+", "+protocol+", 1");
 				}
 
-				result = TlsaValidate(cert, 1, options, resolver, domain, port, protocol, 1);
+				result = TlsaValidate(cert, certlen, options, resolver, domain, ports[0], protocol, 1);
 				if (result != null) {
-					setTlsaMode(result);
+					setTlsaMode(result, scheme, domain, ports[1]);
 				} else {
-					setTlsaMode(c.DANE_ERROR_GENERIC);
+					setTlsaMode(c.DANE_ERROR_GENERIC, scheme, domain, ports[1]);
 				}
 
 			} else {
-				setTlsaMode(c.DANE_NO_HTTPS);
+				setTlsaMode(c.DANE_NO_HTTPS, scheme, domain, ports[1]);
 			}
 		} else {
-			setTlsaMode(result);
+			setTlsaMode(result, scheme, domain, ports[1]);
 		}
 	} else {
-		setTlsaMode(result);	
+		setTlsaMode(result, scheme, domain, ports[1]);	
 	}
 };
 
@@ -415,12 +482,16 @@ var OnBeforeNavigate = function(event) {
 safari.application.addEventListener("activate", OnTabActivate, true);
 safari.application.addEventListener("beforeNavigate", OnBeforeNavigate, true);
 
+//<span style="vertical-align: top;">DNSSEC: </span><a href="#" onclick="doDnssecPopup();"><img id="xx" src="dnssec_init.png" alt="DNSSEC state" width="20" height="20" title="DNSSEC Validator"></a>
+//&nbsp;&nbsp;
+//<span style="vertical-align: top;">TLSA: </span> <a href="#" onclick="doTlsaPopup();"><img id="tlsaicon" src="tlsa_init.png" alt="TLSA state" width="20" height="20" title="TLSA Validator"></a>
+//<INPUT type="button" value="New Window!" onClick="window.open('../popups/dnssecpopup.html','mywindow','width=400,height=200,left=0,top=100,screenX=0,screenY=100')">
+
 </script>
 
+<button type="Submit" class="dnssec-button" id="dnssecbutton" title="DNSSEC Validator" onclick="showPopover('DNSSECPopup');">DNSSEC:&nbsp;&nbsp;<img id="dnssecicon" src="dnssec_init.png" alt="DNSSEC Validator" width="20" height="20"></button>
 
-<span style="vertical-align: top;">DNSSEC: </span> <a href="#" onclick="alert('Helou')"><img id="dnssecicon" src="dnssec_init.png" alt="DNSSEC state" width="20" height="20"></a>
-&nbsp;&nbsp;
-<span style="vertical-align: top;">TLSA: </span> <a href="#" onclick="alert('Helou')"><img id="tlsaicon" src="tlsa_init.png" alt="TLSA state" width="20" height="20"></a>
+<button type="Submit" class="tlsa-button" id="tlsabutton" title="TLSA Validator" onclick="showPopover('TLSAPopup');">TLSA:&nbsp;&nbsp;<img id="tlsaicon" src="tlsa_init.png" alt="TLSA Validator" width="20" height="20"></button>
 
 </body>
 </html>
