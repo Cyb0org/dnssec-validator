@@ -81,16 +81,23 @@ extern int global_debug;
 /*!
  * @brief Prints debugging information.
  *
+ * @param[in] prefix String prefix.
+ * @param[in] fmt    Format string -- follows printf(3) format.
+ */
+int _debug_log(const char *prefix, const char *fmt, ...)
+   __attribute__((format(printf, 2, 3)));
+
+
+/*!
+ * @brief Prints debugging information.
+ *
  * @param[in] pref Mesage prefix.
  * @param[in] fmt  Format of the message.
  */
 #define printf_debug(pref, fmt, ...) \
 	do { \
 		if (global_debug && (fmt != NULL)) { \
-			if (pref != NULL) { \
-				fputs(pref, DEBUG_OUTPUT); \
-			} \
-			fprintf(DEBUG_OUTPUT, fmt, __VA_ARGS__); \
+			_debug_log(pref, fmt, __VA_ARGS__); \
 		} \
 	} while (0)
 
