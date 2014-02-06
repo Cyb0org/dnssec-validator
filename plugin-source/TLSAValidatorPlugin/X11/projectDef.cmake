@@ -17,11 +17,13 @@ SOURCE_GROUP(X11 FILES ${PLATFORM})
 
 # use this to add preprocessor definitions
 add_definitions(
+  -DTGT_SYSTEM=TGT_DFLT
   -DCA_STORE=DIR_CA_STORE
 )
 
 set (SOURCES
     ${SOURCES}
+    ../common/log_dflt.c
     ca_store_directory.c
     ${PLATFORM}
     )

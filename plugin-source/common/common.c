@@ -31,12 +31,14 @@ OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
 
+#include "config_related.h"
+
+
 #include <errno.h>
-#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 
-#if defined RES_WIN
+#if TGT_SYSTEM == TGT_WIN
    #include "libunbound/unbound.h"
 #else
    #include "unbound.h"
@@ -50,25 +52,6 @@ OpenSSL used as well as that of the covered work.
  * Default is off.
  */
 int global_debug = 0;
-
-
-/*
- * Prints debugging information.
- */
-int _debug_log(const char *prefix, const char *fmt, ...)
-{
-	va_list argp;
-
-	if (prefix != NULL) {
-		fputs(prefix, DEBUG_OUTPUT);
-	}
-
-	va_start(argp, fmt);
-	vfprintf(DEBUG_OUTPUT, fmt, argp);
-	va_end(argp);
-
-	return 0;
-}
 
 
 /*

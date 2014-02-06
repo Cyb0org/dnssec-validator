@@ -29,8 +29,12 @@ such a combination shall include the source code for the parts of
 OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
+
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
+#include "config_related.h"
+
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -45,7 +49,7 @@ OpenSSL used as well as that of the covered work.
 #include "dnssec-states.gen"
 
 
-#ifdef RES_WIN
+#if TGT_SYSTEM == TGT_WIN
 /* Windows */
 #include "ldns/config.h"
 #include "ldns/ldns.h"

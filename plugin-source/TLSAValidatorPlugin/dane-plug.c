@@ -32,6 +32,9 @@ OpenSSL used as well as that of the covered work.
 #define _POSIX_SOURCE
 
 
+#include "config_related.h"
+
+
 #define NONE_CA_STORE 0 /* No external CA store is loaded. */
 #define DIR_CA_STORE 1 /* CA certificates stored in directories. */
 #define NSS_CA_STORE 2 /* NSS built-in CA certificates. */
@@ -63,7 +66,7 @@ OpenSSL used as well as that of the covered work.
 #include "dane-plug.h"
 #include "dane-states.gen"
 
-#if defined RES_WIN
+#if TGT_SYSTEM == TGT_WIN
 /* Windows */
   #include "ldns/config.h"
   #include "ldns/ldns.h"

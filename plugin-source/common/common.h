@@ -35,8 +35,12 @@ OpenSSL used as well as that of the covered work.
 #define _COMMON_H_
 
 
+#include "config_related.h"
+
+
 #include <stdbool.h>
-#include <stdio.h>
+
+#include "log.h"
 
 
 #ifdef __cplusplus
@@ -76,16 +80,6 @@ extern int global_debug;
 
 /* Default output used for debugging. */
 #define DEBUG_OUTPUT stderr
-
-
-/*!
- * @brief Prints debugging information.
- *
- * @param[in] prefix String prefix.
- * @param[in] fmt    Format string -- follows printf(3) format.
- */
-int _debug_log(const char *prefix, const char *fmt, ...)
-   __attribute__((format(printf, 2, 3)));
 
 
 /*!
