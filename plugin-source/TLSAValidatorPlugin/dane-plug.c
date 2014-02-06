@@ -286,10 +286,13 @@ int create_socket(const char *domain, const char *port_str)
 	error = WSAStartup( version, &wsaData );
 
 	/* check for error */
-	if ( error != 0 ) return -1;
+	if (error != 0) {
+		return -1;
+	}
 
 	/* check for correct version */
-	if ( LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 0) {
+	if ((LOBYTE(wsaData.wVersion) != 2) ||
+	    (HIBYTE(wsaData.wVersion) != 0)) {
 		WSACleanup();
 		return -1;
 	}
@@ -305,7 +308,7 @@ int create_socket(const char *domain, const char *port_str)
 	if (getaddrres != 0) {
 		printf_debug(DEBUG_PREFIX_CERT, "Error: getaddrinfo: %s\n",
 		    gai_strerror(getaddrres));
-		exit(EXIT_FAILURE);
+		return -1;
 	}
 
 	for (rp = result; rp != NULL; rp = rp->ai_next) {
@@ -324,7 +327,7 @@ int create_socket(const char *domain, const char *port_str)
 	if (rp == NULL) {               /* No address succeeded */
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 		    "Could not connect to remote server!");
-		exit(EXIT_FAILURE);
+		return -1;
 	}
 
 	freeaddrinfo(result);           /* No longer needed */
@@ -1099,7 +1102,7 @@ int get_cert_list(SSL_CTX *ssl_ctx, char *dest_url,
 	server_fd = create_socket(domain, port);
 	if(server_fd == -1) {
 		printf_debug(DEBUG_PREFIX_CERT,
-		    "Error TCP connection to: %s.\n", dest_url);
+		    "Error establishing TCP connection to: %s.\n", dest_url);
 		goto fail;
 	}
 
