@@ -15,7 +15,7 @@ file (GLOB PLATFORM RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
 # use this to add preprocessor definitions
 add_definitions(
-    
+  -DTGT_SYSTEM=TGT_OSX
 )
 
 
@@ -23,6 +23,7 @@ SOURCE_GROUP(Mac FILES ${PLATFORM})
 
 set (SOURCES
     ${SOURCES}
+    ../common/log_osx.m
     ${PLATFORM}
     )
 
@@ -55,6 +56,8 @@ add_library(crypto STATIC IMPORTED)
 set_property(TARGET crypto PROPERTY IMPORTED_LOCATION
              ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/openssl/lib/libcrypto.a)
 
+FIND_LIBRARY(COCOA_FRAMEWORK Cocoa)
+
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
 target_link_libraries(${PROJECT_NAME}
     ${PLUGIN_INTERNAL_DEPS}
@@ -62,6 +65,7 @@ target_link_libraries(${PROJECT_NAME}
     ldns
     ssl
     crypto
+    ${COCOA_FRAMEWORK}
     )
 
 #To create a DMG, include the following file
