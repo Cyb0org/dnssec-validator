@@ -78,10 +78,6 @@ extern int global_debug;
 	"TDN0YUuWrBNh"
 
 
-/* Default output used for debugging. */
-#define DEBUG_OUTPUT stderr
-
-
 /*!
  * @brief Prints debugging information.
  *

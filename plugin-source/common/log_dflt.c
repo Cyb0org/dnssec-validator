@@ -40,6 +40,10 @@ OpenSSL used as well as that of the covered work.
 #include "log.h"
 
 
+/* Default output used for debugging. */
+#define DEBUG_OUTPUT stderr
+
+
 /*
  * Prints debugging information.
  */

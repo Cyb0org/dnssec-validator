@@ -58,8 +58,9 @@ OpenSSL used as well as that of the covered work.
 #include <unistd.h>
 
 #include "ldns/wire2host.h"
-#include "openssl/x509.h"
+#include "openssl/bio.h"
 #include "openssl/evp.h"
+#include "openssl/x509.h"
 
 #include "ca_stores.h"
 #include "common.h"
@@ -634,6 +635,8 @@ void print_certlist_debug(const struct cert_store_head *cert_list)
 	unsigned num;
 	X509 *cert_x509 = NULL;
 	const unsigned char *cert_der;
+	BIO *mem_bio;
+	char *bio_data;
 
 	if (!global_debug) {
 		/* Function prints only debugging information. */
@@ -649,11 +652,25 @@ void print_certlist_debug(const struct cert_store_head *cert_list)
 		cert_der = (unsigned char *) tmp->cert_der;
 		cert_x509 = d2i_X509(NULL, &cert_der, tmp->cert_len);
 		if (cert_x509 != NULL) {
-			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
-			    "Certificate in text format:");
-			X509_print_ex_fp(DEBUG_OUTPUT, cert_x509,
-			    XN_FLAG_COMPAT, X509_FLAG_COMPAT);
-			X509_free(cert_x509); cert_x509 = NULL;
+			mem_bio = BIO_new(BIO_s_mem());
+			if (mem_bio != NULL) {
+				printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+				    "Certificate in text format:");
+				X509_print_ex(mem_bio, cert_x509,
+				    XN_FLAG_COMPAT, X509_FLAG_COMPAT);
+				X509_free(cert_x509); cert_x509 = NULL;
+
+				BIO_get_mem_data(mem_bio, &bio_data);
+
+				/* Already contains new line at the end. */
+				printf_debug(DEBUG_PREFIX_CERT, "%s",
+				    bio_data);
+
+				BIO_free(mem_bio);
+			} else {
+				printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+				    "Cannot create memory BIO.\n");
+			}
 		} else {
 			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 			    "Cannot convert certificate into text format.");
