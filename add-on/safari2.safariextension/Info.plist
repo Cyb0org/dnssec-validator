@@ -115,7 +115,7 @@
 				<key>Filename</key>
 				<string>popups/dnssecpopup.html</string>
 				<key>Height</key>
-				<real>240</real>
+				<string></string>
 				<key>Identifier</key>
 				<string>DNSSECPopup</string>
 				<key>Width</key>
@@ -125,7 +125,7 @@
 				<key>Filename</key>
 				<string>popups/tlsapopup.html</string>
 				<key>Height</key>
-				<real>240</real>
+				<string></string>
 				<key>Identifier</key>
 				<string>TLSAPopup</string>
 				<key>Width</key>

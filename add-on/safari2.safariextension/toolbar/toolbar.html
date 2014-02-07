@@ -25,6 +25,8 @@ DNSSEC/TLSA Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 	<title>DNSSEC/TLSA Validator</title>
 	<script src="../js/npapi.js"></script> 
 	<script src="../js/core.js"></script>
+	<script src="../locale/dnssecmessages.js"></script>
+	<script src="../locale/tlsamessages.js"></script>
     	<style>
 .dnssec-button {
 	background-color: transparent;
@@ -54,6 +56,7 @@ DNSSEC/TLSA Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 // default settings
 var defaultresolver = "217.31.204.130";
 var blankstate = -99;
+var iconbaseurl = "../toolbar/";
 
 // TLSA validator settings
 var https_default_port = "443";
@@ -64,16 +67,29 @@ var certlen = 0;
 // Plugins initialization
 var dnssecobj= InitDnssecPlugin("dnssec");
 var tlsaobj = InitTlsaPlugin("tlsa");
+const myGlobal = safari.extension.globalPage.contentWindow;
 
 
-//*****************************************************
-// Show popup dialog when DNSSEC/TLSA icon was click
-//*****************************************************
-function showPopover(popoverId) {
 
-	if (debugout) {
-		console.log("DNSSEC Window opne");
+function loadStringFromFile(filepath, itemid) {
+
+	var string = "";	
+	var len;
+	var file = fopen("../locale/en/test.msg",0);
+	if (file != -1) {
+		len = flenght(file);
+		if (debugout) {
+			console.log("\nlen("+ len +")");
+		}		
 	}
+//	return string;
+}
+
+
+//*********************************************************
+// Show popup dialog when DNSSEC/TLSA icon was click
+//*********************************************************
+function showPopover(popoverId) {
 
 	var toolbarItemId = "infos";
 	var toolbarItem = safari.extension.toolbarItems.filter(function (tbi) {
@@ -84,9 +100,9 @@ function showPopover(popoverId) {
 };
 
 
-//*****************************************************
+//************************************************************
 // Return true/false if domain name is in exclude domain list
-//*****************************************************
+//************************************************************
 function ExcludeDomainList(domain) {
 
 	var result = true;
@@ -185,56 +201,139 @@ function UpdateTooltip(text, object) {
 };
 
 //****************************************************************
+// set DNSSEC popup infos into globalpage
+//****************************************************************
+function setDnssecPopup(domain, icon, tooltip, textpre, textpost, detail){
+
+	myGlobal.dnssec_domain = domain;
+	myGlobal.dnssec_icon = icon;
+	myGlobal.dnssec_textpre = textpre;
+	myGlobal.dnssec_textpost = textpost;
+	myGlobal.dnssec_detail = detail;
+	myGlobal.dnssec_tooltip = tooltip;
+};
+
+//****************************************************************
+// set TLSA popup infos into globalpage
+//****************************************************************
+function setTlsaPopup(domain, icon, tooltip, text, detail){
+
+	myGlobal.tlsa_domain = domain;
+	myGlobal.tlsa_icon = icon;
+	myGlobal.tlsa_text = text;
+	myGlobal.tlsa_detail = detail;
+	myGlobal.tlsa_tooltip = tooltip;
+};
+
+//****************************************************************
 // set DNSSEC mode - icon, text, tooltip etc..
 //****************************************************************
-function setDnssecMode(dresult) {
+function setDnssecMode(dresult, domain) {
 
 	var c = dnssecExtNPAPIConst;
 	var file = "dnssec_init.png";
-	var tooltip = "XXX";
+	var tooltip = "DNSSEC Validator";
+	var textpre = "";
+	var textpost = "";
+	var detail = "";
+
 	switch (dresult) {
 	case c.DNSSEC_COT_DOMAIN_SECURED: 
 		file = "dnssec_valid.png";
+		tooltip = txt_tooltip_dnssecok;
+		textpre = txt_pre_domain;
+		textpost = txt_post_2securedConnectionDomain;
+		detail = txt_detail_2securedConnectionDomainInfo;
 		break;
 	case c.DNSSEC_COT_DOMAIN_SECURED_BAD_IP:
 		file = "dnssec_ip.png";
+		tooltip = txt_tooltip_dnssecok;
+		textpre = txt_pre_domain;
+		textpost = txt_post_3securedConnectionDomainInvIPaddr;
+		detail = txt_detail_3securedConnectionDomainInvIPaddrInfo;
 		break;	
 	case c.DNSSEC_NXDOMAIN_SIGNATURE_VALID: 
 		file = "dnssec_valid.png";
+		tooltip = txt_tooltip_dnssecok;
+		textpre = txt_preno_domain;
+		textpost = txt_post_6securedConnectionNoDomain;
+		detail = txt_detail_6securedConnectionNoDomainInfo;
 		break;
 	case c.DNSSEC_COT_DOMAIN_BOGUS:
 		file = "dnssec_bogus.png";
+		tooltip = txt_tooltip_dnssecbogus;
+		textpre = txt_pre_domain;
+		textpost = txt_post_4invalidDomainSignature;
+		detail = txt_detail_4invalidDomainSignatureInfo;
 		break;
 	case c.DNSSEC_NXDOMAIN_SIGNATURE_INVALID:
 		file = "dnssec_bogus.png";
+		tooltip = txt_tooltip_dnssecbogus;
+		textpre = txt_preno_domain;
+		textpost = txt_post_7invalidNoDomainSignature;
+		detail = txt_detail_7invalidNoDomainSignatureInfo;
 		break;
 	case c.DNSSEC_DOMAIN_UNSECURED:
 		file = "dnssec_no.png";
+		tooltip = txt_tooltip_dnssecnone;
+		textpre = txt_pre_domain;
+		textpost = txt_post_1unsecuredDomain;
+		detail = txt_detail_1unsecuredDomainInfo;
 		break;
 	case c.DNSSEC_NXDOMAIN_UNSECURED:
 		file = "dnssec_no.png";
+		tooltip = txt_tooltip_dnssecnone;
+		textpre = txt_preno_domain;
+		textpost = txt_post_5unsecuredNoDomain;
+		detail = txt_detail_5unsecuredNoDomainInfo;
 		break;
 	case c.DNSSEC_OFF:
 		file = "dnssec_off.png";
+		tooltip = txt_tooltip_validatoroff;
+		textpre = txt_pre_domain;
+		textpost = txt_post_dnsseOff;
+		detail = txt_detail_dnsseOffInfo;
 		break;
 	case c.DNSSEC_RESOLVER_NO_DNSSEC:
 		file = "dnssec_error.png";
+		tooltip = txt_tooltip_dnssecwrongres;
+		textpre = txt_pre_domain;
+		textpost = txt_post_dnssecWrongResolver;
+		detail = txt_detail_dnssecWrongResolverInfo;
 		break;
 	case c.DNSSEC_ERROR_RESOLVER:
 		file = "dnssec_error.png";
+		tooltip = txt_tooltip_dnssecfail;
+		textpre = txt_pre_domain;
+		textpost = txt_post_0dnssecError;
+		detail = txt_detail_0dnssecErrorInfo;
 		break;
 	case c.DNSSEC_UNBOUND_NO_DATA:
 		file = "dnssec_error.png";
+		tooltip = txt_tooltip_dnssecfail;
+		textpre = txt_pre_domain;
+		textpost = txt_post_unboundnodata;
+		detail = txt_detail_unboundnodataInfo;
 		break;
 	case c.DNSSEC_ERROR_GENERIC:
 		file = "dnssec_error.png";
+		tooltip = txt_tooltip_dnssecfail;
+		textpre = txt_pre_domain;
+		textpost = txt_post_dnssecgenericError;
+		detail = txt_detail_dnssecgenericErrorInfo;
 		break;
 	default:
 		file = "dnssec_init.png";
+		textpre = "DNSSEC Validator allows you to check the existence and validity of DNSSEC signed DNS records.";
+		textpost = "";
+		domain = "";
+		detail = "DNSSEC Validator allows you to check the existence and validity of DNSSEC signed DNS records.";
 		break;
 	}
+
 	setIcon(file,"dnssecicon");
 	UpdateTooltip(tooltip, "dnssecbutton");
+	setDnssecPopup(domain, iconbaseurl+file, tooltip, textpre, textpost, detail);
 };
 
 //****************************************************************
@@ -244,75 +343,142 @@ function setTlsaMode(tresult, scheme, domain, ports) {
 
 	var c = tlsaExtNPAPIConst;
 	var file = "tlsa_init.png";
-	var tooltip = "ZZZ";
+	var tooltip = "TLSA Validator";
+	var text = "";
+	var detail = "";
 
 	switch (tresult) {
 	case c.DANE_VALID_TYPE0:
 		file = "tlsa_valid.png";
+		tooltip = dmvsTooltip;
+		text = dm_vs0;
+		detail = dm_vs0Info;
 		break;
 	case c.DANE_VALID_TYPE1: 
 		file = "tlsa_valid.png";
+		tooltip = dmvsTooltip;
+		text = dm_vs1;
+		detail = dm_vs1Info;
 		break;
 	case c.DANE_VALID_TYPE2: 
 		file = "tlsa_valid.png";
+		tooltip = dmvsTooltip;
+		text = dm_vs2;
+		detail = dm_vs2Info;
 		break;
 	case c.DANE_VALID_TYPE3: 
 		file = "tlsa_valid.png";
+		tooltip = dmvsTooltip;
+		text = dm_vs3;
+		detail = dm_vs3Info;
 		break;
 	case c.DANE_DNSSEC_SECURED: 
 		file = "tlsa_orange.png";
+		tooltip = dmaTooltip;
+		text = tooltip;
+		detail = tooltip;
 		break;
 	case c.DANE_OFF: 
 		file = "tlsa_off.png";
+		tooltip = dmoffTooltip;
+		text = dm_validationoff;
+		detail = dm_validationoffInfo;
 		break;
 	case c.DANE_ERROR_RESOLVER: 
 		file = "tlsa_error.png";
+		tooltip = dmfsTooltip;
+		text = dm_rfesolverfailed;
+		detail = dm_rfesolverfailedInfo;
 		break;
 	case c.DANE_NO_HTTPS: 
 		file = "tlsa_nohttps.png";
+		tooltip = dmnohttpsTooltip ;
+		text = dm_nohttps;
+		detail = dm_nohttpsInfo;
 		break;
 	case c.DANE_NO_TLSA: 
 		file = "tlsa_no.png";
+		tooltip = dmntrTooltip;
+		text = dm_notlsarecord;
+		detail = dm_notlsarecordInfo;
 		break;
 	case c.DANE_DNSSEC_UNSECURED:
 		file = "tlsa_nodnssec.png";
+		tooltip = dmdnssecunsecTooltip;
+		text = dm_dnssecunsecured;
+		detail = dm_dnssecunsecuredInfo;
 		break;
 	case c.DANE_DNSSEC_BOGUS: 
 		file = "tlsa_invalid.png";
+		tooltip = dmdnssecbogusTooltip;
+		text = dm_dnssecbogus;
+		detail = dm_dnssecbogusInfo;
 		break;
 	case c.DANE_NO_CERT_CHAIN: 
 		file = "tlsa_orange.png";
+		tooltip = dmnccTooltip;
+		text = dm_certchain;
+		detail = dm_certchainInfo;
 		break;
 	case c.DANE_CERT_ERROR: 
 		file = "tlsa_orange.png";
+		tooltip = dmnccTooltip;
+		text = dm_certerr;
+		detail = dm_certerrInfo;
 		break;
 	case c.DANE_TLSA_PARAM_ERR: 
 		file = "tlsa_invalid.png";
+		tooltip = dmwpTooltip;
+		text = dm_tlsapramwrong;
+		detail = dm_tlsapramwrongInfo;
 		break;
 	case c.DANE_INVALID_TYPE0: 
 		file = "tlsa_invalid.png";
+		tooltip = dmvfTooltip;
+		text = dm_vf0;
+		detail = dm_vf0Info;
 		break;
 	case c.DANE_INVALID_TYPE1: 
 		file = "tlsa_invalid.png";
+		tooltip = dmvfTooltip;
+		text = dm_vf1;
+		detail = dm_vf1Info;
 		break;
 	case c.DANE_INVALID_TYPE2: 
 		file = "tlsa_invalid.png";
+		tooltip = dmvfTooltip;
+		text = dm_vf2;
+		detail = dm_vf2Info;
 		break;
 	case c.DANE_INVALID_TYPE3: 
 		file = "tlsa_invalid.png";
+		tooltip = dmvfTooltip;
+		text = dm_vf3;
+		detail = dm_vf3Info;
 		break;
 	case c.DANE_RESOLVER_NO_DNSSEC: 
 		file = "tlsa_error.png";
+		tooltip = dmvsTooltipwrongres;
+		text = dnssecWrongResolver;
+		detail = dnssecWrongResolverInfo;
 		break;
 	case c.DANE_ERROR_GENERIC:
 		file = "tlsa_error.png";
+		tooltip = dmerrorgenericTooltip;
+		text = dm_errgen;
+		detail = dm_errgenInfo;
 		break;
 	default:
 		file = "tlsa_init.png";
+		domain = "";
+		tooltip = "TLSA Validator";
+		text = "TLSA Validator allows you to check the authenticity of a TLS/SSL certificate by DANE protocol.";
+		detail = "The authenticity of a TLS/SSL certificate for a domain name is verified by DANE protocol (RFC 6698).";
 		break;
 	}
 	setIcon(file,"tlsaicon");
 	UpdateTooltip(tooltip, "tlsabutton");
+	setTlsaPopup(domain, iconbaseurl+file, tooltip, text, detail);
 };
 
 
@@ -325,11 +491,13 @@ function getResolver() {
 	if (customResolver == null) return defaultresolver;
 	if (customResolver == "") return defaultresolver;
 	return customResolver;
-}; // getResolver
+};
 
-
-function tmp(){
-	var res = safari.extension.settings.blocking;
+//****************************************************************
+// blck hhtp request when the certificate not corresponds to tlsa
+//****************************************************************
+function onBlockHttps(){
+	var block = safari.extension.settings.blocking;
 };
 
 //****************************************************************
@@ -364,12 +532,12 @@ function checkDnssec(url) {
 
 		result = DnssecValidate(domain, options, resolver, ipbrowser);
 		if (result != null) {
-			setDnssecMode(result);
+			setDnssecMode(result, domain);
 		} else {
-			setDnssecMode(c.DNSSEC_ERROR_GENERIC);
+			setDnssecMode(c.DNSSEC_ERROR_GENERIC, domain);
 		}
 	} else {
-		setDnssecMode(result);
+		setDnssecMode(result, domain);
 	}
 };
 
@@ -455,7 +623,7 @@ var OnTabActivate = function(event) {
 	var taburl = safari.application.activeBrowserWindow.activeTab.url;
 	debugout = safari.extension.settings.debuglogout;
 	if (debugout) {
-		console.log("\nBrowser: OnTabActivate("+taburl+")");
+		console.log("\nBrowser: OnTabActivate("+ taburl +")");
 	}
 
 	checkDnssec(taburl);
@@ -469,7 +637,7 @@ var OnBeforeNavigate = function(event) {
 
 	debugout = safari.extension.settings.debuglogout;
 	if (debugout) {
-		console.log("\nBrowser: OnBeforeNavigate("+event.url+")");
+		console.log("\nBrowser: OnBeforeNavigate("+ event.url +")");
 	}
 
 	checkDnssec(event.url);
@@ -481,11 +649,6 @@ var OnBeforeNavigate = function(event) {
 //****************************************************************
 safari.application.addEventListener("activate", OnTabActivate, true);
 safari.application.addEventListener("beforeNavigate", OnBeforeNavigate, true);
-
-//<span style="vertical-align: top;">DNSSEC: </span><a href="#" onclick="doDnssecPopup();"><img id="xx" src="dnssec_init.png" alt="DNSSEC state" width="20" height="20" title="DNSSEC Validator"></a>
-//&nbsp;&nbsp;
-//<span style="vertical-align: top;">TLSA: </span> <a href="#" onclick="doTlsaPopup();"><img id="tlsaicon" src="tlsa_init.png" alt="TLSA state" width="20" height="20" title="TLSA Validator"></a>
-//<INPUT type="button" value="New Window!" onClick="window.open('../popups/dnssecpopup.html','mywindow','width=400,height=200,left=0,top=100,screenX=0,screenY=100')">
 
 </script>
 

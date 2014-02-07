@@ -1,33 +1,75 @@
 <!-- ***** BEGIN LICENSE BLOCK *****
-Copyright 2013 CZ.NIC, z.s.p.o.
+Copyright 2014 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz>
 
-This file is part of DNSSEC Validator 2.0 Add-on.
+This file is part of DNSSEC/TLSA Validator Add-on.
 
-DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
+DNSSEC/TLSA Validator Add-on is free software: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or (at your
 option) any later version.
 
-DNSSEC Validator 2.0 Add-on is distributed in the hope that it will be useful,
+DNSSEC/TLSA Validator Add-on is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 more details.
 
 You should have received a copy of the GNU General Public License along with
-DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
+DNSSEC/TLSA Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** -->
 
-<?xml version="1.0"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html>
 <head>
-<title>DNSSEC/TLSA Validator</title>
-<script type="text/javascript" src="js/dnssec.js" charset="utf-8"></script>
-<script type="text/javascript" src="js/tlsa.js" charset="utf-8"></script>
+    <style>
+        body {
+		font: 0.9em Verdana, Arial, Helvetica; max-width: 43em;
+	        min-width:300px;
+        	overflow-x:hidden;
+        }
+	td {
+		vertical-align: top;
+		padding-right: 8px;
+		padding-bottom: 10px;
+		font-size: 90%;
+	}
+	#divright {
+		text-align: left; 
+		font-size: 100%; 
+		padding-top: 10px; 
+		display: block;
+	}
+	#detail-text {
+		text-align: left;
+		font-size: 90%;
+		padding-top: 10px;
+		display: none;
+	}
+	#homepage {
+		text-align: left;
+		font-size: 80%;
+		padding-top: 10px;
+		display: none;
+	}
+	span {
+		font-size: 90%;
+	}
+    </style>
 </head>
-<body>
-TLSA POPUP
+
+<body>	
+	<table>
+	<tr><td>
+		<img id="popup-tlsa-icon" src="../toolbar/tlsa_init.png"/>
+	</td><td>
+		<strong id="domain-name-title"></strong><br/><strong id="tlsa-tooltip"></strong>
+	</td></tr>
+	</table>
+	<span id="pre-domain-text"></span>
+	<div id="divright"><button type="Submit" onclick="showTlsaDetailInfo();">more info</button></div>
+	<div id="detail-text"></div>
+	<p id="homepage"><a href="http://www.dnssec-validator.cz/" target="blank">Go to plugin homepage for additional information</a></p>
+	<script src="tlsapopup.js"></script>
 </body>
 </html>
