@@ -69,17 +69,27 @@ var dnssecobj= InitDnssecPlugin("dnssec");
 var tlsaobj = InitTlsaPlugin("tlsa");
 const myGlobal = safari.extension.globalPage.contentWindow;
 
-
+//*********************************************************
+// get toolbar icon handle
+//*********************************************************
 function getToolBarItemHandle() {
 
 	var toolbarItemId = "infos";
 	var toolbarItem = safari.extension.toolbarItems.filter(function (tbi) {
 	return tbi.identifier == toolbarItemId && tbi.browserWindow == safari.application.activeBrowserWindow;
 	})[0];
-
 	return toolbarItem;
+};
 
-}
+//*********************************************************
+// get toolbar icon handle
+//*********************************************************
+function getToolBarPopoverHandle(popoverId) {
+
+	var popover = safari.extension.popovers.filter(function (po) { return po.identifier == popoverId;})[0];
+	return popover;
+};
+
 
 
 //*********************************************************
@@ -89,7 +99,7 @@ function showPopover(popoverId) {
 
 	var toolbarItemId = "infos";
 	var toolbarItem = getToolBarItemHandle();
-	var popover = safari.extension.popovers.filter(function (po) { return po.identifier == popoverId;})[0];
+	var popover = getToolBarPopoverHandle(popoverId);
 
 	if (popoverId == "DNSSECPopup") {
 		toolbarItem.image = safari.extension.baseURI + "icons/dnssec.png";
@@ -637,6 +647,8 @@ var OnTabActivate = function(event) {
 	var toolbarItem = getToolBarItemHandle();
 	toolbarItem.image = safari.extension.baseURI + "icons/default.png";
 	toolbarItem.toolTip = "DNSSEC/TLSA Validator";
+	var popover = getToolBarPopoverHandle("DefaultPopup");
+	toolbarItem.popover = popover;
 
 	checkDnssec(taburl);
 	checkTlsa(taburl);
@@ -651,6 +663,13 @@ var OnBeforeNavigate = function(event) {
 	if (debugout) {
 		console.log("\nBrowser: OnBeforeNavigate("+ event.url +")");
 	}
+
+	var toolbarItem = getToolBarItemHandle();
+	toolbarItem.image = safari.extension.baseURI + "icons/default.png";
+	toolbarItem.toolTip = "DNSSEC/TLSA Validator";
+	var popover = getToolBarPopoverHandle("DefaultPopup");
+	toolbarItem.popover = popover;
+
 	checkDnssec(event.url);
 	checkTlsa(event.url);
 };

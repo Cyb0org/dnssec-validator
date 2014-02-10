@@ -64,14 +64,16 @@
 		<array>
 			<dict>
 				<key>Identifier</key>
-				<string>DNSSEC Menu</string>
+				<string>DNSSEC/TLSA Validator Menu</string>
 				<key>Menu Items</key>
 				<array>
 					<dict>
 						<key>Command</key>
 						<string>onAboutClick</string>
 						<key>Identifier</key>
-						<string>DNSSECAboutMenu</string>
+						<string>AboutMenu</string>
+						<key>Image</key>
+						<string>icon.png</string>
 						<key>Title</key>
 						<string>About...</string>
 					</dict>
@@ -80,29 +82,8 @@
 						<string>onHomepageClick</string>
 						<key>Identifier</key>
 						<string>DNSSECHomepageMenu</string>
-						<key>Title</key>
-						<string>Homepage...</string>
-					</dict>
-				</array>
-			</dict>
-			<dict>
-				<key>Identifier</key>
-				<string>TLSA Menu</string>
-				<key>Menu Items</key>
-				<array>
-					<dict>
-						<key>Command</key>
-						<string>onAboutClick</string>
-						<key>Identifier</key>
-						<string>TLSAAboutMenu</string>
-						<key>Title</key>
-						<string>About</string>
-					</dict>
-					<dict>
-						<key>Command</key>
-						<string>onHomepageClick</string>
-						<key>Identifier</key>
-						<string>TLSAHomepageMenu</string>
+						<key>Image</key>
+						<string>icons/default.png</string>
 						<key>Title</key>
 						<string>Homepage...</string>
 					</dict>
@@ -115,7 +96,7 @@
 				<key>Filename</key>
 				<string>popups/dnssecpopup.html</string>
 				<key>Height</key>
-				<string></string>
+				<real>240</real>
 				<key>Identifier</key>
 				<string>DNSSECPopup</string>
 				<key>Width</key>
@@ -125,7 +106,7 @@
 				<key>Filename</key>
 				<string>popups/tlsapopup.html</string>
 				<key>Height</key>
-				<string></string>
+				<real>280</real>
 				<key>Identifier</key>
 				<string>TLSAPopup</string>
 				<key>Width</key>
@@ -134,6 +115,8 @@
 			<dict>
 				<key>Filename</key>
 				<string>popups/default.html</string>
+				<key>Height</key>
+				<real>240</real>
 				<key>Identifier</key>
 				<string>DefaultPopup</string>
 				<key>Width</key>
@@ -148,11 +131,13 @@
 				<key>Image</key>
 				<string>icons/default.png</string>
 				<key>Label</key>
-				<string>Validator Info</string>
+				<string>DNSSEC/TLSA Validator</string>
+				<key>Menu</key>
+				<string>DNSSEC/TLSA Validator Menu</string>
 				<key>Popover</key>
 				<string>DefaultPopup</string>
 				<key>Tool Tip</key>
-				<string>Validator Info</string>
+				<string>DNSSEC/TLSA Validator</string>
 			</dict>
 		</array>
 	</dict>

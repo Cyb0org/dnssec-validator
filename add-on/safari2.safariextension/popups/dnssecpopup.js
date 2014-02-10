@@ -38,21 +38,6 @@ function addText(id, str) {
 
 // set icon into popup
 function DNSSECicon(icon){
-
-
-	var popoverId = "DNSSECPopup"; 
-	var toolbarItemId = "infos";
-	var toolbarItem = safari.extension.toolbarItems.filter(function (tbi) {
-	return tbi.identifier == toolbarItemId && tbi.browserWindow == safari.application.activeBrowserWindow;
-	})[0];
-	var popover = safari.extension.popovers.filter(function (po) { return po.identifier == popoverId;})[0];
-
-
-	if (1) {
-		console.log("\n---popover---"+ toolbarItem.popover.visible);
-	}
-
-
 	var pic = document.getElementById("popup-dnssec-icon"); 
 	if (pic == typeof('undefined')) return;
 	pic.src = icon;
@@ -65,16 +50,24 @@ function showDnssecDetailInfo(){
 	document.getElementById("homepage").style.display = 'block';
 };
 
+function getToolBarPopoverHandle(popoverId) {
+
+	var popover = safari.extension.popovers.filter(function (po) { return po.identifier == popoverId;})[0];
+	return popover;
+};
+
 function openNewTab(popoverId){
 
 	var toolbarItemId = "infos";
 	var toolbarItem = safari.extension.toolbarItems.filter(function (tbi) {
 	return tbi.identifier == toolbarItemId && tbi.browserWindow == safari.application.activeBrowserWindow;})[0];
-	var popover = safari.extension.popovers.filter(function (po) { return po.identifier == popoverId;})[0];
+	var popover = getToolBarPopoverHandle(popoverId);
 	toolbarItem.popover = popover;
 	toolbarItem.popover.hide();
 	toolbarItem.image = safari.extension.baseURI + "icons/default.png";
 	toolbarItem.toolTip = "DNSSEC/TLSA Validator";
+	var popover = getToolBarPopoverHandle("DefaultPopup");
+	toolbarItem.popover = popover;
 	safari.application.activeBrowserWindow.openTab().url = "http://www.dnssec-validator.cz/";
 };
 
