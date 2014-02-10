@@ -90,3 +90,31 @@ function TlsaValidate(cert, len, options, resolver, domain, port, protocol, poli
 	}
 	else return null; 	
 };
+
+//****************************************************************
+// Calls when any item of settings was changed
+//****************************************************************
+function ClearDnssecPluginContetx() {
+
+	if (dnssecobj != null) {
+		dnssecobj.DNSSECCacheFree();
+		dnssecobj.DNSSECCacheInit();
+		if (debugout) {
+	       		console.log("DNSSECplugin context was deleted...");
+		}
+	}
+};
+
+//****************************************************************
+// Calls when any item of settings was changed
+//****************************************************************
+function ClearTlsaPluginContetx() {
+
+	if (tlsaobj != null) {
+		tlsaobj.TLSACacheFree();
+		tlsaobj.TLSACacheInit();
+		if (debugout) {
+	       		console.log("TLSAplugin context was deleted...");
+		}
+	}
+};
