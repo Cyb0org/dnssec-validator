@@ -131,6 +131,14 @@
 				<key>Width</key>
 				<real>320</real>
 			</dict>
+			<dict>
+				<key>Filename</key>
+				<string>popups/default.html</string>
+				<key>Identifier</key>
+				<string>DefaultPopup</string>
+				<key>Width</key>
+				<real>320</real>
+			</dict>
 		</array>
 		<key>Toolbar Items</key>
 		<array>
@@ -138,13 +146,13 @@
 				<key>Identifier</key>
 				<string>infos</string>
 				<key>Image</key>
-				<string>icon.png</string>
+				<string>icons/default.png</string>
 				<key>Label</key>
-				<string>Validator info</string>
+				<string>Validator Info</string>
 				<key>Popover</key>
-				<string>DNSSECPopup</string>
+				<string>DefaultPopup</string>
 				<key>Tool Tip</key>
-				<string>Validator</string>
+				<string>Validator Info</string>
 			</dict>
 		</array>
 	</dict>

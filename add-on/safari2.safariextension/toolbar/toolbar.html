@@ -70,31 +70,39 @@ var tlsaobj = InitTlsaPlugin("tlsa");
 const myGlobal = safari.extension.globalPage.contentWindow;
 
 
+function getToolBarItemHandle() {
 
-function loadStringFromFile(filepath, itemid) {
+	var toolbarItemId = "infos";
+	var toolbarItem = safari.extension.toolbarItems.filter(function (tbi) {
+	return tbi.identifier == toolbarItemId && tbi.browserWindow == safari.application.activeBrowserWindow;
+	})[0];
 
-	var string = "";	
-	var len;
-	var file = fopen("../locale/en/test.msg",0);
-	if (file != -1) {
-		len = flenght(file);
-		if (debugout) {
-			console.log("\nlen("+ len +")");
-		}		
-	}
-//	return string;
+	return toolbarItem;
+
 }
 
 
 //*********************************************************
-// Show popup dialog when DNSSEC/TLSA icon was click
+// Show popup dialog when DNSSEC/TLSA icon was clicked
 //*********************************************************
 function showPopover(popoverId) {
 
 	var toolbarItemId = "infos";
-	var toolbarItem = safari.extension.toolbarItems.filter(function (tbi) {
-	return tbi.identifier == toolbarItemId && tbi.browserWindow == safari.application.activeBrowserWindow;})[0];
+	var toolbarItem = getToolBarItemHandle();
 	var popover = safari.extension.popovers.filter(function (po) { return po.identifier == popoverId;})[0];
+
+	if (popoverId == "DNSSECPopup") {
+		toolbarItem.image = safari.extension.baseURI + "icons/dnssec.png";
+		toolbarItem.toolTip = "DNSSEC Popup";
+	} else if (popoverId == "TLSAPopup") {
+		toolbarItem.image = safari.extension.baseURI + "icons/tlsa.png";
+		toolbarItem.toolTip = "TLSA Popup";
+	}
+	else {
+		toolbarItem.image = safari.extension.baseURI + "icons/default.png";
+		toolbarItem.toolTip = "DNSSEC/TLSA Validator";		
+	}
+
 	toolbarItem.popover = popover;
 	toolbarItem.showPopover();  
 };
@@ -626,6 +634,10 @@ var OnTabActivate = function(event) {
 		console.log("\nBrowser: OnTabActivate("+ taburl +")");
 	}
 
+	var toolbarItem = getToolBarItemHandle();
+	toolbarItem.image = safari.extension.baseURI + "icons/default.png";
+	toolbarItem.toolTip = "DNSSEC/TLSA Validator";
+
 	checkDnssec(taburl);
 	checkTlsa(taburl);
 };
@@ -639,7 +651,6 @@ var OnBeforeNavigate = function(event) {
 	if (debugout) {
 		console.log("\nBrowser: OnBeforeNavigate("+ event.url +")");
 	}
-
 	checkDnssec(event.url);
 	checkTlsa(event.url);
 };
