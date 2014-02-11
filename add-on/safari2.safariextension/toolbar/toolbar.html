@@ -764,11 +764,20 @@ var OnBeforeNavigate = function(event) {
 // fires when http/https request was sends
 //****************************************************************
 var OnNavigate = function(event) {
+
 	debugout = safari.extension.settings.debuglogout;
 	if (debugout) {
-		console.log("\nBrowser: OnNavigate("+ event.url +")");
+		console.log("\nBrowser: OnNavigate("+ safari.application.activeBrowserWindow.activeTab.url +")");
 	}
 
+	var toolbarItem = getToolBarItemHandle();
+	toolbarItem.image = safari.extension.baseURI + "icons/default.png";
+	toolbarItem.toolTip = "DNSSEC/TLSA Validator";
+	var popover = getToolBarPopoverHandle("DefaultPopup");
+	toolbarItem.popover = popover;
+
+	checkDnssec(safari.application.activeBrowserWindow.activeTab.url);
+	var block = checkTlsa(safari.application.activeBrowserWindow.activeTab.url);
 };
 
 //****************************************************************
@@ -787,7 +796,7 @@ var OnOpen = function(event) {
 //****************************************************************
 safari.application.addEventListener("activate", OnTabActivate, true);
 //safari.application.addEventListener("open", OnOpen, true);
-//safari.application.addEventListener("navigate", OnNavigate, true);
+safari.application.addEventListener("navigate", OnNavigate, true);
 safari.application.addEventListener("beforeNavigate", OnBeforeNavigate, true);
 safari.extension.settings.addEventListener("change", OnSettingsChange, false);
 
