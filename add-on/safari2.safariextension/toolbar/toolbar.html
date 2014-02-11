@@ -19,7 +19,6 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC/TLSA Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** -->
 
-
 <html>
 <head>
 	<title>DNSSEC/TLSA Validator</title>
@@ -115,7 +114,6 @@ function showPopover(popoverId) {
 	toolbarItem.showPopover();  
 };
 
-
 //************************************************************
 // Return true/false if domain name is in exclude domain list
 //************************************************************
@@ -154,7 +152,6 @@ function ExcludeDomainList(domain) {
 	return result;
 };
 
-
 //****************************************************************
 // Get URL scheme (http/https/ftp/ftps)
 //****************************************************************
@@ -170,7 +167,6 @@ function getHttpSheme(taburl){
 	else if (taburl.indexOf("ftp") != -1) return "ftp";
 	else return null;	
 };
-
 
 //****************************************************************
 // return domain name and port number of url
@@ -241,7 +237,6 @@ function setTlsaPopup(domain, icon, tooltip, text, detail){
 	myGlobal.tlsa_tooltip = tooltip;
 };
 
-
 //****************************************************************
 // fires when any item of settings was changed
 //****************************************************************
@@ -249,7 +244,6 @@ function OnSettingsChange() {
 	ClearDnssecPluginContetx();
 	ClearTlsaPluginContetx();
 };
-
 
 //****************************************************************
 // set DNSSEC mode - icon, text, tooltip etc..
@@ -507,7 +501,6 @@ function setTlsaMode(tresult, scheme, domain, ports) {
 	setTlsaPopup(domain, iconbaseurl+file, tooltip, text, detail);
 };
 
-
 //****************************************************************
 // get information about custom resolver
 //****************************************************************
@@ -523,7 +516,7 @@ function getResolver() {
 // blck hhtp request when the certificate not corresponds to tlsa
 //****************************************************************
 function onBlockHttps(){
-	var block = safari.extension.settings.blocking;
+	return safari.extension.settings.blocking;
 };
 
 //****************************************************************
@@ -587,22 +580,51 @@ function getCorrectPorts(scheme, tmpport){
 };
 
 //****************************************************************
+// Called when TLSA is invalid, return value for web request blocking
+//****************************************************************
+function checkTlsaResult(ret, domain) {
+	
+	var block = false;
+
+	if (ret >= tlsaExtNPAPIConst.DANE_TLSA_PARAM_ERR) {
+	
+		var alerttext = warningpre
+		+ " " + domain + " " + warningpost;
+		var choice = confirm(alerttext);
+		if (choice) {				
+			if (debugout) {
+				console.log("Connection to this server was canceled by user...");
+			}
+			block = true;					
+		}
+		else {
+			if (debugout) {
+				console.log("Connection to this server was permitted by user....");
+			}
+			block = false;
+		}
+	}
+	return block; 
+};
+
+//****************************************************************
 // check TLSA status
 //****************************************************************
 function checkTlsa(url) {
 
+	var block = false;
     	var c = this.tlsaExtNPAPIConst;
 	var result = c.DANE_OFF;
 
 	var scheme = getHttpSheme(url);
 	if (scheme == null) {
 		setTlsaMode(blankstate, null, null, null);
-		return;		
+		return block;		
 	}
 	var domainport = getDomainAndPort(url);
 	if (domainport == null) {
 		setTlsaMode(blankstate, null, null, null);
-		return;		
+		return block;		
 	}
 	var domain = domainport[0];
 	var ports = getCorrectPorts(scheme, domainport[1]);
@@ -611,25 +633,71 @@ function checkTlsa(url) {
 		if (ExcludeDomainList(domain)) {
 
 			if (scheme == "https" || scheme == "ftps") {
+				var domport = domain+ports[1];
+				var cacheitem = tlsaExtCache.getRecord(domport);
+				if (cacheitem[0] == '' && cacheitem[1] == '') {
 
-				var resolver = this.getResolver();
-				var reschoice = safari.extension.settings.resolverchoice;
-				var options = 0;
-				if (debugout) options |= c.DANE_FLAG_DEBUG;
-				if (reschoice == 3) options |= c.DANE_FLAG_USEFWD;
-				var cert = new Array();
-				cert.push("00FF");
-				if (debugout) {
-					console.log("TLSAplugin request: {certchain}, 1, " +options+", "+resolver+", "+domain+", "+ports[0]+", "+protocol+", 1");
-				}
+					var resolver = this.getResolver();
+					var reschoice = safari.extension.settings.resolverchoice;
+					var options = 0;
+					if (debugout) options |= c.DANE_FLAG_DEBUG;
+					if (reschoice == 3) options |= c.DANE_FLAG_USEFWD;
+					var cert = new Array();
+					cert.push("00FF");
+					if (debugout) {
+						console.log("TLSAplugin request: {certchain}, 1, " +options+", "+resolver+", "+domain+", "+ports[0]+", "+protocol+", 1");
+					}
 
-				result = TlsaValidate(cert, certlen, options, resolver, domain, ports[0], protocol, 1);
-				if (result != null) {
-					setTlsaMode(result, scheme, domain, ports[1]);
+					result = TlsaValidate(cert, certlen, options, resolver, domain, ports[0], protocol, 1);
+					if (result != null) {
+						setTlsaMode(result, scheme, domport, ports[1]);
+						if (onBlockHttps()) {
+							block = checkTlsaResult(result, domport);
+						}
+						tlsaExtCache.addRecord(domport, result, block);
+						tlsaExtCache.printContent();
+					} else {
+						setTlsaMode(c.DANE_ERROR_GENERIC, scheme, domport, ports[1]);
+					}
 				} else {
-					setTlsaMode(c.DANE_ERROR_GENERIC, scheme, domain, ports[1]);
-				}
 
+					var current_time = new Date().getTime();
+					if (cacheitem[2] < current_time) {
+						var resolver = this.getResolver();
+						var reschoice = safari.extension.settings.resolverchoice;
+						var options = 0;
+						if (debugout) options |= c.DANE_FLAG_DEBUG;
+						if (reschoice == 3) options |= c.DANE_FLAG_USEFWD;
+						var cert = new Array();
+						cert.push("00FF");
+						if (debugout) {
+							console.log("TLSAplugin request: {certchain}, 1, " +options+", "+resolver+", "+domain+", "+ports[0]+", "+protocol	+", 1");
+						}
+	
+						result = TlsaValidate(cert, certlen, options, resolver, domain, ports[0], protocol, 1);
+						if (result != null) {
+							setTlsaMode(result, scheme, domport, ports[1]);
+							if (onBlockHttps()) {
+								block = checkTlsaResult(result, domport);
+							}
+							tlsaExtCache.addRecord(domport, result, block);
+							tlsaExtCache.printContent();
+						} else {
+							setTlsaMode(c.DANE_ERROR_GENERIC, scheme, domport, ports[1]);
+						}
+					} else {
+						result = cacheitem[0];
+						if (debugout) {
+						       	console.log("TLSA result from cache: " + result);
+						}
+						setTlsaMode(result, scheme, domport, ports[1]);
+						if (onBlockHttps()) {
+							if (cacheitem[2]) {
+								block = checkTlsaResult(result, domport);
+							}
+						}
+					}
+				}
 			} else {
 				setTlsaMode(c.DANE_NO_HTTPS, scheme, domain, ports[1]);
 			}
@@ -639,12 +707,15 @@ function checkTlsa(url) {
 	} else {
 		setTlsaMode(result, scheme, domain, ports[1]);	
 	}
+	return block;
 };
 
 //****************************************************************
 // fires when tab or windows has changed
 //****************************************************************
 var OnTabActivate = function(event) {
+
+	var block = false;
 
 	var taburl = safari.application.activeBrowserWindow.activeTab.url;
 	debugout = safari.extension.settings.debuglogout;
@@ -659,13 +730,18 @@ var OnTabActivate = function(event) {
 	toolbarItem.popover = popover;
 
 	checkDnssec(taburl);
-	checkTlsa(taburl);
+	block = checkTlsa(taburl);
+	if (block) {
+		event.preventDefault();
+	}
 };
 
 //****************************************************************
 // fires when http/https request was sends
 //****************************************************************
 var OnBeforeNavigate = function(event) {
+
+	var block = false;
 
 	debugout = safari.extension.settings.debuglogout;
 	if (debugout) {
@@ -679,7 +755,10 @@ var OnBeforeNavigate = function(event) {
 	toolbarItem.popover = popover;
 
 	checkDnssec(event.url);
-	checkTlsa(event.url);
+	block = checkTlsa(event.url);
+	if (block) {
+		event.preventDefault();
+	}
 };
 
 //****************************************************************

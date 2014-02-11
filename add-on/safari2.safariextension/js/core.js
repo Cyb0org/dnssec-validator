@@ -22,6 +22,80 @@ DNSSEC/TLSA Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 var debugout = true;
 
 //****************************************************************
+// TLSA Validator's internal cache - shared with all window tabs
+//****************************************************************
+// expirate time of one item in the cache [seconds]
+var CACHE_ITEM_EXPIR = 600; 
+
+var tlsaExtCache = {
+
+	data: null,
+
+	init: function() {
+		// Create new array for caching
+		this.data = new Array();
+		init = false;
+	},
+
+
+	record: function(tlsaresult, block, expir) {
+		this.state = tlsaresult;  // tlsa result
+		this.block = block;    // blocked ?
+		this.expir = expir;    // expir time
+	},
+
+	addRecord: function(domain, tlsaresult, block) {	
+		// Get current time
+			const cur_t = new Date().getTime();
+			var expir = cur_t + CACHE_ITEM_EXPIR * 1000;
+			delete this.data[domain];
+			this.data[domain] = new this.record(tlsaresult, block, expir);
+	},
+
+	getRecord: function(n) {
+		const c = this.data;
+
+		if (typeof c[n] != 'undefined') {
+			return [c[n].state, c[n].block, c[n].expir];
+		}
+		return ['', '', ''];
+	},
+
+	printContent: function() {
+	
+		var i = 0;
+		var n;
+		const c = this.data;
+
+		if (debugout) { 
+			console.log('Cache content:');
+		}
+	          
+		for (n in c) {
+			if (debugout) { 
+				console.log('      r' + i + ': \"' + n 
+				+ '\": ' + c[n].state + '; ' + c[n].block 
+				+ '; ' + c[n].expir);
+			}
+      			i++;
+		}
+
+		if (debugout) {
+			console.log('Total records count: ' + i);
+		}
+	},
+
+	delAllRecords: function() {
+
+		if (debugout) { 
+			console.log('Flushing all cache records...');
+		}
+		delete this.data;
+		this.data = new Array();
+	},
+};
+
+//****************************************************************
 // Initialize DNSSEC binary plugin after start of Safari
 //****************************************************************
 function InitDnssecPlugin(objectid) {
@@ -49,6 +123,7 @@ function InitTlsaPlugin(objectid) {
         var TLSAPlugin = document.getElementById(objectid);
 	if (TLSAPlugin) {
 		TLSAPlugin.TLSACacheInit();
+		tlsaExtCache.init();
 		if (debugout) {
 			console.log("TLSAplugin init ... DONE");
 		}
@@ -113,6 +188,7 @@ function ClearTlsaPluginContetx() {
 	if (tlsaobj != null) {
 		tlsaobj.TLSACacheFree();
 		tlsaobj.TLSACacheInit();
+		tlsaExtCache.delAllRecords();
 		if (debugout) {
 	       		console.log("TLSAplugin context was deleted...");
 		}

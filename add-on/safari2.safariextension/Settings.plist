@@ -130,7 +130,7 @@
 		<key>Key</key>
 		<string>blocking</string>
 		<key>Title</key>
-		<string>Cancel HTTPS connection when TLSA validation fail</string>
+		<string>Cancel HTTPS connection when TLSA validation fails</string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
