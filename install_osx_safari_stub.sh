@@ -32,15 +32,22 @@ function untar_payload()
 	fi
 	echo "Instaling ${PLUGIN_DIR}/${DNSSEC_DIR}"
 	mv ${DNSSEC_DIR} "${PLUGIN_DIR}/${DNSSEC_DIR}"
+	echo ""
+
 	if [ -e "${PLUGIN_DIR}/${TLSA_DIR}" ]; then
 		echo "Deleting old ${PLUGIN_DIR}/${TLSA_DIR}" >&2
 		rm -r "${PLUGIN_DIR}/${TLSA_DIR}"
 	fi
 	echo "Installing ${PLUGIN_DIR}/${TLSA_DIR}"
 	mv ${TLSA_DIR} "${PLUGIN_DIR}/${TLSA_DIR}"
-
 	echo ""
-	echo "Now install ${SAFARIEXT} to complete the installation process."
+
+	
+	echo "Installing ${SAFARIEXT}"
+	if ! open "${SAFARIEXT}" ; then
+		echo "Installation failed." >&2
+	fi
+	echo ""
 #fi
 
 exit 0
