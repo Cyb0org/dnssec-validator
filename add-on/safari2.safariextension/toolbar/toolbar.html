@@ -498,7 +498,11 @@ function setTlsaMode(tresult, scheme, domain, ports) {
 	}
 	setIcon(file,"tlsaicon");
 	UpdateTooltip(tooltip, "tlsabutton");
-	setTlsaPopup(domain, iconbaseurl+file, tooltip, text, detail);
+	if (scheme == null) {
+		setTlsaPopup(domain, iconbaseurl+file, tooltip, text, detail);
+	} else {
+		setTlsaPopup(scheme+"://"+domain, iconbaseurl+file, tooltip, text, detail);
+	}
 };
 
 //****************************************************************
@@ -520,9 +524,51 @@ function onBlockHttps(){
 };
 
 //****************************************************************
+// check DNSSEC support of resolver when unbound returns bogus
+//****************************************************************
+function checkResolverDnssecSupport(result, domain) {
+
+    	var c = this.dnssecExtNPAPIConst;
+	var resulttmp = c.DNSSEC_OFF;
+	var options = 0;
+	var resolver = "";
+	var ipbrowser = "";
+	if (debugout) options |= c.DNSSEC_FLAG_DEBUG;
+	if (true) options |= c.DNSSEC_FLAG_RESOLVIPV4;
+	if (true) options |= c.DNSSEC_FLAG_RESOLVIPV6;	
+	if (debugout) {
+		console.log("	Bogus test request: " +domain+", "+options+",");
+	}
+
+	ClearDnssecPluginContetx();
+
+	resulttmp = DnssecValidate(domain, options, resolver, ipbrowser);
+	if (debugout) {
+		console.log("	Bogus test return: " + resulttmp);
+	}
+	
+	if (result == resulttmp) {
+		if (debugout) {
+			console.log("	Domain name has really bogus...");
+		}
+		ClearDnssecPluginContetx();
+		return false;		
+	} else {
+		if (debugout) {
+			console.log("	Current resolver does not support DNSSEC...");
+		}
+		ClearDnssecPluginContetx();
+		ClearTlsaPluginContetx();
+		return true;			
+	}
+};
+
+//****************************************************************
 // check DNSSEC status
 //****************************************************************
 function checkDnssec(url) {
+
+	wrongresolver = false;
 
 	var domainport = getDomainAndPort(url);
 	if (domainport == null) {
@@ -551,7 +597,17 @@ function checkDnssec(url) {
 
 		result = DnssecValidate(domain, options, resolver, ipbrowser);
 		if (result != null) {
-			setDnssecMode(result, domain);
+			if (result == c.DNSSEC_COT_DOMAIN_BOGUS) {
+				if (checkResolverDnssecSupport(result, domain)) {
+					wrongresolver = true;
+					setDnssecMode(c.DNSSEC_RESOLVER_NO_DNSSEC, domain);
+					
+				} else {
+					setDnssecMode(result, domain);					
+				}
+			} else {
+				setDnssecMode(result, domain);
+			}
 		} else {
 			setDnssecMode(c.DNSSEC_ERROR_GENERIC, domain);
 		}
@@ -628,12 +684,17 @@ function checkTlsa(url) {
 	}
 	var domain = domainport[0];
 	var ports = getCorrectPorts(scheme, domainport[1]);
+	var domport = domain+ports[1];
+
+	if (wrongresolver) {
+		setTlsaMode(c.DANE_RESOLVER_NO_DNSSEC, scheme, domport, ports[1]);
+		return block;		
+	}
 
 	if (safari.extension.settings.tlsaon) {
 		if (ExcludeDomainList(domain)) {
 
 			if (scheme == "https" || scheme == "ftps") {
-				var domport = domain+ports[1];
 				var cacheitem = tlsaExtCache.getRecord(domport);
 				if (cacheitem[0] == '' && cacheitem[1] == '') {
 
@@ -781,24 +842,23 @@ var OnNavigate = function(event) {
 };
 
 //****************************************************************
-// fires when tab or windows was open
+// fires when context menu item was click
 //****************************************************************
-var OnOpen = function(event) {
-	debugout = safari.extension.settings.debuglogout;
-	if (debugout) {
-		console.log("\nBrowser: OnOpen("+ event.url +")");
-	}
+var OnCommand = function(event) {
 
+	if (event.command === "onAbout") {
+		safari.application.activeBrowserWindow.openTab().url = "http://www.dnssec-validator.cz/";
+	}
 };
 
 //****************************************************************
 // events listener
 //****************************************************************
 safari.application.addEventListener("activate", OnTabActivate, true);
-//safari.application.addEventListener("open", OnOpen, true);
 safari.application.addEventListener("navigate", OnNavigate, true);
 safari.application.addEventListener("beforeNavigate", OnBeforeNavigate, true);
 safari.extension.settings.addEventListener("change", OnSettingsChange, false);
+safari.application.addEventListener("command", OnCommand, false);
 
 </script>
 

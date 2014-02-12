@@ -20,6 +20,7 @@ DNSSEC/TLSA Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
 var debugout = true;
+var wrongresolver = false;
 
 //****************************************************************
 // TLSA Validator's internal cache - shared with all window tabs
