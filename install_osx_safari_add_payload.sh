@@ -32,7 +32,7 @@ if [ ! -d "${PLUGIN_SRC_DIR}/${TLSA_DIR}" ]; then
 	cleanup
 	exit 1
 fi
-cd "${PLUGIN_SRC_DIR}/"; tar -cf "../${TAR_FILE}" "./${TLSA_DIR}" ; cd ..
+cd "${PLUGIN_SRC_DIR}/"; tar -rf "../${TAR_FILE}" "./${TLSA_DIR}" ; cd ..
 if [ ! -f "${ADDON_SRC_DIR}/${SAFARIEXT}" ]; then
 	echo "File ${ADDON_SRC_DIR}/${SAFARIEXT} does not exist." >&2
 	cleanup
