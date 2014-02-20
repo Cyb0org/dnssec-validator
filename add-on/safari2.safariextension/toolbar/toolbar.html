@@ -67,13 +67,13 @@ var certlen = 0;
 var dnssecobj= InitDnssecPlugin("dnssec");
 var tlsaobj = InitTlsaPlugin("tlsa");
 const myGlobal = safari.extension.globalPage.contentWindow;
+const myBars = safari.extension.bars[0].hide();
 
 //*********************************************************
 // get toolbar icon handle
 //*********************************************************
-function getToolBarItemHandle() {
+function getToolBarItemHandle(toolbarItemId) {
 
-	var toolbarItemId = "infos";
 	var toolbarItem = safari.extension.toolbarItems.filter(function (tbi) {
 	return tbi.identifier == toolbarItemId && tbi.browserWindow == safari.application.activeBrowserWindow;
 	})[0];
@@ -90,26 +90,22 @@ function getToolBarPopoverHandle(popoverId) {
 };
 
 //*********************************************************
+// set new state (icon and tooltip) on toolbar item
+//*********************************************************
+function setToolbarButton(toolbarItemId, tooltip, file) {
+
+	var toolbarItem = getToolBarItemHandle(toolbarItemId);
+	toolbarItem.image = safari.extension.baseURI + "icons/" + file;
+	toolbarItem.toolTip = tooltip;
+};
+
+//*********************************************************
 // Show popup dialog when DNSSEC/TLSA icon was clicked
 //*********************************************************
-function showPopover(popoverId) {
+function showPopover(popoverId, toolbarItemId) {
 
-	var toolbarItemId = "infos";
-	var toolbarItem = getToolBarItemHandle();
+	var toolbarItem = getToolBarItemHandle(toolbarItemId);
 	var popover = getToolBarPopoverHandle(popoverId);
-
-	if (popoverId == "DNSSECPopup") {
-		toolbarItem.image = safari.extension.baseURI + "icons/dnssec.png";
-		toolbarItem.toolTip = "DNSSEC Popup";
-	} else if (popoverId == "TLSAPopup") {
-		toolbarItem.image = safari.extension.baseURI + "icons/tlsa.png";
-		toolbarItem.toolTip = "TLSA Popup";
-	}
-	else {
-		toolbarItem.image = safari.extension.baseURI + "icons/default.png";
-		toolbarItem.toolTip = "DNSSEC/TLSA Validator";		
-	}
-
 	toolbarItem.popover = popover;
 	toolbarItem.showPopover();  
 };
@@ -246,6 +242,22 @@ function OnSettingsChange() {
 };
 
 //****************************************************************
+// set Default icons and tooltip text
+//****************************************************************
+function setDefaultIcon() {
+	setToolbarButton("Dinfo", "DNSSEC Validator", "dnssec_init.png");
+	setToolbarButton("Tinfo", "TLSA Validator", "tlsa_init.png");
+};
+
+//****************************************************************
+// set Default icons and tooltip text
+//****************************************************************
+function setActionIcon() {
+	setToolbarButton("Dinfo", "DNSSEC Validator", "dnssec_action.png");
+	setToolbarButton("Tinfo", "TLSA Validator", "tlsa_action.png");
+};
+
+//****************************************************************
 // set DNSSEC mode - icon, text, tooltip etc..
 //****************************************************************
 function setDnssecMode(dresult, domain) {
@@ -352,6 +364,7 @@ function setDnssecMode(dresult, domain) {
 	}
 
 	setIcon(file,"dnssecicon");
+	setToolbarButton("Dinfo", tooltip, file);
 	UpdateTooltip(tooltip, "dnssecbutton");
 	setDnssecPopup(domain, iconbaseurl+file, tooltip, textpre, textpost, detail);
 };
@@ -498,6 +511,7 @@ function setTlsaMode(tresult, scheme, domain, ports) {
 	}
 	setIcon(file,"tlsaicon");
 	UpdateTooltip(tooltip, "tlsabutton");
+	setToolbarButton("Tinfo", tooltip, file);
 	if (scheme == null) {
 		setTlsaPopup(domain, iconbaseurl+file, tooltip, text, detail);
 	} else {
@@ -786,11 +800,7 @@ var OnTabActivate = function(event) {
 		console.log("\nBrowser: OnTabActivate("+ taburl +")");
 	}
 
-	var toolbarItem = getToolBarItemHandle();
-	toolbarItem.image = safari.extension.baseURI + "icons/default.png";
-	toolbarItem.toolTip = "DNSSEC/TLSA Validator";
-	var popover = getToolBarPopoverHandle("DefaultPopup");
-	toolbarItem.popover = popover;
+	setActionIcon();
 
 	checkDnssec(taburl);
 	var block = checkTlsa(taburl);
@@ -808,11 +818,7 @@ var OnBeforeNavigate = function(event) {
 		console.log("\nBrowser: OnBeforeNavigate("+ event.url +")");
 	}
 
-	var toolbarItem = getToolBarItemHandle();
-	toolbarItem.image = safari.extension.baseURI + "icons/default.png";
-	toolbarItem.toolTip = "DNSSEC/TLSA Validator";
-	var popover = getToolBarPopoverHandle("DefaultPopup");
-	toolbarItem.popover = popover;
+	setActionIcon();
 
 	checkDnssec(event.url);
 	block = checkTlsa(event.url);
@@ -831,11 +837,7 @@ var OnNavigate = function(event) {
 		console.log("\nBrowser: OnNavigate("+ safari.application.activeBrowserWindow.activeTab.url +")");
 	}
 
-	var toolbarItem = getToolBarItemHandle();
-	toolbarItem.image = safari.extension.baseURI + "icons/default.png";
-	toolbarItem.toolTip = "DNSSEC/TLSA Validator";
-	var popover = getToolBarPopoverHandle("DefaultPopup");
-	toolbarItem.popover = popover;
+	setActionIcon();
 
 	checkDnssec(safari.application.activeBrowserWindow.activeTab.url);
 	var block = checkTlsa(safari.application.activeBrowserWindow.activeTab.url);
@@ -862,9 +864,9 @@ safari.application.addEventListener("command", OnCommand, false);
 
 </script>
 
-<button type="Submit" class="dnssec-button" id="dnssecbutton" title="DNSSEC Validator" onclick="showPopover('DNSSECPopup');">DNSSEC:&nbsp;&nbsp;<img id="dnssecicon" src="dnssec_init.png" alt="DNSSEC Validator" width="20" height="20"></button>
+<button type="Submit" class="dnssec-button" id="dnssecbutton" title="DNSSEC Validator" onclick="showPopover('DNSSECPopup','Dinfo');">DNSSEC:&nbsp;&nbsp;<img id="dnssecicon" src="dnssec_init.png" alt="DNSSEC Validator" width="20" height="20"></button>
 
-<button type="Submit" class="tlsa-button" id="tlsabutton" title="TLSA Validator" onclick="showPopover('TLSAPopup');">TLSA:&nbsp;&nbsp;<img id="tlsaicon" src="tlsa_init.png" alt="TLSA Validator" width="20" height="20"></button>
+<button type="Submit" class="tlsa-button" id="tlsabutton" title="TLSA Validator" onclick="showPopover('TLSAPopup','Tinfo');">TLSA:&nbsp;&nbsp;<img id="tlsaicon" src="tlsa_init.png" alt="TLSA Validator" width="20" height="20"></button>
 
 </body>
 </html>

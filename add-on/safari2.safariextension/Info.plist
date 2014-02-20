@@ -81,19 +81,33 @@
 		<array>
 			<dict>
 				<key>Identifier</key>
-				<string>infos</string>
+				<string>Dinfo</string>
 				<key>Image</key>
-				<string>icons/default.png</string>
+				<string>icons/dnssec_init.png</string>
 				<key>Label</key>
-				<string>DNSSEC/TLSA Validator</string>
+				<string>DNSSEC Validator</string>
 				<key>Menu</key>
 				<string>DNSSEC/TLSA Validator Menu</string>
 				<key>Palette Label</key>
-				<string>Menu Display Button</string>
+				<string>DNSSEC Validator</string>
 				<key>Popover</key>
-				<string>DefaultPopup</string>
+				<string>DNSSECPopup</string>
 				<key>Tool Tip</key>
-				<string>DNSSEC/TLSA Validator</string>
+				<string>DNSSEC Validator</string>
+			</dict>
+			<dict>
+				<key>Identifier</key>
+				<string>Tinfo</string>
+				<key>Image</key>
+				<string>icons/tlsa_init.png</string>
+				<key>Label</key>
+				<string>TLSA Validator</string>
+				<key>Palette Label</key>
+				<string>TLSA Validator</string>
+				<key>Popover</key>
+				<string>TLSAPopup</string>
+				<key>Tool Tip</key>
+				<string>TLSA Validator</string>
 			</dict>
 		</array>
 	</dict>
