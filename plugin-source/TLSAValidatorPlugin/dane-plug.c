@@ -664,6 +664,11 @@ void print_certlist_debug(const struct cert_store_head *cert_list)
 				X509_free(cert_x509); cert_x509 = NULL;
 
 				BIO_get_mem_data(mem_bio, &bio_data);
+				/*
+				 * Make sure the buffer content is
+				 * null-terminated.
+				 */
+				BIO_write(mem_bio, "", 1);
 
 				/* Already contains new line at the end. */
 				printf_debug(DEBUG_PREFIX_CERT, "%s",
