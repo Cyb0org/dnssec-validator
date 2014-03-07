@@ -970,6 +970,7 @@ int get_cert_list(SSL_CTX *ssl_ctx, const char *dest_url,
 	STACK_OF(X509) *chain;
 	X509 *cert2;
 	EVP_PKEY *pkey = NULL;
+	int ret;
 
 	assert(ssl_ctx != NULL);
 
@@ -1002,12 +1003,19 @@ int get_cert_list(SSL_CTX *ssl_ctx, const char *dest_url,
 		}
 	}
 
-	if (SSL_connect(ssl) != 1) {
+	ret = SSL_connect(ssl);
+	if (ret < 0) {
 		printf_debug(DEBUG_PREFIX_CERT,
 		    "Error: Could not build a SSL session to: %s.\n",
 		    dest_url);
 		goto fail;
+	} else if (0 == ret) {
+		printf_debug(DEBUG_PREFIX_CERT,
+		    "Error: SSL handshake with %s shut down by controller.\n",
+		    dest_url);
 	}
+
+	assert(ret >= 0);
 
 	chain = SSL_get_peer_cert_chain(ssl);
 	if (chain == NULL) {
