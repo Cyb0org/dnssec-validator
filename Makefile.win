@@ -29,6 +29,8 @@ PLUGIN_NAME_DNSSEC_OBJ = dnssec-plug.o
 PLUGIN_NAME_TLSA_OBJ = dane-plug.o
 PLUGIN_NAME_COMMON_OBJ = common.o
 PLUGIN_NAME_COMMON_LIB = common.o
+PLUGIN_NAME_LOG_DFLT_OBJ = log_dflt.o
+PLUGIN_NAME_LOG_DFLT_LIB = log_dflt.o
 PLUGIN_NAME_CA_STORE_OBJ = ca_store_win.o
 PLUGIN_NAME_TLSA_LIB = DANEcore-windows-x86.dll
 PLUGIN_NAME_DNSSEC_EXE = DNSSECcore-windows-x86.exe
@@ -60,7 +62,9 @@ sys_windows_all:
 	rm -rf $(PLUGIN_TMP)
 	mkdir $(PLUGIN_TMP)
 #common.o
-	$(X86_MINGW_CC) -Wall -shared -o $(PLUGIN_TMP)/$(PLUGIN_NAME_COMMON_OBJ) -c $(PLUGIN_ROOT)/plugin-source/common/common.c -DCA_STORE=WIN_CA_STORE -DTGT_SYSTEM=TGT_WIN -D__USE_MINGW_ANSI_STDIO=1 -I$(PLUGIN_ROOT)/libswin/windows/x86 -I$(PLUGIN_ROOT)/libswin/ldns -I$(PLUGIN_ROOT)/libswin/unbound -I$(PLUGIN_ROOT)/libswin/openssl/include -I$(PLUGIN_ROOT)/plugin-source/common
+	$(X86_MINGW_CC) -Wall -shared -o $(PLUGIN_TMP)/$(PLUGIN_NAME_COMMON_OBJ) -c $(PLUGIN_ROOT)/plugin-source/common/common.c -DCA_STORE=WIN_CA_STORE -DTGT_SYSTEM=TGT_WIN -D__USE_MINGW_ANSI_STDIO=1 -I$(PLUGIN_ROOT)/libswin/windows/x86 -I$(PLUGIN_ROOT)/libswin/ldns/include -I$(PLUGIN_ROOT)/libswin/unbound -I$(PLUGIN_ROOT)/libswin/openssl/include -I$(PLUGIN_ROOT)/plugin-source/common
+#log_dflt.o
+	$(X86_MINGW_CC) -Wall -shared -o $(PLUGIN_TMP)/$(PLUGIN_NAME_LOG_DFLT_OBJ) -c $(PLUGIN_ROOT)/plugin-source/common/log_dflt.c -DCA_STORE=WIN_CA_STORE -DTGT_SYSTEM=TGT_WIN -D__USE_MINGW_ANSI_STDIO=1 -I$(PLUGIN_ROOT)/libswin/windows/x86 -I$(PLUGIN_ROOT)/libswin/ldns/include -I$(PLUGIN_ROOT)/libswin/unbound -I$(PLUGIN_ROOT)/libswin/openssl/include -I$(PLUGIN_ROOT)/plugin-source/common
 #dnssec-plug.o
 	$(X86_MINGW_CC) -Wall -shared -o $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_OBJ) -c $(PLUGIN_ROOT)/plugin-source/$(PLUGIN_NAME_DNSSEC)/dnssec-plug.c -DCA_STORE=WIN_CA_STORE -DTGT_SYSTEM=TGT_WIN -D__USE_MINGW_ANSI_STDIO=1 -I$(PLUGIN_ROOT)/libswin/windows/x86 -I$(PLUGIN_ROOT)/libswin/ldns -I$(PLUGIN_ROOT)/libswin/unbound -I$(PLUGIN_ROOT)/libswin/openssl/include -I$(PLUGIN_ROOT)/plugin-source/common
 #ca_store_win.o
@@ -68,20 +72,20 @@ sys_windows_all:
 #dane-plug.o
 	$(X86_MINGW_CC) -Wall -shared -o $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_OBJ) -c $(PLUGIN_ROOT)/plugin-source/$(PLUGIN_NAME_TLSA)/dane-plug.c -DCA_STORE=WIN_CA_STORE -DTGT_SYSTEM=TGT_WIN -D__USE_MINGW_ANSI_STDIO=1 -I$(PLUGIN_ROOT)/libswin/windows/x86 -I$(PLUGIN_ROOT)/libswin/ldns -I$(PLUGIN_ROOT)/libswin/unbound -I$(PLUGIN_ROOT)/libswin/openssl/include -I$(PLUGIN_ROOT)/plugin-source/common
 #DNSSECcore-windows-x86.dll
-	$(X86_MINGW_CC) -Wall -shared -o $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_LIB) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_COMMON_OBJ) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_OBJ) $(PLUGIN_ROOT)/libswin/windows/x86/libunbound.a $(PLUGIN_ROOT)/libswin/windows/x86/libldns.a $(PLUGIN_ROOT)/libswin/windows/x86/libssl.a $(PLUGIN_ROOT)/libswin/windows/x86/libcrypto.a -Wl,--output-def,$(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_DEF),-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32
+	$(X86_MINGW_CC) -Wall -shared -o $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_LIB) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_COMMON_OBJ) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_LOG_DFLT_OBJ) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_OBJ) $(PLUGIN_ROOT)/libswin/windows/x86/libunbound.a $(PLUGIN_ROOT)/libswin/windows/x86/libldns.a $(PLUGIN_ROOT)/libswin/windows/x86/libssl.a $(PLUGIN_ROOT)/libswin/windows/x86/libcrypto.a -Wl,--output-def,$(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_DEF),-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32
 	$(X86_MINGW_STRIP) -x -S $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_LIB)
 #DANEcore-windows-x86.dll
-	$(X86_MINGW_CC) -Wall -shared -o $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_LIB) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_COMMON_OBJ) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_OBJ) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_CA_STORE_OBJ) $(PLUGIN_ROOT)/libswin/windows/x86/libunbound.a $(PLUGIN_ROOT)/libswin/windows/x86/libldns.a $(PLUGIN_ROOT)/libswin/windows/x86/libssl.a $(PLUGIN_ROOT)/libswin/windows/x86/libcrypto.a -Wl,--output-def,$(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_DEF),-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32,-lcrypt32
+	$(X86_MINGW_CC) -Wall -shared -o $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_LIB) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_COMMON_OBJ) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_LOG_DFLT_OBJ) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_OBJ) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_CA_STORE_OBJ) $(PLUGIN_ROOT)/libswin/windows/x86/libunbound.a $(PLUGIN_ROOT)/libswin/windows/x86/libldns.a $(PLUGIN_ROOT)/libswin/windows/x86/libssl.a $(PLUGIN_ROOT)/libswin/windows/x86/libcrypto.a -Wl,--output-def,$(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_DEF),-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32,-lcrypt32
 	$(X86_MINGW_STRIP) -x -S $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_LIB)
 #dnssec-plug.o
 	$(X86_MINGW_CC) -DCMNDLINE_TEST -Wall -shared -o $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_OBJ) -c $(PLUGIN_ROOT)/plugin-source/$(PLUGIN_NAME_DNSSEC)/dnssec-plug.c -DCA_STORE=WIN_CA_STORE -DTGT_SYSTEM=TGT_WIN -D__USE_MINGW_ANSI_STDIO=1 -Iplugin-source/common -I$(PLUGIN_ROOT)/libswin/windows/x86 -I$(PLUGIN_ROOT)/libswin/ldns -I$(PLUGIN_ROOT)/libswin/unbound -I$(PLUGIN_ROOT)/libswin/openssl/include -I$(PLUGIN_ROOT)/plugin-source/common -Wl,--output-def,$(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_DEF),-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32
 #dane-plug.o
 	$(X86_MINGW_CC) -DCMNDLINE_TEST -Wall -shared -o $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_OBJ) -c $(PLUGIN_ROOT)/plugin-source/$(PLUGIN_NAME_TLSA)/dane-plug.c -DCA_STORE=WIN_CA_STORE -DTGT_SYSTEM=TGT_WIN -D__USE_MINGW_ANSI_STDIO=1 -Iplugin-source/common -I$(PLUGIN_ROOT)/libswin/windows/x86 -I$(PLUGIN_ROOT)/libswin/ldns -I$(PLUGIN_ROOT)/libswin/unbound -I$(PLUGIN_ROOT)/libswin/openssl/include -I$(PLUGIN_ROOT)/plugin-source/common -Wl,--output-def,$(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_DEF),-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32
 #DNSSECcore-windows-x86.exe
-	$(X86_MINGW_CC) -o $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_EXE) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_COMMON_OBJ) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_OBJ) $(PLUGIN_ROOT)/libswin/windows/x86/libunbound.a $(PLUGIN_ROOT)/libswin/windows/x86/libldns.a $(PLUGIN_ROOT)/libswin/windows/x86/libssl.a $(PLUGIN_ROOT)/libswin/windows/x86/libcrypto.a -Wl,-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32
+	$(X86_MINGW_CC) -o $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_EXE) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_COMMON_OBJ) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_LOG_DFLT_OBJ) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_OBJ) $(PLUGIN_ROOT)/libswin/windows/x86/libunbound.a $(PLUGIN_ROOT)/libswin/windows/x86/libldns.a $(PLUGIN_ROOT)/libswin/windows/x86/libssl.a $(PLUGIN_ROOT)/libswin/windows/x86/libcrypto.a -Wl,-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32
 	$(X86_MINGW_STRIP) -x -S $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_EXE)
 #DANEcore-windows-x86.exe
-	$(X86_MINGW_CC) -o $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_EXE) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_COMMON_OBJ) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_OBJ) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_CA_STORE_OBJ) $(PLUGIN_ROOT)/libswin/windows/x86/libunbound.a $(PLUGIN_ROOT)/libswin/windows/x86/libldns.a $(PLUGIN_ROOT)/libswin/windows/x86/libssl.a $(PLUGIN_ROOT)/libswin/windows/x86/libcrypto.a -Wl,-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32,-lcrypt32
+	$(X86_MINGW_CC) -o $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_EXE) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_COMMON_OBJ) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_LOG_DFLT_OBJ) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_OBJ) $(PLUGIN_ROOT)/$(PLUGIN_TMP)/$(PLUGIN_NAME_CA_STORE_OBJ) $(PLUGIN_ROOT)/libswin/windows/x86/libunbound.a $(PLUGIN_ROOT)/libswin/windows/x86/libldns.a $(PLUGIN_ROOT)/libswin/windows/x86/libssl.a $(PLUGIN_ROOT)/libswin/windows/x86/libcrypto.a -Wl,-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32,-lcrypt32
 	$(X86_MINGW_STRIP) -x -S $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_EXE)
 #dane-plug.o
 #	$(X86_MINGW_CC) -DCMNDLINE_TEST -Wall -shared -o $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_OBJ) -c $(PLUGIN_ROOT)/plugin-source/$(PLUGIN_NAME_TLSA)/dane-plug.c -DCA_STORE=NONE_CA_STORE -DTGT_SYSTEM=TGT_WIN -D__USE_MINGW_ANSI_STDIO=1 -Iplugin-source/common -I$(PLUGIN_ROOT)/libswin/windows/x86 -I$(PLUGIN_ROOT)/libswin/ldns -I$(PLUGIN_ROOT)/libswin/unbound -I$(PLUGIN_ROOT)/libswin/openssl/include -I$(PLUGIN_ROOT)/plugin-source/common -Wl,--output-def,$(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_DEF),-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32
