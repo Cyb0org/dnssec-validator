@@ -53,6 +53,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 		<preference id="cachefree" name="extensions.dnssec.cachefree" type="bool"/>
 		<preference id="popupfgcolor" name="extensions.dnssec.popupfgcolor" type="string"/>
 		<preference id="popupbgcolor" name="extensions.dnssec.popupbgcolor" type="string"/>
+		<preference id="usebrowsercertchain" name="extensions.dnssec.usebrowsercertchain" type="bool"/>
 	</preferences>
 
 	<groupbox>
@@ -85,10 +86,11 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 	<groupbox>
 		<caption label="&groupboxtlsa.label;"/>
 		<checkbox id="dnssec-pref-tlsaonoff" label="&tlsaonoff.label;" preference="tlsaenable" accesskey="&tlsaonoff.accesskey;" checked="true" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
+		<checkbox id="dnssec-pref-usebrowsercertchain" label="&usebrowsercertchain.label;" preference="usebrowsercertchain" accesskey="&usebrowsercertchain.accesskey;" checked="true" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
 		<checkbox id="dnssec-pref-checkallhttps" label="&checkallhttps.label;" preference="checkhttpsrequestsonpages" accesskey="&checkallhttps.accesskey;" checked="false" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
 		<checkbox id="dnssec-pref-tlsablock" label="&tlsablock.label;" preference="tlsablocking" accesskey="&tlsablock.accesskey;" checked="true" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
 		<checkbox id="dnssec-pref-clearcache" label="&clearcache.label;" preference="clearcache" accesskey="&clearcache.accesskey;" checked="false" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
- 	</groupbox>
+	</groupbox>
 	<separator class="groove-thin"/>
 	</prefpane>
 </prefwindow>

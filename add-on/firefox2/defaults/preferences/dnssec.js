@@ -39,5 +39,6 @@ pref("extensions.dnssec.popupbgcolor", "");
 pref("extensions.dnssec.tlsaenable", true);
 pref("extensions.dnssec.tlsablocking", false);
 pref("extensions.dnssec.clearcache", false);
+pref("extensions.dnssec.usebrowsercertchain", true);
 pref("extensions.dnssec.checkhttpsrequestsonpages", false);
 pref("extensions.dnssec.cacheexpir", 600);

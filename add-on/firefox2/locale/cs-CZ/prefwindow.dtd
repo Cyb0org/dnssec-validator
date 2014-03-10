@@ -46,3 +46,5 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY checkallhttps.accesskey "A">
 <!ENTITY clearcache.label "Vymazat mezipaměť prohlížeče při každém spuštění">
 <!ENTITY clearcache.accesskey "m">
+<!ENTITY usebrowsercertchain.label "Použít řětězec certifikátů prohlížeče">
+<!ENTITY usebrowsercertchain.accesskey "c">

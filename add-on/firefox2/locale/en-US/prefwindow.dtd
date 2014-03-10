@@ -46,3 +46,5 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <!ENTITY checkallhttps.accesskey "A">
 <!ENTITY clearcache.label "Clear browser cache at start-up">
 <!ENTITY clearcache.accesskey "b">
+<!ENTITY usebrowsercertchain.label "Use browser's certificate chain">
+<!ENTITY usebrowsercertchain.accesskey "c">
