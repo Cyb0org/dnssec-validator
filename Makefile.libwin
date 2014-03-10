@@ -86,3 +86,6 @@ sys_windows_unbound_pre:
 sys_windows_unbound_post:
 	cd libswin && ln -s $(UNBOUND) unbound && cd $(UNBOUND) && $(X86_MINGW_RANLIB) .libs/libunbound.a && cp .libs/libunbound.a ../windows/x86 && cd ..
 	@echo '### Now you can build the library for Windows... ###'
+
+clean:
+	rm -rf libswin

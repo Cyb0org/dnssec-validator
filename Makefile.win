@@ -136,5 +136,6 @@ xpi_x86:
 	cd $(ADDON_PATH_OP_TLSA) && rm -rf manifest.json np$(PLUGIN_NAME_TLSA).dll $(PLUGIN_NAME_TLSA_LIB)
 	@echo '### DONE... ###'
 
-
+clean:
+	rm -rf  $(PLUGIN_TMP)
 
