@@ -81,7 +81,7 @@ sys_windows_ldns_post:
 	cd libswin && ln -s $(LDNS) ldns && cd $(LDNS) && $(X86_MINGW_RANLIB) .libs/libldns.a && cp .libs/libldns.a ../windows/x86 && cp ldns/config.h ../windows/x86/ldns && cp ldns/net.h ../windows/x86/ldns && cd ..
 
 sys_windows_unbound_pre:
-	cd libswin && cd $(UNBOUND) && export CC="i586-mingw32msvc-gcc" && ./configure --disable-shared --with-ssl=../$(OPENSSL) --with-ldns=../$(LDNS) --host=mingw32  && make -i || @echo 'Continue if error...'
+	cd libswin && cd $(UNBOUND) && export CC="i586-mingw32msvc-gcc" && ./configure --disable-shared --with-libunbound-only --with-ssl=../$(OPENSSL) --with-ldns=../$(LDNS) --host=mingw32  && make -i || @echo 'Continue if error...'
 
 sys_windows_unbound_post:
 	cd libswin && ln -s $(UNBOUND) unbound && cd $(UNBOUND) && $(X86_MINGW_RANLIB) .libs/libunbound.a && cp .libs/libunbound.a ../windows/x86 && cd ..
