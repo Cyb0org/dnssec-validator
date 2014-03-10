@@ -40,7 +40,10 @@ OPENSSL_LIB := $(BASEDIR)/libswin/openssl
 LDNS_LIB := $(BASEDIR)/libswin/ldns
 UNBOUND_LIB := $(BASEDIR)/libswin/unbound
 
+X86_MINGV_HOST = i586-mingw32msvc
+X86_MINGW_PREFIX = i586-mingw32msvc-
 X86_MINGW_CC = i586-mingw32msvc-gcc
+X86_MINGW_LD = i586-mingw32msvc-ld
 X86_MINGW_STRIP = i586-mingw32msvc-strip
 X86_MINGW_RANLIB = i586-mingw32msvc-ranlib
 
@@ -72,16 +75,16 @@ libsource:
 sys_windows_openssl:
 	@echo '### Compiling library for Windows... ###'
 	cd libswin && mkdir windows && cd windows && mkdir x86 && cd x86 && mkdir ldns && cd .. && cd ..
-	cd libswin && cd $(OPENSSL) && ./Configure --cross-compile-prefix=i586-mingw32msvc- mingw enable-static-engine && make && ln -s . lib && cd .. && ln -s $(OPENSSL) openssl && cp $(OPENSSL)/libssl.a windows/x86 && cp $(OPENSSL)/libcrypto.a windows/x86
+	cd libswin && cd $(OPENSSL) && ./Configure --cross-compile-prefix=$(X86_MINGW_PREFIX) mingw enable-static-engine && make && ln -s . lib && cd .. && ln -s $(OPENSSL) openssl && cp $(OPENSSL)/libssl.a windows/x86 && cp $(OPENSSL)/libcrypto.a windows/x86
 
 sys_windows_ldns_pre:
-	cd libswin && cd $(LDNS) && export CC="i586-mingw32msvc-gcc" && ./configure --disable-shared --with-ssl=../$(OPENSSL) --host=mingw32  && make -i || @echo 'Continue if error...'
+	cd libswin && cd $(LDNS) && export CC="$(X86_MINGW_CC)" && export LD="$(X86_MINGW_LD)" && ./configure --disable-shared --with-ssl=../$(OPENSSL) --host=$(X86_MINGV_HOST)  && make -i || @echo 'Continue if error...'
 
 sys_windows_ldns_post:
 	cd libswin && ln -s $(LDNS) ldns && cd $(LDNS) && $(X86_MINGW_RANLIB) .libs/libldns.a && cp .libs/libldns.a ../windows/x86 && cp ldns/config.h ../windows/x86/ldns && cp ldns/net.h ../windows/x86/ldns && cd ..
 
 sys_windows_unbound_pre:
-	cd libswin && cd $(UNBOUND) && export CC="i586-mingw32msvc-gcc" && ./configure --disable-shared --with-libunbound-only --with-ssl=../$(OPENSSL) --with-ldns=../$(LDNS) --host=mingw32  && make -i || @echo 'Continue if error...'
+	cd libswin && cd $(UNBOUND) && export CC="$(X86_MINGW_CC)" && export LD="$(X86_MINGW_LD)" && ./configure --disable-shared --with-libunbound-only --with-ssl=../$(OPENSSL) --with-ldns=../$(LDNS) --host=$(X86_MINGV_HOST)  && make -i || @echo 'Continue if error...'
 
 sys_windows_unbound_post:
 	cd libswin && ln -s $(UNBOUND) unbound && cd $(UNBOUND) && $(X86_MINGW_RANLIB) .libs/libunbound.a && cp .libs/libunbound.a ../windows/x86 && cd ..
