@@ -108,12 +108,17 @@ $(LDNS_DIR): $(LDNS_TARBALL)
 	tar xzf $< -C libs
 
 ## unbound
+## TODO -- Unbound installation procedure expects unbound to be present
+##         although it has not been compiled.
+##         Therefore 'touch unbound' -- Fix the problem and send it
+##         to upstream.
 $(UNBOUND_LIB): $(UNBOUND_DIR) $(LDNS_LIB) $(OPENSSL_LIB)
 	(cd $< && \
 	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared \
 	    --with-ssl=$(OPENSSL_LIB) --with-ldns=$(LDNS_LIB) --without-libevent \
-	    --with-pic --prefix=$@ $(CONFIGURE_ARGS) && \
+	    --with-pic --prefix=$@ $(CONFIGURE_ARGS) --with-libunbound-only && \
 	    $(MAKETYPE) && \
+	    touch unbound && touch unbound-checkconf && touch unbound-control && touch unbound-host && touch unbound-anchor && touch unbound-control-setup && \
 	    $(MAKETYPE) install)
 
 $(UNBOUND_DIR): $(UNBOUND_TARBALL)
