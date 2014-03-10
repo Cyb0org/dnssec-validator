@@ -1,3 +1,12 @@
+v2.1.1 / (release date)
+
+- Ported DNSSEC/TLSA validator to Apple Safari.
+- Fixed SSL bug. Certificate chain was not checked when SSL connection was rejected by host.
+- MF: Added new TLSA-validator option. The plug-in can now download the certificate chain by itself. See issue #31.
+- TLSA add-on bug fix: Certificate chain was not obtained when SSL_connect() returned 0.
+- Plug-ins are capable of writing into system log on Mac OS X.
+- Fixed some another bugs.
+
 v2.1.0 / 25.1.2014
 
 - Port DNSSEC/TLSA validator on the Opera browser
