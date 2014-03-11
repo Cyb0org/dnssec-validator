@@ -18,6 +18,8 @@ add-on/firefox2/plugins/
 cmake_install.cmake
 libs/
 libwin/
+libswin/
+dll_build/
 packages/
 plugins-lib/
 ie/DNSSECValidator/*.sdf
