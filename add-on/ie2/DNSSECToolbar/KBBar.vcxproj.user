@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <DebuggerFlavor>WebBrowserDebugger</DebuggerFlavor>
-    <WebBrowserDebuggerHttpUrl>http://dating.wtmnd.nl</WebBrowserDebuggerHttpUrl>
+    <WebBrowserDebuggerHttpUrl>https://www.nic.cz</WebBrowserDebuggerHttpUrl>
     <WebServiceDebuggerHttpUrl>www.seznam.cz</WebServiceDebuggerHttpUrl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release MinDependency|Win32'">
