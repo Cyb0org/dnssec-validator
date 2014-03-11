@@ -105,7 +105,7 @@ CRITICAL_SECTION CKBBarBand::cs;
 // for tooltip creation
 bool CKBBarBand::csInitialized = false;
 bool csInitialized = false;
-char DefaultIniData[] = "[DNSSEC]\ntlsaenable=1\nkeytext=0\nchoice=3\nchoicedns=0\nuserip=217.31.204.130\nfilteron=0\nlisttld="; 
+char DefaultIniData[] = "[DNSSEC]\ntlsaenable=1\nkeytext=0\nchoice=3\nchoicedns=0\nuserip=8.8.8.8\nfilteron=0\nlisttld="; 
 char str[INET6_ADDRSTRLEN];
 
 //----BEGIN of CACHE MEMORY ---------------------------------------------------
@@ -1960,7 +1960,7 @@ void CKBBarBand::LoadOptionsFromFile(void) {
 	dbserver[0]='\0';
 	if (SUCCEEDED( SHGetFolderPath( NULL, CSIDL_LOCAL_APPDATA, NULL, SHGFP_TYPE_CURRENT, szPath ))){
 		PathAppend( szPath, INI_FILE_PATH);
-		GetPrivateProfileString("DNSSEC", "userip", "217.31.204.130", dbserver, IPADDR_MLEN, szPath);
+		GetPrivateProfileString("DNSSEC", "userip", "8.8.8.8", dbserver, IPADDR_MLEN, szPath);
 		memcpy(dnssecseradr, dbserver, IPADDR_MLEN);
 		tlsaenable = GetPrivateProfileInt("DNSSEC", "tlsaenable", 1 , szPath);
 		textkey = GetPrivateProfileInt("DNSSEC", "keytext", 0 , szPath);		

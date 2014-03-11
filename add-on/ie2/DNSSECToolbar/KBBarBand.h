@@ -59,7 +59,7 @@ using namespace std;
 #define RESOLVER			0
 #define RESOLVER2			0
 #define TLSAENABLE			1
-#define IPUSER		TEXT("217.31.204.130")
+#define IPUSER		TEXT("8.8.8.8")
 #define IPNIC		TEXT("217.31.204.130")
 #define IPOARC		TEXT("149.20.64.20")
 #define TCPUDP				0
