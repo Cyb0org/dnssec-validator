@@ -34,9 +34,6 @@ OpenSSL used as well as that of the covered work.
 #define _DANE_PLUG_H_
 
 
-#include "config_related.h"
-
-
 #ifndef XP_WIN
   #include <stdint.h>
 #else
