@@ -21,7 +21,7 @@ DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 document.write("<object id=\"tlsa-plugin\" type=\"application/x-tlsavalidatorplugin\" width=\"0\" height=\"0\"></object>");
 var defaultResolver = "nofwd"; // LDNS will use system resolver if empty string is passed
-var defaultCustomResolver = "8.8.8.8";
+var defaultCustomResolver = "217.31.204.130";
 
 //--------------------------------------------------------
 // Set string in the web element
@@ -109,7 +109,7 @@ function saveOptions() {
 //--------------------------------------------------------
 function testdnssec() {
 
-	var nameserver = "8.8.8.8";
+	var nameserver = "217.31.204.130";
 	var options = 0;
 	var testnic = 0;
 	var ip = false;

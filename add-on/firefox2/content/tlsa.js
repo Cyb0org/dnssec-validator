@@ -719,31 +719,38 @@ check_tlsa_tab_change:
 		}
 		tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_ACTION);
 		var c = tlsaExtNPAPIConst;
-		var cert = this.getCertificate(window.gBrowser);
-		if (!cert) {
-			if (daneExtension.debugOutput) {
-				dump(this.DANE_DEBUG_PRE + "No certificate!" + this.DANE_DEBUG_POST);
-			}
-			if (daneExtension.debugOutput) {
-				dump(this.DANE_DEBUG_PRE + "------------- TLSA validation end ------------------" + this.DANE_DEBUG_POST);
-			}
-			tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_INIT);
-
-			return null;
-		}
 
 		var derCerts = new Array();
-		var chain = cert.getChain();
-		var len = chain.length;
-		for (var i = 0; i < chain.length; i++) {
-			var certx = chain.queryElementAt(i, Components.interfaces.nsIX509Cert);
-			var derData = certx.getRawDER({});
-			var derHex = derData.map(function(x) {
-				return ("0"+x.toString(16)).substr(-2);
-			}).join("");
-			derCerts.push(derHex);
-		} //for
+		var len = 0;
 
+		if (dnssecExtPrefs.getBool("usebrowsercertchain")) {
+
+			var cert = this.getCertificate(window.gBrowser);
+			if (!cert) {
+				if (daneExtension.debugOutput) {
+					dump(this.DANE_DEBUG_PRE + "No certificate!" + this.DANE_DEBUG_POST);
+				}
+				if (daneExtension.debugOutput) {
+					dump(this.DANE_DEBUG_PRE + "------------- TLSA validation end ------------------" + this.DANE_DEBUG_POST);
+				}
+				tlsaExtHandler.setMode(tlsaExtHandler.DANE_MODE_INIT);
+
+				return null;
+			}
+
+			var chain = cert.getChain();
+			len = chain.length;
+			for (var i = 0; i < chain.length; i++) {
+				var certx = chain.queryElementAt(i, Components.interfaces.nsIX509Cert);
+				var derData = certx.getRawDER({});
+				var derHex = derData.map(function(x) {
+					return ("0"+x.toString(16)).substr(-2);
+				}).join("");
+				derCerts.push(derHex);
+			} //for
+		} else {
+			derCerts.push("00FF00FF");
+		}
 
 		var policy = this.ALLOW_TYPE_01 | this.ALLOW_TYPE_23;
 
@@ -864,33 +871,39 @@ check_tlsa_https:
 		}
 
 		var c = tlsaExtNPAPIConst;
-
-		if(!cert) {
-
-			if (daneExtension.debugOutput) {
-				dump(this.DANE_DEBUG_PRE + "Certificate chain missing!" + this.DANE_DEBUG_POST);
-			}
-
-			tlsaExtHandler.setSecurityState(c.DANE_NO_CERT_CHAIN);
-
-			if (daneExtension.debugOutput) {
-				dump(this.DANE_DEBUG_PRE + "----------- TLSA VALIDATION END -------------" + this.DANE_DEBUG_POST);
-			}
-			return;
-		} // if not cert
-
+		var len = 0;
 		var derCerts = new Array();
-		var chain = cert.getChain();
-		var len = chain.length;
-		for (var i = 0; i < chain.length; i++) {
-			var certx = chain.queryElementAt(i, Components.interfaces.nsIX509Cert);
-			var derData = certx.getRawDER({});
-			var derHex = derData.map(function(x) {
-				return ("0"+x.toString(16)).substr(-2);
-			}).join("");
-			derCerts.push(derHex);
-		} //for
 
+		if (dnssecExtPrefs.getBool("usebrowsercertchain")) {
+
+			if(!cert) {
+
+				if (daneExtension.debugOutput) {
+					dump(this.DANE_DEBUG_PRE + "Certificate chain missing!" + this.DANE_DEBUG_POST);
+				}
+
+				tlsaExtHandler.setSecurityState(c.DANE_NO_CERT_CHAIN);
+
+				if (daneExtension.debugOutput) {
+					dump(this.DANE_DEBUG_PRE + "----------- TLSA VALIDATION END -------------" + this.DANE_DEBUG_POST);
+				}
+				return;
+			} // if not cert
+
+			var chain = cert.getChain();
+			len = chain.length;
+			for (var i = 0; i < chain.length; i++) {
+				var certx = chain.queryElementAt(i, Components.interfaces.nsIX509Cert);
+				var derData = certx.getRawDER({});
+				var derHex = derData.map(function(x) {
+					return ("0"+x.toString(16)).substr(-2);
+				}).join("");
+				derCerts.push(derHex);
+			} //for
+		} else {
+			derCerts.push("00FF00FF");
+		}
+		
 		var policy = this.ALLOW_TYPE_01 | this.ALLOW_TYPE_23;
 
 		var options = 0;

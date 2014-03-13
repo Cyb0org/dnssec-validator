@@ -34,6 +34,9 @@ OpenSSL used as well as that of the covered work.
 #define _BSD_SOURCE /* S_IFREG */
 
 
+#include "config_related.h"
+
+
 #include <sys/stat.h> /* stat(2) */
 
 #include <assert.h>

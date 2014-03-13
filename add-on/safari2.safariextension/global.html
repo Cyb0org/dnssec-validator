@@ -1,0 +1,46 @@
+<!-- ***** BEGIN LICENSE BLOCK *****
+Copyright 2014 CZ.NIC, z.s.p.o.
+
+Authors: Martin Straka <martin.straka@nic.cz>
+
+This file is part of DNSSEC/TLSA Validator Add-on.
+
+DNSSEC/TLSA Validator Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC/TLSA Validator Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC/TLSA Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** -->
+
+
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>DNSSEC/TLSA Validator</title>
+	<script type="text/javascript">
+	const myBars = safari.extension.bars[0].hide();
+	// global variable for toolbar, extension bar an popovers
+	var dnssec_domain = "DNSSEC Validator";
+	var dnssec_icon = "../toolbar/dnssec_init.png";
+	var dnssec_textpre = "DNSSEC Validator allows you to check the existence and validity of DNSSEC signed DNS records.";
+	var dnssec_textpost = "";
+	var dnssec_tooltip = "Checks DNSSEC status";
+	var dnssec_detail = "DNSSEC Validator allows you to check the existence and validity of DNSSEC signed DNS records.";
+	var tlsa_domain = "TLSA Validator";
+	var tlsa_icon = "../toolbar/tlsa_init.png";
+	var tlsa_text = "TLSA Validator allows you to check the authenticity of a TLS/SSL certificate by DANE protocol.";
+	var tlsa_tooltip = "Check TLSA status";
+	var tlsa_detail = "The authenticity of a TLS/SSL certificate for a domain name is verified by DANE protocol (RFC 6698).";
+	</script>
+</head>
+<body>
+</body>
+</html>

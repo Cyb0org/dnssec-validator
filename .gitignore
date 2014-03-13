@@ -18,8 +18,14 @@ add-on/firefox2/plugins/
 cmake_install.cmake
 libs/
 libwin/
+libswin/
+dll_build/
+builds/
 packages/
 plugins-lib/
+add-on/ie2/DNSSECToolbar/Debug/
+add-on/ie2/DNSSECToolbar/ReleaseMinSize/
+add-on/ie2/DNSSECToolbar/IEdnssec.sdf
 ie/DNSSECValidator/*.sdf
 ie/DNSSECValidator/*.suo
 ie/DNSSECValidator/DNSSECValidator/Debug/

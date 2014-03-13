@@ -122,6 +122,12 @@ xpi:
 	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf np$(PLUGIN_NAME_DNSSEC).plugin manifest.json
 	cd $(ADDON_PATH_OP_TLSA) && rm -rf np$(PLUGIN_NAME_TLSA).plugin manifest.json
 	@echo '### Package for Opera MACOSX...Done. ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating package for Safari MACOSX ... ###'
+	./install_osx_safari_add_payload.sh
+	@echo '### Package for Opera Safari...Done. ###'
+
+
 
 xpi_x64:
 	@echo '### ...Creating package for Firefox MACOSX x64... ###'
@@ -157,6 +163,11 @@ xpi_x64:
 	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf np$(PLUGIN_NAME_DNSSEC).plugin manifest.json
 	cd $(ADDON_PATH_OP_TLSA) && rm -rf np$(PLUGIN_NAME_TLSA).plugin manifest.json
 	@echo '### Package for Opera MACOSX x64...Done. ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating package for Safari MACOSX ... ###'
+	./install_osx_safari_add_payload.sh
+	@echo '### Package for Opera Safari...Done. ###'
+
 
 xpi_x86:
 	@echo '### ...Creating package for Firefox MACOSX x86... ###'
@@ -192,5 +203,9 @@ xpi_x86:
 	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf np$(PLUGIN_NAME_DNSSEC).plugin manifest.json
 	cd $(ADDON_PATH_OP_TLSA) && rm -rf np$(PLUGIN_NAME_TLSA).plugin manifest.json
 	@echo '### Package for Opera MACOSX x86...Done. ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating package for Safari MACOSX ... ###'
+	./install_osx_safari_add_payload.sh
+	@echo '### Package for Opera Safari...Done. ###'
 
 clean:

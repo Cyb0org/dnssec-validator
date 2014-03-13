@@ -15,6 +15,7 @@ file (GLOB PLATFORM RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
 # use this to add preprocessor definitions
 add_definitions(
+  -DTGT_SYSTEM=TGT_OSX
   -DCA_STORE=OSX_CA_STORE
 )
 
@@ -23,6 +24,7 @@ SOURCE_GROUP(Mac FILES ${PLATFORM})
 
 set (SOURCES
     ${SOURCES}
+    ../common/log_osx.m
     ca_store_osx.m
     ${PLATFORM}
     )

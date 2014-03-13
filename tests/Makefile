@@ -57,6 +57,16 @@ ifneq ($(KERNEL),freebsd)
 endif
 
 
+# Which system is it compiled on.
+ifeq ($(KERNEL),darwin)
+  CPPFLAGS += -DTGT_SYSTEM=TGT_OSX
+  LOG_OBJ = log_osx.o
+else
+  # Default settings.
+  LOG_OBJ = log_dflt.o
+endif
+
+
 # Which CA store to use.
 CA_STORE ?= AUTO
 ifeq ($(CA_STORE),AUTO)
@@ -126,13 +136,13 @@ clean:
 common.o: ../plugin-source/common/common.c ../plugin-source/common/common.h
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
-dnssec-plug: dnssec-plug.o common.o
+dnssec-plug: dnssec-plug.o common.o $(LOG_OBJ)
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 dnssec-plug.o: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c $(STATIC_LIBS)
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
-dane-plug: dane-plug.o common.o $(CA_STORE_OBJ)
+dane-plug: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ)
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 dane-plug.o: ../plugin-source/TLSAValidatorPlugin/dane-plug.c $(STATIC_LIBS)
@@ -145,6 +155,12 @@ ca_store_nss.o: ../plugin-source/TLSAValidatorPlugin/ca_store_nss.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
 ca_store_osx.o: ../plugin-source/TLSAValidatorPlugin/ca_store_osx.m
+	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS)
+
+log_dflt.o: ../plugin-source/common/log_dflt.c
+	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
+
+log_osx.o: ../plugin-source/common/log_osx.m
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS)
 
 

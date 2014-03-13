@@ -32,6 +32,9 @@ OpenSSL used as well as that of the covered work.
 #define _POSIX_SOURCE
 
 
+#include "config_related.h"
+
+
 #define NONE_CA_STORE 0 /* No external CA store is loaded. */
 #define DIR_CA_STORE 1 /* CA certificates stored in directories. */
 #define NSS_CA_STORE 2 /* NSS built-in CA certificates. */
@@ -55,15 +58,16 @@ OpenSSL used as well as that of the covered work.
 #include <unistd.h>
 
 #include "ldns/wire2host.h"
-#include "openssl/x509.h"
+#include "openssl/bio.h"
 #include "openssl/evp.h"
+#include "openssl/x509.h"
 
 #include "ca_stores.h"
 #include "common.h"
 #include "dane-plug.h"
 #include "dane-states.gen"
 
-#if defined RES_WIN
+#if TGT_SYSTEM == TGT_WIN
 /* Windows */
   #include "ldns/config.h"
   #include "ldns/ldns.h"
@@ -132,7 +136,7 @@ static const char byteMap[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
 static int byteMapLen = sizeof(byteMap);
 //----------------------------------------------------------------------------
 /* structure to save TLSA records */
-struct tlsa_store_ctx {
+struct tlsa_store_item {
 	char *domain;
 	uint8_t dnssec_status;
 	uint8_t cert_usage;
@@ -141,10 +145,10 @@ struct tlsa_store_ctx {
 	uint8_t *association;
 	size_t association_size;
 	unsigned char *assochex;
-	struct tlsa_store_ctx *next;
+	struct tlsa_store_item *next;
 };
 
-#define tlsa_store_ctx_init(ptr) \
+#define tlsa_store_item_init(ptr) \
 	do { \
 		(ptr)->domain = NULL; \
 		(ptr)->dnssec_status = 0; \
@@ -159,21 +163,21 @@ struct tlsa_store_ctx {
 
 /* pointer structure to save TLSA records */
 struct tlsa_store_head {
-	struct tlsa_store_ctx *first;
+	struct tlsa_store_item *first;
 };
 
 /* structure to save certificate records */
-struct cert_store_ctx {
+struct cert_store_item {
 	char *cert_der;
 	int cert_len;
 	char *cert_der_hex;
 	char *spki_der;
 	int spki_len;
 	char *spki_der_hex;
-	struct cert_store_ctx *next;
+	struct cert_store_item *next;
 };
 
-#define cert_store_ctx_init(ptr) \
+#define cert_store_item_init(ptr) \
 	do { \
 		(ptr)->cert_der = NULL; \
 		(ptr)->cert_len = 0; \
@@ -186,7 +190,7 @@ struct cert_store_ctx {
 
 /* pointer structure to save certificate records */
 struct cert_store_head {
-	struct cert_store_ctx *first;
+	struct cert_store_item *first;
 };
 
 /* Structure to save certificate records */
@@ -282,10 +286,13 @@ int create_socket(const char *domain, const char *port_str)
 	error = WSAStartup( version, &wsaData );
 
 	/* check for error */
-	if ( error != 0 ) return -1;
+	if (error != 0) {
+		return -1;
+	}
 
 	/* check for correct version */
-	if ( LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 0) {
+	if ((LOBYTE(wsaData.wVersion) != 2) ||
+	    (HIBYTE(wsaData.wVersion) != 0)) {
 		WSACleanup();
 		return -1;
 	}
@@ -301,7 +308,7 @@ int create_socket(const char *domain, const char *port_str)
 	if (getaddrres != 0) {
 		printf_debug(DEBUG_PREFIX_CERT, "Error: getaddrinfo: %s\n",
 		    gai_strerror(getaddrres));
-		exit(EXIT_FAILURE);
+		return -1;
 	}
 
 	for (rp = result; rp != NULL; rp = rp->ai_next) {
@@ -320,7 +327,7 @@ int create_socket(const char *domain, const char *port_str)
 	if (rp == NULL) {               /* No address succeeded */
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 		    "Could not connect to remote server!");
-		exit(EXIT_FAILURE);
+		return -1;
 	}
 
 	freeaddrinfo(result);           /* No longer needed */
@@ -341,38 +348,6 @@ const char * get_dnssec_status(uint8_t dnssec_status)
 	default: return "ERROR";
 	}
 }
-
-#if 0
-//*****************************************************************************
-// Helper function (add new record in the TLSA list - first)
-// ----------------------------------------------------------------------------
-static
-void add_tlsarecord(struct tlsa_store_head *tlsa_list, const char *domain,
-	uint8_t dnssec_status, uint8_t cert_usage, uint8_t selector,
-	uint8_t matching_type, uint8_t *association, size_t association_size,
-	const char *assochex)
-{
-	struct tlsa_store_ctx *field_tlsa;
-	size_t size;
-
-	field_tlsa = tlsa_list->first;
-	field_tlsa = malloc(sizeof(struct tlsa_store_ctx));
-	size = strlen(domain) + 1;
-	field_tlsa->domain = malloc(size);
-	memcpy(field_tlsa->domain, domain, size);
-	field_tlsa->dnssec_status = dnssec_status;
-	field_tlsa->cert_usage = cert_usage;
-	field_tlsa->selector = selector;
-	field_tlsa->matching_type = matching_type;
-	field_tlsa->association = association;
-	field_tlsa->association_size = association_size;
-	size = strlen(assochex) + 1;
-	field_tlsa->assochex = malloc(size);
-	memcpy(field_tlsa->assochex, assochex, size);
-	field_tlsa->next = tlsa_list->first;
-	tlsa_list->first = field_tlsa;
-}
-#endif
 
 
 //*****************************************************************************
@@ -478,19 +453,19 @@ int add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list,
 	uint8_t selector, uint8_t matching_type,
 	const uint8_t *association, size_t association_size)
 {
-	struct tlsa_store_ctx *tlsa_entry = NULL;
+	struct tlsa_store_item *tlsa_entry = NULL;
 	size_t size;
 
 	assert(domain != NULL);
 	assert(association != NULL);
 	assert(association_size > 0);
 
-	tlsa_entry = malloc(sizeof(struct tlsa_store_ctx));
+	tlsa_entry = malloc(sizeof(struct tlsa_store_item));
 	if (tlsa_entry == NULL) {
 		goto fail;
 	}
 
-	tlsa_store_ctx_init(tlsa_entry);
+	tlsa_store_item_init(tlsa_entry);
 
 	size = strlen(domain) + 1;
 	tlsa_entry->domain = malloc(size);
@@ -519,7 +494,7 @@ int add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list,
 	tlsa_entry->next = NULL;
 
 	if (tlsa_list->first != NULL) {
-		struct tlsa_store_ctx *tmp = tlsa_list->first;
+		struct tlsa_store_item *tmp = tlsa_list->first;
 		while (tmp->next != NULL) {
 			tmp = tmp->next;
 		}
@@ -546,55 +521,13 @@ fail:
 	return -1;
 }
 
-#if 0
-//*****************************************************************************
-// Helper function (sorte TLSA list base on Policy)
-// ----------------------------------------------------------------------------
-static
-struct tlsa_store_head policyFilter(struct tlsa_store_head *tlsa_list, int policy)
-{
-	struct tlsa_store_head tlsa_list_new;
-	tlsa_list_new.first = NULL;
-
-	struct tlsa_store_ctx *tmp;
-	tmp=tlsa_list->first;
-
-	while (tmp != NULL) {
-		switch (tmp->cert_usage) {
-		case CA_CERT_PIN:
-		case EE_CERT_PIN:
-			if (policy & ALLOW_TYPE_01) {
-				add_tlsarecord_bottom(&tlsa_list_new,
-				tmp->domain, tmp->dnssec_status, tmp->cert_usage,
-				tmp->selector, tmp->matching_type, tmp->association,
-				tmp->association_size, (char*)tmp->assochex);
-			}
-			break;
-		case CA_TA_ADDED:
-		case EE_TA_ADDED:
-			if (policy & ALLOW_TYPE_23) {
-				add_tlsarecord_bottom(&tlsa_list_new,
-				tmp->domain, tmp->dnssec_status, tmp->cert_usage,
-				tmp->selector, tmp->matching_type, tmp->association,
-				tmp->association_size, (char*)tmp->assochex);
-			}
-			break;
-		default:
-			break;
-		} //switch
-	} //while
-
-	return tlsa_list_new;
-}
-#endif
-
 //*****************************************************************************
 // Helper function (print TLSA list)
 // ----------------------------------------------------------------------------
 static
 void print_tlsalist_debug(const struct tlsa_store_head *tlsa_list)
 {
-	struct tlsa_store_ctx *tmp;
+	struct tlsa_store_item *tmp;
 	int num;
 
 	if (!global_debug) {
@@ -627,10 +560,12 @@ void print_tlsalist_debug(const struct tlsa_store_head *tlsa_list)
 static
 void print_certlist_debug(const struct cert_store_head *cert_list)
 {
-	struct cert_store_ctx *tmp;
+	struct cert_store_item *tmp;
 	unsigned num;
 	X509 *cert_x509 = NULL;
 	const unsigned char *cert_der;
+	BIO *mem_bio;
+	char *bio_data;
 
 	if (!global_debug) {
 		/* Function prints only debugging information. */
@@ -646,11 +581,30 @@ void print_certlist_debug(const struct cert_store_head *cert_list)
 		cert_der = (unsigned char *) tmp->cert_der;
 		cert_x509 = d2i_X509(NULL, &cert_der, tmp->cert_len);
 		if (cert_x509 != NULL) {
-			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
-			    "Certificate in text format:");
-			X509_print_ex_fp(DEBUG_OUTPUT, cert_x509,
-			    XN_FLAG_COMPAT, X509_FLAG_COMPAT);
-			X509_free(cert_x509); cert_x509 = NULL;
+			mem_bio = BIO_new(BIO_s_mem());
+			if (mem_bio != NULL) {
+				printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+				    "Certificate in text format:");
+				X509_print_ex(mem_bio, cert_x509,
+				    XN_FLAG_COMPAT, X509_FLAG_COMPAT);
+				X509_free(cert_x509); cert_x509 = NULL;
+
+				BIO_get_mem_data(mem_bio, &bio_data);
+				/*
+				 * Make sure the buffer content is
+				 * null-terminated.
+				 */
+				BIO_write(mem_bio, "", 1);
+
+				/* Already contains new line at the end. */
+				printf_debug(DEBUG_PREFIX_CERT, "%s",
+				    bio_data);
+
+				BIO_free(mem_bio);
+			} else {
+				printf_debug(DEBUG_PREFIX_CERT, "%s\n",
+				    "Cannot create memory BIO.\n");
+			}
 		} else {
 			printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 			    "Cannot convert certificate into text format.");
@@ -666,21 +620,33 @@ void print_certlist_debug(const struct cert_store_head *cert_list)
 	}
 }
 
+
+//*****************************************************************************
+// Helper function
+// ----------------------------------------------------------------------------
+static
+void free_tlsalist_item(struct tlsa_store_item *tlsa_item)
+{
+	assert(tlsa_item != NULL);
+
+	free(tlsa_item->domain);
+	free(tlsa_item->association);
+	free(tlsa_item->assochex);
+	free(tlsa_item);
+}
+
 //*****************************************************************************
 // Helper function (free TLSA list)
 // ----------------------------------------------------------------------------
 static
 void free_tlsalist(struct tlsa_store_head *tlsa_list)
 {
-	struct tlsa_store_ctx *aux;
+	struct tlsa_store_item *aux;
 
 	while (tlsa_list->first != NULL) {
 		aux = tlsa_list->first->next;
 
-		free(tlsa_list->first->domain);
-		free(tlsa_list->first->association);
-		free(tlsa_list->first->assochex);
-		free(tlsa_list->first);
+		free_tlsalist_item(tlsa_list->first);
 
 		tlsa_list->first = aux;
 	}
@@ -692,7 +658,7 @@ void free_tlsalist(struct tlsa_store_head *tlsa_list)
 static
 void free_certlist(struct cert_store_head *cert_list)
 {
-	struct cert_store_ctx *aux;
+	struct cert_store_item *aux;
 
 	while (cert_list->first != NULL) {
 		aux = cert_list->first->next;
@@ -706,71 +672,6 @@ void free_certlist(struct cert_store_head *cert_list)
 		cert_list->first = aux;
 	}
 }
-
-#if 0
-//*****************************************************************************
-// Helper function (add new record in the certificate list - first)
-// ----------------------------------------------------------------------------
-static
-void add_certrecord(struct cert_store_head *cert_list, char* cert_der,
-    int cert_len, char* cert_der_hex,  char* spki_der, int spki_len,
-    char* spki_der_hex)
-{
-	struct cert_store_ctx *field_cert;
-	field_cert = cert_list->first;
-	field_cert = malloc(sizeof(struct cert_store_ctx));
-	field_cert->cert_der = malloc(cert_len + 1);
-	memcpy(field_cert->cert_der, cert_der, cert_len);
-	field_cert->cert_len = cert_len;
-	field_cert->cert_der_hex = malloc(strlen(cert_der_hex) + 1);
-	strcpy(field_cert->cert_der_hex, cert_der_hex);
-	field_cert->spki_der = malloc(spki_len + 1);
-	memcpy(field_cert->spki_der, spki_der, spki_len);
-	field_cert->spki_len = spki_len;
-	field_cert->spki_der_hex = malloc(strlen(spki_der_hex) + 1);
-	strcpy(field_cert->spki_der_hex, spki_der_hex);
-	field_cert->next = cert_list->first;
-	cert_list->first = field_cert;
-}
-#endif
-
-#if 0
-//*****************************************************************************
-// Helper function (add new record in the certificate list - last)
-// ----------------------------------------------------------------------------
-static
-void add_certrecord_bottom(struct cert_store_head *cert_list,
-    const char *cert_der, int cert_len, const char *cert_der_hex,
-    const char *spki_der, int spki_len, const char *spki_der_hex)
-{
-	struct cert_store_ctx *field_cert;
-
-	field_cert = malloc(sizeof(struct cert_store_ctx));
-
-	field_cert->cert_der = malloc(cert_len + 1);
-	memcpy(field_cert->cert_der, cert_der, cert_len);
-	field_cert->cert_len = cert_len;
-	field_cert->cert_der_hex = malloc(strlen(cert_der_hex) + 1);
-	strcpy(field_cert->cert_der_hex, cert_der_hex);
-	field_cert->spki_der = malloc(spki_len + 1);
-	memcpy(field_cert->spki_der, spki_der, spki_len);
-	field_cert->spki_len = spki_len;
-	field_cert->spki_der_hex = malloc(strlen(spki_der_hex) + 1);
-	strcpy(field_cert->spki_der_hex, spki_der_hex);
-	field_cert->next = NULL;
-
-	if (cert_list->first != NULL) {
-		struct cert_store_ctx *tmp = cert_list->first;
-		while (tmp->next) {
-			tmp = tmp->next;
-		}
-		tmp->next = field_cert;
-	} else {
-		cert_list->first = field_cert;
-	}
-}
-#endif
-
 
 //*****************************************************************************
 // DANE algorithm (spkicert)
@@ -812,24 +713,24 @@ struct cert_tmp_ctx spkicert(const char *certder, int len)
 //*****************************************************************************
 // Helper function (add new record in the certificate list - last)
 //
-// Retrun 0 on success -1 on failure.
+// Return 0 on success -1 on failure.
 // ----------------------------------------------------------------------------
 static
 int add_certrecord_bottom_from_der_hex(struct cert_store_head *cert_list,
     const char *der_hex)
 {
-	struct cert_store_ctx *cert_entry = NULL;
+	struct cert_store_item *cert_entry = NULL;
 	size_t hex_len;
 
 	assert(cert_list != NULL);
 	assert(der_hex != NULL);
 
-	cert_entry = malloc(sizeof(struct cert_store_ctx));
+	cert_entry = malloc(sizeof(struct cert_store_item));
 	if (cert_entry == NULL) {
 		goto fail;
 	}
 
-	cert_store_ctx_init(cert_entry);
+	cert_store_item_init(cert_entry);
 
 	hex_len = strlen(der_hex);
 	assert(!(hex_len & 0x01)); /* Must be even number. */
@@ -871,7 +772,7 @@ int add_certrecord_bottom_from_der_hex(struct cert_store_head *cert_list,
 
 	/* Append to list. */
 	if (cert_list->first != NULL) {
-		struct cert_store_ctx *tmp = cert_list->first;
+		struct cert_store_item *tmp = cert_list->first;
 		while (tmp->next) {
 			tmp = tmp->next;
 		}
@@ -904,24 +805,24 @@ fail:
 //*****************************************************************************
 // Helper function (add new record in the certificate list - last)
 //
-// Retrun 0 on success -1 on failure.
+// Return 0 on success -1 on failure.
 // ----------------------------------------------------------------------------
 static
 int add_certrecord_bottom_from_x509(struct cert_store_head *cert_list,
     X509 *x509)
 {
-	struct cert_store_ctx *cert_entry = NULL;
+	struct cert_store_item *cert_entry = NULL;
 	EVP_PKEY *pkey = NULL;
 
 	assert(cert_list != NULL);
 	assert(x509 != NULL);
 
-	cert_entry = malloc(sizeof(struct cert_store_ctx));
+	cert_entry = malloc(sizeof(struct cert_store_item));
 	if (cert_entry == NULL) {
 		goto fail;
 	}
 
-	cert_store_ctx_init(cert_entry);
+	cert_store_item_init(cert_entry);
 
 	cert_entry->cert_der = NULL;
 	cert_entry->cert_len = i2d_X509(x509,
@@ -969,7 +870,7 @@ int add_certrecord_bottom_from_x509(struct cert_store_head *cert_list,
 
 	/* Append to list. */
 	if (cert_list->first != NULL) {
-		struct cert_store_ctx *tmp = cert_list->first;
+		struct cert_store_item *tmp = cert_list->first;
 		while (tmp->next) {
 			tmp = tmp->next;
 		}
@@ -1044,14 +945,17 @@ char * strcat_clone(const char *s1, const char *s2)
 }
 #endif
 
+
 //*****************************************************************************
 // Get certificates from SSL handshake
 // Add certificate into structure
 // Helper function
 // return 0 success or -1 on error
+// TODO -- Is there a feasible way how to get certificate chain from the server
+// without using SSL_connect(3) ?
 // ----------------------------------------------------------------------------
 static
-int get_cert_list(SSL_CTX *ssl_ctx, char *dest_url,
+int get_cert_list(SSL_CTX *ssl_ctx, const char *dest_url,
     const char *domain, const char *port,
     struct cert_store_head *cert_list)
 {
@@ -1066,6 +970,7 @@ int get_cert_list(SSL_CTX *ssl_ctx, char *dest_url,
 	STACK_OF(X509) *chain;
 	X509 *cert2;
 	EVP_PKEY *pkey = NULL;
+	int ret;
 
 	assert(ssl_ctx != NULL);
 
@@ -1079,7 +984,7 @@ int get_cert_list(SSL_CTX *ssl_ctx, char *dest_url,
 	server_fd = create_socket(domain, port);
 	if(server_fd == -1) {
 		printf_debug(DEBUG_PREFIX_CERT,
-		    "Error TCP connection to: %s.\n", dest_url);
+		    "Error establishing TCP connection to: %s.\n", dest_url);
 		goto fail;
 	}
 
@@ -1098,12 +1003,19 @@ int get_cert_list(SSL_CTX *ssl_ctx, char *dest_url,
 		}
 	}
 
-	if (SSL_connect(ssl) != 1) {
+	ret = SSL_connect(ssl);
+	if (ret < 0) {
 		printf_debug(DEBUG_PREFIX_CERT,
 		    "Error: Could not build a SSL session to: %s.\n",
 		    dest_url);
 		goto fail;
+	} else if (0 == ret) {
+		printf_debug(DEBUG_PREFIX_CERT,
+		    "Error: SSL handshake with %s shut down by controller.\n",
+		    dest_url);
 	}
+
+	assert(ret >= 0);
 
 	chain = SSL_get_peer_cert_chain(ssl);
 	if (chain == NULL) {
@@ -1293,15 +1205,15 @@ char * sha512(const char *data, int len)
 // ----------------------------------------------------------------------------
 static
 const char * selectorData(uint8_t selector,
-    const struct cert_store_ctx *cert_ctx)
+    const struct cert_store_item *cert_item)
 {
 	printf_debug(DEBUG_PREFIX_DANE, "selector: %i \n",
 	    selector);
 	switch (selector) {
 	case FULL:
-		return cert_ctx->cert_der;
+		return cert_item->cert_der;
 	case SPKI:
-		return cert_ctx->spki_der;
+		return cert_item->spki_der;
 	default:
 		printf_debug(DEBUG_PREFIX_DANE,
 		    "Wrong value of selector parameter: %i \n", selector);
@@ -1316,11 +1228,11 @@ const char * selectorData(uint8_t selector,
 // ----------------------------------------------------------------------------
 static
 char * matchingData(uint8_t matching_type, uint8_t selector,
-    const struct cert_store_ctx *cert_ctx)
+    const struct cert_store_item *cert_item)
 {
 	printf_debug(DEBUG_PREFIX_DANE, "matching_type: %i \n", matching_type);
 
-	const char *data = selectorData(selector, cert_ctx);
+	const char *data = selectorData(selector, cert_item);
 	char *der_copy;
 	unsigned i;
 
@@ -1329,26 +1241,26 @@ char * matchingData(uint8_t matching_type, uint8_t selector,
 	}
 	switch (matching_type) {
 	case EXACT:
-		der_copy = malloc(strlen(cert_ctx->cert_der_hex) + 1);
+		der_copy = malloc(strlen(cert_item->cert_der_hex) + 1);
 		if (der_copy == NULL) {
 			return NULL;
 		}
 		/* Convert hex string to upper case. */
-		for (i = 0; i < (strlen(cert_ctx->cert_der_hex) + 1); ++i) {
-			der_copy[i] = toupper(cert_ctx->cert_der_hex[i]);
+		for (i = 0; i < (strlen(cert_item->cert_der_hex) + 1); ++i) {
+			der_copy[i] = toupper(cert_item->cert_der_hex[i]);
 		}
 		return der_copy;
 	case SHA256:
 		if (selector==SPKI) {
-			return sha256(data, cert_ctx->spki_len);
+			return sha256(data, cert_item->spki_len);
 		} else {
-			return sha256(data, cert_ctx->cert_len);
+			return sha256(data, cert_item->cert_len);
 		}
 	case SHA512:
 		if (selector==SPKI) {
-			return sha512(data, cert_ctx->spki_len);
+			return sha512(data, cert_item->spki_len);
 		} else {
-			return sha512(data, cert_ctx->cert_len);
+			return sha512(data, cert_item->cert_len);
 		}
 	default:
 		printf_debug(DEBUG_PREFIX_DANE,
@@ -1365,26 +1277,26 @@ char * matchingData(uint8_t matching_type, uint8_t selector,
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
 static
-int eeCertMatch1(const struct tlsa_store_ctx *tlsa_ctx,
+int eeCertMatch1(const struct tlsa_store_item *tlsa_item,
     const struct cert_store_head *cert_list)
 {
 	//printf_debug(DEBUG_PREFIX_DANE, "eeCertMatch1\n");
 
 	int ret_val = DANE_INVALID_TYPE1;
-	char *data = matchingData(tlsa_ctx->matching_type,
-	    tlsa_ctx->selector, cert_list->first);
+	char *data = matchingData(tlsa_item->matching_type,
+	    tlsa_item->selector, cert_list->first);
 
 	if (data == NULL) {
 		return DANE_TLSA_PARAM_ERR;
 	}
 
 	if (strcmp((const char *) data,
-	        (const char *) tlsa_ctx->assochex) == 0) {
+	        (const char *) tlsa_item->assochex) == 0) {
 		ret_val = DANE_VALID_TYPE1;
 	}
 
 	printf_debug(DEBUG_PREFIX_DANE, "cert: %s\n", data);
-	printf_debug(DEBUG_PREFIX_DANE, "tlsa: %s\n", tlsa_ctx->assochex);
+	printf_debug(DEBUG_PREFIX_DANE, "tlsa: %s\n", tlsa_item->assochex);
 
 	free(data);
 	return ret_val;
@@ -1398,26 +1310,26 @@ int eeCertMatch1(const struct tlsa_store_ctx *tlsa_ctx,
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
 static
-int eeCertMatch3(const struct tlsa_store_ctx *tlsa_ctx,
+int eeCertMatch3(const struct tlsa_store_item *tlsa_item,
     const struct cert_store_head *cert_list)
 {
 	//printf_debug(DEBUG_PREFIX_DANE, "eeCertMatch3\n");
 
 	int ret_val = DANE_INVALID_TYPE3;
-	char *data = matchingData(tlsa_ctx->matching_type,
-	    tlsa_ctx->selector, cert_list->first);
+	char *data = matchingData(tlsa_item->matching_type,
+	    tlsa_item->selector, cert_list->first);
 
 	if (data == NULL) {
 		return DANE_TLSA_PARAM_ERR;
 	}
 
 	if (strcmp((const char *) data,
-	        (const char *) tlsa_ctx->assochex) == 0) {
+	        (const char *) tlsa_item->assochex) == 0) {
 		ret_val = DANE_VALID_TYPE3;
 	}
 
 	printf_debug(DEBUG_PREFIX_DANE, "cert: %s\n", data);
-	printf_debug(DEBUG_PREFIX_DANE, "tlsa: %s\n", tlsa_ctx->assochex);
+	printf_debug(DEBUG_PREFIX_DANE, "tlsa: %s\n", tlsa_item->assochex);
 
 	free(data);
 	return ret_val;
@@ -1429,10 +1341,10 @@ int eeCertMatch3(const struct tlsa_store_ctx *tlsa_ctx,
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
 static
-int caCertMatch(const struct tlsa_store_ctx *tlsa_ctx,
+int caCertMatch(const struct tlsa_store_item *tlsa_item,
     const struct cert_store_head *cert_list)
 {
-	const struct cert_store_ctx *aux_cert;
+	const struct cert_store_item *aux_cert;
 
 	//printf_debug(DEBUG_PREFIX_DANE, "caCertMatch0\n");
 
@@ -1444,18 +1356,18 @@ int caCertMatch(const struct tlsa_store_ctx *tlsa_ctx,
 
 	aux_cert = cert_list->first->next;
 	while (aux_cert != NULL) {
-		char *data = matchingData(tlsa_ctx->matching_type,
-		    tlsa_ctx->selector, aux_cert);
+		char *data = matchingData(tlsa_item->matching_type,
+		    tlsa_item->selector, aux_cert);
 		if (data == NULL) {
 			return DANE_TLSA_PARAM_ERR;
 		}
 
 		printf_debug(DEBUG_PREFIX_DANE, "cert: %s\n", data);
 		printf_debug(DEBUG_PREFIX_DANE, "tlsa: %s\n",
-		    tlsa_ctx->assochex);
+		    tlsa_item->assochex);
 
 		if (strcmp((const char *) data,
-		        (const char *) tlsa_ctx->assochex) == 0) {
+		        (const char *) tlsa_item->assochex) == 0) {
 			free(data);
 			return DANE_VALID_TYPE0;
 		}
@@ -1473,10 +1385,10 @@ int caCertMatch(const struct tlsa_store_ctx *tlsa_ctx,
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
 static
-int chainCertMatch(const struct tlsa_store_ctx *tlsa_ctx,
+int chainCertMatch(const struct tlsa_store_item *tlsa_item,
     const struct cert_store_head *cert_list)
 {
-	const struct cert_store_ctx *aux_cert;
+	const struct cert_store_item *aux_cert;
 
 	//printf_debug(DEBUG_PREFIX_DANE, "chainCertMatch2\n");
 
@@ -1488,18 +1400,18 @@ int chainCertMatch(const struct tlsa_store_ctx *tlsa_ctx,
 
 	aux_cert = cert_list->first;
 	while (aux_cert != NULL) {
-		char *data = matchingData(tlsa_ctx->matching_type,
-		    tlsa_ctx->selector, aux_cert);
+		char *data = matchingData(tlsa_item->matching_type,
+		    tlsa_item->selector, aux_cert);
 		if (data == NULL) {
 			return DANE_TLSA_PARAM_ERR;
 		}
 
 		printf_debug(DEBUG_PREFIX_DANE, "cert: %s\n", data);
 		printf_debug(DEBUG_PREFIX_DANE, "tlsa: %s\n",
-		    tlsa_ctx->assochex);
+		    tlsa_item->assochex);
 
 		if (strcmp((const char *) data,
-		        (const char *) tlsa_ctx->assochex) == 0) {
+		        (const char *) tlsa_item->assochex) == 0) {
 			free(data);
 			return DANE_VALID_TYPE2;
 		}
@@ -1520,7 +1432,7 @@ int tlsa_validate(const struct tlsa_store_head *tlsa_list,
     const struct cert_store_head *cert_list)
 {
 	int idx;
-	const struct tlsa_store_ctx *aux_tlsa;
+	const struct tlsa_store_item *aux_tlsa;
 
 	idx = DANE_NO_TLSA;
 	aux_tlsa = tlsa_list->first;
@@ -1984,7 +1896,6 @@ int dane_validate(const char *certchain[], int certcount, uint16_t options,
 	print_tlsalist_debug(&tlsa_list);
 
 	if (certcount > 0) {
-
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 		    "Browser's certificate chain is used.");
 
@@ -2000,6 +1911,7 @@ int dane_validate(const char *certchain[], int certcount, uint16_t options,
 	} else {
 		printf_debug(DEBUG_PREFIX_CERT, "%s\n",
 		    "External certificate chain is used.");
+
 		memcpy(uri, "https://", HTTPS_PREF_LEN + 1);
 		strncat(uri, domain, MAX_URI_LEN - HTTPS_PREF_LEN - 1);
 		retval = get_cert_list(glob_val_ctx.ssl_ctx,
@@ -2047,6 +1959,21 @@ int dane_validation_deinit(void)
 
 	return 0;
 }
+
+#if 0
+__attribute__ ((constructor))
+static
+void _construct(void)
+{
+	int global_debug_bak = global_debug;
+
+	global_debug = 1;
+	
+	printf_debug(DEBUG_PREFIX_DANE, "Running inside PID %d.\n", getpid());
+
+	global_debug = global_debug_bak;
+}
+#endif
 
 #ifdef CMNDLINE_TEST
 

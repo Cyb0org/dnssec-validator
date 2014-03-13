@@ -31,11 +31,14 @@ OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
 
+#include "config_related.h"
+
+
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
-#if defined RES_WIN
+#if TGT_SYSTEM == TGT_WIN
    #include "libunbound/unbound.h"
 #else
    #include "unbound.h"

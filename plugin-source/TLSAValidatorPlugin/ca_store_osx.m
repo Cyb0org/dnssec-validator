@@ -31,6 +31,9 @@ OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
 
+#include "config_related.h"
+
+
 #include <openssl/err.h>
 #include <openssl/x509.h>
 

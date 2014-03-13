@@ -194,6 +194,7 @@ setElementsattributes :
 		document.getElementById("dnssec-pref-tlsablock").disabled = !tmpCheck;
 		document.getElementById("dnssec-pref-clearcache").disabled = !tmpCheck;
 		document.getElementById("dnssec-pref-checkallhttps").disabled = !tmpCheck;
+		document.getElementById("dnssec-pref-usebrowsercertchain").disabled = !tmpCheck;
 		if (tmpCheck) {
 			var tmp = document.getElementById("dnssec-pref-checkallhttps").checked;
 			document.getElementById("dnssec-pref-clearcache").disabled = !tmp;

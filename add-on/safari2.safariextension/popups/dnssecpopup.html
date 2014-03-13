@@ -1,0 +1,78 @@
+<!-- ***** BEGIN LICENSE BLOCK *****
+Copyright 2014 CZ.NIC, z.s.p.o.
+
+Authors: Martin Straka <martin.straka@nic.cz>
+
+This file is part of DNSSEC/TLSA Validator Add-on.
+
+DNSSEC/TLSA Validator Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC/TLSA Validator Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC/TLSA Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** -->
+
+
+<!doctype html>
+<html>
+<head>
+    <style>
+        body {
+		font: 0.9em Verdana, Arial, Helvetica; max-width: 43em;
+	        min-width:300px;
+        	overflow-x:hidden;
+        }
+	td {
+		vertical-align: top;
+		padding-right: 8px;
+		padding-bottom: 10px;
+		font-size: 90%;
+	}
+	#divright {
+		text-align: left; 
+		font-size: 100%; 
+		padding-top: 10px; 
+		display: block;
+	}
+	#detail-text {
+		text-align: left;
+		font-size: 90%;
+		padding-top: 10px;
+		display: none;
+	}
+	#homepage {
+		text-align: left;
+		font-size: 80%;
+		padding-top: 10px;
+		display: none;
+	}
+	span {
+		font-size: 90%;
+	}
+    </style>
+</head>
+
+<body>	
+	<table>
+	<tr><td>
+		<img id="popup-dnssec-icon" src="../toolbar/dnssec_init.png"/>
+	</td><td>
+		<strong id="domain-name-title"></strong><br/><strong id="dnssec-tooltip"></strong>
+	</td></tr>
+	</table>
+	<span id="pre-domain-text"></span>
+	<span id="domain-name-text"></span>
+	<span id="post-domain-text"></span>
+	<div id="divright"><button type="Submit" onclick="showDnssecDetailInfo();">more info</button></div>
+	<div id="detail-text"></div>
+	<p id="homepage"><a href="#" onclick="openNewTab('DNSSECPopup');" target="_blank">Go to plugin homepage for additional information</a></p>
+	<script src="dnssecpopup.js"></script>
+</body>
+</html>

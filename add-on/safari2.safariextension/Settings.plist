@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>DefaultValue</key>
+		<real>1</real>
+		<key>Key</key>
+		<string>R</string>
+		<key>Title</key>
+		<string>Resolver settings</string>
+		<key>Titles</key>
+		<array>
+			<string>Use system settings</string>
+			<string>Custom</string>
+			<string>Without Resolver  </string>
+		</array>
+		<key>Type</key>
+		<string>Group</string>
+		<key>Values</key>
+		<array>
+			<real>1</real>
+			<real>2</real>
+			<real>3</real>
+		</array>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<real>1</real>
+		<key>Key</key>
+		<string>resolverchoice</string>
+		<key>Title</key>
+		<string>Resolver</string>
+		<key>Titles</key>
+		<array>
+			<string>Without Resolver (default)</string>
+			<string>Use system settings</string>
+			<string>Custom</string>
+		</array>
+		<key>Type</key>
+		<string>RadioButtons</string>
+		<key>Values</key>
+		<array>
+			<real>1</real>
+			<real>2</real>
+			<real>3</real>
+		</array>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string>217.31.204.130</string>
+		<key>Key</key>
+		<string>resolverip</string>
+		<key>Title</key>
+		<string>IP of custom resolver</string>
+		<key>Type</key>
+		<string>TextField</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<string>Separator</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>x</string>
+		<key>Title</key>
+		<string>Enable domain filter</string>
+	</dict>
+	<dict>
+		<key>Key</key>
+		<string>L</string>
+		<key>Title</key>
+		<string>List of excluded domains and TLD</string>
+		<key>Type</key>
+		<string>Group</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>filteron</string>
+		<key>Title</key>
+		<string>Exclude domains and TLDs in the list below</string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string></string>
+		<key>Key</key>
+		<string>domainlist</string>
+		<key>Title</key>
+		<string>List of domains</string>
+		<key>Type</key>
+		<string>TextField</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<string>Separator</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>x</string>
+		<key>Title</key>
+		<string>Enable HTTPS connection blocking by TLSA Validator </string>
+	</dict>
+	<dict>
+		<key>Title</key>
+		<string>TLSA Validator settings</string>
+		<key>Type</key>
+		<string>Group</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>tlsaon</string>
+		<key>Title</key>
+		<string>Enable validation of TLSA records</string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>blocking</string>
+		<key>Title</key>
+		<string>Cancel HTTPS connection when TLSA validation fails</string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>Key</key>
+		<string>xxx</string>
+		<key>Type</key>
+		<string>Hidden</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<string>Separator</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string>vv</string>
+		<key>Key</key>
+		<string>vv</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>debuglogout</string>
+		<key>Title</key>
+		<string>Print debug infos into error console</string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+</array>
+</plist>

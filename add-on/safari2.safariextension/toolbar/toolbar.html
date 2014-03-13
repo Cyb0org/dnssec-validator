@@ -1,0 +1,871 @@
+<!-- ***** BEGIN LICENSE BLOCK *****
+Copyright 2014 CZ.NIC, z.s.p.o.
+
+Authors: Martin Straka <martin.straka@nic.cz>
+
+This file is part of DNSSEC/TLSA Validator Add-on.
+
+DNSSEC/TLSA Validator Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC/TLSA Validator Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC/TLSA Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** -->
+
+<html>
+<head>
+	<title>DNSSEC/TLSA Validator</title>
+	<script src="../js/npapi.js"></script> 
+	<script src="../js/core.js"></script>
+	<script src="../locale/dnssecmessages.js"></script>
+	<script src="../locale/tlsamessages.js"></script>
+    	<style>
+.dnssec-button {
+	background-color: transparent;
+	background-repeat: no-repeat;
+	border: none; 
+	cursor: pointer;
+	vertical-align: middle;
+	padding : 0px;
+}
+
+.tlsa-button {
+	background-color: transparent;
+	background-repeat: no-repeat;
+	border: none; 
+	cursor: pointer;
+	vertical-align: middle;
+	padding : 0 0 0 10px;
+}
+	</style>
+</head>
+<body>
+
+<object id="dnssec" type="application/x-dnssecvalidatorplugin" width="0" height="0">DNSSECPlugin FAILED to load</object>
+<object id="tlsa" type="application/x-tlsavalidatorplugin" width="0" height="0">TLSAPlugin FAILED to load</object> 
+<script type="text/javascript">
+
+// default settings
+var defaultresolver = "217.31.204.130";
+var blankstate = -99;
+var iconbaseurl = "../toolbar/";
+
+// TLSA validator settings
+var https_default_port = "443";
+var ftps_default_port = "990";
+var protocol = "tcp";
+var certlen = 0;
+
+// Plugins initialization
+var dnssecobj= InitDnssecPlugin("dnssec");
+var tlsaobj = InitTlsaPlugin("tlsa");
+const myGlobal = safari.extension.globalPage.contentWindow;
+const myBars = safari.extension.bars[0].hide();
+
+//*********************************************************
+// get toolbar icon handle
+//*********************************************************
+function getToolBarItemHandle(toolbarItemId) {
+
+	var toolbarItem = safari.extension.toolbarItems.filter(function (tbi) {
+	return tbi.identifier == toolbarItemId && tbi.browserWindow == safari.application.activeBrowserWindow;
+	})[0];
+	return toolbarItem;
+};
+
+//*********************************************************
+// get toolbar icon handle
+//*********************************************************
+function getToolBarPopoverHandle(popoverId) {
+
+	var popover = safari.extension.popovers.filter(function (po) { return po.identifier == popoverId;})[0];
+	return popover;
+};
+
+//*********************************************************
+// set new state (icon and tooltip) on toolbar item
+//*********************************************************
+function setToolbarButton(toolbarItemId, tooltip, file) {
+
+	var toolbarItem = getToolBarItemHandle(toolbarItemId);
+	toolbarItem.image = safari.extension.baseURI + "icons/" + file;
+	toolbarItem.toolTip = tooltip;
+};
+
+//*********************************************************
+// Show popup dialog when DNSSEC/TLSA icon was clicked
+//*********************************************************
+function showPopover(popoverId, toolbarItemId) {
+
+	var toolbarItem = getToolBarItemHandle(toolbarItemId);
+	var popover = getToolBarPopoverHandle(popoverId);
+	toolbarItem.popover = popover;
+	toolbarItem.showPopover();  
+};
+
+//************************************************************
+// Return true/false if domain name is in exclude domain list
+//************************************************************
+function ExcludeDomainList(domain) {
+
+	var result = true;
+
+	if (safari.extension.settings.filteron) {
+		var DomainSeparator = /[.]+/;
+		var DomainArray = domain.split(DomainSeparator);
+		var DomainList = safari.extension.settings.domainlist;
+		if (DomainList == undefined) {
+			return result;
+		}
+		if (DomainList == null) {
+			return result;
+		}
+		if (DomainList == "") {
+			return result;
+		}
+		var DomainListSeparators = /[ ,;]+/;
+		var DomainListArray = DomainList.split(DomainListSeparators);
+
+		var i = 0;
+		var j = 0;
+		var domaintmp = DomainArray[DomainArray.length-1];
+		for (i = DomainArray.length-1; i >= 0; i--) {
+			for (j = 0; j < DomainListArray.length; j++) {
+				if (domaintmp == DomainListArray[j]) {
+					return false;
+				}
+			}
+			domaintmp = DomainArray[i-1] + "." + domaintmp;
+		}
+	}
+	return result;
+};
+
+//****************************************************************
+// Get URL scheme (http/https/ftp/ftps)
+//****************************************************************
+function getHttpSheme(taburl){
+
+	if (taburl == undefined) return null;
+	if (taburl == null) return null;
+	if (taburl == "") return null;
+
+	if (taburl.indexOf("https") != -1) return "https";
+	else if (taburl.indexOf("http") != -1) return "http";
+	else if (taburl.indexOf("ftps") != -1) return "ftps";
+	else if (taburl.indexOf("ftp") != -1) return "ftp";
+	else return null;	
+};
+
+//****************************************************************
+// return domain name and port number of url
+//****************************************************************
+function getDomainAndPort(taburl) {
+
+	if (taburl == undefined) return null;
+	if (taburl == null) return null;
+	if (taburl == "") return null;
+
+	var tmp = taburl.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(:[0-9]+)*(:)?/);
+	return [tmp[1], tmp[2]];
+};
+
+//****************************************************************
+// get domain name from url
+//****************************************************************
+function getDomainFromUrl(taburl){
+
+	if (taburl == undefined) return null;
+	if (taburl == null) return null;
+	if (taburl == "") return null;
+
+	var domain = taburl.match(/^(?:[\w-]+:\/+)?\[?([\w\.\[\]\:-]+)\]?(?::)*(?::\d+)?/)[1];
+	return domain;
+}
+
+//****************************************************************
+// set icon into toolbar
+//****************************************************************
+function setIcon(file, object){
+
+	var pic = document.getElementById(object);
+	if (pic == typeof('undefined')) return;
+	pic.src = file;
+};
+
+//****************************************************************
+// set icon tooltip
+//****************************************************************
+function UpdateTooltip(text, object) {
+	
+	document.getElementById(object).title = text;
+};
+
+//****************************************************************
+// set DNSSEC popup infos into globalpage
+//****************************************************************
+function setDnssecPopup(domain, icon, tooltip, textpre, textpost, detail){
+
+	myGlobal.dnssec_domain = domain;
+	myGlobal.dnssec_icon = icon;
+	myGlobal.dnssec_textpre = textpre;
+	myGlobal.dnssec_textpost = textpost;
+	myGlobal.dnssec_detail = detail;
+	myGlobal.dnssec_tooltip = tooltip;
+};
+
+//****************************************************************
+// set TLSA popup infos into globalpage
+//****************************************************************
+function setTlsaPopup(domain, icon, tooltip, text, detail){
+
+	myGlobal.tlsa_domain = domain;
+	myGlobal.tlsa_icon = icon;
+	myGlobal.tlsa_text = text;
+	myGlobal.tlsa_detail = detail;
+	myGlobal.tlsa_tooltip = tooltip;
+};
+
+//****************************************************************
+// fires when any item of settings was changed
+//****************************************************************
+function OnSettingsChange() {
+	ClearDnssecPluginContetx();
+	ClearTlsaPluginContetx();
+};
+
+//****************************************************************
+// set Default icons and tooltip text
+//****************************************************************
+function setDefaultIcon() {
+	setToolbarButton("Dinfo", "DNSSEC Validator", "dnssec_init.png");
+	setToolbarButton("Tinfo", "TLSA Validator", "tlsa_init.png");
+};
+
+//****************************************************************
+// set Default icons and tooltip text
+//****************************************************************
+function setActionIcon() {
+	setToolbarButton("Dinfo", "DNSSEC Validator", "dnssec_action.png");
+	setToolbarButton("Tinfo", "TLSA Validator", "tlsa_action.png");
+};
+
+//****************************************************************
+// set DNSSEC mode - icon, text, tooltip etc..
+//****************************************************************
+function setDnssecMode(dresult, domain) {
+
+	var c = dnssecExtNPAPIConst;
+	var file = "dnssec_init.png";
+	var tooltip = "DNSSEC Validator";
+	var textpre = "";
+	var textpost = "";
+	var detail = "";
+
+	switch (dresult) {
+	case c.DNSSEC_COT_DOMAIN_SECURED: 
+		file = "dnssec_valid.png";
+		tooltip = txt_tooltip_dnssecok;
+		textpre = txt_pre_domain;
+		textpost = txt_post_2securedConnectionDomain;
+		detail = txt_detail_2securedConnectionDomainInfo;
+		break;
+	case c.DNSSEC_COT_DOMAIN_SECURED_BAD_IP:
+		file = "dnssec_ip.png";
+		tooltip = txt_tooltip_dnssecok;
+		textpre = txt_pre_domain;
+		textpost = txt_post_3securedConnectionDomainInvIPaddr;
+		detail = txt_detail_3securedConnectionDomainInvIPaddrInfo;
+		break;	
+	case c.DNSSEC_NXDOMAIN_SIGNATURE_VALID: 
+		file = "dnssec_valid.png";
+		tooltip = txt_tooltip_dnssecok;
+		textpre = txt_preno_domain;
+		textpost = txt_post_6securedConnectionNoDomain;
+		detail = txt_detail_6securedConnectionNoDomainInfo;
+		break;
+	case c.DNSSEC_COT_DOMAIN_BOGUS:
+		file = "dnssec_bogus.png";
+		tooltip = txt_tooltip_dnssecbogus;
+		textpre = txt_pre_domain;
+		textpost = txt_post_4invalidDomainSignature;
+		detail = txt_detail_4invalidDomainSignatureInfo;
+		break;
+	case c.DNSSEC_NXDOMAIN_SIGNATURE_INVALID:
+		file = "dnssec_bogus.png";
+		tooltip = txt_tooltip_dnssecbogus;
+		textpre = txt_preno_domain;
+		textpost = txt_post_7invalidNoDomainSignature;
+		detail = txt_detail_7invalidNoDomainSignatureInfo;
+		break;
+	case c.DNSSEC_DOMAIN_UNSECURED:
+		file = "dnssec_no.png";
+		tooltip = txt_tooltip_dnssecnone;
+		textpre = txt_pre_domain;
+		textpost = txt_post_1unsecuredDomain;
+		detail = txt_detail_1unsecuredDomainInfo;
+		break;
+	case c.DNSSEC_NXDOMAIN_UNSECURED:
+		file = "dnssec_no.png";
+		tooltip = txt_tooltip_dnssecnone;
+		textpre = txt_preno_domain;
+		textpost = txt_post_5unsecuredNoDomain;
+		detail = txt_detail_5unsecuredNoDomainInfo;
+		break;
+	case c.DNSSEC_OFF:
+		file = "dnssec_off.png";
+		tooltip = txt_tooltip_validatoroff;
+		textpre = txt_pre_domain;
+		textpost = txt_post_dnsseOff;
+		detail = txt_detail_dnsseOffInfo;
+		break;
+	case c.DNSSEC_RESOLVER_NO_DNSSEC:
+		file = "dnssec_error.png";
+		tooltip = txt_tooltip_dnssecwrongres;
+		textpre = txt_pre_domain;
+		textpost = txt_post_dnssecWrongResolver;
+		detail = txt_detail_dnssecWrongResolverInfo;
+		break;
+	case c.DNSSEC_ERROR_RESOLVER:
+		file = "dnssec_error.png";
+		tooltip = txt_tooltip_dnssecfail;
+		textpre = txt_pre_domain;
+		textpost = txt_post_0dnssecError;
+		detail = txt_detail_0dnssecErrorInfo;
+		break;
+	case c.DNSSEC_UNBOUND_NO_DATA:
+		file = "dnssec_error.png";
+		tooltip = txt_tooltip_dnssecfail;
+		textpre = txt_pre_domain;
+		textpost = txt_post_unboundnodata;
+		detail = txt_detail_unboundnodataInfo;
+		break;
+	case c.DNSSEC_ERROR_GENERIC:
+		file = "dnssec_error.png";
+		tooltip = txt_tooltip_dnssecfail;
+		textpre = txt_pre_domain;
+		textpost = txt_post_dnssecgenericError;
+		detail = txt_detail_dnssecgenericErrorInfo;
+		break;
+	default:
+		file = "dnssec_init.png";
+		textpre = "DNSSEC Validator allows you to check the existence and validity of DNSSEC signed DNS records.";
+		textpost = "";
+		domain = "";
+		detail = "DNSSEC Validator allows you to check the existence and validity of DNSSEC signed DNS records.";
+		break;
+	}
+
+	setIcon(file,"dnssecicon");
+	setToolbarButton("Dinfo", tooltip, file);
+	UpdateTooltip(tooltip, "dnssecbutton");
+	setDnssecPopup(domain, iconbaseurl+file, tooltip, textpre, textpost, detail);
+};
+
+//****************************************************************
+// set TLSA mode - icon, text, tooltip etc..
+//****************************************************************
+function setTlsaMode(tresult, scheme, domain, ports) {
+
+	var c = tlsaExtNPAPIConst;
+	var file = "tlsa_init.png";
+	var tooltip = "TLSA Validator";
+	var text = "";
+	var detail = "";
+
+	switch (tresult) {
+	case c.DANE_VALID_TYPE0:
+		file = "tlsa_valid.png";
+		tooltip = dmvsTooltip;
+		text = dm_vs0;
+		detail = dm_vs0Info;
+		break;
+	case c.DANE_VALID_TYPE1: 
+		file = "tlsa_valid.png";
+		tooltip = dmvsTooltip;
+		text = dm_vs1;
+		detail = dm_vs1Info;
+		break;
+	case c.DANE_VALID_TYPE2: 
+		file = "tlsa_valid.png";
+		tooltip = dmvsTooltip;
+		text = dm_vs2;
+		detail = dm_vs2Info;
+		break;
+	case c.DANE_VALID_TYPE3: 
+		file = "tlsa_valid.png";
+		tooltip = dmvsTooltip;
+		text = dm_vs3;
+		detail = dm_vs3Info;
+		break;
+	case c.DANE_DNSSEC_SECURED: 
+		file = "tlsa_orange.png";
+		tooltip = dmaTooltip;
+		text = tooltip;
+		detail = tooltip;
+		break;
+	case c.DANE_OFF: 
+		file = "tlsa_off.png";
+		tooltip = dmoffTooltip;
+		text = dm_validationoff;
+		detail = dm_validationoffInfo;
+		break;
+	case c.DANE_ERROR_RESOLVER: 
+		file = "tlsa_error.png";
+		tooltip = dmfsTooltip;
+		text = dm_rfesolverfailed;
+		detail = dm_rfesolverfailedInfo;
+		break;
+	case c.DANE_NO_HTTPS: 
+		file = "tlsa_nohttps.png";
+		tooltip = dmnohttpsTooltip ;
+		text = dm_nohttps;
+		detail = dm_nohttpsInfo;
+		break;
+	case c.DANE_NO_TLSA: 
+		file = "tlsa_no.png";
+		tooltip = dmntrTooltip;
+		text = dm_notlsarecord;
+		detail = dm_notlsarecordInfo;
+		break;
+	case c.DANE_DNSSEC_UNSECURED:
+		file = "tlsa_nodnssec.png";
+		tooltip = dmdnssecunsecTooltip;
+		text = dm_dnssecunsecured;
+		detail = dm_dnssecunsecuredInfo;
+		break;
+	case c.DANE_DNSSEC_BOGUS: 
+		file = "tlsa_invalid.png";
+		tooltip = dmdnssecbogusTooltip;
+		text = dm_dnssecbogus;
+		detail = dm_dnssecbogusInfo;
+		break;
+	case c.DANE_NO_CERT_CHAIN: 
+		file = "tlsa_orange.png";
+		tooltip = dmnccTooltip;
+		text = dm_certchain;
+		detail = dm_certchainInfo;
+		break;
+	case c.DANE_CERT_ERROR: 
+		file = "tlsa_orange.png";
+		tooltip = dmnccTooltip;
+		text = dm_certerr;
+		detail = dm_certerrInfo;
+		break;
+	case c.DANE_TLSA_PARAM_ERR: 
+		file = "tlsa_invalid.png";
+		tooltip = dmwpTooltip;
+		text = dm_tlsapramwrong;
+		detail = dm_tlsapramwrongInfo;
+		break;
+	case c.DANE_INVALID_TYPE0: 
+		file = "tlsa_invalid.png";
+		tooltip = dmvfTooltip;
+		text = dm_vf0;
+		detail = dm_vf0Info;
+		break;
+	case c.DANE_INVALID_TYPE1: 
+		file = "tlsa_invalid.png";
+		tooltip = dmvfTooltip;
+		text = dm_vf1;
+		detail = dm_vf1Info;
+		break;
+	case c.DANE_INVALID_TYPE2: 
+		file = "tlsa_invalid.png";
+		tooltip = dmvfTooltip;
+		text = dm_vf2;
+		detail = dm_vf2Info;
+		break;
+	case c.DANE_INVALID_TYPE3: 
+		file = "tlsa_invalid.png";
+		tooltip = dmvfTooltip;
+		text = dm_vf3;
+		detail = dm_vf3Info;
+		break;
+	case c.DANE_RESOLVER_NO_DNSSEC: 
+		file = "tlsa_error.png";
+		tooltip = dmvsTooltipwrongres;
+		text = dnssecWrongResolver;
+		detail = dnssecWrongResolverInfo;
+		break;
+	case c.DANE_ERROR_GENERIC:
+		file = "tlsa_error.png";
+		tooltip = dmerrorgenericTooltip;
+		text = dm_errgen;
+		detail = dm_errgenInfo;
+		break;
+	default:
+		file = "tlsa_init.png";
+		domain = "";
+		text = "TLSA Validator allows you to check the authenticity of a TLS/SSL certificate by DANE protocol.";
+		detail = "The authenticity of a TLS/SSL certificate for a domain name is verified by DANE protocol (RFC 6698).";
+		break;
+	}
+	setIcon(file,"tlsaicon");
+	UpdateTooltip(tooltip, "tlsabutton");
+	setToolbarButton("Tinfo", tooltip, file);
+	if (scheme == null) {
+		setTlsaPopup(domain, iconbaseurl+file, tooltip, text, detail);
+	} else {
+		setTlsaPopup(scheme+"://"+domain, iconbaseurl+file, tooltip, text, detail);
+	}
+};
+
+//****************************************************************
+// get information about custom resolver
+//****************************************************************
+function getResolver() {
+	var customResolver = safari.extension.settings.resolverip;
+	if (customResolver == undefined) return defaultresolver;
+	if (customResolver == null) return defaultresolver;
+	if (customResolver == "") return defaultresolver;
+	return customResolver;
+};
+
+//****************************************************************
+// blck hhtp request when the certificate not corresponds to tlsa
+//****************************************************************
+function onBlockHttps(){
+	return safari.extension.settings.blocking;
+};
+
+//****************************************************************
+// check DNSSEC support of resolver when unbound returns bogus
+//****************************************************************
+function checkResolverDnssecSupport(result, domain) {
+
+    	var c = this.dnssecExtNPAPIConst;
+	var resulttmp = c.DNSSEC_OFF;
+	var options = 0;
+	var resolver = "";
+	var ipbrowser = "";
+	if (debugout) options |= c.DNSSEC_FLAG_DEBUG;
+	if (true) options |= c.DNSSEC_FLAG_RESOLVIPV4;
+	if (true) options |= c.DNSSEC_FLAG_RESOLVIPV6;	
+	if (debugout) {
+		console.log("	Bogus test request: " +domain+", "+options+",");
+	}
+
+	ClearDnssecPluginContetx();
+
+	resulttmp = DnssecValidate(domain, options, resolver, ipbrowser);
+	if (debugout) {
+		console.log("	Bogus test return: " + resulttmp);
+	}
+	
+	if (result == resulttmp) {
+		if (debugout) {
+			console.log("	Domain name has really bogus...");
+		}
+		ClearDnssecPluginContetx();
+		return false;		
+	} else {
+		if (debugout) {
+			console.log("	Current resolver does not support DNSSEC...");
+		}
+		ClearDnssecPluginContetx();
+		ClearTlsaPluginContetx();
+		return true;			
+	}
+};
+
+//****************************************************************
+// check DNSSEC status
+//****************************************************************
+function checkDnssec(url) {
+
+	wrongresolver = false;
+
+	var domainport = getDomainAndPort(url);
+	if (domainport == null) {
+		setDnssecMode(blankstate);
+		return;		
+	}
+	var domain = domainport[0];
+    	var c = this.dnssecExtNPAPIConst;
+	var result = c.DNSSEC_OFF;
+
+	if (this.ExcludeDomainList(domain)) {
+
+		var resolver = this.getResolver();
+		var options = 0;
+		var reschoice = safari.extension.settings.resolverchoice;
+
+		if (debugout) options |= c.DNSSEC_FLAG_DEBUG;
+		if (reschoice == 3) options |= c.DNSSEC_FLAG_USEFWD;
+		if (true) options |= c.DNSSEC_FLAG_RESOLVIPV4;
+		if (true) options |= c.DNSSEC_FLAG_RESOLVIPV6;
+		
+		var ipbrowser = "";
+		if (debugout) {
+			console.log("DNSSECplugin request: " +domain+", "+options+", "+resolver+", "+ipbrowser);
+		}
+
+		result = DnssecValidate(domain, options, resolver, ipbrowser);
+		if (result != null) {
+			if (result == c.DNSSEC_COT_DOMAIN_BOGUS) {
+				if (checkResolverDnssecSupport(result, domain)) {
+					wrongresolver = true;
+					setDnssecMode(c.DNSSEC_RESOLVER_NO_DNSSEC, domain);
+					
+				} else {
+					setDnssecMode(result, domain);					
+				}
+			} else {
+				setDnssecMode(result, domain);
+			}
+		} else {
+			setDnssecMode(c.DNSSEC_ERROR_GENERIC, domain);
+		}
+	} else {
+		setDnssecMode(result, domain);
+	}
+};
+
+//****************************************************************
+// return correct port number for plugin and popup text
+//****************************************************************
+function getCorrectPorts(scheme, tmpport){
+
+	var portplugin;
+	var portpopup;
+
+	if (scheme == "https" || scheme == "http") {
+		portplugin = (tmpport == undefined) ? https_default_port : tmpport.substring(1);	
+		portpopup = (tmpport == undefined) ? "" : tmpport;
+	}
+	if (scheme == "ftps" || scheme == "ftp") {
+		portplugin = (tmpport == undefined) ? ftps_default_port : tmpport.substring(1);
+		portpopup = (tmpport == undefined) ? "" : tmpport;
+	}
+	return [portplugin, portpopup];
+};
+
+//****************************************************************
+// Called when TLSA is invalid, return value for web request blocking
+//****************************************************************
+function checkTlsaResult(ret, domain) {
+	
+	var block = false;
+
+	if (ret >= tlsaExtNPAPIConst.DANE_TLSA_PARAM_ERR) {
+	
+		var alerttext = warningpre
+		+ " " + domain + " " + warningpost;
+		var choice = confirm(alerttext);
+		if (choice) {				
+			if (debugout) {
+				console.log("Connection to this server was canceled by user...");
+			}
+			block = true;					
+		}
+		else {
+			if (debugout) {
+				console.log("Connection to this server was permitted by user....");
+			}
+			block = false;
+		}
+	}
+	return block; 
+};
+
+//****************************************************************
+// check TLSA status
+//****************************************************************
+function checkTlsa(url) {
+
+	var block = false;
+    	var c = this.tlsaExtNPAPIConst;
+	var result = c.DANE_OFF;
+
+	var scheme = getHttpSheme(url);
+	if (scheme == null) {
+		setTlsaMode(blankstate, null, null, null);
+		return block;		
+	}
+	var domainport = getDomainAndPort(url);
+	if (domainport == null) {
+		setTlsaMode(blankstate, null, null, null);
+		return block;		
+	}
+	var domain = domainport[0];
+	var ports = getCorrectPorts(scheme, domainport[1]);
+	var domport = domain+ports[1];
+
+	if (wrongresolver) {
+		setTlsaMode(c.DANE_RESOLVER_NO_DNSSEC, scheme, domport, ports[1]);
+		return block;		
+	}
+
+	if (safari.extension.settings.tlsaon) {
+		if (ExcludeDomainList(domain)) {
+
+			if (scheme == "https" || scheme == "ftps") {
+				var cacheitem = tlsaExtCache.getRecord(domport);
+				if (cacheitem[0] == '' && cacheitem[1] == '') {
+
+					var resolver = this.getResolver();
+					var reschoice = safari.extension.settings.resolverchoice;
+					var options = 0;
+					if (debugout) options |= c.DANE_FLAG_DEBUG;
+					if (reschoice == 3) options |= c.DANE_FLAG_USEFWD;
+					var cert = new Array();
+					cert.push("00FF");
+					if (debugout) {
+						console.log("TLSAplugin request: {certchain}, 1, " +options+", "+resolver+", "+domain+", "+ports[0]+", "+protocol+", 1");
+					}
+
+					result = TlsaValidate(cert, certlen, options, resolver, domain, ports[0], protocol, 1);
+					if (result != null) {
+						setTlsaMode(result, scheme, domport, ports[1]);
+						if (onBlockHttps()) {
+							block = checkTlsaResult(result, domport);
+						}
+						if (!block) {
+							tlsaExtCache.addRecord(domport, result, block);
+						}
+						tlsaExtCache.printContent();
+					} else {
+						setTlsaMode(c.DANE_ERROR_GENERIC, scheme, domport, ports[1]);
+					}
+				} else {
+
+					var current_time = new Date().getTime();
+					if (cacheitem[2] < current_time) {
+						var resolver = this.getResolver();
+						var reschoice = safari.extension.settings.resolverchoice;
+						var options = 0;
+						if (debugout) options |= c.DANE_FLAG_DEBUG;
+						if (reschoice == 3) options |= c.DANE_FLAG_USEFWD;
+						var cert = new Array();
+						cert.push("00FF");
+						if (debugout) {
+							console.log("TLSAplugin request: {certchain}, 1, " +options+", "+resolver+", "+domain+", "+ports[0]+", "+protocol	+", 1");
+						}
+	
+						result = TlsaValidate(cert, certlen, options, resolver, domain, ports[0], protocol, 1);
+						if (result != null) {
+							setTlsaMode(result, scheme, domport, ports[1]);
+							if (onBlockHttps()) {
+								block = checkTlsaResult(result, domport);
+							}
+							if (!block) {
+								tlsaExtCache.addRecord(domport, result, block);
+							}
+							tlsaExtCache.printContent();
+						} else {
+							setTlsaMode(c.DANE_ERROR_GENERIC, scheme, domport, ports[1]);
+						}
+					} else {
+						result = cacheitem[0];
+						if (debugout) {
+						       	console.log("TLSA result from cache: " + result);
+						}
+						setTlsaMode(result, scheme, domport, ports[1]);
+//						if (onBlockHttps()) {
+//							if (cacheitem[2]) {
+//								block = checkTlsaResult(result, domport);
+//							}
+//						}
+					}
+				}
+			} else {
+				setTlsaMode(c.DANE_NO_HTTPS, scheme, domain, ports[1]);
+			}
+		} else {
+			setTlsaMode(result, scheme, domain, ports[1]);
+		}
+	} else {
+		setTlsaMode(result, scheme, domain, ports[1]);	
+	}
+	return block;
+};
+
+//****************************************************************
+// fires when tab or windows has changed
+//****************************************************************
+var OnTabActivate = function(event) {
+
+	var taburl = safari.application.activeBrowserWindow.activeTab.url;
+	debugout = safari.extension.settings.debuglogout;
+	if (debugout) {
+		console.log("\nBrowser: OnTabActivate("+ taburl +")");
+	}
+
+	setActionIcon();
+
+	checkDnssec(taburl);
+	var block = checkTlsa(taburl);
+};
+
+//****************************************************************
+// fires when http/https request was sends
+//****************************************************************
+var OnBeforeNavigate = function(event) {
+
+	var block = false;
+
+	debugout = safari.extension.settings.debuglogout;
+	if (debugout) {
+		console.log("\nBrowser: OnBeforeNavigate("+ event.url +")");
+	}
+
+	setActionIcon();
+
+	checkDnssec(event.url);
+	block = checkTlsa(event.url);
+	if (block) {
+		event.preventDefault();
+	}
+};
+
+//****************************************************************
+// fires when http/https request was sends
+//****************************************************************
+var OnNavigate = function(event) {
+
+	debugout = safari.extension.settings.debuglogout;
+	if (debugout) {
+		console.log("\nBrowser: OnNavigate("+ safari.application.activeBrowserWindow.activeTab.url +")");
+	}
+
+	setActionIcon();
+
+	checkDnssec(safari.application.activeBrowserWindow.activeTab.url);
+	var block = checkTlsa(safari.application.activeBrowserWindow.activeTab.url);
+};
+
+//****************************************************************
+// fires when context menu item was click
+//****************************************************************
+var OnCommand = function(event) {
+
+	if (event.command === "onAbout") {
+		safari.application.activeBrowserWindow.openTab().url = "http://www.dnssec-validator.cz/";
+	}
+};
+
+//****************************************************************
+// events listener
+//****************************************************************
+safari.application.addEventListener("activate", OnTabActivate, true);
+safari.application.addEventListener("navigate", OnNavigate, true);
+safari.application.addEventListener("beforeNavigate", OnBeforeNavigate, true);
+safari.extension.settings.addEventListener("change", OnSettingsChange, false);
+safari.application.addEventListener("command", OnCommand, false);
+
+</script>
+
+<button type="Submit" class="dnssec-button" id="dnssecbutton" title="DNSSEC Validator" onclick="showPopover('DNSSECPopup','Dinfo');">DNSSEC:&nbsp;&nbsp;<img id="dnssecicon" src="dnssec_init.png" alt="DNSSEC Validator" width="20" height="20"></button>
+
+<button type="Submit" class="tlsa-button" id="tlsabutton" title="TLSA Validator" onclick="showPopover('TLSAPopup','Tinfo');">TLSA:&nbsp;&nbsp;<img id="tlsaicon" src="tlsa_init.png" alt="TLSA Validator" width="20" height="20"></button>
+
+</body>
+</html>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Author</key>
+	<string>CZ.NIC Labs</string>
+	<key>Builder Version</key>
+	<string>9537.73.11</string>
+	<key>CFBundleDisplayName</key>
+	<string>DNSSEC/TLSA Validator</string>
+	<key>CFBundleIdentifier</key>
+	<string>cz.nic.labs.dnssec</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.1.1</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>Chrome</key>
+	<dict>
+		<key>Bars</key>
+		<array>
+			<dict>
+				<key>Filename</key>
+				<string>toolbar/toolbar.html</string>
+				<key>Identifier</key>
+				<string>dnssec-tlsa-bar</string>
+				<key>Label</key>
+				<string>DNSSEC/TLSA Validator</string>
+			</dict>
+		</array>
+		<key>Context Menu Items</key>
+		<array>
+			<dict>
+				<key>Command</key>
+				<string>onAbout</string>
+				<key>Identifier</key>
+				<string>IDabout</string>
+				<key>Title</key>
+				<string>DNSSEC/TLSA Validator</string>
+			</dict>
+		</array>
+		<key>Database Quota</key>
+		<real>1048576</real>
+		<key>Global Page</key>
+		<string>global.html</string>
+		<key>Popovers</key>
+		<array>
+			<dict>
+				<key>Filename</key>
+				<string>popups/dnssecpopup.html</string>
+				<key>Height</key>
+				<real>240</real>
+				<key>Identifier</key>
+				<string>DNSSECPopup</string>
+				<key>Width</key>
+				<real>320</real>
+			</dict>
+			<dict>
+				<key>Filename</key>
+				<string>popups/tlsapopup.html</string>
+				<key>Height</key>
+				<real>280</real>
+				<key>Identifier</key>
+				<string>TLSAPopup</string>
+				<key>Width</key>
+				<real>320</real>
+			</dict>
+			<dict>
+				<key>Filename</key>
+				<string>popups/default.html</string>
+				<key>Height</key>
+				<real>240</real>
+				<key>Identifier</key>
+				<string>DefaultPopup</string>
+				<key>Width</key>
+				<real>320</real>
+			</dict>
+		</array>
+		<key>Toolbar Items</key>
+		<array>
+			<dict>
+				<key>Identifier</key>
+				<string>Dinfo</string>
+				<key>Image</key>
+				<string>icons/dnssec_init.png</string>
+				<key>Label</key>
+				<string>DNSSEC Validator</string>
+				<key>Menu</key>
+				<string>DNSSEC/TLSA Validator Menu</string>
+				<key>Palette Label</key>
+				<string>DNSSEC Validator</string>
+				<key>Popover</key>
+				<string>DNSSECPopup</string>
+				<key>Tool Tip</key>
+				<string>DNSSEC Validator</string>
+			</dict>
+			<dict>
+				<key>Identifier</key>
+				<string>Tinfo</string>
+				<key>Image</key>
+				<string>icons/tlsa_init.png</string>
+				<key>Label</key>
+				<string>TLSA Validator</string>
+				<key>Palette Label</key>
+				<string>TLSA Validator</string>
+				<key>Popover</key>
+				<string>TLSAPopup</string>
+				<key>Tool Tip</key>
+				<string>TLSA Validator</string>
+			</dict>
+		</array>
+	</dict>
+	<key>Content</key>
+	<dict>
+		<key>Scripts</key>
+		<dict/>
+	</dict>
+	<key>Description</key>
+	<string>Checks whether domain names are secured by DNSSEC and checks certificate via TLSA records</string>
+	<key>ExtensionInfoDictionaryVersion</key>
+	<string>1.0</string>
+	<key>Permissions</key>
+	<dict>
+		<key>Website Access</key>
+		<dict>
+			<key>Include Secure Pages</key>
+			<true/>
+			<key>Level</key>
+			<string>All</string>
+		</dict>
+	</dict>
+	<key>Update Manifest URL</key>
+	<string>http://www.dnssec-validator.cz</string>
+	<key>Website</key>
+	<string>http://www.dnssec-validator.cz</string>
+</dict>
+</plist>
