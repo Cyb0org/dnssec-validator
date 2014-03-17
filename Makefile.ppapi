@@ -1,0 +1,42 @@
+
+TGT_DNSSEC=dnssec_validator
+TGT_DANE=dane_validator
+
+OPTFLAGS = -g -O0
+#OPTFLAGS = -O3
+
+CPPFLAGS += -Iplugin-source/common -DCMNDLINE_TEST -DCA_STORE=DIR_CA_STORE
+CFLAGS += $(OPTFLAGS) -std=c99 -Wall -Wextra -pedantic
+LDFLAGS += -lunbound -lldns -lssl -lcrypto -lpthread -ldl
+
+.PHONY: all clean help install run
+
+all: $(TGT_DNSSEC) $(TGT_DANE)
+
+common.o: plugin-source/common/common.c
+	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS)
+
+log.o: plugin-source/common/log_dflt.c
+	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS)
+
+dnssec-plug.o: plugin-source/DNSSECValidatorPlugin/dnssec-plug.c
+	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS)
+
+$(TGT_DNSSEC): common.o log.o dnssec-plug.o
+	$(CC) $^ -o $@ $(LDFLAGS)
+
+dane-plug.o: plugin-source/TLSAValidatorPlugin/dane-plug.c
+	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS)
+
+ca_store.o: plugin-source/TLSAValidatorPlugin/ca_store_directory.c
+	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS)
+
+$(TGT_DANE): common.o log.o dane-plug.o ca_store.o
+	$(CC) $^ -o $@ $(LDFLAGS)
+
+clean:
+	rm -rf *.o $(TGT_DNSSEC) $(TGT_DANE)
+
+install:
+	mv $(TGT_DNSSEC) ppapi_built/$(TGT_DNSSEC)
+	mv $(TGT_DANE) ppapi_built/$(TGT_DANE)
