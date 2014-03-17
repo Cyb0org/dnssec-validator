@@ -7,7 +7,8 @@ TGT_DANE=$(DANE_PREFIX)_$(OSNAME)_$(MACHINE).nexe
 OPTFLAGS = -g -O0
 #OPTFLAGS = -O3
 
-CPPFLAGS += -Iplugin-source/common -DCMNDLINE_TEST -DCA_STORE=DIR_CA_STORE
+CPPFLAGS += -Iplugin-source/common -DCA_STORE=DIR_CA_STORE
+#CPPFLAGS += -DCMNDLINE_TEST
 CPPFLAGS += -Iplugin-source/DNSSECValidatorPlugin
 CPPFLAGS += -Iplugin-source/TLSAValidatorPlugin
 CFLAGS += $(OPTFLAGS) -std=c99 -Wall -Wextra -pedantic
