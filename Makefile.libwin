@@ -23,7 +23,7 @@
 
 OPENSSL = openssl-1.0.1f
 LDNS = ldns-1.6.17
-UNBOUND = unbound-1.4.21
+UNBOUND = unbound-1.4.22
 
 LIBS_SOURCE = libs-source
 OPENSSL_TARBALL = $(LIBS_SOURCE)/openssl.tar.gz
@@ -34,7 +34,7 @@ BASEDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
 OPENSSL_DIR := $(BASEDIR)/libswin/openssl-1.0.1f
 LDNS_DIR := $(BASEDIR)/libswin/ldns-1.6.17
-UNBOUND_DIR := $(BASEDIR)/libswin/unbound-1.4.21
+UNBOUND_DIR := $(BASEDIR)/libswin/unbound-1.4.22
 
 OPENSSL_LIB := $(BASEDIR)/libswin/openssl
 LDNS_LIB := $(BASEDIR)/libswin/ldns
