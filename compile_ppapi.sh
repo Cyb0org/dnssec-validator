@@ -45,7 +45,7 @@ if [ "x${COMPILE_SSL}" = "xyes" ]; then
 	make clean
 	CMD="./config no-shared no-asm no-hw no-krb5 -D_GNU_SOURCE --prefix=${PREFIX}"
 	${CMD} && make && make install
-	cd ..
+	cd ${SCRIPT_LOCATION}
 fi
 
 #exit
