@@ -85,6 +85,7 @@ if [ "x${COMPILE_SSL}" = "xyes" ]; then
 		make clean
 		CMD="./config no-shared no-asm no-hw no-krb5 -D_GNU_SOURCE --prefix=${PREFIX}"
 		${CMD} && make && make install
+		make clean
 		cd ${SCRIPT_LOCATION}
 	done
 fi
@@ -105,8 +106,17 @@ if [ "x${COMPILE_LDNS}" = "xyes" ]; then
 
 		cd ${LDNS_DIR}
 		make clean
-		CMD="./configure --host=${HOST} --disable-shared --with-ssl=${PREFIX} --prefix=${PREFIX} --disable-ldns-config --with-pic --without-pyldnsx"
-		${CMD} && make && make install
+		CMD="./configure --host=${HOST} --disable-shard --with-ssl=${PREFIX} --prefix=${PREFIX} --disable-ldns-config --with-pic --without-pyldnsx"
+
+		# Build in a separate subdirectory.
+		BUILD_SUBDIR=_build_${OSNAME}-${HOST}
+		if [ -d "${BUILD_SUBDIR}" ]; then
+			rm -r ${BUILD_SUBDIR}
+		fi
+		mkdir ${BUILD_SUBDIR} && cd ${BUILD_SUBDIR}
+		.${CMD} && make && make install
+		cd .. && rm -r ${BUILD_SUBDIR}
+
 		cd ${SCRIPT_LOCATION}
 	done
 fi
@@ -128,12 +138,21 @@ if [ "x${COMPILE_UNBOUND}" = "xyes" ]; then
 		cd ${UNBOUND_DIR}
 		make clean
 		CMD="./configure --host=${HOST} --disable-shared --with-ssl=${PREFIX} --with-ldns=${PREFIX} --prefix=${PREFIX} --with-libunbound-only"
-		${CMD} && make && make install
+
+		# Build in a separate subdirectory.
+		BUILD_SUBDIR=_build_${OSNAME}-${HOST}
+		if [ -d "${BUILD_SUBDIR}" ]; then
+			rm -r ${BUILD_SUBDIR}
+		fi
+		mkdir ${BUILD_SUBDIR} && cd ${BUILD_SUBDIR}
+		.${CMD} && make && make install
+		cd .. && rm -r ${BUILD_SUBDIR}
+
 		cd ${SCRIPT_LOCATION}
 	done
 fi
 
-# exit
+#exit
 
 if [ "x${COMPILE_DNSSEC}" = "xyes" ]; then
 	for MACHINE in ${MACHINES}; do
