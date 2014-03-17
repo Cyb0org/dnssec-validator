@@ -26,7 +26,7 @@ SCRIPT_LOCATION=$(dirname $(readlink -f $0))
 
 OPENSSL_DIR=libs/openssl-1.0.1f
 LDNS_DIR=libs/ldns-1.6.17
-UNBOUND_DIR=libs/unbound-1.4.21
+UNBOUND_DIR=libs/unbound-1.4.22
 
 PREFIX=${SCRIPT_LOCATION}/ppapi_built
 
@@ -64,9 +64,7 @@ if [ "x${COMPILE_UNBOUND}" = "xyes" ]; then
 	cd ${UNBOUND_DIR}
 	make clean
 	CMD="./configure --host=${HOST} --disable-shared --with-ssl=${PREFIX} --with-ldns=${PREFIX} --prefix=${PREFIX} --with-libunbound-only"
-	${CMD} && make && \
-	touch unbound && touch unbound-checkconf && touch unbound-control && touch unbound-host && touch unbound-anchor && touch unbound-control-setup && \
-	make install
+	${CMD} && make && make install
 	cd ${SCRIPT_LOCATION}
 fi
 
