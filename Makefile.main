@@ -14,7 +14,7 @@ BASEDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
 OPENSSL_DIR := $(BASEDIR)/libs/openssl-1.0.1f
 LDNS_DIR := $(BASEDIR)/libs/ldns-1.6.17
-UNBOUND_DIR := $(BASEDIR)/libs/unbound-1.4.21
+UNBOUND_DIR := $(BASEDIR)/libs/unbound-1.4.22
 
 OPENSSL_LIB := $(BASEDIR)/libs/openssl
 LDNS_LIB := $(BASEDIR)/libs/ldns
@@ -99,7 +99,7 @@ $(OPENSSL_DIR): $(OPENSSL_TARBALL)
 ## ldns
 $(LDNS_LIB): $(LDNS_DIR) $(OPENSSL_LIB)
 	(cd $< && \
-	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared --with-ssl=$(OPENSSL_LIB) \
+	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared --with-ssl=$(OPENSSL_LIB) --disable-ldns-config --without-pyldnsx \
 	    --with-pic --prefix=$@ $(CONFIGURE_ARGS) && \
 	    $(MAKETYPE) && \
 	    $(MAKETYPE) install)
@@ -117,9 +117,7 @@ $(UNBOUND_LIB): $(UNBOUND_DIR) $(LDNS_LIB) $(OPENSSL_LIB)
 	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared \
 	    --with-ssl=$(OPENSSL_LIB) --with-ldns=$(LDNS_LIB) --without-libevent \
 	    --with-pic --prefix=$@ $(CONFIGURE_ARGS) --with-libunbound-only && \
-	    $(MAKETYPE) && \
-	    touch unbound && touch unbound-checkconf && touch unbound-control && touch unbound-host && touch unbound-anchor && touch unbound-control-setup && \
-	    $(MAKETYPE) install)
+	    $(MAKETYPE) && $(MAKETYPE) install)
 
 $(UNBOUND_DIR): $(UNBOUND_TARBALL)
 	tar xzf $< -C libs
