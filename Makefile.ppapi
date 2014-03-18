@@ -51,5 +51,5 @@ clean:
 	rm -f *.o $(DNSSEC_PREFIX)* $(TGT_DNSSEC) $(DANE_PREFIX)* $(TGT_DANE)
 
 install:
-	mv $(TGT_DNSSEC) ppapi_built/$(TGT_DNSSEC)
-	mv $(TGT_DANE) ppapi_built/$(TGT_DANE)
+	cp $(TGT_DNSSEC) add-on-ppapi/chrome2dnssec-ppapi
+	cp $(TGT_DANE) ppapi_built/$(TGT_DANE)

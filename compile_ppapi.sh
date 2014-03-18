@@ -63,10 +63,19 @@ for HOST in ${HOSTS}; do
 	fi
 done
 
-COMPILE_SSL="yes"
-COMPILE_LDNS="yes"
-COMPILE_UNBOUND="yes"
-COMPILE_DNSSEC="yes"
+# Can be set at command-line.
+if [ "x${COMPILE_SSL}" = "x" ]; then
+	COMPILE_SSL="yes"
+fi
+if [ "x${COMPILE_LDNS}" = "x" ]; then
+	COMPILE_LDNS="yes"
+fi
+if [ "x${COMPILE_UNBOUND}" = "x" ]; then
+	COMPILE_UNBOUND="yes"
+fi
+if [ "x${COMPILE_DNSSEC}" = "x" ]; then
+	COMPILE_DNSSEC="yes"
+fi
 
 if [ "x${COMPILE_SSL}" = "xyes" ]; then
 	for MACHINE in ${MACHINES}; do
@@ -163,6 +172,10 @@ if [ "x${COMPILE_DNSSEC}" = "xyes" ]; then
 		export CXX=${HOST}-g++
 		export LD=${HOST}-ld
 		export RANLIB=${HOST}-ranlib
+
+		if [ "x${MACHINE}" = "xi686" ]; then
+			export MACHINE="x86_32"
+		fi
 
 		PREFIX="${BUILT_DIR}/${OSNAME}-${HOST}"
 
