@@ -52,6 +52,10 @@ UNBOUND_DIR=libs/unbound-1.4.22
 BUILT_DIR=${SCRIPT_LOCATION}/ppapi_built
 
 
+export CFLAGS="${CFLAGS} -fPIC"
+export CXXFLAGS="${CXXFLAGS} -fPIC"
+
+
 # Create per-host directories.
 if [ ! -d "${BUILT_DIR}" ]; then
 	mkdir ${BUILT_DIR}
@@ -101,7 +105,8 @@ if [ "x${COMPILE_SSL}" = "xyes" ]; then
 		#NEWLIB_OPTS="no-dso no-sock no-ui"
 		cd ${OPENSSL_DIR}
 		make clean
-		CMD="./config no-shared no-asm no-hw no-krb5 -D_GNU_SOURCE --prefix=${PREFIX}"
+		#NO_SHARED=no-shared
+		CMD="./config no-shared no-asm no-hw no-krb5 -fPIC -D_GNU_SOURCE --prefix=${PREFIX}"
 		${CMD} && make && make install_sw && \
 		make clean || exit 1
 		cd ${SCRIPT_LOCATION}
@@ -124,7 +129,8 @@ if [ "x${COMPILE_LDNS}" = "xyes" ]; then
 
 		cd ${LDNS_DIR}
 		make clean
-		CMD="./configure --host=${HOST} --disable-shard --with-ssl=${PREFIX} --prefix=${PREFIX} --disable-ldns-config --with-pic --without-pyldnsx"
+		#NO_SHARED=--disable-shared
+		CMD="./configure --disable-shared --host=${HOST} --with-ssl=${PREFIX} --prefix=${PREFIX} --disable-ldns-config --with-pic --without-pyldnsx"
 
 		if [ "x${COMPILE_IN_SUBDIRS}" = "xyes" ]; then
 			# Build in a separate subdirectory.
@@ -160,7 +166,8 @@ if [ "x${COMPILE_UNBOUND}" = "xyes" ]; then
 
 		cd ${UNBOUND_DIR}
 		make clean
-		CMD="./configure --host=${HOST} --disable-shared --with-ssl=${PREFIX} --with-ldns=${PREFIX} --prefix=${PREFIX} --with-libunbound-only"
+		#NO_SHARED=--disable-shared
+		CMD="./configure --disable-shared --host=${HOST} --with-ssl=${PREFIX} --with-ldns=${PREFIX} --prefix=${PREFIX} --with-libunbound-only"
 
 		if [ "x${COMPILE_IN_SUBDIRS}" = "xyes" ]; then
 			# Build in a separate subdirectory.
