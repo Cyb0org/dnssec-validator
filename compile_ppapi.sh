@@ -1,6 +1,13 @@
 #!/usr/bin/env sh
 
-export NACL_SDK_ROOT=${HOME}/nacl_sdk/pepper_33
+# Select default Native Client SDK path.
+if [ "x${NACL_SDK_ROOT}" = "x" ]; then
+	SDK_VER=33
+	NACL_SDK_ROOT="${HOME}/nacl_sdk/pepper_${SDK_VER}"
+	unset SDK_VER
+fi
+export NACL_SDK_ROOT
+
 if [ ! -d "${NACL_SDK_ROOT}" ]; then
 	echo "Cannot find ${NACL_SDK_ROOT}" >&2
 	exit 1
@@ -16,17 +23,23 @@ if [ ! -d "${X86_TC_PATH}" ]; then
 fi
 
 export PATH=${X86_TC_PATH}/bin:${ARM_TC_PATH}/bin:${PATH}
+export CPPFLAGS="-I${NACL_SDK_ROOT}/include ${CPPFLAGS}"
+export CFLAGS="${CFLAGS} -fPIC"
+export CXXFLAGS="${CXXFLAGS} -fPIC"
 
-export CPPFLAGS="-I${NACL_SDK_ROOT}/include"
 
-DEBUG_PPAPI="no"
+if [ "x${DEBUG_PPAPI}" = "x" ]; then
+	DEBUG_PPAPI="no"
+fi
 
 if [ "x${DEBUG_PPAPI}" = "xyes" ]; then
 	# Debugging version of the toolkit.
 	export LDFLAGS="-L${NACL_SDK_ROOT}/lib/glibc_x86_32/Debug ${LDFLAGS}"
+	export LDFLAGS="-L${NACL_SDK_ROOT}/lib/glibc_x86_64/Debug ${LDFLAGS}"
 else
 	# Release version of the toolkit.
 	export LDFLAGS="-L${NACL_SDK_ROOT}/lib/glibc_x86_32/Release ${LDFLAGS}"
+	export LDFLAGS="-L${NACL_SDK_ROOT}/lib/glibc_x86_64/Release ${LDFLAGS}"
 fi
 
 #
@@ -50,10 +63,6 @@ LDNS_DIR=libs/ldns-1.6.17
 UNBOUND_DIR=libs/unbound-1.4.22
 
 BUILT_DIR=${SCRIPT_LOCATION}/ppapi_built
-
-
-export CFLAGS="${CFLAGS} -fPIC"
-export CXXFLAGS="${CXXFLAGS} -fPIC"
 
 
 # Create per-host directories.
