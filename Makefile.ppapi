@@ -1,8 +1,8 @@
 
 DNSSEC_PREFIX=dnssec_validator
 TGT_DNSSEC=$(DNSSEC_PREFIX)_$(OSNAME)_$(MACHINE).nexe
-DANE_PREFIX=dane_validator
-TGT_DANE=$(DANE_PREFIX)_$(OSNAME)_$(MACHINE).nexe
+TLSA_PREFIX=tlsa_validator
+TGT_TLSA=$(TLSA_PREFIX)_$(OSNAME)_$(MACHINE).nexe
 
 OPTFLAGS = -g -O0
 #OPTFLAGS = -O3
@@ -18,7 +18,7 @@ LDFLAGS += -lppapi
 
 .PHONY: all clean help install run
 
-all: $(TGT_DNSSEC) $(TGT_DANE)
+all: $(TGT_DNSSEC) $(TGT_TLSA)
 
 common.o: plugin-source/common/common.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS)
@@ -44,12 +44,12 @@ ca_store.o: plugin-source/TLSAValidatorPlugin/ca_store_directory.c
 dane-ppapi.o: plugin-source/ppapi/dane-ppapi.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS)
 
-$(TGT_DANE): common.o log.o dane-plug.o ca_store.o dane-ppapi.o
+$(TGT_TLSA): common.o log.o dane-plug.o ca_store.o dane-ppapi.o
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 clean:
-	rm -f *.o $(DNSSEC_PREFIX)* $(TGT_DNSSEC) $(DANE_PREFIX)* $(TGT_DANE)
+	rm -f *.o $(DNSSEC_PREFIX)* $(TGT_DNSSEC) $(TLSA_PREFIX)* $(TGT_TLSA)
 
 install:
-	cp $(TGT_DNSSEC) add-on-ppapi/chrome2dnssec-ppapi
-	cp $(TGT_DANE) ppapi_built/$(TGT_DANE)
+	cp $(TGT_DNSSEC) add-on-ppapi/chrome2dnssec-ppapi/$(TGT_DNSSEC)
+	cp $(TGT_TLSA) add-on-ppapi/chrome2tlsa-ppapi/$(TGT_TLSA)
