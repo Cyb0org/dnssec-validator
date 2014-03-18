@@ -51,6 +51,8 @@ UNBOUND_DIR=libs/unbound-1.4.22
 
 BUILT_DIR=${SCRIPT_LOCATION}/ppapi_built
 
+
+# Create per-host directories.
 if [ ! -d "${BUILT_DIR}" ]; then
 	mkdir ${BUILT_DIR}
 fi
@@ -62,6 +64,7 @@ for HOST in ${HOSTS}; do
 		mkdir ${PREFIX}
 	fi
 done
+
 
 # Can be set at command-line.
 if [ "x${COMPILE_SSL}" = "x" ]; then
@@ -76,6 +79,12 @@ fi
 if [ "x${COMPILE_DNSSEC}" = "x" ]; then
 	COMPILE_DNSSEC="yes"
 fi
+
+if [ "x${COMPILE_IN_SUBDIRS}" = "x" ]; then
+	# Tries to write compilation targets into separate directories.
+	COMPILE_IN_SUBDIRS="no"
+fi
+
 
 if [ "x${COMPILE_SSL}" = "xyes" ]; then
 	for MACHINE in ${MACHINES}; do
@@ -93,8 +102,8 @@ if [ "x${COMPILE_SSL}" = "xyes" ]; then
 		cd ${OPENSSL_DIR}
 		make clean
 		CMD="./config no-shared no-asm no-hw no-krb5 -D_GNU_SOURCE --prefix=${PREFIX}"
-		${CMD} && make && make install
-		make clean
+		${CMD} && make && make install_sw && \
+		make clean || exit 1
 		cd ${SCRIPT_LOCATION}
 	done
 fi
@@ -117,14 +126,19 @@ if [ "x${COMPILE_LDNS}" = "xyes" ]; then
 		make clean
 		CMD="./configure --host=${HOST} --disable-shard --with-ssl=${PREFIX} --prefix=${PREFIX} --disable-ldns-config --with-pic --without-pyldnsx"
 
-		# Build in a separate subdirectory.
-		BUILD_SUBDIR=_build_${OSNAME}-${HOST}
-		if [ -d "${BUILD_SUBDIR}" ]; then
-			rm -r ${BUILD_SUBDIR}
+		if [ "x${COMPILE_IN_SUBDIRS}" = "xyes" ]; then
+			# Build in a separate subdirectory.
+			BUILD_SUBDIR=_build_${OSNAME}-${HOST}
+			if [ -d "${BUILD_SUBDIR}" ]; then
+				rm -r ${BUILD_SUBDIR}
+			fi
+			mkdir ${BUILD_SUBDIR} && cd ${BUILD_SUBDIR} && \
+			.${CMD} && make && make install && \
+			cd .. && rm -r ${BUILD_SUBDIR} || exit 1
+		else
+			${CMD} && make && make install-h install-lib && \
+			make clean || exit 1
 		fi
-		mkdir ${BUILD_SUBDIR} && cd ${BUILD_SUBDIR}
-		.${CMD} && make && make install
-		cd .. && rm -r ${BUILD_SUBDIR}
 
 		cd ${SCRIPT_LOCATION}
 	done
@@ -148,14 +162,19 @@ if [ "x${COMPILE_UNBOUND}" = "xyes" ]; then
 		make clean
 		CMD="./configure --host=${HOST} --disable-shared --with-ssl=${PREFIX} --with-ldns=${PREFIX} --prefix=${PREFIX} --with-libunbound-only"
 
-		# Build in a separate subdirectory.
-		BUILD_SUBDIR=_build_${OSNAME}-${HOST}
-		if [ -d "${BUILD_SUBDIR}" ]; then
-			rm -r ${BUILD_SUBDIR}
+		if [ "x${COMPILE_IN_SUBDIRS}" = "xyes" ]; then
+			# Build in a separate subdirectory.
+			BUILD_SUBDIR=_build_${OSNAME}-${HOST}
+			if [ -d "${BUILD_SUBDIR}" ]; then
+				rm -r ${BUILD_SUBDIR}
+			fi
+			mkdir ${BUILD_SUBDIR} && cd ${BUILD_SUBDIR} && \
+			.${CMD} && make && make install && \
+			cd .. && rm -r ${BUILD_SUBDIR} || exit 1
+		else
+			${CMD} && make && make install && \
+			make clean || exit 1
 		fi
-		mkdir ${BUILD_SUBDIR} && cd ${BUILD_SUBDIR}
-		.${CMD} && make && make install
-		cd .. && rm -r ${BUILD_SUBDIR}
 
 		cd ${SCRIPT_LOCATION}
 	done
@@ -182,9 +201,9 @@ if [ "x${COMPILE_DNSSEC}" = "xyes" ]; then
 		export CPPFLAGS="${CPPFLAGS} -I${PREFIX}/include"
 		export LDFLAGS="${LDFLAGS} -L${PREFIX}/lib"
 
-		make -f Makefile.ppapi clean
-		make -f Makefile.ppapi
-		make -f Makefile.ppapi install
-		make -f Makefile.ppapi clean
+		make -f Makefile.ppapi clean && \
+		make -f Makefile.ppapi && \
+		make -f Makefile.ppapi install && \
+		make -f Makefile.ppapi clean || exit 1
 	done
 fi
