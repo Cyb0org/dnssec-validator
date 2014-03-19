@@ -37,7 +37,7 @@ var currentIPList= new Array();
 var currentIPListDomain= new Array();
 var init = true;
 
-// DNSSEC NPAPI constant returned by binary plugin	
+// DNSSEC NPAPI constant returned by binary plugin
 var dnssecExtNPAPIConst = {
 
 	DNSSEC_UNBOUND_NO_DATA		: -4, /* valdiator does not recived data */
@@ -618,7 +618,10 @@ chrome.webRequest.onResponseStarted.addListener(function(info) {
 
 if (init) {
 	var plugin = document.getElementById("dnssec_validator");
-	plugin.DNSSECCacheInit();
+	//plugin.DNSSECCacheInit();
+	window.setTimeout(function() {plugin.postMessage("Hello world!");}, 5000);  // 100 ms
+	plugin.postMessage("Hello world!");
+
 	init = false;
 }
 //****************************************************************

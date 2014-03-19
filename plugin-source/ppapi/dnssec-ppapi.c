@@ -34,6 +34,7 @@ OpenSSL used as well as that of the covered work.
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "dnssec-plug.h"
 #include "ppapi/c/pp_bool.h"
@@ -45,6 +46,7 @@ OpenSSL used as well as that of the covered work.
 #include "ppapi/c/ppb_var.h"
 #include "ppapi/c/ppp.h"
 #include "ppapi/c/ppp_instance.h"
+#include "ppapi/c/ppp_messaging.h"
 
 
 PP_Module g_module_id;
@@ -105,12 +107,26 @@ PP_Bool Instance_HandleDocumentLoad(PP_Instance pp_instance,
 /*!
  * @brief PPAPI instance interface structure.
  */
+static
 PPP_Instance instance_interface = {
 	.DidCreate = Instance_DidCreate,
 	.DidDestroy = Instance_DidDestroy,
 	.DidChangeView = Instance_DidChangeView,
 	.DidChangeFocus = Instance_DidChangeFocus,
 	.HandleDocumentLoad = Instance_HandleDocumentLoad
+};
+
+
+static
+void Messaging_HandleMessage(PP_Instance instance, struct PP_Var message);
+
+
+/*!
+ * @brief PPAPI messaging inetrface structure.
+ */
+static
+PPP_Messaging messaging_interface = {
+	.HandleMessage = Messaging_HandleMessage
 };
 
 
@@ -136,6 +152,8 @@ int32_t PPP_InitializeModule(PP_Module module_id,
 	g_varMessagingInterface = get_browser_interface(
 	    PPB_MESSAGING_INTERFACE);
 	g_varInterface = get_browser_interface(PPB_VAR_INTERFACE);
+
+	fprintf(stderr, "_001 %s\n", __func__);
 
 	return PP_OK;
 }
@@ -163,7 +181,12 @@ const void * PPP_GetInterface(const char *interface_name)
 	assert(interface_name != NULL);
 
 	if (strcmp(interface_name, PPP_INSTANCE_INTERFACE) == 0) {
+		fprintf(stderr, "_001 %s\n", __func__);
 		return &instance_interface;
+	}
+	if (strcmp(interface_name, PPP_MESSAGING_INTERFACE) == 0) {
+		fprintf(stderr, "_002 %s\n", __func__);
+		return &messaging_interface;
 	}
 
 	return NULL;
@@ -181,15 +204,18 @@ PP_Bool Instance_DidCreate(PP_Instance instance, uint32_t argc,
     const char *argn[], const char *argv[])
 /* ========================================================================= */
 {
+#define STR "Hello world!"
+
 	/* Create PP_Var containing the message body */
 	assert(g_varInterface != NULL);
 	struct PP_Var varString =
-	    g_varInterface->VarFromUtf8("Hello world!", strlen("Hello world!"));
+	    g_varInterface->VarFromUtf8(STR, strlen(STR));
 
 	/* Post message to the JavaScript layer. */
 	g_varMessagingInterface->PostMessage(instance, varString);
 
 	return PP_TRUE;
+#undef STR
 }
 
 
@@ -224,4 +250,13 @@ PP_Bool Instance_HandleDocumentLoad(PP_Instance pp_instance,
 /* ========================================================================= */
 {
 	return PP_FALSE;
+}
+
+
+/* ========================================================================= */
+static
+void Messaging_HandleMessage(PP_Instance instance, struct PP_Var message)
+/* ========================================================================= */
+{
+	fprintf(stderr, "_001 %s\n", __func__);
 }
