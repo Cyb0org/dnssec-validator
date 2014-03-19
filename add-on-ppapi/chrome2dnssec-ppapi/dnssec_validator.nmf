@@ -1,11 +1,44 @@
 {
-  "files": {},
-  "program": {
-    "x86-64": {
-      "url": "dnssec_validator_linux_x86_64.nexe"
+  "files": {
+    "libpthread.so.0ac00c5d": {
+      "x86-32": {
+        "url": "lib32/libpthread.so.0ac00c5d"
+      },
+      "x86-64": {
+        "url": "lib64/libpthread.so.0ac00c5d"
+      }
     },
+    "main.nexe": {
+      "x86-32": {
+        "url": "dnssec_validator_x86_32.nexe"
+      },
+      "x86-64": {
+        "url": "dnssec_validator_x86_64.nexe"
+      }
+    },
+    "libc.so.0ac00c5d": {
+      "x86-64": {
+        "url": "lib64/libc.so.0ac00c5d"
+      },
+      "x86-32": {
+        "url": "lib32/libc.so.0ac00c5d"
+      }
+    },
+    "libdl.so.0ac00c5d": {
+      "x86-32": {
+        "url": "lib32/libdl.so.0ac00c5d"
+      },
+      "x86-64": {
+        "url": "lib64/libdl.so.0ac00c5d"
+      }
+    }
+  },
+  "program": {
     "x86-32": {
-      "url": "dnssec_validator_linux_x86_32.nexe"
+      "url": "lib32/runnable-ld.so"
+    },
+    "x86-64": {
+      "url": "lib64/runnable-ld.so"
     }
   }
 }
