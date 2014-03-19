@@ -396,10 +396,21 @@ function dnssecvalidate(domain, tabId, tab) {
 			+ "; options: " + options  + "; resolver: system; IP-br: " + addr);
 		}
 	}
+
+		var dictionary = {
+//			command: next_command,
+			param_string: domain,
+			param_int: options,
+			param_string: resolver,
+			param_string: addr
+		}
+
 	// Call of DNSSEC Validation plugin
 	try {
-		var plugin = document.getElementById("dnssec_validator");	 	
-		var result = plugin.Validate(domain, options, resolver, addr);
+		var plugin = document.getElementById("dnssec_validator");
+		plugin.postMessage(dictionary);	 	
+//		var result = plugin.Validate(domain, options, resolver, addr);
+		var result = [1,1];
 		if (debuglogout) {
 			console.log(DNSSEC + "DNSSEC plugin result: " + result[0] + "; " + result[1]);
 		}
