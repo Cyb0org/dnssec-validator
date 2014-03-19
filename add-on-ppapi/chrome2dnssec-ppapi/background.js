@@ -22,11 +22,12 @@ DNSSEC Validator 2 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 document.write("<!DOCTYPE html>");
 document.write("<html>");
 document.write("<head>");
+document.write("<script type=\"text/javascript\" src=\"common.js\"></script>");
 document.write("</head>");
-document.write("<body>");
+document.write("<body data-name=\"dnssec_validator\" data-tools=\"\" data-configs=\"\" data-path=\"\">");
 document.write("<embed id=\"dnssec_validator\" width=\"0\" height=\"0\" src=\"dnssec_validator.nmf\" type=\"application/x-nacl\" />");
+document.write("<div id=\"listener\"></div>");
 document.write("<script>");
-
 
 // debug pretext
 var DNSSEC = "DNSSEC: ";
@@ -270,7 +271,7 @@ function getResolver() {
 //****************************************************************
 function setDNSSECSecurityState(tabId, domain, status, addr, ipval) {
 
-	var c = this.dnssecExtNPAPIConst;	
+	var c = this.dnssecExtNPAPIConst;
 
 	switch (status) {
 	case c.DNSSEC_COT_DOMAIN_SECURED: 
@@ -327,7 +328,7 @@ function setDNSSECSecurityState(tabId, domain, status, addr, ipval) {
 //****************************************************************
 // Called when the DNSSEC status is retriving
 //****************************************************************
-function dnssecvalidate(domain, tabId, tab) {                  	
+function dnssecvalidate(domain, tabId, tab) {
      
 	// set custom resolver
 	var resolver = this.getResolver();
@@ -446,7 +447,7 @@ function dnssecvalidate(domain, tabId, tab) {
 		if (debuglogout) {
 			console.log(DNSSEC + "DNSSEC plugin call failed!");
 		}
-	     	return [c.DNSSEC_ERROR_GENERIC, "n/a", addr];		
+		return [c.DNSSEC_ERROR_GENERIC, "n/a", addr];
 	}
 	
 	if (addr == "0.0.0.0") {
@@ -497,13 +498,13 @@ function ExcludeDomainList(domain) {
 //****************************************************************
 // Called when the url of a tab changes.
 //****************************************************************
-function onUrlChange(tabId, changeInfo, tab) {                  	
+function onUrlChange(tabId, changeInfo, tab) {
 
 	debuglogout = StringToBool(localStorage["DebugOutput"]);
 
 	if (changeInfo.status == "undefined") {
 		//chrome.pageAction.hide(tabId);
-		return;		
+		return;
 	}
 
 	if (changeInfo.status != "loading") {
@@ -616,20 +617,35 @@ chrome.webRequest.onResponseStarted.addListener(function(info) {
 );
 
 
+function moduleDidLoad() {
+  // Once we load, hide the plugin. In this example, we don't display anything
+  // in the plugin, so it is fine to hide it.
+  common.hideModule();
+
+  // After the NaCl module has loaded, common.naclModule is a reference to the
+  // NaCl module's <embed> element.
+  //
+  // postMessage sends a message to it.
+  common.naclModule.postMessage("Initialize");
+
+	chrome.tabs.onUpdated.addListener(onUrlChange);
+}
+
+
 if (init) {
-	var plugin = document.getElementById("dnssec_validator");
-	//plugin.DNSSECCacheInit();
-	window.setTimeout(function() {plugin.postMessage("Hello world!");}, 5000);  // 100 ms
-	plugin.postMessage("Hello world!");
+//	var plugin = document.getElementById("dnssec_validator");
+//	//plugin.DNSSECCacheInit();
+//	window.setTimeout(function() {plugin.postMessage("Hello world!");}, 5000);  // 100 ms
+//	plugin.postMessage("Hello world!");
 
 	init = false;
 }
 //****************************************************************
 // Listen for any changes to the URL of any tab.
 //****************************************************************
-chrome.tabs.onUpdated.addListener(onUrlChange);
+//chrome.tabs.onUpdated.addListener(onUrlChange);
+
 
 document.write("</script>");
 document.write("</body>");
 document.write("</html>");
-
