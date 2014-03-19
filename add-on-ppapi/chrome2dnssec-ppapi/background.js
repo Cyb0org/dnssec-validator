@@ -397,18 +397,16 @@ function dnssecvalidate(domain, tabId, tab) {
 		}
 	}
 
-		var dictionary = {
-//			command: next_command,
-			param_string: domain,
-			param_int: options,
-			param_string: resolver,
-			param_string: addr
-		}
-
 	// Call of DNSSEC Validation plugin
 	try {
 		var plugin = document.getElementById("dnssec_validator");
-		plugin.postMessage(dictionary);	 	
+		plugin.postMessage({
+		    command: "validate", // string
+		    domain: domain, // string
+		    options: options, // integer
+		    ipresolver: resolver, // string
+		    ipbrowser: addr // string
+		});
 //		var result = plugin.Validate(domain, options, resolver, addr);
 		var result = [1,1];
 		if (debuglogout) {
@@ -629,17 +627,22 @@ chrome.webRequest.onResponseStarted.addListener(function(info) {
 
 
 function moduleDidLoad() {
-  // Once we load, hide the plugin. In this example, we don't display anything
-  // in the plugin, so it is fine to hide it.
-  common.hideModule();
+	// Once we load, hide the plugin. In this example, we don't display
+	// anything in the plugin, so it is fine to hide it.
+	common.hideModule();
 
-  // After the NaCl module has loaded, common.naclModule is a reference to the
-  // NaCl module's <embed> element.
-  //
-  // postMessage sends a message to it.
-  common.naclModule.postMessage("Initialize");
+	// After the NaCl module has loaded, common.naclModule is a reference
+	// to the NaCl module's <embed> element.
+	//
+	// postMessage sends a message to it.
+	common.naclModule.postMessage({command: "initialise"});
 
 	chrome.tabs.onUpdated.addListener(onUrlChange);
+}
+
+
+function handleMessage(message) {
+	message.data;
 }
 
 
@@ -649,7 +652,7 @@ if (init) {
 //	window.setTimeout(function() {plugin.postMessage("Hello world!");}, 5000);  // 100 ms
 //	plugin.postMessage("Hello world!");
 
-	init = false;
+//	init = false;
 }
 //****************************************************************
 // Listen for any changes to the URL of any tab.

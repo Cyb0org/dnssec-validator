@@ -44,6 +44,8 @@ OpenSSL used as well as that of the covered work.
 #include "ppapi/c/ppb.h"
 #include "ppapi/c/ppb_messaging.h"
 #include "ppapi/c/ppb_var.h"
+#include "ppapi/c/ppb_var_array.h"
+#include "ppapi/c/ppb_var_dictionary.h"
 #include "ppapi/c/ppp.h"
 #include "ppapi/c/ppp_instance.h"
 #include "ppapi/c/ppp_messaging.h"
@@ -51,8 +53,11 @@ OpenSSL used as well as that of the covered work.
 
 PP_Module g_module_id;
 PPB_GetInterface g_get_browser_interface = NULL;
-const PPB_Messaging *g_varMessagingInterface;
-const PPB_Var *g_varInterface;
+
+const PPB_Messaging *g_varMessagingInterface = NULL;
+const PPB_Var *g_varInterface = NULL;
+const PPB_VarArray *g_varArrInterface = NULL;
+const PPB_VarDictionary *g_varDictInterface = NULL;
 
 
 #ifdef __cplusplus
@@ -152,6 +157,9 @@ int32_t PPP_InitializeModule(PP_Module module_id,
 	g_varMessagingInterface = get_browser_interface(
 	    PPB_MESSAGING_INTERFACE);
 	g_varInterface = get_browser_interface(PPB_VAR_INTERFACE);
+	g_varArrInterface = get_browser_interface(PPB_VAR_ARRAY_INTERFACE);
+	g_varDictInterface =
+	    get_browser_interface(PPB_VAR_DICTIONARY_INTERFACE);
 
 	fprintf(stderr, "_001 %s\n", __func__);
 
@@ -253,10 +261,171 @@ PP_Bool Instance_HandleDocumentLoad(PP_Instance pp_instance,
 }
 
 
+#define CMD_INIT_STR "initialise"
+#define CMD_INIT_LEN 10
+#define CMD_DEINIT_STR "deinitialise"
+#define CMD_DEINIT_LEN 12
+#define CMD_VAL_STR "validate"
+#define CMD_VAL_LEN 8
+
+enum cmd_type {
+	CMD_UNKNOWN = 0,
+	CMD_INIT,
+	CMD_DEINIT,
+	CMD_VAL
+};
+
+
+
+/* ========================================================================= */
+static
+enum cmd_type DictGetCmdType(struct PP_Var dict)
+/* ========================================================================= */
+{
+#define CMD_KEY "command"
+#define CMD_KEY_LEN 7
+
+	struct PP_Var cmd_key;
+	struct PP_Var cmd;
+	uint32_t cmd_len;
+	const char *cmd_str = NULL;
+	enum cmd_type ret = CMD_UNKNOWN;
+
+	cmd_key = g_varInterface->VarFromUtf8(CMD_KEY, CMD_KEY_LEN);
+
+	cmd = g_varDictInterface->Get(dict, cmd_key);
+	assert(PP_VARTYPE_STRING == cmd.type);
+	cmd_str = g_varInterface->VarToUtf8(cmd, &cmd_len);
+
+	if ((CMD_INIT_LEN == cmd_len) &&
+	    (memcmp(CMD_INIT_STR, cmd_str, CMD_INIT_LEN) == 0)) {
+		ret = CMD_INIT;
+	} else
+	if ((CMD_DEINIT_LEN == cmd_len) &&
+	    (memcmp(CMD_DEINIT_STR, cmd_str, CMD_DEINIT_LEN) == 0)) {
+		ret = CMD_DEINIT;
+	} else
+	if ((CMD_VAL_LEN == cmd_len) &&
+	    (memcmp(CMD_VAL_STR, cmd_str, CMD_VAL_LEN) == 0)) {
+		ret = CMD_VAL;
+	}
+
+	g_varInterface->Release(cmd);
+
+	g_varInterface->Release(cmd_key); // Key cannot be released before cmd.
+
+	return ret;
+
+#undef CMD_KEY
+#undef CMD_KEY_LEN
+}
+
+
+/* ========================================================================= */
+static
+int DictGetValParameters(struct PP_Var dict,
+    const char **dom_str, uint32_t *dom_len)
+/* ========================================================================= */
+{
+#define DOM_KEY "domain"
+#define DOM_KEY_LEN 6
+
+	struct PP_Var key;
+	struct PP_Var val;
+
+	if ((dom_str != NULL) && (dom_len != NULL)) {
+
+		key = g_varInterface->VarFromUtf8(DOM_KEY, DOM_KEY_LEN);
+		val = g_varDictInterface->Get(dict, key);
+		if (PP_VARTYPE_STRING != val.type) {
+			goto fail;
+		}
+
+		*dom_str = g_varInterface->VarToUtf8(val, dom_len);
+
+		g_varInterface->Release(val);
+		g_varInterface->Release(key);
+
+	}
+
+	return 0;
+
+fail:
+	g_varInterface->Release(val);
+	g_varInterface->Release(key);
+	return -1;
+#undef DOM_KEY
+#undef DOM_KEY_LEN
+}
+
+
 /* ========================================================================= */
 static
 void Messaging_HandleMessage(PP_Instance instance, struct PP_Var message)
 /* ========================================================================= */
 {
+#define CMD "command"
+#define CMD_LEN 7
+
+//	struct PP_Var keys;
+//	struct PP_Var cmd_key;
+//	struct PP_Var cmd;
+//	uint32_t cmd_len;
+//	const char *cmd_str = NULL;
+	enum cmd_type type;
+
+	const char *domain;
+	uint32_t domain_len;
+
+//	cmd_key = g_varInterface->VarFromUtf8(CMD, CMD_LEN);
+
+	g_varInterface->AddRef(message);
+
 	fprintf(stderr, "_001 %s\n", __func__);
+	if (message.type == PP_VARTYPE_DICTIONARY) {
+		type = DictGetCmdType(message);
+		switch (type) {
+		case CMD_INIT:
+			fprintf(stderr, "Command INIT %s.\n", __func__);
+			break;
+		case CMD_DEINIT:
+			fprintf(stderr, "Command DEINIT %s.\n", __func__);
+			break;
+		case CMD_VAL:
+			fprintf(stderr, "Command VAL %s.\n", __func__);
+			DictGetValParameters(message, &domain, &domain_len);
+			for (int i = 0; i < domain_len; ++i) {
+				//fputs(domain[i], stderr);
+				/*
+				 * Calling fputs() causes:
+				 * Signal 11 from untrusted code: pc=...
+				 */
+				fprintf(stderr, "%c", domain[i]);
+			}
+			fprintf(stderr, "\n");
+			break;
+		default:
+			fprintf(stderr, "Command unknown %s.\n", __func__);
+			break;
+		}
+//		keys = g_varDictInterface->GetKeys(message);
+//		fprintf(stderr, "Received %d keys.\n",
+//		    g_varArrInterface->GetLength(keys));
+//		g_varInterface->Release(keys);
+//		cmd = g_varDictInterface->Get(message, cmd_key);
+//		fprintf(stderr, "CMD type %d.\n", cmd.type);
+//		cmd_str = g_varInterface->VarToUtf8(cmd, &cmd_len);
+//		fprintf(stderr, "CMD length %d.\n", cmd_len);
+//		for (int i = 0; i < cmd_len; ++i) {
+//			fputc(cmd_str[i], stderr);
+//		}
+//		fputc('\n', stderr);
+//		g_varInterface->Release(cmd);
+	} else {
+		fprintf(stderr, "_003 %s\n", __func__);
+	}
+
+	g_varInterface->Release(message);
+
+//	g_varInterface->Release(cmd_key);
 }
