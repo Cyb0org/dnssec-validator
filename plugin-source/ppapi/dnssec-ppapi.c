@@ -33,6 +33,7 @@ OpenSSL used as well as that of the covered work.
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -133,6 +134,49 @@ static
 PPP_Messaging messaging_interface = {
 	.HandleMessage = Messaging_HandleMessage
 };
+
+
+struct val_data {
+	char *domain;
+	uint16_t options;
+	char *ipresolver;
+	char *ipbrowser;
+};
+
+
+#define val_data_init(vd) \
+	do { \
+		(vd)->domain = NULL; \
+		(vd)->options = 0; \
+		(vd)->ipresolver = NULL; \
+		(vd)->ipbrowser = NULL; \
+	} while(0)
+
+
+#define val_data_deep_free(vd) \
+	do { \
+		assert(NULL != (vd)); \
+		if (NULL != (vd)->domain) { \
+			free((vd)->domain); \
+		} \
+		if (NULL != (vd)->ipresolver) { \
+			free((vd)->ipresolver); \
+		} \
+		if (NULL != (vd)->ipbrowser) { \
+			free((vd)->ipbrowser); \
+		} \
+		free(vd); \
+	} while(0)
+
+
+/*!
+ * @brief Returns newly allocated structure.
+ *
+ * @note The caller is responsible for freeing the returned value.
+ */
+static
+struct val_data * DictGetValParameters(struct PP_Var dict)
+    __attribute__((warn_unused_result));
 
 
 #ifdef __cplusplus
@@ -321,41 +365,126 @@ enum cmd_type DictGetCmdType(struct PP_Var dict)
 }
 
 
+//struct val_data {
+//	char *domain;
+//	uint16_t options;
+//	char *ipresolver;
+//	char *ipbrowser;
+//};
+
+
 /* ========================================================================= */
 static
-int DictGetValParameters(struct PP_Var dict,
-    const char **dom_str, uint32_t *dom_len)
+struct val_data * DictGetValParameters(struct PP_Var dict)
 /* ========================================================================= */
 {
 #define DOM_KEY "domain"
 #define DOM_KEY_LEN 6
+#define OPT_KEY "options"
+#define OPT_KEY_LEN 7
+#define RES_KEY "ipresolver"
+#define RES_KEY_LEN 10
+#define BROW_KEY "ipbrowser"
+#define BROW_KEY_LEN 9
 
+	struct val_data *ret = NULL;
+	const char *str;
+	uint32_t str_len;
 	struct PP_Var key;
 	struct PP_Var val;
 
-	if ((dom_str != NULL) && (dom_len != NULL)) {
-
-		key = g_varInterface->VarFromUtf8(DOM_KEY, DOM_KEY_LEN);
-		val = g_varDictInterface->Get(dict, key);
-		if (PP_VARTYPE_STRING != val.type) {
-			goto fail;
-		}
-
-		*dom_str = g_varInterface->VarToUtf8(val, dom_len);
-
-		g_varInterface->Release(val);
-		g_varInterface->Release(key);
-
+	ret = malloc(sizeof(struct val_data));
+	if (NULL == ret) {
+		goto fail;
 	}
 
-	return 0;
+	/* Domain name. */
+	key = g_varInterface->VarFromUtf8(DOM_KEY, DOM_KEY_LEN);
+	val = g_varDictInterface->Get(dict, key);
+	if (PP_VARTYPE_STRING != val.type) {
+		goto fail;
+	}
 
-fail:
+	str = g_varInterface->VarToUtf8(val, &str_len);
+
+	ret->domain = malloc(str_len + 1);
+	if (NULL == ret->domain) {
+		goto fail;
+	}
+	memcpy(ret->domain, str, str_len);
+	ret->domain[str_len] = '\0';
+
 	g_varInterface->Release(val);
 	g_varInterface->Release(key);
-	return -1;
+
+	/* Options. */
+	key = g_varInterface->VarFromUtf8(OPT_KEY, OPT_KEY_LEN);
+	val = g_varDictInterface->Get(dict, key);
+	if (PP_VARTYPE_INT32 != val.type) {
+		goto fail;
+	}
+
+	ret->options = val.value.as_int;
+
+	g_varInterface->Release(val);
+	g_varInterface->Release(key);
+
+	/* Resolver. */
+	key = g_varInterface->VarFromUtf8(RES_KEY, RES_KEY_LEN);
+	val = g_varDictInterface->Get(dict, key);
+	if (PP_VARTYPE_STRING != val.type) {
+		goto fail;
+	}
+
+	str = g_varInterface->VarToUtf8(val, &str_len);
+
+	ret->ipresolver = malloc(str_len + 1);
+	if (NULL == ret->ipresolver) {
+		goto fail;
+	}
+	memcpy(ret->ipresolver, str, str_len);
+	ret->ipresolver[str_len] = '\0';
+
+	g_varInterface->Release(val);
+	g_varInterface->Release(key);
+
+	/* Browser. */
+	/* Resolver. */
+	key = g_varInterface->VarFromUtf8(BROW_KEY, BROW_KEY_LEN);
+	val = g_varDictInterface->Get(dict, key);
+	if (PP_VARTYPE_STRING != val.type) {
+		goto fail;
+	}
+
+	str = g_varInterface->VarToUtf8(val, &str_len);
+
+	ret->ipbrowser = malloc(str_len + 1);
+	if (NULL == ret->ipbrowser) {
+		goto fail;
+	}
+	memcpy(ret->ipbrowser, str, str_len);
+	ret->ipbrowser[str_len] = '\0';
+
+	g_varInterface->Release(val);
+	g_varInterface->Release(key);
+
+	return ret;
+
+fail:
+ 	if (NULL != ret) {
+		val_data_deep_free(ret);
+	}
+	g_varInterface->Release(val);
+	g_varInterface->Release(key);
+	return NULL;
 #undef DOM_KEY
 #undef DOM_KEY_LEN
+#undef OPT_KEY
+#undef OPT_KEY_LEN
+#undef RES_KEY
+#undef RES_KEY_LEN
+#undef BROW_KEY
+#undef BROW_KEY_LEN
 }
 
 
@@ -367,17 +496,10 @@ void Messaging_HandleMessage(PP_Instance instance, struct PP_Var message)
 #define CMD "command"
 #define CMD_LEN 7
 
-//	struct PP_Var keys;
-//	struct PP_Var cmd_key;
-//	struct PP_Var cmd;
-//	uint32_t cmd_len;
-//	const char *cmd_str = NULL;
 	enum cmd_type type;
-
-	const char *domain;
-	uint32_t domain_len;
-
-//	cmd_key = g_varInterface->VarFromUtf8(CMD, CMD_LEN);
+	struct val_data *vd = NULL;
+	int val_ret;
+	char *ipvalidator; /* Don't try to free. */
 
 	g_varInterface->AddRef(message);
 
@@ -387,45 +509,35 @@ void Messaging_HandleMessage(PP_Instance instance, struct PP_Var message)
 		switch (type) {
 		case CMD_INIT:
 			fprintf(stderr, "Command INIT %s.\n", __func__);
+			dnssec_validation_init();
 			break;
 		case CMD_DEINIT:
 			fprintf(stderr, "Command DEINIT %s.\n", __func__);
+			dnssec_validation_deinit();
 			break;
 		case CMD_VAL:
 			fprintf(stderr, "Command VAL %s.\n", __func__);
-			DictGetValParameters(message, &domain, &domain_len);
-			for (int i = 0; i < domain_len; ++i) {
-				//fputs(domain[i], stderr);
-				/*
-				 * Calling fputs() causes:
-				 * Signal 11 from untrusted code: pc=...
-				 */
-				fprintf(stderr, "%c", domain[i]);
+			vd = DictGetValParameters(message);
+			if (NULL != vd) {
+				fprintf(stderr, "%s %d '%s' '%s'\n",
+				    vd->domain, vd->options, vd->ipresolver,
+				    vd->ipbrowser);
+				val_ret = dnssec_validate(vd->domain,
+				    vd->options, vd->ipresolver, vd->ipbrowser,
+				    &ipvalidator);
+				fprintf(stderr, "Validation return %d.\n",
+				    val_ret);
+				val_data_deep_free(vd); vd = NULL;
+			} else {
 			}
-			fprintf(stderr, "\n");
 			break;
 		default:
 			fprintf(stderr, "Command unknown %s.\n", __func__);
 			break;
 		}
-//		keys = g_varDictInterface->GetKeys(message);
-//		fprintf(stderr, "Received %d keys.\n",
-//		    g_varArrInterface->GetLength(keys));
-//		g_varInterface->Release(keys);
-//		cmd = g_varDictInterface->Get(message, cmd_key);
-//		fprintf(stderr, "CMD type %d.\n", cmd.type);
-//		cmd_str = g_varInterface->VarToUtf8(cmd, &cmd_len);
-//		fprintf(stderr, "CMD length %d.\n", cmd_len);
-//		for (int i = 0; i < cmd_len; ++i) {
-//			fputc(cmd_str[i], stderr);
-//		}
-//		fputc('\n', stderr);
-//		g_varInterface->Release(cmd);
 	} else {
 		fprintf(stderr, "_003 %s\n", __func__);
 	}
 
 	g_varInterface->Release(message);
-
-//	g_varInterface->Release(cmd_key);
 }
