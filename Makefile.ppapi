@@ -13,7 +13,7 @@ CPPFLAGS += -Iplugin-source/DNSSECValidatorPlugin
 CPPFLAGS += -Iplugin-source/TLSAValidatorPlugin
 CFLAGS += $(OPTFLAGS) -std=c99 -Wall -Wextra -pedantic
 LDFLAGS += -lunbound -lldns -lssl -lcrypto -lpthread -ldl
-LDFLAGS += -lppapi
+LDFLAGS += -lppapi -lnacl_io
 #LDFLAGS += -lppapi_cpp
 
 .PHONY: all clean help install run

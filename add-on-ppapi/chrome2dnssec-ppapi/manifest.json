@@ -19,7 +19,11 @@
    },
    "manifest_version": 2,
    "minimum_chrome_version": "18",
-   "permissions": [ "tabs", "webRequest", "*://*/*",     {"socket" : ["tcp-connect:*.*", "resolve-host", "tcp-listen"]} ],
+   "permissions": [
+      "tabs",
+      "webRequest",
+      "*://*/*"
+   ],
    "nacl_modules": [ {
       "path": "dnssec-validator.nmf",
       "mime_type" : "application/x-nacl"

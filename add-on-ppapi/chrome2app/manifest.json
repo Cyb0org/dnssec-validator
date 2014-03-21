@@ -1,0 +1,29 @@
+{
+   "name": "DNSSEC Validator",
+   "description": "Shows DNSSEC status",
+   "version": "2.1.1",
+   "app": {
+      "background": {
+         "scripts": [ "background.js" ]
+      }
+   },
+   "icons": {
+      "32": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+   },
+   "manifest_version": 2,
+   "minimum_chrome_version": "18",
+   "permissions": [
+      {"socket" : [
+          "tcp-connect:*.*",
+          "resolve-host",
+          "tcp-listen"
+      ]},
+      {"fileSystem": ["write"]}
+   ],
+   "nacl_modules": [ {
+      "path": "dnssec-validator.nmf",
+      "mime_type" : "application/x-nacl"
+    }]
+}

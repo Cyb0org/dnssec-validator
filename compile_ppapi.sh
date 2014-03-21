@@ -80,6 +80,9 @@ done
 
 
 # Can be set at command-line.
+if [ "x${COMPILE_DEBUG}" = "x" ]; then
+	COMPILE_DEBUG="yes"
+fi
 if [ "x${COMPILE_SSL}" = "x" ]; then
 	COMPILE_SSL="yes"
 fi
@@ -111,11 +114,18 @@ if [ "x${COMPILE_SSL}" = "xyes" ]; then
 
 		PREFIX="${BUILT_DIR}/${OSNAME}-${HOST}"
 
+		if [ "x${COMPILE_DEBUG}" = "xyes" ]; then
+			#DEBUG="-d"
+			DEBUG=""
+		else
+			DEBUG=""
+		fi
+
 		#NEWLIB_OPTS="no-dso no-sock no-ui"
 		cd ${OPENSSL_DIR}
 		make clean
 		#NO_SHARED=no-shared
-		CMD="./config no-shared no-asm no-hw no-krb5 -fPIC -D_GNU_SOURCE --prefix=${PREFIX}"
+		CMD="./config ${DEBUG} no-shared no-asm no-hw no-krb5 -fPIC -D_GNU_SOURCE --prefix=${PREFIX}"
 		${CMD} && make && make install_sw && \
 		make clean || exit 1
 		cd ${SCRIPT_LOCATION}
@@ -136,6 +146,12 @@ if [ "x${COMPILE_LDNS}" = "xyes" ]; then
 
 		PREFIX="${BUILT_DIR}/${OSNAME}-${HOST}"
 
+		if [ "x${COMPILE_DEBUG}" = "xyes" ]; then
+			DEBUG="-g -O0"
+		else
+			DEBUG=""
+		fi
+
 		cd ${LDNS_DIR}
 		make clean
 		#NO_SHARED=--disable-shared
@@ -148,10 +164,10 @@ if [ "x${COMPILE_LDNS}" = "xyes" ]; then
 				rm -r ${BUILD_SUBDIR}
 			fi
 			mkdir ${BUILD_SUBDIR} && cd ${BUILD_SUBDIR} && \
-			.${CMD} && make && make install && \
+			CFLAGS="${DEBUG}" .${CMD} && make && make install && \
 			cd .. && rm -r ${BUILD_SUBDIR} || exit 1
 		else
-			${CMD} && make && make install-h install-lib && \
+			CFLAGS="${DEBUG}" ${CMD} && make && make install-h install-lib && \
 			make clean || exit 1
 		fi
 
@@ -173,10 +189,17 @@ if [ "x${COMPILE_UNBOUND}" = "xyes" ]; then
 
 		PREFIX="${BUILT_DIR}/${OSNAME}-${HOST}"
 
+		if [ "x${COMPILE_DEBUG}" = "xyes" ]; then
+			DEBUG1="-g -O0"
+			DEBUG2="--enable-debug"
+		else
+			DEBUG1=""
+		fi
+
 		cd ${UNBOUND_DIR}
 		make clean
 		#NO_SHARED=--disable-shared
-		CMD="./configure --disable-shared --host=${HOST} --with-ssl=${PREFIX} --with-ldns=${PREFIX} --prefix=${PREFIX} --with-libunbound-only"
+		CMD="./configure ${DEBUG2} --disable-shared --host=${HOST} --with-ssl=${PREFIX} --with-ldns=${PREFIX} --prefix=${PREFIX} --with-libunbound-only"
 
 		if [ "x${COMPILE_IN_SUBDIRS}" = "xyes" ]; then
 			# Build in a separate subdirectory.
@@ -185,10 +208,10 @@ if [ "x${COMPILE_UNBOUND}" = "xyes" ]; then
 				rm -r ${BUILD_SUBDIR}
 			fi
 			mkdir ${BUILD_SUBDIR} && cd ${BUILD_SUBDIR} && \
-			.${CMD} && make && make install && \
+			CFLAGS="${DEBUG1}" .${CMD} && make && make install && \
 			cd .. && rm -r ${BUILD_SUBDIR} || exit 1
 		else
-			${CMD} && make && make install && \
+			CFLAGS="${DEBUG1}" ${CMD} && make && make install && \
 			make clean || exit 1
 		fi
 

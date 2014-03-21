@@ -51,6 +51,9 @@ OpenSSL used as well as that of the covered work.
 #include "ppapi/c/ppp_instance.h"
 #include "ppapi/c/ppp_messaging.h"
 
+#include "nacl_io/kernel_intercept.h"
+#include "nacl_io/kernel_wrap.h"
+
 
 PP_Module g_module_id;
 PPB_GetInterface g_get_browser_interface = NULL;
@@ -541,3 +544,21 @@ void Messaging_HandleMessage(PP_Instance instance, struct PP_Var message)
 
 	g_varInterface->Release(message);
 }
+
+
+//int socketpair(int domain, int type, int protocol, int* sv) {
+//  int ret;
+//  fprintf(stderr, "Trying %s\n", __func__);
+//  ret = ki_socketpair(domain, type, protocol, sv);
+//  fprintf(stderr, "Returned %s %d\n", __func__, ret);
+//
+//  return ret;
+//}
+
+
+//int sigaction(int signum,
+//              const struct sigaction* act,
+//              struct sigaction* oldact) {
+//  
+//  return ki_sigaction(signum, act, oldact);
+//}
