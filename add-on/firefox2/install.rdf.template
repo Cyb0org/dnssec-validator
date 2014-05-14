@@ -28,6 +28,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
     <em:name>DNSSEC/TLSA Validator</em:name>
     <em:description>Checks whether domain names in the address bar are secured by DNSSEC and checks certificate with TLSA record if exists.</em:description>
     <em:version></em:version>
+    <em:type>2</em:type>
     <em:creator>CZ.NIC Labs</em:creator>
     <em:developer>Martin Straka</em:developer> <!-- martin.straka(AT)nic.cz -->
     <em:contributor>Ondřej Filip</em:contributor> <!-- ondrej.filip(AT)nic.cz -->    

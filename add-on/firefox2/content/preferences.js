@@ -108,18 +108,6 @@ hasUserValue :
 		}
 	},
 
-
-isInstantApply :
-	function() {
-		try {
-			return Components.classes["@mozilla.org/preferences-service;1"]
-			       .getService(Components.interfaces.nsIPrefBranch)
-			       .getBoolPref("browser.preferences.instantApply", false);
-		} catch (ex) {
-			return null;
-		}
-	},
-
 checkOptdnsserveraddr :
 	function() {
 		var str = document.getElementById("dnssec-pref-optdnsserveraddr").value;
@@ -236,7 +224,6 @@ pane1Load :
 		this._dnssecbogus.textContent = this._stringBundle.getString("dnssecbogus");
 		this._dnssecerror.textContent = this._stringBundle.getString("dnssecerror");
 		this._wrongip.textContent = this._stringBundle.getString("wrongip");
-		this.instantApply = this.isInstantApply();
 		this.setElementsattributes();
 	},
 
@@ -377,12 +364,7 @@ showPrefWindow :
 		}
 
 		// Open the pref window
-		var features = "chrome,titlebar,toolbar,centerscreen";
-		try {
-			features += this.isInstantApply() ? ",dialog=no" : ",modal";
-		} catch (e) {
-			features += ",modal";
-		}
+		var features = "chrome,titlebar,toolbar,centerscreen,dialog=yes";
 		window.openDialog(optionsURL, "", features);
 	},
 };
