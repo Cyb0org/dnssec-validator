@@ -46,7 +46,7 @@ showAboutWindow :
 		}
 
 		// Open the window
-		var features = "chrome,titlebar,toolbar,centerscreen,modal";
+		var features = "chrome,titlebar,toolbar,centerscreen,dialog=yes";
 		window.openDialog(about, "", features);
 	},
 
