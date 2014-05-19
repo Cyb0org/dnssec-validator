@@ -74,7 +74,7 @@ register:
 
 		// Add the observer
 		this._branch = prefService.getBranch(dnssecExtPrefs.prefBranch);
-		this._branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
+		this._branch.QueryInterface(Components.interfaces.nsIPrefBranch);
 		this._branch.addObserver("", this, false);
 	},
 

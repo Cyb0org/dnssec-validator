@@ -29,23 +29,11 @@ prefObj :
 prefBranch : "extensions.dnssec."
 	,
 
-isInstantApply :
-	function() {
-		try {
-			return Components.classes["@mozilla.org/preferences-service;1"]
-			.getService(Components.interfaces.nsIPrefBranch)
-			.getBoolPref("browser.preferences.instantApply", false);
-		} catch (ex) {
-			return null;
-		}
-	},
-
-
 showAboutWindow :
 	function() {
 		var about = "chrome://dnssec/content/about.xul";
 
-		// Check if the pref window is not already opened
+		// Check if the window is not already opened
 		var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
 		         .getService(Components.interfaces.nsIWindowMediator);
 		var enumerator = wm.getEnumerator(null);
@@ -57,13 +45,8 @@ showAboutWindow :
 			}
 		}
 
-		// Open the pref window
-		var features = "chrome,titlebar,toolbar,centerscreen";
-		try {
-			features += this.isInstantApply() ? ",dialog=yes" : ",modal";
-		} catch (e) {
-			features += ",modal";
-		}
+		// Open the window
+		var features = "chrome,titlebar,toolbar,centerscreen,dialog=yes";
 		window.openDialog(about, "", features);
 	},
 

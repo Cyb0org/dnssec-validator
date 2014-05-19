@@ -57,7 +57,7 @@ register:
 
 		// Add the observer
 		this._branch = prefService.getBranch(dnssecExtPrefs.prefBranch);
-		this._branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
+		this._branch.QueryInterface(Components.interfaces.nsIPrefBranch);
 		this._branch.addObserver("", this, false);
 	},
 
@@ -675,7 +675,7 @@ get_invalid_cert_SSLStatus:
 		// firefox > v20
 		else if (typeof Components.classes["@mozilla.org/security/x509certdb;1"] !== "undefined") {
 			var certDB = Components.classes["@mozilla.org/security/x509certdb;1"]
-			             .getService(Components.interfaces.nsIX509CertDB);
+			             .getService(Components.interfaces.nsIX509CertDB2);
 			if (!certDB) {
 				return null;
 			}
