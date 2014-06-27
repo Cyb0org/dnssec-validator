@@ -131,14 +131,22 @@ struct dane_options_st {
 	bool ds; // use root.key with DS record of root zone
 };
 
+/* DNSSEC status */
+enum dnssec_stat {
+	DNSSEC_STAT_INSECURE = 0,
+	DNSSEC_STAT_SECURE,
+	DNSSEC_STAT_BOGUS
+};
+
 //----------------------------------------------------------------------------
-static const char byteMap[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+static const char byteMap[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8',
+     '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 static int byteMapLen = sizeof(byteMap);
 //----------------------------------------------------------------------------
 /* structure to save TLSA records */
 struct tlsa_store_item {
 	char *domain;
-	uint8_t dnssec_status;
+	enum dnssec_stat dnssec_status;
 	uint8_t cert_usage;
 	uint8_t selector;
 	uint8_t matching_type;
@@ -151,7 +159,7 @@ struct tlsa_store_item {
 #define tlsa_store_item_init(ptr) \
 	do { \
 		(ptr)->domain = NULL; \
-		(ptr)->dnssec_status = 0; \
+		(ptr)->dnssec_status = DNSSEC_STAT_INSECURE; \
 		(ptr)->cert_usage = 0; \
 		(ptr)->selector = 0; \
 		(ptr)->matching_type = 0; \
@@ -339,13 +347,13 @@ int create_socket(const char *domain, const char *port_str)
 // Helper function (return DNSSEC status)
 // ----------------------------------------------------------------------------
 static
-const char * get_dnssec_status(uint8_t dnssec_status)
+const char * get_dnssec_status(enum dnssec_stat dnssec_status)
 {
 	switch (dnssec_status) {
-	case 0: return "INSECURE";
-	case 1: return "SECURE";
-	case 2: return "BOGUS";
-	default: return "ERROR";
+	case DNSSEC_STAT_INSECURE: return "INSECURE";
+	case DNSSEC_STAT_SECURE: return "SECURE";
+	case DNSSEC_STAT_BOGUS: return "BOGUS";
+	default: assert(0); return "ERROR";
 	}
 }
 
@@ -449,7 +457,7 @@ char * hextobin(const char *data)
 // ----------------------------------------------------------------------------
 static
 int add_tlsarecord_bottom(struct tlsa_store_head *tlsa_list,
-	const char *domain, uint8_t dnssec_status, uint8_t cert_usage,
+	const char *domain, enum dnssec_stat dnssec_status, uint8_t cert_usage,
 	uint8_t selector, uint8_t matching_type,
 	const uint8_t *association, size_t association_size)
 {
@@ -1274,6 +1282,7 @@ char * matchingData(uint8_t matching_type, uint8_t selector,
 // TLSA validation of EE certificate (type 1)
 // Binary data codes EE certificate
 // Servers certificate must correspond EE certificate in TLSA
+// TODO -- Server certificate must pass PKIX validation to trust anchor.
 // return 1 if validation is success or 0 if not or x<0 when error
 // ----------------------------------------------------------------------------
 static
@@ -1290,8 +1299,7 @@ int eeCertMatch1(const struct tlsa_store_item *tlsa_item,
 		return DANE_TLSA_PARAM_ERR;
 	}
 
-	if (strcmp((const char *) data,
-	        (const char *) tlsa_item->assochex) == 0) {
+	if (strcmp(data, (const char *) tlsa_item->assochex) == 0) {
 		ret_val = DANE_VALID_TYPE1;
 	}
 
@@ -1323,8 +1331,7 @@ int eeCertMatch3(const struct tlsa_store_item *tlsa_item,
 		return DANE_TLSA_PARAM_ERR;
 	}
 
-	if (strcmp((const char *) data,
-	        (const char *) tlsa_item->assochex) == 0) {
+	if (strcmp(data, (const char *) tlsa_item->assochex) == 0) {
 		ret_val = DANE_VALID_TYPE3;
 	}
 
@@ -1431,52 +1438,54 @@ static
 int tlsa_validate(const struct tlsa_store_head *tlsa_list,
     const struct cert_store_head *cert_list)
 {
-	int idx;
+	int val_ret;
 	const struct tlsa_store_item *aux_tlsa;
 
-	idx = DANE_NO_TLSA;
+	val_ret = DANE_NO_TLSA;
 	aux_tlsa = tlsa_list->first;
 	while (aux_tlsa != NULL) {
-		idx = DANE_NO_TLSA;
+		val_ret = DANE_NO_TLSA;
 
 		switch (aux_tlsa->dnssec_status) {
-		case 0:
+		case DNSSEC_STAT_INSECURE:
 			return DANE_DNSSEC_UNSECURED;
-		case 2:
+		case DNSSEC_STAT_BOGUS:
 			return DANE_DNSSEC_BOGUS;
-		case 1:
+		case DNSSEC_STAT_SECURE:
 			printf_debug(DEBUG_PREFIX_DANE,
 			    "cert_usage: %i \n",
 			    aux_tlsa->cert_usage);
 			switch (aux_tlsa->cert_usage) {
 			case CA_CERT_PIN: //0
-				idx = caCertMatch(aux_tlsa, cert_list);
+				val_ret = caCertMatch(aux_tlsa, cert_list);
 				break;
 			case CA_TA_ADDED: //2
-				idx = chainCertMatch(aux_tlsa, cert_list);
+				val_ret = chainCertMatch(aux_tlsa, cert_list);
 				break;
 			case EE_CERT_PIN: //1
-				idx = eeCertMatch1(aux_tlsa, cert_list);
+				val_ret = eeCertMatch1(aux_tlsa, cert_list);
 				break;
 			case EE_TA_ADDED: //3
-				idx = eeCertMatch3(aux_tlsa, cert_list);
+				val_ret = eeCertMatch3(aux_tlsa, cert_list);
 				break; // continue checking
 			default:
 				printf_debug(DEBUG_PREFIX_DANE,
-				    "Wrong value of cert_usage parameter: %i \n",
+				    "Wrong value of cert_usage parameter: %i\n",
 				    aux_tlsa->cert_usage);
-				idx = DANE_TLSA_PARAM_ERR; // unknown cert usage, skip
+				/* Unknown cert usage. */
+				val_ret = DANE_TLSA_PARAM_ERR;
 			}
 			break; // continue checking
 		}
 
 		aux_tlsa = aux_tlsa->next;
-		if ((idx >= DANE_VALID_TYPE0) && (idx <= DANE_VALID_TYPE3)) {
-			return idx;
+		if ((val_ret >= DANE_VALID_TYPE0) &&
+		    (val_ret <= DANE_VALID_TYPE3)) {
+			return val_ret;
 		}
 	}
 
-	return idx;
+	return val_ret;
 }
 
 //*****************************************************************************
@@ -1977,12 +1986,17 @@ void _construct(void)
 
 #ifdef CMNDLINE_TEST
 
+static
 const char *certhex[] = {"12345678"};
 
-//*****************************************************************************
-// Main function for testing of lib, input: domain name
-// ----------------------------------------------------------------------------
+/* ========================================================================= */
+/* ========================================================================= */
+/*
+ * Main funcion. Intended for testing purposes.
+ */
 int main(int argc, char **argv)
+/* ========================================================================= */
+/* ========================================================================= */
 {
 	const char *dname = NULL, *port = NULL;
 	const char *resolver_addresses = NULL;
