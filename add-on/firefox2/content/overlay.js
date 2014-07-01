@@ -912,8 +912,6 @@ setSecurityState :
 		this.valstate = state;
 		var c = dnssecExtNPAPIConst;
 
-		dump(this.valstate + " --- " + this.ipbrowser + '-----\n');
-
 		switch (state) {
 			// 1
 		case c.DNSSEC_DOMAIN_UNSECURED:
