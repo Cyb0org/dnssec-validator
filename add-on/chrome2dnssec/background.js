@@ -53,6 +53,7 @@ var dnssecExtNPAPIConst = {
 	DNSSEC_NXDOMAIN_UNSECURED	: 5, /* non-existent domain is not secured */
 	DNSSEC_NXDOMAIN_SIGNATURE_VALID	: 6, /* domain name does not exist and connection are secured */
 	DNSSEC_NXDOMAIN_SIGNATURE_INVALID: 7, /* domain name does not exist and NSEC/NSEC3 is not valid */
+	DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP: 8, /* domain name does not exist but browser got address */
 
 	DNSSEC_FLAG_DEBUG		: 1, /* debug output */
 	DNSSEC_FLAG_USEFWD		: 2, /* use forwarder/resolver */
@@ -90,6 +91,9 @@ var dnssecModes = {
 	// Non-existent domain is secured, but it has an invalid signature
 	DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID          : "7invalidNoDomainSignature",
 	DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID_INFO     : "7invalidNoDomainSignatureInfo",
+	// Connection is secured, but domain name does not exist, ip wrong
+	DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID_BAD_IP          : "8securedConnectionNoDomainIPaddr",
+	DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID_BAD_IP_INFO     : "8securedConnectionNoDomainIPaddrInfo",
 	// Getting security status
 	DNSSEC_MODE_ACTION     			  	: "actionDnssec",
 	// Inaction status
@@ -152,6 +156,13 @@ function setModeDNSSEC(newMode, tabId, domain, status, addr, ipval) {
 		icon = "dnssec_ip.png";
 		title = this.dnssecModes.DNSSEC_TOOLTIP_SECURED;
 		domainpre = "domain";
+		tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_SECURED);
+		break;
+	/* orange icon */
+	case this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID_BAD_IP:
+		icon = "dnssec_orange.png";
+		title = this.dnssecModes.DNSSEC_TOOLTIP_SECURED;
+		domainpre = "nodomain";
 		tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_SECURED);
 		break;
 	/* grey icon */
@@ -281,6 +292,10 @@ function setDNSSECSecurityState(tabId, domain, status, addr, ipval) {
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED,
 					tabId, domain, status, addr,  ipval);
 		break;
+	case c.DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP: 
+		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID_BAD_IP,
+					tabId, domain, status, addr, ipval);
+		break;
 	case c.DNSSEC_NXDOMAIN_SIGNATURE_VALID: 
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED,
 					tabId, domain, status, addr,  ipval);
@@ -341,7 +356,7 @@ function dnssecvalidate(domain, tabId, tab) {
 		console.log(DNSSEC + "URL: " + currentURL);
 	}
 
-	var addr = "0.0.0.0"; // set default IP address
+	var addr = "n/a"; // set default IP address
 
 	addr = currentIPList[currentURL];
 
@@ -358,7 +373,7 @@ function dnssecvalidate(domain, tabId, tab) {
 
 	if (addr == undefined) {
 
-		addr = "0.0.0.0";
+		addr = "n/a";
 		resolvipv6 = true;
 		resolvipv4 = true;
 	}
@@ -449,9 +464,6 @@ function dnssecvalidate(domain, tabId, tab) {
 	     	return [c.DNSSEC_ERROR_GENERIC, "n/a", addr];		
 	}
 	
-	if (addr == "0.0.0.0") {
-		addr = "n/a"; 
-	}
 	var ipval = result[1];
 	if (ipval == "") {
 		ipval = "n/a";

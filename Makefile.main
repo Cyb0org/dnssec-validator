@@ -12,7 +12,7 @@ UNBOUND_TARBALL = $(LIBS_SOURCE)/unbound.tar.gz
 
 BASEDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
-OPENSSL_DIR := $(BASEDIR)/libs/openssl-1.0.1f
+OPENSSL_DIR := $(BASEDIR)/libs/openssl-1.0.1h
 LDNS_DIR := $(BASEDIR)/libs/ldns-1.6.17
 UNBOUND_DIR := $(BASEDIR)/libs/unbound-1.4.22
 

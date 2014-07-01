@@ -161,6 +161,12 @@
            "7invalidNoDomainSignatureInfo": {
 		"message": "Die übergeordnete Domäne ist durch DNSSEC gesichert. Die erworbene Antwort, welche die Nichtexistenz der Domäne bestätigen soll, enthält eine ungültige Signatur. Dies deutet auf einen DNS-Spoofing Versuch zur Anschlussverweigerung hin."
 		},
+           "8securedConnectionNoDomainIPaddr": {
+		"message": " war mit DNSSEC überprüft und bestätigt."
+		},
+           "8securedConnectionNoDomainIPaddrInfo": {
+		"message": "Der Browser erwarb eine IP-Adresse für eine Domäne, welche nachweisbar nicht in der DNS-Hierarchie existiert. Womöglich benutzt der Validator den im Betriebssystem eingebauten Resolver nicht und benutzt einen anderen Resolver. Mit großer Wahrscheinlichkeit benutzt der Browser einen modifizierten Resolver. Diese Praktik wird manchmal angewendet, um schwer zugängliche Netzwerkteile erreichbarer zu machen."
+		},
                "ipbrowsertext": {"message": "Von Webbrowser benutzte IP-Adresse:"},
            "ipvalidatortext": {"message": "Von Add-on erworbene IP-Adresse:"},
            "actionDnssec": {"message": "Erwerbung des DNSSEC-Zustandes"},

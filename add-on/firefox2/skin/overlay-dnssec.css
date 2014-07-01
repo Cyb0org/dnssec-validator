@@ -59,6 +59,13 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 
+#dnssec-box.securedConnectionNoDomainIPaddr > #dnssec-icon {
+  width: 19px;
+  height: 19px;
+  list-style-image: url("chrome://dnssec/skin/dnssec_orange.png"); /* 35x16 */
+}
+
+
 #dnssec-box.securedConnectionDomainInvIPaddr > #dnssec-icon,
 #dnssec-box.securedConnectionNoDomainInvIPaddr > #dnssec-icon
 {
@@ -179,6 +186,8 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 /* orange */
+
+#dnssec-popup.securedConnectionNoDomainIPaddr > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.validDomainSignature > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.validAuthDomainSignature > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.validNoDomainSignature > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
@@ -323,10 +332,16 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /* DNSSEC popup UI */
+
+
+
 #dnssec-popup-content-box > #dnssec-popup-content-box2.dnssecOff > #dnssec-popup-dnssecOffLabel,
 #dnssec-popup-content-box > #dnssec-popup-content-box2.unboundnodata > #dnssec-popup-wrongresLabel,
 #dnssec-popup-content-box > #dnssec-popup-content-box2.wrongresolver > #dnssec-popup-wrongresLabel,
 #dnssec-popup-content-box > #dnssec-popup-content-box2.errorDnssec > #dnssec-popup-errorLabel,
+#dnssec-popup-content-box > #dnssec-popup-content-box2.securedConnectionNoDomainIPaddr > #dnssec-popup-securedLabel,
+#dnssec-popup-content-box3.securedConnectionNoDomainIPaddr > #dnssec-popup-domainLabel,
+#dnssec-popup-content-box3.securedConnectionNoDomainIPaddr > #dnssec-popup-securedDomainLabel,
 #dnssec-popup-content-box > #dnssec-popup-content-box2.securedConnectionDomain > #dnssec-popup-securedLabel,
 #dnssec-popup-content-box3.securedConnectionDomain > #dnssec-popup-domainLabel,
 #dnssec-popup-content-box3.securedConnectionDomain > #dnssec-popup-securedDomainLabel,

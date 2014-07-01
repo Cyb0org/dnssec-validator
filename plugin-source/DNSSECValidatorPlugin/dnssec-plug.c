@@ -35,14 +35,17 @@ OpenSSL used as well as that of the covered work.
 #include "config_related.h"
 
 
+#include <assert.h>
+#include <errno.h>
+#ifdef CMNDLINE_TEST
+  #include <getopt.h>
+#endif /* CMNDLINE_TEST */
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
-#include <errno.h>
-#include <assert.h>
+#include <unistd.h>
 
 #include "common.h"
 #include "dnssec-plug.h"
@@ -517,9 +520,20 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 		} else { /* response code is NXDOMAIN */
 			if ((!ub_res->secure) && (!ub_res->bogus)) {
 				retval = DNSSEC_NXDOMAIN_UNSECURED;
-			} else if ((ub_res->secure) &&
-			           (!ub_res->bogus)) {
-				retval = DNSSEC_NXDOMAIN_SIGNATURE_VALID;
+			} else if ((ub_res->secure) && (!ub_res->bogus)) {
+				/*
+				 * TODO -- Use IP address structure rather than
+				 * string containing address.
+				 */
+				if ((NULL != ipbrowser) &&
+				    ('\0' != ipbrowser[0])) {
+					/* Browser got address. */
+					retval =
+					    DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP;
+				} else {
+					retval =
+					    DNSSEC_NXDOMAIN_SIGNATURE_VALID;
+				}
 			} else {
 				retval = DNSSEC_NXDOMAIN_SIGNATURE_INVALID;
 			}
@@ -571,6 +585,12 @@ int dnssec_validate(const char *domain, uint16_t options,
 
 	ip_validated[0] = '\0';
 
+	/* Empty string and "n/a" behaves as no address supplied. */
+	if ((NULL != ipbrowser) &&
+	    (('\0' == ipbrowser[0]) || (strcmp(ipbrowser, "n/a") == 0))) {
+		ipbrowser = NULL;
+	}
+
 	/* options init - get integer values send from browser */
 	dnssec_set_validation_options(&glob_val_ctx.opts, options);
 
@@ -582,8 +602,11 @@ int dnssec_validate(const char *domain, uint16_t options,
 	    (optdnssrv != NULL) ? optdnssrv : "(null)",
 	    (ipbrowser != NULL) ? ipbrowser : "(null)");
 
+	/* TODO -- Check whether IP browser is really an IP address. */
+
 	if ((domain == NULL) || (domain[0] == '\0')) {
-		printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n", "Error: no domain...");
+		printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n",
+		    "Error: no domain...");
 		return exitcode;
 	}
 
@@ -704,34 +727,134 @@ void _construct(void)
 
 #ifdef CMNDLINE_TEST
 
-// for command-line testing
-int main(int argc, char **argv)
+
+/*!
+ * @brief Structure help to option structure.
+ */
+struct option_help {
+	int val; /*!< Option value as specified in option structure. */
+	const char *metavar; /*!< Metavar string displayed after option. */
+	const char *help; /*!< Option description. */
+};
+
+
+/*!
+ * @brief Option description string.
+ */
+static
+const char *optstr =
+	"a:hr:";
+
+
+/*!
+ * @brief Command-line options.
+ */
+static
+struct option long_opts[] = {
+	{"address", required_argument, NULL, 'a'},
+	{"help", no_argument, NULL, 'h'},
+	{"resolvers", required_argument, NULL, 'r'},
+	{NULL, no_argument, NULL, 0}
+};
+
+
+/*!
+ * @brief Help to command-line options.
+ */
+static
+struct option_help opts_help[] = {
+	{'a', "ADDRESS", "Compate resolved address wint given ADDRESS."},
+	{'h', NULL, "Prints this message and exits."},
+	{'r', "RESOLVERS", "List of resolvera addresses to be used."},
+	{0, NULL, NULL}
+};
+
+
+#define BASIC_USAGE "dnssec-plug [OPTIONS] dname"
+
+
+/* ========================================================================= */
+/*
+ * Prints a description of the command-line arguments.
+ */
+static
+void print_usage(FILE *fout, const char *basic_usage,
+    const struct option *opts, const struct option_help *usage)
+/* ========================================================================= */
 {
+	assert(fout != NULL);
+	assert(opts != NULL);
+	assert(usage != NULL);
+
+	if ((NULL != basic_usage) && ('\0' != basic_usage[0])) {
+		fprintf(fout, "%s\n", basic_usage);
+	}
+
+	while ((opts->name != NULL) && (usage->help != NULL)) {
+		assert(opts->val == usage->val);
+
+		fprintf(fout, "-%c / --%s", opts->val, opts->name);
+		if (usage->metavar != NULL) {
+			fprintf(fout, "=%s", usage->metavar);
+		}
+		fprintf(fout, "\n\t%s\n", usage->help);
+
+		++opts;
+		++usage;
+	};
+
+	assert((opts->name == NULL) && (usage->help == NULL));
+}
+
+
+/* ========================================================================= */
+/* ========================================================================= */
+/*
+ * Main funcion. Intended for testing purposes.
+ */
+int main(int argc, char **argv)
+/* ========================================================================= */
+/* ========================================================================= */
+{
+	int ch;
 	const char *dname = NULL;
+	const char *supplied_address = NULL;
 	const char *resolver_addresses = NULL;
 	short i;
 	char *tmp = NULL;
 	uint16_t options;
 
-	if ((argc < 2) || (argc > 3)) {
-		fprintf(stderr, "Usage\n\t%s dname [resolver_list]\n",
-		    argv[0]);
-		return 1;
+	while ((ch = getopt_long(argc, argv, optstr, long_opts, NULL)) != -1) {
+		switch (ch) {
+		case 'a':
+			if (NULL != supplied_address) {
+				fprintf(stderr, "Browser address has already "
+				    "been set to '%s'.\n", supplied_address);
+				exit(EXIT_FAILURE);
+			}
+			supplied_address = optarg;
+			break;
+		case 'h':
+			print_usage(stdout, BASIC_USAGE, long_opts, opts_help);
+			exit(EXIT_SUCCESS);
+			break;
+		case 'r':
+			if (NULL != resolver_addresses) {
+				fprintf(stderr, "Resolvers have already been "
+				    "set to '%s'.\n", resolver_addresses);
+				exit(EXIT_FAILURE);
+			}
+			resolver_addresses = optarg;
+			break;
+		default:
+			print_usage(stderr, BASIC_USAGE, long_opts, opts_help);
+			exit(EXIT_FAILURE);
+			break;
+		}
 	}
 
-	dname = argv[1];
-	if (argc > 2) {
-		resolver_addresses = argv[2];
-	} else {
-/*
-		resolver_addresses =
-//		    "::1"
-		    " 8.8.8.8"
-		    " 217.31.204.130"
-//		    " 193.29.206.206"
-		    ;
-*/
-	}
+	/* Last argument is the domain name. */
+	dname = argv[argc - 1];
 
 	options =
 	    DNSSEC_FLAG_DEBUG |
@@ -744,23 +867,23 @@ int main(int argc, char **argv)
 
 	if (dnssec_validation_init() != 0) {
 		printf(DEBUG_PREFIX_DNSSEC "Error initialising context.\n");
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 //#define REMOTE_IPS "217.31.205.50"
 //#define REMOTE_IPS "2001:610:188:301:145::2:10"
 //#define REMOTE_IPS NULL
-#define REMOTE_IPS ""
+//#define REMOTE_IPS ""
 
 	i = dnssec_validate(dname, options, resolver_addresses,
-	    REMOTE_IPS, &tmp);
+	    supplied_address, &tmp);
 	printf(DEBUG_PREFIX_DNSSEC "Returned value: \"%d\" %s\n", i, tmp);
 
 	if (dnssec_validation_deinit() != 0) {
 		printf(DEBUG_PREFIX_DNSSEC "Error de-initialising context.\n");
 	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 #endif /* CMNDLINE_TEST */

@@ -52,7 +52,8 @@ function DNSSECicon2(icon){
 	addText("dnssec-title", chrome.i18n.getMessage(status));
 	addText("dnssec-info", chrome.i18n.getMessage(info));
 	
-	if (statusString == "3securedConnectionDomainInvIPaddr")  {
+	if (statusString == "3securedConnectionDomainInvIPaddr" ||
+	    statusString == "8securedConnectionNoDomainIPaddr")  {
 		document.getElementById("ip-info-b").style.display = 'block';
 		document.getElementById("ip-info-v").style.display = 'block';
 	  	document.getElementById("ip-info-bh").style.display = 'block';

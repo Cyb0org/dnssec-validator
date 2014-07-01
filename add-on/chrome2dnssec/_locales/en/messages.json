@@ -161,6 +161,12 @@
            "7invalidNoDomainSignatureInfo": {
 		"message": "The parent domain is secured by DNSSEC but the received domain name nonexistence response does not contain a valid signature. This may signalise a domain name spoofing attempt in order to deny the access to the domain."
 		},
+           "8securedConnectionNoDomainIPaddr": {
+		"message": " was validated by DNSSEC technology."
+		},
+           "8securedConnectionNoDomainIPaddrInfo": {
+		"message": "The browser obtained an IP address which was proven to be non-existent in the DNS hierarchy. The Validator may use another resolver than the system resolver. The browser is very likely to utilise a modified resolver. This technique is sometimes used to make some network parts available which are normally hard to reach."
+		},
            "ipbrowsertext": {"message": "IP addresses obtained by browser:"},
            "ipvalidatortext": {"message": "IP addresses obtained by add-on:"},
            "actionDnssec": {"message": "Retrieving DNSSEC status"},

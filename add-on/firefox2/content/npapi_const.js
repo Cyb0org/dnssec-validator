@@ -35,6 +35,8 @@ var dnssecExtNPAPIConst = {
 	DNSSEC_NXDOMAIN_UNSECURED	: 5, /* non-existent domain is not secured */
 	DNSSEC_NXDOMAIN_SIGNATURE_VALID	: 6, /* domain name does not exist and connection are secured */
 	DNSSEC_NXDOMAIN_SIGNATURE_INVALID: 7, /* domain name does not exist and NSEC/NSEC3 is not valid */
+	DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP: 8, /* domain name does not exist but browser got address */
+
 
 	DNSSEC_FLAG_DEBUG		: 1, /* debug output */
 	DNSSEC_FLAG_USEFWD		: 2, /* use forwarder/resolver */
