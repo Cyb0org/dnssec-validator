@@ -645,6 +645,8 @@ DNSSEC_MODE_NODOMAIN_UNSECURED                  : "unsecuredNoDomain",
 DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID         : "securedConnectionNoDomain",
 // 7. Non-existent domain is secured, but it has an invalid signature
 DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID          : "invalidNoDomainSignature",
+// 8. Domain name does not exist but browser got address 
+DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID_BAD_IP	: "securedConnectionNoDomainIPaddr",
 // Getting security status
 DNSSEC_MODE_ACTION : "actionDnssec",
 // Inaction status
@@ -701,6 +703,10 @@ valstate : 0,
 		// 7. Non-existent domain is secured, but it has an invalid signature
 		this._domainPreText[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID] =
 		        this._stringBundle.getString("nodomain");
+		// 8. Domain name does not exist but browser got address 
+		this._domainPreText[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID_BAD_IP] =
+		        this._stringBundle.getString("nodomain");
+
 		// -1. Validator OFF
 		this._domainPreText[this.DNSSEC_MODE_OFF] =
 		        this._stringBundle.getString("domain");
@@ -741,6 +747,10 @@ valstate : 0,
 		// 7. Non-existent domain is secured, but it has an invalid signature
 		this._securityText[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID] =
 		        this._stringBundle.getString("7invalidNoDomainSignature");
+		// 8. Domain name does not exist but browser got address 
+		this._securityText[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID_BAD_IP] =
+		        this._stringBundle.getString("8securedConnectionNoDomainIPaddr");
+
 		// -1. Validator OFF
 		this._securityText[this.DNSSEC_MODE_OFF] =
 		        this._stringBundle.getString("dnsseOff");
@@ -784,6 +794,10 @@ valstate : 0,
 		// 7. Non-existent domain is secured, but it has an invalid signature
 		this._securityDetail[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID] =
 		        this._stringBundle.getString("7invalidNoDomainSignatureInfo");
+		// 8. Domain name does not exist but browser got address 
+		this._securityDetail[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID_BAD_IP] =
+		        this._stringBundle.getString("8securedConnectionNoDomainIPaddrInfo");
+
 		// -1. Validator OFF
 		this._securityDetail[this.DNSSEC_MODE_OFF] =
 		        this._stringBundle.getString("dnsseOffInfo");
@@ -892,7 +906,6 @@ _cacheElements :
 	// Set appropriate security state
 setSecurityState :
 	function(state,addr,ipvalidator) {
-
 		this.ipvalidator = ipvalidator;
 		this.ipbrowser = addr;
 		this.valstate = state;
@@ -926,6 +939,10 @@ setSecurityState :
 			// 7
 		case c.DNSSEC_NXDOMAIN_SIGNATURE_INVALID:
 			this.setMode(this.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID);
+			break;
+			// 8
+		case c.DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP:
+			this.setMode(this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID_BAD_IP);
 			break;
 			// 0
 		case c.DNSSEC_OFF:
@@ -1078,6 +1095,7 @@ setSecurityMessages :
 		case this.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED:
 			// Both non-existent domain and connection are secured
 		case this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID:
+		case this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID_BAD_IP:
 			tooltip = this._tooltipLabel[this.DNSSEC_TOOLTIP_SECURED];
 			break;
 			// Domain signature is valid
