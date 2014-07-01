@@ -339,7 +339,8 @@ doNPAPIvalidation:
 			}
 
 		}
-		if (addr == null) addr = "0.0.0.0";
+		// No address obtained.
+		if (addr == null) addr = "n/a";
 
 		/*ipbrowser = addr;*/
 		if (dnssecExtension.debugOutput) {
@@ -1153,7 +1154,7 @@ showAddInfo :
 		document.getElementById(id).style.display = 'block';
 		document.getElementById("link").style.display = 'none';
 		document.getElementById("dnssec-popup-homepage").style.display = 'block';
-		if (this.valstate==3) {
+		if (this.valstate==3 || this.valstate==8) {
 			this.showAddInfoIP();
 		}
 	},
@@ -1163,7 +1164,7 @@ hideAddInfo :
 		document.getElementById("dnssec-popup-security-detail").style.display = 'none';
 		document.getElementById("link").style.display = 'block';
 		document.getElementById("dnssec-popup-homepage").style.display = 'none';
-		if (this.valstate==3) {
+		if (this.valstate==3 || this.valstate==8) {
 			this.hideAddInfoIP();
 		}
 	},
@@ -1186,7 +1187,7 @@ setPopupMessages :
 		this._dnssecPopupSecLabel.textContent = this._domainPreText[newMode] + " " + this._utf8HostName + " " + this._securityText[newMode];
 		this._dnssecPopupSecDetail.textContent = this._securityDetail[newMode];
 
-		if (this.valstate==3) {
+		if (this.valstate==3 || this.valstate==8) {
 			this._dnssecPopupIpBrowser.textContent = this.ipbrowser;
 			if (this.ipvalidator=="") this.ipvalidator="n/a";
 			this._dnssecPopupIpValidator.textContent = this.ipvalidator;

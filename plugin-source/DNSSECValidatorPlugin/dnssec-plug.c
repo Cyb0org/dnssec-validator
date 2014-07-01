@@ -585,6 +585,12 @@ int dnssec_validate(const char *domain, uint16_t options,
 
 	ip_validated[0] = '\0';
 
+	/* Empty string and "n/a" behaves as no address supplied. */
+	if ((NULL != ipbrowser) &&
+	    (('\0' == ipbrowser[0]) || (strcmp(ipbrowser, "n/a") == 0))) {
+		ipbrowser = NULL;
+	}
+
 	/* options init - get integer values send from browser */
 	dnssec_set_validation_options(&glob_val_ctx.opts, options);
 
