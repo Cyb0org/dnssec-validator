@@ -495,7 +495,7 @@ setValidatedData:
 		var ipvalidator = resArr[1];
 
 		var c = dnssecExtNPAPIConst;
-		var d = tlsaExtNPAPIConst;
+
 		if (res==c.DNSSEC_COT_DOMAIN_BOGUS) {
 			if (ext.debugOutput) dump(ext.debugPrefix 
 			+ "Unbound return bogus state: Testing why?\n");
@@ -912,6 +912,8 @@ setSecurityState :
 		this.valstate = state;
 		var c = dnssecExtNPAPIConst;
 
+		dump(this.valstate + " --- " + this.ipbrowser + '-----\n');
+
 		switch (state) {
 			// 1
 		case c.DNSSEC_DOMAIN_UNSECURED:
@@ -1154,7 +1156,8 @@ showAddInfo :
 		document.getElementById(id).style.display = 'block';
 		document.getElementById("link").style.display = 'none';
 		document.getElementById("dnssec-popup-homepage").style.display = 'block';
-		if (this.valstate==3 || this.valstate==8) {
+		if (this.valstate == dnssecExtNPAPIConst.DNSSEC_COT_DOMAIN_SECURED_BAD_IP ||
+			this.valstate == dnssecExtNPAPIConst.DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP) {
 			this.showAddInfoIP();
 		}
 	},
@@ -1164,7 +1167,8 @@ hideAddInfo :
 		document.getElementById("dnssec-popup-security-detail").style.display = 'none';
 		document.getElementById("link").style.display = 'block';
 		document.getElementById("dnssec-popup-homepage").style.display = 'none';
-		if (this.valstate==3 || this.valstate==8) {
+		if (this.valstate == dnssecExtNPAPIConst.DNSSEC_COT_DOMAIN_SECURED_BAD_IP ||
+			this.valstate == dnssecExtNPAPIConst.DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP) {
 			this.hideAddInfoIP();
 		}
 	},
@@ -1187,10 +1191,13 @@ setPopupMessages :
 		this._dnssecPopupSecLabel.textContent = this._domainPreText[newMode] + " " + this._utf8HostName + " " + this._securityText[newMode];
 		this._dnssecPopupSecDetail.textContent = this._securityDetail[newMode];
 
-		if (this.valstate==3 || this.valstate==8) {
+		if (this.valstate == dnssecExtNPAPIConst.DNSSEC_COT_DOMAIN_SECURED_BAD_IP ||
+			this.valstate == dnssecExtNPAPIConst.DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP) {
 			this._dnssecPopupIpBrowser.textContent = this.ipbrowser;
 			if (this.ipvalidator=="") this.ipvalidator="n/a";
 			this._dnssecPopupIpValidator.textContent = this.ipvalidator;
+		} else {
+			this.hideAddInfoIP();
 		}
 
 		//dump(this._dnssecPopupSecDetail.textContent);
