@@ -78,7 +78,7 @@ libs-build: submodules libs $(OPENSSL_LIB) $(LDNS_LIB) $(UNBOUND_LIB) libsource
 submodules:
 	git clone https://gitlab.labs.nic.cz/mstraka/dnssec-libs.git $(LIBS_SOURCE)
 	git clone https://github.com/firebreath/FireBreath.git FireBreath
-	cd FireBreath; git reset --hard b204179fdfbf3d744954fe7bbcb35118ffef02c8; cd .. # 2014-01-28 00:51:06
+	cd FireBreath; git reset --hard 66af0df36be98e9fcf7ee196fe5c275e54752ae8; cd .. # 2014-06-24 17:48:14
 	#git reset --hard origin/master
 	cd ..
 	git submodule update --init --recursive
