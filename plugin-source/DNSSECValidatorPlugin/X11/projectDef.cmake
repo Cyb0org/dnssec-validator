@@ -50,17 +50,17 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   endif ()
 endif ()
 
-# set header file directories
-IF(STATIC_LINKING STREQUAL "yes")
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/include
-                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/ldns/include
-                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/unbound/include
-                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../plugin-source/common)
-ELSE()
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../plugin-source/common)
-ENDIF()
+SET(CMAKE_LIBRARY_PATH ${LIBRARY_LOC} ${CMAKE_LIBRARY_PATH})
 
 IF(STATIC_LINKING STREQUAL "yes")
+  # set header file directories
+  include_directories(BEFORE
+                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/include
+                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/ldns/include
+                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/unbound/include
+                      ${INCLUDE_LOC}
+                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../plugin-source/common)
+
   # set static library paths
   add_library(unbound STATIC IMPORTED)
   set_property(TARGET unbound PROPERTY IMPORTED_LOCATION
@@ -77,14 +77,27 @@ IF(STATIC_LINKING STREQUAL "yes")
   add_library(crypto STATIC IMPORTED)
   set_property(TARGET crypto PROPERTY IMPORTED_LOCATION
                ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/lib/libcrypto.a)
-ENDIF()
 
+  SET(UNBOUND unbound)
+  SET(LDNS ldns)
+  SET(SSL ssl)
+  SET(CRYPTO crypto)
+ELSE()
+  include_directories(BEFORE
+                      ${INCLUDE_LOC}
+                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../plugin-source/common)
+
+  FIND_LIBRARY(UNBOUND unbound)
+  FIND_LIBRARY(LDNS ldns)
+  FIND_LIBRARY(SSL ssl)
+  FIND_LIBRARY(CRYPTO crypto)
+ENDIF()
 
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
 target_link_libraries(${PROJECT_NAME}
     ${PLUGIN_INTERNAL_DEPS}
-    unbound
-    ldns
-    ssl    	
-    crypto
+    ${UNBOUND}
+    ${LDNS}
+    ${SSL}
+    ${CRYPTO}
     )

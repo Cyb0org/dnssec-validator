@@ -13,13 +13,12 @@ file (GLOB PLATFORM RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     Mac/[^.]*.cmake
     )
 
+SOURCE_GROUP(Mac FILES ${PLATFORM})
+
 # use this to add preprocessor definitions
 add_definitions(
   -DTGT_SYSTEM=TGT_OSX
 )
-
-
-SOURCE_GROUP(Mac FILES ${PLATFORM})
 
 set (SOURCES
     ${SOURCES}
@@ -48,15 +47,15 @@ IF(STATIC_LINKING STREQUAL "yes")
   add_library(unbound STATIC IMPORTED)
   set_property(TARGET unbound PROPERTY IMPORTED_LOCATION
                ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/unbound/lib/libunbound.a)
- 
+
   add_library(ldns STATIC IMPORTED)
   set_property(TARGET ldns PROPERTY IMPORTED_LOCATION
                ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/ldns/lib/libldns.a)
- 
+
   add_library(ssl STATIC IMPORTED)
   set_property(TARGET ssl PROPERTY IMPORTED_LOCATION
                ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/lib/libssl.a)
- 
+
   add_library(crypto STATIC IMPORTED)
   set_property(TARGET crypto PROPERTY IMPORTED_LOCATION
                ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/lib/libcrypto.a)
