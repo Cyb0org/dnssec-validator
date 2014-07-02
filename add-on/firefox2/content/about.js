@@ -20,8 +20,13 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
 
-// DNSSEC preferences functions
-var dnssecExtAbout = {
+//Define our namespace
+if(!cz) var cz={};
+if(!cz.nic) cz.nic={};
+if(!cz.nic.extension) cz.nic.extension={};
+
+
+cz.nic.extension.dnssecExtAbout = {
 
 prefObj :
 	Components.classes["@mozilla.org/preferences-service;1"]

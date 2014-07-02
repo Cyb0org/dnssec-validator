@@ -19,8 +19,15 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC/TLSA Validator 2 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-// DNSSEC NPAPI constant returned by binary plugin	
-var dnssecExtNPAPIConst = {
+// DNSSEC NPAPI constant returned by binary plugin
+
+//Define our namespace
+if(!cz) var cz={};
+if(!cz.nic) cz.nic={};
+if(!cz.nic.extension) cz.nic.extension={};
+
+	
+cz.nic.extension.dnssecExtNPAPIConst = {
 
 	DNSSEC_UNBOUND_NO_DATA		: -4, /* valdiator does not recived data */
 	DNSSEC_RESOLVER_NO_DNSSEC	: -3, /* resolver does not support DNSSEC */
@@ -45,7 +52,7 @@ var dnssecExtNPAPIConst = {
 };
 
 // DANE NPAPI constant returned by binary plugin
-var tlsaExtNPAPIConst = {
+cz.nic.extension.tlsaExtNPAPIConst = {
 
 	DANE_RESOLVER_NO_DNSSEC		: -10, /* resolver does not support DNSSEC */
 	DANE_ERROR_RESOLVER		: -2, /* bad resolver or wrong IP address of DNS*/

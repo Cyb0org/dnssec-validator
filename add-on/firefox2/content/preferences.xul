@@ -23,7 +23,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <!DOCTYPE prefwindow SYSTEM "chrome://dnssec/locale/prefwindow.dtd">
-<prefwindow id="dnssec-pref-window" xmlns:html="http://www.w3.org/1999/xhtml" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" title="&prefwindow.title;" ondialogaccept="dnssecExtPrefs.windowDialogaccept();" onunload="dnssecExtPrefs.onUnload(event.target)">
+<prefwindow id="dnssec-pref-window" xmlns:html="http://www.w3.org/1999/xhtml" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" title="&prefwindow.title;" ondialogaccept="cz.nic.extension.dnssecExtPrefs.windowDialogaccept();" onunload="cz.nic.extension.dnssecExtPrefs.onUnload(event.target)">
 <script src="preferences.js"/>
 	<stringbundleset id="stringbundleset">
 		<stringbundle id="dnssec-strings-pref" src="chrome://dnssec/locale/dnssec.preferences"/>
@@ -34,7 +34,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 		<html:object id="dane-tlsa-plugin" type="application/x-tlsavalidatorplugin" width="0" height="0"></html:object>
 	</html:div>
 
-	<prefpane id="dnssec-pref-pane1" onpaneload="dnssecExtPrefs.pane1Load();">
+	<prefpane id="dnssec-pref-pane1" onpaneload="cz.nic.extension.dnssecExtPrefs.pane1Load();">
 	<preferences>
 		<preference id="dnssecdebug" name="extensions.dnssec.dnssecdebug" type="bool"/>
 		<preference id="tlsadebug" name="extensions.dnssec.tlsadebug" type="bool"/>
@@ -58,18 +58,18 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 	<groupbox>
 		<caption label="&groupboxdnsserver.label;"/>
-		<radiogroup id="dnssec-pref-dnsserverchoose" preference="dnsserverchoose" oncommand="dnssecExtPrefs.dnsserverchooseCommand();">
+		<radiogroup id="dnssec-pref-dnsserverchoose" preference="dnsserverchoose" oncommand="cz.nic.extension.dnssecExtPrefs.dnsserverchooseCommand();">
 		<description value="&radiogroupdnsserver.label;"/>
 		<radio id="dnssec-pref-usesysdnsserver" label="&radiodnsserversystem.label;" accesskey="&radiodnsserversystem.accesskey;" value="0"/>
 		<hbox>
 			<radio id="dnssec-pref-useoptdnsserver" label="&radiodnsserveropt.label;" accesskey="&radiodnsserveropt.accesskey;" value="2"/>
-			<textbox id="dnssec-pref-optdnsserveraddr" preference="optdnsserveraddr" oninput="dnssecExtPrefs.optdnsserveraddrInput();"/>
+			<textbox id="dnssec-pref-optdnsserveraddr" preference="optdnsserveraddr" oninput="cz.nic.extension.dnssecExtPrefs.optdnsserveraddrInput();"/>
           <!-- 39 is max length for IPv4 and IPv6 address notation -->
 		</hbox>
 		<radio label="&radiodnsserverunbound.label;" accesskey="&radiodnsserverunbound.accesskey;" value="3"/>
 		</radiogroup>
 	</groupbox>
-	<button id="dnssec-pref-testbutton" label="&dnssecbutton.label;" oncommand="dnssecExtPrefs.testdnssec();"/>
+	<button id="dnssec-pref-testbutton" label="&dnssecbutton.label;" oncommand="cz.nic.extension.dnssecExtPrefs.testdnssec();"/>
 	<description id="dnssecok" style="display: none; min-height: 40px;"/>
 	<description id="dnssecbogus" style="display: none; min-height: 40px;"/>
 	<description id="dnssecerror" style="display: none; min-height: 40px;"/>
@@ -78,18 +78,18 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 
 	<groupbox>
 		<caption label="&groupboxfilter.label;"/>
-		<checkbox id="dnssec-pref-usefilter" label="&usefilter.label;" preference="domainfilter" accesskey="&usefilter.accesskey;" checked="false" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
+		<checkbox id="dnssec-pref-usefilter" label="&usefilter.label;" preference="domainfilter" accesskey="&usefilter.accesskey;" checked="false" oncommand="cz.nic.extension.dnssecExtPrefs.dnsserverchooseCommand();"/>
 		<description value="&filtertext.label;"/>       
-		<textbox id="dnssec-pref-domains" rows="3" multiline="true" disabled="true" preference="domainlist" oninput="dnssecExtPrefs.optdnsserveraddrInput();"/>               
+		<textbox id="dnssec-pref-domains" rows="3" multiline="true" disabled="true" preference="domainlist" oninput="cz.nic.extension.dnssecExtPrefs.optdnsserveraddrInput();"/>               
 	</groupbox>
 
 	<groupbox>
 		<caption label="&groupboxtlsa.label;"/>
-		<checkbox id="dnssec-pref-tlsaonoff" label="&tlsaonoff.label;" preference="tlsaenable" accesskey="&tlsaonoff.accesskey;" checked="true" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
-		<checkbox id="dnssec-pref-usebrowsercertchain" label="&usebrowsercertchain.label;" preference="usebrowsercertchain" accesskey="&usebrowsercertchain.accesskey;" checked="true" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
-		<checkbox id="dnssec-pref-checkallhttps" label="&checkallhttps.label;" preference="checkhttpsrequestsonpages" accesskey="&checkallhttps.accesskey;" checked="false" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
-		<checkbox id="dnssec-pref-tlsablock" label="&tlsablock.label;" preference="tlsablocking" accesskey="&tlsablock.accesskey;" checked="true" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
-		<checkbox id="dnssec-pref-clearcache" label="&clearcache.label;" preference="clearcache" accesskey="&clearcache.accesskey;" checked="false" oncommand="dnssecExtPrefs.dnsserverchooseCommand();"/>
+		<checkbox id="dnssec-pref-tlsaonoff" label="&tlsaonoff.label;" preference="tlsaenable" accesskey="&tlsaonoff.accesskey;" checked="true" oncommand="cz.nic.extension.dnssecExtPrefs.dnsserverchooseCommand();"/>
+		<checkbox id="dnssec-pref-usebrowsercertchain" label="&usebrowsercertchain.label;" preference="usebrowsercertchain" accesskey="&usebrowsercertchain.accesskey;" checked="true" oncommand="cz.nic.extension.dnssecExtPrefs.dnsserverchooseCommand();"/>
+		<checkbox id="dnssec-pref-checkallhttps" label="&checkallhttps.label;" preference="checkhttpsrequestsonpages" accesskey="&checkallhttps.accesskey;" checked="false" oncommand="cz.nic.extension.dnssecExtPrefs.dnsserverchooseCommand();"/>
+		<checkbox id="dnssec-pref-tlsablock" label="&tlsablock.label;" preference="tlsablocking" accesskey="&tlsablock.accesskey;" checked="true" oncommand="cz.nic.extension.dnssecExtPrefs.dnsserverchooseCommand();"/>
+		<checkbox id="dnssec-pref-clearcache" label="&clearcache.label;" preference="clearcache" accesskey="&clearcache.accesskey;" checked="false" oncommand="cz.nic.extension.dnssecExtPrefs.dnsserverchooseCommand();"/>
 	</groupbox>
 	<separator class="groove-thin"/>
 	</prefpane>

@@ -12,21 +12,6 @@
 #include "TLSAValidatorPluginAPI.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-/// @fn FB::variant TLSAValidatorPluginAPI::echo(const FB::variant& msg)
-///
-/// @brief  Echos whatever is passed from Javascript.
-///         Go ahead and change it. See what happens!
-///////////////////////////////////////////////////////////////////////////////
-FB::variant TLSAValidatorPluginAPI::echo(const FB::variant& msg)
-{
-    static int n(0);
-    fire_echo("So far, you clicked this many times: ", n++);
-
-    // return "foobar";
-    return msg;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 /// @fn TLSAValidatorPluginPtr TLSAValidatorPluginAPI::getPlugin()
 ///
 /// @brief  Gets a reference to the plugin that was passed in when the object
@@ -43,30 +28,12 @@ TLSAValidatorPluginPtr TLSAValidatorPluginAPI::getPlugin()
     return plugin;
 }
 
-// Read/Write property testString
-std::string TLSAValidatorPluginAPI::get_testString()
-{
-    return m_testString;
-}
 
-void TLSAValidatorPluginAPI::set_testString(const std::string& val)
-{
-    m_testString = val;
-}
-
-// Read-only property version
-std::string TLSAValidatorPluginAPI::get_version()
-{
-    return FBSTRING_PLUGIN_VERSION;
-}
-
-void TLSAValidatorPluginAPI::testEvent()
-{
-    fire_test();
-}
-
-FB::VariantList TLSAValidatorPluginAPI::TLSAValidate(const std::vector<std::string> &certchain, const int certcount, const uint16_t options, const std::string& optdnssrv, const std::string& domain, const std::string& port,
-			      const std::string& protocol, const int policy)
+FB::VariantList TLSAValidatorPluginAPI::TLSAValidate(
+	const std::vector<std::string> &certchain, const int certcount, 
+	const uint16_t options, const std::string& optdnssrv, 
+	const std::string& domain, const std::string& port,
+	const std::string& protocol, const int policy)
 {    
 
     const char **vc = (const char **) malloc(sizeof(char *) * certcount);
@@ -76,7 +43,8 @@ FB::VariantList TLSAValidatorPluginAPI::TLSAValidate(const std::vector<std::stri
 
     FB::VariantList reslist;
     short rv;
-    rv = dane_validate(vc, certcount, options, optdnssrv.c_str(), domain.c_str(), port.c_str(), protocol.c_str(), policy);    
+    rv = dane_validate(vc, certcount, options, optdnssrv.c_str(), 
+	domain.c_str(), port.c_str(), protocol.c_str(), policy);    
     reslist.push_back(rv);
     free(vc);
     return reslist;

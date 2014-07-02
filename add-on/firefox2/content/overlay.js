@@ -19,21 +19,24 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-window.addEventListener("load", function() {
-	dnssecExtension.init();
-}, false);
+//Define our namespace
+if(!cz) var cz={};
+if(!cz.nic) cz.nic={};
+if(!cz.nic.extension) cz.nic.extension={};
 
-window.addEventListener("unload", function() {
-	dnssecExtension.uninit();
-}, false);
+// extension inti/deinit
+window.addEventListener("load", function() {cz.nic.extension.dnssecExtension.init();}, false);
+window.addEventListener("unload", function() {cz.nic.extension.dnssecExtension.uninit();}, false);
 
-var dnssecExtUrlBarListener = {
+
+// window location changed, also happens on changing tabs
+cz.nic.extension.dnssecExtUrlBarListener = {
 
 onLocationChange:
 	function(aWebProgress, aRequest, aLocationURI)
 	{
 		//dump('Browser: onLocationChange()\n');
-		dnssecExtension.processNewURL(aLocationURI);
+		cz.nic.extension.dnssecExtension.processNewURL(aLocationURI);
 	},
 
 onSecurityChange:
@@ -62,8 +65,10 @@ onStatusChange:
 	}
 };
 
+
+
 /* Observe preference changes */
-var dnssecExtPrefObserver = {
+cz.nic.extension.dnssecExtPrefObserver = {
 
 _branch: null,
 
@@ -73,7 +78,7 @@ register:
 		.getService(Components.interfaces.nsIPrefService);
 
 		// Add the observer
-		this._branch = prefService.getBranch(dnssecExtPrefs.prefBranch);
+		this._branch = prefService.getBranch(cz.nic.extension.dnssecExtPrefs.prefBranch);
 		this._branch.QueryInterface(Components.interfaces.nsIPrefBranch);
 		this._branch.addObserver("", this, false);
 	},
@@ -92,14 +97,14 @@ observe:
 		// aData is the name of the pref that's been changed (relative to aSubject)
 		switch (aData) {
 		case "dnssecdebug":     // Change debugging to stdout
-			dnssecExtension.getDebugOutputFlag();
+			cz.nic.extension.dnssecExtension.getDebugOutputFlag();
 			break;
 		case "asyncresolve":    // Change sync/async resolving
-			dnssecExtension.getAsyncResolveFlag();
+			cz.nic.extension.dnssecExtension.getAsyncResolveFlag();
 			break;
 		case "popupfgcolor":   // Change popup-window fore/background color
 		case "popupbgcolor":
-			dnssecExtension.getPopupColors();
+			cz.nic.extension.dnssecExtension.getPopupColors();
 			break;
 		}
 	}
@@ -110,7 +115,7 @@ observe:
 /* dnssecExtension */
 // --------------------------------------------------------------
 // **************************************************************
-var dnssecExtension = {
+cz.nic.extension.dnssecExtension = {
 
 dnssecExtID: "dnssec@nic.cz",
 debugOutput: false,
@@ -139,13 +144,13 @@ init:
 		this.getAsyncResolveFlag();
 
 		// Set inaction mode (no icon)
-		dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_INACTION);
+		cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_INACTION);
 
 		// Change popup-window fore/background color if desired
 		this.getPopupColors();
 
 		// Register preferences observer
-		dnssecExtPrefObserver.register();
+		cz.nic.extension.dnssecExtPrefObserver.register();
 
 		// Create the timer
 		this.timer = Components.classes["@mozilla.org/timer;1"]
@@ -157,26 +162,26 @@ init:
 			this.showHomepage(dnssecExt);
 		} else {   // Firefox >= 3.7, async
 			Application.getExtensions(function(extensions) {
-				var dnssecExt = extensions.get(dnssecExtension.dnssecExtID);
-				dnssecExtension.showHomepage(dnssecExt);
+				var dnssecExt = extensions.get(cz.nic.extension.dnssecExtension.dnssecExtID);
+				cz.nic.extension.dnssecExtension.showHomepage(dnssecExt);
 			});
 		}
 
 		// Listen for webpage events
-		gBrowser.addProgressListener(dnssecExtUrlBarListener);
+		gBrowser.addProgressListener(cz.nic.extension.dnssecExtUrlBarListener);
 	},
 
 showHomepage:
 	function(dnssecExt) {
 		// Get saved extension version
-		var dnssecExtOldVersion = dnssecExtPrefs.getChar("version");
+		var dnssecExtOldVersion = cz.nic.extension.dnssecExtPrefs.getChar("version");
 
 		// Display initialisation page if appropriate
 		if (dnssecExt.version != dnssecExtOldVersion) {
-			dnssecExtPrefs.setChar("version", dnssecExt.version);  // Save new version
-			dnssecExtPrefs.setChar("dnsserveraddr", "nofwd");  // Save default settings of resolver
-			dnssecExtPrefs.setBool("usefwd", true);  // Save default settings of resolver
-			dnssecExtPrefs.setInt("dnsserverchoose", 3);  // Save default settings of resolver
+			cz.nic.extension.dnssecExtPrefs.setChar("version", dnssecExt.version);  // Save new version
+			cz.nic.extension.dnssecExtPrefs.setChar("dnsserveraddr", "nofwd");  // Save default settings of resolver
+			cz.nic.extension.dnssecExtPrefs.setBool("usefwd", true);  // Save default settings of resolver
+			cz.nic.extension.dnssecExtPrefs.setInt("dnsserverchoose", 3);  // Save default settings of resolver
 
 			// Define timer callback
 			this.timer.initWithCallback(
@@ -192,19 +197,19 @@ showHomepage:
 
 getDebugOutputFlag:
 	function() {
-		this.debugOutput = dnssecExtPrefs.getBool("dnssecdebug");
+		this.debugOutput = cz.nic.extension.dnssecExtPrefs.getBool("dnssecdebug");
 	},
 
 getAsyncResolveFlag:
 	function() {
-		this.asyncResolve = dnssecExtPrefs.getBool("asyncresolve");
+		this.asyncResolve = cz.nic.extension.dnssecExtPrefs.getBool("asyncresolve");
 	},
 
 getPopupColors:
 	function() {
 		var dpw = document.getElementById("dnssec-popup-container");
-		dpw.style.color = dnssecExtPrefs.getChar("popupfgcolor");
-		dpw.style.backgroundColor = dnssecExtPrefs.getChar("popupbgcolor");
+		dpw.style.color = cz.nic.extension.dnssecExtPrefs.getChar("popupfgcolor");
+		dpw.style.backgroundColor = cz.nic.extension.dnssecExtPrefs.getChar("popupbgcolor");
 	},
 
 uninit:
@@ -214,13 +219,13 @@ uninit:
 			dump(this.debugPrefix + 'Stop of add-on\n');
 		}
 
-		gBrowser.removeProgressListener(dnssecExtUrlBarListener);
+		gBrowser.removeProgressListener(cz.nic.extension.dnssecExtUrlBarListener);
 
 		// Unregister preferences observer
-		dnssecExtPrefObserver.unregister();
+		cz.nic.extension.dnssecExtPrefObserver.unregister();
 
 		// Reset resolving flag
-		dnssecExtPrefs.setBool("resolvingactive", false);
+		cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
 
 		//validator.shutdown();
 		var dsp = document.getElementById("dnssec-plugin");
@@ -275,7 +280,7 @@ processNewURL:
 			}
 			this.oldAsciiHost = null;
 			// Set inaction mode (no icon)
-			dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_INACTION);
+			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_INACTION);
 			return;
 
 			// Eliminate duplicated queries
@@ -291,7 +296,7 @@ processNewURL:
 		}
 
 		// Check DNS security
-		dnssecExtHandler.checkSecurity(asciiHost, utf8Host);
+		cz.nic.extension.dnssecExtHandler.checkSecurity(asciiHost, utf8Host);
 
 	},
 };//class
@@ -301,7 +306,7 @@ processNewURL:
 /* Get security status through NPAPI plugin call */
 // --------------------------------------------------------------
 // **************************************************************
-var dnssecExtResolver = {
+cz.nic.extension.dnssecExtResolver = {
 
 
 //******************************************
@@ -312,18 +317,18 @@ doNPAPIvalidation:
 
 		// Plugin callback
 		function NPAPIcallback(plug, resArr) {
-			dnssecExtResolver.setValidatedData(dn, resArr, aRecord, addr);
+			cz.nic.extension.dnssecExtResolver.setValidatedData(dn, resArr, aRecord, addr);
 		}
 
 		// Get DNS resolver address(es)
-		var nameserver = dnssecExtPrefs.getChar("dnsserveraddr");
+		var nameserver = cz.nic.extension.dnssecExtPrefs.getChar("dnsserveraddr");
 
 		// Create variable to pass options
-		var c = dnssecExtNPAPIConst;
+		var c = cz.nic.extension.dnssecExtNPAPIConst;
 		var options = 0;
 
-		if (dnssecExtension.debugOutput) options |= c.DNSSEC_FLAG_DEBUG;
-		if (dnssecExtPrefs.getInt("dnsserverchoose") != 3) options |= c.DNSSEC_FLAG_USEFWD;
+		if (cz.nic.extension.dnssecExtension.debugOutput) options |= c.DNSSEC_FLAG_DEBUG;
+		if (cz.nic.extension.dnssecExtPrefs.getInt("dnsserverchoose") != 3) options |= c.DNSSEC_FLAG_USEFWD;
 		if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
 		if (resolvipv6) options |= c.DNSSEC_FLAG_RESOLVIPV6;
 
@@ -334,8 +339,10 @@ doNPAPIvalidation:
 			aRecord.rewind();
 			if (aRecord.hasMore()) {   // Address list has another item
 				addr = aRecord.getNextAddrAsString();
-				if (dnssecExtension.debugOutput) dump(dnssecExtension.debugPrefix + 'Checking browser IP: '
+				if (cz.nic.extension.dnssecExtension.debugOutput) {
+					dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Checking browser IP: '
 					                                      + addr + ';\n');
+				}
 			}
 
 		}
@@ -343,8 +350,8 @@ doNPAPIvalidation:
 		if (addr == null) addr = "n/a";
 
 		/*ipbrowser = addr;*/
-		if (dnssecExtension.debugOutput) {
-			dump(dnssecExtension.debugPrefix + 'Validation parameters: \"'
+		if (cz.nic.extension.dnssecExtension.debugOutput) {
+			dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Validation parameters: \"'
 			     + dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
 		}
 
@@ -353,17 +360,17 @@ doNPAPIvalidation:
 			// Get the binary plugin
 			var dsp = document.getElementById("dnssec-plugin");
 
-			if (!dnssecExtension.asyncResolve) {   // Synchronous NPAPI validation
+			if (!cz.nic.extension.dnssecExtension.asyncResolve) {   // Synchronous NPAPI validation
 				NPAPIcallback(null, dsp.Validate(dn, options, nameserver, addr));
 			} else {   // Asynchronous NPAPI validation
 				dsp.ValidateAsync(dn, options, nameserver, addr, NPAPIcallback);
 			}
 		} catch (ex) {
-			dump(dnssecExtension.debugPrefix + 'Error: Plugin call failed!\n');
+			dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Error: Plugin call failed!\n');
 			// Set error mode
-			dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
+			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR);
 			// Reset resolving flag
-			dnssecExtPrefs.setBool("resolvingactive", false);
+			cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
 
 			return;
 		}
@@ -377,10 +384,10 @@ revalidate:
 
 		// Plugin callback
 		function NPAPIcallback(plug, resArr) {
-			dnssecExtResolver.ValidatedDataNoFwd(dn, resArr, res, addr);
+			cz.nic.extension.dnssecExtResolver.ValidatedDataNoFwd(dn, resArr, res, addr);
 		}
 
-		var c = dnssecExtNPAPIConst;
+		var c = cz.nic.extension.dnssecExtNPAPIConst;
 		var resolvipv4 = true;
 		var resolvipv6 = false;
 		var dsp = document.getElementById("dnssec-plugin");
@@ -388,30 +395,30 @@ revalidate:
 		dsp.DNSSECCacheInit();
 		var options = 0;
 
-		if (dnssecExtension.debugOutput) options |= c.DNSSEC_FLAG_DEBUG;
+		if (cz.nic.extension.dnssecExtension.debugOutput) options |= c.DNSSEC_FLAG_DEBUG;
 		if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
 		if (resolvipv6) options |= c.DNSSEC_FLAG_RESOLVIPV6;
-		if (dnssecExtension.debugOutput) {
-			dump(dnssecExtension.debugPrefix + "NOFWD parameters: " + 
+		if (cz.nic.extension.dnssecExtension.debugOutput) {
+			dump(cz.nic.extension.dnssecExtension.debugPrefix + "NOFWD parameters: " + 
 				dn + "; options: " + options  + "; resolver: nofwd; IP-br: " + 
 				addr + ';\n');
 		}
 		// Call NPAPI validation
 		try {
-			if (!dnssecExtension.asyncResolve) {   // Synchronous NPAPI validation
+			if (!cz.nic.extension.dnssecExtension.asyncResolve) {   // Synchronous NPAPI validation
 				NPAPIcallback(null, dsp.Validate(dn, options, "nofwd", addr));
 			} else {   // Asynchronous NPAPI validation
 				dsp.ValidateAsync(dn, options, "nofwd", addr, NPAPIcallback);
 			}
 		} catch (ex) {
-			if (dnssecExtension.debugOutput) {
+			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(dnssecExtension.debugPrefix + 'Error: Plugin call failed!\n');
 			}
 			// Set error mode
-			dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
+			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR);
 
 			// Reset resolving flag
-			dnssecExtPrefs.setBool("resolvingactive", false);
+			cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
 
 			return;
 		}
@@ -424,8 +431,8 @@ revalidate:
 ValidatedDataNoFwd:
 	function(dn, resArr, res, addr) {
 
-		var ext = dnssecExtension;
-		var c = dnssecExtNPAPIConst;
+		var ext = cz.nic.extension.dnssecExtension;
+		var c = cz.nic.extension.dnssecExtNPAPIConst;
 		if (ext.debugOutput) {
 			dump(ext.debugPrefix + 'NOFWD result: ' + resArr[0] + ' : ' +
 			 resArr[1] +' ;\n');
@@ -455,7 +462,7 @@ ValidatedDataNoFwd:
 		// Set appropriate state if host name does not changed
 		// during resolving process (tab has not been switched)
 		if (dn == gBrowser.currentURI.asciiHost) {
-			dnssecExtHandler.setSecurityState(res,addr,ipvalidator);
+			cz.nic.extension.dnssecExtHandler.setSecurityState(res,addr,ipvalidator);
 		}
 
 		if (ext.debugOutput) {
@@ -464,14 +471,14 @@ ValidatedDataNoFwd:
 		// Resolving has finished
 		if (ext.debugOutput) {
 			dump(ext.debugPrefix + 'Lock is: ' + 
-			dnssecExtPrefs.getBool("resolvingactive") + '\n');
+			cz.nic.extension.dnssecExtPrefs.getBool("resolvingactive") + '\n');
 			dump(ext.debugPrefix + 'Unlocking section...\n');
 		}
 
-		dnssecExtPrefs.setBool("resolvingactive", false);
+		cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
 		if (ext.debugOutput) {
 			dump(ext.debugPrefix + 'Lock is: ' +
-			dnssecExtPrefs.getBool("resolvingactive") + '\n');
+			cz.nic.extension.dnssecExtPrefs.getBool("resolvingactive") + '\n');
 		}
 	},
 
@@ -481,7 +488,7 @@ ValidatedDataNoFwd:
 setValidatedData:
 	function(dn, resArr, aRecord, addr) {
 
-		var ext = dnssecExtension;
+		var ext = cz.nic.extension.dnssecExtension;
 
 		if (ext.debugOutput) {
 			dump(ext.debugPrefix + 'Result: ' + dn + ' : ' +
@@ -494,7 +501,7 @@ setValidatedData:
 		res = resArr[0];
 		var ipvalidator = resArr[1];
 
-		var c = dnssecExtNPAPIConst;
+		var c = cz.nic.extension.dnssecExtNPAPIConst;
 
 		if (res==c.DNSSEC_COT_DOMAIN_BOGUS) {
 			if (ext.debugOutput) dump(ext.debugPrefix 
@@ -506,7 +513,7 @@ setValidatedData:
 		// Set appropriate state if host name does not changed
 		// during resolving process (tab has not been switched)
 		if (dn == gBrowser.currentURI.asciiHost) {
-			dnssecExtHandler.setSecurityState(res, addr, ipvalidator);
+			cz.nic.extension.dnssecExtHandler.setSecurityState(res, addr, ipvalidator);
 		}
 
 		if (ext.debugOutput)
@@ -514,12 +521,12 @@ setValidatedData:
 
 		// Resolving has finished
 		if (ext.debugOutput) {
-			dump(ext.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
+			dump(ext.debugPrefix + 'Lock is: ' + cz.nic.extension.dnssecExtPrefs.getBool("resolvingactive") + '\n');
 			dump(ext.debugPrefix + 'Unlocking section...\n');
 		}
-		dnssecExtPrefs.setBool("resolvingactive", false);
+		cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
 		if (ext.debugOutput)
-			dump(ext.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
+			dump(ext.debugPrefix + 'Lock is: ' + cz.nic.extension.dnssecExtPrefs.getBool("resolvingactive") + '\n');
 	},
 
 //*****************************************************
@@ -529,11 +536,11 @@ ExcludeDomainList:
 	function(domain) {
 
 		var result = true;
-		var DoaminFilter = dnssecExtPrefs.getBool("domainfilter");
+		var DoaminFilter = cz.nic.extension.dnssecExtPrefs.getBool("domainfilter");
 		if (DoaminFilter) {
 			var DomainSeparator = /[.]+/;
 			var DomainArray = domain.split(DomainSeparator);
-			var DomainList = dnssecExtPrefs.getChar("domainlist");
+			var DomainList = cz.nic.extension.dnssecExtPrefs.getChar("domainlist");
 			var DomainListSeparators = /[ ,;]+/;
 			var DomainListArray = DomainList.split(DomainListSeparators);
 			var i = 0;
@@ -557,19 +564,19 @@ ExcludeDomainList:
 onBrowserLookupComplete:
 	function(dn, aRecord) {
 
-		var c = dnssecExtNPAPIConst;
+		var c = cz.nic.extension.dnssecExtNPAPIConst;
 
 		if (this.ExcludeDomainList(dn)) {
-			if (dnssecExtension.debugOutput) {
-				dump(dnssecExtension.debugPrefix + 'Validate this domain? YES\n');
+			if (cz.nic.extension.dnssecExtension.debugOutput) {
+				dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Validate this domain? YES\n');
 			}
 
 			var resolvipv4 = false; // No IPv4 resolving as default
 			var resolvipv6 = false; // No IPv6 resolving as default
 			var addr = null;
 
-			if (dnssecExtension.debugOutput)
-				dump(dnssecExtension.debugPrefix + dnssecExtension.debugStartNotice);
+			if (cz.nic.extension.dnssecExtension.debugOutput)
+				dump(cz.nic.extension.dnssecExtension.debugPrefix + cz.nic.extension.dnssecExtension.debugStartNotice);
 
 			if (aRecord && aRecord.hasMore()) {   // Address list is not empty
 				addr = aRecord.getNextAddrAsString();
@@ -585,8 +592,8 @@ onBrowserLookupComplete:
 				//if (resolvipv4 && resolvipv6) break;
 			}
 
-			if (dnssecExtension.debugOutput) {
-				dump(dnssecExtension.debugPrefix + 'Browser uses IPv4/IPv6 resolving: \"'
+			if (cz.nic.extension.dnssecExtension.debugOutput) {
+				dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Browser uses IPv4/IPv6 resolving: \"'
 				     + resolvipv4 + '/' + resolvipv6 + '\"\n');
 			}
 			// Resolve IPv4 if no version is desired
@@ -595,23 +602,23 @@ onBrowserLookupComplete:
 			this.doNPAPIvalidation(dn, resolvipv4, resolvipv6, aRecord);
 		}
 		else {
-			if (dnssecExtension.debugOutput) {
-				dump(dnssecExtension.debugPrefix + 
+			if (cz.nic.extension.dnssecExtension.debugOutput) {
+				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
 				'Validate this domain? NO\n');
 			}
 			// no DNSSEC validation resolve
-			dnssecExtHandler.setSecurityState(c.DNSSEC_OFF);
+			cz.nic.extension.dnssecExtHandler.setSecurityState(c.DNSSEC_OFF);
 			// Reset resolving flag
-			if (dnssecExtension.debugOutput) {
-				dump(dnssecExtension.debugPrefix + 'Lock is: ' +
-				dnssecExtPrefs.getBool("resolvingactive") + '\n');
-				dump(dnssecExtension.debugPrefix +
+			if (cz.nic.extension.dnssecExtension.debugOutput) {
+				dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Lock is: ' +
+				cz.nic.extension.dnssecExtPrefs.getBool("resolvingactive") + '\n');
+				dump(cz.nic.extension.dnssecExtension.debugPrefix +
 				'Unlocking section...\n');
 			}
-			dnssecExtPrefs.setBool("resolvingactive", false);
-			if (dnssecExtension.debugOutput) {
-				dump(dnssecExtension.debugPrefix + 'Lock is: ' +
-				 dnssecExtPrefs.getBool("resolvingactive") + '\n');
+			cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
+			if (cz.nic.extension.dnssecExtension.debugOutput) {
+				dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Lock is: ' +
+				 cz.nic.extension.dnssecExtPrefs.getBool("resolvingactive") + '\n');
 			}
 		}//if
 
@@ -625,7 +632,7 @@ onBrowserLookupComplete:
 /* Utility class to handle manipulations of the dnssec indicators in the UI */
 //*****************************************************************************
 //*****************************************************************************
-var dnssecExtHandler = {
+cz.nic.extension.dnssecExtHandler = {
 
 // Mode strings used to control CSS display
 
@@ -910,7 +917,7 @@ setSecurityState :
 		this.ipvalidator = ipvalidator;
 		this.ipbrowser = addr;
 		this.valstate = state;
-		var c = dnssecExtNPAPIConst;
+		var c = cz.nic.extension.dnssecExtNPAPIConst;
 
 		switch (state) {
 			// 1
@@ -977,23 +984,23 @@ checkSecurity :
 		//this.setMode(this.DNSSEC_MODE_ACTION);
 
 		// Detect if any resolving is already running...
-		if (dnssecExtPrefs.getBool("resolvingactive")) {
+		if (cz.nic.extension.dnssecExtPrefs.getBool("resolvingactive")) {
 
 			// Set inaction mode (no icon)
 //      dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_INACTION);
 
-			if (dnssecExtension.debugOutput)
-				dump(dnssecExtension.debugPrefix + 'Activating resolving timer\n');
+			if (cz.nic.extension.dnssecExtension.debugOutput)
+				dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Activating resolving timer\n');
 
 			// Cancel running timer if any
-			dnssecExtension.timer.cancel();
+			cz.nic.extension.dnssecExtension.timer.cancel();
 
 			// Define timer callback
-			dnssecExtension.timer.initWithCallback(
+			cz.nic.extension.dnssecExtension.timer.initWithCallback(
 			function() {
-				if (dnssecExtension.debugOutput)
-					dump(dnssecExtension.debugPrefix + 'Starting timer action\n');
-				dnssecExtension.processNewURL(gBrowser.currentURI);
+				if (cz.nic.extension.dnssecExtension.debugOutput)
+					dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Starting timer action\n');
+				cz.nic.extension.dnssecExtension.processNewURL(gBrowser.currentURI);
 			},
 			500,
 			Components.interfaces.nsITimer.TYPE_ONE_SHOT);
@@ -1003,13 +1010,13 @@ checkSecurity :
 		}
 
 		// ...and lock the critical section - this should be atomic in FF
-		if (dnssecExtension.debugOutput) {
-			dump(dnssecExtension.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
-			dump(dnssecExtension.debugPrefix + 'Locking section...\n');
+		if (cz.nic.extension.dnssecExtension.debugOutput) {
+			dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Lock is: ' + cz.nic.extension.dnssecExtPrefs.getBool("resolvingactive") + '\n');
+			dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Locking section...\n');
 		}
-		dnssecExtPrefs.setBool("resolvingactive", true);
-		if (dnssecExtension.debugOutput)
-			dump(dnssecExtension.debugPrefix + 'Lock is: ' + dnssecExtPrefs.getBool("resolvingactive") + '\n');
+		cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", true);
+		if (cz.nic.extension.dnssecExtension.debugOutput)
+			dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Lock is: ' + cz.nic.extension.dnssecExtPrefs.getBool("resolvingactive") + '\n');
 
 		// Set action state
 //    this.setMode(this.DNSSEC_MODE_ACTION);
@@ -1029,7 +1036,7 @@ checkSecurity :
 		onLookupComplete:
 			function(aRequest, aRecord, aStatus) {
 			// Check hostname security state
-			dnssecExtResolver.onBrowserLookupComplete(dnssecExtHandler._asciiHostName, aRecord);
+			cz.nic.extension.dnssecExtResolver.onBrowserLookupComplete(cz.nic.extension.dnssecExtHandler._asciiHostName, aRecord);
 			}
 		};
 
@@ -1043,13 +1050,13 @@ checkSecurity :
 		try {
 			dnsService.asyncResolve(asciiHost, 0, dnsListener, th); // Ci.nsIDNSService.RESOLVE_BYPASS_CACHE
 		} catch(ex) {
-			dump(dnssecExtension.debugPrefix + 'Error: Browser\'s async DNS lookup failed!\n');
+			dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Error: Browser\'s async DNS lookup failed!\n');
 
 			// Set error mode
-			dnssecExtHandler.setMode(dnssecExtHandler.DNSSEC_MODE_ERROR);
+			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR);
 
 			// Reset resolving flag
-			dnssecExtPrefs.setBool("resolvingactive", false);
+			cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
 
 			return;
 		}
@@ -1154,8 +1161,8 @@ showAddInfo :
 		document.getElementById(id).style.display = 'block';
 		document.getElementById("link").style.display = 'none';
 		document.getElementById("dnssec-popup-homepage").style.display = 'block';
-		if (this.valstate == dnssecExtNPAPIConst.DNSSEC_COT_DOMAIN_SECURED_BAD_IP ||
-			this.valstate == dnssecExtNPAPIConst.DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP) {
+		if (this.valstate == cz.nic.extension.dnssecExtNPAPIConst.DNSSEC_COT_DOMAIN_SECURED_BAD_IP ||
+			this.valstate == cz.nic.extension.dnssecExtNPAPIConst.DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP) {
 			this.showAddInfoIP();
 		}
 	},
@@ -1165,8 +1172,8 @@ hideAddInfo :
 		document.getElementById("dnssec-popup-security-detail").style.display = 'none';
 		document.getElementById("link").style.display = 'block';
 		document.getElementById("dnssec-popup-homepage").style.display = 'none';
-		if (this.valstate == dnssecExtNPAPIConst.DNSSEC_COT_DOMAIN_SECURED_BAD_IP ||
-			this.valstate == dnssecExtNPAPIConst.DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP) {
+		if (this.valstate == cz.nic.extension.dnssecExtNPAPIConst.DNSSEC_COT_DOMAIN_SECURED_BAD_IP ||
+			this.valstate == cz.nic.extension.dnssecExtNPAPIConst.DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP) {
 			this.hideAddInfoIP();
 		}
 	},
@@ -1189,8 +1196,8 @@ setPopupMessages :
 		this._dnssecPopupSecLabel.textContent = this._domainPreText[newMode] + " " + this._utf8HostName + " " + this._securityText[newMode];
 		this._dnssecPopupSecDetail.textContent = this._securityDetail[newMode];
 
-		if (this.valstate == dnssecExtNPAPIConst.DNSSEC_COT_DOMAIN_SECURED_BAD_IP ||
-			this.valstate == dnssecExtNPAPIConst.DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP) {
+		if (this.valstate == cz.nic.extension.dnssecExtNPAPIConst.DNSSEC_COT_DOMAIN_SECURED_BAD_IP ||
+			this.valstate == cz.nic.extension.dnssecExtNPAPIConst.DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP) {
 			this._dnssecPopupIpBrowser.textContent = this.ipbrowser;
 			if (this.ipvalidator=="") this.ipvalidator="n/a";
 			this._dnssecPopupIpValidator.textContent = this.ipvalidator;
