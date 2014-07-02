@@ -53,27 +53,33 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif ()
 
 # set header file directories
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/include
-                    ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/ldns/include
-                    ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/unbound/include
-                    ${CMAKE_CURRENT_SOURCE_DIR}/../../../plugin-source/common)
+IF(STATIC_LINKING STREQUAL "yes")
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/include
+                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/ldns/include
+                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/unbound/include
+                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../plugin-source/common)
+ELSE()
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../plugin-source/common)
+ENDIF()
 
-# set static library paths
-add_library(unbound STATIC IMPORTED)
-set_property(TARGET unbound PROPERTY IMPORTED_LOCATION
-             ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/unbound/lib/libunbound.a)
+IF(STATIC_LINKING STREQUAL "yes")
+  # set static library paths
+  add_library(unbound STATIC IMPORTED)
+  set_property(TARGET unbound PROPERTY IMPORTED_LOCATION
+               ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/unbound/lib/libunbound.a)
 
-add_library(ldns STATIC IMPORTED)
-set_property(TARGET ldns PROPERTY IMPORTED_LOCATION
-             ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/ldns/lib/libldns.a)
+  add_library(ldns STATIC IMPORTED)
+  set_property(TARGET ldns PROPERTY IMPORTED_LOCATION
+               ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/ldns/lib/libldns.a)
 
-add_library(ssl STATIC IMPORTED)
-set_property(TARGET ssl PROPERTY IMPORTED_LOCATION
-             ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/lib/libssl.a)
+  add_library(ssl STATIC IMPORTED)
+  set_property(TARGET ssl PROPERTY IMPORTED_LOCATION
+               ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/lib/libssl.a)
 
-add_library(crypto STATIC IMPORTED)
-set_property(TARGET crypto PROPERTY IMPORTED_LOCATION
-             ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/lib/libcrypto.a)
+  add_library(crypto STATIC IMPORTED)
+  set_property(TARGET crypto PROPERTY IMPORTED_LOCATION
+               ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/lib/libcrypto.a)
+ENDIF()
 
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
 target_link_libraries(${PROJECT_NAME}

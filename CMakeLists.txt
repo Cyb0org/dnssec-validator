@@ -12,6 +12,7 @@ PROJECT(C++)
 # CONFIGURE_ARGS - args passed to autotools' ./configure (for ldns and unbound)
 # LIB_CFLAGS - CFLAGS for dependent libraries
 # TARGET_OS - target OS name build is made for
+# STATIC_LINKING - whether to statically link openssl, ldns and unbound
  
 SET(LIB_CFLAGS "${LIB_CFLAGS} -fPIC")
 SET(BUILD_MAC96 0)
@@ -35,6 +36,14 @@ ELSEIF(TARGET_ARCH MATCHES "^(i.86|x86)$")
     SET(BUILD_64BIT 0)
 ELSE()
     MESSAGE(SEND_ERROR "Unsupported architecture - '${TARGET_ARCH}'")
+ENDIF()
+
+# Check whether to disable static linking. Default is on.
+IF(STATIC_LINKING STREQUAL "no")
+    MESSAGE("Linking dynamically")
+ELSE()
+    SET(STATIC_LINKING "yes")
+    MESSAGE("Linking statically")
 ENDIF()
 
 IF(WIN32)
@@ -94,6 +103,7 @@ ADD_CUSTOM_COMMAND(TARGET RecursiveBuild
         BUILD_64BIT=${BUILD_64BIT}
         BUILD_MAC96=${BUILD_MAC96}
 	MAKETYPE=${MAKETYPE}
+	STATIC_LINKING=${STATIC_LINKING}
     )
 
 

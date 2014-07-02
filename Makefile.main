@@ -1,6 +1,6 @@
-.PHONY: all build-static-libs clean scour submodules plugin
+.PHONY: all build-static-libs clean get-git-libraries get-git-firebreath get-submodules scour plugin prepare-dependencies
 
-all: build-static-libs plugin
+all: prepare-dependencies plugin
 
 CFLAGS=-fPIC
 export CFLAGS
@@ -76,11 +76,19 @@ endif
 ## You need to run 'make prepmake' after changing.
 PLUGIN_CONFIGURATION ?= MinSizeRel
 
-build-static-libs: submodules $(OPENSSL_LIB) $(LDNS_LIB) $(UNBOUND_LIB)
+PREPARATION_DEPS = get-submodules
+ifeq ($(STATIC_LINKING),yes)
+	# Build also static libraries.
+	PREPARATION_DEPS += $(OPENSSL_LIB) $(LDNS_LIB) $(UNBOUND_LIB)
+endif
 
-submodules:
+prepare-dependencies: $(PREPARATION_DEPS)
+
+get-git-libraries:
 	rm -rf $(LIBS_ARCHIVE_DIR)
 	git clone https://gitlab.labs.nic.cz/mstraka/dnssec-libs.git $(LIBS_ARCHIVE_DIR)
+
+get-git-firebreath:
 	rm -rf $(FIREBREATH_DIR)
 	git clone https://github.com/firebreath/FireBreath.git $(FIREBREATH_DIR)
 	cd $(FIREBREATH_DIR); git reset --hard 66af0df36be98e9fcf7ee196fe5c275e54752ae8; cd .. # 2014-06-24 17:48:14
@@ -88,6 +96,14 @@ submodules:
 	cd ..
 	git submodule update --init --recursive
 	#(cd $(FIREBREATH_DIR) && git checkout $(FIREBREATH_TAG))
+
+SUBMODULE_DEPS = get-git-firebreath
+ifeq ($(STATIC_LINKING),yes)
+	# Download library sources.
+	SUBMODULE_DEPS += get-git-libraries
+endif
+
+get-submodules: $(SUBMODULE_DEPS)
 
 $(LIBS_SRC_DIR):
 	mkdir $@
@@ -125,7 +141,9 @@ $(UNBOUND_DIR): $(UNBOUND_TARBALL) $(LIBS_SRC_DIR)
 
 # Build the plugin.
 plugin:
-	$(MAKETYPE) -f $(MAKE_OS) $(ARCH)
+	#echo $(MAKETYPE) -f $(MAKE_OS) STATIC_LINKING=$(STATIC_LINKING) $(ARCH)
+	#echo $(MAKETYPE) -f $(MAKE_OS) $(XPI)
+	$(MAKETYPE) -f $(MAKE_OS) STATIC_LINKING=$(STATIC_LINKING) $(ARCH)
 	$(MAKETYPE) -f $(MAKE_OS) $(XPI)
 
 # Cleans built files.
