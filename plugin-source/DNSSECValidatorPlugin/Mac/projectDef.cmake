@@ -33,38 +33,58 @@ set(LOCALIZED "Mac/bundle_template/Localized.r")
 
 add_mac_plugin(${PROJECT_NAME} ${PLIST} ${STRINGS} ${LOCALIZED} SOURCES)
 
-# set header file directories
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/include
-                    ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/ldns/include
-                    ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/unbound/include
-                    ${CMAKE_CURRENT_SOURCE_DIR}/../../../plugin-source/common)
+SET(CMAKE_LIBRARY_PATH ${LIBRARY_LOC} ${CMAKE_LIBRARY_PATH})
 
-# set static library paths
-add_library(unbound STATIC IMPORTED)
-set_property(TARGET unbound PROPERTY IMPORTED_LOCATION
-             ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/unbound/lib/libunbound.a)
+IF(STATIC_LINKING STREQUAL "yes")
+  # set header file directories
+  include_directories(BEFORE
+                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/include
+                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/ldns/include
+                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/unbound/include
+                      ${INCLUDE_LOC}
+                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../plugin-source/common)
 
-add_library(ldns STATIC IMPORTED)
-set_property(TARGET ldns PROPERTY IMPORTED_LOCATION
-             ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/ldns/lib/libldns.a)
+  # set static library paths
+  add_library(unbound STATIC IMPORTED)
+  set_property(TARGET unbound PROPERTY IMPORTED_LOCATION
+               ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/unbound/lib/libunbound.a)
+ 
+  add_library(ldns STATIC IMPORTED)
+  set_property(TARGET ldns PROPERTY IMPORTED_LOCATION
+               ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/ldns/lib/libldns.a)
+ 
+  add_library(ssl STATIC IMPORTED)
+  set_property(TARGET ssl PROPERTY IMPORTED_LOCATION
+               ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/lib/libssl.a)
+ 
+  add_library(crypto STATIC IMPORTED)
+  set_property(TARGET crypto PROPERTY IMPORTED_LOCATION
+               ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/lib/libcrypto.a)
 
-add_library(ssl STATIC IMPORTED)
-set_property(TARGET ssl PROPERTY IMPORTED_LOCATION
-             ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/lib/libssl.a)
+  SET(UNBOUND unbound)
+  SET(LDNS ldns)
+  SET(SSL ssl)
+  SET(CRYPTO crypto)
+ELSE()
+  include_directories(BEFORE
+                      ${INCLUDE_LOC}
+                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../plugin-source/common)
 
-add_library(crypto STATIC IMPORTED)
-set_property(TARGET crypto PROPERTY IMPORTED_LOCATION
-             ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/lib/libcrypto.a)
+  FIND_LIBRARY(UNBOUND unbound)
+  FIND_LIBRARY(LDNS ldns)
+  FIND_LIBRARY(SSL ssl)
+  FIND_LIBRARY(CRYPTO crypto)
+ENDIF()
 
 FIND_LIBRARY(COCOA_FRAMEWORK Cocoa)
 
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
 target_link_libraries(${PROJECT_NAME}
     ${PLUGIN_INTERNAL_DEPS}
-    unbound
-    ldns
-    ssl
-    crypto
+    ${UNBOUND}
+    ${LDNS}
+    ${SSL}
+    ${CRYPTO}
     ${COCOA_FRAMEWORK}
     )
 

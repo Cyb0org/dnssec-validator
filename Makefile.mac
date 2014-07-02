@@ -48,7 +48,7 @@ sys_macosx:
 	cp libszal/libunbound.a $(LIBS_BUILT_DIR)/unbound/lib
 	cd FireBreath && mkdir projects && cd ..
 	cp -r plugin-source/* $(PLUGIN_FB_S)
-	./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386;x86_64"  -DCMAKE_BUILD_TYPE=MinSizeRel
+	./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DSTATIC_LINKING=$(STATIC_LINKING) -DINCLUDE_LOC=$(INCLUDE_LOC) -DLIBRARY_LOC=$(LIBRARY_LOC) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" -DCMAKE_BUILD_TYPE=MinSizeRel
 	cd $(PLUGIN_FB_B) && xcodebuild && cd ../..
 	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_DNSSEC)/Debug/np$(PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/
 	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_TLSA)/Debug/np$(PLUGIN_NAME_TLSA).plugin $(PLUGIN_NAME_LIB)/
@@ -64,7 +64,7 @@ sys_macosx_x64:
 	mkdir $(PLUGIN_NAME_LIB)
 	cd FireBreath && mkdir projects && cd ..
 	cp -r plugin-source/* $(PLUGIN_FB_S)
-	./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="x86_64"  -DCMAKE_BUILD_TYPE=MinSizeRel
+	./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DSTATIC_LINKING=$(STATIC_LINKING) -DINCLUDE_LOC=$(INCLUDE_LOC) -DLIBRARY_LOC=$(LIBRARY_LOC) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_BUILD_TYPE=MinSizeRel
 	cd $(PLUGIN_FB_B) && xcodebuild && cd ../..
 	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_DNSSEC)/Debug/np$(PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/
 	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_TLSA)/Debug/np$(PLUGIN_NAME_TLSA).plugin $(PLUGIN_NAME_LIB)/
@@ -80,7 +80,7 @@ sys_macosx_x86:
 	mkdir $(PLUGIN_NAME_LIB)
 	cd FireBreath && mkdir projects && cd ..
 	cp -r plugin-source/* $(PLUGIN_FB_S)
-	./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386"  -DCMAKE_BUILD_TYPE=MinSizeRel
+	./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DSTATIC_LINKING=$(STATIC_LINKING) -DINCLUDE_LOC=$(INCLUDE_LOC) -DLIBRARY_LOC=$(LIBRARY_LOC) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386" -DCMAKE_BUILD_TYPE=MinSizeRel
 	cd $(PLUGIN_FB_B) && xcodebuild && cd ../..
 	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_DNSSEC)/Debug/np$(PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/
 	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_TLSA)/Debug/np$(PLUGIN_NAME_TLSA).plugin $(PLUGIN_NAME_LIB)/

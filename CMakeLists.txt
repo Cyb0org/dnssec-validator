@@ -13,6 +13,8 @@ PROJECT(C++)
 # LIB_CFLAGS - CFLAGS for dependent libraries
 # TARGET_OS - target OS name build is made for
 # STATIC_LINKING - whether to statically link openssl, ldns and unbound
+# INCLUDE_LOC - where to search for header files
+# LIBRARY_LOC - where to search for libraries
  
 SET(LIB_CFLAGS "${LIB_CFLAGS} -fPIC")
 SET(BUILD_MAC96 0)
@@ -104,6 +106,6 @@ ADD_CUSTOM_COMMAND(TARGET RecursiveBuild
         BUILD_MAC96=${BUILD_MAC96}
 	MAKETYPE=${MAKETYPE}
 	STATIC_LINKING=${STATIC_LINKING}
+	INCLUDE_LOC=${INCLUDE_LOC}
+	LIBRARY_LOC=${LIBRARY_LOC}
     )
-
-
