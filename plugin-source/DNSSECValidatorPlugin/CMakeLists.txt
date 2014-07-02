@@ -43,6 +43,10 @@ SET( SOURCES
     ${GENERATED}
     )
 
+SET(LIBS_BUILT_DIR
+    libs-built
+    )
+
 # This will include Win/projectDef.cmake, X11/projectDef.cmake, Mac/projectDef 
 # depending on the platform
 include_platform()

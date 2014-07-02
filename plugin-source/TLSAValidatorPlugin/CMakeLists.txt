@@ -37,9 +37,13 @@ SOURCE_GROUP(Generated FILES
     ${GENERATED}
     )
 
-SET( SOURCES
+SET(SOURCES
     ${GENERAL}
     ${GENERATED}
+    )
+
+SET(LIBS_BUILT_DIR
+    libs-built
     )
 
 # This will include Win/projectDef.cmake, X11/projectDef.cmake, Mac/projectDef 
