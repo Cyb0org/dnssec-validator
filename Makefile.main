@@ -28,45 +28,44 @@ FIREBREATH_TAG := firebreath-1.6.0
 
 PLUGIN_BUILD_DIR := $(FIREBREATH_DIR)/build
 
+# UNIXOID -- Name of the *NIX derivative.
+# UNIXOID_LC -- Lower case *NIX name.
+
 # Different NPAPI plugin names based on OS
 # PLUGIN_BINARY_TREE is necessary because Mac has dirtree structure instead of
 # a single file.
-ifeq ($(TARGET_OS),LINUX)
-   ifeq ($(MAKETYPE),gmake)
-     MAKE_OS := Makefile.bsd
-     ARCH := sys_freebsd_x64
-     XPI := xpi_x64 
-   else
-     ifeq ($(BUILD_64BIT),1)
-      MAKE_OS := Makefile.lin
-      ARCH := sys_linux_x64
-      XPI := xpi_x64
-     else
-      ARCH := sys_linux_x86
-      XPI := xpi_x86
-      MAKE_OS := Makefile.lin
-     endif
+MAKE_CMD ?= gmake
+UNIXOID ?= UNIX
+UNIXOID_LC ?= unix
+ifeq ($(OS_TARGET),UNIX)
+  MAKE_OS := Makefile.unix
+  ifeq ($(BUILD_64BIT),1)
+    ARCH := sys_$(UNIXOID_LC)_x64
+    XPI := xpi_x64
+  else
+    ARCH := sys_$(UNIXOID_LC)_x86
+    XPI := xpi_x86
   endif
 endif
-ifeq ($(TARGET_OS),MAC)
-    MAKE_OS := Makefile.mac
-    ifeq ($(BUILD_MAC96),1)
-        ARCH := sys_macosx
-        XPI := xpi
-    else	
+ifeq ($(OS_TARGET),MAC)
+  MAKE_OS := Makefile.mac
+  ifeq ($(BUILD_MAC96),1)
+    ARCH := sys_macosx
+    XPI := xpi
+  else	
     ifeq ($(BUILD_64BIT),1)
       ARCH := sys_macosx_x64
       XPI := xpi_x64
     else 
-        ARCH := sys_macosx_x86
-        XPI := xpi_x86
-      endif 
+      ARCH := sys_macosx_x86
+      XPI := xpi_x86
     endif 
+  endif 
 endif
-ifeq ($(TARGET_OS),WINDOWS)
-    MAKE_OS := Makefile.win
-    ARCH := sys_windows_x86
-    XPI := xpi_x86
+ifeq ($(OS_TARGET),WINDOWS)
+  MAKE_OS := Makefile.win
+  ARCH := sys_windows_x86
+  XPI := xpi_x86
 endif
 
 ## uncomment to make plugin build verbose - shows gcc invocations etc.
@@ -112,7 +111,7 @@ $(LIBS_SRC_DIR):
 $(OPENSSL_LIB): $(OPENSSL_DIR)
 	# sed on OS X does not handle the 0xA9 (copyright) character well
 	(cd $< && sed -e 's/\(^"BSD-[^"]*",[^g]*\)gcc\(.*\$\)/\1cc\2/g' < Configure > ConfigureBSD || cp Configure ConfigureBSD; chmod +x ConfigureBSD)
-	(cd $< && ./ConfigureBSD no-shared no-krb5 --prefix=$@ $(OPENSSL_ARGS) && $(MAKETYPE) -j1 && $(MAKETYPE) -j1 install)
+	(cd $< && ./ConfigureBSD no-shared no-krb5 --prefix=$@ $(OPENSSL_ARGS) && $(MAKE_CMD) -j1 && $(MAKE_CMD) -j1 install)
 
 $(OPENSSL_DIR): $(OPENSSL_TARBALL) $(LIBS_SRC_DIR)
 	tar xzf $< -C $(LIBS_SRC_DIR)
@@ -122,8 +121,8 @@ $(LDNS_LIB): $(LDNS_DIR) $(OPENSSL_LIB)
 	(cd $< && \
 	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared --with-ssl=$(OPENSSL_LIB) --disable-ldns-config --without-pyldnsx \
 	    --with-pic --prefix=$@ $(CONFIGURE_ARGS) && \
-	    $(MAKETYPE) && \
-	    $(MAKETYPE) install)
+	    $(MAKE_CMD) && \
+	    $(MAKE_CMD) install)
 
 $(LDNS_DIR): $(LDNS_TARBALL) $(LIBS_SRC_DIR)
 	tar xzf $< -C $(LIBS_SRC_DIR)
@@ -134,17 +133,15 @@ $(UNBOUND_LIB): $(UNBOUND_DIR) $(LDNS_LIB) $(OPENSSL_LIB)
 	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared \
 	    --with-ssl=$(OPENSSL_LIB) --with-ldns=$(LDNS_LIB) --without-libevent \
 	    --with-pic --prefix=$@ $(CONFIGURE_ARGS) --with-libunbound-only && \
-	    $(MAKETYPE) && $(MAKETYPE) install)
+	    $(MAKE_CMD) && $(MAKE_CMD) install)
 
 $(UNBOUND_DIR): $(UNBOUND_TARBALL) $(LIBS_SRC_DIR)
 	tar xzf $< -C $(LIBS_SRC_DIR)
 
 # Build the plugin.
 plugin:
-	#echo $(MAKETYPE) -f $(MAKE_OS) STATIC_LINKING=$(STATIC_LINKING) $(ARCH)
-	#echo $(MAKETYPE) -f $(MAKE_OS) $(XPI)
-	$(MAKETYPE) -f $(MAKE_OS) STATIC_LINKING=$(STATIC_LINKING) $(ARCH)
-	$(MAKETYPE) -f $(MAKE_OS) $(XPI)
+	$(MAKE_CMD) -f $(MAKE_OS) UNIXOID=$(UNIXOID) UNIXOID_LC=$(UNIXOID_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) $(ARCH)
+	$(MAKE_CMD) -f $(MAKE_OS) UNIXOID=$(UNIXOID) UNIXOID_LC=$(UNIXOID_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) $(XPI)
 
 # Cleans built files.
 clean:

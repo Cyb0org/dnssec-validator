@@ -52,11 +52,12 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   endif ()
 endif ()
 
-SET(CMAKE_LIBRARY_PATH ${LIBRARY_LOC} ${CMAKE_LIBRARY_PATH})
+SET(CMAKE_LIBRARY_PATH_FLAG ${CMAKE_LIBRARY_PATH_FLAG} ${LIBRARY_LOC})
+SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${LIBRARY_LOC})
 
 IF(STATIC_LINKING STREQUAL "yes")
   # set header file directories
-  include_directories(BEFORE
+  include_directories(AFTER
                       ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/openssl/include
                       ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/ldns/include
                       ${CMAKE_CURRENT_SOURCE_DIR}/../../../${LIBS_BUILT_DIR}/unbound/include
@@ -85,7 +86,7 @@ IF(STATIC_LINKING STREQUAL "yes")
   SET(SSL ssl)
   SET(CRYPTO crypto)
 ELSE()
-  include_directories(BEFORE
+  include_directories(AFTER
                       ${INCLUDE_LOC}
                       ${CMAKE_CURRENT_SOURCE_DIR}/../../../plugin-source/common)
 

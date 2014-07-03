@@ -11,14 +11,14 @@ PROJECT(C++)
 # OPENSSL_ARGS - args passed to openssl's ./Configure
 # CONFIGURE_ARGS - args passed to autotools' ./configure (for ldns and unbound)
 # LIB_CFLAGS - CFLAGS for dependent libraries
-# TARGET_OS - target OS name build is made for
+# OS_TARGET - target OS name build is made for
 # STATIC_LINKING - whether to statically link openssl, ldns and unbound
 # INCLUDE_LOC - where to search for header files
 # LIBRARY_LOC - where to search for libraries
  
 SET(LIB_CFLAGS "${LIB_CFLAGS} -fPIC")
 SET(BUILD_MAC96 0)
-SET(MAKETYPE "make")
+SET(MAKE_CMD "make")
 
 # If build arch is not explicitly set, use current
 IF(NOT DEFINED TARGET_ARCH)
@@ -49,14 +49,14 @@ ELSE()
 ENDIF()
 
 IF(WIN32)
-    SET(TARGET_OS "WINDOWS")
+    SET(OS_TARGET "WINDOWS")
     SET(OPENSSL_ARGS "mingw ${LIB_CFLAGS}")
     SET(CONFIGURE_ARGS "--cross-compile-prefix=i586-mingw32msvc-")
     MESSAGE("WIN")
 ELSEIF(UNIX)
     IF(APPLE)
         CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-        SET(TARGET_OS "MAC")
+        SET(OS_TARGET "MAC")
         IF(BUILD_64BIT)
             SET(OPENSSL_ARGS "darwin64-x86_64-cc ${LIB_CFLAGS}")
             SET(CONFIGURE_ARGS "--target=x86_64-apple-darwin11")
@@ -69,20 +69,32 @@ ELSEIF(UNIX)
 	    MESSAGE("APPLE i386")
         ENDIF()
     ELSE() # Linux
-        SET(TARGET_OS "LINUX")
+        SET(OS_TARGET "UNIX")
 	IF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
-	SET(OPENSSL_ARGS "BSD-x86_64 ${LIB_CFLAGS}")
-	SET(CONFIGURE_ARGS "--target=x86_64-pc-freebsd")
-	SET(MAKETYPE "gmake")
-	MESSAGE("FREEBSD x86_64")
-        ELSEIF(BUILD_64BIT)
-            SET(OPENSSL_ARGS "linux-x86_64 ${LIB_CFLAGS}")
-            SET(CONFIGURE_ARGS "--target=x86_64-pc-linux-gnu")
-	    MESSAGE("LINUX x86_64")
+            SET(MAKE_CMD "gmake")
+            SET(UNIXOID "FreeBSD")
+            SET(UNIXOID_LC "freebsd")
+            IF(BUILD_64BIT)
+	        SET(OPENSSL_ARGS "BSD-x86_64 ${LIB_CFLAGS}")
+	        SET(CONFIGURE_ARGS "--target=x86_64-pc-freebsd")
+	        MESSAGE("FREEBSD x86_64")
+            ELSE()
+            ENDIF()
+        ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+            SET(MAKE_CMD "gmake")
+            SET(UNIXOID "Linux")
+            SET(UNIXOID_LC "linux")
+            IF(BUILD_64BIT)
+                SET(OPENSSL_ARGS "linux-x86_64 ${LIB_CFLAGS}")
+                SET(CONFIGURE_ARGS "--target=x86_64-pc-linux-gnu")
+	        MESSAGE("LINUX x86_64")
+            ELSE()
+                SET(OPENSSL_ARGS "linux-elf ${LIB_CFLAGS}")
+                SET(CONFIGURE_ARGS "--target=i686-pc-linux-gnu")
+	        MESSAGE("LINUX x86")
+            ENDIF()
         ELSE()
-            SET(OPENSSL_ARGS "linux-elf ${LIB_CFLAGS}")
-            SET(CONFIGURE_ARGS "--target=i686-pc-linux-gnu")
-	    MESSAGE("LINUX x86")
+            MESSAGE(SEND_ERROR "Unsupported *NIX derivative '${${CMAKE_SYSTEM_NAME}}'.")
         ENDIF()
     ENDIF()
 ELSE()
@@ -94,17 +106,19 @@ ADD_CUSTOM_TARGET(RecursiveBuild ALL)
 
 # Calling Makefile.main passing the set variables on command line
 ADD_CUSTOM_COMMAND(TARGET RecursiveBuild 
-    COMMAND ${MAKETYPE} 
+    COMMAND ${MAKE_CMD} 
     ARGS -f Makefile.main 
         LIB_CFLAGS=${LIB_CFLAGS}
         OPENSSL_ARGS=${OPENSSL_ARGS} 
         CONFIGURE_ARGS=${CONFIGURE_ARGS} 
-        TARGET_OS=${TARGET_OS}
+        OS_TARGET=${OS_TARGET}
         CMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
         XPI_ARCH=${TARGET_ARCH}
         BUILD_64BIT=${BUILD_64BIT}
         BUILD_MAC96=${BUILD_MAC96}
-	MAKETYPE=${MAKETYPE}
+        UNIXOID=${UNIXOID}
+        UNIXOID_LC=${UNIXOID_LC}
+	MAKE_CMD=${MAKE_CMD}
 	STATIC_LINKING=${STATIC_LINKING}
 	INCLUDE_LOC=${INCLUDE_LOC}
 	LIBRARY_LOC=${LIBRARY_LOC}

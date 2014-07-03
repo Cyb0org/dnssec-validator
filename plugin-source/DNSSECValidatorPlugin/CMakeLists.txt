@@ -26,7 +26,6 @@ file (GLOB GENERAL RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     ${DSLIB}
     )
 
-
 # Generated files are stored in ${GENERATED} by the project configuration
 SET_SOURCE_FILES_PROPERTIES(
     ${GENERATED}
@@ -38,7 +37,7 @@ SOURCE_GROUP(Generated FILES
     ${GENERATED}
     )
 
-SET( SOURCES
+SET(SOURCES
     ${GENERAL}
     ${GENERATED}
     )
