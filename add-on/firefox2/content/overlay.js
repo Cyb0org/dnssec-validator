@@ -140,6 +140,11 @@ init:
 		var dsp = document.getElementById("dnssec-plugin");
 		dsp.DNSSECCacheInit();
 
+		cz.nic.extension.libCore.init();
+		//if (cz.nic.extension.libCore.dnssec_validation_init_core() == 0) {
+		//	dump("DNSSEC Init: DONE\n");
+		//}
+
 		// Enable asynchronous resolving if desired
 		this.getAsyncResolveFlag();
 
@@ -230,6 +235,9 @@ uninit:
 		//validator.shutdown();
 		var dsp = document.getElementById("dnssec-plugin");
 		dsp.DNSSECCacheFree();
+
+		cz.nic.extension.libCore.dnssec_validation_deinit_core();
+
 		if (this.debugOutput) {
 			dump(this.debugPrefix + 'Clear Cache...\n');
 		}
@@ -308,6 +316,12 @@ processNewURL:
 // **************************************************************
 cz.nic.extension.dnssecExtResolver = {
 
+xxx: function(dn, options, nameserver, addr) {	
+
+	var retval = cz.nic.extension.libCore.dnssec_validate_core(dn, options, nameserver, addr);
+	dump('Result: ' + retval[0] + ' ipval: ' + retval[1] + ';\n');	
+	return retval;
+},
 
 //******************************************
 // Called when request is not cached already
@@ -356,6 +370,11 @@ doNPAPIvalidation:
 		}
 
 		// Call NPAPI validation
+
+		var ress = this.xxx(dn, options, nameserver, addr);
+		cz.nic.extension.dnssecExtResolver.setValidatedData(dn, ress, aRecord, addr)
+		cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
+/*
 		try {
 			// Get the binary plugin
 			var dsp = document.getElementById("dnssec-plugin");
@@ -374,6 +393,7 @@ doNPAPIvalidation:
 
 			return;
 		}
+*/
 	},
 
 //*****************************************************

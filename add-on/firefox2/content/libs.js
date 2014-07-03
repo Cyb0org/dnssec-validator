@@ -22,6 +22,13 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 Components.utils.import("resource://gre/modules/ctypes.jsm");
 Components.utils.import("resource://gre/modules/AddonManager.jsm"); 
 
+
+//Define our namespace
+if(!cz) var cz={};
+if(!cz.nic) cz.nic={};
+if(!cz.nic.extension) cz.nic.extension={};
+
+
 cz.nic.extension.libCore = {
 dnsseclib: null,
 tlsalib: null,  
@@ -46,14 +53,14 @@ init: function() {
 				var tlsaLibName = "tlsalib.so";
 			}
 
-			this.initlibs(dnssecLibName, tlsaLibName);
+			cz.nic.extension.libCore.initlibs(dnssecLibName, tlsaLibName);
 		}
 		catch(e) {
+
 			// Failed loading from OS libs. 
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-				"Error: Can not load system libraries!\n"
-				"Local libraries will be used...\n");				
+				"--- Error: Can not load system libraries! Local libraries will be used...\n");				
 			}
 
 			//Fall back to libraries distributed with plugin.
@@ -63,9 +70,9 @@ init: function() {
 				var tlsaLibName = addon.getResourceURI("plugins/DANEcore-macosx")
 					.QueryInterface(Components.interfaces.nsIFileURL).file.path;
 			} else if(os.match("Linux") && abi.match("x86_64")) {
-				var dnssecLibName = addon.getResourceURI("plugins/DNSSECcore-linux-x64.so")
+				var dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-linux-x64.so")
 					.QueryInterface(Components.interfaces.nsIFileURL).file.path;
-				var tlsaLibName = addon.getResourceURI("plugins/DANEcore-linux-x64.so")
+				var tlsaLibName = addon.getResourceURI("plugins/libTLSAcore-linux-x64.so")
 					.QueryInterface(Components.interfaces.nsIFileURL).file.path;
 
 			} else if(os.match("Linux") && abi.match("x86")) {
@@ -79,13 +86,19 @@ init: function() {
 				var tlsaLibName = addon.getResourceURI("plugins/DANEcore-windows-x86.dll")
 						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
 			}
-			this.initlibs(dnssecLibName, tlsaLibName);
+			cz.nic.extension.libCore.initlibs(dnssecLibName, tlsaLibName);
 		}
 	});
 },
-  
+
+
 initlibs: function(dnssecLibName, tlsaLibName) {
-  	
+
+	if (cz.nic.extension.dnssecExtension.debugOutput) {
+		dump(cz.nic.extension.dnssecExtension.debugPrefix + 
+	            "Load:\n    " + dnssecLibName + "\n    " + tlsaLibName + "\n");				
+	}
+
 	//open libraries
 	this.dnsseclib = ctypes.open(dnssecLibName);
 	this.tlsalib = ctypes.open(tlsaLibName);
@@ -100,7 +113,6 @@ initlibs: function(dnssecLibName, tlsaLibName) {
 	    this.dnsseclib.declare("dnssec_validation_deinit",
 	    ctypes.default_abi,
 	    ctypes.int);
-
     
 	this.dnssec_validate = 
 	    this.dnsseclib.declare("dnssec_validate",
@@ -112,7 +124,7 @@ initlibs: function(dnssecLibName, tlsaLibName) {
 	    ctypes.char.ptr,	//ipbrowser
 	    ctypes.char.ptr.ptr //ipvalidator out	
 	    );
-
+/*
 	//declare tlsa API functions    
 	this.dane_validation_init = 
 	    this.tlsalib.declare("dane_validation_init",
@@ -123,7 +135,8 @@ initlibs: function(dnssecLibName, tlsaLibName) {
 	    this.tlsalib.declare("dane_validation_deinit",
 	    ctypes.default_abi,
 	    ctypes.int);
-
+*/
+/*
 	this.dane_validate = 
 	    this.dnsseclib.declare("dane_validate",
 	    ctypes.default_abi,
@@ -137,12 +150,37 @@ initlibs: function(dnssecLibName, tlsaLibName) {
 	    ctypes.char.ptr, 	//protocol
 	    ctypes.int		//policy
 	    );
-}
+*/
+	var res = this.dnssec_validation_init();
+	
+	dump(res + "-------------\n");
 
-// for catching of ipvalidator out param   
-dnssec_validate: function(outputParam) {
-	return this.dnssec_validate(outputParam);
+        return this;
 },
+
+
+// wrapper to dnssec init
+dnssec_validation_init_core: function() {
+
+	var res = this.dnssec_validation_init();
+	//dump("DNSSEC Init: DONE " + res+ "\n");
+	return res;
+},
+
+// wrapper to dnssec deinit
+dnssec_validation_deinit_core: function() {
+	var res = cz.nic.extension.libCore.dnssec_validation_deinit();
+	return res;
+},
+
+// wrapper to dnssec validation query
+dnssec_validate_core: function(dn, options, nameserver, addr, outputParam) {
+
+	let outputParam = new ctypes.char.ptr();
+	var retval = this.dnssec_validate(dn, options, nameserver, addr, outputParam.address());
+	return [retval, outputParam];
+},
+
 
 close: function() {
 	this.dnsseclib.close();

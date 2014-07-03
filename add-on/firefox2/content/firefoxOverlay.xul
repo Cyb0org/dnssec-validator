@@ -29,7 +29,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 	<script type="application/javascript" src="chrome://dnssec/content/about.js"/>
 	<script type="application/javascript" src="chrome://dnssec/content/npapi_const.js"/>
 	<script type="application/javascript" src="chrome://dnssec/content/preferences.js"/>
-
+	<script type="application/javascript" src="chrome://dnssec/content/libs.js"/>
 	<stringbundleset id="stringbundleset">
 		<stringbundle id="dnssec-strings" src="chrome://dnssec/locale/dnssec.properties"/>
 	</stringbundleset>
