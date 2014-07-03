@@ -122,7 +122,7 @@ OS_NAME = linux
 ARCH = x64
 
 
-TARGETS := dane-plug dnssec-plug libDNSSECcore-$(OS_NAME)-$(ARCH).so libTLSAcore-$(OS_NAME)-$(ARCH).so
+TARGETS := dane-plug dnssec-plug libDNSSECcore-$(OS_NAME)-$(ARCH).so checkDNSSEClib libDANEcore-$(OS_NAME)-$(ARCH).so checkDANElib
 
 ## Generic targets
 
@@ -143,14 +143,26 @@ common.o: ../plugin-source/common/common.c ../plugin-source/common/common.h
 libDNSSECcore-$(OS_NAME)-$(ARCH).so: dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
 	$(CC) $^ -o $@ $(LDFLAGS) -shared
 
+checkDNSSEClib.o: checkDNSSEClib.c
+	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/DNSSECValidatorPlugin
+
+checkDNSSEClib: checkDNSSEClib.o libDNSSECcore-$(OS_NAME)-$(ARCH).so
+	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDNSSECcore-$(OS_NAME)-$(ARCH)
+
 dnssec-plug: dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 dnssec-plug.o: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
-libTLSAcore-$(OS_NAME)-$(ARCH).so: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
+libDANEcore-$(OS_NAME)-$(ARCH).so: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
 	$(CC) $^ -o $@ $(LDFLAGS) -shared
+
+checkDANElib.o: checkDANElib.c
+	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/TLSAValidatorPlugin
+
+checkDANElib: checkDANElib.o libDANEcore-$(OS_NAME)-$(ARCH).so
+	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDANEcore-$(OS_NAME)-$(ARCH)
 
 dane-plug: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
 	$(CC) $^ -o $@ $(LDFLAGS)
