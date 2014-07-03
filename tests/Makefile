@@ -45,7 +45,8 @@ CPPFLAGS += -DCMNDLINE_TEST
 
 OPTFLAGS = -g -O0
 #OPTFLAGS = -g -O3
-CFLAGS += $(OPTFLAGS) -Wall -Wextra -pedantic
+PICFLAGS = -fPIC -g
+CFLAGS += $(OPTFLAGS) $(PICFLAGS) -Wall -Wextra -pedantic
 CFLAGS += $(OPENSSL_CFLAGS) $(LDNS_CFLAGS) $(UNBOUND_CFLAGS)
 CFLAGS += -I../plugin-source/common
 CFLAGS_STD = -std=c99
@@ -117,8 +118,11 @@ else
 endif
 
 
+OS_NAME = linux
+ARCH = x64
 
-TARGETS := dane-plug dnssec-plug
+
+TARGETS := dane-plug dnssec-plug libDNSSECcore-$(OS_NAME)-$(ARCH).so libTLSAcore-$(OS_NAME)-$(ARCH).so
 
 ## Generic targets
 
@@ -136,16 +140,22 @@ clean:
 common.o: ../plugin-source/common/common.c ../plugin-source/common/common.h
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
-dnssec-plug: dnssec-plug.o common.o $(LOG_OBJ)
+libDNSSECcore-$(OS_NAME)-$(ARCH).so: dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
+	$(CC) $^ -o $@ $(LDFLAGS) -shared
+
+dnssec-plug: dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
 	$(CC) $^ -o $@ $(LDFLAGS)
 
-dnssec-plug.o: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c $(STATIC_LIBS)
+dnssec-plug.o: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
-dane-plug: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ)
+libTLSAcore-$(OS_NAME)-$(ARCH).so: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
+	$(CC) $^ -o $@ $(LDFLAGS) -shared
+
+dane-plug: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
 	$(CC) $^ -o $@ $(LDFLAGS)
 
-dane-plug.o: ../plugin-source/TLSAValidatorPlugin/dane-plug.c $(STATIC_LIBS)
+dane-plug.o: ../plugin-source/TLSAValidatorPlugin/dane-plug.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
 ca_store_directory.o: ../plugin-source/TLSAValidatorPlugin/ca_store_directory.c
