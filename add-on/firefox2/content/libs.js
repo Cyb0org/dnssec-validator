@@ -40,7 +40,7 @@ init: function() {
 		   .getService(Components.interfaces.nsIXULRuntime).XPCOMABI;
 		var os = Components.classes["@mozilla.org/xre/app-info;1"]
 		    .getService(Components.interfaces.nsIXULRuntime).OS;
-        
+ /*       
 		try {
 			if(os.match("Darwin")) {
 				var dnssecLibName = "dnsseclib.dylib";
@@ -88,6 +88,38 @@ init: function() {
 			}
 			cz.nic.extension.libCore.initlibs(dnssecLibName, tlsaLibName);
 		}
+*/
+
+			//Fall back to libraries distributed with plugin.
+			if(os.match("Darwin")) {
+				var dnssecLibName = addon.getResourceURI("plugins/DNSSECcore-macosx")
+					.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+
+				var tlsaLibName = addon.getResourceURI("plugins/DANEcore-macosx")
+					.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+			} else if(os.match("Linux") && abi.match("x86_64")) {
+				var dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-linux-x64.so")
+					.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+
+				var tlsaLibName = addon.getResourceURI("plugins/libTLSAcore-linux-x64.so")
+					.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+
+			} else if(os.match("Linux") && abi.match("x86")) {
+				var dnssecLibName = addon.getResourceURI("plugins/DNSSECcore-linux-x86.so")
+
+						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+				var tlsaLibName = addon.getResourceURI("plugins/DANEcore-linux-x86.so")
+						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+			} else if(os.match("WINNT")) {
+				var dnssecLibName = addon.getResourceURI("plugins/DNSSECcore-windows-x86.dll")
+						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+
+				var tlsaLibName = addon.getResourceURI("plugins/DANEcore-windows-x86.dll")
+						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+			}
+			cz.nic.extension.libCore.initlibs(dnssecLibName, tlsaLibName);
+
+
 	});
 },
 
@@ -150,18 +182,14 @@ initlibs: function(dnssecLibName, tlsaLibName) {
 	    ctypes.char.ptr, 	//protocol
 	    ctypes.int		//policy
 	    );
-*/
-	var res = this.dnssec_validation_init();
-	
-	dump(res + "-------------\n");
-
-        return this;
+*/	
+	dump("-----end init--------\n");
 },
 
 
 // wrapper to dnssec init
 dnssec_validation_init_core: function() {
-
+	dump("-----dnssec_validation_init_core--------\n");
 	var res = this.dnssec_validation_init();
 	//dump("DNSSEC Init: DONE " + res+ "\n");
 	return res;
@@ -169,7 +197,7 @@ dnssec_validation_init_core: function() {
 
 // wrapper to dnssec deinit
 dnssec_validation_deinit_core: function() {
-	var res = cz.nic.extension.libCore.dnssec_validation_deinit();
+	var res = this.dnssec_validation_deinit();
 	return res;
 },
 

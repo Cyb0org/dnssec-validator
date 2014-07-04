@@ -141,6 +141,8 @@ init:
 		dsp.DNSSECCacheInit();
 
 		cz.nic.extension.libCore.init();
+
+
 		//if (cz.nic.extension.libCore.dnssec_validation_init_core() == 0) {
 		//	dump("DNSSEC Init: DONE\n");
 		//}
@@ -317,6 +319,9 @@ processNewURL:
 cz.nic.extension.dnssecExtResolver = {
 
 xxx: function(dn, options, nameserver, addr) {	
+	dump("1-----dnssec_validation_init_core--------\n");
+	cz.nic.extension.libCore.dnssec_validation_init_core();
+	dump("2-----dnssec_validation_init_core--------\n");
 
 	var retval = cz.nic.extension.libCore.dnssec_validate_core(dn, options, nameserver, addr);
 	dump('Result: ' + retval[0] + ' ipval: ' + retval[1] + ';\n');	
