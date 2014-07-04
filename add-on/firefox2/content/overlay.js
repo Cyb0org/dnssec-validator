@@ -125,7 +125,7 @@ debugEndNotice: "------------ DNSSEC resolving end -----------------\n",
 asyncResolve: false,
 timer: null,
 oldAsciiHost: null,
-
+coreinit: false,
 
 init:
 	function() {
@@ -136,9 +136,6 @@ init:
 		if (this.debugOutput) {
 			dump(this.debugPrefix + 'Start of add-on\n');
 		}
-
-		var dsp = document.getElementById("dnssec-plugin");
-		dsp.DNSSECCacheInit();
 
 		cz.nic.extension.libCore.init();
 
@@ -235,8 +232,7 @@ uninit:
 		cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
 
 		//validator.shutdown();
-		var dsp = document.getElementById("dnssec-plugin");
-		dsp.DNSSECCacheFree();
+
 
 		cz.nic.extension.libCore.dnssec_validation_deinit_core();
 
@@ -264,7 +260,14 @@ processNewURL:
 		var scheme = null;
 		var asciiHost = null;
 		var utf8Host = null;
-
+/*
+		if (!coreinit) {
+			dump("1-----dnssec_validation_init_core--------\n");
+			cz.nic.extension.libCore.dnssec_validation_init_core();
+			dump("2-----dnssec_validation_init_core--------\n");
+			coreinit = true;
+		}
+*/
 		try {
 			scheme = aLocationURI.scheme;             // Get URI scheme
 			asciiHost = aLocationURI.asciiHost;       // Get punycoded hostname
@@ -319,9 +322,6 @@ processNewURL:
 cz.nic.extension.dnssecExtResolver = {
 
 xxx: function(dn, options, nameserver, addr) {	
-	dump("1-----dnssec_validation_init_core--------\n");
-	cz.nic.extension.libCore.dnssec_validation_init_core();
-	dump("2-----dnssec_validation_init_core--------\n");
 
 	var retval = cz.nic.extension.libCore.dnssec_validate_core(dn, options, nameserver, addr);
 	dump('Result: ' + retval[0] + ' ipval: ' + retval[1] + ';\n');	
@@ -415,9 +415,6 @@ revalidate:
 		var c = cz.nic.extension.dnssecExtNPAPIConst;
 		var resolvipv4 = true;
 		var resolvipv6 = false;
-		var dsp = document.getElementById("dnssec-plugin");
-		dsp.DNSSECCacheFree();
-		dsp.DNSSECCacheInit();
 		var options = 0;
 
 		if (cz.nic.extension.dnssecExtension.debugOutput) options |= c.DNSSEC_FLAG_DEBUG;
@@ -429,6 +426,7 @@ revalidate:
 				addr + ';\n');
 		}
 		// Call NPAPI validation
+/*
 		try {
 			if (!cz.nic.extension.dnssecExtension.asyncResolve) {   // Synchronous NPAPI validation
 				NPAPIcallback(null, dsp.Validate(dn, options, "nofwd", addr));
@@ -447,6 +445,7 @@ revalidate:
 
 			return;
 		}
+*/
 	},
 
 
@@ -478,9 +477,7 @@ ValidatedDataNoFwd:
 				dump(ext.debugPrefix + "Results: FWD: " + res 
 				+ "; NOFWD: " + restmp +"\n");
 			}
-			var dsp = document.getElementById("dnssec-plugin");
-			dsp.DNSSECCacheFree();
-			dsp.DNSSECCacheInit();
+
 			res=c.DNSSEC_RESOLVER_NO_DNSSEC;
 		}//if
 

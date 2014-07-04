@@ -101,7 +101,7 @@ init: function() {
 				var dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-linux-x64.so")
 					.QueryInterface(Components.interfaces.nsIFileURL).file.path;
 
-				var tlsaLibName = addon.getResourceURI("plugins/libTLSAcore-linux-x64.so")
+				var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-linux-x64.so")
 					.QueryInterface(Components.interfaces.nsIFileURL).file.path;
 
 			} else if(os.match("Linux") && abi.match("x86")) {
