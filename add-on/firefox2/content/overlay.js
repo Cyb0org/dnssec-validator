@@ -321,10 +321,16 @@ processNewURL:
 // **************************************************************
 cz.nic.extension.dnssecExtResolver = {
 
-xxx: function(dn, options, nameserver, addr) {	
+xxx: function(dn, options, nameserver, addr) {
 
+	if (nameserver == "nofwd") {
+		dump("Y0000 No resolver\n");
+		nameserver = "";
+	}
+
+//	var retval = 0;
 	var retval = cz.nic.extension.libCore.dnssec_validate_core(dn, options, nameserver, addr);
-	dump('Result: ' + retval[0] + ' ipval: ' + retval[1] + ';\n');	
+	dump('Result: ' + retval[0] + ' ipval: ' + retval[1] + ';\n');
 	return retval;
 },
 

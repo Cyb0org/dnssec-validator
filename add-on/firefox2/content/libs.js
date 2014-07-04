@@ -156,6 +156,16 @@ initlibs: function(dnssecLibName, tlsaLibName) {
 	    ctypes.char.ptr,	//ipbrowser
 	    ctypes.char.ptr.ptr //ipvalidator out	
 	    );
+
+	this.dnssec_validate2 = 
+	    this.dnsseclib.declare("dnssec_validate2",
+	    ctypes.default_abi,
+	    ctypes.int,		//return state
+	    ctypes.char.ptr,	//doamin
+	    ctypes.uint16_t,//options
+	    ctypes.char.ptr,	//optdnssrv
+	    ctypes.char.ptr	//ipbrowser
+	    );
 /*
 	//declare tlsa API functions    
 	this.dane_validation_init = 
@@ -205,7 +215,8 @@ dnssec_validation_deinit_core: function() {
 dnssec_validate_core: function(dn, options, nameserver, addr, outputParam) {
 
 	let outputParam = new ctypes.char.ptr();
-	var retval = this.dnssec_validate(dn, options, nameserver, addr, outputParam.address());
+	//var retval = this.dnssec_validate(dn, options, nameserver, addr, 0);
+	var retval = this.dnssec_validate2(dn, options, nameserver, addr);
 	return [retval, outputParam];
 },
 
