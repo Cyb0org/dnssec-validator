@@ -698,12 +698,6 @@ int dnssec_validate(const char *domain, uint16_t options,
 int dnssec_validate2(const char *domain, uint16_t options,
     const char *optdnssrv, const char *ipbrowser)
 {
-	options =
-	    DNSSEC_FLAG_DEBUG |
-	    DNSSEC_FLAG_USEFWD |
-	    DNSSEC_FLAG_RESOLVIPV4 |
-	    DNSSEC_FLAG_RESOLVIPV6;
-
 	/* Apply options. */
 	dnssec_set_validation_options(&glob_val_ctx.opts, options);
 
