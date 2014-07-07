@@ -9,19 +9,25 @@ KERNEL = $(shell uname -s | tr '[:upper:]' '[:lower:]')
 # Determine achitexture.
 ARCH = $(shell uname -m | tr '[:upper:]' '[:lower:]' | sed -e 's/amd64/x86_64/g')
 
+BASEDIR = ..
+LIBS_BUILT_DIR = libs-built
+OPENSSL_LIB := $(BASEDIR)/$(LIBS_BUILT_DIR)/openssl
+LDNS_LIB := $(BASEDIR)/$(LIBS_BUILT_DIR)/ldns
+UNBOUND_LIB := $(BASEDIR)/$(LIBS_BUILT_DIR)/unbound
+
 # OS dependent stuff.
 ifeq ($(USE_STATIC), yes)
-  UNBOUND_CFLAGS = -I../libs/unbound/include
-  UNBOUND_LDFLAGS = -L../libs/unbound/lib -lunbound
-  UNBOUND_STATIC = ../libs/unbound/lib/libunbound.a
-  LDNS_CFLAGS = -I../libs/ldns/include
-  LDNS_LDFLAGS = -L../libs/ldns/lib -lldns
-  LDNS_STATIC = ../libs/ldns/lib/libldns.a
-  OPENSSL_CFLAGS = -I../libs/openssl/include
-  OPENSSL_LDFLAGS = -L../libs/openssl/lib -lssl -lcrypto
-  OPENSSL_STATIC = ../libs/openssl/lib/libssl.a ../libs/openssl/lib/libcrypto.a
+  OPENSSL_CFLAGS = -I$(OPENSSL_LIB)/include
+  OPENSSL_LDFLAGS = -L$(OPENSSL_LIB)/lib -lssl -lcrypto
+  OPENSSL_STATIC = $(OPENSSL_LIB)/lib/libssl.a $(OPENSSL_LIB)/lib/libcrypto.a
+  LDNS_CFLAGS = -I$(LDNS_LIB)/include
+  LDNS_LDFLAGS = -L$(LDNS_LIB)/lib -lldns
+  LDNS_STATIC = $(LDNS_LIB)/lib/libldns.a
+  UNBOUND_CFLAGS = -I$(UNBOUND_LIB)/include
+  UNBOUND_LDFLAGS = -L$(UNBOUND_LIB)/lib -lunbound
+  UNBOUND_STATIC = $(UNBOUND_LIB)/lib/libunbound.a
 
-  STATIC_LIBS = $(UNBOUND_STATIC) $(LDNS_STATIC) $(OPENSSL_STATIC)
+  STATIC_LIBS = $(OPENSSL_STATIC) $(LDNS_STATIC) $(UNBOUND_STATIC)
 else
   THIRD_PARTY_LOCATION := $(shell echo ${HOME})/third_party/built
   #UNBOUND_CFLAGS =
