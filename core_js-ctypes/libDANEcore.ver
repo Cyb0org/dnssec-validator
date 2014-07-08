@@ -1,0 +1,6 @@
+{ global:
+dane_set_validation_options;
+dane_validation_init;
+dane_validate;
+dane_validation_deinit;
+local: *; };

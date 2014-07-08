@@ -1,13 +1,34 @@
+# ***** BEGIN LICENSE BLOCK *****
+# Copyright 2011, 2012 CZ.NIC, z.s.p.o.
+#
+# Authors: Karel Slany <karel.slany@nic.cz>
+#
+# This file is part of DNSSEC Validator 2.0 Add-on.
+#
+# DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# DNSSEC Validator 2.0 Add-on is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
+# ***** END LICENSE BLOCK *****
 
-.PHONY: all clean loc run
 
-# Passed parameter.
-USE_STATIC ?= yes
+.PHONY: all clean
 
-# Determine OS type
-KERNEL = $(shell uname -s | tr '[:upper:]' '[:lower:]')
-# Determine achitexture.
-ARCH = $(shell uname -m | tr '[:upper:]' '[:lower:]' | sed -e 's/amd64/x86_64/g')
+
+UNIXOID ?= UNIX
+# Lower case.
+UNIXOID_LC ?= unix
+MAKE_CMD ?= gmake
+SHELL_CMD ?= bash
+
 
 BASEDIR = ..
 LIBS_BUILT_DIR = libs-built
@@ -15,8 +36,16 @@ OPENSSL_LIB := $(BASEDIR)/$(LIBS_BUILT_DIR)/openssl
 LDNS_LIB := $(BASEDIR)/$(LIBS_BUILT_DIR)/ldns
 UNBOUND_LIB := $(BASEDIR)/$(LIBS_BUILT_DIR)/unbound
 
+
+# Determine OS type
+KERNEL = $(shell uname -s | tr '[:upper:]' '[:lower:]')
+# Determine achitexture.
+ARCH = $(shell uname -m | tr '[:upper:]' '[:lower:]' | sed -e 's/amd64/x86_64/g')
+
+
 # OS dependent stuff.
-ifeq ($(USE_STATIC), yes)
+STATIC_LINKING ?= yes
+ifeq ($(STATIC_LINKING),yes)
   OPENSSL_CFLAGS = -I$(OPENSSL_LIB)/include
   OPENSSL_LDFLAGS = -L$(OPENSSL_LIB)/lib -lssl -lcrypto
   OPENSSL_STATIC = $(OPENSSL_LIB)/lib/libssl.a $(OPENSSL_LIB)/lib/libcrypto.a
@@ -29,25 +58,14 @@ ifeq ($(USE_STATIC), yes)
 
   STATIC_LIBS = $(OPENSSL_STATIC) $(LDNS_STATIC) $(UNBOUND_STATIC)
 else
-  THIRD_PARTY_LOCATION := $(shell echo ${HOME})/third_party/built
   #UNBOUND_CFLAGS =
   UNBOUND_LDFLAGS = -lunbound
-  ifeq ($(strip $(UNBOUND_CFLAGS)),)
-    UNBOUND_CFLAGS = -I$(THIRD_PARTY_LOCATION)/include
-    UNBOUND_LDFLAGS = -L$(THIRD_PARTY_LOCATION)/lib -Wl,-rpath,$(THIRD_PARTY_LOCATION)/lib $(UNBOUND_LDFLAGS)
-  endif
   #LDNS_CFLAGS =
   LDNS_LDFLAGS = -lldns
-  ifeq ($(strip $(UNBOUND_CFLAGS)),)
-    LDNS_CFLAGS = -I$(THIRD_PARTY_LOCATION)/include
-    LDNS_LDFLAGS = -L$(THIRD_PARTY_LOCATION)/lib -Wl,-rpath,$(THIRD_PARTY_LOCATION)/lib $(LDNS_LDFLAGS)
-  endif
   OPENSSL_CFLAGS = $(shell pkg-config --cflags openssl)
   OPENSSL_LDFLAGS = $(shell pkg-config --libs openssl)
 endif
 
-
-CPPFLAGS += -DCMNDLINE_TEST
 
 OPTFLAGS = -g -O0
 #OPTFLAGS = -g -O3
@@ -59,10 +77,6 @@ CFLAGS_STD = -std=c99
 
 LDFLAGS += $(UNBOUND_LDFLAGS) $(LDNS_LDFLAGS) $(OPENSSL_LDFLAGS)
 LDFLAGS += -lpthread
-ifneq ($(KERNEL),freebsd)
-  LDFLAGS += -ldl
-endif
-
 
 # Which system is it compiled on.
 ifeq ($(KERNEL),darwin)
@@ -124,19 +138,9 @@ else
 endif
 
 
-OS_NAME = linux
-ARCH = x64
-
-
-TARGETS := dane-plug dnssec-plug libDNSSECcore-$(OS_NAME)-$(ARCH).so checkDNSSEClib libDANEcore-$(OS_NAME)-$(ARCH).so checkDANElib
-
-## Generic targets
+TARGETS := libDNSSECcore-$(UNIXOID_LC)-$(ARCH).so libDANEcore-$(UNIXOID_LC)-$(ARCH).so
 
 all: $(TARGETS)
-
-run: all
-	./dane-plug gitlab.labs.nic.cz
-	./dnssec-plug
 
 clean:
 	rm -f *.o $(TARGETS)
@@ -146,32 +150,32 @@ clean:
 common.o: ../plugin-source/common/common.c ../plugin-source/common/common.h
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
-libDNSSECcore-$(OS_NAME)-$(ARCH).so: dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
-	$(CC) $^ -o $@ $(LDFLAGS) -shared -Wl,-version-script -Wl,../core_js-ctypes/libDNSSECcore.ver
+libDNSSECcore-$(UNIXOID_LC)-$(ARCH).so: dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
+	$(CC) $^ -o $@ $(LDFLAGS) -shared -Wl,-version-script -Wl,./libDNSSECcore.ver
 
-checkDNSSEClib.o: checkDNSSEClib.c
-	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/DNSSECValidatorPlugin
+#checkDNSSEClib.o: checkDNSSEClib.c
+#	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/DNSSECValidatorPlugin
 
-checkDNSSEClib: checkDNSSEClib.o libDNSSECcore-$(OS_NAME)-$(ARCH).so
-	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDNSSECcore-$(OS_NAME)-$(ARCH)
+#checkDNSSEClib: checkDNSSEClib.o libDNSSECcore-$(UNIXOID_LC)-$(ARCH).so
+#	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDNSSECcore-$(UNIXOID_LC)-$(ARCH)
 
-dnssec-plug: dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
-	$(CC) $^ -o $@ $(LDFLAGS)
+#dnssec-plug: dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
+#	$(CC) $^ -o $@ $(LDFLAGS)
 
 dnssec-plug.o: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
-libDANEcore-$(OS_NAME)-$(ARCH).so: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
-	$(CC) $^ -o $@ $(LDFLAGS) -shared -Wl,-version-script -Wl,../core_js-ctypes/libDANEcore.ver
+libDANEcore-$(UNIXOID_LC)-$(ARCH).so: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
+	$(CC) $^ -o $@ $(LDFLAGS) -shared -Wl,-version-script -Wl,./libDANEcore.ver
 
-checkDANElib.o: checkDANElib.c
-	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/TLSAValidatorPlugin
+#checkDANElib.o: checkDANElib.c
+#	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/TLSAValidatorPlugin
 
-checkDANElib: checkDANElib.o libDANEcore-$(OS_NAME)-$(ARCH).so
-	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDANEcore-$(OS_NAME)-$(ARCH)
+#checkDANElib: checkDANElib.o libDANEcore-$(UNIXOID_LC)-$(ARCH).so
+#	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDANEcore-$(UNIXOID_LC)-$(ARCH)
 
-dane-plug: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
-	$(CC) $^ -o $@ $(LDFLAGS)
+#dane-plug: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
+#	$(CC) $^ -o $@ $(LDFLAGS)
 
 dane-plug.o: ../plugin-source/TLSAValidatorPlugin/dane-plug.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
@@ -190,27 +194,3 @@ log_dflt.o: ../plugin-source/common/log_dflt.c
 
 log_osx.o: ../plugin-source/common/log_osx.m
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS)
-
-
-#PUGIN_INCLUDES := -I$(OPENSSL_LIB)/include -I$(LDNS_LIB)/include -I$(UNBOUND_LIB)/include
-#PLUGIN_LIBS := -L$(UNBOUND_LIB)/lib -L$(OPENSSL_LIB)/lib -L$(LDNS_LIB)/lib -lunbound -lldns -lssl -lcrypto -lpthread -ldl
-
-#LOC_LOCATION := $(shell echo ${HOME})/third_party/built
-#LOC_INCLUDES := -I$(LOC_LOCATION)/include
-#LOC_LIBS := -L$(LOC_LOCATION)/lib -Wl,-rpath,$(LOC_LOCATION)/lib -lunbound -lldns
-
-#dane-plug-loclibs: ../plugin-source/TLSAValidatorPlugin/dane-plug.c
-#	$(CC) $< -o $@ $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(LOC_INCLUDES) $(LOC_LIBS)
-
-#unbound-test-dnssec: unbound-test-dnssec.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
-#	$(CC) $< -o $@ $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(PLUGIN_INCLUDES) $(PLUGIN_LIBS)
-
-#ssl-test: ssl-test.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
-#	$(CC) $< -o $@ $(CPPFLAGS) $(CFLAGS_NOSTD) $(LDFLAGS) $(PLUGIN_INCLUDES) $(PLUGIN_LIBS)
-##	gcc -Wall -pedantic -g -lssl -lcrypto -o ssl-test ssl-test.c
-
-#dnssec-plug.o: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c $(UNBOUND_LIB) $(DANE_CORE_LIB)
-#	$(CC) -c $^ -o $@ $(CPPFLAGS) $(CFLAGS) $(PLUGIN_INCLUDES)
-
-#dnssec-plug-loclibs: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c
-#	$(CC) $< -o $@ $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(LOC_INCLUDES) $(LOC_LIBS)

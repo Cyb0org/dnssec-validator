@@ -695,16 +695,6 @@ int dnssec_validate(const char *domain, uint16_t options,
 }
 
 
-int dnssec_validate2(const char *domain, uint16_t options,
-    const char *optdnssrv, const char *ipbrowser)
-{
-	/* Apply options. */
-	dnssec_set_validation_options(&glob_val_ctx.opts, options);
-
-	return dnssec_validate(domain, options, optdnssrv, ipbrowser, NULL);
-}
-
-
 //*****************************************************************************
 // Initialises global validation structures.
 // ----------------------------------------------------------------------------

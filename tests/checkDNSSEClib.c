@@ -6,10 +6,6 @@
 #include "dnssec-plug.h"
 
 
-int dnssec_validate2(const char *domain, uint16_t options,
-    const char *optdnssrv, const char *ipbrowser);
-
-
 /* ========================================================================= */
 /* ========================================================================= */
 /*
@@ -37,11 +33,6 @@ int main(void)
 	    supplied_address, &tmp);
 
 	fprintf(stdout, "Returned value: \"%d\" %s\n", i, tmp);
-
-	i = dnssec_validate2(dname, options, resolver_addresses,
-	    supplied_address);
-
-	fprintf(stdout, "Returned value: \"%d\"\n", i);
 
 	return EXIT_SUCCESS;
 }
