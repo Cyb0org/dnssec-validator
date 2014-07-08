@@ -137,12 +137,8 @@ init:
 			dump(this.debugPrefix + 'Start of add-on\n');
 		}
 
+		// Plugins initialization
 		cz.nic.extension.libCore.init();
-
-
-		//if (cz.nic.extension.libCore.dnssec_validation_init_core() == 0) {
-		//	dump("DNSSEC Init: DONE\n");
-		//}
 
 		// Enable asynchronous resolving if desired
 		this.getAsyncResolveFlag();
@@ -231,10 +227,9 @@ uninit:
 		// Reset resolving flag
 		cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
 
-		//validator.shutdown();
-
-
+		// Plugins deinitialization
 		cz.nic.extension.libCore.dnssec_validation_deinit_core();
+		cz.nic.extension.libCore.close();
 
 		if (this.debugOutput) {
 			dump(this.debugPrefix + 'Clear Cache...\n');
@@ -260,14 +255,7 @@ processNewURL:
 		var scheme = null;
 		var asciiHost = null;
 		var utf8Host = null;
-/*
-		if (!coreinit) {
-			dump("1-----dnssec_validation_init_core--------\n");
-			cz.nic.extension.libCore.dnssec_validation_init_core();
-			dump("2-----dnssec_validation_init_core--------\n");
-			coreinit = true;
-		}
-*/
+
 		try {
 			scheme = aLocationURI.scheme;             // Get URI scheme
 			asciiHost = aLocationURI.asciiHost;       // Get punycoded hostname
@@ -321,29 +309,12 @@ processNewURL:
 // **************************************************************
 cz.nic.extension.dnssecExtResolver = {
 
-xxx: function(dn, options, nameserver, addr) {
-
-	if (nameserver == "nofwd") {
-		dump("Y0000 No resolver\n");
-		nameserver = "";
-	}
-
-//	var retval = 0;
-	var retval = cz.nic.extension.libCore.dnssec_validate_core(dn, options, nameserver, addr);
-	dump('Result: ' + retval[0] + ' ipval: ' + retval[1] + ';\n');
-	return retval;
-},
-
 //******************************************
 // Called when request is not cached already
 //*******************************************
-doNPAPIvalidation:
+dnssecValidate:
 	function(dn, resolvipv4, resolvipv6, aRecord) {
 
-		// Plugin callback
-		function NPAPIcallback(plug, resArr) {
-			cz.nic.extension.dnssecExtResolver.setValidatedData(dn, resArr, aRecord, addr);
-		}
 
 		// Get DNS resolver address(es)
 		var nameserver = cz.nic.extension.dnssecExtPrefs.getChar("dnsserveraddr");
@@ -365,8 +336,8 @@ doNPAPIvalidation:
 			if (aRecord.hasMore()) {   // Address list has another item
 				addr = aRecord.getNextAddrAsString();
 				if (cz.nic.extension.dnssecExtension.debugOutput) {
-					dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Checking browser IP: '
-					                                      + addr + ';\n');
+					dump(cz.nic.extension.dnssecExtension.debugPrefix +
+					    'Checking browser IP: ' + addr + ';\n');
 				}
 			}
 
@@ -380,133 +351,17 @@ doNPAPIvalidation:
 			     + dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
 		}
 
-		// Call NPAPI validation
-
-		var ress = this.xxx(dn, options, nameserver, addr);
-		cz.nic.extension.dnssecExtResolver.setValidatedData(dn, ress, aRecord, addr)
-		cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
-/*
+		// Call plugin validation method
 		try {
-			// Get the binary plugin
-			var dsp = document.getElementById("dnssec-plugin");
-
-			if (!cz.nic.extension.dnssecExtension.asyncResolve) {   // Synchronous NPAPI validation
-				NPAPIcallback(null, dsp.Validate(dn, options, nameserver, addr));
-			} else {   // Asynchronous NPAPI validation
-				dsp.ValidateAsync(dn, options, nameserver, addr, NPAPIcallback);
-			}
+			var retval = cz.nic.extension.libCore.dnssec_validate_core(dn, options, nameserver, addr);
+			cz.nic.extension.dnssecExtResolver.setValidatedData(dn, retval[0], retval[1], addr);
 		} catch (ex) {
-			dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Error: Plugin call failed!\n');
+			dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Error: Plugin validation method call failed!\n');
 			// Set error mode
 			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR);
 			// Reset resolving flag
 			cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
-
 			return;
-		}
-*/
-	},
-
-//*****************************************************
-// Called when unbound return bogus, validation without resolver
-//*****************************************************
-revalidate:
-	function(dn, addr, res) {
-
-		// Plugin callback
-		function NPAPIcallback(plug, resArr) {
-			cz.nic.extension.dnssecExtResolver.ValidatedDataNoFwd(dn, resArr, res, addr);
-		}
-
-		var c = cz.nic.extension.dnssecExtNPAPIConst;
-		var resolvipv4 = true;
-		var resolvipv6 = false;
-		var options = 0;
-
-		if (cz.nic.extension.dnssecExtension.debugOutput) options |= c.DNSSEC_FLAG_DEBUG;
-		if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
-		if (resolvipv6) options |= c.DNSSEC_FLAG_RESOLVIPV6;
-		if (cz.nic.extension.dnssecExtension.debugOutput) {
-			dump(cz.nic.extension.dnssecExtension.debugPrefix + "NOFWD parameters: " + 
-				dn + "; options: " + options  + "; resolver: nofwd; IP-br: " + 
-				addr + ';\n');
-		}
-		// Call NPAPI validation
-/*
-		try {
-			if (!cz.nic.extension.dnssecExtension.asyncResolve) {   // Synchronous NPAPI validation
-				NPAPIcallback(null, dsp.Validate(dn, options, "nofwd", addr));
-			} else {   // Asynchronous NPAPI validation
-				dsp.ValidateAsync(dn, options, "nofwd", addr, NPAPIcallback);
-			}
-		} catch (ex) {
-			if (cz.nic.extension.dnssecExtension.debugOutput) {
-				dump(dnssecExtension.debugPrefix + 'Error: Plugin call failed!\n');
-			}
-			// Set error mode
-			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR);
-
-			// Reset resolving flag
-			cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
-
-			return;
-		}
-*/
-	},
-
-
-//*****************************************************
-// Set appropriate security state for without resolver
-//*****************************************************
-ValidatedDataNoFwd:
-	function(dn, resArr, res, addr) {
-
-		var ext = cz.nic.extension.dnssecExtension;
-		var c = cz.nic.extension.dnssecExtNPAPIConst;
-		if (ext.debugOutput) {
-			dump(ext.debugPrefix + 'NOFWD result: ' + resArr[0] + ' : ' +
-			 resArr[1] +' ;\n');
-		}
-
-		var restmp = resArr[0];
-		var ipvalidator = resArr[1];
-
-		if (restmp==c.DNSSEC_COT_DOMAIN_BOGUS) {
-			if (ext.debugOutput) dump(ext.debugPrefix 
-				+ 'Yes, domain name has DNSSEC bogus\n');
-			res=restmp;
-		}
-		else {
-			if (ext.debugOutput) {
-				dump(ext.debugPrefix 
-				+ "Current resolver does not support DNSSEC!\n");
-				dump(ext.debugPrefix + "Results: FWD: " + res 
-				+ "; NOFWD: " + restmp +"\n");
-			}
-
-			res=c.DNSSEC_RESOLVER_NO_DNSSEC;
-		}//if
-
-		// Set appropriate state if host name does not changed
-		// during resolving process (tab has not been switched)
-		if (dn == gBrowser.currentURI.asciiHost) {
-			cz.nic.extension.dnssecExtHandler.setSecurityState(res,addr,ipvalidator);
-		}
-
-		if (ext.debugOutput) {
-			dump(ext.debugPrefix + ext.debugEndNotice);
-		}
-		// Resolving has finished
-		if (ext.debugOutput) {
-			dump(ext.debugPrefix + 'Lock is: ' + 
-			cz.nic.extension.dnssecExtPrefs.getBool("resolvingactive") + '\n');
-			dump(ext.debugPrefix + 'Unlocking section...\n');
-		}
-
-		cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
-		if (ext.debugOutput) {
-			dump(ext.debugPrefix + 'Lock is: ' +
-			cz.nic.extension.dnssecExtPrefs.getBool("resolvingactive") + '\n');
 		}
 	},
 
@@ -514,29 +369,61 @@ ValidatedDataNoFwd:
 // Set appropriate security state
 //*****************************************************
 setValidatedData:
-	function(dn, resArr, aRecord, addr) {
+	function(dn, valres, ipval, addr) {
 
 		var ext = cz.nic.extension.dnssecExtension;
 
 		if (ext.debugOutput) {
 			dump(ext.debugPrefix + 'Result: ' + dn + ' : ' +
-			resArr[0] + '\n');
+			valres + '; IP validator: '+ ipval + '\n');
 		}
 
-		// Get validated data from cache or by NPAPI call
-		var res = -1;
-
-		res = resArr[0];
-		var ipvalidator = resArr[1];
+		var res = valres;
+		var ipvalidator = ipval;
 
 		var c = cz.nic.extension.dnssecExtNPAPIConst;
 
-		if (res==c.DNSSEC_COT_DOMAIN_BOGUS) {
+		if (res == c.DNSSEC_COT_DOMAIN_BOGUS) {
 			if (ext.debugOutput) dump(ext.debugPrefix 
 			+ "Unbound return bogus state: Testing why?\n");
-			this.revalidate(dn,addr,res);
-			return;
-		}// if
+
+			var resolvipv4 = true;
+			var resolvipv6 = false;
+			var options = 0;
+
+			if (cz.nic.extension.dnssecExtension.debugOutput) options |= c.DNSSEC_FLAG_DEBUG;
+			if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
+			if (resolvipv6) options |= c.DNSSEC_FLAG_RESOLVIPV6;
+			if (cz.nic.extension.dnssecExtension.debugOutput) {
+				dump(cz.nic.extension.dnssecExtension.debugPrefix + "NOFWD parameters: " + 
+					dn + "; options: " + options  + "; resolver: nofwd; IP-br: " + 
+					addr + ';\n');
+			}
+
+			cz.nic.extension.libCore.dnssec_validation_deinit_core();
+			cz.nic.extension.libCore.dnssec_validation_init_core();
+
+			var retval = cz.nic.extension.libCore.dnssec_validate_core(dn, options, "nofwd", addr);
+
+			if (ext.debugOutput) {
+				dump(ext.debugPrefix + 'NOFWD result: ' + retval[0] + ' : ' + retval[1] +' ;\n');
+			}
+
+			if (retval[0] == c.DNSSEC_COT_DOMAIN_BOGUS) {
+				if (ext.debugOutput) {
+					dump(ext.debugPrefix + 'Yes, domain name has DNSSEC bogus\n');
+				}
+				res = c.DNSSEC_COT_DOMAIN_BOGUS;
+			} else {
+				if (ext.debugOutput) {
+					dump(ext.debugPrefix 
+					+ "Current resolver does not support DNSSEC!\n");
+					dump(ext.debugPrefix + "Results: FWD: " + res 
+					+ "; NOFWD: " + restmp +"\n");
+				}
+				res = c.DNSSEC_RESOLVER_NO_DNSSEC;
+			}
+		}
 
 		// Set appropriate state if host name does not changed
 		// during resolving process (tab has not been switched)
@@ -627,7 +514,7 @@ onBrowserLookupComplete:
 			// Resolve IPv4 if no version is desired
 			if (!resolvipv4 && !resolvipv6) resolvipv4 = true;
 			// Call NPAPI plugin core
-			this.doNPAPIvalidation(dn, resolvipv4, resolvipv6, aRecord);
+			this.dnssecValidate(dn, resolvipv4, resolvipv6, aRecord);
 		}
 		else {
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
