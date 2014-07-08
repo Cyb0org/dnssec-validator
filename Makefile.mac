@@ -98,7 +98,7 @@ xpi_x86:
 	chmod 777 $(ADDON_PATH_FF)/npapi_built/build.sh
 	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86.plugin $(ADDON_PATH_FF)/npapi_built/plugins/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
 	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86.plugin $(ADDON_PATH_FF)/npapi_built/plugins/np$(NPAPI_PLUGIN_NAME_TLSA).plugin
-	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
+	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/npapi_built/install.rdf.template > $(ADDON_PATH_FF)/npapi_built/install.rdf
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/npapi_built/about.template > $(ADDON_PATH_FF)/npapi_built/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
 	cd $(ADDON_PATH_FF)/npapi_built && $(SHELL_CMD) ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x86-npapi.xpi
@@ -183,7 +183,7 @@ xpi_x64:
 	chmod 777 $(ADDON_PATH_FF)/npapi_built/build.sh
 	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.plugin $(ADDON_PATH_FF)/npapi_built/plugins/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
 	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x64.plugin $(ADDON_PATH_FF)/npapi_built/plugins/np$(NPAPI_PLUGIN_NAME_TLSA).plugin
-	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86_64-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
+	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86_64-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/npapi_built/install.rdf.template > $(ADDON_PATH_FF)/npapi_built/install.rdf
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/npapi_built/about.template > $(ADDON_PATH_FF)/npapi_built/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
 	cd $(ADDON_PATH_FF)/npapi_built && ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x64-npapi.xpi
