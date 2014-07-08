@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ***** BEGIN LICENSE BLOCK *****
+Copyright 2012 CZ.NIC, z.s.p.o.
+
+Authors: Martin Straka <martin.straka@nic.cz>
+
+This file is part of DNSSEC Validator 2.0 Add-on.
+
+DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC Validator 2.0 Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** -->
+
+<?xml-stylesheet href="chrome://dnssec/skin/overlay.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://dnssec/locale/dnssec.dtd">
+<overlay id="dnssec-overlay" xmlns:html="http://www.w3.org/1999/xhtml" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	<script type="application/javascript" src="chrome://dnssec/content/overlay.js"/>
+	<script type="application/javascript" src="chrome://dnssec/content/tlsa.js"/>
+	<script type="application/javascript" src="chrome://dnssec/content/about.js"/>
+	<script type="application/javascript" src="chrome://dnssec/content/npapi_const.js"/>
+	<script type="application/javascript" src="chrome://dnssec/content/preferences.js"/>
+
+	<stringbundleset id="stringbundleset">
+		<stringbundle id="dnssec-strings" src="chrome://dnssec/locale/dnssec.properties"/>
+	</stringbundleset>
+
+	<popupset id="mainPopupSet">
+	<!-- Popup for DNSSEC information -->
+	<panel id="dnssec-popup" type="arrow" position="after_start" hidden="true" noautofocus="true" onpopuphidden="focusAndSelectUrlBar();" norestorefocus="true" onblur="cz.nic.extension.dnssecExtHandler.hideDnssecPopup();">
+		<vbox id="dnssec-popup-container" align="top">
+			<hbox id="dnssec-popup-content-box" align="top">
+				<image id="dnssec-popup-icon"/>
+				<vbox id="dnssec-popup-content-box2" align="top">
+					<description id="dnssec-popup-content-host"/>
+					<description id="dnssec-popup-securedLabel" value="&dnssec.securedLabel;"/>
+					<description id="dnssec-popup-unsecuredLabel" value="&dnssec.unsecuredLabel;"/>
+					<description id="dnssec-popup-errorLabel" value="&dnssec.errorLabel;"/>
+					<description id="dnssec-popup-wrongresLabel" value="&dnssec.wrongresLabel;"/>
+					<description id="dnssec-popup-dnssecOffLabel" value="&dnssec.offLabel;"/>
+					<description id="dnssec-popup-bogusLabel" value="&dnssec.bogusLabel;"/> 	
+				 </vbox>	
+			</hbox>
+			<vbox id="dnssec-popup-content-box3">      
+				<description id="dnssec-popup-security-text"/>
+			</vbox>
+			<button label="&dnssec.button;" id="link" accesskey="&dnssec.button.accesskey;" oncommand="cz.nic.extension.dnssecExtHandler.showAddInfo('dnssec-popup-security-detail'); return false;" style="display: block;"/>
+			<vbox id="dnssec-popup-content-box4">	
+				<description id="dnssec-popup-security-detail" style="display: none;"/>
+				<description id="dnssec-popup-ipbrowser-title" value="&dnssec.ipbrowser;" style="display: none;"/>
+				<description id="dnssec-popup-ipbrowser-ip" style="display: none;"/>
+				<description id="dnssec-popup-ipvalidator-title" value="&dnssec.ipvalidator;" style="display: none;"/>
+				<description id="dnssec-popup-ipvalidator-ip" style="display: none;"/>
+				<label id="dnssec-popup-homepage" class="text-link" value="&dnssec.homepage;" onclick="var win = Components.classes['@mozilla.org/appshell/window-mediator;1'].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow('navigator:browser'); win.openUILinkIn('http://www.dnssec-validator.cz', 'tab'); cz.nic.extension.dnssecExtHandler.hideDnssecPopup();" style="display: none;"/>	
+			</vbox>
+		</vbox>
+	</panel>
+
+	<!-- Popup for TLSA information -->
+	<panel id="tlsa-popup" type="arrow" position="after_start" hidden="true" noautofocus="true" onpopuphidden="focusAndSelectUrlBar();" norestorefocus="true" onblur="cz.nic.extension.tlsaExtHandler.hideTlsaPopup();">
+		<vbox id="tlsa-popup-container" align="top">
+			<hbox id="tlsa-popup-content-box" align="top">
+				<image id="tlsa-popup-icon"/>
+				<vbox id="tlsa-popup-content-box2" align="top">
+					<description id="tlsa-popup-content-host"/>
+					<description id="tlsa-popup-security-label"/>			 	
+				</vbox>	
+			</hbox>
+			<vbox id="tlsa-popup-content-box3">      
+				<description id="tlsa-popup-security-text"/>
+			</vbox>
+			<button label="&dnssec.button;" id="linkt" accesskey="&dnssec.button.accesskey;" oncommand="cz.nic.extension.tlsaExtHandler.showAddInfo('tlsa-popup-security-detail'); return false;" style="display: block;"/>
+			<vbox id="tlsa-popup-content-box4">	
+				<description id="tlsa-popup-security-detail" style="display: none;"/>
+				<description id="tlsa-popup-ipbrowser-title" value="&dnssec.ipbrowser;" style="display: none;"/>
+				<description id="tlsa-popup-ipbrowser-ip" style="display: none;"/>
+				<description id="tlsa-popup-ipvalidator-title" value="&dnssec.ipvalidator;" style="display: none;"/>
+				<description id="tlsa-popup-ipvalidator-ip" style="display: none;"/>
+				<label id="tlsa-popup-homepage" class="text-link" value="&dnssec.homepage;" onclick="var win = Components.classes['@mozilla.org/appshell/window-mediator;1'].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow('navigator:browser'); win.openUILinkIn('http://www.dnssec-validator.cz', 'tab'); cz.nic.extension.tlsaExtHandler.hideTlsaPopup();" style="display: none;"/>	
+			</vbox>
+		</vbox>
+	</panel>
+
+	<!-- Popup for contex menu -->
+	<menupopup id="dnssec-context-menu">
+		<menuitem label="&dnssec.about.label;" accesskey="&dnssec.about.accesskey;" oncommand="cz.nic.extension.dnssecExtAbout.showAboutWindow();"/>
+		<menuitem label="&dnssec.home.label;" accesskey="&dnssec.home.accesskey;" oncommand="var win = Components.classes['@mozilla.org/appshell/window-mediator;1'].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow('navigator:browser'); win.openUILinkIn('http://www.dnssec-validator.cz', 'tab');" style="display: block;"/>
+		<menuseparator/>
+		<menuitem label="&dnssec.preferences.label;" accesskey="&dnssec.preferences.accesskey;" oncommand="cz.nic.extension.dnssecExtPrefs.showPrefWindow();"/>
+	</menupopup>
+
+	<!-- Popup for forwarder information -->
+	<panel id="dnssec-popup-fwd" type="arrow" position="after_start" hidden="true" noautofocus="true"
+           onpopuphidden="focusAndSelectUrlBar();" norestorefocus="true" close="true"
+           onblur="cz.nic.extension.dnssecExtHandler.hideDnssecPopupfwd();">
+	<vbox id="dnssec-popup-fwd-container">
+		<description id="dnssec-popup-fwd-text"/>
+		<separator class="groove-thin"/>
+		<hbox>
+			<button label="&dnssec.buttoncancel;" id="fwdnotif" accesskey="&dnssec.buttoncancel.accesskey;" oncommand="cz.nic.extension.dnssecExtHandler.hideDnssecFwdInfo(); return false;"/>
+			<button label="&dnssec.buttonset;" id="fwdset" accesskey="&dnssec.buttonset.accesskey;" oncommand="cz.nic.extension.dnssecExtPrefs.showPrefWindow(); return false;"/>
+		</hbox>
+	</vbox>
+	</panel>
+	</popupset>
+
+	<textbox id="urlbar">
+	<!-- DNSSEC NPAPI plugin -->
+	<html:div>
+		<html:object id="dnssec-plugin" type="application/x-dnssecvalidatorplugin" width="0" height="0"></html:object>
+	</html:div>
+	<!-- TLSA NPAPI plugin -->
+  	<html:div>
+		<html:object id="dane-tlsa-plugin" type="application/x-tlsavalidatorplugin" width="0" height="0"></html:object>
+	</html:div>
+
+	<box id="urlbar-icons">
+	<!-- DNSSEC button in urlbar -->
+		<hbox id="dnssec-box" role="button"
+			onclick="cz.nic.extension.dnssecExtHandler.handleDnssecButtonEvent(event);"
+			onkeypress="cz.nic.extension.dnssecExtHandler.handleDnssecButtonEvent(event);"
+			context="dnssec-context-menu">
+	<image id="dnssec-icon" validate="never"/>
+	<!-- /stack -->
+	</hbox>
+	<!-- TLSA button in urlbar -->
+	<hbox id="tlsa-box" role="button"
+	    onclick="cz.nic.extension.tlsaExtHandler.handleTlsaButtonEvent(event);"
+	   onkeypress="cz.nic.extension.tlsaExtHandler.handleTlsaButtonEvent(event);"
+           context="dnssec-context-menu">
+          <image id="tlsa-icon" validate="never"/>
+        <!-- /stack -->
+	</hbox>
+	</box>
+	</textbox>
+</overlay>
