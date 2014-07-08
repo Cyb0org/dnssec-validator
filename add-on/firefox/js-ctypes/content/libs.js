@@ -154,7 +154,7 @@ initlibs: function(dnssecLibName, tlsaLibName) {
 	    this.dnsseclib.declare("dnssec_validation_deinit",
 	    ctypes.default_abi,
 	    ctypes.int);
-    
+
 	this.dnssec_validate = 
 	    this.dnsseclib.declare("dnssec_validate",
 	    ctypes.default_abi,
@@ -171,6 +171,7 @@ initlibs: function(dnssecLibName, tlsaLibName) {
 	    this.tlsalib.declare("dane_validation_init",
 	    ctypes.default_abi,
 	    ctypes.int);
+
 
 	this.dane_validation_deinit = 
 	    this.tlsalib.declare("dane_validation_deinit",
@@ -190,8 +191,7 @@ initlibs: function(dnssecLibName, tlsaLibName) {
 	    ctypes.char.ptr, 	//port
 	    ctypes.char.ptr, 	//protocol
 	    ctypes.int		//policy
-	    );
-	
+	    );	
 },
 
 

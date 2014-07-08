@@ -165,8 +165,6 @@ savePrefs :
 
 setElementsattributes :
 	function() {
-
-
 		var tmpCheck;
 		document.getElementById("dnssecok").style.display = 'none';
 		document.getElementById("dnssecbogus").style.display = 'none';
@@ -286,15 +284,10 @@ testdnssec :
 		}
 		else {
 			try {
-				// Get the binary plugin
-				var dsp = document.getElementById("dnssec-plugin");
-				dsp.DNSSECCacheFree();
-				dsp.DNSSECCacheInit();
-				//dump('TEST parameters: \"'+ dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
-				testnic = dsp.Validate(dn, options, nameserver, addr);
+				window.arguments[0].dnssec_validation_deinit_core();	
+				testnic = window.arguments[0].dnssec_validate_core(dn, options, nameserver, addr);
 				testnic = testnic[0];
-				//dump('TEST Return: ' + testnic + '\n');
-				//this.setLoading(false);
+
 				if (testnic==-2) {
 					document.getElementById("dnssecok").style.display = 'none';
 					document.getElementById("dnssecbogus").style.display = 'none';
@@ -334,11 +327,10 @@ windowDialogaccept :
 onUnload :
 	function(prefwindow) {
 		this.setBool("cachefree", true);
-		var dsp = document.getElementById("dnssec-plugin");
 		var dsp2 = document.getElementById("dane-tlsa-plugin");
-		dsp.DNSSECCacheFree();
+		window.arguments[0].dnssec_validation_deinit_core();
 		dsp2.TLSACacheFree();
-		dsp.DNSSECCacheInit();
+		//dsp.DNSSECCacheInit();
 		dsp2.TLSACacheInit();
 		return true;
 	},
@@ -352,9 +344,8 @@ setLoading :
 	},
 
 showPrefWindow :
-	function() {
+	function(libCore) {
 		var optionsURL = "chrome://dnssec/content/preferences.xul";
-
 		// Check if the pref window is not already opened
 		var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
 		         .getService(Components.interfaces.nsIWindowMediator);
@@ -366,10 +357,9 @@ showPrefWindow :
 				return;
 			}
 		}
-
 		// Open the pref window
 		var features = "chrome,titlebar,toolbar,centerscreen,dialog=yes";
-		window.openDialog(optionsURL, "", features);
+		window.openDialog(optionsURL, "", features, libCore);
 	},
 };
 
