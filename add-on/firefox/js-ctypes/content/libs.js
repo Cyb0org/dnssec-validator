@@ -59,7 +59,7 @@ dnssec_init: function() {
 			// Failed loading from OS lib. Fall back to library distributed with plugin. 
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-				"Warning: Cannot find DNSSEC system library! Library distributed with plugin will be used.\n");				
+				"Warning: Cannot find DNSSEC system library! Library distributed with plugin will be used.\n");	
 			}
 
 			if(os.match("Darwin")) {
@@ -75,7 +75,7 @@ dnssec_init: function() {
 				} else {
 					if (cz.nic.extension.dnssecExtension.debugOutput) {
 						dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-						"Error: Unknown architecture of Linux!\n");				
+						"Error: Unknown architecture of Linux!\n");
 					}
 					return;
 				}
@@ -139,7 +139,7 @@ dane_init: function() {
 			// Failed loading from OS libs. Fall back to libraries distributed with plugin. 
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-				"Warning: Cannot find DANE system library! Library distributed with plugin will be used.\n");				
+				"Warning: Cannot find DANE system library! Library distributed with plugin will be used.\n");
 			}
 
 			if(os.match("Darwin")) {
@@ -200,7 +200,7 @@ _initDnssecLib: function(dnssecLibName) {
 
 	if (cz.nic.extension.dnssecExtension.debugOutput) {
 		dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-	            "Loading DNSSEC library:\n        " + dnssecLibName + "\n");				
+	            "Loading DNSSEC library:\n        " + dnssecLibName + "\n");
 	}
 
 	//declare dnssec API functions
@@ -222,7 +222,7 @@ _initDnssecLib: function(dnssecLibName) {
 	    ctypes.uint16_t,	//options
 	    ctypes.char.ptr,	//optdnssrv
 	    ctypes.char.ptr,	//ipbrowser
-	    ctypes.char.ptr.ptr //ipvalidator out	
+	    ctypes.char.ptr.ptr //ipvalidator out
 	    );
 },
 
@@ -234,7 +234,7 @@ _initTlsaLib: function(tlsaLibName) {
 
 	if (cz.nic.extension.daneExtension.debugOutput) {
 		dump(cz.nic.extension.daneExtension.debugPrefix + 
-	            "Loading DANE library:\n        " + tlsaLibName + "\n");				
+	            "Loading DANE library:\n        " + tlsaLibName + "\n");
 	}
 
 	//declare tlsa API functions    
@@ -311,8 +311,8 @@ dane_validate_core: function(certchain, cetlen, options, nameserver, dname,
 	var ptrArrayType = ctypes.char.ptr.array(cetlen);
 	var myArray = ptrArrayType();
 
-	for (int i = 0; i < cetlen, i++) {
-		//TODO inicialize myArray from certchain[i];	
+	for (var i = 0; i < cetlen; i++) {
+		//TODO inicialize myArray from certchain[i];
 	}
 
 	var retval = this.dane_validate(certchain, cetlen, options, nameserver,
