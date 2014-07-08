@@ -19,16 +19,15 @@
 # DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 # ***** END LICENSE BLOCK *****
 
-LIBS_BUILT_DIR = libs-built
-
-PLUGIN_NAME_DNSSEC = DNSSECValidatorPlugin
-PLUGIN_NAME_TLSA = TLSAValidatorPlugin
+NPAPI_PLUGIN_NAME_DNSSEC = DNSSECValidatorPlugin
+NPAPI_PLUGIN_NAME_TLSA = TLSAValidatorPlugin
 PLUGIN_FB_S = FireBreath/projects
 PLUGIN_FB_B = FireBreath/build
+
 PLUGIN_NAME_LIB = plugins-lib
 PLUGIN_ADD_ON = packages
-ADDON_PATH_FF = add-on/firefox2
-ADDON_PATH_CR = add-on/chrome2dnssec
+ADDON_PATH_FF = add-on/firefox
+ADDON_PATH_CR_DNSSEC = add-on/chrome2dnsse_DNSSECc
 ADDON_PATH_CR_TLSA = add-on/chrome2tlsa
 ADDON_PATH_OP_DNSSEC = add-on/opera2dnssec
 ADDON_PATH_OP_TLSA = add-on/opera2tlsa
@@ -36,10 +35,206 @@ ADDON_PATH_OP_TLSA = add-on/opera2tlsa
 EXTENSION_VERSION = $(shell cat Version)
 EXTENSION_VERSION_CR = $(shell cut -c 1-5 Version)
 
-#all: sys_macosx sys_macosx_x64 sys_macosx_x86 xpi xpi_x64 xpi_x86
 
-sys_macosx:
-	@echo '### ...Creating plugin library for MACOSX... ###'
+LIBS_BUILT_DIR = libs-built
+
+
+UNIXOID ?= MacOSX
+# Lower case.
+UNIXOID_LC ?= macosx
+MAKE_CMD ?= gmake
+SHELL_CMD ?=
+
+JSCTYPES_PLUGIN_NAME_DNSSEC = libDNSSECcore-$(UNIXOID_LC)
+JSCTYPES_PLUGIN_NAME_DANE = libDANEcore-$(UNIXOID_LC)
+
+
+
+
+
+.PHONY: clean sys_$(UNIXOID_LC)_x86 sys_$(UNIXOID_LC)_x64 npapi_x86 npapi_x64 js-ctypes_x86 js-ctypes_x64 xpi_x86 xpi_x64
+
+#all: sys_$(UNIXOID_LC)_x86 sys_$(UNIXOID_LC)_x64 xpi_x86 xpi_x64 sys_$(UNIXOID_LC) xpi
+
+sys_$(UNIXOID_LC)_x86: npapi_x86 js-ctypes_x86
+
+sys_$(UNIXOID_LC)_x64: npapi_x64 js-ctypes_x64
+
+npapi_x86:
+	@echo '### ...Creating NPAPI plugin library for $(UNIXOID) x86... ###'
+	rm -rf $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86.plugin $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86.plugin $(PLUGIN_FB_S)
+	mkdir $(PLUGIN_NAME_LIB) || echo "$(PLUGIN_NAME_LIB) already exists."
+	cd FireBreath && mkdir projects && cd ..
+	cp -r plugin-source/* $(PLUGIN_FB_S)
+	$(SHELL_CMD) ./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DSTATIC_LINKING=$(STATIC_LINKING) -DINCLUDE_LOC=$(INCLUDE_LOC) -DLIBRARY_LOC=$(LIBRARY_LOC) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386" -DCMAKE_BUILD_TYPE=MinSizeRel
+	cd $(PLUGIN_FB_B) && xcodebuild && cd ../..
+	cp -R $(PLUGIN_FB_B)/projects/$(NPAPI_PLUGIN_NAME_DNSSEC)/Debug/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86.plugin
+	cp -R $(PLUGIN_FB_B)/projects/$(NPAPI_PLUGIN_NAME_TLSA)/Debug/np$(NPAPI_PLUGIN_NAME_TLSA).plugin $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86.plugin
+	strip -x -S $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86.plugin/Contents/MacOS/np$(NPAPI_PLUGIN_NAME_DNSSEC)
+	strip -x -S $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86.plugin/Contents/MacOS/np$(NPAPI_PLUGIN_NAME_TLSA)
+	rm -rf $(PLUGIN_FB_B)
+	rm -rf $(PLUGIN_FB_S)
+	@echo '### ...NPAPI plugin x86 $(UNIXOID) ... Done. ###'
+
+js-ctypes_x86:
+
+
+
+
+
+
+
+
+
+
+
+xpi_x86:
+	@echo '### Creating NPAPI package for Firefox $(UNIXOID) x86... ###'
+	rm -rf $(ADDON_PATH_FF)/npapi_built
+	mkdir $(ADDON_PATH_FF)/npapi_built
+	mkdir $(ADDON_PATH_FF)/npapi_built/plugins
+	cp -r $(ADDON_PATH_FF)/npapi/* $(ADDON_PATH_FF)/npapi_built
+	cp -r $(ADDON_PATH_FF)/common/* $(ADDON_PATH_FF)/npapi_built
+	chmod 777 $(ADDON_PATH_FF)/npapi_built/build.sh
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86.plugin $(ADDON_PATH_FF)/npapi_built/plugins/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86.plugin $(ADDON_PATH_FF)/npapi_built/plugins/np$(NPAPI_PLUGIN_NAME_TLSA).plugin
+	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
+	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/npapi_built/about.template > $(ADDON_PATH_FF)/npapi_built/content/about.xul
+	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
+	cd $(ADDON_PATH_FF)/npapi_built && $(SHELL_CMD) ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x86-npapi.xpi
+	@echo '### DONE... ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating js-ctypes package for Firefox $(UNIXOID) x86... ###'
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo '### DONE... ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating package for Chrome $(UNIXOID) x86... ###'
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86.plugin $(ADDON_PATH_CR_DNSSEC)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86.plugin $(ADDON_PATH_CR_TLSA)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin
+	sed -e 's/dnssecplugin/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_DNSSEC)/manifest.json.template > $(ADDON_PATH_CR_DNSSEC)/manifest.json
+	sed -e 's/tlsaplugin/np$(NPAPI_PLUGIN_NAME_TLSA).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/manifest.json.template > $(ADDON_PATH_CR_TLSA)/manifest.json
+	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x86.tar.gz chrome2dnssec && mv CR-dnssec_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x86.tar.gz ../$(PLUGIN_ADD_ON)
+	cd add-on && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x86.tar.gz chrome2tlsa && mv CR-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x86.tar.gz ../$(PLUGIN_ADD_ON)
+	cd $(ADDON_PATH_CR_DNSSEC) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
+	cd $(ADDON_PATH_CR_TLSA) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_TLSA).plugin
+	@echo '### DONE... ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating package for Opera $(UNIXOID) x86... ###'
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86.plugin $(ADDON_PATH_OP_DNSSEC)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86.plugin $(ADDON_PATH_OP_TLSA)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin
+	sed -e 's/dnssecplugin/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_DNSSEC)/manifest.json.template > $(ADDON_PATH_OP_DNSSEC)/manifest.json
+	sed -e 's/tlsaplugin/np$(NPAPI_PLUGIN_NAME_TLSA).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_TLSA)/manifest.json.template > $(ADDON_PATH_OP_TLSA)/manifest.json
+	cd add-on && tar -czf OP-dnssec_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x86.tar.gz opera2dnssec && mv OP-dnssec_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x86.tar.gz ../$(PLUGIN_ADD_ON)
+	cd add-on && tar -czf OP-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x86.tar.gz opera2tlsa && mv OP-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x86.tar.gz ../$(PLUGIN_ADD_ON)
+	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
+	cd $(ADDON_PATH_OP_TLSA) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_TLSA).plugin
+	@echo '### DONE... ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating package for Safari $(UNIXOID) ... ###'
+	./install_osx_safari_add_payload.sh
+	@echo '### DONE... ###'
+
+npapi_x64:
+	@echo '### ...Creating NPAPI plugin library for $(UNIXOID) x64... ###'
+	rm -rf $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.plugin $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x64.plugin $(PLUGIN_FB_S)
+	mkdir $(PLUGIN_NAME_LIB) || echo "$(PLUGIN_NAME_LIB) already exists."
+	cd FireBreath && mkdir projects && cd ..
+	cp -r plugin-source/* $(PLUGIN_FB_S)
+	$(SHELL_CMD) ./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DSTATIC_LINKING=$(STATIC_LINKING) -DINCLUDE_LOC=$(INCLUDE_LOC) -DLIBRARY_LOC=$(LIBRARY_LOC) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_BUILD_TYPE=MinSizeRel
+	cd $(PLUGIN_FB_B) && xcodebuild && cd ../..
+	cp -R $(PLUGIN_FB_B)/projects/$(NPAPI_PLUGIN_NAME_DNSSEC)/Debug/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.plugin
+	cp -R $(PLUGIN_FB_B)/projects/$(NPAPI_PLUGIN_NAME_TLSA)/Debug/np$(NPAPI_PLUGIN_NAME_TLSA).plugin $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x64.plugin
+	strip -x -S $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.plugin/Contents/MacOS/np$(NPAPI_PLUGIN_NAME_DNSSEC)
+	strip -x -S $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x64.plugin/Contents/MacOS/np$(NPAPI_PLUGIN_NAME_TLSA)
+	rm -rf $(PLUGIN_FB_B)
+	rm -rf $(PLUGIN_FB_S)
+	@echo '### ...NPAPI plugin x64 $(UNIXOID) ... Done. ###'
+
+js-ctypes_x64:
+
+
+
+
+
+
+
+
+
+
+
+xpi_x64:
+	@echo '### Creating NPAPI package for Firefox $(UNIXOID) x64... ###'
+	rm -rf $(ADDON_PATH_FF)/npapi_built
+	mkdir $(ADDON_PATH_FF)/npapi_built
+	mkdir $(ADDON_PATH_FF)/npapi_built/plugins
+	cp -r $(ADDON_PATH_FF)/npapi/* $(ADDON_PATH_FF)/npapi_built
+	cp -r $(ADDON_PATH_FF)/common/* $(ADDON_PATH_FF)/npapi_built
+	chmod 777 $(ADDON_PATH_FF)/npapi_built/build.sh
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.plugin $(ADDON_PATH_FF)/npapi_built/plugins/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x64.plugin $(ADDON_PATH_FF)/npapi_built/plugins/np$(NPAPI_PLUGIN_NAME_TLSA).plugin
+	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86_64-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
+	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/npapi_built/about.template > $(ADDON_PATH_FF)/npapi_built/content/about.xul
+	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
+	cd $(ADDON_PATH_FF)/npapi_built && ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x64-npapi.xpi
+	@echo '### DONE... ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating js-ctypes package for Firefox $(UNIXOID) x64... ###'
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo
+	@echo '### DONE... ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating package for Chrome $(UNIXOID) x64... ###'
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.plugin $(ADDON_PATH_CR_DNSSEC)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x64.plugin $(ADDON_PATH_CR_TLSA)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin
+	sed -e 's/dnssecplugin/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_DNSSEC)/manifest.json.template > $(ADDON_PATH_CR_DNSSEC)/manifest.json
+	sed -e 's/tlsaplugin/np$(NPAPI_PLUGIN_NAME_TLSA).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/manifest.json.template > $(ADDON_PATH_CR_TLSA)/manifest.json
+	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x64.tar.gz chrome2dnssec && mv CR-dnssec_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x64.tar.gz ../$(PLUGIN_ADD_ON)
+	cd add-on && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x64.tar.gz chrome2tlsa && mv CR-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x64.tar.gz ../$(PLUGIN_ADD_ON)
+	cd $(ADDON_PATH_CR_DNSSEC) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
+	cd $(ADDON_PATH_CR_TLSA) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_TLSA).plugin
+	@echo '### DONE... ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating package for Opera $(UNIXOID) x64... ###'
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.plugin $(ADDON_PATH_OP_DNSSEC)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x64.plugin $(ADDON_PATH_OP_TLSA)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin
+	sed -e 's/dnssecplugin/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_DNSSEC)/manifest.json.template > $(ADDON_PATH_OP_DNSSEC)/manifest.json
+	sed -e 's/tlsaplugin/np$(NPAPI_PLUGIN_NAME_TLSA).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_TLSA)/manifest.json.template > $(ADDON_PATH_OP_TLSA)/manifest.json
+	cd add-on && tar -czf OP-dnssec_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x64.tar.gz opera2dnssec && mv OP-dnssec_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x64.tar.gz ../$(PLUGIN_ADD_ON)
+	cd add-on && tar -czf OP-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x64.tar.gz opera2tlsa && mv OP-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC)-x64.tar.gz ../$(PLUGIN_ADD_ON)
+	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
+	cd $(ADDON_PATH_OP_TLSA) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_TLSA).plugin
+	@echo '### DONE... ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating package for Safari $(UNIXOID) ... ###'
+	./install_osx_safari_add_payload.sh
+	@echo '### DONE... ###'
+
+clean:
+	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)
+
+sys_$(UNIXOID_LC):
+	@echo '### ...Creating plugin library for $(UNIXOID)... ###'
 	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)
 	mkdir $(PLUGIN_NAME_LIB)
 	cp libszal/libldns.a $(LIBS_BUILT_DIR)/ldns/lib
@@ -48,166 +243,51 @@ sys_macosx:
 	cp libszal/libunbound.a $(LIBS_BUILT_DIR)/unbound/lib
 	cd FireBreath && mkdir projects && cd ..
 	cp -r plugin-source/* $(PLUGIN_FB_S)
-	./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DSTATIC_LINKING=$(STATIC_LINKING) -DINCLUDE_LOC=$(INCLUDE_LOC) -DLIBRARY_LOC=$(LIBRARY_LOC) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" -DCMAKE_BUILD_TYPE=MinSizeRel
+	$(SHELL_CMD) ./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DSTATIC_LINKING=$(STATIC_LINKING) -DINCLUDE_LOC=$(INCLUDE_LOC) -DLIBRARY_LOC=$(LIBRARY_LOC) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" -DCMAKE_BUILD_TYPE=MinSizeRel
 	cd $(PLUGIN_FB_B) && xcodebuild && cd ../..
-	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_DNSSEC)/Debug/np$(PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/
-	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_TLSA)/Debug/np$(PLUGIN_NAME_TLSA).plugin $(PLUGIN_NAME_LIB)/
-	strip -x -S $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC).plugin/Contents/MacOS/np$(PLUGIN_NAME_DNSSEC)
-	strip -x -S $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA).plugin/Contents/MacOS/np$(PLUGIN_NAME_TLSA)
+	cp -R $(PLUGIN_FB_B)/projects/$(NPAPI_PLUGIN_NAME_DNSSEC)/Debug/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/
+	cp -R $(PLUGIN_FB_B)/projects/$(NPAPI_PLUGIN_NAME_TLSA)/Debug/np$(NPAPI_PLUGIN_NAME_TLSA).plugin $(PLUGIN_NAME_LIB)/
+	strip -x -S $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin/Contents/MacOS/np$(NPAPI_PLUGIN_NAME_DNSSEC)
+	strip -x -S $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin/Contents/MacOS/np$(NPAPI_PLUGIN_NAME_TLSA)
 	rm -rf $(PLUGIN_FB_B)
 	rm -rf $(PLUGIN_FB_S)
-	@echo '### ...Plugin for MACOSX ... Done. ###'
-
-sys_macosx_x64:
-	@echo '### ...Creating plugin library for MACOSX x64... ###'
-	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)
-	mkdir $(PLUGIN_NAME_LIB)
-	cd FireBreath && mkdir projects && cd ..
-	cp -r plugin-source/* $(PLUGIN_FB_S)
-	./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DSTATIC_LINKING=$(STATIC_LINKING) -DINCLUDE_LOC=$(INCLUDE_LOC) -DLIBRARY_LOC=$(LIBRARY_LOC) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_BUILD_TYPE=MinSizeRel
-	cd $(PLUGIN_FB_B) && xcodebuild && cd ../..
-	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_DNSSEC)/Debug/np$(PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/
-	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_TLSA)/Debug/np$(PLUGIN_NAME_TLSA).plugin $(PLUGIN_NAME_LIB)/
-	strip -x -S $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC).plugin/Contents/MacOS/np$(PLUGIN_NAME_DNSSEC)
-	strip -x -S $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA).plugin/Contents/MacOS/np$(PLUGIN_NAME_TLSA)
-	rm -rf $(PLUGIN_FB_B)
-	rm -rf $(PLUGIN_FB_S)
-	@echo '### ...Plugin for MACOSX x64... Done. ###'
-
-sys_macosx_x86:
-	@echo '### ...Creating plugin library for MACOSX x86... ###'
-	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)
-	mkdir $(PLUGIN_NAME_LIB)
-	cd FireBreath && mkdir projects && cd ..
-	cp -r plugin-source/* $(PLUGIN_FB_S)
-	./FireBreath/prepmac.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DSTATIC_LINKING=$(STATIC_LINKING) -DINCLUDE_LOC=$(INCLUDE_LOC) -DLIBRARY_LOC=$(LIBRARY_LOC) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_ARCHITECTURES="i386" -DCMAKE_BUILD_TYPE=MinSizeRel
-	cd $(PLUGIN_FB_B) && xcodebuild && cd ../..
-	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_DNSSEC)/Debug/np$(PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/
-	cp -R $(PLUGIN_FB_B)/projects/$(PLUGIN_NAME_TLSA)/Debug/np$(PLUGIN_NAME_TLSA).plugin $(PLUGIN_NAME_LIB)/
-	strip -x -S $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC).plugin/Contents/MacOS/np$(PLUGIN_NAME_DNSSEC)
-	strip -x -S $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA).plugin/Contents/MacOS/np$(PLUGIN_NAME_TLSA)
-	rm -rf $(PLUGIN_FB_B)
-	rm -rf $(PLUGIN_FB_S)
-	@echo '### ...Plugin for MACOSX x86... Done. ###'
+	@echo '### ...Plugin for $(UNIXOID) ... Done. ###'
 
 xpi:
-	@echo '### ...Creating package for Firefox MACOSX... ###'
+	@echo '### ...Creating package for Firefox $(UNIXOID)... ###'
 	rm -rf $(ADDON_PATH_FF)/plugins
 	mkdir $(ADDON_PATH_FF)/plugins
 	chmod 777 $(ADDON_PATH_FF)/build.sh
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_FF)/plugins
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA).plugin $(ADDON_PATH_FF)/plugins
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_FF)/plugins
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin $(ADDON_PATH_FF)/plugins
 	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86_64-gcc3<\/em:targetPlatform><em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/about.template > $(ADDON_PATH_FF)/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
-	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-macosx.xpi
-	@echo '### Package for Firefox MACOSX...Done. ###'
+	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC).xpi
+	@echo '### Package for Firefox $(UNIXOID)...Done. ###'
 	@echo '--------------------------------------------------'
-	@echo '### Creating package for Chrome MACOSX ... ###'
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_CR)
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA).plugin $(ADDON_PATH_CR_TLSA)
-	sed -e 's/dnssecplugin/npDNSSECValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
-	sed -e 's/tlsaplugin/npTLSAValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/manifest.json.template > $(ADDON_PATH_CR_TLSA)/manifest.json
-	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-macosx.tar.gz chrome2dnssec && mv CR-dnssec_validator-$(EXTENSION_VERSION)-macosx.tar.gz ../$(PLUGIN_ADD_ON)
-	cd add-on && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-macosx.tar.gz chrome2tlsa && mv CR-tlsa_validator-$(EXTENSION_VERSION)-macosx.tar.gz ../$(PLUGIN_ADD_ON)
-	cd $(ADDON_PATH_CR) && rm -rf np$(PLUGIN_NAME_DNSSEC).plugin manifest.json
-	cd $(ADDON_PATH_CR_TLSA) && rm -rf np$(PLUGIN_NAME_TLSA).plugin manifest.json
-	@echo '### Package for Chrome MACOSX...Done. ###'
+	@echo '### Creating package for Chrome $(UNIXOID) ... ###'
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_CR_DNSSEC)
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin $(ADDON_PATH_CR_TLSA)
+	sed -e 's/dnssecplugin/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_DNSSEC)/manifest.json.template > $(ADDON_PATH_CR_DNSSEC)/manifest.json
+	sed -e 's/tlsaplugin/np$(NPAPI_PLUGIN_NAME_TLSA).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/manifest.json.template > $(ADDON_PATH_CR_TLSA)/manifest.json
+	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC).tar.gz chrome2dnssec && mv CR-dnssec_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC).tar.gz ../$(PLUGIN_ADD_ON)
+	cd add-on && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC).tar.gz chrome2tlsa && mv CR-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC).tar.gz ../$(PLUGIN_ADD_ON)
+	cd $(ADDON_PATH_CR_DNSSEC) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
+	cd $(ADDON_PATH_CR_TLSA) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_TLSA).plugin
+	@echo '### Package for Chrome $(UNIXOID)...Done. ###'
 	@echo '--------------------------------------------------'
-	@echo '### Creating package for Opera MACOSX ... ###'
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_OP_DNSSEC)
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA).plugin $(ADDON_PATH_OP_TLSA)
-	sed -e 's/dnssecplugin/npDNSSECValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_DNSSEC)/manifest.json.template > $(ADDON_PATH_OP_DNSSEC)/manifest.json
-	sed -e 's/tlsaplugin/npTLSAValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_TLSA)/manifest.json.template > $(ADDON_PATH_OP_TLSA)/manifest.json
-	cd add-on && tar -czf OP-dnssec_validator-$(EXTENSION_VERSION)-macosx.tar.gz opera2dnssec && mv OP-dnssec_validator-$(EXTENSION_VERSION)-macosx.tar.gz ../$(PLUGIN_ADD_ON)
-	cd add-on && tar -czf OP-tlsa_validator-$(EXTENSION_VERSION)-macosx.tar.gz opera2tlsa && mv OP-tlsa_validator-$(EXTENSION_VERSION)-macosx.tar.gz ../$(PLUGIN_ADD_ON)
-	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf np$(PLUGIN_NAME_DNSSEC).plugin manifest.json
-	cd $(ADDON_PATH_OP_TLSA) && rm -rf np$(PLUGIN_NAME_TLSA).plugin manifest.json
-	@echo '### Package for Opera MACOSX...Done. ###'
+	@echo '### Creating package for Opera $(UNIXOID) ... ###'
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_OP_DNSSEC)
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin $(ADDON_PATH_OP_TLSA)
+	sed -e 's/dnssecplugin/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_DNSSEC)/manifest.json.template > $(ADDON_PATH_OP_DNSSEC)/manifest.json
+	sed -e 's/tlsaplugin/np$(NPAPI_PLUGIN_NAME_TLSA).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_TLSA)/manifest.json.template > $(ADDON_PATH_OP_TLSA)/manifest.json
+	cd add-on && tar -czf OP-dnssec_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC).tar.gz opera2dnssec && mv OP-dnssec_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC).tar.gz ../$(PLUGIN_ADD_ON)
+	cd add-on && tar -czf OP-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC).tar.gz opera2tlsa && mv OP-tlsa_validator-$(EXTENSION_VERSION)-$(UNIXOID_LC).tar.gz ../$(PLUGIN_ADD_ON)
+	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
+	cd $(ADDON_PATH_OP_TLSA) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_TLSA).plugin
+	@echo '### Package for Opera $(UNIXOID)...Done. ###'
 	@echo '--------------------------------------------------'
-	@echo '### Creating package for Safari MACOSX ... ###'
+	@echo '### Creating package for Safari $(UNIXOID) ... ###'
 	./install_osx_safari_add_payload.sh
 	@echo '### Package for Opera Safari...Done. ###'
-
-
-
-xpi_x64:
-	@echo '### ...Creating package for Firefox MACOSX x64... ###'
-	rm -rf $(ADDON_PATH_FF)/plugins
-	mkdir $(ADDON_PATH_FF)/plugins
-	chmod 777 $(ADDON_PATH_FF)/build.sh
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_FF)/plugins
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA).plugin $(ADDON_PATH_FF)/plugins
-	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86_64-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
-	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/about.template > $(ADDON_PATH_FF)/content/about.xul
-	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
-	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-macosx_x64.xpi
-	@echo '### Package for Firefox MACOSX...Done. ###'
-	@echo '--------------------------------------------------'
-	@echo '### Creating package for Chrome MACOSX ... ###'
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_CR)
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA).plugin $(ADDON_PATH_CR_TLSA)
-	sed -e 's/dnssecplugin/npDNSSECValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
-	sed -e 's/tlsaplugin/npTLSAValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/manifest.json.template > $(ADDON_PATH_CR_TLSA)/manifest.json
-	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-macosx_x64.tar.gz chrome2dnssec && mv CR-dnssec_validator-$(EXTENSION_VERSION)-macosx_x64.tar.gz ../$(PLUGIN_ADD_ON)
-	cd add-on && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-macosx_x64.tar.gz chrome2tlsa && mv CR-tlsa_validator-$(EXTENSION_VERSION)-macosx_x64.tar.gz ../$(PLUGIN_ADD_ON)
-	cd $(ADDON_PATH_CR) && rm -rf np$(PLUGIN_NAME_DNSSEC).plugin manifest.json
-	cd $(ADDON_PATH_CR_TLSA) && rm -rf np$(PLUGIN_NAME_TLSA).plugin manifest.json
-	@echo '### Package for Chrome MACOSX x64...Done. ###'
-	@echo '--------------------------------------------------'
-	@echo '### Creating package for Opera MACOSX ... ###'
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_OP_DNSSEC)
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA).plugin $(ADDON_PATH_OP_TLSA)
-	sed -e 's/dnssecplugin/npDNSSECValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_DNSSEC)/manifest.json.template > $(ADDON_PATH_OP_DNSSEC)/manifest.json
-	sed -e 's/tlsaplugin/npTLSAValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_TLSA)/manifest.json.template > $(ADDON_PATH_OP_TLSA)/manifest.json
-	cd add-on && tar -czf OP-dnssec_validator-$(EXTENSION_VERSION)-macosx_x64.tar.gz opera2dnssec && mv OP-dnssec_validator-$(EXTENSION_VERSION)-macosx_x64.tar.gz ../$(PLUGIN_ADD_ON)
-	cd add-on && tar -czf OP-tlsa_validator-$(EXTENSION_VERSION)-macosx_x64.tar.gz opera2tlsa && mv OP-tlsa_validator-$(EXTENSION_VERSION)-macosx_x64.tar.gz ../$(PLUGIN_ADD_ON)
-	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf np$(PLUGIN_NAME_DNSSEC).plugin manifest.json
-	cd $(ADDON_PATH_OP_TLSA) && rm -rf np$(PLUGIN_NAME_TLSA).plugin manifest.json
-	@echo '### Package for Opera MACOSX x64...Done. ###'
-	@echo '--------------------------------------------------'
-	@echo '### Creating package for Safari MACOSX ... ###'
-	./install_osx_safari_add_payload.sh
-	@echo '### Package for Opera Safari...Done. ###'
-
-
-xpi_x86:
-	@echo '### ...Creating package for Firefox MACOSX x86... ###'
-	rm -rf $(ADDON_PATH_FF)/plugins
-	mkdir $(ADDON_PATH_FF)/plugins
-	chmod 777 $(ADDON_PATH_FF)/build.sh
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_FF)/plugins
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA).plugin $(ADDON_PATH_FF)/plugins
-	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/install.rdf.template > $(ADDON_PATH_FF)/install.rdf
-	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/about.template > $(ADDON_PATH_FF)/content/about.xul
-	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
-	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-macosx_x86.xpi
-	@echo '### Package for Firefox MACOSX...Done. ###'
-	@echo '--------------------------------------------------'
-	@echo '### Creating package for Chrome MACOSX ... ###'
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_CR)
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA).plugin $(ADDON_PATH_CR_TLSA)
-	sed -e 's/dnssecplugin/npDNSSECValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
-	sed -e 's/tlsaplugin/npTLSAValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/manifest.json.template > $(ADDON_PATH_CR_TLSA)/manifest.json
-	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-macosx_x86.tar.gz chrome2dnssec && mv CR-dnssec_validator-$(EXTENSION_VERSION)-macosx_x86.tar.gz ../$(PLUGIN_ADD_ON)
-	cd add-on && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-macosx_x86.tar.gz chrome2tlsa && mv CR-tlsa_validator-$(EXTENSION_VERSION)-macosx_x86.tar.gz ../$(PLUGIN_ADD_ON)
-	cd $(ADDON_PATH_CR) && rm -rf np$(PLUGIN_NAME_DNSSEC).plugin manifest.json
-	cd $(ADDON_PATH_CR_TLSA) && rm -rf np$(PLUGIN_NAME_TLSA).plugin manifest.json
-	@echo '### Package for Chrome MACOSX x86...Done. ###'
-	@echo '--------------------------------------------------'
-	@echo '### Creating package for Opera MACOSX ... ###'
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_OP_DNSSEC)
-	cp -R $(PLUGIN_NAME_LIB)/np$(PLUGIN_NAME_TLSA).plugin $(ADDON_PATH_OP_TLSA)
-	sed -e 's/dnssecplugin/npDNSSECValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_DNSSEC)/manifest.json.template > $(ADDON_PATH_OP_DNSSEC)/manifest.json
-	sed -e 's/tlsaplugin/npTLSAValidatorPlugin.plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_TLSA)/manifest.json.template > $(ADDON_PATH_OP_TLSA)/manifest.json
-	cd add-on && tar -czf OP-dnssec_validator-$(EXTENSION_VERSION)-macosx_x86.tar.gz opera2dnssec && mv OP-dnssec_validator-$(EXTENSION_VERSION)-macosx_x86.tar.gz ../$(PLUGIN_ADD_ON)
-	cd add-on && tar -czf OP-tlsa_validator-$(EXTENSION_VERSION)-macosx_x86.tar.gz opera2tlsa && mv OP-tlsa_validator-$(EXTENSION_VERSION)-macosx_x86.tar.gz ../$(PLUGIN_ADD_ON)
-	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf np$(PLUGIN_NAME_DNSSEC).plugin manifest.json
-	cd $(ADDON_PATH_OP_TLSA) && rm -rf np$(PLUGIN_NAME_TLSA).plugin manifest.json
-	@echo '### Package for Opera MACOSX x86...Done. ###'
-	@echo '--------------------------------------------------'
-	@echo '### Creating package for Safari MACOSX ... ###'
-	./install_osx_safari_add_payload.sh
-	@echo '### Package for Opera Safari...Done. ###'
-
-clean:
