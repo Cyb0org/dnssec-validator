@@ -29,10 +29,6 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 		<stringbundle id="dnssec-strings-pref" src="chrome://dnssec/locale/dnssec.preferences"/>
 	</stringbundleset>
 
-	<html:div>
-		<html:object id="dane-tlsa-plugin" type="application/x-tlsavalidatorplugin" width="0" height="0"></html:object>
-	</html:div>
-
 	<prefpane id="dnssec-pref-pane1" onpaneload="cz.nic.extension.dnssecExtPrefs.pane1Load();">
 	<preferences>
 		<preference id="dnssecdebug" name="extensions.dnssec.dnssecdebug" type="bool"/>

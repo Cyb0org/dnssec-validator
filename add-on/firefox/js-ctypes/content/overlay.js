@@ -137,8 +137,8 @@ init:
 			dump(this.debugPrefix + 'Start of add-on\n');
 		}
 
-		// Plugins initialization
-		cz.nic.extension.libCore.init();
+		// Plugin initialization
+		cz.nic.extension.libCore.dnssec_init();
 
 		// Enable asynchronous resolving if desired
 		this.getAsyncResolveFlag();
@@ -227,9 +227,9 @@ uninit:
 		// Reset resolving flag
 		cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
 
-		// Plugins deinitialization
+		// Plugin deinitialization
 		cz.nic.extension.libCore.dnssec_validation_deinit_core();
-		cz.nic.extension.libCore.close();
+		cz.nic.extension.libCore.dnssec_close();
 
 		if (this.debugOutput) {
 			dump(this.debugPrefix + 'Clear Cache...\n');

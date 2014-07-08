@@ -233,8 +233,8 @@ init:
 			dump(this.debugPrefix + 'Start of add-on\n');
 		}
 
-		var dsp = document.getElementById("dane-tlsa-plugin");
-		dsp.TLSACacheInit();
+		// Plugin initialization
+		cz.nic.extension.libCore.dane_init();
 
 		// Set inaction mode (no icon)
 		cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_INACTION);
@@ -316,8 +316,9 @@ uninit:
 		this.unregisterObserver("http-on-examine-response");
 		//this.unregisterObserver("http-on-examine-cached-response");
 
-		var dsp = document.getElementById("dane-tlsa-plugin");
-		dsp.TLSACacheFree();
+		// Plugin deinitialization
+		cz.nic.extension.libCore.dane_validation_deinit_core();
+		cz.nic.extension.libCore.dane_close();
 
 		cz.nic.extension.tlsaExtCache.delAllRecords();
 
@@ -777,13 +778,12 @@ check_tlsa_tab_change:
 			     port +", "+ protocol +", "+ policy+ this.DANE_DEBUG_POST);
 		}
 
-		// Call NPAPI validation
+		// Call validation
 		try {
-			var tlsa = document.getElementById("dane-tlsa-plugin");
-			var daneMatch = tlsa.TLSAValidate(derCerts, len, options,
+			var daneMatch = cz.nic.extension.libCore.dane_validate_core(derCerts, len, options,
 			                                  nameserver, domain, port, protocol, policy);
 			if (cz.nic.extension.daneExtension.debugOutput) {
-				dump(this.DANE_DEBUG_PRE + "Return: " + daneMatch[0]
+				dump(this.DANE_DEBUG_PRE + "Return: " + daneMatch
 				     + " for https://" + domain + ";" + this.DANE_DEBUG_POST);
 			}
 		} catch (ex) {
@@ -797,22 +797,22 @@ check_tlsa_tab_change:
 
 		}
 
-		if (daneMatch[0] == c.DANE_DNSSEC_BOGUS) {
+		if (daneMatch == c.DANE_DNSSEC_BOGUS) {
 
 			options = 0;
-			tlsa.TLSACacheFree();
-			tlsa.TLSACacheInit();
-			var daneMatchnofwd = tlsa.TLSAValidate(derCerts, len, options, "nofwd", domain, port, protocol, policy);
+			cz.nic.extension.libCore.dane_validation_deinit_core();
+			cz.nic.extension.libCore.dane_validation_init_core();
+			var daneMatchnofwd = cz.nic.extension.libCore.dane_validate_core(derCerts, len, options, "nofwd", domain, port, protocol, policy);
 
-			if (daneMatchnofwd[0] != daneMatch[0]) {
-				daneMatch[0] = c.DANE_RESOLVER_NO_DNSSEC;
-				tlsa.TLSACacheFree();
-				tlsa.TLSACacheInit();
+			if (daneMatchnofwd != daneMatch) {
+				daneMatch = c.DANE_RESOLVER_NO_DNSSEC;
+				cz.nic.extension.libCore.dane_validation_deinit_core();
+				cz.nic.extension.libCore.dane_validation_init_core();
 			}
 		}
 
 		var block = "no";
-/*		if (daneMatch[0] >= c.DANE_DNSSEC_BOGUS) {
+/*		if (daneMatch >= c.DANE_DNSSEC_BOGUS) {
 
 			var cacheitem = cz.nic.extension.tlsaExtCache.getRecord(domain);
 			if (cacheitem[1] == "no" || cacheitem[1] == "yes") {
@@ -845,7 +845,7 @@ check_tlsa_tab_change:
 								     domain+ ") was CONFIRMED" + this.DANE_DEBUG_POST);
 							}
 						}
-						//cz.nic.extension.tlsaExtCache.addRecord(domain, daneMatch[0] , block);
+						//cz.nic.extension.tlsaExtCache.addRecord(domain, daneMatch , block);
 						//cz.nic.extension.tlsaExtCache.printContent();
 					}
 				}
@@ -855,9 +855,9 @@ check_tlsa_tab_change:
 		if (cz.nic.extension.daneExtension.debugOutput) {
 			dump(this.DANE_DEBUG_PRE + "------------ TLSA validation end ------------------" + this.DANE_DEBUG_POST);
 		}
-		cz.nic.extension.tlsaExtCache.addRecord(hostport, daneMatch[0] , block);
+		cz.nic.extension.tlsaExtCache.addRecord(hostport, daneMatch , block);
 		cz.nic.extension.tlsaExtCache.printContent();
-		cz.nic.extension.tlsaExtHandler.setSecurityState(daneMatch[0]);
+		cz.nic.extension.tlsaExtHandler.setSecurityState(daneMatch);
 		return null;
 	},
 
@@ -929,13 +929,12 @@ check_tlsa_https:
 			     port +", "+ protocol +", "+ policy+ this.DANE_DEBUG_POST);
 		}
 
-		// Call NPAPI validation
+		// Call validation
 		try {
-			var tlsa = document.getElementById("dane-tlsa-plugin");
-			var daneMatch = tlsa.TLSAValidate(derCerts, len, options,
+			var daneMatch = cz.nic.extension.libCore.dane_validate_core(derCerts, len, options,
 			                                  nameserver, domain, port, protocol, policy);
 			if (cz.nic.extension.daneExtension.debugOutput) {
-				dump(this.DANE_DEBUG_PRE + "Return: " + daneMatch[0]
+				dump(this.DANE_DEBUG_PRE + "Return: " + daneMatch
 				     + " for https://" + domain + ";" + this.DANE_DEBUG_POST);
 			}
 		} catch (ex) {
@@ -949,7 +948,7 @@ check_tlsa_https:
 		}
 
 		var block = "no";
-		if (daneMatch[0] >= c.DANE_TLSA_PARAM_ERR) {
+		if (daneMatch >= c.DANE_TLSA_PARAM_ERR) {
 			if (channel) {
 				var tlsablock = cz.nic.extension.dnssecExtPrefs.getBool("tlsablocking");
 				if (tlsablock) {
@@ -964,7 +963,7 @@ check_tlsa_https:
 						var uritop = window.content.location.href;
 
 						if (url == uritop) {
-							cz.nic.extension.tlsaExtHandler.setSecurityState(daneMatch[0]);
+							cz.nic.extension.tlsaExtHandler.setSecurityState(daneMatch);
 						}
 						if (cz.nic.extension.daneExtension.debugOutput) {
 							dump(this.DANE_DEBUG_PRE + "https request for (" +
@@ -981,7 +980,7 @@ check_tlsa_https:
 				}
 			}
 		}
-		cz.nic.extension.tlsaExtCache.addRecord(hostport, daneMatch[0] , block);
+		cz.nic.extension.tlsaExtCache.addRecord(hostport, daneMatch , block);
 		cz.nic.extension.tlsaExtCache.printContent();
 
 

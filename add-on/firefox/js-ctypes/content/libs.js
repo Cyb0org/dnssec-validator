@@ -33,7 +33,7 @@ cz.nic.extension.libCore = {
 dnsseclib: null,
 tlsalib: null,  
   
-init: function() {
+dnssec_init: function() {
 	AddonManager.getAddonByID("dnssec@nic.cz", function(addon) {
   		
 		var abi = Components.classes["@mozilla.org/xre/app-info;1"]
@@ -41,48 +41,36 @@ init: function() {
 		var os = Components.classes["@mozilla.org/xre/app-info;1"]
 		    .getService(Components.interfaces.nsIXULRuntime).OS;
 
-		// Loading from OS libs.         
+		// Loading from OS DNSSEC lib.         
 		try {
 			if(os.match("Darwin")) {
 				var dnssecLibName = "libDNSSECcore.dylib";
-				var tlsaLibName = "libDANEcore.dylib";
 			} else if(os.match("WINNT")) {
 				var dnssecLibName = "libDNSSECcore.dll";
-				var tlsaLibName = "libDANEcore.dll";
 			} else if(os.match("Linux")) {
 				var dnssecLibName = "libDNSSECcore.so";
-				var tlsaLibName = "libDANEcore.so";
 			} else if(os.match("FreeBSD")) {
 				var dnssecLibName = "libDNSSECcore.so";
-				var tlsaLibName = "libDANEcore.so";
 			}
 
-			cz.nic.extension.libCore.initlibs(dnssecLibName, 
-			    tlsaLibName);
+			cz.nic.extension.libCore._initDnssecLib(dnssecLibName);
 
 		} catch(e) {
-			// Failed loading from OS libs. Fall back to libraries distributed with plugin. 
+			// Failed loading from OS lib. Fall back to library distributed with plugin. 
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-				"Warning: Cannot find system libraries! Libraries distributed with plugin will be used.\n");				
+				"Warning: Cannot find DNSSEC system library! Library distributed with plugin will be used.\n");				
 			}
 
 			if(os.match("Darwin")) {
 				var dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-osx.dylib")
 					.QueryInterface(Components.interfaces.nsIFileURL).file.path;
-				var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-osx.dylib")
-					.QueryInterface(Components.interfaces.nsIFileURL).file.path;
-
 			} else if(os.match("Linux")) {
 				if (abi.match("x86_64")) {
 					var dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-linux-x64.so")
 						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
-					var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-linux-x64.so")
-						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
 				} else if (abi.match("x86")) {
 					var dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-linux-x86.so")
-						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
-					var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-linux-x86.so")
 						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
 				} else {
 					if (cz.nic.extension.dnssecExtension.debugOutput) {
@@ -96,12 +84,8 @@ init: function() {
 				if (abi.match("x86_64")) {
 					var dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-freebsd-x64.so")
 						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
-					var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-freebsd-x64.so")
-						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
 				} else if (abi.match("x86")) {
 					var dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-freebsd-x86.so")
-						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
-					var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-freebsd-x86.so")
 						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
 				} else {
 					if (cz.nic.extension.dnssecExtension.debugOutput) {
@@ -115,6 +99,84 @@ init: function() {
 				var dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-win-x86.dll")
 						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
 
+			} else {
+				if (cz.nic.extension.dnssecExtension.debugOutput) {
+					dump(cz.nic.extension.dnssecExtension.debugPrefix + 
+					"Error: Unsupported OS!\n");
+				}
+				return;
+			}
+			cz.nic.extension.libCore._initDnssecLib(dnssecLibName);
+		}
+
+	});
+},
+
+
+dane_init: function() {
+	AddonManager.getAddonByID("dnssec@nic.cz", function(addon) {
+  		
+		var abi = Components.classes["@mozilla.org/xre/app-info;1"]
+		   .getService(Components.interfaces.nsIXULRuntime).XPCOMABI;
+		var os = Components.classes["@mozilla.org/xre/app-info;1"]
+		    .getService(Components.interfaces.nsIXULRuntime).OS;
+
+		// Loading from OS DANE libs.         
+		try {
+			if(os.match("Darwin")) {
+				var tlsaLibName = "libDANEcore.dylib";
+			} else if(os.match("WINNT")) {
+				var tlsaLibName = "libDANEcore.dll";
+			} else if(os.match("Linux")) {
+				var tlsaLibName = "libDANEcore.so";
+			} else if(os.match("FreeBSD")) {
+				var tlsaLibName = "libDANEcore.so";
+			}
+
+			cz.nic.extension.libCore._initTlsaLib(tlsaLibName);
+
+		} catch(e) {
+			// Failed loading from OS libs. Fall back to libraries distributed with plugin. 
+			if (cz.nic.extension.dnssecExtension.debugOutput) {
+				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
+				"Warning: Cannot find DANE system library! Library distributed with plugin will be used.\n");				
+			}
+
+			if(os.match("Darwin")) {
+				var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-osx.dylib")
+					.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+
+			} else if(os.match("Linux")) {
+				if (abi.match("x86_64")) {
+					var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-linux-x64.so")
+						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+				} else if (abi.match("x86")) {
+					var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-linux-x86.so")
+						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+				} else {
+					if (cz.nic.extension.dnssecExtension.debugOutput) {
+						dump(cz.nic.extension.dnssecExtension.debugPrefix + 
+						"Error: Unknown architecture of Linux!\n");				
+					}
+					return;
+				}
+
+			} else if (os.match("FreeBSD")) {
+				if (abi.match("x86_64")) {
+					var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-freebsd-x64.so")
+						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+				} else if (abi.match("x86")) {
+					var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-freebsd-x86.so")
+						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+				} else {
+					if (cz.nic.extension.dnssecExtension.debugOutput) {
+						dump(cz.nic.extension.dnssecExtension.debugPrefix + 
+						"Error: Unknown architecture of FreeBSD!\n");
+					}
+					return;
+				}
+
+			} else if(os.match("WINNT")) {
 				var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-win-x86.dll")
 						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
 			} else {
@@ -124,24 +186,21 @@ init: function() {
 				}
 				return;
 			}
-			cz.nic.extension.libCore.initlibs(dnssecLibName,
-			    tlsaLibName);
+			cz.nic.extension.libCore._initTlsaLib(tlsaLibName);
 		}
 
 	});
 },
 
 
-initlibs: function(dnssecLibName, tlsaLibName) {
+_initDnssecLib: function(dnssecLibName) {
 
-	//open libraries
+	//open library
 	this.dnsseclib = ctypes.open(dnssecLibName);
-	this.tlsalib = ctypes.open(tlsaLibName);
 
 	if (cz.nic.extension.dnssecExtension.debugOutput) {
 		dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-	            "Loading libraries:\n        " + dnssecLibName + 
-		    "\n        " + tlsaLibName + "\n");				
+	            "Loading DNSSEC library:\n        " + dnssecLibName + "\n");				
 	}
 
 	//declare dnssec API functions
@@ -160,11 +219,23 @@ initlibs: function(dnssecLibName, tlsaLibName) {
 	    ctypes.default_abi,
 	    ctypes.int,		//return state
 	    ctypes.char.ptr,	//doamin
-	    ctypes.uint16_t,//options
+	    ctypes.uint16_t,	//options
 	    ctypes.char.ptr,	//optdnssrv
 	    ctypes.char.ptr,	//ipbrowser
 	    ctypes.char.ptr.ptr //ipvalidator out	
 	    );
+},
+
+
+_initTlsaLib: function(tlsaLibName) {
+
+	//open library
+	this.tlsalib = ctypes.open(tlsaLibName);
+
+	if (cz.nic.extension.daneExtension.debugOutput) {
+		dump(cz.nic.extension.daneExtension.debugPrefix + 
+	            "Loading DANE library:\n        " + tlsaLibName + "\n");				
+	}
 
 	//declare tlsa API functions    
 	this.dane_validation_init = 
@@ -178,12 +249,11 @@ initlibs: function(dnssecLibName, tlsaLibName) {
 	    ctypes.default_abi,
 	    ctypes.int);
 
-
 	this.dane_validate = 
-	    this.dnsseclib.declare("dane_validate",
+	    this.tlsalib.declare("dane_validate",
 	    ctypes.default_abi,
 	    ctypes.int,		//return state
-	    ctypes.ArrayType(ctypes.char.ptr),//certchain[]
+	    ctypes.char.ptr.array(),//certchain[]
 	    ctypes.int,		//certcount
 	    ctypes.uint16_t,	//options
 	    ctypes.char.ptr,	//optdnssrv
@@ -191,7 +261,7 @@ initlibs: function(dnssecLibName, tlsaLibName) {
 	    ctypes.char.ptr, 	//port
 	    ctypes.char.ptr, 	//protocol
 	    ctypes.int		//policy
-	    );	
+	    );
 },
 
 
@@ -207,6 +277,7 @@ dnssec_validation_deinit_core: function() {
 	return res;
 },
 
+
 // wrapper to dnssec validation query
 dnssec_validate_core: function(dn, options, nameserver, addr, outputParam) {
 
@@ -217,8 +288,43 @@ dnssec_validate_core: function(dn, options, nameserver, addr, outputParam) {
 },
 
 
-close: function() {
+
+// wrapper to tlsa init
+dane_validation_init_core: function() {
+	var res = this.dane_validation_init();
+	return res;
+},
+
+// wrapper to tlsa deinit
+dane_validation_deinit_core: function() {
+	var res = this.dane_validation_deinit();
+	return res;
+},
+
+// wrapper to dnssec validation query
+dane_validate_core: function(certchain, cetlen, options, nameserver, dname,
+    port, protocol, policy) {
+
+	// certchain = array of strings in tlsa.js ->
+	//(certchain = new array(); certchain.push(string))
+
+	var ptrArrayType = ctypes.char.ptr.array(cetlen);
+	var myArray = ptrArrayType();
+
+	for (int i = 0; i < cetlen, i++) {
+		//TODO inicialize myArray from certchain[i];	
+	}
+
+	var retval = this.dane_validate(certchain, cetlen, options, nameserver,
+	    dname, port, protocol, policy);
+	return retval;
+},
+
+dnssec_close: function() {
 	this.dnsseclib.close();
+},
+
+dane_close: function() {
 	this.tlsalib.close();
 }
 

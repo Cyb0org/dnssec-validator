@@ -114,13 +114,6 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 	</popupset>
 
 	<textbox id="urlbar">
-	<!-- DNSSEC NPAPI plugin -->
-
-	<!-- TLSA NPAPI plugin -->
-  	<html:div>
-		<html:object id="dane-tlsa-plugin" type="application/x-tlsavalidatorplugin" width="0" height="0"></html:object>
-	</html:div>
-
 	<box id="urlbar-icons">
 	<!-- DNSSEC button in urlbar -->
 		<hbox id="dnssec-box" role="button"

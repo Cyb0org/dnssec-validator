@@ -327,11 +327,8 @@ windowDialogaccept :
 onUnload :
 	function(prefwindow) {
 		this.setBool("cachefree", true);
-		var dsp2 = document.getElementById("dane-tlsa-plugin");
 		window.arguments[0].dnssec_validation_deinit_core();
-		dsp2.TLSACacheFree();
-		//dsp.DNSSECCacheInit();
-		dsp2.TLSACacheInit();
+		window.arguments[0].dane_validation_deinit_core();
 		return true;
 	},
 
