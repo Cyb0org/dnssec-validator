@@ -1,40 +1,17 @@
-.PHONY: all build-static-libs clean get-git-libraries get-git-firebreath get-submodules scour plugin prepare-dependencies
+.PHONY: all clean download-git-firebreath scour plugin
 
-all: prepare-dependencies plugin
+all: download-git-firebreath plugin
 
 CFLAGS=-fPIC
 export CFLAGS
 
-BASEDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-
-LIBS_ARCHIVE_DIR = libs-archives
-LIBS_SRC_DIR = libs-src
-LIBS_BUILT_DIR = libs-built
-
-OPENSSL_TARBALL = $(LIBS_ARCHIVE_DIR)/openssl.tar.gz
-LDNS_TARBALL = $(LIBS_ARCHIVE_DIR)/ldns.tar.gz
-UNBOUND_TARBALL = $(LIBS_ARCHIVE_DIR)/unbound.tar.gz
-
-OPENSSL_DIR := $(BASEDIR)/$(LIBS_SRC_DIR)/openssl-1.0.1h
-LDNS_DIR := $(BASEDIR)/$(LIBS_SRC_DIR)/ldns-1.6.17
-UNBOUND_DIR := $(BASEDIR)/$(LIBS_SRC_DIR)/unbound-1.4.22
-
-OPENSSL_LIB := $(BASEDIR)/$(LIBS_BUILT_DIR)/openssl
-LDNS_LIB := $(BASEDIR)/$(LIBS_BUILT_DIR)/ldns
-UNBOUND_LIB := $(BASEDIR)/$(LIBS_BUILT_DIR)/unbound
-
-FIREBREATH_DIR := $(BASEDIR)/FireBreath
-FIREBREATH_TAG := firebreath-1.6.0
-
-PLUGIN_BUILD_DIR := $(FIREBREATH_DIR)/build
-
-# UNIXOID -- Name of the *NIX derivative.
-# UNIXOID_LC -- Lower case *NIX name.
+# Sets location variables.
+include Makefile.layout
 
 # Different NPAPI plugin names based on OS
 # PLUGIN_BINARY_TREE is necessary because Mac has dirtree structure instead of
 # a single file.
-MAKE_CMD ?= gmake
+MAKE_CMD ?= make
 UNIXOID ?= UNIX
 UNIXOID_LC ?= unix
 ifeq ($(OS_TARGET),UNIX)
@@ -68,26 +45,14 @@ ifeq ($(OS_TARGET),WINDOWS)
   XPI := xpi_x86
 endif
 
-## uncomment to make plugin build verbose - shows gcc invocations etc.
+## uncomment to make plug-in build verbose - shows gcc invocations etc.
 #PLUGIN_VERBOSE_BUILD = VERBOSE=1
 
 ## Configuration is one of Debug, Release, MinSizeRel and RelWithDebInfo.
 ## You need to run 'make prepmake' after changing.
 PLUGIN_CONFIGURATION ?= MinSizeRel
 
-PREPARATION_DEPS = get-submodules
-ifeq ($(STATIC_LINKING),yes)
-	# Build also static libraries.
-	PREPARATION_DEPS += $(OPENSSL_LIB) $(LDNS_LIB) $(UNBOUND_LIB)
-endif
-
-prepare-dependencies: $(PREPARATION_DEPS)
-
-get-git-libraries:
-	rm -rf $(LIBS_ARCHIVE_DIR)
-	git clone https://gitlab.labs.nic.cz/mstraka/dnssec-libs.git $(LIBS_ARCHIVE_DIR)
-
-get-git-firebreath:
+download-git-firebreath:
 	rm -rf $(FIREBREATH_DIR)
 	git clone https://github.com/firebreath/FireBreath.git $(FIREBREATH_DIR)
 	cd $(FIREBREATH_DIR); git reset --hard 66af0df36be98e9fcf7ee196fe5c275e54752ae8; cd .. # 2014-06-24 17:48:14
@@ -96,60 +61,18 @@ get-git-firebreath:
 	git submodule update --init --recursive
 	#(cd $(FIREBREATH_DIR) && git checkout $(FIREBREATH_TAG))
 
-SUBMODULE_DEPS = get-git-firebreath
-ifeq ($(STATIC_LINKING),yes)
-	# Download library sources.
-	SUBMODULE_DEPS += get-git-libraries
-endif
-
-get-submodules: $(SUBMODULE_DEPS)
-
-$(LIBS_SRC_DIR):
-	mkdir $@
-
-## openssl
-$(OPENSSL_LIB): $(OPENSSL_DIR)
-	# sed on OS X does not handle the 0xA9 (copyright) character well
-	(cd $< && sed -e 's/\(^"BSD-[^"]*",[^g]*\)gcc\(.*\$\)/\1cc\2/g' < Configure > ConfigureBSD || cp Configure ConfigureBSD; chmod +x ConfigureBSD)
-	(cd $< && ./ConfigureBSD no-shared no-krb5 --prefix=$@ $(OPENSSL_ARGS) && $(MAKE_CMD) -j1 && $(MAKE_CMD) -j1 install)
-
-$(OPENSSL_DIR): $(OPENSSL_TARBALL) $(LIBS_SRC_DIR)
-	tar xzf $< -C $(LIBS_SRC_DIR)
-
-## ldns
-$(LDNS_LIB): $(LDNS_DIR) $(OPENSSL_LIB)
-	(cd $< && \
-	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared --with-ssl=$(OPENSSL_LIB) --disable-ldns-config --without-pyldnsx \
-	    --with-pic --prefix=$@ $(CONFIGURE_ARGS) && \
-	    $(MAKE_CMD) && \
-	    $(MAKE_CMD) install)
-
-$(LDNS_DIR): $(LDNS_TARBALL) $(LIBS_SRC_DIR)
-	tar xzf $< -C $(LIBS_SRC_DIR)
-
-## unbound
-$(UNBOUND_LIB): $(UNBOUND_DIR) $(LDNS_LIB) $(OPENSSL_LIB)
-	(cd $< && \
-	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared \
-	    --with-ssl=$(OPENSSL_LIB) --with-ldns=$(LDNS_LIB) --without-libevent \
-	    --with-pic --prefix=$@ $(CONFIGURE_ARGS) --with-libunbound-only && \
-	    $(MAKE_CMD) && $(MAKE_CMD) install)
-
-$(UNBOUND_DIR): $(UNBOUND_TARBALL) $(LIBS_SRC_DIR)
-	tar xzf $< -C $(LIBS_SRC_DIR)
-
-# Build the plugin.
+# Build the plug-in.
 plugin:
+	$(MAKE_CMD) -f Makefile.static_libs CONFIGURE_ARGS=$(CONFIGURE_ARGS) STATIC_LINKING=$(STATIC_LINKING)
 	$(MAKE_CMD) -f $(MAKE_OS) UNIXOID=$(UNIXOID) UNIXOID_LC=$(UNIXOID_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) $(ARCH)
 	$(MAKE_CMD) -f $(MAKE_OS) UNIXOID=$(UNIXOID) UNIXOID_LC=$(UNIXOID_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) $(XPI)
 
 # Cleans built files.
 clean:
-	rm -rf $(LIBS_BUILT_DIR)
-	rm -rf $(LIBS_SRC_DIR)
+	$(MAKE_CMD) -f Makefile.static_libs clean-static-libs
 	rm -rf $(FIREBREATH_DIR)
 	rm -rf CMakeCache.txt CMakeFiles/ cmake_install.cmake
 
 # Cleans even more.
 scour: clean
-	rm -rf $(LIBS_ARCHIVE_DIR)
+	$(MAKE_CMD) -f Makefile.static_libs scour-static-libs

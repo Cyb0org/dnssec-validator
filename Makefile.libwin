@@ -74,6 +74,7 @@ libsource:
 
 sys_windows_openssl:
 	@echo '### Compiling library for Windows... ###'
+	rm -rf libswin/windows
 	cd libswin && mkdir windows && cd windows && mkdir x86 && cd x86 && mkdir ldns && cd .. && cd ..
 	cd libswin && cd $(OPENSSL) && ./Configure --cross-compile-prefix=$(X86_MINGW_PREFIX) mingw enable-static-engine && make && ln -s . lib && cd .. && ln -s $(OPENSSL) openssl && cp $(OPENSSL)/libssl.a windows/x86 && cp $(OPENSSL)/libcrypto.a windows/x86
 
