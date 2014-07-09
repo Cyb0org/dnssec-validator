@@ -19,29 +19,8 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC/TLSA Validator 2 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-window.addEventListener("load", function() {
-	cz.nic.extension.daneExtension.init();
-}, false);
-window.addEventListener("unload", function() {
-	cz.nic.extension.daneExtension.uninit();
-}, false);
-
-
-// **********************************************************************
-/* onPageLoad: observe that page is completed in any tabs or window */
-// **********************************************************************
-function onPageLoad(event) {
-
-	//if (cz.nic.extension.daneExtension.debugOutput)
-	//dump(cz.nic.extension.tlsaValidator.DANE_DEBUG_PRE + "+++++++PAGE WAS LOADED++++++++++++" + cz.nic.extension.tlsaValidator.DANE_DEBUG_POST);
-	if (event.originalTarget instanceof HTMLDocument) {
-		var win = event.originalTarget.defaultView;
-		if (win.frameElement) {
-			win = win.top;
-		}
-	}
-};
-
+window.addEventListener("load", function() { cz.nic.extension.daneExtension.init();}, false);
+window.addEventListener("unload", function() {cz.nic.extension.daneExtension.uninit();}, false);
 
 // **********************************************
 /* Observe preference changes */
@@ -251,7 +230,7 @@ init:
 
 		// Listen for webpage events
 		gBrowser.addProgressListener(cz.nic.extension.daneExtUrlBarListener);
-		gBrowser.addEventListener("load", onPageLoad, true);
+
 		cz.nic.extension.tlsaExtCache.init();
 
 		var clearcache = cz.nic.extension.dnssecExtPrefs.getBool("clearcache");
@@ -310,7 +289,6 @@ uninit:
 		}
 
 		gBrowser.removeProgressListener(cz.nic.extension.daneExtUrlBarListener);
-		//gBrowser.removeEventListener("load", onPageLoad, true);
 
 		// Unregister preferences observer
 		cz.nic.extension.daneExtPrefObserver.unregister();
@@ -322,8 +300,6 @@ uninit:
 		dsp.TLSACacheFree();
 
 		cz.nic.extension.tlsaExtCache.delAllRecords();
-
-		gBrowser.removeEventListener("load", onPageLoad, true);
 
 		if (this.debugOutput) {
 			dump(this.debugPrefix + 'Clear Cache...\n');

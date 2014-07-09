@@ -22,11 +22,6 @@ DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
 Components.utils.import("resource://gre/modules/ctypes.jsm");
 Components.utils.import("resource://gre/modules/AddonManager.jsm"); 
 
-//Define our namespace
-//if(!cz) var cz={};
-//if(!cz.nic) cz.nic={};
-//if(!cz.nic.extension) cz.nic.extension={};
-
 // libCore object
 cz.nic.extension.libCore = {
 

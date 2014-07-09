@@ -19,13 +19,6 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-
-//Define our namespace
-if(!cz) var cz={};
-if(!cz.nic) cz.nic={};
-if(!cz.nic.extension) cz.nic.extension={};
-
-
 cz.nic.extension.dnssecExtAbout = {
 
 prefObj :
