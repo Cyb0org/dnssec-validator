@@ -22,9 +22,9 @@ DNSSEC/TLSA Validator 2 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 // DNSSEC NPAPI constant returned by binary plugin
 
 //Define our namespace
-if(!cz) var cz={};
-if(!cz.nic) cz.nic={};
-if(!cz.nic.extension) cz.nic.extension={};
+//if(!cz) var cz={};
+//if(!cz.nic) cz.nic={};
+//if(!cz.nic.extension) cz.nic.extension={};
 
 	
 cz.nic.extension.dnssecExtNPAPIConst = {

@@ -23,9 +23,9 @@ Components.utils.import("resource://gre/modules/ctypes.jsm");
 Components.utils.import("resource://gre/modules/AddonManager.jsm"); 
 
 //Define our namespace
-if(!cz) var cz={};
-if(!cz.nic) cz.nic={};
-if(!cz.nic.extension) cz.nic.extension={};
+//if(!cz) var cz={};
+//if(!cz.nic) cz.nic={};
+//if(!cz.nic.extension) cz.nic.extension={};
 
 // libCore object
 cz.nic.extension.libCore = {
