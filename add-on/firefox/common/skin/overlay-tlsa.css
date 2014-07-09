@@ -41,6 +41,9 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
   list-style-image: url("chrome://dnssec/skin/tlsa_invalid.png"); /* 19x19 */
 }
 
+
+#tlsa-box.dm_errorgeneric > #tlsa-icon,
+#tlsa-box.dm_error > #tlsa-icon,
 #tlsa-box.dm_error > #tlsa-icon,
 #tlsa-box.dm_wrongres > #tlsa-icon,
 #tlsa-box.dm_rfesolverfailed > #tlsa-icon {
@@ -141,6 +144,8 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 /* error */
+
+#tlsa-popup.dm_errorgeneric > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
 #tlsa-popup.dm_error > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
 #tlsa-popup.dm_rfesolverfailed > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon,
 #tlsa-popup.dm_wrongres > #tlsa-popup-container > #tlsa-popup-content-box > #tlsa-popup-icon {

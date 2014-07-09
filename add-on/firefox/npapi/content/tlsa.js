@@ -233,11 +233,13 @@ init:
 			dump(this.debugPrefix + 'Start of add-on\n');
 		}
 
-		var dsp = document.getElementById("dane-tlsa-plugin");
-		dsp.TLSACacheInit();
-
-		// Set inaction mode (no icon)
-		cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_INACTION);
+		try {
+			var dsp = document.getElementById("dane-tlsa-plugin");
+			dsp.TLSACacheInit();
+			cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_INACTION);
+		} catch(e) {
+			cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_ERROR_GENERIC);
+		}
 
 		// Register preferences observer
 		cz.nic.extension.daneExtPrefObserver.register();
@@ -792,7 +794,7 @@ check_tlsa_tab_change:
 				dump(this.DANE_DEBUG_PRE + 'Error: TLSA plugin call failed!' + this.DANE_DEBUG_POST);
 				dump(this.DANE_DEBUG_PRE + "----------- TLSA validation end --------------" + this.DANE_DEBUG_POST);
 			}
-			cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_ERROR);
+			cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_ERROR_GENERIC);
 			return null;
 
 		}
@@ -944,7 +946,7 @@ check_tlsa_https:
 				dump(this.DANE_DEBUG_PRE + "----------- TLSA VALIDATION END --------------" + this.DANE_DEBUG_POST);
 			}
 			// Set error mode
-			cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_ERROR);
+			cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_ERROR_GENERIC);
 			return;
 		}
 
@@ -1004,6 +1006,7 @@ DANE_MODE_INACTION 				: "dm_inaction",
 DANE_MODE_VALIDATION_OFF   			: "dm_validationoff",
 DANE_MODE_ACTION   				: "dm_action",
 DANE_MODE_ERROR 				: "dm_error",
+DANE_MODE_ERROR_GENERIC				: "dm_errorgeneric",
 DANE_MODE_RESOLVER_FAILED     			: "dm_rfesolverfailed",
 DANE_MODE_DNSSEC_BOGUS				: "dm_dnssecbogus",
 DANE_MODE_DNSSEC_UNSECURED			: "dm_dnssecunsecured",
@@ -1123,6 +1126,8 @@ _utf8HostName : null,
 		        this._stringBundle.getString("dane.mode.validation.off");
 		this._securityText[this.DANE_MODE_WRONG_RESOLVER] =
 		        this._stringBundle.getString("dane.mode.wrong.resolver");
+		this._securityText[this.DANE_MODE_ERROR_GENERIC] =
+		        this._stringBundle.getString("dane.mode.error.generic");
 		return this._securityText;
 	},
 
@@ -1136,6 +1141,8 @@ _utf8HostName : null,
 
 		this._securityDetail[this.DANE_MODE_ERROR] =
 		        this._stringBundle.getString("dane.mode.error.detail");
+		this._securityDetail[this.DANE_MODE_ERROR_GENERIC] =
+		        this._stringBundle.getString("dane.mode.error.generic.detail");
 		this._securityDetail[this.DANE_MODE_RESOLVER_FAILED] =
 		        this._stringBundle.getString("dane.mode.resolver.failed.detail");
 		this._securityDetail[this.DANE_MODE_DNSSEC_BOGUS] =
@@ -1315,7 +1322,7 @@ setSecurityState :
 			this.setMode(this.DANE_MODE_WRONG_RESOLVER);
 			break;
 		default:
-			this.setMode(this.DANE_MODE_ERROR);
+			this.setMode(this.DANE_MODE_ERROR_GENERIC);
 			break;
 		}
 	},
@@ -1380,6 +1387,7 @@ setSecurityMessages :
 			tooltip = this._tooltipLabel[this.DANE_TOOLTIP_NO_TLSA_RECORD];
 			break;
 		case this.DANE_MODE_ERROR:
+		case this.DANE_MODE_ERROR_GENERIC:
 		case this.DANE_MODE_RESOLVER_FAILED:
 			tooltip = this._tooltipLabel[this.DANE_TOOLTIP_FAILED_RESOLVER];
 			break;

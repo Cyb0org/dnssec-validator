@@ -137,14 +137,19 @@ init:
 			dump(this.debugPrefix + 'Start of add-on\n');
 		}
 
-		var dsp = document.getElementById("dnssec-plugin");
-		dsp.DNSSECCacheInit();
+		try {
+			var dsp = document.getElementById("dnssec-plugin");
+			dsp.DNSSECCacheInit();
+			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_INACTION);
+		} catch(e) {
+			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR_GENERIC);
+		}
 
 		// Enable asynchronous resolving if desired
 		this.getAsyncResolveFlag();
 
 		// Set inaction mode (no icon)
-		cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_INACTION);
+
 
 		// Change popup-window fore/background color if desired
 		this.getPopupColors();
@@ -368,7 +373,7 @@ doNPAPIvalidation:
 		} catch (ex) {
 			dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Error: Plugin call failed!\n');
 			// Set error mode
-			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR);
+			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR_GENERIC);
 			// Reset resolving flag
 			cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
 
@@ -415,7 +420,7 @@ revalidate:
 				dump(dnssecExtension.debugPrefix + 'Error: Plugin call failed!\n');
 			}
 			// Set error mode
-			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR);
+			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR_GENERIC);
 
 			// Reset resolving flag
 			cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
@@ -663,7 +668,7 @@ DNSSEC_MODE_INACTION : "inactionDnssec",
 DNSSEC_MODE_ERROR : "errorDnssec",
 // 0. DNSSEC OFF
 DNSSEC_MODE_OFF   : "dnssecOff",
-DNSSEC_MODE_ERROR_GENERIC : "GenericError",
+DNSSEC_MODE_ERROR_GENERIC : "genericError",
 
 	// Tooltips
 DNSSEC_TOOLTIP_SECURED   : "securedTooltip",
@@ -687,6 +692,9 @@ valstate : 0,
 		delete this._domainPreText;
 		this._domainPreText = {};
 
+		// DNSSEC error
+		this._domainPreText[this.DNSSEC_MODE_ERROR_GENERIC] =
+		        this._stringBundle.getString("domain");
 		// 0. DNSSEC error
 		this._domainPreText[this.DNSSEC_MODE_ERROR] =
 		        this._stringBundle.getString("domain");
@@ -731,6 +739,9 @@ valstate : 0,
 		delete this._securityText;
 		this._securityText = {};
 
+		// DNSSEC error
+		this._securityText[this.DNSSEC_MODE_ERROR_GENERIC] =
+		        this._stringBundle.getString("dnssecgenericError");
 		// 0. DNSSEC error
 		this._securityText[this.DNSSEC_MODE_ERROR] =
 		        this._stringBundle.getString("0dnssecError");
@@ -758,7 +769,6 @@ valstate : 0,
 		// 8. Domain name does not exist but browser got address 
 		this._securityText[this.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID_BAD_IP] =
 		        this._stringBundle.getString("8securedConnectionNoDomainIPaddr");
-
 		// -1. Validator OFF
 		this._securityText[this.DNSSEC_MODE_OFF] =
 		        this._stringBundle.getString("dnsseOff");
@@ -778,6 +788,9 @@ valstate : 0,
 		delete this._securityDetail;
 		this._securityDetail = {};
 
+		// DNSSEC error
+		this._securityDetail[this.DNSSEC_MODE_ERROR_GENERIC] =
+		        this._stringBundle.getString("dnssecgenericErrorInfo");
 		// 0. DNSSEC error
 		this._securityDetail[this.DNSSEC_MODE_ERROR] =
 		        this._stringBundle.getString("0dnssecErrorInfo");

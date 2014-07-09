@@ -28,6 +28,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
   list-style-image: url("chrome://dnssec/skin/dnssec_valid.png"); /* 35x16 */
 }
 
+#dnssec-box.genericError > #dnssec-icon,
 #dnssec-box.unboundnodata > #dnssec-icon,
 #dnssec-box.wrongresolver > #dnssec-icon,
 #dnssec-box.errorDnssec > #dnssec-icon {
@@ -218,6 +219,9 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 /* grey with error */
+
+
+#dnssec-popup.genericError > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.unboundnodata > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.errorDnssec > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon,
 #dnssec-popup.wrongresolver > #dnssec-popup-container > #dnssec-popup-content-box > #dnssec-popup-icon {
@@ -339,6 +343,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #dnssec-popup-content-box > #dnssec-popup-content-box2.unboundnodata > #dnssec-popup-wrongresLabel,
 #dnssec-popup-content-box > #dnssec-popup-content-box2.wrongresolver > #dnssec-popup-wrongresLabel,
 #dnssec-popup-content-box > #dnssec-popup-content-box2.errorDnssec > #dnssec-popup-errorLabel,
+#dnssec-popup-content-box > #dnssec-popup-content-box2.genericError > #dnssec-popup-errorLabel,
 #dnssec-popup-content-box > #dnssec-popup-content-box2.securedConnectionNoDomainIPaddr > #dnssec-popup-securedLabel,
 #dnssec-popup-content-box3.securedConnectionNoDomainIPaddr > #dnssec-popup-domainLabel,
 #dnssec-popup-content-box3.securedConnectionNoDomainIPaddr > #dnssec-popup-securedDomainLabel,
