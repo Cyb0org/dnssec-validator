@@ -19,9 +19,9 @@
 # DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 # ***** END LICENSE BLOCK *****
 
-UNIXOID = FreeBSD
+OSNAME = FreeBSD
 # Lower case.
-UNIXOID_LC = freebsd
+OSNAME_LC = freebsd
 MAKE_CMD = gmake
 SHELL_CMD = bash
 

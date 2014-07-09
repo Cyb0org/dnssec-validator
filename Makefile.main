@@ -12,37 +12,45 @@ include Makefile.layout
 # PLUGIN_BINARY_TREE is necessary because Mac has dirtree structure instead of
 # a single file.
 MAKE_CMD ?= make
-UNIXOID ?= UNIX
-UNIXOID_LC ?= unix
+OSNAME ?= UNIX
+OSNAME_LC ?= unix
+HWARCH = default
+CORE_TGT = sys_unknown
+XPI_TGT = xpi_unknown
 ifeq ($(OS_TARGET),UNIX)
   MAKE_OS := Makefile.unix
   ifeq ($(BUILD_64BIT),1)
-    ARCH := sys_$(UNIXOID_LC)_x64
-    XPI := xpi_x64
+    HWARCH = x64
+    CORE_TGT := sys_$(OSNAME_LC)_$(HWARCH)
+    XPI_TGT = xpi_$(HWARCH)
   else
-    ARCH := sys_$(UNIXOID_LC)_x86
-    XPI := xpi_x86
+    HWARCH = x86
+    CORE_TGT := sys_$(OSNAME_LC)_$(HWARCH)
+    XPI_TGT = xpi_$(HWARCH)
   endif
 endif
 ifeq ($(OS_TARGET),MAC)
   MAKE_OS := Makefile.mac
   ifeq ($(BUILD_MAC96),1)
-    ARCH := sys_macosx
-    XPI := xpi
+    CORE_TGT := sys_macosx
+    XPI_TGT := xpi
   else	
     ifeq ($(BUILD_64BIT),1)
-      ARCH := sys_macosx_x64
-      XPI := xpi_x64
-    else 
-      ARCH := sys_macosx_x86
-      XPI := xpi_x86
+      HWARCH = x64
+      CORE_TGT := sys_macosx_$(HWARCH)
+      XPI_TGT = xpi_$(HWARCH)
+    else
+      HWARCH = x86
+      CORE_TGT := sys_macosx_$(HWARCH)
+      XPI_TGT = xpi_$(HWARCH)
     endif 
   endif 
 endif
 ifeq ($(OS_TARGET),WINDOWS)
   MAKE_OS := Makefile.win
-  ARCH := sys_windows_x86
-  XPI := xpi_x86
+  HWARCH = x86
+  CORE_TGT := sys_windows_$(HWARCH)
+  XPI_TGT = xpi_$(HWARCH)
 endif
 
 ## uncomment to make plug-in build verbose - shows gcc invocations etc.
@@ -63,9 +71,9 @@ download-git-firebreath:
 
 # Build the plug-in.
 plugin:
-	$(MAKE_CMD) -f Makefile.static_libs CONFIGURE_ARGS=$(CONFIGURE_ARGS) STATIC_LINKING=$(STATIC_LINKING)
-	$(MAKE_CMD) -f $(MAKE_OS) UNIXOID=$(UNIXOID) UNIXOID_LC=$(UNIXOID_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) $(ARCH)
-	$(MAKE_CMD) -f $(MAKE_OS) UNIXOID=$(UNIXOID) UNIXOID_LC=$(UNIXOID_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) $(XPI)
+	$(MAKE_CMD) -f Makefile.static_libs CONFIGURE_ARGS=$(CONFIGURE_ARGS) OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) HWARCH=$(HWARCH) STATIC_LINKING=$(STATIC_LINKING)
+	$(MAKE_CMD) -f $(MAKE_OS) OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) HWARCH=$(HWARCH) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) $(CORE_TGT)
+	$(MAKE_CMD) -f $(MAKE_OS) OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) HWARCH=$(HWARCH) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) $(XPI_TGT)
 
 # Cleans built files.
 clean:

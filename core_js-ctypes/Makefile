@@ -22,25 +22,26 @@
 
 .PHONY: all clean
 
+include ../Makefile.layout
 
-UNIXOID ?= UNIX
+
+OSNAME ?= UNIX
 # Lower case.
-UNIXOID_LC ?= unix
-MAKE_CMD ?= gmake
+OSNAME_LC ?= unix
+MAKE_CMD ?= make
 SHELL_CMD ?= bash
 
 
 BASEDIR = ..
-LIBS_BUILT_DIR = libs-built
-OPENSSL_LIB := $(BASEDIR)/$(LIBS_BUILT_DIR)/openssl
-LDNS_LIB := $(BASEDIR)/$(LIBS_BUILT_DIR)/ldns
-UNBOUND_LIB := $(BASEDIR)/$(LIBS_BUILT_DIR)/unbound
+OPENSSL_LIB = $(BASEDIR)/$(LIBS_BUILT_DIR)/openssl
+LDNS_LIB = $(BASEDIR)/$(LIBS_BUILT_DIR)/ldns
+UNBOUND_LIB = $(BASEDIR)/$(LIBS_BUILT_DIR)/unbound
 
 
 # Determine OS type
 KERNEL = $(shell uname -s | tr '[:upper:]' '[:lower:]')
 # Determine achitexture.
-ARCH = $(shell uname -m | tr '[:upper:]' '[:lower:]' | sed -e 's/amd64/x86_64/g')
+#ARCH = $(shell uname -m | tr '[:upper:]' '[:lower:]' | sed -e 's/amd64/x86_64/g')
 
 
 # OS dependent stuff.
@@ -138,7 +139,7 @@ else
 endif
 
 
-TARGETS := libDNSSECcore-$(UNIXOID_LC)-$(ARCH).so libDANEcore-$(UNIXOID_LC)-$(ARCH).so
+TARGETS := libDNSSECcore-$(OSNAME_LC)-$(HWARCH).so libDANEcore-$(OSNAME_LC)-$(HWARCH).so
 
 all: $(TARGETS)
 
@@ -150,14 +151,14 @@ clean:
 common.o: ../plugin-source/common/common.c ../plugin-source/common/common.h
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
-libDNSSECcore-$(UNIXOID_LC)-$(ARCH).so: dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
+libDNSSECcore-$(OSNAME_LC)-$(HWARCH).so: dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
 	$(CC) $^ -o $@ $(LDFLAGS) -shared -Wl,-version-script -Wl,./libDNSSECcore.ver
 
 #checkDNSSEClib.o: checkDNSSEClib.c
 #	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/DNSSECValidatorPlugin
 
-#checkDNSSEClib: checkDNSSEClib.o libDNSSECcore-$(UNIXOID_LC)-$(ARCH).so
-#	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDNSSECcore-$(UNIXOID_LC)-$(ARCH)
+#checkDNSSEClib: checkDNSSEClib.o libDNSSECcore-$(OSNAME_LC)-$(HWARCH).so
+#	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDNSSECcore-$(OSNAME_LC)-$(HWARCH)
 
 #dnssec-plug: dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
 #	$(CC) $^ -o $@ $(LDFLAGS)
@@ -165,14 +166,14 @@ libDNSSECcore-$(UNIXOID_LC)-$(ARCH).so: dnssec-plug.o common.o $(LOG_OBJ) $(STAT
 dnssec-plug.o: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
-libDANEcore-$(UNIXOID_LC)-$(ARCH).so: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
+libDANEcore-$(OSNAME_LC)-$(HWARCH).so: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
 	$(CC) $^ -o $@ $(LDFLAGS) -shared -Wl,-version-script -Wl,./libDANEcore.ver
 
 #checkDANElib.o: checkDANElib.c
 #	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/TLSAValidatorPlugin
 
-#checkDANElib: checkDANElib.o libDANEcore-$(UNIXOID_LC)-$(ARCH).so
-#	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDANEcore-$(UNIXOID_LC)-$(ARCH)
+#checkDANElib: checkDANElib.o libDANEcore-$(OSNAME_LC)-$(ARCH).so
+#	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDANEcore-$(OSNAME_LC)-$(ARCH)
 
 #dane-plug: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
 #	$(CC) $^ -o $@ $(LDFLAGS)

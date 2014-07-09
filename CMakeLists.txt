@@ -57,8 +57,8 @@ ELSEIF(UNIX)
     IF(APPLE)
         CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
         SET(OS_TARGET "MAC")
-	SET(UNIXOID "MacOSX")
-	SET(UNIXOID_LC "macosx")
+	SET(OSNAME "MacOSX")
+	SET(OSNAME_LC "macosx")
         IF(BUILD_64BIT)
             SET(OPENSSL_ARGS "darwin64-x86_64-cc ${LIB_CFLAGS}")
             SET(CONFIGURE_ARGS "--target=x86_64-apple-darwin11")
@@ -74,8 +74,8 @@ ELSEIF(UNIX)
         SET(OS_TARGET "UNIX")
 	IF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
             SET(MAKE_CMD "gmake")
-            SET(UNIXOID "FreeBSD")
-            SET(UNIXOID_LC "freebsd")
+            SET(OSNAME "FreeBSD")
+            SET(OSNAME_LC "freebsd")
             IF(BUILD_64BIT)
 	        SET(OPENSSL_ARGS "BSD-x86_64 ${LIB_CFLAGS}")
 	        SET(CONFIGURE_ARGS "--target=x86_64-pc-freebsd")
@@ -84,8 +84,8 @@ ELSEIF(UNIX)
             ENDIF()
         ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
             SET(MAKE_CMD "make")
-            SET(UNIXOID "Linux")
-            SET(UNIXOID_LC "linux")
+            SET(OSNAME "Linux")
+            SET(OSNAME_LC "linux")
             IF(BUILD_64BIT)
                 SET(OPENSSL_ARGS "linux-x86_64 ${LIB_CFLAGS}")
                 SET(CONFIGURE_ARGS "--target=x86_64-pc-linux-gnu")
@@ -118,8 +118,8 @@ ADD_CUSTOM_COMMAND(TARGET RecursiveBuild
         XPI_ARCH=${TARGET_ARCH}
         BUILD_64BIT=${BUILD_64BIT}
         BUILD_MAC96=${BUILD_MAC96}
-        UNIXOID=${UNIXOID}
-        UNIXOID_LC=${UNIXOID_LC}
+        OSNAME=${OSNAME}
+        OSNAME_LC=${OSNAME_LC}
 	MAKE_CMD=${MAKE_CMD}
 	STATIC_LINKING=${STATIC_LINKING}
 	INCLUDE_LOC=${INCLUDE_LOC}
