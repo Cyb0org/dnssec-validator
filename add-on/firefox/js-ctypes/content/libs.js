@@ -39,16 +39,17 @@ dnssec_init: function() {
 		// Loading from OS DNSSEC lib.         
 		try {
 			if(os.match("Darwin")) {
-				var dnssecLibName = "libDNSSECcore.dylib";
+				var dnssecLibName = "libDNSSECcore-osx.dylib";
 			} else if(os.match("WINNT")) {
-				var dnssecLibName = "libDNSSECcore.dll";
+				var dnssecLibName = "libDNSSECcore-win.dll";
 			} else if(os.match("Linux")) {
-				var dnssecLibName = "libDNSSECcore.so";
+				var dnssecLibName = "libDNSSECcore-linux.so";
 			} else if(os.match("FreeBSD")) {
-				var dnssecLibName = "libDNSSECcore.so";
+				var dnssecLibName = "libDNSSECcore-freebsd.so";
 			}
 
 			cz.nic.extension.libCore._initDnssecLib(dnssecLibName);
+			return true;
 
 		} catch(e) {
 			// Failed loading from OS lib. Fall back to library distributed with plugin. 
@@ -72,7 +73,7 @@ dnssec_init: function() {
 						dump(cz.nic.extension.dnssecExtension.debugPrefix + 
 						"Error: Unknown architecture of Linux!\n");
 					}
-					return;
+					return false;
 				}
 
 			} else if (os.match("FreeBSD")) {
@@ -87,7 +88,7 @@ dnssec_init: function() {
 						dump(cz.nic.extension.dnssecExtension.debugPrefix + 
 						"Error: Unknown architecture of FreeBSD!\n");
 					}
-					return;
+					return false;
 				}
 
 			} else if(os.match("WINNT")) {
@@ -99,9 +100,10 @@ dnssec_init: function() {
 					dump(cz.nic.extension.dnssecExtension.debugPrefix + 
 					"Error: Unsupported OS!\n");
 				}
-				return;
+				return false;
 			}
 			cz.nic.extension.libCore._initDnssecLib(dnssecLibName);
+			return true;
 		}
 
 	});
@@ -119,16 +121,17 @@ dane_init: function() {
 		// Loading from OS DANE libs.         
 		try {
 			if(os.match("Darwin")) {
-				var tlsaLibName = "libDANEcore.dylib";
+				var tlsaLibName = "libDANEcore-osx.dylib";
 			} else if(os.match("WINNT")) {
-				var tlsaLibName = "libDANEcore.dll";
+				var tlsaLibName = "libDANEcore-win.dll";
 			} else if(os.match("Linux")) {
-				var tlsaLibName = "libDANEcore.so";
+				var tlsaLibName = "libDANEcore-linux.so";
 			} else if(os.match("FreeBSD")) {
-				var tlsaLibName = "libDANEcore.so";
+				var tlsaLibName = "libDANEcore-freebsd.so";
 			}
 
 			cz.nic.extension.libCore._initTlsaLib(tlsaLibName);
+			return true;
 
 		} catch(e) {
 			// Failed loading from OS libs. Fall back to libraries distributed with plugin. 
@@ -153,7 +156,7 @@ dane_init: function() {
 						dump(cz.nic.extension.dnssecExtension.debugPrefix + 
 						"Error: Unknown architecture of Linux!\n");				
 					}
-					return;
+					return false;
 				}
 
 			} else if (os.match("FreeBSD")) {
@@ -168,7 +171,7 @@ dane_init: function() {
 						dump(cz.nic.extension.dnssecExtension.debugPrefix + 
 						"Error: Unknown architecture of FreeBSD!\n");
 					}
-					return;
+					return false;
 				}
 
 			} else if(os.match("WINNT")) {
@@ -179,9 +182,10 @@ dane_init: function() {
 					dump(cz.nic.extension.dnssecExtension.debugPrefix + 
 					"Error: Unsupported OS!\n");
 				}
-				return;
+				return false;
 			}
 			cz.nic.extension.libCore._initTlsaLib(tlsaLibName);
+			return true;
 		}
 
 	});

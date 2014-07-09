@@ -138,13 +138,15 @@ init:
 		}
 
 		// Plugin initialization
-		cz.nic.extension.libCore.dnssec_init();
+		if (cz.nic.extension.libCore.dnssec_init()) {
+			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_INACTION);
+		} else {
+			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR_GENERIC);
+		}
 
 		// Enable asynchronous resolving if desired
 		this.getAsyncResolveFlag();
 
-		// Set inaction mode (no icon)
-		cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_INACTION);
 
 		// Change popup-window fore/background color if desired
 		this.getPopupColors();
@@ -358,7 +360,7 @@ dnssecValidate:
 		} catch (ex) {
 			dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Error: Plugin validation method call failed!\n');
 			// Set error mode
-			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR);
+			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR_GENERIC);
 			// Reset resolving flag
 			cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
 			return;
@@ -578,7 +580,7 @@ DNSSEC_MODE_INACTION : "inactionDnssec",
 DNSSEC_MODE_ERROR : "errorDnssec",
 // 0. DNSSEC OFF
 DNSSEC_MODE_OFF   : "dnssecOff",
-DNSSEC_MODE_ERROR_GENERIC : "GenericError",
+DNSSEC_MODE_ERROR_GENERIC : "genericError",
 
 	// Tooltips
 DNSSEC_TOOLTIP_SECURED   : "securedTooltip",
@@ -602,6 +604,9 @@ valstate : 0,
 		delete this._domainPreText;
 		this._domainPreText = {};
 
+		// DNSSEC error
+		this._domainPreText[this.DNSSEC_MODE_ERROR_GENERIC] =
+		        this._stringBundle.getString("domain");
 		// 0. DNSSEC error
 		this._domainPreText[this.DNSSEC_MODE_ERROR] =
 		        this._stringBundle.getString("domain");
@@ -646,6 +651,9 @@ valstate : 0,
 		delete this._securityText;
 		this._securityText = {};
 
+		// DNSSEC error
+		this._securityText[this.DNSSEC_MODE_ERROR_GENERIC] =
+		        this._stringBundle.getString("dnssecgenericError");
 		// 0. DNSSEC error
 		this._securityText[this.DNSSEC_MODE_ERROR] =
 		        this._stringBundle.getString("0dnssecError");
@@ -693,6 +701,9 @@ valstate : 0,
 		delete this._securityDetail;
 		this._securityDetail = {};
 
+		// DNSSEC error
+		this._securityDetail[this.DNSSEC_MODE_ERROR_GENERIC] =
+		        this._stringBundle.getString("dnssecgenericErrorInfo");
 		// 0. DNSSEC error
 		this._securityDetail[this.DNSSEC_MODE_ERROR] =
 		        this._stringBundle.getString("0dnssecErrorInfo");
@@ -968,7 +979,7 @@ checkSecurity :
 			dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Error: Browser\'s async DNS lookup failed!\n');
 
 			// Set error mode
-			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR);
+			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR_GENERIC);
 
 			// Reset resolving flag
 			cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
