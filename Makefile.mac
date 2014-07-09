@@ -117,6 +117,8 @@ xpi_x86:
 	@echo
 	@echo
 	@echo
+	@echo
+	@echo
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Chrome $(UNIXOID) x86... ###'
@@ -190,6 +192,8 @@ xpi_x64:
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating js-ctypes package for Firefox $(UNIXOID) x64... ###'
+	@echo
+	@echo
 	@echo
 	@echo
 	@echo
