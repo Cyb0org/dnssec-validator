@@ -146,6 +146,9 @@ xpi_x86:
 	@echo
 	@echo
 	@echo
+	@echo
+	@echo
+	@echo
 
 npapi_x64:
 	@echo '### ...Creating NPAPI plugin library for $(OSNAME) x64... ###'
@@ -230,6 +233,9 @@ xpi_x64:
 	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.so
 	cd $(ADDON_PATH_OP_TLSA) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_TLSA)_x64.so
 	@echo '### DONE... ###'
+	@echo
+	@echo
+	@echo
 	@echo
 	@echo
 	@echo

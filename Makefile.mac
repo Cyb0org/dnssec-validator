@@ -144,7 +144,10 @@ xpi_x86:
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Safari $(OSNAME) ... ###'
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86.plugin $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86.plugin $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin
 	./install_osx_safari_add_payload.sh
+	rm -rf $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin
 	@echo '### DONE... ###'
 
 npapi_x64:
@@ -231,7 +234,10 @@ xpi_x64:
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Safari $(OSNAME) ... ###'
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.plugin $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
+	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x64.plugin $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin
 	./install_osx_safari_add_payload.sh
+	rm -rf $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin
 	@echo '### DONE... ###'
 
 clean:
