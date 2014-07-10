@@ -30,6 +30,7 @@ OSNAME ?= UNIX
 OSNAME_LC ?= unix
 MAKE_CMD ?= make
 SHELL_CMD ?= bash
+SHLIB_SUFF ?= so
 
 
 BASEDIR = ..
@@ -83,6 +84,7 @@ LDFLAGS += -lpthread
 ifeq ($(KERNEL),darwin)
   CPPFLAGS += -DTGT_SYSTEM=TGT_OSX
   LOG_OBJ = log_osx.o
+  SHLIB_SUFF = dylib
 else
   # Default settings.
   LOG_OBJ = log_dflt.o
@@ -139,7 +141,7 @@ else
 endif
 
 
-TARGETS := libDNSSECcore-$(OSNAME_LC)-$(HWARCH).so libDANEcore-$(OSNAME_LC)-$(HWARCH).so
+TARGETS := libDNSSECcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF) libDANEcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF)
 
 all: $(TARGETS)
 
@@ -151,13 +153,13 @@ clean:
 common.o: ../plugin-source/common/common.c ../plugin-source/common/common.h
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
-libDNSSECcore-$(OSNAME_LC)-$(HWARCH).so: dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
+libDNSSECcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF): dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
 	$(CC) $^ -o $@ $(LDFLAGS) -shared -Wl,-version-script -Wl,./libDNSSECcore.ver
 
 #checkDNSSEClib.o: checkDNSSEClib.c
 #	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/DNSSECValidatorPlugin
 
-#checkDNSSEClib: checkDNSSEClib.o libDNSSECcore-$(OSNAME_LC)-$(HWARCH).so
+#checkDNSSEClib: checkDNSSEClib.o libDNSSECcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF)
 #	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDNSSECcore-$(OSNAME_LC)-$(HWARCH)
 
 #dnssec-plug: dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
@@ -166,13 +168,13 @@ libDNSSECcore-$(OSNAME_LC)-$(HWARCH).so: dnssec-plug.o common.o $(LOG_OBJ) $(STA
 dnssec-plug.o: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
-libDANEcore-$(OSNAME_LC)-$(HWARCH).so: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
+libDANEcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF): dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
 	$(CC) $^ -o $@ $(LDFLAGS) -shared -Wl,-version-script -Wl,./libDANEcore.ver
 
 #checkDANElib.o: checkDANElib.c
 #	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/TLSAValidatorPlugin
 
-#checkDANElib: checkDANElib.o libDANEcore-$(OSNAME_LC)-$(ARCH).so
+#checkDANElib: checkDANElib.o libDANEcore-$(OSNAME_LC)-$(ARCH).$(SHLIB_SUFF)
 #	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDANEcore-$(OSNAME_LC)-$(ARCH)
 
 #dane-plug: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
