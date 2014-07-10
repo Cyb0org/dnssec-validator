@@ -23,14 +23,15 @@
 PLUGIN_ROOT = .
 PLUGIN_SRC_DIR = $(PLUGIN_ROOT)/plugin-source
 PLUGIN_TMP = $(PLUGIN_ROOT)/dll_build
+PLUGIN_LIB_DEST = $(PLUGIN_ROOT)/plugins-lib
 PLUGIN_NAME_DNSSEC = DNSSECValidatorPlugin
 PLUGIN_NAME_TLSA = TLSAValidatorPlugin
-PLUGIN_NAME_DNSSEC_LIB = DNSSECcore-windows-x86.dll
-PLUGIN_NAME_TLSA_LIB = DANEcore-windows-x86.dll
+PLUGIN_NAME_DNSSEC_LIB = libDNSSECcore-windows-x86.dll
+PLUGIN_NAME_TLSA_LIB = libDANEcore-windows-x86.dll
 PLUGIN_NAME_DNSSEC_EXE = DNSSECcore-windows-x86.exe
 PLUGIN_NAME_TLSA_EXE = DANEcore-windows-x86.exe
-PLUGIN_NAME_DNSSEC_DEF = DNSSECcore-windows-x86.def
-PLUGIN_NAME_TLSA_DEF = DANEcore-windows-x86.def
+PLUGIN_NAME_DNSSEC_DEF = libDNSSECcore-windows-x86.def
+PLUGIN_NAME_TLSA_DEF = libDANEcore-windows-x86.def
 PLUGIN_NAME_DNSSEC = DNSSECValidatorPlugin
 PLUGIN_NAME_TLSA = TLSAValidatorPlugin
 PLUGIN_NAME_LIB = libwin
@@ -109,47 +110,54 @@ $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_EXE): $(PLUGIN_TMP)/common.o $(PLUGIN_TMP)/log_
 #	$(X86_MINGW_CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS)
 
 sys_windows_all: $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_LIB) $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_LIB) $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_EXE) $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_EXE)
+	cp $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_LIB) $(PLUGIN_LIB_DEST)
+	cp $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_LIB) $(PLUGIN_LIB_DEST)
+	cp $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_EXE) $(PLUGIN_LIB_DEST)
+	cp $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_EXE) $(PLUGIN_LIB_DEST)
+	cp $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_DEF) $(PLUGIN_LIB_DEST)
+	cp $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_DEF) $(PLUGIN_LIB_DEST)
+	rm -rf $(PLUGIN_TMP)
 	@echo '### Done creating plugin dll for Windows x86. ###'
 
 xpi_x86:
+	@echo '### Creating js-ctypes package for Firefox $(OSNAME) x86... ###'
+	rm -rf $(ADDON_PATH_FF)/js-ctypes_built
+	mkdir $(ADDON_PATH_FF)/js-ctypes_built
+	mkdir $(ADDON_PATH_FF)/js-ctypes_built/plugins
+	cp -r $(ADDON_PATH_FF)/js-ctypes/* $(ADDON_PATH_FF)/js-ctypes_built
+	cp -r $(ADDON_PATH_FF)/common/* $(ADDON_PATH_FF)/js-ctypes_built
+	chmod 777 $(ADDON_PATH_FF)/js-ctypes_built/build.sh
+	cp $(PLUGIN_LIB_DEST)/$(PLUGIN_NAME_DNSSEC_LIB) $(ADDON_PATH_FF)/js-ctypes_built/plugins
+	cp $(PLUGIN_LIB_DEST)/$(PLUGIN_NAME_TLSA_LIB) $(ADDON_PATH_FF)/js-ctypes_built/plugins
+	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>WINNT_x86-msvc<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/js-ctypes_built/install.rdf.template > $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
+	grep -v optionsURL $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx > $(ADDON_PATH_FF)/js-ctypes_built/install.rdf
+	rm $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
+	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/js-ctypes_built/about.template > $(ADDON_PATH_FF)/js-ctypes_built/content/about.xul
+	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
+	cd $(ADDON_PATH_FF)/js-ctypes_built && ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-windows-x86-js-ctypes.xpi
+	@echo '### DONE... ###'
+	@echo '--------------------------------------------------'
 	@echo '### Creating NPAPI packages for Firefox windows x86... ###'
 	rm -rf $(ADDON_PATH_FF)/npapi_built
 	mkdir $(ADDON_PATH_FF)/npapi_built
 	mkdir $(ADDON_PATH_FF)/npapi_built/plugins
 	cp -r $(ADDON_PATH_FF)/npapi/* $(ADDON_PATH_FF)/npapi_built
 	cp -r $(ADDON_PATH_FF)/common/* $(ADDON_PATH_FF)/npapi_built
-	cp $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_LIB) $(ADDON_PATH_FF)/npapi_built/plugins
-	cp $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_LIB) $(ADDON_PATH_FF)/npapi_built/plugins
-	cp $(PLUGIN_TMP)/np$(PLUGIN_NAME_DNSSEC).dll $(ADDON_PATH_FF)/npapi_built/plugins
-	cp $(PLUGIN_TMP)/np$(PLUGIN_NAME_TLSA).dll $(ADDON_PATH_FF)/npapi_built/plugins
+	cp $(PLUGIN_LIB_DEST)/$(PLUGIN_NAME_DNSSEC_LIB) $(ADDON_PATH_FF)/npapi_built/plugins
+	cp $(PLUGIN_LIB_DEST)/$(PLUGIN_NAME_TLSA_LIB) $(ADDON_PATH_FF)/npapi_built/plugins
+	cp $(PLUGIN_LIB_DEST)/np$(PLUGIN_NAME_DNSSEC).dll $(ADDON_PATH_FF)/npapi_built/plugins
+	cp $(PLUGIN_LIB_DEST)/np$(PLUGIN_NAME_TLSA).dll $(ADDON_PATH_FF)/npapi_built/plugins
 	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>WINNT_x86-msvc<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/npapi_built/install.rdf.template > $(ADDON_PATH_FF)/npapi_built/install.rdf
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/npapi_built/about.template > $(ADDON_PATH_FF)/npapi_built/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
-	cd $(ADDON_PATH_FF)/npapi_built && ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-windows-x86.xpi
-	@echo '### DONE... ###'
-	@echo '--------------------------------------------------'
-	@echo '### Creating js-ctypes package for Firefox windows x86... ###'
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
+	cd $(ADDON_PATH_FF)/npapi_built && ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-windows-x86-npapi.xpi
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Chrome windows x86... ###'
-	cp $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_LIB) $(ADDON_PATH_CR)
-	cp $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_LIB) $(ADDON_PATH_CR_TLSA)
-	cp $(PLUGIN_TMP)/np$(PLUGIN_NAME_DNSSEC).dll $(ADDON_PATH_CR)
-	cp $(PLUGIN_TMP)/np$(PLUGIN_NAME_TLSA).dll $(ADDON_PATH_CR_TLSA)
+	cp $(PLUGIN_LIB_DEST)/$(PLUGIN_NAME_DNSSEC_LIB) $(ADDON_PATH_CR)
+	cp $(PLUGIN_LIB_DEST)/$(PLUGIN_NAME_TLSA_LIB) $(ADDON_PATH_CR_TLSA)
+	cp $(PLUGIN_LIB_DEST)/np$(PLUGIN_NAME_DNSSEC).dll $(ADDON_PATH_CR)
+	cp $(PLUGIN_LIB_DEST)/np$(PLUGIN_NAME_TLSA).dll $(ADDON_PATH_CR_TLSA)
 	sed -e 's/dnssecplugin/np$(PLUGIN_NAME_DNSSEC).dll/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR)/manifest.json.template > $(ADDON_PATH_CR)/manifest.json
 	sed -e 's/tlsaplugin/np$(PLUGIN_NAME_TLSA).dll/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/manifest.json.template > $(ADDON_PATH_CR_TLSA)/manifest.json
 	cd add-on && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz chrome2dnssec && mv CR-dnssec_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz ../$(PLUGIN_ADD_ON)
@@ -159,10 +167,10 @@ xpi_x86:
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Opera windows x86... ###'
-	cp $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_LIB) $(ADDON_PATH_OP_DNSSEC)
-	cp $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_LIB) $(ADDON_PATH_OP_TLSA)
-	cp $(PLUGIN_TMP)/np$(PLUGIN_NAME_DNSSEC).dll $(ADDON_PATH_OP_DNSSEC)
-	cp $(PLUGIN_TMP)/np$(PLUGIN_NAME_TLSA).dll $(ADDON_PATH_OP_TLSA)
+	cp $(PLUGIN_LIB_DEST)/$(PLUGIN_NAME_DNSSEC_LIB) $(ADDON_PATH_OP_DNSSEC)
+	cp $(PLUGIN_LIB_DEST)/$(PLUGIN_NAME_TLSA_LIB) $(ADDON_PATH_OP_TLSA)
+	cp $(PLUGIN_LIB_DEST)/np$(PLUGIN_NAME_DNSSEC).dll $(ADDON_PATH_OP_DNSSEC)
+	cp $(PLUGIN_LIB_DEST)/np$(PLUGIN_NAME_TLSA).dll $(ADDON_PATH_OP_TLSA)
 	sed -e 's/dnssecplugin/np$(PLUGIN_NAME_DNSSEC).dll/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_DNSSEC)/manifest.json.template > $(ADDON_PATH_OP_DNSSEC)/manifest.json
 	sed -e 's/tlsaplugin/np$(PLUGIN_NAME_TLSA).dll/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_TLSA)/manifest.json.template > $(ADDON_PATH_OP_TLSA)/manifest.json
 	cd add-on && tar -czf OP-dnssec_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz opera2dnssec && mv OP-dnssec_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz ../$(PLUGIN_ADD_ON)

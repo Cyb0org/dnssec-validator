@@ -31,14 +31,14 @@ add_windows_plugin(${PROJECT_NAME} SOURCES)
 
 # generate .lib from the validating library compiled by mingw
 add_custom_command(TARGET ${PROJNAME} PRE_LINK
-                   COMMAND lib.exe /machine:x86 /def:DANEcore-windows-x86.def
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../dll_build
+                   COMMAND lib.exe /machine:x86 /def:libDANEcore-windows-x86.def
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../plugins-lib
     )
 
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
 target_link_libraries(${PROJNAME}
     ${PLUGIN_INTERNAL_DEPS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../dll_build/DANEcore-windows-x86.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../plugins-lib/libDANEcore-windows-x86.lib
     )
 
 
