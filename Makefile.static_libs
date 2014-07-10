@@ -46,15 +46,16 @@ $(LIBS_SRC_DIR):
 $(OPENSSL_LIB): $(OPENSSL_DIR)
 	# sed on OS X does not handle the 0xA9 (copyright) character well
 	(cd $< && sed -e 's/\(^"BSD-[^"]*",[^g]*\)gcc\(.*\$\)/\1cc\2/g' < Configure > ConfigureBSD || cp Configure ConfigureBSD; chmod +x ConfigureBSD)
-	(cd $< && ./ConfigureBSD no-shared no-krb5 --prefix=$@ $(OPENSSL_ARGS) && $(MAKE_CMD) -j1 && $(MAKE_CMD) -j1 install && $(MAKE_CMD) clean)
+	(cd $< && ./ConfigureBSD no-shared no-krb5 --prefix=$@ $(OPENSSL_ARGS) $(CROSSCOMPILE_OPENSSL_FLAGS) && $(MAKE_CMD) -j1 && $(MAKE_CMD) -j1 install && $(MAKE_CMD) clean)
 
 $(OPENSSL_DIR): $(OPENSSL_TARBALL) $(LIBS_SRC_DIR)
 	tar xzf $< -C $(LIBS_SRC_DIR)
 
 ## ldns
 $(LDNS_LIB): $(LDNS_DIR) $(OPENSSL_LIB)
-	(cd $< && \
-	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared --with-ssl=$(OPENSSL_LIB) --disable-ldns-config --without-pyldnsx \
+	(cd $< && $(CROSSCOMPILE_PREPARATION_EXPORTS) \
+	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared $(CROSSCOMPILE_HOST_FLAGS) \
+	    --with-ssl=$(OPENSSL_LIB) --disable-ldns-config --without-pyldnsx \
 	    --with-pic --prefix=$@ $(CONFIGURE_ARGS) && \
 	    $(MAKE_CMD) && $(MAKE_CMD) install && \
 	    $(MAKE_CMD) clean)
@@ -64,8 +65,8 @@ $(LDNS_DIR): $(LDNS_TARBALL) $(LIBS_SRC_DIR)
 
 ## unbound
 $(UNBOUND_LIB): $(UNBOUND_DIR) $(LDNS_LIB) $(OPENSSL_LIB)
-	(cd $< && \
-	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared \
+	(cd $< && $(CROSSCOMPILE_PREPARATION_EXPORTS) \
+	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared $(CROSSCOMPILE_HOST_FLAGS) \
 	    --with-ssl=$(OPENSSL_LIB) --with-ldns=$(LDNS_LIB) --without-libevent \
 	    --with-pic --prefix=$@ $(CONFIGURE_ARGS) --with-libunbound-only && \
 	    $(MAKE_CMD) && $(MAKE_CMD) install && \

@@ -30,8 +30,8 @@ BASEDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
 LIBS_ARCHIVE_DIR = libs-archives
 LIBS_SRC_DIR = libs-src
-#LIBS_BUILT_DIR = libs-built-$(OSNAME_LC)-$(HWARCH)
-LIBS_BUILT_DIR = libs-built
+#LIBS_BUILT_DIR ?= libs-built-$(OSNAME_LC)-$(HWARCH)
+LIBS_BUILT_DIR ?= libs-built
 
 OPENSSL_TARBALL = $(BASEDIR)/$(LIBS_ARCHIVE_DIR)/openssl.tar.gz
 LDNS_TARBALL = $(BASEDIR)/$(LIBS_ARCHIVE_DIR)/ldns.tar.gz

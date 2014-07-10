@@ -1,44 +1,32 @@
 # ***** BEGIN LICENSE BLOCK *****
 # Copyright 2011, 2012 CZ.NIC, z.s.p.o.
 #
-# Authors: Martin Straka <martin.straka@nic.cz>
+# Authors:
+# Karel Slany <karel.slany@nic.cz>
+# Martin Straka <martin.straka@nic.cz>
 #
-# This file is part of DNSSEC Validator Add-on.
+# This file is part of DNSSEC Validator 2.0 Add-on.
 #
-# DNSSEC Validator Add-on is free software: you can redistribute it and/or
+# DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or (at your
 # option) any later version.
 #
-# DNSSEC Validator Add-on is distributed in the hope that it will be useful,
+# DNSSEC Validator 2.0 Add-on is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 # more details.
 #
 # You should have received a copy of the GNU General Public License along with
-# DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
+# DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 # ***** END LICENSE BLOCK *****
 
-.PHONY: all libs-build sys_windows_openssl sys_windows_ldns_pre sys_windows_ldns_post sys_windows_unbound_pre sys_windows_unbound_post
+.PHONY: all clean-libwin postcompile scour-libwin
 
-OPENSSL = openssl-1.0.1h
-LDNS = ldns-1.6.17
-UNBOUND = unbound-1.4.22
+# Override default settings.
+LIBS_BUILT_DIR = libs-win
 
-LIBS_SOURCE = libs-source
-OPENSSL_TARBALL = $(LIBS_SOURCE)/openssl.tar.gz
-LDNS_TARBALL = $(LIBS_SOURCE)/ldns.tar.gz
-UNBOUND_TARBALL = $(LIBS_SOURCE)/unbound.tar.gz
-
-BASEDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-
-OPENSSL_DIR := $(BASEDIR)/libswin/openssl-1.0.1h
-LDNS_DIR := $(BASEDIR)/libswin/ldns-1.6.17
-UNBOUND_DIR := $(BASEDIR)/libswin/unbound-1.4.22
-
-OPENSSL_LIB := $(BASEDIR)/libswin/openssl
-LDNS_LIB := $(BASEDIR)/libswin/ldns
-UNBOUND_LIB := $(BASEDIR)/libswin/unbound
+include Makefile.static_libs
 
 X86_MINGV_HOST = i586-mingw32msvc
 X86_MINGW_PREFIX = i586-mingw32msvc-
@@ -47,49 +35,28 @@ X86_MINGW_LD = i586-mingw32msvc-ld
 X86_MINGW_STRIP = i586-mingw32msvc-strip
 X86_MINGW_RANLIB = i586-mingw32msvc-ranlib
 
-all: libs-build sys_windows_openssl sys_windows_ldns_pre sys_windows_ldns_post sys_windows_unbound_pre sys_windows_unbound_post
+MAKE_CMD = make
 
-libs-build: submodules libswin $(OPENSSL_DIR) $(LDNS_DIR) $(UNBOUND_DIR) libsource
+# Set cross-compilation flags
+CROSSCOMPILE_OPENSSL_FLAGS = --cross-compile-prefix=$(X86_MINGW_PREFIX) mingw enable-static-engine
+CROSSCOMPILE_PREPARATION_EXPORTS = export CC="$(X86_MINGW_CC)" && export LD="$(X86_MINGW_LD)" &&
+CROSSCOMPILE_HOST_FLAGS = --host=$(X86_MINGV_HOST)
 
-submodules:
-	git clone https://gitlab.labs.nic.cz/mstraka/dnssec-libs.git $(LIBS_SOURCE)
+all: $(BUILD_STATIC_STEPS) postcompile
 
-libswin:
-	mkdir libswin
+postcompile:
+	mkdir -p $(BASEDIR)/$(LIBS_BUILT_DIR)/windows/x86
+	cp $(OPENSSL_LIB)/lib/libcrypto.a $(BASEDIR)/$(LIBS_BUILT_DIR)/windows/x86
+	cp $(OPENSSL_LIB)/lib/libssl.a $(BASEDIR)/$(LIBS_BUILT_DIR)/windows/x86
+	cp $(LDNS_LIB)/lib/libldns.a $(BASEDIR)/$(LIBS_BUILT_DIR)/windows/x86
+	cp $(UNBOUND_LIB)/lib/libunbound.a $(BASEDIR)/$(LIBS_BUILT_DIR)/windows/x86
+	mkdir -p $(BASEDIR)/$(LIBS_BUILT_DIR)/windows/x86/ldns
+	cp $(LDNS_DIR)/ldns/config.h $(BASEDIR)/$(LIBS_BUILT_DIR)/windows/x86/ldns
+	cp $(LDNS_DIR)/ldns/net.h $(BASEDIR)/$(LIBS_BUILT_DIR)/windows/x86/ldns
 
-## openssl
-$(OPENSSL_DIR): $(OPENSSL_TARBALL)
-	tar xzf $< -C libswin
+# Clean those flags.
+OPENSSL_ARGS =
 
-## ldns
-$(LDNS_DIR): $(LDNS_TARBALL)
-	tar xzf $< -C libswin
+clean-libwin: clean-static-libs
 
-## unbound
-$(UNBOUND_DIR): $(UNBOUND_TARBALL)
-	tar xzf $< -C libswin
-
-libsource:
-	rm -rf $(LIBS_SOURCE)
-
-sys_windows_openssl:
-	@echo '### Compiling library for Windows... ###'
-	rm -rf libswin/windows
-	cd libswin && mkdir windows && cd windows && mkdir x86 && cd x86 && mkdir ldns && cd .. && cd ..
-	cd libswin && cd $(OPENSSL) && ./Configure --cross-compile-prefix=$(X86_MINGW_PREFIX) mingw enable-static-engine && make && ln -s . lib && cd .. && ln -s $(OPENSSL) openssl && cp $(OPENSSL)/libssl.a windows/x86 && cp $(OPENSSL)/libcrypto.a windows/x86
-
-sys_windows_ldns_pre:
-	cd libswin && cd $(LDNS) && export CC="$(X86_MINGW_CC)" && export LD="$(X86_MINGW_LD)" && ./configure --disable-shared --with-ssl=../$(OPENSSL) --host=$(X86_MINGV_HOST)  && make -i || @echo 'Continue if error...'
-
-sys_windows_ldns_post:
-	cd libswin && ln -s $(LDNS) ldns && cd $(LDNS) && $(X86_MINGW_RANLIB) .libs/libldns.a && cp .libs/libldns.a ../windows/x86 && cp ldns/config.h ../windows/x86/ldns && cp ldns/net.h ../windows/x86/ldns && cd ..
-
-sys_windows_unbound_pre:
-	cd libswin && cd $(UNBOUND) && export CC="$(X86_MINGW_CC)" && export LD="$(X86_MINGW_LD)" && ./configure --disable-shared --with-libunbound-only --with-ssl=../$(OPENSSL) --with-ldns=../$(LDNS) --host=$(X86_MINGV_HOST)  && make -i || @echo 'Continue if error...'
-
-sys_windows_unbound_post:
-	cd libswin && ln -s $(UNBOUND) unbound && cd $(UNBOUND) && $(X86_MINGW_RANLIB) .libs/libunbound.a && cp .libs/libunbound.a ../windows/x86 && cd ..
-	@echo '### Now you can build the library for Windows... ###'
-
-clean:
-	rm -rf libswin
+scour-libwin: scour-static-libs
