@@ -36,16 +36,18 @@ dnssec_init: function() {
 		var os = Components.classes["@mozilla.org/xre/app-info;1"]
 		    .getService(Components.interfaces.nsIXULRuntime).OS;
 
+		let dnssecLibName = "unpecified";
+
 		// Loading from OS DNSSEC lib.         
 		try {
 			if(os.match("Darwin")) {
-				var dnssecLibName = "libDNSSECcore-osx.dylib";
+				dnssecLibName = "libDNSSECcore-macosx.dylib";
 			} else if(os.match("WINNT")) {
-				var dnssecLibName = "libDNSSECcore-win.dll";
+				dnssecLibName = "libDNSSECcore-windows.dll";
 			} else if(os.match("Linux")) {
-				var dnssecLibName = "libDNSSECcore-linux.so";
+				dnssecLibName = "libDNSSECcore-linux.so";
 			} else if(os.match("FreeBSD")) {
-				var dnssecLibName = "libDNSSECcore-freebsd.so";
+				dnssecLibName = "libDNSSECcore-freebsd.so";
 			}
 
 			cz.nic.extension.libCore._initDnssecLib(dnssecLibName);
@@ -55,50 +57,50 @@ dnssec_init: function() {
 			// Failed loading from OS lib. Fall back to library distributed with plugin. 
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-				"Warning: Cannot find DNSSEC system library! Library distributed with plugin will be used.\n");	
+				    "Warning: Cannot find DNSSEC system library! Library distributed with plugin will be used.\n");	
 			}
 
 			if(os.match("Darwin")) {
-				var dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-osx.dylib")
-					.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+				dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-macosx.dylib")
+				    .QueryInterface(Components.interfaces.nsIFileURL).file.path;
 			} else if(os.match("Linux")) {
 				if (abi.match("x86_64")) {
-					var dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-linux-x64.so")
-						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+					dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-linux-x64.so")
+					    .QueryInterface(Components.interfaces.nsIFileURL).file.path;
 				} else if (abi.match("x86")) {
-					var dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-linux-x86.so")
-						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+					dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-linux-x86.so")
+					    .QueryInterface(Components.interfaces.nsIFileURL).file.path;
 				} else {
 					if (cz.nic.extension.dnssecExtension.debugOutput) {
 						dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-						"Error: Unknown architecture of Linux!\n");
+						    "Error: Unknown architecture of Linux!\n");
 					}
 					return false;
 				}
 
 			} else if (os.match("FreeBSD")) {
 				if (abi.match("x86_64")) {
-					var dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-freebsd-x64.so")
-						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+					dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-freebsd-x64.so")
+					    .QueryInterface(Components.interfaces.nsIFileURL).file.path;
 				} else if (abi.match("x86")) {
-					var dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-freebsd-x86.so")
-						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+					dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-freebsd-x86.so")
+					    .QueryInterface(Components.interfaces.nsIFileURL).file.path;
 				} else {
 					if (cz.nic.extension.dnssecExtension.debugOutput) {
 						dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-						"Error: Unknown architecture of FreeBSD!\n");
+						    "Error: Unknown architecture of FreeBSD!\n");
 					}
 					return false;
 				}
 
 			} else if(os.match("WINNT")) {
-				var dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-win-x86.dll")
-						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+				dnssecLibName = addon.getResourceURI("plugins/libDNSSECcore-windows-x86.dll")
+				    .QueryInterface(Components.interfaces.nsIFileURL).file.path;
 
 			} else {
 				if (cz.nic.extension.dnssecExtension.debugOutput) {
 					dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-					"Error: Unsupported OS!\n");
+					    "Error: Unsupported OS!\n");
 				}
 				return false;
 			}
@@ -118,16 +120,18 @@ dane_init: function() {
 		var os = Components.classes["@mozilla.org/xre/app-info;1"]
 		    .getService(Components.interfaces.nsIXULRuntime).OS;
 
+		let tlsaLibName = "unpecified";
+
 		// Loading from OS DANE libs.         
 		try {
 			if(os.match("Darwin")) {
-				var tlsaLibName = "libDANEcore-osx.dylib";
+				tlsaLibName = "libDANEcore-macosx.dylib";
 			} else if(os.match("WINNT")) {
-				var tlsaLibName = "libDANEcore-win.dll";
+				tlsaLibName = "libDANEcore-windows.dll";
 			} else if(os.match("Linux")) {
-				var tlsaLibName = "libDANEcore-linux.so";
+				tlsaLibName = "libDANEcore-linux.so";
 			} else if(os.match("FreeBSD")) {
-				var tlsaLibName = "libDANEcore-freebsd.so";
+				tlsaLibName = "libDANEcore-freebsd.so";
 			}
 
 			cz.nic.extension.libCore._initTlsaLib(tlsaLibName);
@@ -137,50 +141,50 @@ dane_init: function() {
 			// Failed loading from OS libs. Fall back to libraries distributed with plugin. 
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-				"Warning: Cannot find DANE system library! Library distributed with plugin will be used.\n");
+				    "Warning: Cannot find DANE system library! Library distributed with plugin will be used.\n");
 			}
 
 			if(os.match("Darwin")) {
-				var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-osx.dylib")
-					.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+				tlsaLibName = addon.getResourceURI("plugins/libDANEcore-macosx.dylib")
+				    .QueryInterface(Components.interfaces.nsIFileURL).file.path;
 
 			} else if(os.match("Linux")) {
 				if (abi.match("x86_64")) {
-					var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-linux-x64.so")
-						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+					tlsaLibName = addon.getResourceURI("plugins/libDANEcore-linux-x64.so")
+					    .QueryInterface(Components.interfaces.nsIFileURL).file.path;
 				} else if (abi.match("x86")) {
-					var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-linux-x86.so")
-						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+					tlsaLibName = addon.getResourceURI("plugins/libDANEcore-linux-x86.so")
+					    .QueryInterface(Components.interfaces.nsIFileURL).file.path;
 				} else {
 					if (cz.nic.extension.dnssecExtension.debugOutput) {
 						dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-						"Error: Unknown architecture of Linux!\n");				
+						    "Error: Unknown architecture of Linux!\n");				
 					}
 					return false;
 				}
 
 			} else if (os.match("FreeBSD")) {
 				if (abi.match("x86_64")) {
-					var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-freebsd-x64.so")
-						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+					tlsaLibName = addon.getResourceURI("plugins/libDANEcore-freebsd-x64.so")
+					    .QueryInterface(Components.interfaces.nsIFileURL).file.path;
 				} else if (abi.match("x86")) {
-					var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-freebsd-x86.so")
-						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+					tlsaLibName = addon.getResourceURI("plugins/libDANEcore-freebsd-x86.so")
+					    .QueryInterface(Components.interfaces.nsIFileURL).file.path;
 				} else {
 					if (cz.nic.extension.dnssecExtension.debugOutput) {
 						dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-						"Error: Unknown architecture of FreeBSD!\n");
+						    "Error: Unknown architecture of FreeBSD!\n");
 					}
 					return false;
 				}
 
 			} else if(os.match("WINNT")) {
-				var tlsaLibName = addon.getResourceURI("plugins/libDANEcore-win-x86.dll")
-						.QueryInterface(Components.interfaces.nsIFileURL).file.path;
+				tlsaLibName = addon.getResourceURI("plugins/libDANEcore-windows-x86.dll")
+				    .QueryInterface(Components.interfaces.nsIFileURL).file.path;
 			} else {
 				if (cz.nic.extension.dnssecExtension.debugOutput) {
 					dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-					"Error: Unsupported OS!\n");
+					    "Error: Unsupported OS!\n");
 				}
 				return false;
 			}
