@@ -83,8 +83,8 @@ js-ctypes_x86:
 	$(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x86 clean all
 	cp core_js-ctypes/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x86.dylib $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x86.dylib
 	cp core_js-ctypes/$(JSCTYPES_PLUGIN_NAME_DANE)-x86.dylib $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x86.dylib
-	strip -x $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x86.dylib
-	strip -x $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x86.dylib
+	strip -x -S $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x86.dylib
+	strip -x -S $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x86.dylib
 	$(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x86 clean
 	@echo '### ...js-ctypes plugin x86 $(OSNAME) ... Done. ###'
 
@@ -113,7 +113,7 @@ xpi_x86:
 	chmod 777 $(ADDON_PATH_FF)/js-ctypes_built/build.sh
 	cp $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x86.dylib $(ADDON_PATH_FF)/js-ctypes_built/plugins
 	cp $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x86.dylib $(ADDON_PATH_FF)/js-ctypes_built/plugins
-	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>$(OSNAME)<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/js-ctypes_built/install.rdf.template > $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
+	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/js-ctypes_built/install.rdf.template > $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
 	grep -v optionsURL $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx > $(ADDON_PATH_FF)/js-ctypes_built/install.rdf
 	rm $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/js-ctypes_built/about.template > $(ADDON_PATH_FF)/js-ctypes_built/content/about.xul
@@ -174,8 +174,8 @@ js-ctypes_x64:
 	$(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x64 clean all
 	cp core_js-ctypes/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.dylib $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.dylib
 	cp core_js-ctypes/$(JSCTYPES_PLUGIN_NAME_DANE)-x64.dylib $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x64.dylib
-	strip -x $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.dylib
-	strip -x $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x64.dylib
+	strip -x -S $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.dylib
+	strip -x -S $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x64.dylib
 	$(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x64 clean
 	@echo '### ...js-ctypes plugin x64 $(OSNAME) ... Done. ###'
 
@@ -192,7 +192,7 @@ xpi_x64:
 	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86_64-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/npapi_built/install.rdf.template > $(ADDON_PATH_FF)/npapi_built/install.rdf
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/npapi_built/about.template > $(ADDON_PATH_FF)/npapi_built/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
-	cd $(ADDON_PATH_FF)/npapi_built && ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64-npapi.xpi
+	cd $(ADDON_PATH_FF)/npapi_built && $(SHELL_CMD) ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64-npapi.xpi
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating js-ctypes package for Firefox $(OSNAME) x64... ###'
@@ -204,7 +204,7 @@ xpi_x64:
 	chmod 777 $(ADDON_PATH_FF)/js-ctypes_built/build.sh
 	cp $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.dylib $(ADDON_PATH_FF)/js-ctypes_built/plugins
 	cp $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x64.dylib $(ADDON_PATH_FF)/js-ctypes_built/plugins
-	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>$(OSNAME)<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/js-ctypes_built/install.rdf.template > $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
+	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>Darwin_x86_64-gcc3<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/js-ctypes_built/install.rdf.template > $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
 	grep -v optionsURL $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx > $(ADDON_PATH_FF)/js-ctypes_built/install.rdf
 	rm $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/js-ctypes_built/about.template > $(ADDON_PATH_FF)/js-ctypes_built/content/about.xul
@@ -271,8 +271,8 @@ sys_$(OSNAME_LC):
 	$(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x64 clean all
 	cp core_js-ctypes/$(JSCTYPES_PLUGIN_NAME_DNSSEC).dylib $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC).dylib
 	cp core_js-ctypes/$(JSCTYPES_PLUGIN_NAME_DANE).dylib $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE).dylib
-	strip -x $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC).dylib
-	strip -x $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE).dylib
+	strip -x -S $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC).dylib
+	strip -x -S $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE).dylib
 	$(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x64 clean
 	@echo '### ...js-ctypes plugin x96 $(OSNAME) ... Done. ###'
 
