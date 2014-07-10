@@ -71,7 +71,8 @@ OpenSSL used as well as that of the covered work.
 /* Windows */
   #include "ldns/config.h"
   #include "ldns/ldns.h"
-  #include "libunbound/unbound.h"
+//  #include "libunbound/unbound.h"
+  #include "unbound.h"
 
   #include <wincrypt.h>
   #include <winsock2.h>

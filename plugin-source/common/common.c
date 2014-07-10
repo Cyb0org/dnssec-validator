@@ -38,11 +38,11 @@ OpenSSL used as well as that of the covered work.
 #include <stdlib.h>
 #include <string.h>
 
-#if TGT_SYSTEM == TGT_WIN
-   #include "libunbound/unbound.h"
-#else
+//#if TGT_SYSTEM == TGT_WIN
+//   #include "libunbound/unbound.h"
+//#else
    #include "unbound.h"
-#endif
+//#endif
 
 #include "common.h"
 
