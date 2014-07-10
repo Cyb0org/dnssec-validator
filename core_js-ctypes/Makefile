@@ -77,14 +77,19 @@ CFLAGS += $(OPENSSL_CFLAGS) $(LDNS_CFLAGS) $(UNBOUND_CFLAGS)
 CFLAGS += -I../plugin-source/common
 CFLAGS_STD = -std=c99
 
+LDFLAGS_DNSSEC_VISIBILITY = -Wl,-version-script -Wl,./libDNSSECcore.ver
+LDFLAGS_DANE_VISIBILITY = -Wl,-version-script -Wl,./libDANEcore.ver
 LDFLAGS += $(UNBOUND_LDFLAGS) $(LDNS_LDFLAGS) $(OPENSSL_LDFLAGS)
 LDFLAGS += -lpthread
+LDFLAGS += $(LDFLAGS_VISIBILITY)
 
 # Which system is it compiled on.
 ifeq ($(KERNEL),darwin)
   CPPFLAGS += -DTGT_SYSTEM=TGT_OSX
   LOG_OBJ = log_osx.o
   SHLIB_SUFF = dylib
+  LDFLAGS_DNSSEC_VISIBILITY =
+  LDFLAGS_DANE_VISIBILITY =
 else
   # Default settings.
   LOG_OBJ = log_dflt.o
@@ -154,7 +159,7 @@ common.o: ../plugin-source/common/common.c ../plugin-source/common/common.h
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
 libDNSSECcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF): dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
-	$(CC) $^ -o $@ $(LDFLAGS) -shared -Wl,-version-script -Wl,./libDNSSECcore.ver
+	$(CC) $^ -o $@ $(LDFLAGS) -shared $(LDFLAGS_DNSSEC_VISIBILITY)
 
 #checkDNSSEClib.o: checkDNSSEClib.c
 #	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/DNSSECValidatorPlugin
@@ -169,7 +174,7 @@ dnssec-plug.o: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
 libDANEcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF): dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
-	$(CC) $^ -o $@ $(LDFLAGS) -shared -Wl,-version-script -Wl,./libDANEcore.ver
+	$(CC) $^ -o $@ $(LDFLAGS) -shared $(LDFLAGS_DANE_VISIBILITY)
 
 #checkDANElib.o: checkDANElib.c
 #	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/TLSAValidatorPlugin
