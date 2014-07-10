@@ -301,21 +301,19 @@ dane_validation_deinit_core: function() {
 },
 
 // wrapper to dnssec validation query
-dane_validate_core: function(certchain, cetlen, options, nameserver, dname,
+dane_validate_core: function(certchain, certlen, options, nameserver, dname,
     port, protocol, policy) {
 
-	// certchain = array of strings in tlsa.js ->
-	//(certchain = new array(); certchain.push(string))
+	let ptrArrayType = ctypes.char.ptr.array(certlen);
+	let certCArray = ptrArrayType();
 
-	var ptrArrayType = ctypes.char.ptr.array(cetlen);
-	var myArray = ptrArrayType();
-
-	for (var i = 0; i < cetlen; i++) {
-		//TODO inicialize myArray from certchain[i];
+	for (let i = 0; i < certlen; ++i) {
+		/* Convert JS array of strings to array of char *. */
+		certCArray[i] = ctypes.char.array()(certchain[i]);
 	}
 
-	var retval = this.dane_validate(certchain, cetlen, options, nameserver,
-	    dname, port, protocol, policy);
+	var retval = this.dane_validate(certCArray, certlen, options,
+	    nameserver, dname, port.toString(), protocol, policy);
 	return retval;
 },
 
