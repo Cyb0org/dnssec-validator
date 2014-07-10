@@ -77,16 +77,16 @@ npapi_x86:
 	@echo '### ...NPAPI plugin x86 $(OSNAME) ... Done. ###'
 
 js-ctypes_x86:
-
-
-
-
-
-
-
-
-
-
+	@echo '### ...Creating js-ctypes plugin library for $(OSNAME) x86... ###'
+	rm -rf $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x86.dylib  $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x86.dylib
+	mkdir $(PLUGIN_NAME_LIB) || echo "$(PLUGIN_NAME_LIB) already exists."
+	$(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x86 clean all
+	cp core_js-ctypes/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x86.dylib $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x86.dylib
+	cp core_js-ctypes/$(JSCTYPES_PLUGIN_NAME_DANE)-x86.dylib $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x86.dylib
+	strip $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x86.dylib
+	strip $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x86.dylib
+	$(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x86 clean
+	@echo '### ...js-ctypes plugin x86 $(OSNAME) ... Done. ###'
 
 xpi_x86:
 	@echo '### Creating NPAPI package for Firefox $(OSNAME) x86... ###'
@@ -105,20 +105,20 @@ xpi_x86:
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating js-ctypes package for Firefox $(OSNAME) x86... ###'
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
+	rm -rf $(ADDON_PATH_FF)/js-ctypes_built
+	mkdir $(ADDON_PATH_FF)/js-ctypes_built
+	mkdir $(ADDON_PATH_FF)/js-ctypes_built/plugins
+	cp -r $(ADDON_PATH_FF)/js-ctypes/* $(ADDON_PATH_FF)/js-ctypes_built
+	cp -r $(ADDON_PATH_FF)/common/* $(ADDON_PATH_FF)/js-ctypes_built
+	chmod 777 $(ADDON_PATH_FF)/js-ctypes_built/build.sh
+	cp $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x86.dylib $(ADDON_PATH_FF)/js-ctypes_built/plugins
+	cp $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x86.dylib $(ADDON_PATH_FF)/js-ctypes_built/plugins
+	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>$(OSNAME)<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/js-ctypes_built/install.rdf.template > $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
+	grep -v optionsURL $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx > $(ADDON_PATH_FF)/js-ctypes_built/install.rdf
+	rm $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
+	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/js-ctypes_built/about.template > $(ADDON_PATH_FF)/js-ctypes_built/content/about.xul
+	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
+	cd $(ADDON_PATH_FF)/js-ctypes_built && $(SHELL_CMD) ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x86-js-ctypes.xpi
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Chrome $(OSNAME) x86... ###'
@@ -167,16 +167,17 @@ npapi_x64:
 	@echo '### ...NPAPI plugin x64 $(OSNAME) ... Done. ###'
 
 js-ctypes_x64:
-
-
-
-
-
-
-
-
-
-
+	@echo '### ...Creating js-ctypes plugin library for $(OSNAME) x64... ###'
+	rm -rf $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.dylib $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.dylib
+	mkdir $(PLUGIN_NAME_LIB) || echo "$(PLUGIN_NAME_LIB) already exists."
+	echo $(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x64 clean all
+	$(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x64 clean all
+	cp core_js-ctypes/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.dylib $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.dylib
+	cp core_js-ctypes/$(JSCTYPES_PLUGIN_NAME_DANE)-x64.dylib $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x64.dylib
+	strip $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.dylib
+	strip $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x64.dylib
+	$(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x64 clean
+	@echo '### ...js-ctypes plugin x64 $(OSNAME) ... Done. ###'
 
 xpi_x64:
 	@echo '### Creating NPAPI package for Firefox $(OSNAME) x64... ###'
@@ -195,20 +196,20 @@ xpi_x64:
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating js-ctypes package for Firefox $(OSNAME) x64... ###'
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
-	@echo
+	rm -rf $(ADDON_PATH_FF)/js-ctypes_built
+	mkdir $(ADDON_PATH_FF)/js-ctypes_built
+	mkdir $(ADDON_PATH_FF)/js-ctypes_built/plugins
+	cp -r $(ADDON_PATH_FF)/js-ctypes/* $(ADDON_PATH_FF)/js-ctypes_built
+	cp -r $(ADDON_PATH_FF)/common/* $(ADDON_PATH_FF)/js-ctypes_built
+	chmod 777 $(ADDON_PATH_FF)/js-ctypes_built/build.sh
+	cp $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.dylib $(ADDON_PATH_FF)/js-ctypes_built/plugins
+	cp $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x64.dylib $(ADDON_PATH_FF)/js-ctypes_built/plugins
+	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>$(OSNAME)<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/js-ctypes_built/install.rdf.template > $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
+	grep -v optionsURL $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx > $(ADDON_PATH_FF)/js-ctypes_built/install.rdf
+	rm $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
+	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/js-ctypes_built/about.template > $(ADDON_PATH_FF)/js-ctypes_built/content/about.xul
+	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
+	cd $(ADDON_PATH_FF)/js-ctypes_built && $(SHELL_CMD) ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64-js-ctypes.xpi
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Chrome $(OSNAME) x64... ###'
@@ -244,7 +245,7 @@ clean:
 	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)
 
 sys_$(OSNAME_LC):
-	@echo '### ...Creating plugin library for $(OSNAME)... ###'
+	@echo '### ...Creating NPAPI plugin library for $(OSNAME) x96... ###'
 	rm -rf $(PLUGIN_NAME_LIB) $(PLUGIN_FB_S)
 	mkdir $(PLUGIN_NAME_LIB)
 	cp libszal/libldns.a $(LIBS_BUILT_DIR)/ldns/lib
@@ -261,10 +262,22 @@ sys_$(OSNAME_LC):
 	strip -x -S $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin/Contents/MacOS/np$(NPAPI_PLUGIN_NAME_TLSA)
 	rm -rf $(PLUGIN_FB_B)
 	rm -rf $(PLUGIN_FB_S)
-	@echo '### ...Plugin for $(OSNAME) ... Done. ###'
+	@echo '### ...NPAPI plugin library for $(OSNAME) x96... Done. ###'
+	@echo '--------------------------------------------------'
+	@echo '### ...Creating js-ctypes plugin library for $(OSNAME) x96... ###'
+	rm -rf $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC).dylib $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC).dylib
+	mkdir $(PLUGIN_NAME_LIB) || echo "$(PLUGIN_NAME_LIB) already exists."
+	echo $(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x64 clean all
+	$(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x64 clean all
+	cp core_js-ctypes/$(JSCTYPES_PLUGIN_NAME_DNSSEC).dylib $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC).dylib
+	cp core_js-ctypes/$(JSCTYPES_PLUGIN_NAME_DANE).dylib $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE).dylib
+	strip $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC).dylib
+	strip $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE).dylib
+	$(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x64 clean
+	@echo '### ...js-ctypes plugin x96 $(OSNAME) ... Done. ###'
 
 xpi:
-	@echo '### ...Creating package for Firefox $(OSNAME)... ###'
+	@echo '### ...Creating NPAPI package for Firefox $(OSNAME)... ###'
 	rm -rf $(ADDON_PATH_FF)/plugins
 	mkdir $(ADDON_PATH_FF)/plugins
 	chmod 777 $(ADDON_PATH_FF)/build.sh
@@ -274,7 +287,24 @@ xpi:
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/about.template > $(ADDON_PATH_FF)/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
 	cd $(ADDON_PATH_FF) && ./build.sh && mv dnssec.xpi ../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC).xpi
-	@echo '### Package for Firefox $(OSNAME)...Done. ###'
+	@echo '### NPAPI Package for Firefox $(OSNAME)...Done. ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating js-ctypes package for Firefox $(OSNAME) x64... ###'
+	rm -rf $(ADDON_PATH_FF)/js-ctypes_built
+	mkdir $(ADDON_PATH_FF)/js-ctypes_built
+	mkdir $(ADDON_PATH_FF)/js-ctypes_built/plugins
+	cp -r $(ADDON_PATH_FF)/js-ctypes/* $(ADDON_PATH_FF)/js-ctypes_built
+	cp -r $(ADDON_PATH_FF)/common/* $(ADDON_PATH_FF)/js-ctypes_built
+	chmod 777 $(ADDON_PATH_FF)/js-ctypes_built/build.sh
+	cp $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC).dylib $(ADDON_PATH_FF)/js-ctypes_built/plugins
+	cp $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE).dylib $(ADDON_PATH_FF)/js-ctypes_built/plugins
+	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>$(OSNAME)<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/js-ctypes_built/install.rdf.template > $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
+	grep -v optionsURL $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx > $(ADDON_PATH_FF)/js-ctypes_built/install.rdf
+	rm $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
+	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/js-ctypes_built/about.template > $(ADDON_PATH_FF)/js-ctypes_built/content/about.xul
+	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
+	cd $(ADDON_PATH_FF)/js-ctypes_built && $(SHELL_CMD) ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-js-ctypes.xpi
+	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Chrome $(OSNAME) ... ###'
 	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin $(ADDON_PATH_CR_DNSSEC)
