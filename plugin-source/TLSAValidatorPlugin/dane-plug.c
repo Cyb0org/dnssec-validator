@@ -1869,6 +1869,11 @@ int dane_validate(const char *certchain[], int certcount, uint16_t options,
 	}
 	/* ----------------------------------------------- */
 
+	/* Initialise SSL context if not initialised. */
+	if (NULL == glob_val_ctx.ssl_ctx) {
+		glob_val_ctx.ssl_ctx = ssl_context_init();
+	}
+
 	/* Create TLSA query. */
 	dn = create_tlsa_qname(domain, port_str, protocol);
 	retval = ub_resolve(glob_val_ctx.ub, dn, LDNS_RR_TYPE_TLSA,
