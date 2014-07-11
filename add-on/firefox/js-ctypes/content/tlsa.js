@@ -214,9 +214,6 @@ init:
 		}
 
 		// Plugin initialization
-		cz.nic.extension.libCore.dane_init();
-
-
 		if (cz.nic.extension.libCore.dane_init()) {
 			cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_INACTION);
 		} else {
