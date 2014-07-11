@@ -30,7 +30,7 @@ tlsalib: null,
   
 dnssec_init: function() {
 	AddonManager.getAddonByID("dnssec@nic.cz", function(addon) {
-  		
+
 		var abi = Components.classes["@mozilla.org/xre/app-info;1"]
 		   .getService(Components.interfaces.nsIXULRuntime).XPCOMABI;
 		var os = Components.classes["@mozilla.org/xre/app-info;1"]
@@ -152,7 +152,7 @@ dnssec_init: function() {
 
 dane_init: function() {
 	AddonManager.getAddonByID("dnssec@nic.cz", function(addon) {
-  		
+
 		var abi = Components.classes["@mozilla.org/xre/app-info;1"]
 		   .getService(Components.interfaces.nsIXULRuntime).XPCOMABI;
 		var os = Components.classes["@mozilla.org/xre/app-info;1"]
