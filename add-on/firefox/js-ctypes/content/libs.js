@@ -59,7 +59,7 @@ dnssec_init: function() {
 			cz.nic.extension.libCore._initDnssecLib(dnssecLibName);
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-				    "Loaded " + dnssecLibName + ".\n");
+			            "Loaded DNSSEC library:\n        " + dnssecLibName + "\n");
 			}
 			return true;
 		} catch(e) {
@@ -109,7 +109,7 @@ dnssec_init: function() {
 			cz.nic.extension.libCore._initDnssecLib(dnssecLibName);
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-				    "Loaded " + dnssecLibName + ".\n");
+			            "Loaded DNSSEC library:\n        " + dnssecLibName + "\n");
 			}
 			return true;
 		} catch(e) {
@@ -142,7 +142,7 @@ dnssec_init: function() {
 		cz.nic.extension.libCore._initDnssecLib(dnssecLibName);
 		if (cz.nic.extension.dnssecExtension.debugOutput) {
 			dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-			    "Loaded " + dnssecLibName + ".\n");
+		            "Loaded DNSSEC library:\n        " + dnssecLibName + "\n");
 		}
 		return true;
 
@@ -180,7 +180,7 @@ dane_init: function() {
 			cz.nic.extension.libCore._initTlsaLib(tlsaLibName);
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(cz.nic.extension.daneExtension.debugPrefix + 
-				    "Loaded " + tlsaLibName + ".\n");
+			            "Loaded DANE library:\n        " + tlsaLibName + "\n");
 			}
 			return true;
 		} catch(e) {
@@ -230,7 +230,7 @@ dane_init: function() {
 			cz.nic.extension.libCore._initTlsaLib(tlsaLibName);
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(cz.nic.extension.daneExtension.debugPrefix + 
-				    "Loaded " + tlsaLibName + ".\n");
+			            "Loaded DANE library:\n        " + tlsaLibName + "\n");
 			}
 			return true;
 		} catch(e) {
@@ -262,8 +262,9 @@ dane_init: function() {
 		cz.nic.extension.libCore._initTlsaLib(tlsaLibName);
 		if (cz.nic.extension.daneExtension.debugOutput) {
 			dump(cz.nic.extension.daneExtension.debugPrefix + 
-			    "Loaded " + tlsaLibName + ".\n");
+		            "Loaded DANE library:\n        " + tlsaLibName + "\n");
 		}
+
 		return true;
 
 	});
@@ -274,11 +275,6 @@ _initDnssecLib: function(dnssecLibName) {
 
 	//open library
 	this.dnsseclib = ctypes.open(dnssecLibName);
-
-	if (cz.nic.extension.dnssecExtension.debugOutput) {
-		dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-	            "Loading DNSSEC library:\n        " + dnssecLibName + "\n");
-	}
 
 	//declare dnssec API functions
 	this.dnssec_validation_init = 
@@ -308,11 +304,6 @@ _initTlsaLib: function(tlsaLibName) {
 
 	//open library
 	this.tlsalib = ctypes.open(tlsaLibName);
-
-	if (cz.nic.extension.daneExtension.debugOutput) {
-		dump(cz.nic.extension.daneExtension.debugPrefix + 
-	            "Loading DANE library:\n        " + tlsaLibName + "\n");
-	}
 
 	//declare tlsa API functions    
 	this.dane_validation_init = 
