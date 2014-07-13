@@ -57,7 +57,7 @@ $(LDNS_LIB): $(LDNS_DIR) $(OPENSSL_LIB)
 	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared $(CROSSCOMPILE_HOST_FLAGS) \
 	    --with-ssl=$(OPENSSL_LIB) --disable-ldns-config --without-pyldnsx \
 	    --with-pic --prefix=$@ $(CONFIGURE_ARGS) && \
-	    $(MAKE_CMD) && $(MAKE_CMD) install && \
+	    CFLAGS="$(CFLAGS)" $(MAKE_CMD) && $(MAKE_CMD) install && \
 	    $(MAKE_CMD) clean)
 
 $(LDNS_DIR): $(LDNS_TARBALL) $(LIBS_SRC_DIR)
@@ -69,7 +69,7 @@ $(UNBOUND_LIB): $(UNBOUND_DIR) $(LDNS_LIB) $(OPENSSL_LIB)
 	    CFLAGS="$(LIB_CFLAGS)" ./configure --disable-shared $(CROSSCOMPILE_HOST_FLAGS) \
 	    --with-ssl=$(OPENSSL_LIB) --with-ldns=$(LDNS_LIB) --without-libevent \
 	    --with-pic --prefix=$@ $(CONFIGURE_ARGS) --with-libunbound-only && \
-	    $(MAKE_CMD) && $(MAKE_CMD) install && \
+	    CFLAGS="$(CFLAGS)" $(MAKE_CMD) && $(MAKE_CMD) install && \
 	    $(MAKE_CMD) clean)
 
 $(UNBOUND_DIR): $(UNBOUND_TARBALL) $(LIBS_SRC_DIR)
