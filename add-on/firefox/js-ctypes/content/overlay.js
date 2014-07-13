@@ -19,15 +19,33 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
+Components.utils.import("resource://gre/modules/ctypes.jsm");
+Components.utils.import("resource://gre/modules/AddonManager.jsm"); 
+
 //Define our namespace
 if(!cz) var cz={};
 if(!cz.nic) cz.nic={};
 if(!cz.nic.extension) cz.nic.extension={};
 
-// extension inti/deinit
 window.addEventListener("load", function() {cz.nic.extension.dnssecExtension.init();}, false);
 window.addEventListener("unload", function() {cz.nic.extension.dnssecExtension.uninit();}, false);
 
+cz.nic.extension.worker = new ChromeWorker("chrome://dnssec/content/dnsseclib.js");
+
+cz.nic.extension.worker.onmessage = function(event) {
+
+	if (cz.nic.extension.dnssecExtension.debugOutput) {
+		dump(cz.nic.extension.dnssecExtension.debugPrefix 
+		+ '-------- ASYNC RESOLVING DONE -----------------\n\n');
+	}
+
+	var retval = event.data.split("§");
+	var dn = retval[0];	
+	var status = retval[1];
+	var ip = retval[2];
+	var addr = retval[3];
+	cz.nic.extension.dnssecExtResolver.setValidatedData(dn, parseInt(status,10), ip, addr);
+    };
 
 // window location changed, also happens on changing tabs
 cz.nic.extension.dnssecExtUrlBarListener = {
@@ -110,6 +128,7 @@ observe:
 	}
 };
 
+
 // **************************************************************
 // --------------------------------------------------------------
 /* dnssecExtension */
@@ -126,6 +145,7 @@ asyncResolve: false,
 timer: null,
 oldAsciiHost: null,
 coreinit: false,
+
 
 init:
 	function() {
@@ -298,6 +318,7 @@ processNewURL:
 			dump(' ...valid\n');
 		}
 
+
 		// Check DNS security
 		cz.nic.extension.dnssecExtHandler.checkSecurity(asciiHost, utf8Host);
 
@@ -353,10 +374,22 @@ dnssecValidate:
 			     + dn + '; ' + options + '; ' + nameserver + '; ' + addr + '\"\n');
 		}
 
-		// Call plugin validation method
+		cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ACTION);
+
+		// Call DNSSEC validation
 		try {
-			var retval = cz.nic.extension.libCore.dnssec_validate_core(dn, options, nameserver, addr);
-			cz.nic.extension.dnssecExtResolver.setValidatedData(dn, retval[0], retval[1], addr);
+			if (!cz.nic.extension.dnssecExtension.asyncResolve) {   
+				// Synchronous js-ctypes validation
+				var retval = cz.nic.extension.libCore.dnssec_validate_core(dn, options, nameserver, addr);
+				cz.nic.extension.dnssecExtResolver.setValidatedData(dn, retval[0], retval[1], addr);
+			} else {   
+				// Asynchronous js-ctypes validation
+				if (cz.nic.extension.dnssecExtension.debugOutput) {
+					dump("\n" + cz.nic.extension.dnssecExtension.debugPrefix + "-------- CALL CORE -- ASYNC RESOLVING ---------\n");
+				}
+				var queryParams = dn + '§' + options + '§' + nameserver + '§' + addr;
+				cz.nic.extension.worker.postMessage(queryParams);
+			}
 		} catch (ex) {
 			dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Error: Plugin validation method call failed!\n');
 			// Set error mode
@@ -377,7 +410,7 @@ setValidatedData:
 
 		if (ext.debugOutput) {
 			dump(ext.debugPrefix + 'Result: ' + dn + ' : ' +
-			valres + '; IP validator: '+ ipval + '\n');
+			valres + '; IP validator: '+ ipval + '; IP browser: '+ addr + '\n');
 		}
 
 		var res = valres;
