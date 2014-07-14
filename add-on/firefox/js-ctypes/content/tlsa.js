@@ -23,6 +23,27 @@ window.addEventListener("load", function() {cz.nic.extension.daneExtension.init(
 window.addEventListener("unload", function() {cz.nic.extension.daneExtension.uninit();}, false);
 
 
+cz.nic.extension.worker2 = new ChromeWorker("chrome://dnssec/content/tlsalib.js");
+
+cz.nic.extension.worker2.onmessage = function(event) {
+
+	if (cz.nic.extension.daneExtension.debugOutput) {
+		dump(cz.nic.extension.daneExtension.debugPrefix 
+		+ '-------- ASYNC RESOLVING DONE -----------------\n\n');
+	}
+
+	var retval = event.data.split("§");
+	var hostport = retval[0];	
+	var status = retval[1];
+	status = parseInt(status,10);
+
+	cz.nic.extension.tlsaExtCache.addRecord(hostport, status , "no");
+	cz.nic.extension.tlsaExtCache.printContent();
+	cz.nic.extension.tlsaExtHandler.setSecurityState(status);
+};
+
+
+
 // **********************************************
 /* Observe preference changes */
 // **********************************************
@@ -722,8 +743,10 @@ check_tlsa_tab_change:
 				return null;
 			}
 
+			var certsstr = "";
 			var chain = cert.getChain();
 			len = chain.length;
+			let issep = false;
 			for (var i = 0; i < chain.length; i++) {
 				var certx = chain.queryElementAt(i, Components.interfaces.nsIX509Cert);
 				var derData = certx.getRawDER({});
@@ -731,6 +754,8 @@ check_tlsa_tab_change:
 					return ("0"+x.toString(16)).substr(-2);
 				}).join("");
 				derCerts.push(derHex);
+				(issep) ? certsstr =  certsstr + "~" + derHex : certsstr = certsstr + derHex;
+				issep = true;
 			} //for
 		} else {
 			derCerts.push("00FF00FF");
@@ -740,7 +765,7 @@ check_tlsa_tab_change:
 
 		var options = 0;
 		if (cz.nic.extension.daneExtension.debugOutput) {
-			options |= c.DANE_FLAG_DEBUG;
+			//options |= c.DANE_FLAG_DEBUG;
 		}
 		if (cz.nic.extension.dnssecExtPrefs.getInt("dnsserverchoose") != 3) {
 			options |= c.DANE_FLAG_USEFWD;
@@ -760,23 +785,35 @@ check_tlsa_tab_change:
 			     port +", "+ protocol +", "+ policy+ this.DANE_DEBUG_POST);
 		}
 
-		// Call validation
+		// Call TLSA validation
 		try {
-			var daneMatch = cz.nic.extension.daneLibCore.dane_validate_core(derCerts, len, options,
+			if (!cz.nic.extension.dnssecExtension.asyncResolve) {   
+				// Synchronous js-ctypes validation
+				var daneMatch = cz.nic.extension.daneLibCore.dane_validate_core(derCerts, len, options,
 			                                  nameserver, domain, port, protocol, policy);
-			if (cz.nic.extension.daneExtension.debugOutput) {
-				dump(this.DANE_DEBUG_PRE + "Return: " + daneMatch
+				if (cz.nic.extension.daneExtension.debugOutput) {
+					dump(this.DANE_DEBUG_PRE + "Return: " + daneMatch
 				     + " for https://" + domain + ";" + this.DANE_DEBUG_POST);
+				}
+			} else {   
+				// Asynchronous js-ctypes validation
+				if (cz.nic.extension.daneExtension.debugOutput) {
+					dump("\n" + cz.nic.extension.daneExtension.debugPrefix 
+					    + "-------- CALL CORE -- ASYNC RESOLVING ---------\n");
+				}
+				var queryParams = "validate" + '§' + certsstr + '§' + len + '§' + options 
+					+ '§' + nameserver + '§' + domain + '§' + port + '§'
+					+ protocol + '§' + policy + '§' + hostport;
+				cz.nic.extension.worker2.postMessage(queryParams);
+				return null;
 			}
 		} catch (ex) {
-
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(this.DANE_DEBUG_PRE + 'Error: TLSA plugin call failed!' + this.DANE_DEBUG_POST);
 				dump(this.DANE_DEBUG_PRE + "----------- TLSA validation end --------------" + this.DANE_DEBUG_POST);
 			}
 			cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_ERROR_GENERIC);
 			return null;
-
 		}
 
 		if (daneMatch == c.DANE_DNSSEC_BOGUS) {
