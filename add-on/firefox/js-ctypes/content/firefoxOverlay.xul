@@ -29,7 +29,11 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 	<script type="application/javascript" src="chrome://dnssec/content/about.js"/>
 	<script type="application/javascript" src="chrome://dnssec/content/npapi_const.js"/>
 	<script type="application/javascript" src="chrome://dnssec/content/preferences.js"/>
+<!--
 	<script type="application/javascript" src="chrome://dnssec/content/libs.js"/>
+-->
+	<script type="application/javascript" src="chrome://dnssec/content/dnsseclib.js"/>
+	<script type="application/javascript" src="chrome://dnssec/content/tlsalib.js"/>
 
 	<stringbundleset id="stringbundleset">
 		<stringbundle id="dnssec-strings" src="chrome://dnssec/locale/dnssec.properties"/>
@@ -96,7 +100,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 		<menuitem label="&dnssec.about.label;" accesskey="&dnssec.about.accesskey;" oncommand="cz.nic.extension.dnssecExtAbout.showAboutWindow();"/>
 		<menuitem label="&dnssec.home.label;" accesskey="&dnssec.home.accesskey;" oncommand="var win = Components.classes['@mozilla.org/appshell/window-mediator;1'].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow('navigator:browser'); win.openUILinkIn('http://www.dnssec-validator.cz', 'tab');" style="display: block;"/>
 		<menuseparator/>
-		<menuitem label="&dnssec.preferences.label;" accesskey="&dnssec.preferences.accesskey;" oncommand="cz.nic.extension.dnssecExtPrefs.showPrefWindow(cz.nic.extension.libCore);"/>
+		<menuitem label="&dnssec.preferences.label;" accesskey="&dnssec.preferences.accesskey;" oncommand="cz.nic.extension.dnssecExtPrefs.showPrefWindow(cz.nic.extension.dnssecLibCore);"/>
 	</menupopup>
 
 	<!-- Popup for forwarder information -->

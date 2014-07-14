@@ -34,17 +34,26 @@ cz.nic.extension.worker = new ChromeWorker("chrome://dnssec/content/dnsseclib.js
 
 cz.nic.extension.worker.onmessage = function(event) {
 
-	if (cz.nic.extension.dnssecExtension.debugOutput) {
-		dump(cz.nic.extension.dnssecExtension.debugPrefix 
-		+ '-------- ASYNC RESOLVING DONE -----------------\n\n');
-	}
-
 	var retval = event.data.split("§");
-	var dn = retval[0];	
-	var status = retval[1];
-	var ip = retval[2];
-	var addr = retval[3];
-	cz.nic.extension.dnssecExtResolver.setValidatedData(dn, parseInt(status,10), ip, addr);
+
+	switch(retval[0]) {
+	case "initialiseRet":
+		break;
+	case "validateRet":
+		if (cz.nic.extension.dnssecExtension.debugOutput) {
+			dump(cz.nic.extension.dnssecExtension.debugPrefix 
+			+ '-------- ASYNC RESOLVING DONE -----------------\n\n');
+		}
+
+		var dn = retval[1];
+		var status = retval[2];
+		var ip = retval[3];
+		var addr = retval[4];
+		cz.nic.extension.dnssecExtResolver.setValidatedData(dn, parseInt(status,10), ip, addr);
+		break;
+	default:
+		break;
+	}
     };
 
 // window location changed, also happens on changing tabs
@@ -158,11 +167,19 @@ init:
 		}
 
 		// Plugin initialization
-		if (cz.nic.extension.libCore.dnssec_init()) {
+		if (cz.nic.extension.dnssecLibCore.dnssec_init()) {
 			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_INACTION);
 		} else {
 			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR_GENERIC);
 		}
+
+		setTimeout(function() {
+				dump("A0001 " + cz.nic.extension.dnssecLibCore.coreFileName + "\n");
+				let cmd = "initialise§" + cz.nic.extension.dnssecLibCore.coreFileName;
+				cz.nic.extension.worker.postMessage(cmd);
+			}, 1000);
+
+		dump("A0002 " + cz.nic.extension.dnssecLibCore.coreFileName + "\n");
 
 		// Enable asynchronous resolving if desired
 		this.getAsyncResolveFlag();
@@ -250,8 +267,8 @@ uninit:
 		cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
 
 		// Plugin deinitialization
-		cz.nic.extension.libCore.dnssec_validation_deinit_core();
-		cz.nic.extension.libCore.dnssec_close();
+		cz.nic.extension.dnssecLibCore.dnssec_validation_deinit_core();
+		cz.nic.extension.dnssecLibCore.dnssec_close();
 
 		if (this.debugOutput) {
 			dump(this.debugPrefix + 'Clear Cache...\n');
@@ -380,14 +397,14 @@ dnssecValidate:
 		try {
 			if (!cz.nic.extension.dnssecExtension.asyncResolve) {   
 				// Synchronous js-ctypes validation
-				var retval = cz.nic.extension.libCore.dnssec_validate_core(dn, options, nameserver, addr);
+				var retval = cz.nic.extension.dnssecLibCore.dnssec_validate_core(dn, options, nameserver, addr);
 				cz.nic.extension.dnssecExtResolver.setValidatedData(dn, retval[0], retval[1], addr);
 			} else {   
 				// Asynchronous js-ctypes validation
 				if (cz.nic.extension.dnssecExtension.debugOutput) {
 					dump("\n" + cz.nic.extension.dnssecExtension.debugPrefix + "-------- CALL CORE -- ASYNC RESOLVING ---------\n");
 				}
-				var queryParams = dn + '§' + options + '§' + nameserver + '§' + addr;
+				var queryParams = "validate§" + dn + '§' + options + '§' + nameserver + '§' + addr;
 				cz.nic.extension.worker.postMessage(queryParams);
 			}
 		} catch (ex) {
@@ -435,10 +452,10 @@ setValidatedData:
 					addr + ';\n');
 			}
 
-			cz.nic.extension.libCore.dnssec_validation_deinit_core();
-			cz.nic.extension.libCore.dnssec_validation_init_core();
+			cz.nic.extension.dnssecLibCore.dnssec_validation_deinit_core();
+			cz.nic.extension.dnssecLibCore.dnssec_validation_init_core();
 
-			var retval = cz.nic.extension.libCore.dnssec_validate_core(dn, options, "nofwd", addr);
+			var retval = cz.nic.extension.dnssecLibCore.dnssec_validate_core(dn, options, "nofwd", addr);
 
 			if (ext.debugOutput) {
 				dump(ext.debugPrefix + 'NOFWD result: ' + retval[0] + ' : ' + retval[1] +' ;\n');

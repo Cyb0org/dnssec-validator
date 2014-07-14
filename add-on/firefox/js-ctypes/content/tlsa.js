@@ -214,7 +214,7 @@ init:
 		}
 
 		// Plugin initialization
-		if (cz.nic.extension.libCore.dane_init()) {
+		if (cz.nic.extension.daneLibCore.dane_init()) {
 			cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_INACTION);
 		} else {
 			cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_ERROR_GENERIC);
@@ -300,8 +300,8 @@ uninit:
 		//this.unregisterObserver("http-on-examine-cached-response");
 
 		// Plugin deinitialization
-		cz.nic.extension.libCore.dane_validation_deinit_core();
-		cz.nic.extension.libCore.dane_close();
+		cz.nic.extension.daneLibCore.dane_validation_deinit_core();
+		cz.nic.extension.daneLibCore.dane_close();
 
 		cz.nic.extension.tlsaExtCache.delAllRecords();
 
@@ -762,7 +762,7 @@ check_tlsa_tab_change:
 
 		// Call validation
 		try {
-			var daneMatch = cz.nic.extension.libCore.dane_validate_core(derCerts, len, options,
+			var daneMatch = cz.nic.extension.daneLibCore.dane_validate_core(derCerts, len, options,
 			                                  nameserver, domain, port, protocol, policy);
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(this.DANE_DEBUG_PRE + "Return: " + daneMatch
@@ -782,14 +782,14 @@ check_tlsa_tab_change:
 		if (daneMatch == c.DANE_DNSSEC_BOGUS) {
 
 			options = 0;
-			cz.nic.extension.libCore.dane_validation_deinit_core();
-			cz.nic.extension.libCore.dane_validation_init_core();
-			var daneMatchnofwd = cz.nic.extension.libCore.dane_validate_core(derCerts, len, options, "nofwd", domain, port, protocol, policy);
+			cz.nic.extension.daneLibCore.dane_validation_deinit_core();
+			cz.nic.extension.daneLibCore.dane_validation_init_core();
+			var daneMatchnofwd = cz.nic.extension.daneLibCore.dane_validate_core(derCerts, len, options, "nofwd", domain, port, protocol, policy);
 
 			if (daneMatchnofwd != daneMatch) {
 				daneMatch = c.DANE_RESOLVER_NO_DNSSEC;
-				cz.nic.extension.libCore.dane_validation_deinit_core();
-				cz.nic.extension.libCore.dane_validation_init_core();
+				cz.nic.extension.daneLibCore.dane_validation_deinit_core();
+				cz.nic.extension.daneLibCore.dane_validation_init_core();
 			}
 		}
 
@@ -913,7 +913,7 @@ check_tlsa_https:
 
 		// Call validation
 		try {
-			var daneMatch = cz.nic.extension.libCore.dane_validate_core(derCerts, len, options,
+			var daneMatch = cz.nic.extension.daneLibCore.dane_validate_core(derCerts, len, options,
 			                                  nameserver, domain, port, protocol, policy);
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(this.DANE_DEBUG_PRE + "Return: " + daneMatch

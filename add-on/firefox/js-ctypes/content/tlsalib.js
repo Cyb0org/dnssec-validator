@@ -37,7 +37,7 @@ dane_init: function() {
 		var os = Components.classes["@mozilla.org/xre/app-info;1"]
 		    .getService(Components.interfaces.nsIXULRuntime).OS;
 
-		var tlsaLibName = "unpecified";
+		var tlsaLibName = "unspecified";
 
 		if(os.match("Darwin")) {
 			tlsaLibName = "libDANEcore-macosx.dylib";
@@ -56,7 +56,7 @@ dane_init: function() {
 		}
 
 		try {
-			cz.nic.extension.libCore._initTlsaLib(tlsaLibName);
+			cz.nic.extension.daneLibCore._initTlsaLib(tlsaLibName);
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(cz.nic.extension.daneExtension.debugPrefix + 
 			            "Loaded DANE library:\n        " + tlsaLibName + "\n");
@@ -106,7 +106,7 @@ dane_init: function() {
 		    .path;
 
 		try {
-			cz.nic.extension.libCore._initTlsaLib(tlsaLibName);
+			cz.nic.extension.daneLibCore._initTlsaLib(tlsaLibName);
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(cz.nic.extension.daneExtension.debugPrefix + 
 			            "Loaded DANE library:\n        " + tlsaLibName + "\n");
@@ -138,7 +138,7 @@ dane_init: function() {
 		    .QueryInterface(Components.interfaces.nsIFileURL).file
 		    .path;
 
-		cz.nic.extension.libCore._initTlsaLib(tlsaLibName);
+		cz.nic.extension.daneLibCore._initTlsaLib(tlsaLibName);
 		if (cz.nic.extension.daneExtension.debugOutput) {
 			dump(cz.nic.extension.daneExtension.debugPrefix + 
 		            "Loaded DANE library:\n        " + tlsaLibName + "\n");

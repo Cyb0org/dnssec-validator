@@ -26,7 +26,8 @@ if(!cz.nic.extension) cz.nic.extension={};
 
 // libCore object
 cz.nic.extension.dnssecLibCore = {
-dnsseclib: null, 
+dnsseclib: null,
+coreFileName: null,
   
 dnssec_init: function() {
 
@@ -37,7 +38,7 @@ dnssec_init: function() {
 		var os = Components.classes["@mozilla.org/xre/app-info;1"]
 		    .getService(Components.interfaces.nsIXULRuntime).OS;
 
-		var dnssecLibName = "unpecified";
+		var dnssecLibName = "unspecified";
 
 		/* Try system location. */
 		if(os.match("Darwin")) {
@@ -57,7 +58,7 @@ dnssec_init: function() {
 		}
 
 		try {
-			cz.nic.extension.libCore._initDnssecLib(dnssecLibName);
+			cz.nic.extension.dnssecLibCore._initDnssecLib(dnssecLibName);
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
 			            "Loaded DNSSEC library:\n        " + dnssecLibName + "\n");
@@ -74,7 +75,7 @@ dnssec_init: function() {
 			}
 		}
 
-		dnssecLibName = "unpecified";
+		dnssecLibName = "unspecified";
 
 		var abiStr = "unspecified";
 		if (abi.match("x86_64")) {
@@ -107,7 +108,7 @@ dnssec_init: function() {
 		    .path;
 
 		try {
-			cz.nic.extension.libCore._initDnssecLib(dnssecLibName);
+			cz.nic.extension.dnssecLibCore._initDnssecLib(dnssecLibName);
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
 			            "Loaded DNSSEC library:\n        " + dnssecLibName + "\n");
@@ -124,7 +125,7 @@ dnssec_init: function() {
 		}
 
 		/* Last choice. Only for some OS. */
-		dnssecLibName = "unpecified";
+		dnssecLibName = "unspecified";
 
 		if(os.match("Darwin")) {
 			/* Fat binary. */
@@ -140,7 +141,7 @@ dnssec_init: function() {
 		    .QueryInterface(Components.interfaces.nsIFileURL).file
 		    .path;
 
-		cz.nic.extension.libCore._initDnssecLib(dnssecLibName);
+		cz.nic.extension.dnssecLibCore._initDnssecLib(dnssecLibName);
 		if (cz.nic.extension.dnssecExtension.debugOutput) {
 			dump(cz.nic.extension.dnssecExtension.debugPrefix + 
 		            "Loaded DNSSEC library:\n        " + dnssecLibName + "\n");
@@ -157,17 +158,17 @@ _initDnssecLib: function(dnssecLibName) {
 	this.dnsseclib = ctypes.open(dnssecLibName);
 
 	//declare dnssec API functions
-	this.dnssec_validation_init = 
+	this.dnssec_validation_init =
 	    this.dnsseclib.declare("dnssec_validation_init",
 	    ctypes.default_abi,
 	    ctypes.int);
 
-	this.dnssec_validation_deinit = 
+	this.dnssec_validation_deinit =
 	    this.dnsseclib.declare("dnssec_validation_deinit",
 	    ctypes.default_abi,
 	    ctypes.int);
 
-	this.dnssec_validate = 
+	this.dnssec_validate =
 	    this.dnsseclib.declare("dnssec_validate",
 	    ctypes.default_abi,
 	    ctypes.int,		//return state
@@ -177,6 +178,8 @@ _initDnssecLib: function(dnssecLibName) {
 	    ctypes.char.ptr,	//ipbrowser
 	    ctypes.char.ptr.ptr //ipvalidator out
 	    );
+
+	this.coreFileName = dnssecLibName;
 },
 
 // wrapper to dnssec init
@@ -193,7 +196,6 @@ dnssec_validation_deinit_core: function() {
 
 // wrapper to dnssec validation query
 dnssec_validate_core: function(dn, options, nameserver, addr, outputParam) {
-
 	var outputParam = new ctypes.char.ptr();
 	var retval = this.dnssec_validate(dn, options, nameserver, addr, 
 	    outputParam.address());
@@ -207,34 +209,55 @@ dnssec_close: function() {
 
 };
 
+
+/*
+ * Supported commands/returns are:
+ *
+ * initialise/initialiseRet
+ * validate/validateRet
+ *
+ */
 onmessage = function(event) {
 
 	var queryParams = event.data.split("§");
-	var dn = queryParams[0];	
-	var options = queryParams[1];
-	var nameserver = queryParams[2];
-	var addr = queryParams[3];
-	options = parseInt(options, 10);
 
-	var retval = 0;
+	switch (queryParams[0]) {
+	case "initialise":
+		cz.nic.extension.dnssecLibCore._initDnssecLib(queryParams[1]);
+		break;
+	case "validate":
+		let dn = queryParams[1];
+		let options = queryParams[2];
+		let nameserver = queryParams[3];
+		let addr = queryParams[4];
+		options = parseInt(options, 10);
 
-	//open library
-	let dnssecLibName = "plugins/libDNSSECcore-linux-x64.so";
-	var dnsseclib = ctypes.open(dnssecLibName);
+/*
+		//open library
+		let dnssecLibName = "plugins/libDNSSECcore-linux-x64.so";
+		var dnsseclib = ctypes.open(dnssecLibName);
 
-	var dnssec_validate =  dnsseclib.declare("dnssec_validate",
-	    ctypes.default_abi,
-	    ctypes.int,		//return state
-	    ctypes.char.ptr,	//doamin
-	    ctypes.uint16_t,	//options
-	    ctypes.char.ptr,	//optdnssrv
-	    ctypes.char.ptr,	//ipbrowser
-	    ctypes.char.ptr.ptr //ipvalidator out
-	    );
+		var dnssec_validate =  dnsseclib.declare("dnssec_validate",
+		    ctypes.default_abi,
+		    ctypes.int,		//return state
+		    ctypes.char.ptr,	//domain
+		    ctypes.uint16_t,	//options
+		    ctypes.char.ptr,	//optdnssrv
+		    ctypes.char.ptr,	//ipbrowser
+		    ctypes.char.ptr.ptr //ipvalidator out
+		    );
 
-	var outputParam = new ctypes.char.ptr();
-	var retval = dnssec_validate(dn, options, nameserver, addr, outputParam.address());
-	retval = dn + "§" + retval + "§" + outputParam.readString() + "§" + addr;
-	postMessage(retval);
-	return;
+		var outputParam = new ctypes.char.ptr();
+		var retval = dnssec_validate(dn, options, nameserver, addr, outputParam.address());
+*/
+		let outputParam = new ctypes.char.ptr();
+		let retval =
+		    cz.nic.extension.dnssecLibCore.dnssec_validate_core(
+		        dn, options, nameserver, addr, outputParam);
+		retval = "validateRet§" + dn + "§" + retval[0] + "§" + retval[1] + "§" + addr;
+		postMessage(retval);
+		break;
+	default:
+		break;
+	}
 };
