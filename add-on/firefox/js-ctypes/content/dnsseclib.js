@@ -226,6 +226,14 @@ onmessage = function(event) {
 		cz.nic.extension.dnssecLibCore._initDnssecLib(queryParams[1]);
 		break;
 	case "validate":
+		if (null == cz.nic.extension.dnssecLibCore.coreFileName) {
+			dump("Uninitialised.\n");
+			setTimeout(function() {
+					dump("Calling again.\n");
+					this.onmessage(event);
+				}, 1000);
+			return;
+		}
 		let dn = queryParams[1];
 		let options = queryParams[2];
 		let nameserver = queryParams[3];

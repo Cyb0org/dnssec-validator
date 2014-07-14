@@ -177,7 +177,7 @@ init:
 				dump("A0001 " + cz.nic.extension.dnssecLibCore.coreFileName + "\n");
 				let cmd = "initialise§" + cz.nic.extension.dnssecLibCore.coreFileName;
 				cz.nic.extension.worker.postMessage(cmd);
-			}, 1000);
+			}, 500);
 
 		dump("A0002 " + cz.nic.extension.dnssecLibCore.coreFileName + "\n");
 
