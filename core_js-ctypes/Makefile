@@ -59,6 +59,11 @@ ifeq ($(STATIC_LINKING),yes)
   UNBOUND_STATIC = $(UNBOUND_LIB)/lib/libunbound.a
 
   STATIC_LIBS = $(OPENSSL_STATIC) $(LDNS_STATIC) $(UNBOUND_STATIC)
+
+  ifneq ($(KERNEL),darwin)
+    # On OS X the following flags should be omitted when linking statically.
+    LDFLAGS += -lssl -lcrypto -lldns -lunbound
+  endif
 else
   #UNBOUND_CFLAGS =
   UNBOUND_LDFLAGS = -lunbound
