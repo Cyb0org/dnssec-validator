@@ -26,11 +26,11 @@ if(!cz.nic.extension) cz.nic.extension={};
 
 // libCore object
 cz.nic.extension.dnssecLibCore = {
+
 dnsseclib: null,
 coreFileName: null,
   
 dnssec_init: function() {
-
 	AddonManager.getAddonByID("dnssec@nic.cz", function(addon) {
 
 		var abi = Components.classes["@mozilla.org/xre/app-info;1"]
@@ -182,6 +182,9 @@ _initDnssecLib: function(dnssecLibName) {
 	this.coreFileName = dnssecLibName;
 },
 
+
+
+
 // wrapper to dnssec init
 dnssec_validation_init_core: function() {
 	var res = this.dnssec_validation_init();
@@ -202,6 +205,15 @@ dnssec_validate_core: function(dn, options, nameserver, addr, outputParam) {
 	return [retval, outputParam.readString()];
 },
 
+
+
+
+
+
+
+
+
+
 // shoutdown lib
 dnssec_close: function() {
 	this.dnsseclib.close();
@@ -220,18 +232,25 @@ dnssec_close: function() {
 onmessage = function(event) {
 
 	var queryParams = event.data.split("§");
+	let cmd = queryParams[0];
 
-	switch (queryParams[0]) {
+	switch (cmd) {
 	case "initialise":
 		cz.nic.extension.dnssecLibCore._initDnssecLib(queryParams[1]);
 		break;
 	case "validate":
 		if (null == cz.nic.extension.dnssecLibCore.coreFileName) {
-			dump("Uninitialised.\n");
+			if (cz.nic.extension.dnssecExtension.debugOutput) {
+				dump(cz.nic.extension.dnssecExtension.debugPrefix +
+				    "Calling uninitialised worker.\n");
+			}
 			setTimeout(function() {
-					dump("Calling again.\n");
-					this.onmessage(event);
-				}, 1000);
+				if (cz.nic.extension.dnssecExtension.debugOutput) {
+					dump(cz.nic.extension.dnssecExtension.debugPrefix +
+					    "Trying to call again.\n");
+				}
+				this.onmessage(event);
+			}, 1000);
 			return;
 		}
 		let dn = queryParams[1];
@@ -247,12 +266,12 @@ onmessage = function(event) {
 
 		var dnssec_validate =  dnsseclib.declare("dnssec_validate",
 		    ctypes.default_abi,
-		    ctypes.int,		//return state
-		    ctypes.char.ptr,	//domain
-		    ctypes.uint16_t,	//options
-		    ctypes.char.ptr,	//optdnssrv
-		    ctypes.char.ptr,	//ipbrowser
-		    ctypes.char.ptr.ptr //ipvalidator out
+		    ctypes.int, // return state
+		    ctypes.char.ptr, // domain
+		    ctypes.uint16_t, // options
+		    ctypes.char.ptr, // optdnssrv
+		    ctypes.char.ptr, // ipbrowser
+		    ctypes.char.ptr.ptr // ipvalidator out
 		    );
 
 		var outputParam = new ctypes.char.ptr();

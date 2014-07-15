@@ -36,7 +36,7 @@ cz.nic.extension.worker.onmessage = function(event) {
 
 	var retval = event.data.split("§");
 
-	switch(retval[0]) {
+	switch (retval[0]) {
 	case "initialiseRet":
 		break;
 	case "validateRet":
@@ -54,7 +54,7 @@ cz.nic.extension.worker.onmessage = function(event) {
 	default:
 		break;
 	}
-    };
+};
 
 // window location changed, also happens on changing tabs
 cz.nic.extension.dnssecExtUrlBarListener = {
@@ -174,12 +174,9 @@ init:
 		}
 
 		setTimeout(function() {
-				dump("A0001 " + cz.nic.extension.dnssecLibCore.coreFileName + "\n");
-				let cmd = "initialise§" + cz.nic.extension.dnssecLibCore.coreFileName;
-				cz.nic.extension.worker.postMessage(cmd);
-			}, 500);
-
-		dump("A0002 " + cz.nic.extension.dnssecLibCore.coreFileName + "\n");
+			let cmd = "initialise§" + cz.nic.extension.dnssecLibCore.coreFileName;
+			cz.nic.extension.worker.postMessage(cmd);
+		}, 500);
 
 		// Enable asynchronous resolving if desired
 		this.getAsyncResolveFlag();

@@ -27,7 +27,8 @@ if(!cz.nic.extension) cz.nic.extension={};
 // libCore object
 cz.nic.extension.daneLibCore = {
 
-tlsalib: null,  
+tlsalib: null,
+coreFileName: null,
   
 dane_init: function() {
 	AddonManager.getAddonByID("dnssec@nic.cz", function(addon) {
@@ -39,6 +40,7 @@ dane_init: function() {
 
 		var tlsaLibName = "unspecified";
 
+		/* Try system location. */
 		if(os.match("Darwin")) {
 			tlsaLibName = "libDANEcore-macosx.dylib";
 		} else if(os.match("FreeBSD")) {
@@ -113,7 +115,8 @@ dane_init: function() {
 			}
 			return true;
 		} catch(e) {
-			/* Failed loading plug-in distributed library.
+			/*
+			 * Failed loading plug-in distributed library.
 			 */
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(cz.nic.extension.daneExtension.debugPrefix + 
@@ -160,7 +163,6 @@ _initTlsaLib: function(tlsaLibName) {
 	    ctypes.default_abi,
 	    ctypes.int);
 
-
 	this.dane_validation_deinit = 
 	    this.tlsalib.declare("dane_validation_deinit",
 	    ctypes.default_abi,
@@ -179,6 +181,8 @@ _initTlsaLib: function(tlsaLibName) {
 	    ctypes.char.ptr, 	//protocol
 	    ctypes.int		//policy
 	    );
+
+	this.coreFileName = tlsaLibName;
 },
 
 // wrapper to tlsa init
@@ -210,6 +214,7 @@ dane_validate_core: function(certchain, certlen, options, nameserver, dname,
 	return retval;
 },
 
+// shoutdown lib
 dane_close: function() {
 	this.tlsalib.close();
 }
@@ -217,46 +222,68 @@ dane_close: function() {
 };
 
 
-
+/*
+ * Supported commands/returns are:
+ *
+ * initialise/initialiseRet
+ * validate/validateRet
+ *
+ */
 onmessage = function(event) {
 
 	var queryParams = event.data.split("§");
-	 
-	if ("validate" == queryParams[0]) {
+	let cmd = queryParams[0];
 
-		var cmd = queryParams[0];	
-		var certarray = queryParams[1];
+	switch (cmd) {
+	case "initialise":
+		cz.nic.extension.daneLibCore._initTlsaLib(queryParams[1]);
+		break;
+	case "validate":
+		if (null == cz.nic.extension.daneLibCore.coreFileName) {
+			if (cz.nic.extension.daneExtension.debugOutput) {
+				dump(cz.nic.extension.daneExtension.debugPrefix +
+				    "Calling uninitialised worker.\n");
+			}
+			setTimeout(function() {
+				if (cz.nic.extension.daneExtension.debugOutput) {
+					dump(cz.nic.extension.daneExtension.debugPrefix +
+					    "Trying to call again.\n");
+				}
+				this.onmessage(event);
+			}, 1000);
+			return;
+		}
+
+		let certarray = queryParams[1];
 		certarray = certarray.split("~");
-		var certlen = queryParams[2];	
-		var options = queryParams[3];
-		var nameserver = queryParams[4];
-		var dname = queryParams[5];
-		var port = queryParams[6];
-		var protocol = queryParams[7];
-		var policy = queryParams[8];
-		var hostport = queryParams[9];
-
+		let certlen = queryParams[2];
+		let options = queryParams[3];
+		let nameserver = queryParams[4];
+		let dname = queryParams[5];
+		let port = queryParams[6];
+		let protocol = queryParams[7];
+		let policy = queryParams[8];
+		let hostport = queryParams[9];
 		certlen = parseInt(certlen, 10);
 		options = parseInt(options, 10);
 		policy = parseInt(policy, 10);
 
-		var retval = 0;
-
+/*
 		//open library
 		let tlsaLibName = "plugins/libDANEcore-linux-x64.so";
 		var tlsalib = ctypes.open(tlsaLibName);
 
 		var dane_validate = tlsalib.declare("dane_validate",
-	    	ctypes.default_abi,
-		    ctypes.int,		//return state
-		    ctypes.char.ptr.array(),//certchain[]
-		    ctypes.int,		//certcount
-		    ctypes.uint16_t,	//options
-		    ctypes.char.ptr,	//optdnssrv
-		    ctypes.char.ptr,	//domain
-		    ctypes.char.ptr, 	//port
-		    ctypes.char.ptr, 	//protocol
-		    ctypes.int		//policy
+		ctypes.default_abi,
+		    ctypes.int, // return state
+		    ctypes.char.ptr.array(), // certchain[]
+		    ctypes.int, //certcount
+		    ctypes.uint16_t, // options
+		    ctypes.char.ptr, // optdnssrv
+		    ctypes.char.ptr, // domain
+		    ctypes.char.ptr, // port
+		    ctypes.char.ptr, // protocol
+		    ctypes.int // policy
 		    );
 
 
@@ -264,17 +291,23 @@ onmessage = function(event) {
 		var certCArray = ptrArrayType();
 
 		for (var i = 0; i < certlen; ++i) {
-			/* Convert JS array of strings to array of char *. */
+			// Convert JS array of strings to array of char.
 			certCArray[i] = ctypes.char.array()(certarray[i]);
 		}
 
-		retval = dane_validate(certCArray, certlen, options,
+		var retval = dane_validate(certCArray, certlen, options,
 		    nameserver, dname, port, protocol, policy);
+*/
 
-		retval = hostport + "§" + retval;
+		let retval = cz.nic.extension.daneLibCore.dane_validate_core(
+		    certarray, certlen, options, nameserver, dname, port,
+		    protocol, policy);
+
+		retval = "validateRet§" + hostport + "§" + retval;
 		postMessage(retval);
-		return;
-	} else {
+		break;
+	default:
+		break;
 	}
 };
 

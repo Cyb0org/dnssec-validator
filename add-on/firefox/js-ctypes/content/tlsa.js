@@ -27,19 +27,28 @@ cz.nic.extension.worker2 = new ChromeWorker("chrome://dnssec/content/tlsalib.js"
 
 cz.nic.extension.worker2.onmessage = function(event) {
 
-	if (cz.nic.extension.daneExtension.debugOutput) {
-		dump(cz.nic.extension.daneExtension.debugPrefix 
-		+ '-------- ASYNC RESOLVING DONE -----------------\n\n');
-	}
-
 	var retval = event.data.split("§");
-	var hostport = retval[0];	
-	var status = retval[1];
-	status = parseInt(status,10);
 
-	cz.nic.extension.tlsaExtCache.addRecord(hostport, status , "no");
-	cz.nic.extension.tlsaExtCache.printContent();
-	cz.nic.extension.tlsaExtHandler.setSecurityState(status);
+	switch (retval[0]) {
+	case "initialiseRet":
+		break;
+	case "validateRet":
+		if (cz.nic.extension.daneExtension.debugOutput) {
+			dump(cz.nic.extension.daneExtension.debugPrefix 
+			+ '-------- ASYNC RESOLVING DONE -----------------\n\n');
+		}
+
+		var hostport = retval[1];
+		var status = retval[2];
+		status = parseInt(status, 10);
+
+		cz.nic.extension.tlsaExtCache.addRecord(hostport, status , "no");
+		cz.nic.extension.tlsaExtCache.printContent();
+		cz.nic.extension.tlsaExtHandler.setSecurityState(status);
+		break;
+	default:
+		break;
+	}
 };
 
 
@@ -240,6 +249,11 @@ init:
 		} else {
 			cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_ERROR_GENERIC);
 		}
+
+		setTimeout(function() {
+			let cmd = "initialise§" + cz.nic.extension.daneLibCore.coreFileName;
+			cz.nic.extension.worker2.postMessage(cmd);
+		}, 500);
 
 		// Set inaction mode (no icon)
 		cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_INACTION);
