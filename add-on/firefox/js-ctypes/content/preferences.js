@@ -256,7 +256,7 @@ optdnsserveraddrInput :
 testdnssec :
 	function() {
 		//this.setLoading(true);
-		var options = 7;
+		var options = 6;
 		var ip = false;
 		var testnic = 0;
 		var dn = "www.nic.cz";
@@ -274,7 +274,7 @@ testdnssec :
 			break;
 		case '3': // Self-validation
 			nameserver = "nofwd";
-			options = 5;
+			options = 4;
 			break;
 		default:
 			nameserver = "";
@@ -316,7 +316,9 @@ testdnssec :
 					this.savePrefs();
 				}
 			} catch (ex) {
-				dump('Error: Plugin call failed!\n');
+				if (this.getBool("dnssecdebug")) {
+					dump('Error: Plugin call failed!\n');
+				}
 			}
 		}//if ip
 	},
