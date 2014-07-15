@@ -829,6 +829,8 @@ check_tlsa_tab_change:
 		}
 
 		var tlsablock = cz.nic.extension.dnssecExtPrefs.getBool("tlsablocking");
+		var checkall = cz.nic.extension.dnssecExtPrefs.getBool("checkhttpsrequestsonpages");
+
 		var c = cz.nic.extension.tlsaExtNPAPIConst;
 
 		cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_ACTION);
@@ -843,7 +845,7 @@ check_tlsa_tab_change:
 
 		// Call TLSA validation
 		try {
-			if (tlsablock) {   
+			if (checkall) {   
 				// Synchronous js-ctypes validation
 				var daneMatch = cz.nic.extension.daneLibCore.dane_validate_core(certArrayParam[0], 
 						     certArrayParam[2], validationParams[0], validationParams[1],
@@ -908,6 +910,8 @@ check_tlsa_https:
 		}
 
 		var tlsablock = cz.nic.extension.dnssecExtPrefs.getBool("tlsablocking");
+		var checkall = cz.nic.extension.dnssecExtPrefs.getBool("checkhttpsrequestsonpages");
+
 		var c = cz.nic.extension.tlsaExtNPAPIConst;
 		var certArrayParam = this.prepare_certificate_array("https", cert);
 		if (certArrayParam == null) {
@@ -918,7 +922,7 @@ check_tlsa_https:
 
 		// Call TLSA validation
 		try {
-			if (tlsablock) {   
+			if (checkall) {   
 				// Synchronous js-ctypes validation
 				var daneMatch = cz.nic.extension.daneLibCore.dane_validate_core(certArrayParam[0], 
 						     certArrayParam[2], validationParams[0], validationParams[1],
