@@ -22,17 +22,21 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 Components.utils.import("resource://gre/modules/ctypes.jsm");
 Components.utils.import("resource://gre/modules/AddonManager.jsm"); 
 
-//Define our namespace
+// Define our namespace
 if(!cz) var cz={};
 if(!cz.nic) cz.nic={};
 if(!cz.nic.extension) cz.nic.extension={};
 
+
+// Init and unload of add-on and its plugin core
 window.addEventListener("load", function() {cz.nic.extension.dnssecExtension.init();}, false);
 window.addEventListener("unload", function() {cz.nic.extension.dnssecExtension.uninit();}, false);
 
-cz.nic.extension.worker = new ChromeWorker("chrome://dnssec/content/dnsseclib.js");
+// Create worker for async call of dnssec validation core
+cz.nic.extension.dnssecworker = new ChromeWorker("chrome://dnssec/content/dnsseclib.js");
 
-cz.nic.extension.worker.onmessage = function(event) {
+// Callback from dnssecworker (dnsseclib.js), return validation status
+cz.nic.extension.dnssecworker.onmessage = function(event) {
 
 	var retval = event.data.split("§");
 
@@ -175,7 +179,7 @@ init:
 
 		setTimeout(function() {
 			let cmd = "initialise§" + cz.nic.extension.dnssecLibCore.coreFileName;
-			cz.nic.extension.worker.postMessage(cmd);
+			cz.nic.extension.dnssecworker.postMessage(cmd);
 		}, 500);
 
 		// Enable asynchronous resolving if desired
@@ -402,7 +406,7 @@ dnssecValidate:
 					dump("\n" + cz.nic.extension.dnssecExtension.debugPrefix + "-------- CALL CORE -- ASYNC RESOLVING ---------\n");
 				}
 				var queryParams = "validate§" + dn + '§' + options + '§' + nameserver + '§' + addr;
-				cz.nic.extension.worker.postMessage(queryParams);
+				cz.nic.extension.dnssecworker.postMessage(queryParams);
 			}
 		} catch (ex) {
 			dump(cz.nic.extension.dnssecExtension.debugPrefix + 'Error: Plugin validation method call failed!\n');

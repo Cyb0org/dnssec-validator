@@ -240,15 +240,19 @@ onmessage = function(event) {
 		break;
 	case "validate":
 		if (null == cz.nic.extension.daneLibCore.coreFileName) {
+/*
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(cz.nic.extension.daneExtension.debugPrefix +
 				    "Calling uninitialised worker.\n");
 			}
+*/
 			setTimeout(function() {
+/*
 				if (cz.nic.extension.daneExtension.debugOutput) {
 					dump(cz.nic.extension.daneExtension.debugPrefix +
 					    "Trying to call again.\n");
 				}
+*/
 				this.onmessage(event);
 			}, 1000);
 			return;
@@ -267,37 +271,6 @@ onmessage = function(event) {
 		certlen = parseInt(certlen, 10);
 		options = parseInt(options, 10);
 		policy = parseInt(policy, 10);
-
-/*
-		//open library
-		let tlsaLibName = "plugins/libDANEcore-linux-x64.so";
-		var tlsalib = ctypes.open(tlsaLibName);
-
-		var dane_validate = tlsalib.declare("dane_validate",
-		ctypes.default_abi,
-		    ctypes.int, // return state
-		    ctypes.char.ptr.array(), // certchain[]
-		    ctypes.int, //certcount
-		    ctypes.uint16_t, // options
-		    ctypes.char.ptr, // optdnssrv
-		    ctypes.char.ptr, // domain
-		    ctypes.char.ptr, // port
-		    ctypes.char.ptr, // protocol
-		    ctypes.int // policy
-		    );
-
-
-		var ptrArrayType = ctypes.char.ptr.array(certlen);
-		var certCArray = ptrArrayType();
-
-		for (var i = 0; i < certlen; ++i) {
-			// Convert JS array of strings to array of char.
-			certCArray[i] = ctypes.char.array()(certarray[i]);
-		}
-
-		var retval = dane_validate(certCArray, certlen, options,
-		    nameserver, dname, port, protocol, policy);
-*/
 
 		let retval = cz.nic.extension.daneLibCore.dane_validate_core(
 		    certarray, certlen, options, nameserver, dname, port,

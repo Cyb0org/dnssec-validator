@@ -182,9 +182,6 @@ _initDnssecLib: function(dnssecLibName) {
 	this.coreFileName = dnssecLibName;
 },
 
-
-
-
 // wrapper to dnssec init
 dnssec_validation_init_core: function() {
 	var res = this.dnssec_validation_init();
@@ -204,15 +201,6 @@ dnssec_validate_core: function(dn, options, nameserver, addr, outputParam) {
 	    outputParam.address());
 	return [retval, outputParam.readString()];
 },
-
-
-
-
-
-
-
-
-
 
 // shoutdown lib
 dnssec_close: function() {
@@ -240,15 +228,19 @@ onmessage = function(event) {
 		break;
 	case "validate":
 		if (null == cz.nic.extension.dnssecLibCore.coreFileName) {
+/*
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix +
 				    "Calling uninitialised worker.\n");
 			}
+*/
 			setTimeout(function() {
+/*
 				if (cz.nic.extension.dnssecExtension.debugOutput) {
 					dump(cz.nic.extension.dnssecExtension.debugPrefix +
 					    "Trying to call again.\n");
 				}
+*/
 				this.onmessage(event);
 			}, 1000);
 			return;
@@ -259,24 +251,6 @@ onmessage = function(event) {
 		let addr = queryParams[4];
 		options = parseInt(options, 10);
 
-/*
-		//open library
-		let dnssecLibName = "plugins/libDNSSECcore-linux-x64.so";
-		var dnsseclib = ctypes.open(dnssecLibName);
-
-		var dnssec_validate =  dnsseclib.declare("dnssec_validate",
-		    ctypes.default_abi,
-		    ctypes.int, // return state
-		    ctypes.char.ptr, // domain
-		    ctypes.uint16_t, // options
-		    ctypes.char.ptr, // optdnssrv
-		    ctypes.char.ptr, // ipbrowser
-		    ctypes.char.ptr.ptr // ipvalidator out
-		    );
-
-		var outputParam = new ctypes.char.ptr();
-		var retval = dnssec_validate(dn, options, nameserver, addr, outputParam.address());
-*/
 		let outputParam = new ctypes.char.ptr();
 		let retval =
 		    cz.nic.extension.dnssecLibCore.dnssec_validate_core(

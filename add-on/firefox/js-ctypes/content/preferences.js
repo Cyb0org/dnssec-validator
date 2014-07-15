@@ -185,11 +185,13 @@ setElementsattributes :
 		document.getElementById("dnssec-pref-clearcache").disabled = !tmpCheck;
 		document.getElementById("dnssec-pref-checkallhttps").disabled = !tmpCheck;
 		document.getElementById("dnssec-pref-usebrowsercertchain").disabled = !tmpCheck;
-		if (tmpCheck) {
-			var tmp = document.getElementById("dnssec-pref-checkallhttps").checked;
-			document.getElementById("dnssec-pref-clearcache").disabled = !tmp;
-			document.getElementById("dnssec-pref-tlsablock").disabled = !tmp;
-		}
+		document.getElementById("dnssec-pref-tlsablock").disabled = !tmpCheck;
+		document.getElementById("dnssec-pref-clearcache").disabled = !tmpCheck;
+//		if (tmpCheck) {
+//			var tmp = document.getElementById("dnssec-pref-checkallhttps").checked;
+//			document.getElementById("dnssec-pref-tlsablock").disabled = !tmp;
+//			document.getElementById("dnssec-pref-clearcache").disabled = !tmp;
+//		}
 
 	},
 
@@ -328,7 +330,7 @@ onUnload :
 	function(prefwindow) {
 		this.setBool("cachefree", true);
 		window.arguments[0].dnssec_validation_deinit_core();
-		window.arguments[0].dane_validation_deinit_core();
+		window.arguments[1].dane_validation_deinit_core();
 		return true;
 	},
 
@@ -341,7 +343,7 @@ setLoading :
 	},
 
 showPrefWindow :
-	function(libCore) {
+	function(dnssecLibCore, daneLibCore) {
 		var optionsURL = "chrome://dnssec/content/preferences.xul";
 		// Check if the pref window is not already opened
 		var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
@@ -356,7 +358,7 @@ showPrefWindow :
 		}
 		// Open the pref window
 		var features = "chrome,titlebar,toolbar,centerscreen,dialog=yes";
-		window.openDialog(optionsURL, "", features, libCore);
+		window.openDialog(optionsURL, "", features, dnssecLibCore, daneLibCore);
 	},
 
 // Functions for IP address with port notation validation
