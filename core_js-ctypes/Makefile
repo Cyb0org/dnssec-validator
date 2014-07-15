@@ -49,13 +49,13 @@ KERNEL = $(shell uname -s | tr '[:upper:]' '[:lower:]')
 STATIC_LINKING ?= yes
 ifeq ($(STATIC_LINKING),yes)
   OPENSSL_CFLAGS = -I$(OPENSSL_LIB)/include
-  OPENSSL_LDFLAGS = -L$(OPENSSL_LIB)/lib -lssl -lcrypto
+  OPENSSL_LDFLAGS = -L$(OPENSSL_LIB)/lib
   OPENSSL_STATIC = $(OPENSSL_LIB)/lib/libssl.a $(OPENSSL_LIB)/lib/libcrypto.a
   LDNS_CFLAGS = -I$(LDNS_LIB)/include
-  LDNS_LDFLAGS = -L$(LDNS_LIB)/lib -lldns
+  LDNS_LDFLAGS = -L$(LDNS_LIB)/lib
   LDNS_STATIC = $(LDNS_LIB)/lib/libldns.a
   UNBOUND_CFLAGS = -I$(UNBOUND_LIB)/include
-  UNBOUND_LDFLAGS = -L$(UNBOUND_LIB)/lib -lunbound
+  UNBOUND_LDFLAGS = -L$(UNBOUND_LIB)/lib
   UNBOUND_STATIC = $(UNBOUND_LIB)/lib/libunbound.a
 
   STATIC_LIBS = $(OPENSSL_STATIC) $(LDNS_STATIC) $(UNBOUND_STATIC)
@@ -159,7 +159,7 @@ common.o: ../plugin-source/common/common.c ../plugin-source/common/common.h
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
 libDNSSECcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF): dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
-	$(CC) $^ -o $@ $(LDFLAGS) -shared $(LDFLAGS_DNSSEC_VISIBILITY)
+	$(CC) $^ -o $@ $(LDFLAGS) -shared $(LDFLAGS_DNSSEC_VISIBILITY) $(CFLAGS)
 
 #checkDNSSEClib.o: checkDNSSEClib.c
 #	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/DNSSECValidatorPlugin
@@ -174,7 +174,7 @@ dnssec-plug.o: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
 libDANEcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF): dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
-	$(CC) $^ -o $@ $(LDFLAGS) -shared $(LDFLAGS_DANE_VISIBILITY)
+	$(CC) $^ -o $@ $(LDFLAGS) -shared $(LDFLAGS_DANE_VISIBILITY) $(CFLAGS)
 
 #checkDANElib.o: checkDANElib.c
 #	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/TLSAValidatorPlugin

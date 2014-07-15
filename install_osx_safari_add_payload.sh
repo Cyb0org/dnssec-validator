@@ -10,9 +10,13 @@ else
 	VERSION="x.y.z"
 fi
 
+if [ "x${HWARCH}" = "x" ]; then
+	HWARCH=unknown
+fi
+
 PKGS_DIR=packages
 SCRIPT_STUB=install_osx_safari_stub.sh
-TARGET_FILE="AS-dnssec-tlsa_validator-${VERSION}-macosx.sh"
+TARGET_FILE="AS-dnssec-tlsa_validator-${VERSION}-macosx-${HWARCH}.sh"
 
 PLUGIN_SRC_DIR=plugins-lib
 ADDON_SRC_DIR=add-on
