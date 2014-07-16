@@ -134,7 +134,7 @@ dane_init: function() {
 
 		if(os.match("Darwin")) {
 			/* Fat binary. */
-			tlsaLibName = "plugins/libDANEcore-macosx-.dylib";
+			tlsaLibName = "plugins/libDANEcore-macosx.dylib";
 		} else {
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(cz.nic.extension.daneExtension.debugPrefix +
