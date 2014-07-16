@@ -707,16 +707,16 @@ get_invalid_cert_SSLStatus:
 		}
 		// firefox > v20
 		else if (typeof Components.classes["@mozilla.org/security/x509certdb;1"] !== "undefined") {
-			var certDB = Components.classes["@mozilla.org/security/x509certdb;1"]
-			             .getService(Components.interfaces.nsIX509CertDB2);
-			if (!certDB) {
-				return null;
-			}
 
+ 			var certDB = Components.classes["@mozilla.org/security/x509certdb;1"]
+			             .getService(Components.interfaces.nsIX509CertDB2);
+ 			if (!certDB) {
+ 				return null;
+ 			}
 			var privateMode = false;
 			if (typeof Components.classes['@mozilla.org/privatebrowsing;1'] !== 'undefined') {
-				privateMode = Components.classes["@mozilla.org/privatebrowsing;1"]
-				              .getService(Components.interfaces.nsIPrivateBrowsingService);
+				Components.utils.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
+				privateMode = PrivateBrowsingUtils.isWindowPrivate(window);
 				recentCertsSvc = certDB.getRecentBadCerts(privateMode);
 			}
 		}
