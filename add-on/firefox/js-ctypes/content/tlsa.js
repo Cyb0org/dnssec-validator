@@ -33,11 +33,22 @@ cz.nic.extension.daneworker.onmessage = function(event) {
 
 	switch (retval[0]) {
 	case "initialiseRet":
+		if ("tryAgain" == retval[1]) {
+			if (cz.nic.extension.daneExtension.debugOutput) {
+				dump(cz.nic.extension.daneExtension.debugPrefix +
+				    "Trying to reinitialise worker.\n");
+			}
+			setTimeout(function() {
+				let cmd = "initialise§" +
+				    cz.nic.extension.daneLibCore.coreFileName;
+				cz.nic.extension.daneworker.postMessage(cmd);
+			}, 500);
+		}
 		break;
 	case "validateRet":
 		if (cz.nic.extension.daneExtension.debugOutput) {
-			dump(cz.nic.extension.daneExtension.debugPrefix 
-			+ '-------- ASYNC RESOLVING DONE -----------------\n\n');
+			dump(cz.nic.extension.daneExtension.debugPrefix +
+			    '-------- ASYNC RESOLVING DONE -----------------\n\n');
 		}
 
 		var hostport = retval[1];
@@ -253,7 +264,8 @@ init:
 		}
 
 		setTimeout(function() {
-			let cmd = "initialise§" + cz.nic.extension.daneLibCore.coreFileName;
+			let cmd = "initialise§" +
+			    cz.nic.extension.daneLibCore.coreFileName;
 			cz.nic.extension.daneworker.postMessage(cmd);
 		}, 500);
 

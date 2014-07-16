@@ -51,7 +51,7 @@ dane_init: function() {
 			tlsaLibName = "libDANEcore-windows.dll";
 		} else {
 			if (cz.nic.extension.daneExtension.debugOutput) {
-				dump(cz.nic.extension.daneExtension.debugPrefix + 
+				dump(cz.nic.extension.daneExtension.debugPrefix +
 				    "Error: Unsupported OS!\n");
 			}
 			return false;
@@ -60,8 +60,9 @@ dane_init: function() {
 		try {
 			cz.nic.extension.daneLibCore._initTlsaLib(tlsaLibName);
 			if (cz.nic.extension.daneExtension.debugOutput) {
-				dump(cz.nic.extension.daneExtension.debugPrefix + 
-			            "Loaded DANE library:\n        " + tlsaLibName + "\n");
+				dump(cz.nic.extension.daneExtension.debugPrefix +
+				    "Loaded DANE library:\n        " +
+				    tlsaLibName + "\n");
 			}
 			return true;
 		} catch(e) {
@@ -70,8 +71,10 @@ dane_init: function() {
 			 * distributed with the plug-in.
 			 */
 			if (cz.nic.extension.daneExtension.debugOutput) {
-				dump(cz.nic.extension.daneExtension.debugPrefix + 
-				    "Warning: Cannot find DANE system library! Library distributed with plugin will be used.\n");
+				dump(cz.nic.extension.daneExtension.debugPrefix +
+				    "Warning: Cannot find DANE system " +
+				    "library '" + tlsaLibName + "'! Library " +
+				    "distributed with plugin will be used.\n");
 			}
 		}
 
@@ -84,7 +87,7 @@ dane_init: function() {
 			abiStr = "x86";
 		} else {
 			if (cz.nic.extension.daneExtension.debugOutput) {
-				dump(cz.nic.extension.daneExtension.debugPrefix + 
+				dump(cz.nic.extension.daneExtension.debugPrefix +
 				    "Error: Unsupported OS architecture!\n");
 			}
 			return false;
@@ -110,8 +113,9 @@ dane_init: function() {
 		try {
 			cz.nic.extension.daneLibCore._initTlsaLib(tlsaLibName);
 			if (cz.nic.extension.daneExtension.debugOutput) {
-				dump(cz.nic.extension.daneExtension.debugPrefix + 
-			            "Loaded DANE library:\n        " + tlsaLibName + "\n");
+				dump(cz.nic.extension.daneExtension.debugPrefix +
+				    "Loaded DANE library:\n        " +
+				    tlsaLibName + "\n");
 			}
 			return true;
 		} catch(e) {
@@ -119,8 +123,9 @@ dane_init: function() {
 			 * Failed loading plug-in distributed library.
 			 */
 			if (cz.nic.extension.daneExtension.debugOutput) {
-				dump(cz.nic.extension.daneExtension.debugPrefix + 
-				    "Warning: Cannot load plug-in core library.\n");
+				dump(cz.nic.extension.daneExtension.debugPrefix +
+				    "Warning: Cannot load plug-in core " +
+				    "library '" + tlsaLibName + "'.\n");
 			}
 		}
 
@@ -132,7 +137,7 @@ dane_init: function() {
 			tlsaLibName = "plugins/libDANEcore-macosx-.dylib";
 		} else {
 			if (cz.nic.extension.daneExtension.debugOutput) {
-				dump(cz.nic.extension.daneExtension.debugPrefix + 
+				dump(cz.nic.extension.daneExtension.debugPrefix +
 				    "Error: Sorry, no core found!\n");
 			}
 			return false;
@@ -141,13 +146,23 @@ dane_init: function() {
 		    .QueryInterface(Components.interfaces.nsIFileURL).file
 		    .path;
 
-		cz.nic.extension.daneLibCore._initTlsaLib(tlsaLibName);
-		if (cz.nic.extension.daneExtension.debugOutput) {
-			dump(cz.nic.extension.daneExtension.debugPrefix + 
-		            "Loaded DANE library:\n        " + tlsaLibName + "\n");
+		try {
+			cz.nic.extension.daneLibCore._initTlsaLib(tlsaLibName);
+			if (cz.nic.extension.daneExtension.debugOutput) {
+				dump(cz.nic.extension.daneExtension.debugPrefix +
+				    "Loaded DANE library:\n        " +
+				    tlsaLibName + "\n");
+			}
+			return true;
+		} catch(e) {
+			if (cz.nic.extension.daneExtension.debugOutput) {
+				dump(cz.nic.extension.daneExtension.debugPrefix +
+				    "Error: Cannot load plug-in core " +
+				    "library '" + tlsaLibName + "'.\n");
+			}
 		}
 
-		return true;
+		return false;
 
 	});
 },
@@ -217,7 +232,7 @@ dane_validate_core: function(certchain, certlen, options, nameserver, dname,
 // shoutdown lib
 dane_close: function() {
 	this.tlsalib.close();
-}
+},
 
 };
 
@@ -233,10 +248,18 @@ onmessage = function(event) {
 
 	var queryParams = event.data.split("§");
 	let cmd = queryParams[0];
+	let retval = null;
 
 	switch (cmd) {
 	case "initialise":
-		cz.nic.extension.daneLibCore._initTlsaLib(queryParams[1]);
+		try {
+			cz.nic.extension.daneLibCore._initTlsaLib(
+			    queryParams[1]);
+			retval = "initialiseRet§ok";
+		} catch(e) {
+			retval = "initialiseRet§tryAgain";
+		}
+		postMessage(retval);
 		break;
 	case "validate":
 		if (null == cz.nic.extension.daneLibCore.coreFileName) {
@@ -272,7 +295,7 @@ onmessage = function(event) {
 		options = parseInt(options, 10);
 		policy = parseInt(policy, 10);
 
-		let retval = cz.nic.extension.daneLibCore.dane_validate_core(
+		retval = cz.nic.extension.daneLibCore.dane_validate_core(
 		    certarray, certlen, options, nameserver, dname, port,
 		    protocol, policy);
 
@@ -283,4 +306,3 @@ onmessage = function(event) {
 		break;
 	}
 };
-

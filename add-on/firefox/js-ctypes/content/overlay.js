@@ -42,11 +42,22 @@ cz.nic.extension.dnssecworker.onmessage = function(event) {
 
 	switch (retval[0]) {
 	case "initialiseRet":
+		if ("tryAgain" == retval[1]) {
+			if (cz.nic.extension.dnssecExtension.debugOutput) {
+				dump(cz.nic.extension.dnssecExtension.debugPrefix +
+				    "Trying to reinitialise worker.\n");
+			}
+			setTimeout(function() {
+				let cmd = "initialise§" +
+				    cz.nic.extension.dnssecLibCore.coreFileName;
+				cz.nic.extension.dnssecworker.postMessage(cmd);
+			}, 500);
+		}
 		break;
 	case "validateRet":
 		if (cz.nic.extension.dnssecExtension.debugOutput) {
-			dump(cz.nic.extension.dnssecExtension.debugPrefix 
-			+ '-------- ASYNC RESOLVING DONE -----------------\n\n');
+			dump(cz.nic.extension.dnssecExtension.debugPrefix +
+			    '-------- ASYNC RESOLVING DONE -----------------\n\n');
 		}
 
 		var dn = retval[1];
@@ -178,7 +189,8 @@ init:
 		}
 
 		setTimeout(function() {
-			let cmd = "initialise§" + cz.nic.extension.dnssecLibCore.coreFileName;
+			let cmd = "initialise§" +
+			    cz.nic.extension.dnssecLibCore.coreFileName;
 			cz.nic.extension.dnssecworker.postMessage(cmd);
 		}, 500);
 

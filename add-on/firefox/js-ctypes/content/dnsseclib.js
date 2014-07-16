@@ -51,7 +51,7 @@ dnssec_init: function() {
 			dnssecLibName = "libDNSSECcore-windows.dll";
 		} else {
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
-				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
+				dump(cz.nic.extension.dnssecExtension.debugPrefix +
 				    "Error: Unsupported OS!\n");
 			}
 			return false;
@@ -60,8 +60,9 @@ dnssec_init: function() {
 		try {
 			cz.nic.extension.dnssecLibCore._initDnssecLib(dnssecLibName);
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
-				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-			            "Loaded DNSSEC library:\n        " + dnssecLibName + "\n");
+				dump(cz.nic.extension.dnssecExtension.debugPrefix +
+				    "Loaded DNSSEC library:\n        " +
+				    dnssecLibName + "\n");
 			}
 			return true;
 		} catch(e) {
@@ -70,8 +71,10 @@ dnssec_init: function() {
 			 * distributed with the plug-in. 
 			 */
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
-				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-				    "Warning: Cannot find DNSSEC system library! Library distributed with plugin will be used.\n");
+				dump(cz.nic.extension.dnssecExtension.debugPrefix +
+				    "Warning: Cannot find DNSSEC system " +
+				    "library '" + dnssecLibName + "'! Library " +
+				    "distributed with plugin will be used.\n");
 			}
 		}
 
@@ -84,7 +87,7 @@ dnssec_init: function() {
 			abiStr = "x86";
 		} else {
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
-				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
+				dump(cz.nic.extension.dnssecExtension.debugPrefix +
 				    "Error: Unsupported OS architecture!\n");
 			}
 			return false;
@@ -110,8 +113,9 @@ dnssec_init: function() {
 		try {
 			cz.nic.extension.dnssecLibCore._initDnssecLib(dnssecLibName);
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
-				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-			            "Loaded DNSSEC library:\n        " + dnssecLibName + "\n");
+				dump(cz.nic.extension.dnssecExtension.debugPrefix +
+				    "Loaded DNSSEC library:\n        " +
+				    dnssecLibName + "\n");
 			}
 			return true;
 		} catch(e) {
@@ -119,8 +123,9 @@ dnssec_init: function() {
 			 * Failed loading plug-in distributed library.
 			 */
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
-				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-				    "Warning: Cannot load plug-in core library.\n");
+				dump(cz.nic.extension.dnssecExtension.debugPrefix +
+				    "Warning: Cannot load plug-in core " +
+				    "library '" + dnssecLibName + "'.\n");
 			}
 		}
 
@@ -132,7 +137,7 @@ dnssec_init: function() {
 			dnssecLibName = "plugins/libDNSSECcore-macosx.dylib";
 		} else {
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
-				dump(cz.nic.extension.dnssecExtension.debugPrefix + 
+				dump(cz.nic.extension.dnssecExtension.debugPrefix +
 				    "Error: Sorry, no core found!\n");
 			}
 			return false;
@@ -141,13 +146,23 @@ dnssec_init: function() {
 		    .QueryInterface(Components.interfaces.nsIFileURL).file
 		    .path;
 
-		cz.nic.extension.dnssecLibCore._initDnssecLib(dnssecLibName);
-		if (cz.nic.extension.dnssecExtension.debugOutput) {
-			dump(cz.nic.extension.dnssecExtension.debugPrefix + 
-		            "Loaded DNSSEC library:\n        " + dnssecLibName + "\n");
+		try {
+			cz.nic.extension.dnssecLibCore._initDnssecLib(dnssecLibName);
+			if (cz.nic.extension.dnssecExtension.debugOutput) {
+				dump(cz.nic.extension.dnssecExtension.debugPrefix +
+				    "Loaded DNSSEC library:\n        " +
+				    dnssecLibName + "\n");
+			}
+			return true;
+		} catch(e) {
+			if (cz.nic.extension.dnssecExtension.debugOutput) {
+				dump(cz.nic.extension.dnssecExtension.debugPrefix +
+				    "Error: Cannot load plug-in core " +
+				    "library '" + dnssecLibName + "'.\n");
+			}
 		}
 
-		return true;
+		return false;
 
 	});
 },
@@ -221,10 +236,18 @@ onmessage = function(event) {
 
 	var queryParams = event.data.split("§");
 	let cmd = queryParams[0];
+	let retval = null;
 
 	switch (cmd) {
 	case "initialise":
-		cz.nic.extension.dnssecLibCore._initDnssecLib(queryParams[1]);
+		try {
+			cz.nic.extension.dnssecLibCore._initDnssecLib(
+			    queryParams[1]);
+			retval = "initialiseRet§ok";
+		} catch(e) {
+			retval = "initialiseRet§tryAgain";
+		}
+		postMessage(retval);
 		break;
 	case "validate":
 		if (null == cz.nic.extension.dnssecLibCore.coreFileName) {
@@ -252,10 +275,10 @@ onmessage = function(event) {
 		options = parseInt(options, 10);
 
 		let outputParam = new ctypes.char.ptr();
-		let retval =
-		    cz.nic.extension.dnssecLibCore.dnssec_validate_core(
-		        dn, options, nameserver, addr, outputParam);
-		retval = "validateRet§" + dn + "§" + retval[0] + "§" + retval[1] + "§" + addr;
+		retval = cz.nic.extension.dnssecLibCore.dnssec_validate_core(
+		    dn, options, nameserver, addr, outputParam);
+		retval = "validateRet§" + dn + "§" + retval[0] +
+		    "§" + retval[1] + "§" + addr;
 		postMessage(retval);
 		break;
 	default:
