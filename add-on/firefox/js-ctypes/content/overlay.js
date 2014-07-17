@@ -51,6 +51,10 @@ cz.nic.extension.dnssecworker.onmessage = function(event) {
 				    cz.nic.extension.dnssecLibCore.coreFileName;
 				cz.nic.extension.dnssecworker.postMessage(cmd);
 			}, 500);
+		} else if ("fail" == retval[1]) {
+			/* Core cannot be initialised. */
+			cz.nic.extension.dnssecExtHandler.setMode(
+			    cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR_GENERIC);
 		}
 		break;
 	case "validateRet":

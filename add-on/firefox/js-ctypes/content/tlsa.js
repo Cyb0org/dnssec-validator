@@ -43,6 +43,9 @@ cz.nic.extension.daneworker.onmessage = function(event) {
 				    cz.nic.extension.daneLibCore.coreFileName;
 				cz.nic.extension.daneworker.postMessage(cmd);
 			}, 500);
+		} else if ("fail" == retval[1]) {
+			cz.nic.extension.tlsaExtHandler.setMode(
+			    cz.nic.extension.tlsaExtHandler.DANE_MODE_ERROR_GENERIC);
 		}
 		break;
 	case "validateRet":

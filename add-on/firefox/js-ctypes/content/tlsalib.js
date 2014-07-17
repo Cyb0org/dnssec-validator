@@ -29,6 +29,10 @@ cz.nic.extension.daneLibCore = {
 
 tlsalib: null,
 coreFileName: null,
+
+/* Counts initialisation attempt. */
+initAttempt:  0,
+ATTEMPT_LIMIT: 10,
   
 dane_init: function() {
 	AddonManager.getAddonByID("dnssec@nic.cz", function(addon) {
@@ -169,6 +173,8 @@ dane_init: function() {
 
 _initTlsaLib: function(tlsaLibName) {
 
+	++this.initAttempt;
+
 	//open library
 	this.tlsalib = ctypes.open(tlsaLibName);
 
@@ -212,7 +218,7 @@ dane_validation_deinit_core: function() {
 	return res;
 },
 
-// wrapper to dnssec validation query
+// wrapper to dane validation query
 dane_validate_core: function(certchain, certlen, options, nameserver, dname,
     port, protocol, policy) {
 
@@ -249,6 +255,13 @@ onmessage = function(event) {
 	var queryParams = event.data.split("§");
 	let cmd = queryParams[0];
 	let retval = null;
+
+	if (cz.nic.extension.daneLibCore.initAttempt >
+	    cz.nic.extension.daneLibCore.ATTEMPT_LIMIT) {
+		retval = "initialiseRet§fail";
+		postMessage(retval);
+		return;
+	}
 
 	switch (cmd) {
 	case "initialise":

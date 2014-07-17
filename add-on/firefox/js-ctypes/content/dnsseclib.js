@@ -29,6 +29,10 @@ cz.nic.extension.dnssecLibCore = {
 
 dnsseclib: null,
 coreFileName: null,
+
+/* Counts initialisation attempt. */
+initAttempt:  0,
+ATTEMPT_LIMIT: 10,
   
 dnssec_init: function() {
 	AddonManager.getAddonByID("dnssec@nic.cz", function(addon) {
@@ -169,6 +173,8 @@ dnssec_init: function() {
 
 _initDnssecLib: function(dnssecLibName) {
 
+	++this.initAttempt;
+
 	//open library
 	this.dnsseclib = ctypes.open(dnssecLibName);
 
@@ -237,6 +243,13 @@ onmessage = function(event) {
 	var queryParams = event.data.split("§");
 	let cmd = queryParams[0];
 	let retval = null;
+
+	if (cz.nic.extension.dnssecLibCore.initAttempt >
+	    cz.nic.extension.dnssecLibCore.ATTEMPT_LIMIT) {
+		retval = "initialiseRet§fail";
+		postMessage(retval);
+		return;
+	}
 
 	switch (cmd) {
 	case "initialise":
