@@ -57,7 +57,7 @@ cz.nic.extension.dnssecworker.onmessage = function(event) {
 			cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
 			cz.nic.extension.dnssecExtHandler.setMode(
 			    cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR_GENERIC);
-		}		
+		}
 		break;
 	case "validateRet":
 		if (cz.nic.extension.dnssecExtension.debugOutput) {

@@ -33,7 +33,7 @@ coreFileName: null,
 /* Counts initialisation attempt. */
 initAttempt:  0,
 ATTEMPT_LIMIT: 5,
-  
+
 dnssec_init: function() {
 	AddonManager.getAddonByID("dnssec@nic.cz", function(addon) {
 
@@ -72,7 +72,7 @@ dnssec_init: function() {
 		} catch(e) {
 			/*
 			 * Failed loading OS library. Fall back to library
-			 * distributed with the plug-in. 
+			 * distributed with the plug-in.
 			 */
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix +
@@ -218,7 +218,7 @@ dnssec_validation_deinit_core: function() {
 // wrapper to dnssec validation query
 dnssec_validate_core: function(dn, options, nameserver, addr, outputParam) {
 	var outputParam = new ctypes.char.ptr();
-	var retval = this.dnssec_validate(dn, options, nameserver, addr, 
+	var retval = this.dnssec_validate(dn, options, nameserver, addr,
 	    outputParam.address());
 	return [retval, outputParam.readString()];
 },

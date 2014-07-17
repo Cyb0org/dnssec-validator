@@ -44,6 +44,7 @@ cz.nic.extension.daneworker.onmessage = function(event) {
 				cz.nic.extension.daneworker.postMessage(cmd);
 			}, 500);
 		} else if ("fail" == retval[1]) {
+			/* Core cannot be initialised. */
 			cz.nic.extension.daneExtension.initFailed = true;
 			cz.nic.extension.tlsaExtHandler.setMode(
 			    cz.nic.extension.tlsaExtHandler.DANE_MODE_ERROR_GENERIC);
@@ -771,7 +772,7 @@ prepare_certificate_array: function (action, cert) {
 	var certchain;
 
 	if (cz.nic.extension.dnssecExtPrefs.getBool("usebrowsercertchain")) {
-		if (action == "urlchange") {		
+		if (action == "urlchange") {
 			cert = this.getCertificate(window.gBrowser);
 		}
 		
