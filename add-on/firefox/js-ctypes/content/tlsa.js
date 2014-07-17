@@ -947,7 +947,7 @@ check_tlsa_https:
 
 		// Call TLSA validation
 		try {
-			if (checkall) {   
+			if (checkall) {
 				// Synchronous js-ctypes validation
 				var daneMatch = cz.nic.extension.daneLibCore.dane_validate_core(certArrayParam[0], 
 						     certArrayParam[2], validationParams[0], validationParams[1],
@@ -956,7 +956,7 @@ check_tlsa_https:
 					dump(this.DANE_DEBUG_PRE + "Return: " + daneMatch
 				     + " for https://" + domain + ";" + this.DANE_DEBUG_POST);
 				}
-			} else {   
+			} else {
 				// Asynchronous js-ctypes validation
 				if (cz.nic.extension.daneExtension.debugOutput) {
 					dump("\n" + cz.nic.extension.daneExtension.debugPrefix 

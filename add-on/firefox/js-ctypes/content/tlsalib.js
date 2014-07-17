@@ -33,7 +33,7 @@ coreFileName: null,
 /* Counts initialisation attempt. */
 initAttempt:  0,
 ATTEMPT_LIMIT: 5,
-  
+
 dane_init: function() {
 	AddonManager.getAddonByID("dnssec@nic.cz", function(addon) {
 
@@ -178,18 +178,18 @@ _initTlsaLib: function(tlsaLibName) {
 	//open library
 	this.tlsalib = ctypes.open(tlsaLibName);
 
-	//declare tlsa API functions    
-	this.dane_validation_init = 
+	//declare tlsa API functions
+	this.dane_validation_init =
 	    this.tlsalib.declare("dane_validation_init",
 	    ctypes.default_abi,
 	    ctypes.int);
 
-	this.dane_validation_deinit = 
+	this.dane_validation_deinit =
 	    this.tlsalib.declare("dane_validation_deinit",
 	    ctypes.default_abi,
 	    ctypes.int);
 
-	this.dane_validate = 
+	this.dane_validate =
 	    this.tlsalib.declare("dane_validate",
 	    ctypes.default_abi,
 	    ctypes.int,		//return state
