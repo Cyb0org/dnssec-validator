@@ -188,11 +188,9 @@ init:
 		}
 
 		// Plugin initialization
-		if (cz.nic.extension.dnssecLibCore.dnssec_init()) {
-			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_INACTION);
-		} else {
-			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR_GENERIC);
-		}
+		cz.nic.extension.dnssecLibCore.dnssec_init();
+
+		cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_INACTION);
 
 		setTimeout(function() {
 			let cmd = "initialise§" +

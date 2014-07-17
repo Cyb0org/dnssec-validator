@@ -263,20 +263,15 @@ init:
 		}
 
 		// Plugin initialization
-		if (cz.nic.extension.daneLibCore.dane_init()) {
-			cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_INACTION);
-		} else {
-			cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_ERROR_GENERIC);
-		}
+		cz.nic.extension.daneLibCore.dane_init();
+
+		cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_INACTION);
 
 		setTimeout(function() {
 			let cmd = "initialise§" +
 			    cz.nic.extension.daneLibCore.coreFileName;
 			cz.nic.extension.daneworker.postMessage(cmd);
 		}, 500);
-
-		// Set inaction mode (no icon)
-		cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_INACTION);
 
 		// Register preferences observer
 		cz.nic.extension.daneExtPrefObserver.register();
