@@ -32,7 +32,7 @@ coreFileName: null,
 
 /* Counts initialisation attempt. */
 initAttempt:  0,
-ATTEMPT_LIMIT: 10,
+ATTEMPT_LIMIT: 5,
   
 dnssec_init: function() {
 	AddonManager.getAddonByID("dnssec@nic.cz", function(addon) {

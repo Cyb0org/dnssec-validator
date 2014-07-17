@@ -44,6 +44,7 @@ cz.nic.extension.daneworker.onmessage = function(event) {
 				cz.nic.extension.daneworker.postMessage(cmd);
 			}, 500);
 		} else if ("fail" == retval[1]) {
+			cz.nic.extension.daneExtension.initFailed = true;
 			cz.nic.extension.tlsaExtHandler.setMode(
 			    cz.nic.extension.tlsaExtHandler.DANE_MODE_ERROR_GENERIC);
 		}
@@ -245,6 +246,7 @@ debugPrefix: "  dane: ",
 DANE_DEBUG_PRE: "  dane: ",
 DANE_DEBUG_POST: "\n",
 oldAsciiHost: null,
+initFailed: false,
 
 //---------------------------------------------------------
 // initialization of TLSA plugin
@@ -351,9 +353,11 @@ uninit:
 		this.unregisterObserver("http-on-examine-response");
 		//this.unregisterObserver("http-on-examine-cached-response");
 
-		// Plugin deinitialization
-		cz.nic.extension.daneLibCore.dane_validation_deinit_core();
-		cz.nic.extension.daneLibCore.dane_close();
+		if (!cz.nic.extension.daneExtension.initFailed) {
+			// Plugin deinitialization
+			cz.nic.extension.daneLibCore.dane_validation_deinit_core();
+			cz.nic.extension.daneLibCore.dane_close();
+		}
 
 		cz.nic.extension.tlsaExtCache.delAllRecords();
 
@@ -389,6 +393,11 @@ unregisterObserver:
 //---------------------------------------------------------
 observe:
 	function(channel, topic, data) {
+
+		if (cz.nic.extension.daneExtension.initFailed) {
+			cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_ERROR_GENERIC);
+			return;
+		}
 
 		var freecache = cz.nic.extension.dnssecExtPrefs.getBool("cachefree");
 		if (freecache) {
@@ -550,6 +559,11 @@ is_in_domain_list:
 //---------------------------------------------------------
 processNewURL:
 	function(aRequest, aLocationURI) {
+
+		if (cz.nic.extension.daneExtension.initFailed) {
+			cz.nic.extension.tlsaExtHandler.setMode(cz.nic.extension.tlsaExtHandler.DANE_MODE_ERROR_GENERIC);
+			return;
+		}
 
 		var scheme = null;
 		var asciiHost = null;

@@ -53,9 +53,11 @@ cz.nic.extension.dnssecworker.onmessage = function(event) {
 			}, 500);
 		} else if ("fail" == retval[1]) {
 			/* Core cannot be initialised. */
+			cz.nic.extension.dnssecExtension.initFailed = true;
+			cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
 			cz.nic.extension.dnssecExtHandler.setMode(
 			    cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR_GENERIC);
-		}
+		}		
 		break;
 	case "validateRet":
 		if (cz.nic.extension.dnssecExtension.debugOutput) {
@@ -172,6 +174,7 @@ asyncResolve: false,
 timer: null,
 oldAsciiHost: null,
 coreinit: false,
+initFailed: false,
 
 
 init:
@@ -282,9 +285,11 @@ uninit:
 		// Reset resolving flag
 		cz.nic.extension.dnssecExtPrefs.setBool("resolvingactive", false);
 
-		// Plugin deinitialization
-		cz.nic.extension.dnssecLibCore.dnssec_validation_deinit_core();
-		cz.nic.extension.dnssecLibCore.dnssec_close();
+		if (!cz.nic.extension.dnssecExtension.initFailed) {
+			// Plugin deinitialization
+			cz.nic.extension.dnssecLibCore.dnssec_validation_deinit_core();
+			cz.nic.extension.dnssecLibCore.dnssec_close();
+		}
 
 		if (this.debugOutput) {
 			dump(this.debugPrefix + 'Clear Cache...\n');
@@ -307,6 +312,12 @@ unregisterObserver:
 
 processNewURL:
 	function(aLocationURI) {
+
+		if (cz.nic.extension.dnssecExtension.initFailed) {
+			cz.nic.extension.dnssecExtHandler.setMode(cz.nic.extension.dnssecExtHandler.DNSSEC_MODE_ERROR_GENERIC);
+			return;
+		}
+
 		var scheme = null;
 		var asciiHost = null;
 		var utf8Host = null;
