@@ -34,6 +34,7 @@ SHLIB_SUFF ?= so
 
 
 BASEDIR = ..
+JSCTYPES_CORE_DIR = core_js-ctypes
 OPENSSL_LIB = $(BASEDIR)/$(LIBS_BUILT_DIR)/openssl
 LDNS_LIB = $(BASEDIR)/$(LIBS_BUILT_DIR)/ldns
 UNBOUND_LIB = $(BASEDIR)/$(LIBS_BUILT_DIR)/unbound
@@ -41,8 +42,6 @@ UNBOUND_LIB = $(BASEDIR)/$(LIBS_BUILT_DIR)/unbound
 
 # Determine OS type
 KERNEL = $(shell uname -s | tr '[:upper:]' '[:lower:]')
-# Determine achitexture.
-#ARCH = $(shell uname -m | tr '[:upper:]' '[:lower:]' | sed -e 's/amd64/x86_64/g')
 
 
 # OS dependent stuff.
@@ -82,8 +81,8 @@ CFLAGS += $(OPENSSL_CFLAGS) $(LDNS_CFLAGS) $(UNBOUND_CFLAGS)
 CFLAGS += -I../plugin-source/common
 CFLAGS_STD = -std=c99
 
-LDFLAGS_DNSSEC_VISIBILITY = -Wl,-version-script -Wl,./libDNSSECcore.ver
-LDFLAGS_DANE_VISIBILITY = -Wl,-version-script -Wl,./libDANEcore.ver
+LDFLAGS_DNSSEC_VISIBILITY = -Wl,-version-script -Wl,$(BASEDIR)/$(JSCTYPES_CORE_DIR)/libDNSSECcore.ver
+LDFLAGS_DANE_VISIBILITY = -Wl,-version-script -Wl,$(BASEDIR)/$(JSCTYPES_CORE_DIR)/libDANEcore.ver
 LDFLAGS += $(UNBOUND_LDFLAGS) $(LDNS_LDFLAGS) $(OPENSSL_LDFLAGS)
 LDFLAGS += -lpthread
 LDFLAGS += $(LDFLAGS_VISIBILITY)
@@ -151,7 +150,7 @@ else
 endif
 
 
-TARGETS := libDNSSECcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF) libDANEcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF)
+TARGETS = libDNSSECcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF) libDANEcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF)
 
 all: $(TARGETS)
 
@@ -166,29 +165,11 @@ common.o: ../plugin-source/common/common.c ../plugin-source/common/common.h
 libDNSSECcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF): dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
 	$(CC) $^ -o $@ $(LDFLAGS) -shared $(LDFLAGS_DNSSEC_VISIBILITY) $(CFLAGS)
 
-#checkDNSSEClib.o: checkDNSSEClib.c
-#	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/DNSSECValidatorPlugin
-
-#checkDNSSEClib: checkDNSSEClib.o libDNSSECcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF)
-#	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDNSSECcore-$(OSNAME_LC)-$(HWARCH)
-
-#dnssec-plug: dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
-#	$(CC) $^ -o $@ $(LDFLAGS)
-
 dnssec-plug.o: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
 libDANEcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF): dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
 	$(CC) $^ -o $@ $(LDFLAGS) -shared $(LDFLAGS_DANE_VISIBILITY) $(CFLAGS)
-
-#checkDANElib.o: checkDANElib.c
-#	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/TLSAValidatorPlugin
-
-#checkDANElib: checkDANElib.o libDANEcore-$(OSNAME_LC)-$(ARCH).$(SHLIB_SUFF)
-#	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDANEcore-$(OSNAME_LC)-$(ARCH)
-
-#dane-plug: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
-#	$(CC) $^ -o $@ $(LDFLAGS)
 
 dane-plug.o: ../plugin-source/TLSAValidatorPlugin/dane-plug.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
