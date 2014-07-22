@@ -675,10 +675,11 @@ Public License instead of this License.  But first, please read
 
 Additional permission under GNU GPL version 3 section 7
 
-If you modify this Program, or any covered work, by linking or
-combining it with OpenSSL (or a modified version of that library),
-containing parts covered by the terms of The OpenSSL Project, the
-licensors of this Program grant you additional permission to convey
-the resulting work. Corresponding Source for a non-source form of
-such a combination shall include the source code for the parts of
-OpenSSL used as well as that of the covered work.
+In addition, as a special exception, copyright holders gives permission to
+link the code of the Program with the OpenSSL project's "OpenSSL" library (or
+with modified versions of it that use the same license as the "OpenSSL"
+library), and distribute the linked executables. You must obey the GNU General
+Public License in all respects for all of the code used other than "OpenSSL".
+If you modify this file, you may extend this exception to your version of the
+file, but you are not obligated to do so. If you do not wish to do so, delete
+this exception statement from your version.
