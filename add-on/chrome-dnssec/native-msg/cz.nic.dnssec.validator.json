@@ -1,0 +1,9 @@
+{
+    "name": "cz.nic.dnssec.validator",
+    "description": "Chrome Native Messaging API Example Host",
+    "path": "/home/martin/Git/dnssec-validator/tests/dnssec-plug",
+    "type": "stdio",
+    "allowed_origins": [
+    "chrome-extension://kkmlcojhcgbnbppbgbhfpnhhgbkigpib/"
+    ]
+}

@@ -1,0 +1,176 @@
+{
+	"preftitle": {
+		"message": "DNSSEC Validator-Einstellungen"
+		},
+	"prefresolver": {
+		"message": "Zur Namensauflösung benutzte DNS-Server:"
+		},
+	"groupboxfilter": {
+		"message": "Ausgeschlossene Domänen"
+		},
+	"usefilter": {
+		"message": "Schliesse Domänen aus dieser Liste aus"
+		},
+	"filtertext": {
+		"message": "Liste ausgeschlossener Domänen und TLDs (mit Komma abgetrennt)"
+		},
+	"debugoutputtext": {
+		"message": "Schreibe Debuginformationen in die Entwicklerkonsole"
+		},
+	"legend": {
+		"message": "Resolver-Einstellungen"
+		},
+	"resolver0": {
+		"message": "Systemeinstellungen benutzen"
+		},
+	"resolver1": {
+		"message": "Öffentliche validierende Resolver CZ.NIC"
+		},
+	"resolver2": {
+		"message": "Öffentliche validierende Resolver OARC"
+		},
+	"resolver3": {
+		"message": " Eigener "
+		},
+	"resolver4": {
+		"message": "Ohne Resolver"
+		},
+	"savebutton": {
+		"message": "Einstellungen speichern"
+		},
+	"testbutton": {
+		"message": "Bestehende Einstellungen testen"
+		},
+	"cancelbutton": {
+		"message": "Stornieren"
+		},
+	"messageok": {
+		"message": "Erfolg – Die bestehenden Einstellungen ermöglichen Validierung durch DNSSEC."
+		},
+	"messagebogus": {
+		"message": "Versagen – ungültige DNSSEC Antwort, die DNSSEC-Validierung ist nicht mit bestehenden Einstellungen möglich."
+		},
+	"messageerror": {
+		"message": "Versagen – keine DNSSEC Antwort, die eingegebene IP-Adesse des Resolvers ist ungültig, oder es gibt einen Netzwerkfehler."
+		},
+	"messageip": {
+		"message": "Fehler – Zeichenkette enthält keine gültige IP-Adresse."
+		},
+	"moreinfo": {
+		"message": "Mehr info"
+		},
+	"homepage": {
+		"message": "Für mehr Informationen gehe zur Plugin Homepage"
+		},
+	"dnssecfail": {
+		"message": "DNSSEC-Zustand unbekannt"
+		},
+	"dnssecok": {
+		"message": "Gesichert durch DNSSEC"
+		},
+	"dnssecaction": {
+		"message": "Erwerbung des DNSSEC-Zustandes"
+		},
+	"dnssecbogus": {
+		"message": "Ungültige DNSSEC-Signatur"
+		},
+ 	"dnssecnone": {
+		"message": "Nicht durch DNSSEC gesichert"
+		},
+ 	"validatoroff": {
+		"message": "Nicht durch DNSSEC geprüft"
+		},
+	"domain": {
+		"message": "Der Domänenname "
+		},
+	 "nodomain": {
+		"message": "Die Nichtexistenz des Domänennamen "
+		},
+         "dnssecgenericError": {
+		"message": " kann nicht mit DNSSEC überprüft werden. Es kam zu einem Fehler während Erwerbs der DNSSEC Validator core."
+		},
+         "dnssecgenericErrorInfo": {
+		"message": "Bitte Neustart Sie Ihren Web-Browser..."
+		},
+ 	"dnssecwrongres": {
+		"message": "Resolver unterstützt DNSSEC nicht"
+		},
+         "dnssecWrongResolver": {
+		"message": " kann nicht mit DNSSEC überprüft werden."
+		},
+         "dnssecWrongResolverInfo": {
+		"message": "Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht. Ändern Sie bitte die Einstellungen des Resolvers (Wahl \"Ohne Resolver\")."
+		},
+        "unboundnodata": {
+		"message": " nelze ověřit pomocí DNSSEC technologie."
+		},
+         "unboundnodataInfo": {
+		"message": "Die DNSSEC-Validierung wurde nicht ausgeführt. Dies kann durch eine Anwesenheit eines Proxy-Servers in ihrem Netzwerk verursacht werden. In diesem Fall können die IP-Adresseneinträge des Servers nicht bestätigt werden."
+		},
+         "dnsseOff": {
+		"message": " wurde nicht durch DNSSEC überprüft."
+		},
+         "dnsseOffInfo": {
+		"message": "Die DNSSEC-Validierung wurde nicht ausgeführt, weil diese Domäne oder ihre übergeordnete Domäne in der Liste der ausgeschlossenen Domänen erwähnt ist."
+		},
+         "0dnssecError": {
+		"message": " kann nicht mit DNSSEC überprüft werden."
+		},
+         "0dnssecErrorInfo": {
+		"message": "Während der Ermittlung des DNSSEC-Zustandes kam es zu einem Fehler. Dieser kann durch einen Verbindungsausfall zum DNS-Server oder eine falsch angegebene IP-Adresse eines validierenden Resolvers verursacht sein."
+		},
+         "1unsecuredDomain": {
+		"message": " ist nicht durch DNSSEC gesichert."
+		},
+         "1unsecuredDomainInfo": {
+		"message": "Weil der Domänenname nicht durch DNSSEC gesichert ist, gibt es keinen Weg die Gültigkeit der gewonnenen IP-Adressdaten zu gewährleisten. Sie sind somit nicht gegen DNS-Spoofing gesichert."
+		},
+         "2securedConnectionDomain": {
+		"message": " ist korrekt durch DNSSEC gesichert."
+		},
+         "2securedConnectionDomainInfo": {
+		"message": "Die zu diesem Domänennamen angehörige IP-Adresse war mit DNSSEC überprüft und bestätigt. Diese Domäne ist durch DNSSEC gesichert, sie sind somit gegen DNS-Spoofing gesichert."
+		},
+         "3securedConnectionDomainInvIPaddr": {
+		"message": " ist durch DNSSEC gesichert, aber die vom Webbrowser benutzte IP-Adresse ist ungültig."
+		},
+	 "3securedConnectionDomainInvIPaddrInfo": {
+		"message": "Die zu diesem Domänennamen angehörige IP-Adresse war mit DNSSEC überprüft und nicht bestätigt. Es mag einen legitimen Grund für die Verwendung einer anderen IP-Adresse geben, es kann sich auch allerdings um DNS-Spoofing handeln." 
+		},
+          "4invalidDomainSignature": {
+		"message": " ist durch DNSSEC gesichert, allerdings ist die DNSSEC-Signatur inkorrekt."
+		},
+          "4invalidDomainSignatureInfo": {
+		"message": "Dieser Domänenname ist durch DNSSEC gesichert, aber keine gültige Vertrauenskette konnte zusammengestellt werden. Dies kann auf DNS-Spoofing hindeuten."
+		},
+          "5unsecuredNoDomain": {
+		"message": " kann nicht mit DNSSEC überprüft werden."
+		},
+          "5unsecuredNoDomainInfo": {
+		"message": "Die übergeordnete Domäne ist nicht durch DNSSEC gesichert, deswegen kann dieser Domänenname nicht überprüft werden."
+		},
+          "6securedConnectionNoDomain": {
+		"message": " war mit DNSSEC überprüft und bestätigt."
+		},
+          "6securedConnectionNoDomainInfo": {
+		"message": "Die übergeordnete Domäne ist durch DNSSEC gesichert, darum ist es möglich die Nichtexistenz des Domänennamen zu bestätigen."
+		},
+           "7invalidNoDomainSignature": {
+		"message": " war mit DNSSEC überprüft, konnte aber wegen einer ungültigen Signatur nicht bestätigt werden."
+		},
+           "7invalidNoDomainSignatureInfo": {
+		"message": "Die übergeordnete Domäne ist durch DNSSEC gesichert. Die erworbene Antwort, welche die Nichtexistenz der Domäne bestätigen soll, enthält eine ungültige Signatur. Dies deutet auf einen DNS-Spoofing Versuch zur Anschlussverweigerung hin."
+		},
+           "8securedConnectionNoDomainIPaddr": {
+		"message": " war mit DNSSEC überprüft und bestätigt."
+		},
+           "8securedConnectionNoDomainIPaddrInfo": {
+		"message": "Der Browser erwarb eine IP-Adresse für eine Domäne, welche nachweisbar nicht in der DNS-Hierarchie existiert. Womöglich benutzt der Validator den im Betriebssystem eingebauten Resolver nicht und benutzt einen anderen Resolver. Mit großer Wahrscheinlichkeit benutzt der Browser einen modifizierten Resolver. Diese Praktik wird manchmal angewendet, um schwer zugängliche Netzwerkteile erreichbarer zu machen."
+		},
+               "ipbrowsertext": {"message": "Von Webbrowser benutzte IP-Adresse:"},
+           "ipvalidatortext": {"message": "Von Add-on erworbene IP-Adresse:"},
+           "actionDnssec": {"message": "Erwerbung des DNSSEC-Zustandes"},
+           "inactionDnssec": {"message": "Idle."},
+           "errorDnssec": {"message": "DNSSEC-Zustand unbekannt"},
+	   "fwdinfo" : {"message": "Warnung: Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht. Ändern Sie bitte die Einstellungen des Resolvers.\n\nWollen Sie zu den Einstellungen weitergehen?"}
+}

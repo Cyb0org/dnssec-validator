@@ -1,0 +1,176 @@
+{
+	"preftitle": {
+		"message": "Nastavení DNSSEC validátoru"
+		},
+	"prefresolver": {
+		"message": "DNS resolver(y) používané pro překlad jmen:"
+		},
+	"groupboxfilter": {
+		"message": "Domény vyřazené z validace"
+		},
+	"usefilter": {
+		"message": "Nevalidovat domény uvedené v seznamu"
+		},
+	"filtertext": {
+		"message": "Seznam vyřazených domén a TLD (oddělené čárkami)"
+		},
+	"debugoutputtext": {
+		"message": "Vypisovat ladící informace do konzole"
+		},
+	"legend": {
+		"message": "Nastavení resolveru"
+		},
+	"resolver0": {
+		"message": "Načíst ze systému"
+		},
+	"resolver1": {
+		"message": "Veřejné resolvery CZ.NICu"
+		},
+	"resolver2": {
+		"message": "Veřejné resolvery OARCu"
+		},
+	"resolver3": {
+		"message": " Vlastní "
+		},
+	"resolver4": {
+		"message": "Bez resolveru"
+		},
+	"savebutton": {
+		"message": "Uložit nastavení"
+		},
+	"testbutton": {
+		"message": "Test současného nastavení"
+		},
+	"cancelbutton": {
+		"message": "Zrušit"
+		},
+	"messageok": {
+		"message": "Úspěch - současné nastavení umožňuje DNSSEC validaci."
+		},
+	"messagebogus": {
+		"message": "Selhání - špatná DNSSEC odpověď, DNSSEC validace není možná s aktuálním nastavením."
+		},
+	"messageerror": {
+		"message": "Selhání - není DNS odpověď, IP adresa resolveru je buď špatná nebo selhalo připojení k síti."
+		},
+	"messageip": {
+		"message": "Chyba - špatný formát nastavené IP adresy."
+		},
+	"moreinfo": {
+		"message": "Více info"
+		},
+	"homepage": {
+		"message": "Jít na domovskou stránku doplňku pro další informace"
+		},
+	"dnssecfail": {
+		"message": "Stav DNSSEC neznámý"
+		},
+	"dnssecok": {
+		"message": "Zabezpečeno DNSSEC"
+		},
+	"dnssecaction": {
+		"message": "Zjišťování DNSSEC zabezpečení"
+		},
+	"dnssecbogus": {
+		"message": "Neplatný DNSSEC podpis"
+		},
+ 	"dnssecnone": {
+		"message": "Nezabezpečeno DNSSEC"
+		},
+ 	"validatoroff": {
+		"message": "Neověřeno DNSSEC"
+		},
+	"domain": {
+		"message": "Doménové jméno "
+		},
+	 "nodomain": {
+		"message": "Neexistence doménového jména "
+		},
+         "dnssecgenericError": {
+		"message": " nelze ověřit pomocí DNSSEC technologie, protože došlo k selhání DNSSEC validátoru."
+		},
+         "dnssecgenericErrorInfo": {
+		"message": "Prosím, restartujte webový prohlížeč pro jeho opětovnou inicializaci..."
+		},
+        "unboundnodata": {
+		"message": " nelze ověřit pomocí DNSSEC technologie."
+		},
+         "unboundnodataInfo": {
+		"message": "Při zjišťování stavu zabezpečení doménového jména technologií DNSSEC došlo k chybě. Chyba může být způsobena použitím proxy serveru ve vaší síti. DNSSEC validátor v tomto případě není schopen ověřit záznamy o IP adrese serveru."
+		},
+         "dnsseOff": {
+		"message": " nebylo ověřeno pomocí technologie DNSSEC."
+		},
+         "dnsseOffInfo": {
+		"message": "DNSSEC validace nebyla provedena, protože tato doména nebo její nadřazená doména je uvedena v seznamu vyloučených doménových jmen."
+		},
+ 	"dnssecwrongres": {
+		"message": "Resolver nepodporuje DNSSEC"
+		},
+         "dnssecWrongResolver": {
+		"message": " nelze ověřit pomocí DNSSEC technologie."
+		},
+         "dnssecWrongResolverInfo": {
+		"message": "Aktuálně nastavený resolver nepodporuje DNSSEC technologii. Prosím, změňte nastavení validátoru (nastavte volbu \"Bez resolveru\")."
+		},
+         "0dnssecError": {
+		"message": " nelze ověřit pomocí DNSSEC technologie."
+		},
+         "0dnssecErrorInfo": {
+		"message": "Při zjišťování stavu zabezpečení doménového jména technologií DNSSEC došlo k chybě. Příčinou může být buď výpadek spojení ke vzdálenému serveru nebo aktuálně nastavená IP adresa DNS serveru není platnou adresou serveru pro překlad doménového jména."
+		},
+         "1unsecuredDomain": {
+		"message": " není zabezpečeno DNSSEC technologií."
+		},
+         "1unsecuredDomainInfo": {
+		"message": "Jelikož toto doménové jméno není zabezpečeno technologií DNSSEC, neexistuje možnost ověření platnosti získaných údajů a nejste tedy chráněni proti podvržení doménového jména."
+		},
+         "2securedConnectionDomain": {
+		"message": " je korektně zabezpečeno DNSSEC technologií."
+		},
+         "2securedConnectionDomainInfo": {
+		"message": "Informace o IP adrese pro toto doménové jméno byla ověřena technologií DNSSEC. Jelikož je doménové jméno touto technologií korektně zabezpečeno, jste ochránění proti podvržení doménového jména."
+		},
+         "3securedConnectionDomainInvIPaddr": {
+		"message": " je zabezpečeno DNSSEC technologií, ale IP adresa prohlížeče je odlišná."
+		},
+	 "3securedConnectionDomainInvIPaddrInfo": {
+		"message": "Toto doménové jméno je zabezpečeno technologií DNSSEC, avšak IP adresa serveru získaná prohlížečem je odlišná od IP adresy získané DNSSEC doplňkem. To může mít legitimní důvod, ale může se také jednat o podvržení doménového jména!" 
+		},
+          "4invalidDomainSignature": {
+		"message": " je zabezpečeno DNSSEC technologií, byl však odhalen neplatný podpis!"
+		},
+          "4invalidDomainSignatureInfo": {
+		"message": "Toto doménové jméno je zabezpečeno technologií DNSSEC, nebylo však možné vytvořit řetězec důvěry a ověřit tak platnost podpisu nebo podpis záznamů je neplatný. To může signalizovat podvržení doménového jména útočníkem!"
+		},
+          "5unsecuredNoDomain": {
+		"message": " nemohla být ověřena pomocí technologie DNSSEC."
+		},
+          "5unsecuredNoDomainInfo": {
+		"message": "Nadřazená doména není zabezpečena technologií DNSSEC. Není tedy možné ověřit, zdali toto doménové jméno skutečně neexistuje."
+		},
+          "6securedConnectionNoDomain": {
+		"message": " byla korektně ověřena technologií DNSSEC."
+		},
+          "6securedConnectionNoDomainInfo": {
+		"message": "Nadřazená doména je zabezpečena technologií DNSSEC. Bylo tedy možno úspěšně ověřit neexistenci tohoto doménového jména."
+		},
+           "7invalidNoDomainSignature": {
+		"message": " nebyla korektně ověřena technologií DNSSEC, protože byl odhalen neplatný podpis záznamů!"
+		},
+           "7invalidNoDomainSignatureInfo": {
+		"message": "Nadřazená doména je zabezpečena technologií DNSSEC, ale získaná odpověď dokazující neexistenci domény neobsahuje platný podpis. Může se jednat o podvržení doménového jména za účelem odepření přístupu k doméně."
+		},
+           "8securedConnectionNoDomainIPaddr": {
+		"message": " byla korektně ověřena technologií DNSSEC."
+		},
+           "8securedConnectionNoDomainIPaddrInfo": {
+		"message": "Prohlížeč získal IP adresu pro doménové jméno, jehož DNS záznam prokazatelně neexistuje v hierarchii DNS. Toto může být způsobeno tím, že validátor využívá jiný než systémový resolver, zatímco prohlížeč používá resolver, který byl pravděpodobně upraven. Tato praktika se někdy využívá pro zpřístupnění částí sítí, které nejsou běžně dostupné."
+		},
+           "ipbrowsertext": {"message": "IP adresy použité prohlížečem:"},
+           "ipvalidatortext": {"message": "IP adresy ověřené doplňkem:"},
+           "actionDnssec": {"message": "Zjišťování DNSSEC zabezpečení"},
+           "inactionDnssec": {"message": "Nečinný"},
+           "errorDnssec": {"message": "Stav DNSSEC neznámý"},
+	   "fwdinfo" : {"message": "Upozornění: Aktuálně nastavený resolver nepodporuje DNSSEC technologii. Prosím, změňte nastavení validátoru.\n\nChcete přejít do nastavení?"}
+}

@@ -825,6 +825,17 @@ int main(int argc, char **argv)
 	char *tmp = NULL;
 	uint16_t options;
 
+	char buf[255];
+	do {
+		buf[0] = '\0';
+		i = 6;
+		scanf("%254s", buf);
+		printf("%d %s\n", i, buf);
+		fprintf(stderr, "%d %s\n", i, buf);
+	} while (0);
+
+	return EXIT_SUCCESS;
+
 	while ((ch = getopt_long(argc, argv, optstr, long_opts, NULL)) != -1) {
 		switch (ch) {
 		case 'a':
@@ -867,7 +878,7 @@ int main(int argc, char **argv)
 	dnssec_set_validation_options(&glob_val_ctx.opts, options);
 
 	if (dnssec_validation_init() != 0) {
-		printf(DEBUG_PREFIX_DNSSEC "Error initialising context.\n");
+		//printf(DEBUG_PREFIX_DNSSEC "Error initialising context.\n");
 		return EXIT_FAILURE;
 	}
 
@@ -878,10 +889,10 @@ int main(int argc, char **argv)
 
 	i = dnssec_validate(dname, options, resolver_addresses,
 	    supplied_address, &tmp);
-	printf(DEBUG_PREFIX_DNSSEC "Returned value: \"%d\" %s\n", i, tmp);
+	//printf(DEBUG_PREFIX_DNSSEC "Returned value: \"%d\" %s\n", i, tmp);
 
 	if (dnssec_validation_deinit() != 0) {
-		printf(DEBUG_PREFIX_DNSSEC "Error de-initialising context.\n");
+		//printf(DEBUG_PREFIX_DNSSEC "Error de-initialising context.\n");
 	}
 
 	return EXIT_SUCCESS;

@@ -1,0 +1,177 @@
+{
+	"preftitle": {
+		"message": "DNSSEC Validator settings"
+		},
+	"prefresolver": {
+		"message": "DNS resolver(s) used for name resolution:"
+		},
+	"groupboxfilter": {
+		"message": "List of excluded domains and TLDs"
+		},
+	"usefilter": {
+		"message": "Exclude domains in list"
+		},
+	"filtertext": {
+		"message": "List of domains or TLDs (separated by commas)"
+		},
+	"debugoutputtext": {
+		"message": "Print debugging information to developer tools console"
+		},
+	"legend": {
+		"message": "Resolver settings"
+		},
+	"resolver0": {
+		"message": "Use system settings"
+		},
+	"resolver1": {
+		"message": "Public resolvers CZ.NIC"
+		},
+	"resolver2": {
+		"message": "Public resolvers OARC"
+		},
+	"resolver3": {
+		"message": " Custom: "
+		},
+	"resolver4": {
+		"message": "Without resolver"
+		},
+	"savebutton": {
+		"message": "Save settings"
+		},
+	"testbutton": {
+		"message": "Test current settings"
+		},
+	"cancelbutton": {
+		"message": "Cancel"
+		},
+	"messageok": {
+		"message": "Success - current settings allows DNSSEC validation."
+		},
+	"messagebogus": {
+		"message": "Failure - bogus DNSSEC reply, DNSSEC validation not possible with current settings."
+		},
+	"messageerror": {
+		"message": "Failure - no DNS reply, possible network error or wrong server address."
+		},
+	"messageip": {
+		"message": "Error - string contains no valid IP address."
+		},
+	"moreinfo": {
+		"message": "More info"
+		},
+	"homepage": {
+		"message": "Go to plugin homepage for additional information"
+		},
+	"dnssecfail": {
+		"message": "DNSSEC status unknown"
+		},
+	"dnssecok": {
+		"message": "Secured by DNSSEC"
+		},
+	"dnssecaction": {
+		"message": "Retrieving DNSSEC status"
+		},
+	"dnssecbogus": {
+		"message": "Bogus DNSSEC signature"
+		},
+ 	"dnssecnone": {
+		"message": "Not secured by DNSSEC"
+		},
+ 	"validatoroff": {
+		"message": "Not verified by DNSSEC"
+		},
+	"domain": {
+		"message": "Domain name "
+		},
+	 "nodomain": {
+		"message": "Nonexistence of the domain name "
+		},
+         "dnssecgenericError": {
+		"message": " can not be verified by DNSSEC because an error occurred in DNSSEC validator core."
+		},
+         "dnssecgenericErrorInfo": {
+		"message": "Please, restart your web-browser..."
+		},
+ 	"dnssecwrongres": {
+		"message": "Resolver doesn't support DNSSEC"
+		},
+         "dnssecWrongResolver": {
+		"message": " can not be verified by DNSSEC."
+		},
+         "dnssecWrongResolverInfo": {
+		"message": "Current DNS server or resolver does not support DNSSEC technology. Please, change the validator settings (choice \"Without resolver\")."
+		},
+        "unboundnodata": {
+		"message": " can not be verified by DNSSEC."
+		},
+         "unboundnodataInfo": {
+		"message": "An error occurred while getting the DNSSEC status of this domain name. This may be caused by using a proxy server in your network. The validator is in such cases unable to prove the server's IP-address records."
+		},
+         "dnsseOff": {
+		"message": " was not verified by DNSSEC."
+		},
+         "dnsseOffInfo": {
+		"message": "DNSSEC validation was not performed because this domain or its parent domain is mentioned in the list of excluded domains."
+		},
+         "0dnssecError": {
+		"message": " can not be verified by DNSSEC."
+		},
+         "0dnssecErrorInfo": {
+		"message": "An error occurred while getting the DNSSEC status of this domain name. This may be caused by loss of connection to the DNS server or the user-chosen validating resolver IP address is not an address of a validating resolver."
+		},
+         "1unsecuredDomain": {
+		"message": " is not secured by DNSSEC."
+		},
+         "1unsecuredDomainInfo": {
+		"message": "This domain name is not secured by DNSSEC, so it is not possible to verify validity of obtained data and you are not secured against domain name spoofing."
+		},
+         "2securedConnectionDomain": {
+		"message": " is correctly secured by DNSSEC."
+		},
+         "2securedConnectionDomainInfo": {
+		"message": "Information about the IP address of this domain name was validated using DNSSEC. Because this domain name is secured by DNSSEC, you are protected against domain name spoofing."
+		},
+         "3securedConnectionDomainInvIPaddr": {
+		"message": " is secured by DNSSEC but browser's IP address is invalid."
+		},
+	 "3securedConnectionDomainInvIPaddrInfo": {
+		"message": "This domain name is secured by DNSSEC but the IP address which the browser is using differs from the address obtained by the DNSSEC add-on. This may have a legitimate reason but can also point at a DNS spoofing attempt!" 
+		},
+          "4invalidDomainSignature": {
+		"message": " is secured by DNSSEC but invalid domain name signature has been detected!"
+		},
+          "4invalidDomainSignatureInfo": {
+		"message": "This domain name is secured by DNSSEC but invalid domain name signature has been detected. It could indicate spoofed domain name!"
+		},
+          "5unsecuredNoDomain": {
+		"message": " an not be verified with DNSSEC."
+		},
+          "5unsecuredNoDomainInfo": {
+		"message": "The parent domain is not secured by DNSSEC, thus it was not possible to verify nonexistence of this domain name."
+		},
+          "6securedConnectionNoDomain": {
+		"message": " was validated by DNSSEC."
+		},
+          "6securedConnectionNoDomainInfo": {
+		"message": "The parent domain is secured by DNSSEC, thus it was possible to successfully verify nonexistence of this domain name."
+		},
+           "7invalidNoDomainSignature": {
+		"message": " was not correctly validated by DNSSEC because invalid signature has been detected!"
+		},
+           "7invalidNoDomainSignatureInfo": {
+		"message": "The parent domain is secured by DNSSEC but the received domain name nonexistence response does not contain a valid signature. This may signalise a domain name spoofing attempt in order to deny the access to the domain."
+		},
+           "8securedConnectionNoDomainIPaddr": {
+		"message": " was validated by DNSSEC technology."
+		},
+           "8securedConnectionNoDomainIPaddrInfo": {
+		"message": "The browser obtained an IP address which was proven to be non-existent in the DNS hierarchy. The Validator may use another resolver than the system resolver. The browser is very likely to utilise a modified resolver. This technique is sometimes used to make some network parts available which are normally hard to reach."
+		},
+           "ipbrowsertext": {"message": "IP addresses obtained by browser:"},
+           "ipvalidatortext": {"message": "IP addresses obtained by add-on:"},
+           "actionDnssec": {"message": "Retrieving DNSSEC status"},
+           "inactionDnssec": {"message": "Idle"},
+           "errorDnssec": {"message": "DNSSEC status unknown"},
+	    "fwdinfo" : {"message": "Note: Current DNS server or resolver does not support DNSSEC technology. Please, change the validator settings.\n\nDo you want to proceed to settings?"}
+}
+
