@@ -133,8 +133,7 @@ xpi_x86:
 	cp $(PLUGIN_LIB_DEST)/$(PLUGIN_NAME_DNSSEC_LIB) $(ADDON_PATH_FF)/js-ctypes_built/plugins
 	cp $(PLUGIN_LIB_DEST)/$(PLUGIN_NAME_TLSA_LIB) $(ADDON_PATH_FF)/js-ctypes_built/plugins
 	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>WINNT_x86-msvc<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/js-ctypes_built/install.rdf.template > $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
-	grep -v optionsURL $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx > $(ADDON_PATH_FF)/js-ctypes_built/install.rdf
-	rm $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
+	mv optionsURL $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx $(ADDON_PATH_FF)/js-ctypes_built/install.rdf
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/js-ctypes_built/about.template > $(ADDON_PATH_FF)/js-ctypes_built/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
 	cd $(ADDON_PATH_FF)/js-ctypes_built && ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-windows-x86-js-ctypes.xpi
