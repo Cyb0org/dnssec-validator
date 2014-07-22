@@ -35,8 +35,9 @@ var debuglogout = false;
 var currentIPList= new Array();
 var currentIPListDomain= new Array();
 var init = true;
+var native_msg_port = null;
 
-// DNSSEC NPAPI constant returned by binary plugin	
+// DNSSEC NPAPI constant returned by binary plugin
 var dnssecExtNPAPIConst = {
 
 	DNSSEC_UNBOUND_NO_DATA		: -4, /* valdiator does not recived data */
@@ -411,12 +412,13 @@ function dnssecvalidate(domain, tabId, tab) {
 	}
 	// Call of DNSSEC Validation plugin
 	try {
-		//var plugin = document.getElementById("dnssec-plugin");	 	
+		//var plugin = document.getElementById("dnssec-plugin");
 		//var result = plugin.Validate(domain, options, resolver, addr);
 
-		chrome.runtime.sendNativeMessage('cz.nic.dnssec.validator', { text: domain },
-		  function(response) {console.log("Received " + response);});
-
+		console.log("Changed domain.");
+		native_msg_port.postMessage({ text: domain });
+//		chrome.runtime.sendNativeMessage('cz.nic.dnssec.validator',
+//		    { text: domain }, handle_native_response);
 
 		if (debuglogout) {
 			console.log(DNSSEC + "DNSSEC plugin result: " + result[0] + "; " + result[1]);
@@ -465,7 +467,7 @@ function dnssecvalidate(domain, tabId, tab) {
 		if (debuglogout) {
 			console.log(DNSSEC + "DNSSEC plugin call failed!");
 		}
-	     	return [c.DNSSEC_ERROR_GENERIC, "n/a", addr];		
+	     	return [c.DNSSEC_ERROR_GENERIC, "n/a", addr];
 	}
 	
 	var ipval = result[1];
@@ -513,13 +515,13 @@ function ExcludeDomainList(domain) {
 //****************************************************************
 // Called when the url of a tab changes.
 //****************************************************************
-function onUrlChange(tabId, changeInfo, tab) {                  	
+function onUrlChange(tabId, changeInfo, tab) {
 
 	debuglogout = StringToBool(localStorage["DebugOutput"]);
 
 	if (changeInfo.status == "undefined") {
 		//chrome.pageAction.hide(tabId);
-		return;		
+		return;
 	}
 
 	if (changeInfo.status != "loading") {
@@ -632,6 +634,11 @@ chrome.webRequest.onResponseStarted.addListener(function(info) {
 );
 
 
+function handle_native_response(resp) {
+	console.log("Received: " + resp);
+}
+
+
 if (init) {
 /*
     var hostName = "cz.nic.dnssec.validator";
@@ -640,11 +647,15 @@ if (init) {
     port.onDisconnect.addListener(onDisconnected);
     updateUiState();
 */
-chrome.runtime.sendNativeMessage('cz.nic.dnssec.validator',
-  { text: "www.nic.cz" },
-  function(response) {
-   console.log("Received " + response);
- });
+
+	console.log("Initialising.");
+	native_msg_port =
+	    chrome.runtime.connectNative('cz.nic.dnssec.validator');
+	
+	native_msg_port.onMessage.addListener(handle_native_response);
+	native_msg_port.onDisconnect.addListener(
+	    function() { console.log("Disconnected"); });
+	native_msg_port.postMessage({ text: "www.nic.cz" });
 
 	init = false;
 }

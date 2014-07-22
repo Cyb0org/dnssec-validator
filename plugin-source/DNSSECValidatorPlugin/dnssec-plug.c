@@ -825,16 +825,51 @@ int main(int argc, char **argv)
 	char *tmp = NULL;
 	uint16_t options;
 
-	char buf[255];
-	do {
-		buf[0] = '\0';
-		i = 6;
-		scanf("%254s", buf);
-		printf("%d %s\n", i, buf);
-		fprintf(stderr, "%d %s\n", i, buf);
-	} while (0);
+#define CHREXT_CALL "chrome-extension://"
+#define MAX_BUF_LEN 255
 
-	return EXIT_SUCCESS;
+	char inbuf[MAX_BUF_LEN], outbuf[MAX_BUF_LEN];
+	unsigned int inlen;
+	unsigned int outlen;
+
+	if ((argc > 1) &&
+	    (strncmp(argv[1], CHREXT_CALL, strlen(CHREXT_CALL)) == 0)) {
+		/* Native messaging call. */
+		fputs("Calling via native messaging.\n", stderr);
+
+		do {
+			fputs("Waiting for input.\n", stderr);
+
+			inbuf[0] = '\0';
+			inlen = 0;
+			if (fread(&inlen, 4, 1, stdin) != 1) {
+				fputs("Cannot read input length.\n", stderr);
+				return EXIT_FAILURE;
+			}
+			if (fread(inbuf, 1, inlen, stdin) != inlen) {
+				fputs("Cannot read message.\n", stderr);
+				return EXIT_FAILURE;
+			}
+			inbuf[inlen] = '\0';
+			fprintf(stderr, "IN %d %s\n", inlen, inbuf);
+//			scanf("%254s", inbuf);
+
+			if (MAX_BUF_LEN <= snprintf(outbuf, MAX_BUF_LEN,
+			        "{\"text\": \"This is a response message\"}")) {
+				/* Error. */
+				return EXIT_FAILURE;
+			}
+
+			outlen = strlen(outbuf);
+			fprintf(stderr, "OUT %d %s\n", outlen, outbuf);
+			{
+				fwrite(&outlen, 4, 1, stdout);
+				fputs(outbuf, stdout);
+				fflush(stdout);
+			}
+		} while (1);
+		return EXIT_SUCCESS;
+	}
 
 	while ((ch = getopt_long(argc, argv, optstr, long_opts, NULL)) != -1) {
 		switch (ch) {
