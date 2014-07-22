@@ -395,10 +395,11 @@ observe:
 			return;
 		}
 
-		var freecache = cz.nic.extension.dnssecExtPrefs.getBool("cachefree");
+		var freecache = cz.nic.extension.dnssecExtPrefs.getBool("tlsacachefree");
 		if (freecache) {
+			cz.nic.extension.daneLibCore.dane_validation_deinit_core();
 			cz.nic.extension.tlsaExtCache.delAllRecords();
-			cz.nic.extension.dnssecExtPrefs.setBool("cachefree", false);
+			cz.nic.extension.dnssecExtPrefs.setBool("tlsacachefree", false);
 		}
 
 		var checkall = cz.nic.extension.dnssecExtPrefs.getBool("checkhttpsrequestsonpages");
@@ -592,10 +593,11 @@ processNewURL:
 			}
 		}
 
-		var freecache = cz.nic.extension.dnssecExtPrefs.getBool("cachefree");
+		var freecache = cz.nic.extension.dnssecExtPrefs.getBool("tlsacachefree");
 		if (freecache) {
+			cz.nic.extension.daneLibCore.dane_validation_deinit_core();
 			cz.nic.extension.tlsaExtCache.delAllRecords();
-			cz.nic.extension.dnssecExtPrefs.setBool("cachefree", false);
+			cz.nic.extension.dnssecExtPrefs.setBool("tlsacachefree", false);
 		}
 
 		var tlsaon = cz.nic.extension.dnssecExtPrefs.getBool("tlsaenable");

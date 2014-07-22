@@ -24,12 +24,13 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <!DOCTYPE prefwindow SYSTEM "chrome://dnssec/locale/prefwindow.dtd">
 <prefwindow id="dnssec-pref-window" xmlns:html="http://www.w3.org/1999/xhtml" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" title="&prefwindow.title;" ondialogaccept="cz.nic.extension.dnssecExtPrefs.windowDialogaccept();" onunload="cz.nic.extension.dnssecExtPrefs.onUnload(event.target)">
-<script type="application/javascript" src="chrome://dnssec/content/preferences.js"/>
+	<script type="application/javascript" src="chrome://dnssec/content/preferences.js"/>
+
 	<stringbundleset id="stringbundleset">
 		<stringbundle id="dnssec-strings-pref" src="chrome://dnssec/locale/dnssec.preferences"/>
 	</stringbundleset>
 
-	<prefpane id="dnssec-pref-pane1" onpaneload="cz.nic.extension.dnssecExtPrefs.pane1Load();">
+<prefpane id="dnssec-pref-pane1" onpaneload="cz.nic.extension.dnssecExtPrefs.pane1Load();">
 	<preferences>
 		<preference id="dnssecdebug" name="extensions.dnssec.dnssecdebug" type="bool"/>
 		<preference id="tlsadebug" name="extensions.dnssec.tlsadebug" type="bool"/>
@@ -45,7 +46,8 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 		<preference id="domainlist" name="extensions.dnssec.domainlist" type="string"/>
 		<preference id="version" name="extensions.dnssec.version" type="string"/>
 		<preference id="resolvingactive" name="extensions.dnssec.resolvingactive" type="bool"/>
-		<preference id="cachefree" name="extensions.dnssec.cachefree" type="bool"/>
+		<preference id="tlsacachefree" name="extensions.dnssec.tlsacachefree" type="bool"/>
+		<preference id="dnsseccachefree" name="extensions.dnssec.dnsseccachefree" type="bool"/>
 		<preference id="popupfgcolor" name="extensions.dnssec.popupfgcolor" type="string"/>
 		<preference id="popupbgcolor" name="extensions.dnssec.popupbgcolor" type="string"/>
 		<preference id="usebrowsercertchain" name="extensions.dnssec.usebrowsercertchain" type="bool"/>
@@ -88,5 +90,5 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 	</groupbox>
 	<description id="xblank" value="" style="display: block; min-height: 40px;"/>
 	<separator class="groove-thin"/>
-	</prefpane>
+</prefpane>
 </prefwindow>

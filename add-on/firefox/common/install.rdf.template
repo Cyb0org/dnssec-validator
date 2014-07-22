@@ -41,7 +41,8 @@ DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
     <em:translator>Michał Kępień</em:translator> <!-- karel.slany(AT)nic.cz -->
     <em:homepageURL>https://www.dnssec-validator.cz/</em:homepageURL>
     <em:iconURL>chrome://dnssec/skin/icon.png</em:iconURL>
-    <em:optionsURL>chrome://dnssec/content/preferences.xul</em:optionsURL> <!-- This line is removed in js-types plug-in. -->
+    <em:optionsURL>chrome://dnssec/content/preferences.xul</em:optionsURL>
+    <em:aboutURL>chrome://dnssec/content/about.xul</em:aboutURL>
     <em:targetPlatform></em:targetPlatform>
  <em:targetApplication>
       <Description>

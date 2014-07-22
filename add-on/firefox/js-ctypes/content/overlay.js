@@ -316,6 +316,12 @@ processNewURL:
 			return;
 		}
 
+		var freecache = cz.nic.extension.dnssecExtPrefs.getBool("dnsseccachefree");
+		if (freecache) {
+			cz.nic.extension.dnssecLibCore.dnssec_validation_deinit_core();
+			cz.nic.extension.dnssecExtPrefs.setBool("dnsseccachefree", false);
+		}
+
 		var scheme = null;
 		var asciiHost = null;
 		var utf8Host = null;
@@ -379,7 +385,6 @@ cz.nic.extension.dnssecExtResolver = {
 //*******************************************
 dnssecValidate:
 	function(dn, resolvipv4, resolvipv6, aRecord) {
-
 
 		// Get DNS resolver address(es)
 		var nameserver = cz.nic.extension.dnssecExtPrefs.getChar("dnsserveraddr");
