@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ***** BEGIN LICENSE BLOCK *****
+Copyright 2014 CZ.NIC, z.s.p.o.
+
+Authors: Martin Straka <martin.straka@nic.cz>
+
+This file is part of DNSSEC Validator 2.x Add-on.
+
+DNSSEC Validator 2.x Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC Validator 2.x Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** -->
+
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+  <Description about="urn:mozilla:install-manifest">
+    <em:id>dnssec@nic.cz</em:id>
+    <em:name>DNSSEC/TLSA Validator</em:name>
+    <em:description>Checks whether domain names in the address bar are secured by DNSSEC and checks certificate with TLSA record if exists.</em:description>
+    <em:version>@VERSION@</em:version>
+    <em:type>2</em:type>
+    <em:creator>CZ.NIC Labs</em:creator>
+    <em:developer>Martin Straka</em:developer> <!-- martin.straka(AT)nic.cz -->
+    <em:developer>Karel Slaný</em:developer> <!-- martin.straka(AT)nic.cz -->
+    <em:contributor>Ondřej Filip</em:contributor> <!-- ondrej.filip(AT)nic.cz -->    
+    <em:contributor>Ondřej Surý</em:contributor> <!-- ondrej.sury(AT)nic.cz -->
+    <em:contributor>Martin Sojka</em:contributor> <!-- martin.sojka(AT)nic.cz -->
+    <em:contributor>Bedrich Kosata</em:contributor> <!-- bedrich.kosata(AT)nic.cz -->
+    <em:contributor>Pavel Tůma</em:contributor> <!-- pavel.tuma(AT)nic.cz -->
+    <em:translator>Karel Slaný</em:translator> <!-- karel.slany(AT)nic.cz -->
+    <em:translator>Michał Kępień</em:translator> <!-- karel.slany(AT)nic.cz -->
+    <em:homepageURL>https://www.dnssec-validator.cz/</em:homepageURL>
+    <em:iconURL>chrome://dnssec/skin/icon.png</em:iconURL>
+    <em:optionsURL>chrome://dnssec/content/preferences.xul</em:optionsURL> <!-- This line is removed in js-types plug-in. -->
+    <em:targetPlatform>@OS_TARGET@</em:targetPlatform>
+ <em:targetApplication>
+      <Description>
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- Firefox, Iceweasel, Flock -->
+        <em:minVersion>18.0</em:minVersion>
+        <em:maxVersion>30.*</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+ 
+    <em:targetApplication>
+      <Description>
+        <em:id>{86c18b42-e466-45a9-ae7a-9b95ba6f5640}</em:id> <!-- Mozilla -->
+        <em:minVersion>1.5</em:minVersion>
+        <em:maxVersion>1.8+</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+ 
+    <em:targetApplication>
+      <Description>
+ 	<em:id>{3550f703-e582-4d05-9a08-453d09bdfdc6}</em:id> <!-- Thunderbird -->
+ 	<em:minVersion>3.0</em:minVersion>
+ 	<em:maxVersion>18.*</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+ 
+    <em:targetApplication>
+      <Description>
+        <em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id> <!-- SeaMonkey -->
+        <em:minVersion>2.0</em:minVersion>
+        <em:maxVersion>2.20</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+ 
+    <em:targetApplication>
+      <Description>
+        <em:id>{718e30fb-e89b-41dd-9da7-e25a45638b28}</em:id> <!-- Sunbird -->
+        <em:minVersion>0.5</em:minVersion>
+        <em:maxVersion>5.0b2pre</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+    <em:unpack>true</em:unpack>
+  </Description>
+</RDF>

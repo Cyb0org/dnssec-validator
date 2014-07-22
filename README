@@ -1,0 +1,34 @@
+DNSSEC Validator 2.x extension for Mozilla Firefox <http://www.dnssec-validator.cz>
+-------------------------------------------------------------------------------
+
+INSTALLATION
+---------------
+Select "dnssec_validator-2.x-*.xpi" in File -> Open dialog and follow wizard instructions
+
+
+CONFIGURATION
+----------------
+Besides using GUI preferences we can change some add-on's options through the
+system of browser's hidden preferences (about:config). There are available
+these parameters:
+ - extensions.dnssec.debugoutput [boolean]
+   -> print debug information to standard output (see section DEBUGGING)
+ - extensions.dnssec.asyncresolve [boolean]
+   -> enable asynchronous resolving
+ - extensions.dnssec.popupfgcolor [string]
+ - extensions.dnssec.popupbgcolor [string]
+   -> popup-window text and background color
+      (use color notation according to "https://developer.mozilla.org/en/CSS/
+       color_value" (e.g. "#ffffff", "white", etc.), or leave empty for using
+       theme colors)
+
+Please do not change any other add-on's option here except those mentioned
+above.
+
+
+DEBUGGING
+------------
+For enable debug info of an extension to stdout, set next Firefox preferences
+in "about:config":
+ - "browser.dom.window.dump.enabled" to "true"
+ - "extensions.dnssec.debugoutput" to "true"

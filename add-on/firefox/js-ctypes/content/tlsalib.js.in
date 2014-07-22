@@ -42,74 +42,7 @@ dane_init: function() {
 		var os = Components.classes["@mozilla.org/xre/app-info;1"]
 		    .getService(Components.interfaces.nsIXULRuntime).OS;
 
-		var tlsaLibName = "unspecified";
-
-		/* Try system location. */
-		if(os.match("Darwin")) {
-			tlsaLibName = "libDANEcore-macosx.dylib";
-		} else if(os.match("FreeBSD")) {
-			tlsaLibName = "libDANEcore-freebsd.so";
-		} else if(os.match("Linux")) {
-			tlsaLibName = "libDANEcore-linux.so";
-		} else if(os.match("WINNT")) {
-			tlsaLibName = "libDANEcore-windows.dll";
-		} else {
-			if (cz.nic.extension.daneExtension.debugOutput) {
-				dump(cz.nic.extension.daneExtension.debugPrefix +
-				    "Error: Unsupported OS!\n");
-			}
-			return false;
-		}
-
-		try {
-			cz.nic.extension.daneLibCore._initTlsaLib(tlsaLibName);
-			if (cz.nic.extension.daneExtension.debugOutput) {
-				dump(cz.nic.extension.daneExtension.debugPrefix +
-				    "Loaded DANE library:\n        " +
-				    tlsaLibName + "\n");
-			}
-			return true;
-		} catch(e) {
-			/*
-			 * Failed loading OS library. Fall back to library
-			 * distributed with the plug-in.
-			 */
-			if (cz.nic.extension.daneExtension.debugOutput) {
-				dump(cz.nic.extension.daneExtension.debugPrefix +
-				    "Warning: Cannot find DANE system " +
-				    "library '" + tlsaLibName + "'! Library " +
-				    "distributed with plugin will be used.\n");
-			}
-		}
-
-		tlsaLibName = "unspecified";
-
-		var abiStr = "unspecified";
-		if (abi.match("x86_64")) {
-			abiStr = "x64";
-		} else if (abi.match("x86")) {
-			abiStr = "x86";
-		} else {
-			if (cz.nic.extension.daneExtension.debugOutput) {
-				dump(cz.nic.extension.daneExtension.debugPrefix +
-				    "Error: Unsupported OS architecture!\n");
-			}
-			return false;
-		}
-
-		if(os.match("Darwin")) {
-			tlsaLibName =
-			    "plugins/libDANEcore-macosx-" + abiStr + ".dylib";
-		} else if (os.match("FreeBSD")) {
-			tlsaLibName =
-			    "plugins/libDANEcore-freebsd-" + abiStr + ".so";
-		} else if(os.match("Linux")) {
-			tlsaLibName =
-			    "plugins/libDANEcore-linux-" + abiStr + ".so";
-		} else if(os.match("WINNT")) {
-			tlsaLibName =
-			    "plugins/libDANEcore-windows-x86.dll";
-		}
+		var tlsaLibName = "@libDANEcore@";
 		tlsaLibName = addon.getResourceURI(tlsaLibName)
 		    .QueryInterface(Components.interfaces.nsIFileURL).file
 		    .path;
