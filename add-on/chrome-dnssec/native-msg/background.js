@@ -490,7 +490,7 @@ function checkValidatedData(tabId, domain, status, ipval, addr) {
 
 		// Call of DNSSEC Validation plugin (async)
 		try {
-			var queryParams = "validate2§" + domain + '§' + options
+			var queryParams = "validateBogus§" + domain + '§' + options
 					  + '§nofwd§' + addr + '§' + tabId;
 			native_msg_port.postMessage(queryParams);
 	
@@ -657,7 +657,7 @@ function handle_native_response(resp) {
 		checkValidatedData(tabId, dn, status, ip, addr);
 		break;
 
-	case "validate2Ret":
+	case "validateBogusRet":
 
 		var dn = retval[1];
 		var status = retval[2];
@@ -702,7 +702,6 @@ if (init) {
 	native_msg_port.onMessage.addListener(handle_native_response);
 	native_msg_port.onDisconnect.addListener(
 	    function() { console.log("Disconnected"); });
-	native_msg_port.postMessage({ text: "www.nic.cz" });
 
 	init = false;
 }

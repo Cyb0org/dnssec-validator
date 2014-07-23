@@ -824,7 +824,7 @@ int wait_for_and_process_native_message(void)
 #define DELIMS "§"
 	char inbuf[MAX_BUF_LEN], outbuf[MAX_BUF_LEN];
 	unsigned int inlen, outlen;
-	char *cmd, *dn, *options_str, *nameserver, *addr;
+	char *cmd, *dn, *options_str, *nameserver, *addr, *tab_id;
 	int options_num;
 	int val_ret;
 	char *tmp;
@@ -850,12 +850,14 @@ int wait_for_and_process_native_message(void)
 	--inlen;
 	inbuf[inlen] = '\0';
 	cmd = strtok(inbuf + 1, DELIMS); /* TODO -- strtok_r() ?*/
-	if (strcmp(cmd, "validate") == 0) {
+	if ((strcmp(cmd, "validate") == 0) ||
+	    (strcmp(cmd, "validateBogus") == 0)) {
 		/* Tokenise input. */
 		dn = strtok(NULL, DELIMS);
 		options_str = strtok(NULL, DELIMS);
 		nameserver = strtok(NULL, DELIMS);
 		addr = strtok(NULL, DELIMS);
+		tab_id = strtok(NULL, DELIMS);
 
 		options_num = strtol(options_str, NULL, 10);
 
@@ -864,8 +866,8 @@ int wait_for_and_process_native_message(void)
 
 		/* Generate output. */
 		if (MAX_BUF_LEN <= snprintf(outbuf, MAX_BUF_LEN,
-		        "\"validateRet§%s§%d§%s§%s\"", dn, val_ret, tmp,
-		        addr)) {
+		        "\"%sRet§%s§%d§%s§%s§%s\"", cmd, dn, val_ret, tmp,
+		        addr, tab_id)) {
 			/* Error. */
 			printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n",
 			    "Error while creating response string.");
