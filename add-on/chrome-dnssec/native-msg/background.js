@@ -407,6 +407,9 @@ function dnssecvalidate(domain, tabId, tab) {
 
 	// Call of DNSSEC Validation plugin (async)
 	try {
+		if (resolver == '') {
+			resolver = "sysresolver";
+		}
 		var queryParams = "validate§" + domain + '§' + options 
 				+ '§' + resolver + '§' + addr + '§' + tabId;
 		native_msg_port.postMessage(queryParams);
@@ -486,14 +489,15 @@ function checkValidatedData(tabId, domain, status, ipval, addr) {
 			    + "; resolver: nofwd; IP-br: " + addr);
 		}
 
-		/* TODO - delete unbound context here */
+		/* Delete unbound context here. */
+		native_msg_port.postMessage("reinitialise");
 
 		// Call of DNSSEC Validation plugin (async)
 		try {
-			var queryParams = "validateBogus§" + domain + '§' + options
-					  + '§nofwd§' + addr + '§' + tabId;
+			var queryParams = "validateBogus§" + domain + '§' +
+			    options + '§nofwd§' + addr + '§' + tabId;
 			native_msg_port.postMessage(queryParams);
-	
+
 		} catch (ex) {
 			if (debuglogout) {
 				console.log(DNSSEC 

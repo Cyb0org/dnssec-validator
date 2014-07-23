@@ -812,6 +812,8 @@ void print_usage(FILE *fout, const char *basic_usage,
 /*!
  * @brief Waits for a native message string and sends a native response.
  *
+ * Commands: validate, validateBogus, reinitialise
+ *
  * @return -1 on error,
  *          0 on success
  *          1 if end of program desired.
@@ -849,15 +851,30 @@ int wait_for_and_process_native_message(void)
 	/* First and last character is '"' .*/
 	--inlen;
 	inbuf[inlen] = '\0';
-	cmd = strtok(inbuf + 1, DELIMS); /* TODO -- strtok_r() ?*/
-	if ((strcmp(cmd, "validate") == 0) ||
-	    (strcmp(cmd, "validateBogus") == 0)) {
+	cmd = strtok(inbuf + 1, DELIMS);
+	/*
+	 * TODO -- strtok_r()?
+	 * Use a tokeniser which can handle empty strings.
+	 */
+	if (strcmp(cmd, "reinitialise") == 0) {
+		printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n", "Reinitialising.");
+
+		dnssec_validation_deinit();
+		dnssec_validation_init();
+
+		/* Generate no output. */
+	} else if ((strcmp(cmd, "validate") == 0) ||
+	           (strcmp(cmd, "validateBogus") == 0)) {
 		/* Tokenise input. */
 		dn = strtok(NULL, DELIMS);
 		options_str = strtok(NULL, DELIMS);
 		nameserver = strtok(NULL, DELIMS);
 		addr = strtok(NULL, DELIMS);
 		tab_id = strtok(NULL, DELIMS);
+
+		if (strcmp("sysresolver", nameserver) == 0) {
+			nameserver = NULL;
+		}
 
 		options_num = strtol(options_str, NULL, 10);
 
@@ -911,6 +928,8 @@ int main(int argc, char **argv)
 	int ret;
 
 #define CHREXT_CALL "chrome-extension://"
+
+//	global_debug = 1;
 
 	if ((argc > 1) &&
 	    (strncmp(argv[1], CHREXT_CALL, strlen(CHREXT_CALL)) == 0)) {
