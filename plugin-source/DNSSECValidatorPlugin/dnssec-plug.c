@@ -701,7 +701,7 @@ int dnssec_validate(const char *domain, uint16_t options,
 // ----------------------------------------------------------------------------
 int dnssec_validation_deinit(void)
 {
-	printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n", "Deinitialising DNSSEC.");
+	printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n", "De-initialising DNSSEC.");
 
 	if (glob_val_ctx.ub != NULL) {
 		ub_ctx_delete(glob_val_ctx.ub);
@@ -726,7 +726,7 @@ void _construct(void)
 }
 #endif
 
-#ifdef CMNDLINE_TEST
+#if defined(CMNDLINE_TEST) || defined(NATIVE_MESSAGING)
 
 
 /*!
@@ -764,9 +764,9 @@ struct option long_opts[] = {
  */
 static
 struct option_help opts_help[] = {
-	{'a', "ADDRESS", "Compate resolved address wint given ADDRESS."},
+	{'a', "ADDRESS", "Compare resolved address with given ADDRESS."},
 	{'h', NULL, "Prints this message and exits."},
-	{'r', "RESOLVERS", "List of resolvera addresses to be used."},
+	{'r', "RESOLVERS", "List of resolver addresses to be used."},
 	{0, NULL, NULL}
 };
 
@@ -809,9 +809,91 @@ void print_usage(FILE *fout, const char *basic_usage,
 
 
 /* ========================================================================= */
+/*!
+ * @brief Waits for a native message string and sends a native response.
+ *
+ * @return -1 on error,
+ *          0 on success
+ *          1 if end of program desired.
+ */
+static
+int wait_for_and_process_native_message(void)
+/* ========================================================================= */
+{
+#define MAX_BUF_LEN 1024
+#define DELIMS "§"
+	char inbuf[MAX_BUF_LEN], outbuf[MAX_BUF_LEN];
+	unsigned int inlen, outlen;
+	char *cmd, *dn, *options_str, *nameserver, *addr;
+	int options_num;
+	int val_ret;
+	char *tmp;
+
+	printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n", "Waiting for native input.");
+
+	inbuf[0] = '\0';
+	inlen = 0;
+	if (fread(&inlen, 4, 1, stdin) != 1) {
+		printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n",
+		    "Cannot read input length.");
+		return -1;
+	}
+	if (fread(inbuf, 1, inlen, stdin) != inlen) {
+		printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n",
+		    "Cannot read message.");
+		return -1;
+	}
+	inbuf[inlen] = '\0';
+	printf_debug(DEBUG_PREFIX_DNSSEC, "IN %d %s\n", inlen, inbuf);
+
+	/* First and last character is '"' .*/
+	--inlen;
+	inbuf[inlen] = '\0';
+	cmd = strtok(inbuf + 1, DELIMS); /* TODO -- strtok_r() ?*/
+	if (strcmp(cmd, "validate") == 0) {
+		/* Tokenise input. */
+		dn = strtok(NULL, DELIMS);
+		options_str = strtok(NULL, DELIMS);
+		nameserver = strtok(NULL, DELIMS);
+		addr = strtok(NULL, DELIMS);
+
+		options_num = strtol(options_str, NULL, 10);
+
+		val_ret = dnssec_validate(dn, options_num, nameserver, addr,
+		    &tmp);
+
+		/* Generate output. */
+		if (MAX_BUF_LEN <= snprintf(outbuf, MAX_BUF_LEN,
+		        "\"validateRet§%s§%d§%s§%s\"", dn, val_ret, tmp,
+		        addr)) {
+			/* Error. */
+			printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n",
+			    "Error while creating response string.");
+			return -1;
+		}
+
+		outlen = strlen(outbuf);
+
+		printf_debug(DEBUG_PREFIX_DNSSEC, "OUT %d %s\n", outlen,
+		    outbuf);
+		/* Write and flush. */
+		fwrite(&outlen, 4, 1, stdout);
+		fputs(outbuf, stdout);
+		fflush(stdout);
+	} else {
+		/* No action. */
+	}
+
+	return 0;
+#undef MAX_BUF_LEN
+#undef DELIMS
+}
+
+
+/* ========================================================================= */
 /* ========================================================================= */
 /*
- * Main funcion. Intended for testing purposes.
+ * Main function. Intended for testing purposes or for native messaging.
  */
 int main(int argc, char **argv)
 /* ========================================================================= */
@@ -824,51 +906,21 @@ int main(int argc, char **argv)
 	short i;
 	char *tmp = NULL;
 	uint16_t options;
+	int ret;
 
 #define CHREXT_CALL "chrome-extension://"
-#define MAX_BUF_LEN 255
-
-	char inbuf[MAX_BUF_LEN], outbuf[MAX_BUF_LEN];
-	unsigned int inlen;
-	unsigned int outlen;
 
 	if ((argc > 1) &&
 	    (strncmp(argv[1], CHREXT_CALL, strlen(CHREXT_CALL)) == 0)) {
 		/* Native messaging call. */
-		fputs("Calling via native messaging.\n", stderr);
+		printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n",
+		    "Calling via native messaging.");
 
 		do {
-			fputs("Waiting for input.\n", stderr);
+			ret = wait_for_and_process_native_message();
+		} while (0 == ret);
 
-			inbuf[0] = '\0';
-			inlen = 0;
-			if (fread(&inlen, 4, 1, stdin) != 1) {
-				fputs("Cannot read input length.\n", stderr);
-				return EXIT_FAILURE;
-			}
-			if (fread(inbuf, 1, inlen, stdin) != inlen) {
-				fputs("Cannot read message.\n", stderr);
-				return EXIT_FAILURE;
-			}
-			inbuf[inlen] = '\0';
-			fprintf(stderr, "IN %d %s\n", inlen, inbuf);
-//			scanf("%254s", inbuf);
-
-			if (MAX_BUF_LEN <= snprintf(outbuf, MAX_BUF_LEN,
-			        "{\"text\": \"This is a response message\"}")) {
-				/* Error. */
-				return EXIT_FAILURE;
-			}
-
-			outlen = strlen(outbuf);
-			fprintf(stderr, "OUT %d %s\n", outlen, outbuf);
-			{
-				fwrite(&outlen, 4, 1, stdout);
-				fputs(outbuf, stdout);
-				fflush(stdout);
-			}
-		} while (1);
-		return EXIT_SUCCESS;
+		return (1 == ret) ? EXIT_SUCCESS : EXIT_FAILURE;
 	}
 
 	while ((ch = getopt_long(argc, argv, optstr, long_opts, NULL)) != -1) {
@@ -933,4 +985,4 @@ int main(int argc, char **argv)
 	return EXIT_SUCCESS;
 }
 
-#endif /* CMNDLINE_TEST */
+#endif /* CMNDLINE_TEST || NATIVE_MESSAGING */
