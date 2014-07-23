@@ -410,8 +410,8 @@ function dnssecvalidate(domain, tabId, tab) {
 		if (resolver == '') {
 			resolver = "sysresolver";
 		}
-		var queryParams = "validate§" + domain + '§' + options 
-				+ '§' + resolver + '§' + addr + '§' + tabId;
+		var queryParams = "validate~" + domain + '~' + options 
+				+ '~' + resolver + '~' + addr + '~' + tabId;
 		native_msg_port.postMessage(queryParams);
 	
 	} catch (ex) {
@@ -494,8 +494,8 @@ function checkValidatedData(tabId, domain, status, ipval, addr) {
 
 		// Call of DNSSEC Validation plugin (async)
 		try {
-			var queryParams = "validateBogus§" + domain + '§' +
-			    options + '§nofwd§' + addr + '§' + tabId;
+			var queryParams = "validateBogus~" + domain + '~' +
+			    options + '~nofwd~' + addr + '~' + tabId;
 			native_msg_port.postMessage(queryParams);
 
 		} catch (ex) {
@@ -640,7 +640,7 @@ function onUrlChange(tabId, changeInfo, tab) {
 //****************************************************************
 function handle_native_response(resp) {
 
-	var retval = resp.split("§");
+	var retval = resp.split("~");
 
 	switch (retval[0]) {
 	case "validateRet":
@@ -705,7 +705,7 @@ if (init) {
 	
 	native_msg_port.onMessage.addListener(handle_native_response);
 	native_msg_port.onDisconnect.addListener(
-	    function() { console.log("Disconnected"); });
+	    function() { console.log("Main host disconnected."); });
 
 	init = false;
 }
@@ -740,4 +740,3 @@ chrome.tabs.onUpdated.addListener(onUrlChange);
 document.write("</script>");
 document.write("</body>");
 document.write("</html>");
-

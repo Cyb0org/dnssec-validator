@@ -823,7 +823,7 @@ int wait_for_and_process_native_message(void)
 /* ========================================================================= */
 {
 #define MAX_BUF_LEN 1024
-#define DELIMS "§"
+#define DELIMS "~"
 	char inbuf[MAX_BUF_LEN], outbuf[MAX_BUF_LEN];
 	unsigned int inlen, outlen;
 	char *cmd, *dn, *options_str, *nameserver, *addr, *tab_id;
@@ -856,7 +856,10 @@ int wait_for_and_process_native_message(void)
 	 * TODO -- strtok_r()?
 	 * Use a tokeniser which can handle empty strings.
 	 */
-	if (strcmp(cmd, "reinitialise") == 0) {
+	if (strcmp(cmd, "finish") == 0) {
+		/* Just tell that exit is desired. */
+		return 1;
+	} else if (strcmp(cmd, "reinitialise") == 0) {
 		printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n", "Reinitialising.");
 
 		dnssec_validation_deinit();
@@ -882,9 +885,8 @@ int wait_for_and_process_native_message(void)
 		    &tmp);
 
 		/* Generate output. */
-		if (MAX_BUF_LEN <= snprintf(outbuf, MAX_BUF_LEN,
-		        "\"%sRet§%s§%d§%s§%s§%s\"", cmd, dn, val_ret, tmp,
-		        addr, tab_id)) {
+		if (snprintf(outbuf, MAX_BUF_LEN, "\"%sRet~%s~%d~%s~%s~%s\"",
+		        cmd, dn, val_ret, tmp, addr, tab_id) >= MAX_BUF_LEN) {
 			/* Error. */
 			printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n",
 			    "Error while creating response string.");
@@ -901,6 +903,8 @@ int wait_for_and_process_native_message(void)
 		fflush(stdout);
 	} else {
 		/* No action. */
+		printf_debug(DEBUG_PREFIX_DNSSEC, "Undefined command '%s'.\n",
+		    cmd);
 	}
 
 	return 0;
