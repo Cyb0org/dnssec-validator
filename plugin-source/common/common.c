@@ -34,6 +34,7 @@ OpenSSL used as well as that of the covered work.
 #include "config_related.h"
 
 
+#include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -159,4 +160,51 @@ fail:
 		*err_code_ptr = err_code;
 	}
 	return NULL;
+}
+
+
+/* ========================================================================= */
+/*
+ * Splits input string. The input string is modified. Empty string is
+ *     returned when empty token encountered.
+ */
+char * strsplit(char *str, const char *delim, char **saveptr)
+/* ========================================================================= */
+{
+	char *ret;
+
+	assert(NULL != saveptr);
+
+	if ((NULL == delim) || ('\0' == delim[0])) {
+		/* Delimiters are empty. */
+		if (str != NULL) {
+			*saveptr = NULL;
+			return str;
+		} else {
+			return *saveptr;
+		}
+	}
+
+	/* Continue original string. */
+	if (NULL == str) {
+		str = *saveptr;
+	}
+
+	/* Original string end. */
+	if (NULL == str) {
+		return NULL;
+	}
+
+	ret = str;
+
+	str += strcspn(str, delim);
+
+	if ('\0' != *str) {
+		*str = '\0';
+		*saveptr = ++str;
+	} else {
+		*saveptr = NULL;
+	}
+
+	return ret;
 }

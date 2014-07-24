@@ -37,9 +37,9 @@ OpenSSL used as well as that of the covered work.
 
 #include <assert.h>
 #include <errno.h>
-#ifdef CMNDLINE_TEST
+#if defined(CMNDLINE_TEST) || defined(NATIVE_MESSAGING)
   #include <getopt.h>
-#endif /* CMNDLINE_TEST */
+#endif /* CMNDLINE_TEST || NATIVE_MESSAGING */
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -812,7 +812,7 @@ void print_usage(FILE *fout, const char *basic_usage,
 /*!
  * @brief Waits for a native message string and sends a native response.
  *
- * Commands: validate, validateBogus, reinitialise
+ * Commands: finish, validate, validateBogus, reinitialise
  *
  * @return -1 on error,
  *          0 on success
@@ -826,7 +826,7 @@ int wait_for_and_process_native_message(void)
 #define DELIMS "~"
 	char inbuf[MAX_BUF_LEN], outbuf[MAX_BUF_LEN];
 	unsigned int inlen, outlen;
-	char *cmd, *dn, *options_str, *nameserver, *addr, *tab_id;
+	char *cmd, *dn, *options_str, *nameserver, *addr, *tab_id, *saveptr;
 	int options_num;
 	int val_ret;
 	char *tmp;
@@ -851,7 +851,7 @@ int wait_for_and_process_native_message(void)
 	/* First and last character is '"' .*/
 	--inlen;
 	inbuf[inlen] = '\0';
-	cmd = strtok(inbuf + 1, DELIMS);
+	cmd = strsplit(inbuf + 1, DELIMS, &saveptr);
 	/*
 	 * TODO -- strtok_r()?
 	 * Use a tokeniser which can handle empty strings.
@@ -869,13 +869,14 @@ int wait_for_and_process_native_message(void)
 	} else if ((strcmp(cmd, "validate") == 0) ||
 	           (strcmp(cmd, "validateBogus") == 0)) {
 		/* Tokenise input. */
-		dn = strtok(NULL, DELIMS);
-		options_str = strtok(NULL, DELIMS);
-		nameserver = strtok(NULL, DELIMS);
-		addr = strtok(NULL, DELIMS);
-		tab_id = strtok(NULL, DELIMS);
+		dn = strsplit(NULL, DELIMS, &saveptr);
+		options_str = strsplit(NULL, DELIMS, &saveptr);
+		nameserver = strsplit(NULL, DELIMS, &saveptr);
+		addr = strsplit(NULL, DELIMS, &saveptr);
+		tab_id = strsplit(NULL, DELIMS, &saveptr);
 
-		if (strcmp("sysresolver", nameserver) == 0) {
+		if (('\0' == nameserver[0]) ||
+		    (strcmp("sysresolver", nameserver) == 0)) {
 			nameserver = NULL;
 		}
 
@@ -947,6 +948,8 @@ int main(int argc, char **argv)
 
 		return (1 == ret) ? EXIT_SUCCESS : EXIT_FAILURE;
 	}
+
+#undef CHREXT_CALL
 
 	while ((ch = getopt_long(argc, argv, optstr, long_opts, NULL)) != -1) {
 		switch (ch) {

@@ -1990,7 +1990,87 @@ void _construct(void)
 }
 #endif
 
-#ifdef CMNDLINE_TEST
+#if defined(CMNDLINE_TEST) || defined(NATIVE_MESSAGING)
+
+/* ========================================================================= */
+/*!
+ * @brief Waits for a native message string and sends a native response.
+ *
+ * Commands: finish, validate, validateBogus, reinitialise
+ *
+ * @return -1 on error,
+ *          0 on success
+ *          1 if end of program desired.
+ */
+static
+int wait_for_and_process_native_message(void)
+/* ========================================================================= */
+{
+#define MAX_BUF_LEN 1024
+#define DELIMS "~"
+	char inbuf[MAX_BUF_LEN], outbuf[MAX_BUF_LEN];
+	unsigned int inlen, outlen;
+	char *cmd, *saveptr;
+
+	printf_debug(DEBUG_PREFIX_DANE, "%s\n", "Waiting for native input.");
+
+	inbuf[0] = '\0';
+	inlen = 0;
+	if (fread(&inlen, 4, 1, stdin) != 1) {
+		printf_debug(DEBUG_PREFIX_DANE, "%s\n",
+		    "Cannot read input length.");
+		return -1;
+	}
+	if (fread(inbuf, 1, inlen, stdin) != inlen) {
+		printf_debug(DEBUG_PREFIX_DANE, "%s\n",
+		    "Cannot read message.");
+		return -1;
+	}
+	inbuf[inlen] = '\0';
+	printf_debug(DEBUG_PREFIX_DANE, "IN %d %s\n", inlen, inbuf);
+
+	/* First and last character is '"' .*/
+	--inlen;
+	inbuf[inlen] = '\0';
+	cmd = strsplit(inbuf + 1, DELIMS, &saveptr);
+	/*
+	 * TODO -- strtok_r()?
+	 * Use a tokeniser which can handle empty strings.
+	 */
+	if (strcmp(cmd, "finish") == 0) {
+		/* Just tell that exit is desired. */
+		return 1;
+	} else if (strcmp(cmd, "reinitialise") == 0) {
+		printf_debug(DEBUG_PREFIX_DANE, "%s\n", "Reinitialising.");
+
+		dane_validation_deinit();
+		dane_validation_init();
+
+		/* Generate no output. */
+	} else if ((strcmp(cmd, "validate") == 0) ||
+	           (strcmp(cmd, "validateBogus") == 0)) {
+
+		/* TODO */
+		outbuf[0] = '\0';
+
+		outlen = strlen(outbuf);
+
+		printf_debug(DEBUG_PREFIX_DANE, "OUT %d %s\n", outlen,
+		    outbuf);
+		/* Write and flush. */
+		fwrite(&outlen, 4, 1, stdout);
+		fputs(outbuf, stdout);
+		fflush(stdout);
+	} else {
+		/* No action. */
+		printf_debug(DEBUG_PREFIX_DANE, "Undefined command '%s'.\n",
+		    cmd);
+	}
+
+	return 0;
+#undef MAX_BUF_LEN
+#undef DELIMS
+}
 
 static
 const char *certhex[] = {"12345678"};
@@ -2009,6 +2089,26 @@ int main(int argc, char **argv)
 	int res = DANE_ERROR_GENERIC;
 
 	uint16_t options;
+	int ret;
+
+#define CHREXT_CALL "chrome-extension://"
+
+	global_debug = 1;
+
+	if ((argc > 1) &&
+	    (strncmp(argv[1], CHREXT_CALL, strlen(CHREXT_CALL)) == 0)) {
+		/* Native messaging call. */
+		printf_debug(DEBUG_PREFIX_DANE, "%s\n",
+		    "Calling via native messaging.");
+
+		do {
+			ret = wait_for_and_process_native_message();
+		} while (0 == ret);
+
+		return (1 == ret) ? EXIT_SUCCESS : EXIT_FAILURE;
+	}
+
+#undef CHREXT_CALL
 
 	if ((argc < 2) || (argc > 4)) {
 		fprintf(stderr, "Usage:\n\t%s dname port [resolver_list]\n",
@@ -2057,4 +2157,4 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-#endif /* CMNDLINE_TEST */
+#endif /* CMNDLINE_TEST || NATIVE_MESSAGING */

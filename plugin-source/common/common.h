@@ -113,6 +113,19 @@ struct ub_ctx * unbound_resolver_init(const char *optdnssrv,
     int *err_code_ptr, int usefwd, int userootds, const char *debug_prefix);
 
 
+/*!
+ * @brief Splits input string. The input string is modified. Empty string is
+ *     returned when empty token encountered.
+ *
+ * @param[in,out] str     String to be split.
+ * @param[in]     delim   String of delimiters.
+ * @param[in,out] saveptr Save pointer.
+ *
+ * @note Usage is similar to strtok_r().
+ */
+char * strsplit(char *str, const char *delim, char **saveptr);
+
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
