@@ -712,6 +712,7 @@ function tlsaValidationPrepare(tabId, changeInfo, url) {
 		localStorage["cachefree"] = false;
 		localStorage["deltlsactx"] = false;
 		wrongresolver = false;
+		native_msg_port.postMessage("reinitialise");
 	}
 
 	// deactivate popup if exist
