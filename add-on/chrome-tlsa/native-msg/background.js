@@ -35,6 +35,7 @@ var debuglogout = false;
 var init = true;
 var wrongresolver = false;
 var checkall = false;
+var native_msg_port = null;
 
 /* TLSA Validator's internal cache - shared with all window tabs */
 var tlsaExtCache = {
@@ -941,26 +942,67 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 var callback = function () {
 };
 
+
+//****************************************************************
+/* callback from native host (plugin) */
+//****************************************************************
+function handle_native_response(resp) {
+
+	var retval = resp.split("~");
+
+	switch (retval[0]) {
+	case "validateRet":
+
+		break;
+
+	case "validateBogusRet":
+
+		break;
+
+	default:
+		break;
+	}
+};
+
+
 //****************************************************************
 // Interenal initialization of plugin when browser starts
 //****************************************************************
 if (init) {
 
-	var plugin = document.getElementById("tlsa-plugin");
-	plugin.TLSACacheInit();
+	localStorage["deltlsactx"] = false;
 
+	debuglogout = StringToBool(localStorage["DebugOutput"]);
+
+	native_msg_port =
+	    chrome.runtime.connectNative('cz.nic.validator.tlsa');
+	
+	native_msg_port.onMessage.addListener(handle_native_response);
+	native_msg_port.onDisconnect.addListener(
+	    function() { 
+		if (debuglogout) {
+			console.log("Main host disconnected.");
+		}
+	     });
+
+	/* Initialise SSL context. */
+	//native_msg_port.postMessage("reinitialise");
+
+	// internal javascript dane cache init
 	tlsaExtCache.init();
 
+	init = false;
+
 	if (StringToBool(localStorage["clearcache"])) {
-		// new API since Chrome Dev 19.0.1055.1
 		if( chrome['browsingData'] && chrome['browsingData']['removeCache'] ){
 			chrome.browsingData.removeCache( {'since': 0}, callback);
-			if (StringToBool(localStorage["DebugOutput"])) {
+			if (debuglogout) {
 				console.log(DANE + "Clear browser cache....");
 			}
-		}	
+		}
 	}
 }
+
 
 //****************************************************************
 // TLS/SSL features for DANE/TLSA validation
