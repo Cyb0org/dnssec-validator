@@ -2010,7 +2010,10 @@ int wait_for_and_process_native_message(void)
 #define DELIMS "~"
 	char inbuf[MAX_BUF_LEN], outbuf[MAX_BUF_LEN];
 	unsigned int inlen, outlen;
-	char *cmd, *saveptr;
+	char *cmd, *options_str, *resolver, *dn, *port, *proto, *policy_str,
+	    *tab_id, *saveptr;
+	int options_num, policy_num;
+	int val_ret;
 
 	printf_debug(DEBUG_PREFIX_DANE, "%s\n", "Waiting for native input.");
 
@@ -2049,9 +2052,34 @@ int wait_for_and_process_native_message(void)
 		/* Generate no output. */
 	} else if ((strcmp(cmd, "validate") == 0) ||
 	           (strcmp(cmd, "validateBogus") == 0)) {
+		options_str = strsplit(NULL, DELIMS, &saveptr);
+		resolver = strsplit(NULL, DELIMS, &saveptr);
+		dn = strsplit(NULL, DELIMS, &saveptr);
+		port = strsplit(NULL, DELIMS, &saveptr);
+		proto = strsplit(NULL, DELIMS, &saveptr);
+		policy_str = strsplit(NULL, DELIMS, &saveptr);
+		tab_id = strsplit(NULL, DELIMS, &saveptr);
 
-		/* TODO */
-		outbuf[0] = '\0';
+		if (('\0' == resolver[0]) ||
+		    (strcmp("sysresolver", resolver) == 0)) {
+			resolver = NULL;
+		}
+
+		options_num = strtol(options_str, NULL, 10);
+		policy_num = strtol(policy_str, NULL, 10);
+
+		val_ret = dane_validate(NULL, 0, options_num, resolver, dn,
+		    port, proto, policy_num);
+
+		/* Generate output. */
+		if (snprintf(outbuf, MAX_BUF_LEN, "\"%sRet~%s~%s~%s~%d~%s\"",
+		        cmd, dn, port, proto, val_ret,
+		        tab_id) >= MAX_BUF_LEN) {
+			/* Error. */
+			printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n",
+			    "Error while creating response string.");
+			return -1;
+		}
 
 		outlen = strlen(outbuf);
 
@@ -2146,7 +2174,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	res = dane_validate(certhex, 0, options, resolver_addresses, dname,
+	res = dane_validate(certhex, 1, options, resolver_addresses, dname,
 	    port, "tcp", 1);
 	printf(DEBUG_PREFIX_DANE "Main result: %i\n", res);
 
