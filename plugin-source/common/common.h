@@ -105,7 +105,7 @@ extern int global_debug;
  *
  * @param[in]  optdnssrv    Space-separated list of resolver IP addresses.
  * @param[out] err_code_ptr Location to which to write the error code.
- * @param[in]  usefwd       Use exrernal resolvers.
+ * @param[in]  usefwd       Use external resolvers.
  * @param[in]  userootds    Use root key with DS record of root zone.
  * @return Pointer to newly created unbound context or NULL on failure.
  */

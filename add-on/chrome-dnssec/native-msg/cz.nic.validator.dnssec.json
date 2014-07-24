@@ -1,5 +1,5 @@
 {
-    "name": "cz.nic.dnssec.validator",
+    "name": "cz.nic.validator.dnssec",
     "description": "Chrome Native Messaging API Example Host",
     "path": "/home/martin/Git/dnssec-validator/tests/dnssec-plug",
     "type": "stdio",

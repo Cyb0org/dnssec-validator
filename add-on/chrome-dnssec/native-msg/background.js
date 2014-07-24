@@ -703,7 +703,7 @@ if (init) {
 	debuglogout = StringToBool(localStorage["DebugOutput"]);
 
 	native_msg_port =
-	    chrome.runtime.connectNative('cz.nic.dnssec.validator');
+	    chrome.runtime.connectNative('cz.nic.validator.dnssec');
 	
 	native_msg_port.onMessage.addListener(handle_native_response);
 	native_msg_port.onDisconnect.addListener(

@@ -244,7 +244,7 @@ function testdnssec() {
 		}
 
 		var port = chrome.runtime.connectNative(
-		    "cz.nic.dnssec.validator");
+		    "cz.nic.validator.dnssec");
 		port.onMessage.addListener(handle_test_response);
 		port.onDisconnect.addListener(function() {
 			if (debuglogout) {
