@@ -1,0 +1,65 @@
+<!-- ***** BEGIN LICENSE BLOCK *****
+Copyright 2013 CZ.NIC, z.s.p.o.
+
+Authors: Martin Straka <martin.straka@nic.cz>
+
+This file is part of DNSSEC/TLSA Validator 2.x Add-on.
+
+DNSSEC Validator 2.x Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC/TLSA Validator 2.x Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** -->
+
+<html>
+<head>
+    <title>TLSA Validator preferences</title>
+    <script src="options.js"></script>
+    <style>
+        body {
+        font: 0.9em Verdana, Arial, Helvetica; max-width: 28em;
+        }
+	p {font-size: 90%;}
+    </style>
+</head>
+
+<body>
+	<h2 id="preftitle"></h2>        
+	<form name="tlsaSettings">
+	<fieldset>
+		<legend id="legend"></legend>
+		<p id="prefresolver"></p>
+		<label id="resolver0"><input type="radio" name="resolver" value=""/></label><br/>
+		<label id="resolver3"><input type="radio" name="resolver" value="custom"/></label><input name="customResolver" value="217.31.204.130" /><br/>
+		<label id="resolver4"><input type="radio" name="resolver" value="nofwd" checked="true"/></label><br/><br/>
+		<input type="button" value="Test" id="testbutton"/><br/>
+		<p id="messageok" style="display: none;"></p>
+		<p id="messagebogus" style="display: none;"></p>
+		<p id="messageerror" style="display: none;"></p>
+		<p id="messageip" style="display: none;"></p>
+	</fieldset><br/>
+	<fieldset>
+		<legend id="groupboxfilter"></legend>
+		<label id="usefilter"><input type="checkbox" id="domainfilteron" name="domainfilteron"/></label><br/>
+		<p id="filtertext"></p>  		
+		<textarea name="domainlist" id="domainlist" cols="42" rows="3"></textarea>
+	</fieldset>
+	        <input type="checkbox" id="debugOutput" name="debugOutput" style="display: none;"/><br/>
+		<label id="AllHttpstext"><input type="checkbox" id="AllHttps" name="AllHttps"/></label><br/>         
+		<label id="blockhttpstext"><input type="checkbox" id="blockhttps" name="blockhttps"/></label><br/>
+		<label id="clearcachetext"><input type="checkbox" id="clearcache" name="clearcache"/></label><br/><br/>
+		<label id="debugoutputtext"><input type="checkbox" id="DebugOutput" name="DebugOutput"/></label><br/><br/>
+		<input type="hidden"   id="cachefree" name="cachefree"/>
+		<input type="button" value="Save" id="savebutton"/>
+		<input type="button" value="Cancel" id="cancelbutton"/>
+      </form>
+</body>
+</html>

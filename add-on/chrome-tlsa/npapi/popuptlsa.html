@@ -1,0 +1,52 @@
+<!-- ***** BEGIN LICENSE BLOCK *****
+Copyright 2012 CZ.NIC, z.s.p.o.
+
+Authors: Martin Straka <martin.straka@nic.cz>
+
+This file is part of DNSSEC Validator 2.0 Add-on.
+
+DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC Validator 2.0 Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** -->
+
+<!doctype html>
+<html>
+
+<head>
+    <style>
+        body {
+        font: 0.9em Verdana, Arial, Helvetica; max-width: 43em;
+        min-width:350px;
+        overflow-x:hidden;
+        }
+	td {vertical-align: top; padding-right: 8px; padding-bottom: 10px}
+	.divright {text-align: left; font-size: 100%; padding-top: 10px}
+	a { padding: 0.1em 1em 0.1em 1em; border: outset 0.1em; text-decoration: none }
+	a:link, a:visited {  background: #D0D0D0; color: #000;}
+	a:hover { color: #000; } 
+    </style>
+</head>
+
+<body>	
+    <table>
+    	<tr>
+	  <td><img onclick='TLSAicon()' id='tlsa-icon' src='icon.png' /></td>
+	 <td><strong id="domain-name-title-tlsa"></strong><br/><strong id="tlsa-title"></strong></td>
+    	</tr>
+    </table>
+    <span id="long-text-tlsa"></span>
+    <div class="divright"><a href="detail-tlsa.html" id='moreinfo-tlsa'></a></div>
+    <script src="popuptlsa.js"></script>
+</body>
+
+</html>

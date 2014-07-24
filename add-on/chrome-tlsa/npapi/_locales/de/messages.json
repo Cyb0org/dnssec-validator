@@ -1,0 +1,159 @@
+{
+	"preftitle": {
+		"message": "TLSA Validator-Einstellungen"
+		},
+	"prefresolver": {
+		"message": "Zur Namensauflösung benutzte DNS-Server:"
+		},
+	"groupboxfilter": {
+		"message": "Ausgeschlossene Domänen"
+		},
+	"usefilter": {
+		"message": "Schliesse Domänen aus dieser Liste aus"
+		},
+	"blockhttpstext": {
+		"message": "Blockiere HTTPS Verbingung wenn TLSA Validierung scheitert"
+		},	
+	"AllHttpstext": {
+		"message": "Validiere mit TLSA alle HTTPS Verbindungen auf der Webpage"
+		},	
+	"filtertext": {
+		"message": "Liste ausgeschlossener Domänen und TLDs (mit Komma abgetrennt)"
+		},
+	"clearcachetext": {
+		"message": "Lösche Browser-Cache beim Neustart"
+		},
+	"debugoutputtext": {
+		"message": "Schreibe Debuginformationen in die Entwicklerkonsole"
+		},
+	"legend": {
+		"message": "Resolver-Einstellungen"
+		},
+	"resolver0": {
+		"message": "Systemeinstellungen benutzen"
+		},
+	"resolver1": {
+		"message": "Öffentliche validierende Resolver CZ.NIC"
+		},
+	"resolver2": {
+		"message": "Öffentliche validierende Resolver OARC"
+		},
+	"resolver3": {
+		"message": " Eigener "
+		},
+	"resolver4": {
+		"message": "Ohne Resolver"
+		},
+	"savebutton": {
+		"message": "Einstellungen speichern"
+		},
+	"testbutton": {
+		"message": "Bestehende Einstellungen testen"
+		},
+	"cancelbutton": {
+		"message": "Stornieren"
+		},
+	"messageok": {
+		"message": "Erfolg – Die bestehenden Einstellungen ermöglichen Validierung durch DNSSEC."
+		},
+	"messagebogus": {
+		"message": "Versagen – ungültige DNSSEC Antwort, die DNSSEC-Validierung ist nicht mit bestehenden Einstellungen möglich."
+		},
+	"messageerror": {
+		"message": "Versagen – keine DNSSEC Antwort, die eingegebene IP-Adesse des Resolvers ist ungültig, oder es gibt einen Netzwerkfehler."
+		},
+	"messageip": {
+		"message": "Fehler – Zeichenkette enthält keine gültige IP-Adresse."
+		},
+	"moreinfo": {
+		"message": "Mehr info"
+		},
+	"homepage": {
+		"message": "Für mehr Informationen gehe zur Plugin Homepage"
+		},
+	"dnssecfail": {
+		"message": "DNSSEC-Zustand unbekannt"
+		},
+	"dnssecok": {
+		"message": "Gesichert durch DNSSEC"
+		},
+	"dnssecaction": {
+		"message": "Erwerbung des DNSSEC-Zustandes"
+		},
+	"dnssecbogus": {
+		"message": "Ungültige DNSSEC-Signatur"
+		},
+ 	"dnssecnone": {
+		"message": "Nicht durch DNSSEC gesichert"
+		},
+ 	"validatoroff": {
+		"message": "Nicht durch DNSSEC geprüft"
+		},
+	"domain": {
+		"message": "Der Domänenname "
+		},
+	 "nodomain": {
+		"message": "Die Nichtexistenz des Domänennamen "
+		},
+ 	"dnssecwrongres": {
+		"message": "Resolver unterstützt DNSSEC nicht"
+		},
+         "dnssecWrongResolver": {
+		"message": "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll bestätigt werden."
+		},
+         "dnssecWrongResolverInfo": {
+		"message": "Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht. Ändern Sie bitte die Einstellungen des Resolvers (Wahl \"Ohne Resolver\")."
+		},
+"dm_errgen": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Es kam zu einem Fehler während Erwerbs der TLSA Validator core."},
+"dm_errgenInfo": { "message":  "Bitte Neustart Sie Ihren Web-Browser..."},
+"dm_rfesolverfailed": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Es kam zu einem Fehler während Erwerbs des TLSA Eintrags für diese Domäne."},
+"dm_rfesolverfailedInfo": { "message":  "Es kam zu einem Fehler während Erwerbs des TLSA Eintrags für diese Domäne. Dies kann durch einen Verbindungsausfall zum DNS-Server verursacht werden, oder die von Benutzer gewählte IP-Adresse eines validierenden Resolvers ist keine richtige Adresse eines validierenden Resolvers."},
+"dm_nohttps": { "message":  "Weil für diese Domäne keine HTTPS Verbindung hergestellt wurde, ist es nicht möglich eine Validierung des TLSA Eintrags auszuführen."},
+"dm_nohttpsInfo": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll bestätigt werden. Die Verbindung zum Server ist nicht mittels HTTPS Protokoll realisiert."},
+"dm_notlsarecord": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Es gibt keinen TLSA Eintrag für diese Domäne."},
+"dm_notlsarecordInfo": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll bestätigt werden. Kein TLSA Eintrag für diese Domäne konnte ermittelt werden."},
+"dm_dnssecunsecured": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Diese Domäne ist nicht durch DNSSEC gesichert."},
+"dm_dnssecunsecuredInfo": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll bestätigt werden. Diese Domäne ist nicht durch DNSSEC gesichert."},
+"dm_dnssecbogus": { "message":  "Die Domäne ist durch DNSSEC gesichert, aber die Signatur ist ungültig. Darum kann man die Vertrauenswürdigkeit des Serverzertifikats nicht mittels DANE bestätigen."},
+"dm_dnssecbogusInfo": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll bestätigt werden. Die DNS Einträge für diese Domäne haben eine ungültige DNSSEC Signatur."},
+"dm_certchain": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Die Zertifikatskette konnte nicht hergestellt werden."},
+"dm_certchainInfo": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll bestätigt werden. Die Vertrauenskette konnte nicht hergestellt werden, weil zurzeit nicht alle nötige Zertifikate vorhanden sind."},
+"dm_certerr": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Das Serverzertifikat konnte nicht empfangen werden."},
+"dm_certerrInfo": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll bestätigt werden. Das Serverzertifikat kann zurzeit nicht empfangen werden."},
+"dm_tlsapramwrong": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Der erhaltene TLSA Eintrag enthält ungültige Parameterwerte."},
+"dm_tlsapramwrongInfo": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll bestätigt werden. Der erhaltene TLSA Eintrag enthält ungültige Parameterwerte. Dies kann an ein TLSA Manipulationsversuch (Spoofing) hindeuten."},
+"dm_vf": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Das Zertifikat entspricht nicht dem durch DNSSEC gesicherten TLSA Eintrag."},
+"dm_vfInfo": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll bestätigt werden. Das Serverzertifikat entspricht nicht dem TLSA Eintrag. Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."},
+"dm_vf0": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Das Zertifikat entspricht nicht dem durch DNSSEC gesicherten TLSA Eintrag."},
+"dm_vf0Info": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll bestätigt werden. Das Zertifikat entspricht nicht dem CA Zertifikat im TLSA Eintrag (Typ 0). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."},
+"dm_vf1": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Das Zertifikat entspricht nicht dem durch DNSSEC gesicherten TLSA Eintrag."},
+"dm_vf1Info": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll bestätigt werden. Das Zertifikat entspricht nicht dem EE Zertifikat im TLSA Eintrag (Typ 1). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."},
+"dm_vf2": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Das Zertifikat entspricht nicht dem durch DNSSEC gesicherten TLSA Eintrag."},
+"dm_vf2Info": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll bestätigt werden. Das Zertifikat entspricht nicht dem CA Zertifikat im TLSA Eintrag (Typ 2). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."},
+"dm_vf3": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Das Zertifikat entspricht nicht dem durch DNSSEC gesicherten TLSA Eintrag."},
+"dm_vf3Info": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll bestätigt werden. Das Zertifikat entspricht nicht dem EE Zertifikat im TLSA Eintrag (Typ 3). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."},
+"dm_vs0": { "message":  "Das Serverzertifikat für diese Domäne wurde durch DANE Protokoll bestätigt. Das Zertifikat entspricht dem durch DNSSEC gesicherten TLSA Eintrag."},
+"dm_vs0Info": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat wurde durch DANE Protokoll bestätigt. Das Zertifikat lief eine PKIX Validierung durch und entspricht dem CA Zertifikat im TLSA Eintrag (Typ 0). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."},
+"dm_vs1": { "message":  "Das Serverzertifikat für diese Domäne wurde durch DANE Protokoll bestätigt. Das Zertifikat entspricht dem durch DNSSEC gesicherten TLSA Eintrag."},
+"dm_vs1Info": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat wurde durch DANE Protokoll bestätigt. Das Zertifikat lief eine PKIX Validierung durch und entspricht dem EE Zertifikat im TLSA Eintrag (Typ 1). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."},
+"dm_vs2": { "message":  "Das Serverzertifikat für diese Domäne wurde durch DANE Protokoll bestätigt. Das Zertifikat entspricht dem durch DNSSEC gesicherten TLSA Eintrag."},
+"dm_vs2Info": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat wurde durch DANE Protokoll bestätigt. Das Zertifikat lief eine PKIX Validierung durch und entspricht dem CA Zertifikat im TLSA Eintrag (Typ 2). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."},
+"dm_vs3": { "message":  "Das Serverzertifikat für diese Domäne wurde durch DANE Protokoll bestätigt. Das Zertifikat entspricht dem durch DNSSEC gesicherten TLSA Eintrag."},
+"dm_vs3Info": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat wurde durch DANE Protokoll bestätigt. Das Zertifikat entspricht dem EE Zertifikat im TLSA Eintrag (Typ 3). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."},
+"dm_validationoff": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Die Validierung von TLSA Einträgen ist nicht genehmigt, oder diese Domäne ist von der Validierung ausgeschlossen."},
+"dm_validationoffInfo": { "message":  "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll bestätigt werden. Die Validierung von TLSA Einträgen ist nicht genehmigt, oder diese Domäne, oder die TLD, ist in der Liste der ausgeschlossenen Domänen erwähnt."},
+           "dmvsTooltip": {"message": "Zertifikat entspricht TLSA"},
+           "dmvfTooltip": {"message": "Zertifikat entspricht nicht TLSA"},
+           "dmaTooltip": {"message": "TLSA Validierung wird durchgeführt"},
+           "dmfsTooltip": {"message": "TLSA Status unbekannt"},
+           "dmwpTooltip": {"message": "Ungültige TLSA Parametern"},
+           "dmntrTooltip": {"message": "Kein TLSA Eintrag vorhanden"},
+           "dmnccTooltip": {"message": "Zertifikat unverfügbar"},
+           "dmoffTooltip": {"message": "TLSA Validierung ausgeschaltet"},
+           "dmnohttpsTooltip": {"message": "Keine HTTPS Verbindung"},
+           "dmdnssecbogusTooltip": {"message": "Ungültige DNSSEC Signatur"},
+           "dmdnssecunsecTooltip": {"message": "Nicht durch DNSSEC gesichert"},
+           "dmerrorgenericTooltip": {"message": "Validator scheitern"},
+	   "warningpre" : {"message": "TLSA-Validator Warnung!\n\ndas Serverzertifikat für https://"},
+	   "warningpost" : {"message": "\nentspricht nicht dem TLSA Eintrag. Dies kann bedeuten:\n- Versuch sich mit einem nicht vertrauenswürdigem Server zu vrebinden\n- ungültiger oder unzuverlässiger Serverzertifikat\n\nWollen Sie die Verbindung zu diesem Server abbrechen?"}
+}
