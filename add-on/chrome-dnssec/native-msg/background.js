@@ -266,10 +266,7 @@ function getResolver() {
 			if (dnssecCustomResolver != undefined) {
 				resolver = dnssecCustomResolver;
 			} else {
-			// We shouldn't get here unless someone deletes part of
-			// localStorage with the custom resolver setting.
-			// Empty string causes LDNS to use system settings.
-			resolver = "";
+				resolver = "sysresolver";
 			}
 		}
 	}
@@ -407,9 +404,6 @@ function dnssecvalidate(domain, tabId, tab) {
 
 	// Call of DNSSEC Validation plugin (async)
 	try {
-		if (resolver == '') {
-			resolver = "sysresolver";
-		}
 		var queryParams = "validate~" + domain + '~' + options 
 				+ '~' + resolver + '~' + addr + '~' + tabId;
 		native_msg_port.postMessage(queryParams);

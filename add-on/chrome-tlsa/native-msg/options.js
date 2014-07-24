@@ -119,13 +119,74 @@ function saveOptions() {
 	window.close();
 }
 
+
+//--------------------------------------------------------
+// Callback to handle native message response.
+//--------------------------------------------------------
+function handle_test_response(resp) {
+	var retval = resp.split("~");
+	var testnic = retval[2];
+
+	if (debuglogout) {
+		console.log(DNSSEC + "Received response:" + resp + " " + testnic);
+	}
+
+	if (testnic == 2) {
+		document.getElementById("messageok").style.display = 'block';
+		document.getElementById("messagebogus").style.display = 'none';
+		document.getElementById("messageerror").style.display = 'none';
+		document.getElementById("messageip").style.display = 'none';
+	}
+	else if (testnic == 4) {
+		document.getElementById("messageok").style.display = 'none';
+		document.getElementById("messagebogus").style.display = 'block';
+		document.getElementById("messageerror").style.display = 'none';
+		document.getElementById("messageip").style.display = 'none';
+	}
+	else {
+		document.getElementById("messageok").style.display = 'none';
+		document.getElementById("messagebogus").style.display = 'none';
+		document.getElementById("messageerror").style.display = 'block';
+		document.getElementById("messageip").style.display = 'none';
+	}
+
+	var elems = document.getElementsByTagName('input');
+	var len = elems.length;
+
+	for (var i = 0; i < len; i++) {
+	    elems[i].disabled = false;
+	}
+
+	document.getElementById("actionimg").style.display = 'none';
+	document.getElementById("testbutton").style.display = 'block';
+	document.getElementById("testbutton").value = 
+		chrome.i18n.getMessage("testbutton");
+}
+
+
 //--------------------------------------------------------
 // test on DNSSEC support
 //--------------------------------------------------------
 function testdnssec() {
 
+
+	var elems = document.getElementsByTagName('input');
+	var len = elems.length;
+
+	for (var i = 0; i < len; i++) {
+	    elems[i].disabled = true;
+	}
+
+	document.getElementById("messageok").style.display = 'none';
+	document.getElementById("messagebogus").style.display = 'none';
+	document.getElementById("messageerror").style.display = 'none';
+	document.getElementById("messageip").style.display = 'none';
+
+	document.getElementById("testbutton").style.display = 'none';
+	document.getElementById("actionimg").style.display = 'block';
+
 	var nameserver = "217.31.204.130";
-	var options = 0;
+	var options = 7;
 	var testnic = 0;
 	var ip = false;
 	var dn = "www.nic.cz";
@@ -133,27 +194,25 @@ function testdnssec() {
 	var chioce = 0;
 	var tmp = document.tlsaSettings.customResolver.value;
 	var radiogroup = document.tlsaSettings.resolver;
-      
+
 	for (var i = 0; i < radiogroup.length; i++) {
 		var child = radiogroup[i];
 		if (child.checked == true) {
 			switch (i) {
 				case 0: // System setting
-					nameserver = "";
-					chioce=0;
+					nameserver = "sysresolver";
+					chioce = 0;
 					break;
 				case 1: // Custom
-					chioce=1;
-					//tmp = document.tlsaSettings.customResolver.value;
-					if (!checkOptdnsserveraddr(tmp)) { 
-						ip=true;
-					}
-					else {
+					chioce = 1;
+					if (!checkOptdnsserveraddr(tmp)) {
+						ip = true;
+					} else {
 						nameserver = tmp;
 					}
 					break;
 				case 2: // NOFWD
-					chioce=2;
+					chioce = 2;
 					nameserver = "nofwd";
 					options = 5;
 					break;
@@ -162,46 +221,46 @@ function testdnssec() {
 	} // for
 
 	if (ip) {
+
+		var elems = document.getElementsByTagName('input');
+		var len = elems.length;
+
+		for (var i = 0; i < len; i++) {
+		    elems[i].disabled = false;
+		}
+
 		document.getElementById("messageok").style.display = 'none';
 		document.getElementById("messagebogus").style.display = 'none';
 		document.getElementById("messageerror").style.display = 'none'
 		document.getElementById("messageip").style.display = 'block';
+		document.getElementById("actionimg").style.display = 'none';
+		document.getElementById("testbutton").style.display = 'block';
+	
+		document.getElementById("testbutton").value = 
+			chrome.i18n.getMessage("testbutton");
 	}
 	else {
-		try {
-			var plugin = document.getElementById("tlsa-plugin");
-			plugin.TLSACacheFree();
-			plugin.TLSACacheInit();
-			var derCerts = new Array();
-			derCerts.push("XXX");
-			testnic = plugin.TLSAValidate(derCerts, 0, options, nameserver, dn, "443", "tcp", 1);     
-			if (testnic==13) {
-				document.getElementById("messageok").style.display = 'block';
-				document.getElementById("messagebogus").style.display = 'none';
-				document.getElementById("messageerror").style.display = 'none';
-				document.getElementById("messageip").style.display = 'none';
+
+		var queryParams = "validate~" + dn + '~' + options + '~' +
+		    nameserver + '~' + addr + '~notab';
+
+		if (debuglogout) {
+			console.log(DNSSEC + queryParams);
+		}
+
+		var port = chrome.runtime.connectNative(
+		    "cz.nic.validator.tlsa");
+		port.onMessage.addListener(handle_test_response);
+		port.onDisconnect.addListener(function() {
+			if (debuglogout) {
+				console.log(DNSSEC + "Helper host disconnected.");
 			}
-			else if (testnic==16) {
-				document.getElementById("messageok").style.display = 'none';
-				document.getElementById("messagebogus").style.display = 'block';
-				document.getElementById("messageerror").style.display = 'none';
-				document.getElementById("messageip").style.display = 'none';
-			}
-			else { 
-				document.getElementById("messageok").style.display = 'none';
-				document.getElementById("messagebogus").style.display = 'none';
-				document.getElementById("messageerror").style.display = 'block';
-				document.getElementById("messageip").style.display = 'none';
-			} 
-		} catch (ex) {
-				console.log('Error: Plugin call failed!\n');
-			       	document.getElementById("messageok").style.display = 'none';
-				document.getElementById("messagebogus").style.display = 'none';
-				document.getElementById("messageerror").style.display = 'none';
-				document.getElementById("messageip").style.display = 'none';
-		} //try
+		});
+		port.postMessage(queryParams);
+		port.postMessage("finish");
 	}//if ip
 }
+
 
 //--------------------------------------------------------
 // help function for clear TLSA localestorage
