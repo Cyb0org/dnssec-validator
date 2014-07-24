@@ -4,6 +4,6 @@
     "path": "/home/martin/Git/dnssec-validator/tests/dane-plug",
     "type": "stdio",
     "allowed_origins": [
-    "chrome-extension://knldjmfmopnpolahpmmgbagdohdnhkik/"
+    "chrome-extension://gmgeefghnadlmkpbjfamblomkoknhjga/"
     ]
 }
