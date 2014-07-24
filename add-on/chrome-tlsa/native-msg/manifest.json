@@ -22,5 +22,5 @@
    "minimum_chrome_version": "18",
    "permissions": [ "tabs", "webRequest", "webRequestBlocking", "browsingData", "nativeMessaging", "*://*/*" ],
    "update_url": "http://clients2.google.com/service/update2/crx",
-   "version": "version-of-add-on"
+   "version": "2.1.1"
 }

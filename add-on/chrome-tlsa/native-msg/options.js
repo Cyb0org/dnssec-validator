@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
-Copyright 2012 CZ.NIC, z.s.p.o.
+Copyright 2014 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz>
 
@@ -19,9 +19,13 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-document.write("<object id=\"tlsa-plugin\" type=\"application/x-tlsavalidatorplugin\" width=\"0\" height=\"0\"></object>");
 var defaultResolver = "nofwd"; // LDNS will use system resolver if empty string is passed
 var defaultCustomResolver = "217.31.204.130";
+// debug pretext
+var DNSSEC = "TLSA: ";
+// enable print debug info into debug console
+var debuglogout = false;
+
 
 //--------------------------------------------------------
 // Set string in the web element
@@ -32,6 +36,18 @@ function addText(id, str){
 		document.getElementById(id).appendChild(tn);
 	}
 }
+
+
+//--------------------------------------------------------
+// text bool value from LocalStorage to bool
+//--------------------------------------------------------
+function StringToBool(value) {
+	if (value == undefined) return false;
+	else if (value == "false") return false;
+	else if (value == "true") return true;
+	else return false;
+}
+
 
 //--------------------------------------------------------
 // check correct format of IP addresses in the textarea
@@ -71,6 +87,7 @@ function checkdomainlist() {
 // Cancel settings without saving on the localstorage
 //--------------------------------------------------------
 function cancelOptions() {
+
 	window.close();
 }
 
@@ -95,9 +112,7 @@ function saveOptions() {
 	localStorage["clearcache"] = document.tlsaSettings.clearcache.checked;
 	localStorage["AllHttps"] = document.tlsaSettings.AllHttps.checked;
 	localStorage["domainlist"] = document.tlsaSettings.domainlist.value;
-	var plugin = document.getElementById("tlsa-plugin");
-	plugin.TLSACacheFree();
-	plugin.TLSACacheInit();
+	localStorage["deltlsactx"] = true;
 	document.write("<div>Settings were saved...</div>");
 	document.write("<div>Please, close this window...Thanks</div>");
 	localStorage["cachefree"] = true;
@@ -194,11 +209,18 @@ function testdnssec() {
 function eraseOptions() {
 	localStorage.removeItem("dnssecResolver");
 	localStorage.removeItem("dnssecCustomResolver");
-	localStorage.removeItem("DebugOutput");
+	localStorage.removeItem("DebugOutput");	
+	localStorage.removeItem("deltlsactx");
+	localStorage.removeItem("cachefree");
+	localStorage.removeItem("domainlist");
+	localStorage.removeItem("domainfilteron");
 	location.reload();
 }
 
 
+//--------------------------------------------------------
+// Refresh some elements on the page
+//--------------------------------------------------------
 function AllHttpscheckbox() {
 
 	var ischecked = document.getElementById("AllHttps").checked;
@@ -211,9 +233,12 @@ function AllHttpscheckbox() {
 		document.getElementById("blockhttpstext").style.color = 'grey';
 		document.getElementById("clearcachetext").style.color = 'grey';
 	}
-	//location.reload();
 }
 
+
+//--------------------------------------------------------
+// Refresh some elements on the page
+//--------------------------------------------------------
 function RefreshExclude() {
 
 	var ischecked = document.getElementById("domainfilteron").checked;
@@ -225,7 +250,6 @@ function RefreshExclude() {
 		document.getElementById("domainlist").style.color = 'grey';
 		document.getElementById("filtertext").style.color = 'grey';
 	}
-	//location.reload();
 }
 
 
@@ -242,43 +266,42 @@ window.onload = function(){
 	domainfilteron[0].onchange = RefreshExclude; 
 }
 
-
 //--------------------------------------------------------
-// show DNSSEC text about resover settings 
+// show DNSSEC text about resover settings
 //--------------------------------------------------------
 function testinfodisplay(state){
-
-   if (state==0) {
+	if (state == 0) {
 		document.getElementById("messageok").style.display = 'none';
 		document.getElementById("messagebogus").style.display = 'none';
 		document.getElementById("messageerror").style.display = 'none'
 		document.getElementById("messageip").style.display = 'block';
-   	}
-    else if (state==1) {
+	}
+	else if (state == 1) {
 		document.getElementById("messageok").style.display = 'none';
 		document.getElementById("messagebogus").style.display = 'none';
 		document.getElementById("messageerror").style.display = 'block';
-	    document.getElementById("messageip").style.display = 'none';
-        }
-    else if (state==2) {
+		document.getElementById("messageip").style.display = 'none';
+	}
+	else if (state == 2) {
 		document.getElementById("messageok").style.display = 'none';
 		document.getElementById("messagebogus").style.display = 'block';
 		document.getElementById("messageerror").style.display = 'none';
 		document.getElementById("messageip").style.display = 'none';
-        }
-    else if (state==3) { 
+	}
+	else if (state == 3) {
 		document.getElementById("messageok").style.display = 'block';
 		document.getElementById("messagebogus").style.display = 'none';
 		document.getElementById("messageerror").style.display = 'none';
-	    document.getElementById("messageip").style.display = 'none';
-        }
-    else {
+		document.getElementById("messageip").style.display = 'none';
+	}
+	else {
 		document.getElementById("messageok").style.display = 'none';
 		document.getElementById("messagebogus").style.display = 'none';
 		document.getElementById("messageerror").style.display = 'none';
-	    document.getElementById("messageip").style.display = 'none';
+		document.getElementById("messageip").style.display = 'none';
 	}
-} 
+}
+
 
 //--------------------------------------------------------
 // Settings window initialization
@@ -314,7 +337,8 @@ window.addEventListener('load',function() {
 	document.getElementById("savebutton").value=chrome.i18n.getMessage("savebutton");
 	document.getElementById("cancelbutton").value=chrome.i18n.getMessage("cancelbutton");
 
-	if (state==4) {
+	if (state == 4) {
+
 		var dnssecResolver = localStorage["dnssecResolver"];
 	        // IP address of custom resolver
 	        var dnssecCustomResolver = localStorage["dnssecCustomResolver"];
@@ -334,6 +358,9 @@ window.addEventListener('load',function() {
 		if (dnssecCustomResolver == undefined) {
 			dnssecCustomResolver = defaultCustomResolver;
 		}
+
+		localStorage["deltlsactx"] = false;
+
 	        // OMG localstorage has everything as text
 	        DebugOutput = (DebugOutput == undefined || DebugOutput == "false") ? false : true;
 	        document.tlsaSettings.customResolver.value = dnssecCustomResolver;
@@ -378,6 +405,9 @@ window.addEventListener('load',function() {
 		}
 	}
 	else {
+		localStorage["deltlsactx"] = false;
+
+
 		document.tlsaSettings.customResolver.value = unescape(resolver);
 		var radiogroup = document.tlsaSettings.resolver;
 		var child = radiogroup[choice];

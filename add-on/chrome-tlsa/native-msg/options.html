@@ -1,5 +1,5 @@
 <!-- ***** BEGIN LICENSE BLOCK *****
-Copyright 2013 CZ.NIC, z.s.p.o.
+Copyright 2014 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz>
 
@@ -24,36 +24,37 @@ DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
     <title>TLSA Validator preferences</title>
     <script src="options.js"></script>
     <style>
-        body {
-        font: 0.9em Verdana, Arial, Helvetica; max-width: 28em;
-        }
+	body {font: 0.9em Verdana, Arial, Helvetica; max-width: 32em;}
 	p {font-size: 90%;}
+	span {font-size: 160%; font-weight: bold;}
+	div {font-size: 90%; padding: 5px 5px;}
     </style>
 </head>
 
 <body>
-	<h2 id="preftitle"></h2>        
+	<img  src="icon.png" alt="Icon"/><span id="preftitle"> </span><br/><br/>
 	<form name="tlsaSettings">
 	<fieldset>
 		<legend id="legend"></legend>
 		<p id="prefresolver"></p>
 		<label id="resolver0"><input type="radio" name="resolver" value=""/></label><br/>
-		<label id="resolver3"><input type="radio" name="resolver" value="custom"/></label><input name="customResolver" value="217.31.204.130" /><br/>
+		<label id="resolver3"><input type="radio" name="resolver" value="custom"/></label>
+		<input id="customResolver" name="customResolver" value="217.31.204.130" size="30"/><br/>
 		<label id="resolver4"><input type="radio" name="resolver" value="nofwd" checked="true"/></label><br/><br/>
-		<input type="button" value="Test" id="testbutton"/><br/>
-		<p id="messageok" style="display: none;"></p>
-		<p id="messagebogus" style="display: none;"></p>
-		<p id="messageerror" style="display: none;"></p>
-		<p id="messageip" style="display: none;"></p>
+		<input type="button" value="Test" id="testbutton"/><img  src="action.gif" alt="Action img" id="actionimg" style="display: none;"/><br/>
+		<div id="messageok" style="display: none; background-color: #CCFFCC; border: 1px solid green;""></div>
+		<div id="messagebogus" style="display: none; background-color: #FFBBBB; border: 1px solid red;"></div>
+		<div id="messageerror" style="display: none; background-color: #FFBBBB; border: 1px solid red;"></div>
+		<div id="messageip" style="display: none; background-color: #FFBBBB; border: 1px solid red;"></div>
 	</fieldset><br/>
 	<fieldset>
 		<legend id="groupboxfilter"></legend>
 		<label id="usefilter"><input type="checkbox" id="domainfilteron" name="domainfilteron"/></label><br/>
-		<p id="filtertext"></p>  		
-		<textarea name="domainlist" id="domainlist" cols="42" rows="3"></textarea>
+		<p id="filtertext"></p>
+		<textarea name="domainlist" id="domainlist" cols="48" rows="4"></textarea>
 	</fieldset>
 	        <input type="checkbox" id="debugOutput" name="debugOutput" style="display: none;"/><br/>
-		<label id="AllHttpstext"><input type="checkbox" id="AllHttps" name="AllHttps"/></label><br/>         
+		<label id="AllHttpstext"><input type="checkbox" id="AllHttps" name="AllHttps"/></label><br/>
 		<label id="blockhttpstext"><input type="checkbox" id="blockhttps" name="blockhttps"/></label><br/>
 		<label id="clearcachetext"><input type="checkbox" id="clearcache" name="clearcache"/></label><br/><br/>
 		<label id="debugoutputtext"><input type="checkbox" id="DebugOutput" name="DebugOutput"/></label><br/><br/>
