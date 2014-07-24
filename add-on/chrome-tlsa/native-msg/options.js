@@ -22,7 +22,7 @@ DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
 var defaultResolver = "nofwd"; // LDNS will use system resolver if empty string is passed
 var defaultCustomResolver = "217.31.204.130";
 // debug pretext
-var DNSSEC = "TLSA: ";
+var DANE = "DANE: ";
 // enable print debug info into debug console
 var debuglogout = false;
 
@@ -125,19 +125,19 @@ function saveOptions() {
 //--------------------------------------------------------
 function handle_test_response(resp) {
 	var retval = resp.split("~");
-	var testnic = retval[2];
+	var testnic = retval[4];
 
 	if (debuglogout) {
-		console.log(DNSSEC + "Received response:" + resp + " " + testnic);
+		console.log(DANE + "Received response:" + resp + " " + testnic);
 	}
 
-	if (testnic == 2) {
+	if (testnic == 13) {
 		document.getElementById("messageok").style.display = 'block';
 		document.getElementById("messagebogus").style.display = 'none';
 		document.getElementById("messageerror").style.display = 'none';
 		document.getElementById("messageip").style.display = 'none';
 	}
-	else if (testnic == 4) {
+	else if (testnic == 16) {
 		document.getElementById("messageok").style.display = 'none';
 		document.getElementById("messagebogus").style.display = 'block';
 		document.getElementById("messageerror").style.display = 'none';
@@ -240,12 +240,11 @@ function testdnssec() {
 			chrome.i18n.getMessage("testbutton");
 	}
 	else {
-
-		var queryParams = "validate~" + dn + '~' + options + '~' +
-		    nameserver + '~' + addr + '~notab';
+		var queryParams = "validate" + '~' + options + '~' + nameserver 
+				+ '~' + dn + '~443~tcp~3~noTab';
 
 		if (debuglogout) {
-			console.log(DNSSEC + queryParams);
+			console.log(DANE + queryParams);
 		}
 
 		var port = chrome.runtime.connectNative(
@@ -253,7 +252,7 @@ function testdnssec() {
 		port.onMessage.addListener(handle_test_response);
 		port.onDisconnect.addListener(function() {
 			if (debuglogout) {
-				console.log(DNSSEC + "Helper host disconnected.");
+				console.log(DANE + "Helper host disconnected.");
 			}
 		});
 		port.postMessage(queryParams);
