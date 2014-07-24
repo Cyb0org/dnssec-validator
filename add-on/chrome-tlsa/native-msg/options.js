@@ -241,7 +241,7 @@ function testdnssec() {
 	}
 	else {
 		var queryParams = "validate" + '~' + options + '~' + nameserver 
-				+ '~' + dn + '~443~tcp~3~noTab';
+				+ '~' + dn + '~443~tcp~3~noTab~https';
 
 		if (debuglogout) {
 			console.log(DANE + queryParams);

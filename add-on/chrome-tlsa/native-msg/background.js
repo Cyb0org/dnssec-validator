@@ -85,7 +85,7 @@ var tlsaExtCache = {
 		for (n in c) {
 			if (debuglogout) { 
 				console.log(DANE +'      r' + i + ': \"' + n 
-				+ '\": \"' + c[n].state + '\"; ' + c[n].block 
+				+ '\"; \"' + c[n].state + '\"; ' + c[n].block 
 				+ '\"; ' + c[n].expir);
 			}
       			i++;
@@ -494,7 +494,7 @@ function tlsavalidate(tabId, scheme, domain, port, domainport){
 	try {
 		var queryParams = "validate" + '~' + options + '~' + resolver 
 				+ '~' + domain + '~' + port + '~' + protocol 
-				+ '~' + policy + '~' + tabId;
+				+ '~' + policy + '~' + tabId + '~' + scheme;
 
 		native_msg_port.postMessage(queryParams);
 
@@ -690,27 +690,6 @@ function checkDaneResult(ret, domain) {
 };
 */
 
-/*
-function setValidatedData(tabId, hostport, status) {
-
-
-
-
-
-		block = "no";
-			
-		if (portpopup == "") {
-			tlsaExtCache.addRecord(domain, ret, block);			
-		} else {
-			domain = domain + portpopup;
-			tlsaExtCache.addRecord(domain, ret, block);
-		}
-		tlsaExtCache.printContent();
-
-};
-*/
-
-
 
 //****************************************************************
 // Prepare TLSA validation parameters and properties
@@ -769,6 +748,8 @@ function tlsaValidationPrepare(tabId, changeInfo, url) {
 		setTLSASecurityState(tabId, domainport, c.DANE_NO_HTTPS, scheme);
 		return;
 	}
+	
+	domainport = domain + ":" + portplugin;
 
 	var cacheitem = tlsaExtCache.getRecord(domainport);
 
@@ -784,7 +765,10 @@ function tlsaValidationPrepare(tabId, changeInfo, url) {
 			tlsavalidate(tabId, scheme, domain, portplugin, domainport);
 
 		} else {
-
+			if (debuglogout) {
+				console.log(DANE 
+				+ "Result from cache: " + cacheitem[0]);
+			}			
 			setTLSASecurityState(tabId, domainport, cacheitem[0], scheme);
 		}				
 	}
@@ -907,6 +891,30 @@ function onBeforeRequest(tabId, url) {
 
 
 //****************************************************************
+// set TLSA state and popup fields
+//****************************************************************
+function setReceivedData(tabId, domain, port, protocol, status, scheme) {
+
+	var portpopup = "";
+
+	if (scheme == "https") {
+		portpopup = (port == "443") ? "" : ":"+port;
+		portpopup = (port == "443") ? "" : ":"+port;
+
+	}
+	if (scheme == "ftps") {
+		portpopup = (port == "990") ? "" : ":"+port;
+	}
+
+	tlsaExtCache.addRecord(domain+":"+port, status, "no");
+	tlsaExtCache.printContent();
+
+	setTLSASecurityState(tabId, domain+portpopup, status, scheme);
+};
+
+
+
+//****************************************************************
 /* callback from native host (plugin) */
 //****************************************************************
 function handle_native_response(resp) {
@@ -916,9 +924,12 @@ function handle_native_response(resp) {
 	switch (retval[0]) {
 	case "validateRet":
 
-		var hostport = retval[1];
-		var status = retval[2];
-		var tabId = retval[3];
+		var domain = retval[1];
+		var port = retval[2];
+		var protocol = retval[3];
+		var status = retval[4];
+		var tabId = retval[5];
+		var scheme = retval[6];
 		status = parseInt(status, 10);
 		tabId = parseInt(tabId, 10);
 
@@ -927,14 +938,17 @@ function handle_native_response(resp) {
 			+ "-------- ASYNC RESOLVING DONE -----------------");
 		}
 
-		setValidatedData(tabId, hostport, status);
+		setReceivedData(tabId, domain, port, protocol, status, scheme);
 		break;
 
 	case "validateBogusRet":
 
-		var hostport = retval[1];
-		var status = retval[2];
-		var tabId = retval[3];
+		var domain = retval[1];
+		var port = retval[2];
+		var protocol = retval[3];
+		var status = retval[4];
+		var tabId = retval[5];
+		var scheme = retval[6];
 		status = parseInt(status, 10);
 		tabId = parseInt(tabId, 10);
 
@@ -943,7 +957,7 @@ function handle_native_response(resp) {
 			+ "-------- ASYNC RESOLVING DONE -----------------");
 		}
 
-		setValidatedData(tabId, hostport, status);
+		setReceivedData(tabId, domain, port, protocol, status, scheme);
 		break;
 
 	default:
