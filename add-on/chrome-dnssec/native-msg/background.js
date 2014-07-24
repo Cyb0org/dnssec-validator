@@ -549,6 +549,14 @@ function onUrlChange(tabId, changeInfo, tab) {
 
 	debuglogout = StringToBool(localStorage["DebugOutput"]);
 
+	var clearcdnssectx = StringToBool(localStorage["deldnssecctx"]);
+
+	if (clearcdnssectx) {
+		native_msg_port.postMessage("reinitialise");
+		localStorage["deldnssecctx"] = false;
+	}
+
+
 	if (changeInfo.status == "undefined") {
 		//chrome.pageAction.hide(tabId);
 		return;
@@ -689,23 +697,21 @@ function handle_native_response(resp) {
 // Initialization of plugin     
 //****************************************************************
 if (init) {
-/*
-    var hostName = "cz.nic.dnssec.validator";
-    port = chrome.runtime.connectNative(hostName);
-    port.onMessage.addListener(onNativeMessage);
-    port.onDisconnect.addListener(onDisconnected);
-    updateUiState();
-*/
+
+	localStorage["deldnssecctx"] = false;
 
 	debuglogout = StringToBool(localStorage["DebugOutput"]);
 
-	console.log("Initialising.");
 	native_msg_port =
 	    chrome.runtime.connectNative('cz.nic.dnssec.validator');
 	
 	native_msg_port.onMessage.addListener(handle_native_response);
 	native_msg_port.onDisconnect.addListener(
-	    function() { console.log("Main host disconnected."); });
+	    function() { 
+		if (debuglogout) {
+			console.log("Main host disconnected.");
+		}
+	     });
 
 	init = false;
 }

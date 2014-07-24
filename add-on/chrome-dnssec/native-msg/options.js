@@ -19,9 +19,12 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidatorplugin\" width=\"0\" height=\"0\"></object>");
 var defaultResolver = "nofwd"; // LDNS will use system resolver if empty string is passed
 var defaultCustomResolver = "217.31.204.130";
+// debug pretext
+var DNSSEC = "DNSSEC: ";
+// enable print debug info into debug console
+var debuglogout = false;
 
 //--------------------------------------------------------
 // Set string in the web element
@@ -31,6 +34,16 @@ function addText(id, str){
 		var tn = document.createTextNode(str);
 		document.getElementById(id).appendChild(tn);
 	}
+}
+
+//--------------------------------------------------------
+// text bool value from LocalStorage to bool
+//--------------------------------------------------------
+function StringToBool(value) {
+	if (value == undefined) return false;
+	else if (value == "false") return false;
+	else if (value == "true") return true;
+	else return false;
 }
 
 //--------------------------------------------------------
@@ -95,10 +108,7 @@ function saveOptions() {
 	localStorage["DebugOutput"] = document.dnssecSettings.DebugOutput.checked;
 	localStorage["domainfilteron"] = document.dnssecSettings.domainfilteron.checked;
 	localStorage["domainlist"] = document.dnssecSettings.domainlist.value;
-	document.write("<object id=\"dnssec-plugin\" type=\"application/x-dnssecvalidatorplugin\" width=\"0\" height=\"0\"></object>");
-	var plugin = document.getElementById("dnssec-plugin");
-	plugin.DNSSECCacheFree();
-	plugin.DNSSECCacheInit();
+	localStorage["deldnssecctx"] = true;
 	document.write("<div>Settings were saved...</div>");
 	document.write("<div>Please, close this window...Thanks</div>");
 	window.close();
@@ -112,16 +122,9 @@ function handle_test_response(resp) {
 	var retval = resp.split("~");
 	var testnic = retval[2];
 
-	console.log("Received response:" + resp + " " + testnic);
-
-	/*
-	 * TODO -- receiving of responses is asynchronous.
-	 * It takes the resolver some time to time-out on non-existing IP
-	 * addresses. During those time the button should be disabled and
-	 * re-enabled after received a response.
-	 */
-
-	/* TODO -- Re-enable button. */
+	if (debuglogout) {
+		console.log(DNSSEC + "Received response:" + resp + " " + testnic);
+	}
 
 	if (testnic == 2) {
 		document.getElementById("messageok").style.display = 'block';
@@ -141,6 +144,18 @@ function handle_test_response(resp) {
 		document.getElementById("messageerror").style.display = 'block';
 		document.getElementById("messageip").style.display = 'none';
 	}
+
+	var elems = document.getElementsByTagName('input');
+	var len = elems.length;
+
+	for (var i = 0; i < len; i++) {
+	    elems[i].disabled = false;
+	}
+
+	document.getElementById("actionimg").style.display = 'none';
+	document.getElementById("testbutton").style.display = 'block';
+	document.getElementById("testbutton").value = 
+		chrome.i18n.getMessage("testbutton");
 }
 
 
@@ -148,6 +163,22 @@ function handle_test_response(resp) {
 // test on DNSSEC support
 //--------------------------------------------------------
 function testdnssec() {
+
+
+	var elems = document.getElementsByTagName('input');
+	var len = elems.length;
+
+	for (var i = 0; i < len; i++) {
+	    elems[i].disabled = true;
+	}
+
+	document.getElementById("messageok").style.display = 'none';
+	document.getElementById("messagebogus").style.display = 'none';
+	document.getElementById("messageerror").style.display = 'none';
+	document.getElementById("messageip").style.display = 'none';
+
+	document.getElementById("testbutton").style.display = 'none';
+	document.getElementById("actionimg").style.display = 'block';
 
 	var nameserver = "217.31.204.130";
 	var options = 7;
@@ -164,89 +195,66 @@ function testdnssec() {
 		if (child.checked == true) {
 			switch (i) {
 				case 0: // System setting
-					nameserver = "";
-					chioce=0;
+					nameserver = "sysresolver";
+					chioce = 0;
 					break;
 				case 1: // Custom
-					chioce=1;
-					//tmp = document.dnssecSettings.customResolver.value;
+					chioce = 1;
 					if (!checkOptdnsserveraddr(tmp)) {
-						ip=true;
-					}
-					else {
+						ip = true;
+					} else {
 						nameserver = tmp;
 					}
 					break;
 				case 2: // NOFWD
-					chioce=2;
+					chioce = 2;
 					nameserver = "nofwd";
-					options = 5; ;
+					options = 5;
 					break;
 			} //switch
 		} // if
 	} // for
 
 	if (ip) {
+
+		var elems = document.getElementsByTagName('input');
+		var len = elems.length;
+
+		for (var i = 0; i < len; i++) {
+		    elems[i].disabled = false;
+		}
+
 		document.getElementById("messageok").style.display = 'none';
 		document.getElementById("messagebogus").style.display = 'none';
 		document.getElementById("messageerror").style.display = 'none'
 		document.getElementById("messageip").style.display = 'block';
+		document.getElementById("actionimg").style.display = 'none';
+		document.getElementById("testbutton").style.display = 'block';
+	
+		document.getElementById("testbutton").value = 
+			chrome.i18n.getMessage("testbutton");
 	}
 	else {
-		/*
-		 * TODO -- Disable button. Button should be enabled when
-		 * receiving response.
-		 */
 
-		var resolver = nameserver;
-		if (resolver == '') {
-			resolver = "sysresolver";
-		}
 		var queryParams = "validate~" + dn + '~' + options + '~' +
-		    resolver + '~' + addr + '~notab';
-		console.log(queryParams);
+		    nameserver + '~' + addr + '~notab';
+
+		if (debuglogout) {
+			console.log(DNSSEC + queryParams);
+		}
 
 		var port = chrome.runtime.connectNative(
 		    "cz.nic.dnssec.validator");
 		port.onMessage.addListener(handle_test_response);
 		port.onDisconnect.addListener(function() {
-			console.log("Helper host disconnected.");
+			if (debuglogout) {
+				console.log(DNSSEC + "Helper host disconnected.");
+			}
 		});
 		port.postMessage(queryParams);
 		port.postMessage("finish");
-
-/*
-		try {
-			if (testnic == 2) {
-				document.getElementById("messageok").style.display = 'block';
-				document.getElementById("messagebogus").style.display = 'none';
-				document.getElementById("messageerror").style.display = 'none';
-				document.getElementById("messageip").style.display = 'none';
-			}
-			else if (testnic == 4) {
-				document.getElementById("messageok").style.display = 'none';
-				document.getElementById("messagebogus").style.display = 'block';
-				document.getElementById("messageerror").style.display = 'none';
-				document.getElementById("messageip").style.display = 'none';
-			}
-			else {
-				document.getElementById("messageok").style.display = 'none';
-				document.getElementById("messagebogus").style.display = 'none';
-				document.getElementById("messageerror").style.display = 'block';
-				document.getElementById("messageip").style.display = 'none';
-			}
-		} catch (ex) {
-				console.log('Error: Plugin call failed!\n');
-				document.getElementById("messageok").style.display = 'none';
-				document.getElementById("messagebogus").style.display = 'none';
-				document.getElementById("messageerror").style.display = 'none';
-				document.getElementById("messageip").style.display = 'none';
-		} //try
-*/
 	}//if ip
 }
-
-
 
 
 //--------------------------------------------------------
@@ -256,9 +264,16 @@ function eraseOptions() {
 	localStorage.removeItem("dnssecResolver");
 	localStorage.removeItem("dnssecCustomResolver");
 	localStorage.removeItem("DebugOutput");
+	localStorage.removeItem("deldnssecctx");
+	localStorage.removeItem("domainlist");
+	localStorage.removeItem("domainfilteron");
 	location.reload();
 }
 
+
+//--------------------------------------------------------
+// Refresh some elements on the page
+//--------------------------------------------------------
 function RefreshExclude() {
 
 	var ischecked = document.getElementById("domainfilteron").checked;
@@ -270,16 +285,17 @@ function RefreshExclude() {
 		document.getElementById("domainlist").style.color = 'grey';
 		document.getElementById("filtertext").style.color = 'grey';
 	}
-	//location.reload();
 }
+
+
 
 //--------------------------------------------------------
 // Replaces onclick for the option buttons
 //--------------------------------------------------------
 window.onload = function(){
-	document.querySelector('input[id="savebutton"]').onclick=saveOptions;
-	document.querySelector('input[id="testbutton"]').onclick=testdnssec;
-	document.querySelector('input[id="cancelbutton"]').onclick=cancelOptions;
+	document.querySelector('input[id="savebutton"]').onclick = saveOptions;
+	document.querySelector('input[id="testbutton"]').onclick = testdnssec;
+	document.querySelector('input[id="cancelbutton"]').onclick = cancelOptions;
 	var domainfilteron = document.querySelectorAll('input[type=checkbox][id=domainfilteron]');
 	domainfilteron[0].onchange = RefreshExclude;
 }
@@ -288,25 +304,25 @@ window.onload = function(){
 // show DNSSEC text about resover settings
 //--------------------------------------------------------
 function testinfodisplay(state){
-	if (state==0) {
+	if (state == 0) {
 		document.getElementById("messageok").style.display = 'none';
 		document.getElementById("messagebogus").style.display = 'none';
 		document.getElementById("messageerror").style.display = 'none'
 		document.getElementById("messageip").style.display = 'block';
 	}
-	else if (state==1) {
+	else if (state == 1) {
 		document.getElementById("messageok").style.display = 'none';
 		document.getElementById("messagebogus").style.display = 'none';
 		document.getElementById("messageerror").style.display = 'block';
 		document.getElementById("messageip").style.display = 'none';
 	}
-	else if (state==2) {
+	else if (state == 2) {
 		document.getElementById("messageok").style.display = 'none';
 		document.getElementById("messagebogus").style.display = 'block';
 		document.getElementById("messageerror").style.display = 'none';
 		document.getElementById("messageip").style.display = 'none';
 	}
-	else if (state==3) {
+	else if (state == 3) {
 		document.getElementById("messageok").style.display = 'block';
 		document.getElementById("messagebogus").style.display = 'none';
 		document.getElementById("messageerror").style.display = 'none';
@@ -324,6 +340,8 @@ function testinfodisplay(state){
 // Settings window initialization
 //--------------------------------------------------------
 window.addEventListener('load',function(){
+
+	debuglogout = StringToBool(localStorage["DebugOutput"]);
 
 	resultRegexp = /\?([^?,]+),([^,]+),([^,]+)$/;
 	matches = resultRegexp.exec(document.location.href);
@@ -368,6 +386,9 @@ window.addEventListener('load',function(){
 		if (dnssecCustomResolver == undefined) {
 			dnssecCustomResolver = defaultCustomResolver;
 		}
+
+		localStorage["deldnssecctx"] = false;
+
 		// OMG local storage has everything as text
 		DebugOutput = (DebugOutput == undefined || DebugOutput == "false") ? false : true;
 		document.dnssecSettings.customResolver.value = dnssecCustomResolver;
@@ -393,6 +414,8 @@ window.addEventListener('load',function(){
 		}
 	}
 	else {
+		localStorage["deldnssecctx"] = false;
+
 		document.dnssecSettings.customResolver.value = unescape(resolver);
 		var radiogroup = document.dnssecSettings.resolver;
 		var child = radiogroup[choice];
