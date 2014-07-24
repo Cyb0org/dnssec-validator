@@ -749,9 +749,9 @@ function tlsaValidationPrepare(tabId, changeInfo, url) {
 		return;
 	}
 	
-	domainport = domain + ":" + portplugin;
+	var cacheitem = domain + ":" + portplugin;
 
-	var cacheitem = tlsaExtCache.getRecord(domainport);
+	var cacheitem = tlsaExtCache.getRecord(cacheitem);
 
 	// if domain:port is not in internal cache
 	if (cacheitem[0] == '' && cacheitem[1] == '') {
