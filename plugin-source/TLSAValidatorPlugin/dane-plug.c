@@ -2011,7 +2011,7 @@ int wait_for_and_process_native_message(void)
 	char inbuf[MAX_BUF_LEN], outbuf[MAX_BUF_LEN];
 	unsigned int inlen, outlen;
 	char *cmd, *options_str, *resolver, *dn, *port, *proto, *policy_str,
-	    *tab_id, *saveptr;
+	    *tab_id, *schema, *saveptr;
 	int options_num, policy_num;
 	int val_ret;
 
@@ -2059,6 +2059,7 @@ int wait_for_and_process_native_message(void)
 		proto = strsplit(NULL, DELIMS, &saveptr);
 		policy_str = strsplit(NULL, DELIMS, &saveptr);
 		tab_id = strsplit(NULL, DELIMS, &saveptr);
+		schema = strsplit(NULL, DELIMS, &saveptr);
 
 		if (('\0' == resolver[0]) ||
 		    (strcmp("sysresolver", resolver) == 0)) {
@@ -2072,9 +2073,9 @@ int wait_for_and_process_native_message(void)
 		    port, proto, policy_num);
 
 		/* Generate output. */
-		if (snprintf(outbuf, MAX_BUF_LEN, "\"%sRet~%s~%s~%s~%d~%s\"",
-		        cmd, dn, port, proto, val_ret,
-		        tab_id) >= MAX_BUF_LEN) {
+		if (snprintf(outbuf, MAX_BUF_LEN,
+		        "\"%sRet~%s~%s~%s~%d~%s~%s\"", cmd, dn, port, proto,
+		        val_ret, tab_id, schema) >= MAX_BUF_LEN) {
 			/* Error. */
 			printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n",
 			    "Error while creating response string.");
