@@ -2051,6 +2051,7 @@ int wait_for_and_process_native_message(void)
 
 		/* Generate no output. */
 	} else if ((strcmp(cmd, "validate") == 0) ||
+	           (strcmp(cmd, "validateBlock") == 0) ||
 	           (strcmp(cmd, "validateBogus") == 0)) {
 		options_str = strsplit(NULL, DELIMS, &saveptr);
 		resolver = strsplit(NULL, DELIMS, &saveptr);
