@@ -1,0 +1,10 @@
+## Process this file with automake to produce Makefile.in
+
+# Scan for additional macro definitions.
+#ACLOCAL_AMFLAGS = -I $(top_srcdir)/m4
+
+SUBDIRS = \
+	core_js-ctypes
+
+EXTRA_DIST = \
+	autogen.sh
