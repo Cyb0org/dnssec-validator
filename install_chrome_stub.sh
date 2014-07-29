@@ -9,7 +9,7 @@ SAFARIEXT=safari2.safariextz
 uuencode=0
 binary=1
 
-function untar_payload()
+untar_payload()
 {
 	SCRIPT="$0"
 	if [ "x$1" != "x" ]; then
@@ -18,10 +18,10 @@ function untar_payload()
 
 	match=$(grep --text --line-number '^PAYLOAD:$' "${SCRIPT}" | cut -d ':' -f 1)
 	payload_start=$((match + 1))
-	if [[ $binary -ne 0 ]]; then
+	if [ $binary -ne 0 ]; then
 		tail -n +$payload_start "${SCRIPT}" | tar -xzf -
 	fi
-	if [[ $uuencode -ne 0 ]]; then
+	if [ $uuencode -ne 0 ]; then
 		tail -n +$payload_start "${SCRIPT}" | uudecode | tar -xzf -
 	fi
 }

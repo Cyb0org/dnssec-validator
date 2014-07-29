@@ -6,7 +6,8 @@
 #cd tests && make clean && make && cd ..
 
 
-CHROME_BINARY="google-chrome-stable"
+#CHROME_BINARY="google-chrome-stable"
+CHROME_BINARY="chromium"
 
 TARGZ_FILE=arch_$$.tar.gz
 
@@ -32,7 +33,7 @@ SCRIPT_STUB="install_chrome_stub.sh"
 rm -rf __tmp__ && mkdir __tmp__
 TEMP_DIR="__tmp__"
 
-function cleanup() {
+cleanup () {
 	rm -rf "${TEMP_DIR}" "${TARGZ_FILE}" "${TARGET_DNSSEC}" "${TARGET_TLSA}"
 }
 
@@ -40,7 +41,7 @@ function cleanup() {
 #cleanup
 cp -r add-on/chrome-dnssec/native-msg_built ${TEMP_DIR}/dnssec-pkg
 mv ${TEMP_DIR}/dnssec-pkg/cz.nic.validator.dnssec.json.in ${TEMP_DIR}/cz.nic.validator.dnssec.json.in
-rm ${TEMP_DIR}/dnssec-pkg/cz.nic.validator.dnssec.json*
+rm -f ${TEMP_DIR}/dnssec-pkg/cz.nic.validator.dnssec.json*
 cp tests/dnssec-plug ${TEMP_DIR}/dnssec-plug
 cp ../chrome_dnssec_validator.pem ${TEMP_DIR}/chrome_dnssec_validator.pem
 ${CHROME_BINARY} --pack-extension="${TEMP_DIR}/dnssec-pkg" --pack-extension-key="${TEMP_DIR}/chrome_dnssec_validator.pem"
@@ -58,7 +59,7 @@ rm -f ${TARGZ_FILE}
 mkdir ${TEMP_DIR}
 cp -r add-on/chrome-tlsa/native-msg_built ${TEMP_DIR}/tlsa-pkg
 mv ${TEMP_DIR}/tlsa-pkg/cz.nic.validator.tlsa.json.in ${TEMP_DIR}/cz.nic.validator.tlsa.json.in
-rm ${TEMP_DIR}/tlsa-pkg/cz.nic.validator.tlsa.json*
+rm -f ${TEMP_DIR}/tlsa-pkg/cz.nic.validator.tlsa.json*
 cp tests/dane-plug ${TEMP_DIR}/dane-plug
 cp ../chrome_tlsa_validator.pem ${TEMP_DIR}/chrome_tlsa_validator.pem
 ${CHROME_BINARY} --pack-extension="${TEMP_DIR}/tlsa-pkg" --pack-extension-key="${TEMP_DIR}/chrome_tlsa_validator.pem"
