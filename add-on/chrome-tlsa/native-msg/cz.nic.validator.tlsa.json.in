@@ -1,7 +1,7 @@
 {
     "name": "cz.nic.validator.tlsa",
     "description": "Chrome Native Messaging API Example Host",
-    "path": "/home/martin/Git/dnssec-validator/tests/dane-plug",
+    "path": @DANE_BINARY@,
     "type": "stdio",
     "allowed_origins": [
     "chrome-extension://gmgeefghnadlmkpbjfamblomkoknhjga/"
