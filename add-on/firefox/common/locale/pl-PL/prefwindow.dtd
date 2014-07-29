@@ -1,0 +1,50 @@
+<!-- ***** BEGIN LICENSE BLOCK *****
+Copyright 2012 CZ.NIC, z.s.p.o.
+
+Authors: Martin Straka <martin.straka@nic.cz>
+
+This file is part of DNSSEC Validator 2.0 Add-on.
+
+DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC Validator 2.0 Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
+***** END LICENSE BLOCK ***** -->
+
+<!ENTITY prefwindow.title "Ustawienia Walidatora">
+<!ENTITY groupboxdnsserver.label "Ustawienia resolvera">
+<!ENTITY radiogroupdnsserver.label "Resolver(y) DNS wykorzystywane do rozwiązywania nazw:">
+<!ENTITY radiodnsserversystem.label "Użyj ustawień systemowych">
+<!ENTITY radiodnsserversystem.accesskey "U">
+<!ENTITY radiodnsserverpreset.label "DNSSEC publiczne resolvery:">
+<!ENTITY radiodnsserverpreset.accesskey "D">
+<!ENTITY menuitemdnsservercznic.label "CZ.NICa">
+<!ENTITY menuitemdnsserveroarc.label "OARCa">
+<!ENTITY radiodnsserveropt.label "Własne:">
+<!ENTITY radiodnsserveropt.accesskey "W">
+<!ENTITY radiodnsserverunbound.label "Bez resolvera">
+<!ENTITY radiodnsserverunbound.accesskey "B">
+<!ENTITY dnssecbutton.label "Przetestuj obecne ustawienia">
+<!ENTITY groupboxfilter.label "Lista wykluczonych domen i TLD">
+<!ENTITY usefilter.label "Wyklucz wymienione domeny">
+<!ENTITY usefilter.accesskey "y">
+<!ENTITY filtertext.label "Lista domen i/lub TLD (oddzielonych przecinkami)">
+<!ENTITY groupboxtlsa.label "Ustawienia TLSA Walidatora">
+<!ENTITY tlsaonoff.label "Pozwalają TLSA Walidator">
+<!ENTITY tlsaonoff.accesskey "T">
+<!ENTITY tlsablock.label "Przerwij połączenie HTTPS, jeśli walidacja TLSA nie powiedzie się">
+<!ENTITY tlsablock.accesskey "P">
+<!ENTITY checkallhttps.label "Włącz walidację TLSA dla wszystkich żądań HTTPS na stronie">
+<!ENTITY checkallhttps.accesskey "H">
+<!ENTITY clearcache.label "Czyść pamięć podręczną przeglądarki podczas startu">
+<!ENTITY clearcache.accesskey "C">
+<!ENTITY usebrowsercertchain.label "Łańcuch certyfikatów Użyj przeglądarki">
+<!ENTITY usebrowsercertchain.accesskey "U">

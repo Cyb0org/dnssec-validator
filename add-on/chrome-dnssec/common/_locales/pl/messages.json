@@ -161,6 +161,12 @@
    "7invalidNoDomainSignatureInfo":{
       "message":"Domena nadrzędna jest zabezpieczona przez DNSSEC, ale odpowiedź otrzymana dla nieobecnej nazwy domenowej nie zawiera poprawnego podpisu. Może to oznaczać próbę sfałszowania nazwy domenowej w celu uniemożliwienia dostępu do domeny."
    },
+   "8securedConnectionNoDomainIPaddr": {
+	"message": " została zweryfikowana przy użyciu DNSSEC."
+   },
+   "8securedConnectionNoDomainIPaddrInfo": {
+	"message": "Przeglądarka uzyskać adres IP dla nazwy domeny, której rekord DNS wyraźnie istnieją w hierarchii DNS. Może to być spowodowane faktem, że weryfikator zastosowań innych niż program rozpoznawania systemu, a przeglądarki wykorzystuje mechanizm rozwiązywania, które mogą być modyfikowane. Ta praktyka jest czasem używany do dostępu do części sieci, które nie są łatwo dostępne."
+   },
    "ipbrowsertext":{
       "message":"Adres IP uzyskany przez przeglądarkę:"
    },
