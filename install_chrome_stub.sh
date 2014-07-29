@@ -47,9 +47,12 @@ CORE_DIR=$1
 	SYSTEM=`uname -s | tr '[:upper:]' '[:lower:]'`
 	# https://developer.chrome.com/extensions/messaging#native-messaging
 	MANIFEST_DIR=""
+	CHROMIUM_MANIFEST_DIR=""
 	case "${SYSTEM}" in
 	linux)
 		MANIFEST_DIR="${HOME}/.config/google-chrome/NativeMessagingHosts"
+		# On Linux install to Chromium as well.
+		CHROMIUM_MANIFEST_DIR="${HOME}/.config/chromium/NativeMessagingHosts"
 		;;
 	darwin)
 		MANIFEST_DIR="${HOME}/Library/Application Support/Google/Chrome/NativeMessagingHosts"
@@ -62,6 +65,10 @@ CORE_DIR=$1
 
 	if [ ! -d "${MANIFEST_DIR}" ]; then
 		mkdir -p "${MANIFEST_DIR}"
+	fi
+
+	if [ -n "${CHROMIUM_MANIFEST_DIR}" ] && [ ! -d "${CHROMIUM_MANIFEST_DIR}" ]; then
+		mkdir -p ${CHROMIUM_MANIFEST_DIR}
 	fi
 
 	WORK_DIR=`pwd`
@@ -80,6 +87,9 @@ CORE_DIR=$1
 	# Update JSON template.
 	ESCAPED_PATH=`echo "${CORE_DIR}/${PLUG_FILE}" | sed -e 's/\//\\\\\//g'`
 	sed -e "s/[@][^_]*_BINARY[@]/\"${ESCAPED_PATH}\"/g" < "${TMP_DIR}/${JSON_IN_FILE}" > "${MANIFEST_DIR}/${JSON_FILE}"
+	if [ -n "${CHROMIUM_MANIFEST_DIR}" ]; then
+		sed -e "s/[@][^_]*_BINARY[@]/\"${ESCAPED_PATH}\"/g" < "${TMP_DIR}/${JSON_IN_FILE}" > "${CHROMIUM_MANIFEST_DIR}/${JSON_FILE}"
+	fi
 
 	# Move crx file.
 	cp "${TMP_DIR}/${CRX_FILE}" "${WORK_DIR}/${CRX_FILE}"
