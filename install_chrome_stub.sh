@@ -163,7 +163,7 @@ CORE_DIR=$1
 	# Update JSON template.
 	ESCAPED_PATH=`echo "${CORE_DIR}/${PLUG_FILE}" | sed -e 's/\//\\\\\//g'`
 	if [ -n "${CHROMIUM_MANIFEST_DIR}" ]; then
-		sed -e "s/[@][^_]*_BINARY[@]/\"${ESCAPED_PATH}\"/g" < "${TMP_DIR}/${JSON_IN_FILE}" > "${G_CHROME_CHROMIUM_MANIFEST_DIR}/${JSON_FILE}"
+		sed -e "s/[@][^_]*_BINARY[@]/\"${ESCAPED_PATH}\"/g" < "${TMP_DIR}/${JSON_IN_FILE}" > "${CHROMIUM_MANIFEST_DIR}/${JSON_FILE}"
 	fi
 	if [ -n "${G_CHROME_MANIFEST_DIR}" ]; then
 		sed -e "s/[@][^_]*_BINARY[@]/\"${ESCAPED_PATH}\"/g" < "${TMP_DIR}/${JSON_IN_FILE}" > "${G_CHROME_MANIFEST_DIR}/${JSON_FILE}"
