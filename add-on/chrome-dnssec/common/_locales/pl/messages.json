@@ -1,0 +1,183 @@
+{
+   "preftitle":{
+      "message":"Ustawienia Walidatora DNSSEC"
+   },
+   "prefresolver":{
+      "message":"Resolver(y) DNS wykorzystywane do rozwiązywania nazw:"
+   },
+   "groupboxfilter":{
+      "message":"Lista wykluczonych domen i TLD"
+   },
+   "usefilter":{
+      "message":"Wyklucz wymienione domeny"
+   },
+   "filtertext":{
+      "message":"Lista domen i/lub TLD (oddzielonych przecinkami)"
+   },
+   "debugoutputtext":{
+      "message":"Wyświetlaj informacje diagnostyczne w konsoli narzędzi dla programistów"
+   },
+   "legend":{
+      "message":"Ustawienia resolvera"
+   },
+   "resolver0":{
+      "message":"Użyj ustawień systemowych"
+   },
+   "resolver1":{
+      "message":"Publiczne resolvery CZ.NIC"
+   },
+   "resolver2":{
+      "message":"Publiczne resolvery OARC"
+   },
+   "resolver3":{
+      "message":" Własne: "
+   },
+   "resolver4":{
+      "message":"Bez resolvera"
+   },
+   "savebutton":{
+      "message":"Zapisz ustawienia"
+   },
+   "testbutton":{
+      "message":"Przetestuj obecne ustawienia"
+   },
+   "cancelbutton":{
+      "message":"Anuluj"
+   },
+   "messageok":{
+      "message":"Sukces - obecne ustawienia umożliwiają walidację DNSSEC."
+   },
+   "messagebogus":{
+      "message":"Niepowodzenie - fałszywa odpowiedź DNSSEC, walidacja DNSSEC niemożliwa przy obecnych ustawieniach."
+   },
+   "messageerror":{
+      "message":"Niepowodzenie - brak odpowiedzi DNS, możliwy błąd sieci lub niewłaściwy adres serwera."
+   },
+   "messageip":{
+      "message":"Błąd - podany ciąg znaków nie zawiera poprawnego adresu IP."
+   },
+   "moreinfo":{
+      "message":"Więcej informacji"
+   },
+   "homepage":{
+      "message":"Aby uzyskać więcej informacji, przejdź do strony domowej wtyczki"
+   },
+   "dnssecfail":{
+      "message":"Stan DNSSEC nieznany"
+   },
+   "dnssecok":{
+      "message":"Zabezpieczona przez DNSSEC"
+   },
+   "dnssecaction":{
+      "message":"Sprawdzanie stanu DNSSEC"
+   },
+   "dnssecbogus":{
+      "message":"Fałszywy podpis DNSSEC"
+   },
+   "dnssecnone":{
+      "message":"Niezabezpieczona przez DNSSEC"
+   },
+   "validatoroff":{
+      "message":"Niezweryfikowana przy użyciu DNSSEC"
+   },
+   "domain":{
+      "message":"Nazwa domenowa "
+   },
+   "nodomain":{
+      "message":"Nieobecność nazwy domenowej "
+   },
+   "dnssecgenericError":{
+      "message":" nie może zostać zweryfikowana przy użyciu DNSSEC, ponieważ wystąpił błąd w rdzeniu walidatora DNSSEC."
+   },
+   "dnssecgenericErrorInfo":{
+      "message":"Proszę zrestartować przeglądarkę..."
+   },
+   "dnssecwrongres":{
+      "message":"Resolver nie obsługuje DNSSEC"
+   },
+   "dnssecWrongResolver":{
+      "message":" nie może zostać zweryfikowana przy użyciu DNSSEC."
+   },
+   "dnssecWrongResolverInfo":{
+      "message":"Obecny serwer DNS lub resolver nie obsługuje technologii DNSSEC. Proszę zmienić ustawienia walidatora (opcja \"Bez resolvera\")."
+   },
+   "unboundnodata":{
+      "message":" nie może zostać zweryfikowana przy użyciu DNSSEC."
+   },
+   "unboundnodataInfo":{
+      "message":"Wystąpił błąd podczas sprawdzania stanu DNSSEC tej nazwy domenowej. Może to być spowodowane wykorzystywaniem serwera proxy w twojej sieci. W takich przypadkach walidator nie jest w stanie zweryfikować rekordów zawierających adres(y) IP serwera."
+   },
+   "dnsseOff":{
+      "message":" nie została zweryfikowana przy użyciu DNSSEC."
+   },
+   "dnsseOffInfo":{
+      "message":"Walidacja DNSSEC nie została przeprowadzona, ponieważ ta domena lub jej domena nadrzędna jest wymieniona na liście wykluczonych domen."
+   },
+   "0dnssecError":{
+      "message":" nie może zostać zweryfikowana przy użyciu DNSSEC."
+   },
+   "0dnssecErrorInfo":{
+      "message":"Wystąpił błąd podczas sprawdzania stanu DNSSEC tej nazwy domenowej. Może to być spowodowane utratą łączności z serwerem DNS lub tym, że podany przez użytkownika adres IP walidującego resolvera nie jest adresem walidującego resolvera."
+   },
+   "1unsecuredDomain":{
+      "message":" nie jest zabezpieczona przez DNSSEC."
+   },
+   "1unsecuredDomainInfo":{
+      "message":"Ta nazwa domenowa nie jest zabezpieczona przez DNSSEC, więc nie jest możliwe zweryfikowanie poprawności otrzymanych danych i nie jesteś chroniony(-a) przed fałszowaniem nazw domenowych."
+   },
+   "2securedConnectionDomain":{
+      "message":" jest poprawnie zabezpieczona przez DNSSEC."
+   },
+   "2securedConnectionDomainInfo":{
+      "message":"Informacje o adresie IP tej nazwy domenowej zostały zweryfikowane przy użyciu DNSSEC. Ta nazwa domenowa jest zabezpieczona przez DNSSEC, więc jesteś chroniony(-a) przed fałszowaniem nazw domenowych."
+   },
+   "3securedConnectionDomainInvIPaddr":{
+      "message":" jest zabezpieczona przez DNSSEC, ale adres IP w przeglądarce jest niewłaściwy."
+   },
+   "3securedConnectionDomainInvIPaddrInfo":{
+      "message":"Ta nazwa domenowa jest zabezpieczona przez DNSSEC, ale adres IP wykorzystywany przez przeglądarkę różni się od adresu uzyskanego przez dodatek DNSSEC. Może być ku temu słuszny powód, ale może to też oznaczać próbę sfałszowania odpowiedzi DNS!"
+   },
+   "4invalidDomainSignature":{
+      "message":" jest zabezpieczona przez DNSSEC, ale wykryto niewłaściwy podpis nazwy domenowej!"
+   },
+   "4invalidDomainSignatureInfo":{
+      "message":"Ta nazwa domenowa jest zabezpieczona przez DNSSEC, ale wykryto niewłaściwy podpis nazwy domenowej. Może to oznaczać sfałszowanie nazwy domenowej!"
+   },
+   "5unsecuredNoDomain":{
+      "message":" nie może zostać zweryfikowana przy użyciu DNSSEC."
+   },
+   "5unsecuredNoDomainInfo":{
+      "message":"Domena nadrzędna nie jest zabezpieczona przez DNSSEC, więc nie było możliwe zweryfikowanie nieobecności tej nazwy domenowej."
+   },
+   "6securedConnectionNoDomain":{
+      "message":" została zweryfikowana przy użyciu DNSSEC."
+   },
+   "6securedConnectionNoDomainInfo":{
+      "message":"Domena nadrzędna jest zabezpieczona przez DNSSEC, więc można było pomyślnie zweryfikować nieobecność tej nazwy domenowej."
+   },
+   "7invalidNoDomainSignature":{
+      "message":" nie została pomyślnie zweryfikowana przy użyciu DNSSEC, ponieważ wykryto niewłaściwy podpis!"
+   },
+   "7invalidNoDomainSignatureInfo":{
+      "message":"Domena nadrzędna jest zabezpieczona przez DNSSEC, ale odpowiedź otrzymana dla nieobecnej nazwy domenowej nie zawiera poprawnego podpisu. Może to oznaczać próbę sfałszowania nazwy domenowej w celu uniemożliwienia dostępu do domeny."
+   },
+   "ipbrowsertext":{
+      "message":"Adres IP uzyskany przez przeglądarkę:"
+   },
+   "ipvalidatortext":{
+      "message":"Adres IP uzyskany przez dodatek:"
+   },
+   "actionDnssec":{
+      "message":"Sprawdzanie stanu DNSSEC"
+   },
+   "inactionDnssec":{
+      "message":"Bezczynny"
+   },
+   "errorDnssec":{
+      "message":"Stan DNSSEC nieznany"
+   },
+   "fwdinfo":{
+      "message":"Uwaga: Obecny serwer DNS lub resolver nie obsługuje technologii DNSSEC. Proszę zmienić ustawienia walidatora.\n\nCzy chcesz przejść do ustawień?"
+   }
+}
+
