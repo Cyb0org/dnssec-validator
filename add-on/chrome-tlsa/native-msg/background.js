@@ -742,19 +742,106 @@ function onUrlChange(tabId, changeInfo, tab) {
 
 
 //****************************************************************
-// set TLSA state and popup fields
+// create and return port number as string for popup title
 //****************************************************************
-function setReceivedData(tabId, domain, port, protocol, status, scheme) {
-
+function setPortToPopup(scheme, port) {
+	
 	var portpopup = "";
 
 	if (scheme == "https") {
 		portpopup = (port == "443") ? "" : ":"+port;
-		portpopup = (port == "443") ? "" : ":"+port;
-
 	}
 	if (scheme == "ftps") {
 		portpopup = (port == "990") ? "" : ":"+port;
+	}
+
+	return portpopup;
+}
+
+
+//***********************************************************************
+// Check if domain has DNSSEC bogus or resolver does not support DNSSEC
+//***********************************************************************
+function checkBogusState(tabId, domain, port, protocol, status, scheme) {
+
+	var c = this.tlsaExtNPAPIConst;
+	var portpopup = setPortToPopup(scheme, port);
+
+	if (debuglogout) {
+		console.log(DANE + "   DANE plugin result: " + status);
+	}
+
+	if (status == c.DANE_DNSSEC_BOGUS) {
+		if (debuglogout) {
+			console.log(DANE
+			    + "   Yes, DNSSEC of domain is really bogus");
+		}
+
+		tlsaExtCache.addRecord(domain+":"+port, status, "no");
+		tlsaExtCache.printContent();
+
+		setTLSASecurityState(tabId, domain+portpopup, status, scheme);
+	}
+	else {
+		if (debuglogout) {
+			console.log(DANE
+			    + "   Current resolver does not support DNSSEC!");
+		}
+
+		setTLSASecurityState(tabId, domain+portpopup,
+				c.DANE_RESOLVER_NO_DNSSEC, scheme);
+	}
+}
+
+
+//****************************************************************
+// set TLSA state and popup fields, if not DNSSEC bogus
+//****************************************************************
+function setReceivedData(tabId, domain, port, protocol, status, scheme) {
+
+	var c = this.tlsaExtNPAPIConst;
+	var portpopup = setPortToPopup(scheme, port);
+
+
+	if (status == c.DANE_DNSSEC_BOGUS) {
+		if (debuglogout) {
+			console.log(DANE + 
+			    "Plugin returns DNSSEC bogus state: Testing why?");
+		}
+
+		var options = 0;
+		var resolvipv4 = true; // No IPv4 resolving as default
+		var resolvipv6 = false; // No IPv6 resolving as default
+
+		if (debuglogout) options |= c.DNSSEC_FLAG_DEBUG;
+		if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
+		if (resolvipv6) options |= c.DNSSEC_FLAG_RESOLVIPV6;
+
+		if (debuglogout) {
+			console.log(DANE + "DANE plugin inputs: null, " + 
+				     "0" +", "+ options +", nofwd, "+ domain 
+				      +", "+ port +", "+ protocol +", "+ policy); 
+			console.log(DANE 
+			    + "-------- ASYNC RESOLVING START ----------------");
+		}
+	
+		var queryParams = "validateBogus" + '~' + options + '~' + 'nofwd' 
+				+ '~' + domain + '~' + port + '~' + protocol 
+				+ '~' + policy + '~' + tabId + '~' + scheme;
+
+		native_msg_port.postMessage("reinitialise");
+	
+		try {
+			native_msg_port.postMessage(queryParams);
+
+		} catch (ex) {
+			if (debuglogout) {
+				console.log(DANE + "DANE plugin call failed!");
+			}
+			setTLSASecurityState(tabId, domain+portpopup,
+					c.DANE_ERROR_GENERIC, scheme);
+		}
+		return;	
 	}
 
 	tlsaExtCache.addRecord(domain+":"+port, status, "no");
@@ -769,17 +856,7 @@ function setReceivedData(tabId, domain, port, protocol, status, scheme) {
 //****************************************************************
 function setReceivedDataBlock(domain, port, status, block) {
 
-	var portpopup = "";
-
-	if (scheme == "https") {
-		portpopup = (port == "443") ? "" : ":"+port;
-		portpopup = (port == "443") ? "" : ":"+port;
-
-	}
-	if (scheme == "ftps") {
-		portpopup = (port == "990") ? "" : ":"+port;
-	}
-
+	var portpopup = setPortToPopup(scheme, port);
 	tlsaExtCache.addRecord(domain+":"+port, status, block);
 	tlsaExtCache.printContent();
 }
@@ -849,6 +926,8 @@ function handle_native_response(resp) {
 			console.log(DANE 
 			+ "-------- ASYNC RESOLVING DONE -----------------");
 		}
+		checkBogusState(tabId, domain, port, protocol, status, scheme);
+
 		break;
 	default:
 		break;
