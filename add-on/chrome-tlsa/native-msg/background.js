@@ -812,7 +812,8 @@ function setReceivedData(tabId, domain, port, protocol, status, scheme) {
 		var options = 0;
 		var resolvipv4 = true; // No IPv4 resolving as default
 		var resolvipv6 = false; // No IPv6 resolving as default
-
+		var policy = 3; 
+	
 		if (debuglogout) options |= c.DNSSEC_FLAG_DEBUG;
 		if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
 		if (resolvipv6) options |= c.DNSSEC_FLAG_RESOLVIPV6;

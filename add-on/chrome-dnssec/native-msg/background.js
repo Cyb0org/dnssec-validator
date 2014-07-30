@@ -245,7 +245,7 @@ function setModeDNSSEC(newMode, tabId, domain, status, addr, ipval) {
 		console.log(DNSSEC + "Set mode: " + newMode + "; TabId: " + tabId 
 			+ "; Doamin: " + domain + "; Status: " + status);
 	}
-         
+     
 	// This is extremely fucking annoying, but chrome.extension.getViews() won't work
 	// unless popup is opened, so we set the validation result like GET parameters.
 	chrome.pageAction.setPopup({tabId: tabId, popup: "popup.html?" + domain 
@@ -513,6 +513,10 @@ function checkValidatedData(tabId, domain, status, ipval, addr) {
 function setValidatedData(tabId, domain, status, ipval, addr) {
 
 	var c = this.dnssecExtNPAPIConst;
+
+	if (ipval == "") {
+		ipval = "n/a";
+	}
 
 	if (debuglogout) {
 		console.log(DNSSEC + "   DNSSEC plugin result: " + status 
