@@ -137,6 +137,22 @@ xpi_x86:
 	cd $(ADDON_PATH_CR_TLSA) && mv npapi_built chrome2tlsa && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x86-npapi.tar.gz chrome2tlsa && mv chrome2tlsa npapi_built && mv CR-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x86-npapi.tar.gz ../../$(PLUGIN_ADD_ON)
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
+	@echo '### Creating native-msg package for Chrome $(OSNAME) x86... ###'
+	rm -rf $(ADDON_PATH_CR_DNSSEC)/native-msg_built
+	mkdir $(ADDON_PATH_CR_DNSSEC)/native-msg_built
+	cp -r $(ADDON_PATH_CR_DNSSEC)/native-msg/* $(ADDON_PATH_CR_DNSSEC)/native-msg_built
+	cp -r $(ADDON_PATH_CR_DNSSEC)/common/* $(ADDON_PATH_CR_DNSSEC)/native-msg_built
+	rm $(ADDON_PATH_CR_DNSSEC)/native-msg_built/manifest.json.template
+	rm -rf $(ADDON_PATH_CR_TLSA)/native-msg_built
+	mkdir $(ADDON_PATH_CR_TLSA)/native-msg_built
+	cp -r $(ADDON_PATH_CR_TLSA)/native-msg/* $(ADDON_PATH_CR_TLSA)/native-msg_built
+	cp -r $(ADDON_PATH_CR_TLSA)/common/* $(ADDON_PATH_CR_TLSA)/native-msg_built
+	rm $(ADDON_PATH_CR_TLSA)/native-msg_built/manifest.json.template
+	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_DNSSEC)/native-msg/manifest.json.template > $(ADDON_PATH_CR_DNSSEC)/native-msg_built/manifest.json
+	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/native-msg/manifest.json.template > $(ADDON_PATH_CR_TLSA)/native-msg_built/manifest.json
+	echo '# TODO -- Compile and bundle core application?'
+	@echo '### DONE... ###'
+	@echo '--------------------------------------------------'
 	@echo '### Creating package for Opera $(OSNAME) x86... ###'
 	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86.plugin $(ADDON_PATH_OP_DNSSEC)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
 	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86.plugin $(ADDON_PATH_OP_TLSA)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin
@@ -231,6 +247,22 @@ xpi_x64:
 	sed -e 's/tlsaplugin/np$(NPAPI_PLUGIN_NAME_TLSA).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/npapi/manifest.json.template > $(ADDON_PATH_CR_TLSA)/npapi_built/manifest.json
 	cd $(ADDON_PATH_CR_DNSSEC) && mv npapi_built chrome2dnssec && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64-npapi.tar.gz chrome2dnssec && mv chrome2dnssec npapi_built && mv CR-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64-npapi.tar.gz ../../$(PLUGIN_ADD_ON)
 	cd $(ADDON_PATH_CR_TLSA) && mv npapi_built chrome2tlsa && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64-npapi.tar.gz chrome2tlsa && mv chrome2tlsa npapi_built && mv CR-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64-npapi.tar.gz ../../$(PLUGIN_ADD_ON)
+	@echo '### DONE... ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating native-msg package for Chrome $(OSNAME) x64... ###'
+	rm -rf $(ADDON_PATH_CR_DNSSEC)/native-msg_built
+	mkdir $(ADDON_PATH_CR_DNSSEC)/native-msg_built
+	cp -r $(ADDON_PATH_CR_DNSSEC)/native-msg/* $(ADDON_PATH_CR_DNSSEC)/native-msg_built
+	cp -r $(ADDON_PATH_CR_DNSSEC)/common/* $(ADDON_PATH_CR_DNSSEC)/native-msg_built
+	rm $(ADDON_PATH_CR_DNSSEC)/native-msg_built/manifest.json.template
+	rm -rf $(ADDON_PATH_CR_TLSA)/native-msg_built
+	mkdir $(ADDON_PATH_CR_TLSA)/native-msg_built
+	cp -r $(ADDON_PATH_CR_TLSA)/native-msg/* $(ADDON_PATH_CR_TLSA)/native-msg_built
+	cp -r $(ADDON_PATH_CR_TLSA)/common/* $(ADDON_PATH_CR_TLSA)/native-msg_built
+	rm $(ADDON_PATH_CR_TLSA)/native-msg_built/manifest.json.template
+	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_DNSSEC)/native-msg/manifest.json.template > $(ADDON_PATH_CR_DNSSEC)/native-msg_built/manifest.json
+	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/native-msg/manifest.json.template > $(ADDON_PATH_CR_TLSA)/native-msg_built/manifest.json
+	echo '# TODO -- Compile and bundle core application?'
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Opera $(OSNAME) x64... ###'
@@ -341,6 +373,22 @@ xpi_fat:
 	sed -e 's/tlsaplugin/np$(NPAPI_PLUGIN_NAME_TLSA).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/npapi/manifest.json.template > $(ADDON_PATH_CR_TLSA)/npapi_built/manifest.json
 	cd $(ADDON_PATH_CR_DNSSEC) && mv npapi_built chrome2dnssec && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-fat-npapi.tar.gz chrome2dnssec && mv chrome2dnssec npapi_built && mv CR-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-fat-npapi.tar.gz ../../$(PLUGIN_ADD_ON)
 	cd $(ADDON_PATH_CR_TLSA) && mv npapi_built chrome2tlsa && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-fat-npapi.tar.gz chrome2tlsa && mv chrome2tlsa npapi_built && mv CR-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-fat-npapi.tar.gz ../../$(PLUGIN_ADD_ON)
+	@echo '### DONE... ###'
+	@echo '--------------------------------------------------'
+	@echo '### Creating native-msg package for Chrome $(OSNAME) fat... ###'
+	rm -rf $(ADDON_PATH_CR_DNSSEC)/native-msg_built
+	mkdir $(ADDON_PATH_CR_DNSSEC)/native-msg_built
+	cp -r $(ADDON_PATH_CR_DNSSEC)/native-msg/* $(ADDON_PATH_CR_DNSSEC)/native-msg_built
+	cp -r $(ADDON_PATH_CR_DNSSEC)/common/* $(ADDON_PATH_CR_DNSSEC)/native-msg_built
+	rm $(ADDON_PATH_CR_DNSSEC)/native-msg_built/manifest.json.template
+	rm -rf $(ADDON_PATH_CR_TLSA)/native-msg_built
+	mkdir $(ADDON_PATH_CR_TLSA)/native-msg_built
+	cp -r $(ADDON_PATH_CR_TLSA)/native-msg/* $(ADDON_PATH_CR_TLSA)/native-msg_built
+	cp -r $(ADDON_PATH_CR_TLSA)/common/* $(ADDON_PATH_CR_TLSA)/native-msg_built
+	rm $(ADDON_PATH_CR_TLSA)/native-msg_built/manifest.json.template
+	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_DNSSEC)/native-msg/manifest.json.template > $(ADDON_PATH_CR_DNSSEC)/native-msg_built/manifest.json
+	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/native-msg/manifest.json.template > $(ADDON_PATH_CR_TLSA)/native-msg_built/manifest.json
+	echo '# TODO -- Compile and bundle core application?'
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Opera $(OSNAME) fat... ###'
