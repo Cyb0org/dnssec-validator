@@ -506,10 +506,6 @@ ALLOW_TYPE_23: 2,
 DANE_DEBUG_PRE: "  dane: ",
 DANE_DEBUG_POST: "\n",
 
-overrideService:
-	Components.classes["@mozilla.org/security/certoverride;1"]
-	.getService(Components.interfaces.nsICertOverrideService),
-
 //---------------------------------------------------------
 // return true if domain name or TLD is in the list of
 // exluded domains else false
