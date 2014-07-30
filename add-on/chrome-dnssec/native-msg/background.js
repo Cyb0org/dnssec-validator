@@ -615,7 +615,7 @@ function onUrlChange(tabId, changeInfo, tab) {
         }//if
 
         if (debuglogout) {
-		console.log("Browser: onUrlChange(TabID: " + tabId 
+		console.log("\nBrowser: onUrlChange(TabID: " + tabId 
 		    + ", Action: " + changeInfo.status 
 		    + ", Info: " + changeInfo.url + ");");
 	}
