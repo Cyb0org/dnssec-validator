@@ -43,16 +43,19 @@ while [ $# -gt 0 ]; do
 	shift
 done
 
-if [ $# -ne 1 ]; then
-	echo >&2 -ne "${USAGE}"
-	exit 1
-fi
 
 #CHROME_BINARY="google-chrome-stable"
 #CHROME_BINARY="chromium"
-CHROME_BINARY="$1"
+if [ -z "${CHROME_BINARY}" ]; then
+	# CHROME_BINARY may be passed via variable.
+	if [ $# -ne 1 ]; then
+		echo >&2 -ne "${USAGE}"
+		exit 1
+	fi
+	CHROME_BINARY="$1"
+fi
 
-if ! type 1>/dev/null 2>&1 ${CHROME_BINARY}; then
+if ! type 1>/dev/null 2>&1 "${CHROME_BINARY}"; then
 	echo >&2 "'${CHROME_BINARY}' is not a command."
 	exit 1
 fi
@@ -107,7 +110,7 @@ if [ ! -f ../chrome_dnssec_validator.pem ]; then
 	exit 1
 fi
 cp ../chrome_dnssec_validator.pem ${TEMP_DIR}/chrome_dnssec_validator.pem
-${CHROME_BINARY} --pack-extension="${TEMP_DIR}/dnssec-pkg" --pack-extension-key="${TEMP_DIR}/chrome_dnssec_validator.pem"
+"${CHROME_BINARY}" --pack-extension="${TEMP_DIR}/dnssec-pkg" --pack-extension-key="${TEMP_DIR}/chrome_dnssec_validator.pem"
 rm ${TEMP_DIR}/chrome_dnssec_validator.pem
 #
 cd ${TEMP_DIR}; tar -czf "${TARGZ_FILE}" cz.nic.validator.dnssec.json.in dnssec-plug dnssec-pkg.crx; cd ..
@@ -136,7 +139,7 @@ if [ ! -f ../chrome_tlsa_validator.pem ]; then
 	exit 1
 fi
 cp ../chrome_tlsa_validator.pem ${TEMP_DIR}/chrome_tlsa_validator.pem
-${CHROME_BINARY} --pack-extension="${TEMP_DIR}/tlsa-pkg" --pack-extension-key="${TEMP_DIR}/chrome_tlsa_validator.pem"
+"${CHROME_BINARY}" --pack-extension="${TEMP_DIR}/tlsa-pkg" --pack-extension-key="${TEMP_DIR}/chrome_tlsa_validator.pem"
 rm ${TEMP_DIR}/chrome_tlsa_validator.pem
 #
 cd ${TEMP_DIR}; tar -czf "${TARGZ_FILE}" cz.nic.validator.tlsa.json.in dane-plug tlsa-pkg.crx; cd ..

@@ -23,6 +23,39 @@ untar_payload()
 }
 
 
+full_canonical_name()
+{
+	# Avoids using readlink -f .
+
+	TGT_FILE="$1"
+
+	cd $(dirname "${TGT_FILE}")
+	TGT_FILE=$(basename "${TGT_FILE}")
+
+	# Cycle counter.
+	CNTR=0
+
+	# Iterate down a (possible) chain of symlinks.
+	while [ -L "${TGT_FILE}" ]; do
+		TGT_FILE=$(readlink ${TGT_FILE})
+		cd $(dirname "${TGT_FILE}")
+		TGT_FILE=$(basename "${TGT_FILE}")
+
+		CNTR=$(expr ${CNTR} + 1)
+		if [ ${CNTR} -ge 1000 ]; then
+			# Probably in a symlink cycle.
+			return 1
+		fi
+	done
+
+	# Compute the canonicalised name by finding the physical path
+	# for the directory we're in and appending the target file.
+	PHYS_DIR=`pwd -P`
+	RESULT="${PHYS_DIR}/${TGT_FILE}"
+	echo ${RESULT}
+}
+
+
 CORE_DIR_DFLT="${HOME}/chrome_dnssec_tlsa_cores"
 
 OPTS="acgh"
@@ -97,8 +130,10 @@ if [ "x${CHROMIUM_CORE}" = 'xno' ] && [ "x${G_CHROME_CORE}" = 'xno' ]; then
 fi
 
 
-SCRIPT_NAME=$(basename $0)
-BASEDIR=$(dirname $(readlink -f $0))
+# readlink behaves differently on OS X.
+#SCRIPT_NAME=$(basename $0)
+#BASEDIR=$(dirname $(readlink -f $0))
+SCRIPT_CANONICAL_NAME=`full_canonical_name "$0"`
 CORE_DIR=$1
 
 #read -p "Install files? " ans
@@ -149,8 +184,8 @@ CORE_DIR=$1
 
 	WORK_DIR=`pwd`
 
-	TMP_DIR=`mktemp -d`
-	cd "${TMP_DIR}"; untar_payload ${BASEDIR}/${SCRIPT_NAME}; cd "${WORK_DIR}"
+	TMP_DIR=`mktemp -d /tmp/valext-XXXXXX`
+	cd "${TMP_DIR}"; untar_payload "${SCRIPT_CANONICAL_NAME}"; cd "${WORK_DIR}"
 
 	PLUG_FILE=`ls "${TMP_DIR}" | grep plug`
 	JSON_IN_FILE=`ls "${TMP_DIR}" | grep json.in`
