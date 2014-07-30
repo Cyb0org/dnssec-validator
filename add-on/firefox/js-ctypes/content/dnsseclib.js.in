@@ -42,74 +42,8 @@ dnssec_init: function() {
 		var os = Components.classes["@mozilla.org/xre/app-info;1"]
 		    .getService(Components.interfaces.nsIXULRuntime).OS;
 
-		var dnssecLibName = "unspecified";
+		var dnssecLibName = "@libDNSSECcore@";
 
-		/* Try system location. */
-		if(os.match("Darwin")) {
-			dnssecLibName = "libDNSSECcore-macosx.dylib";
-		} else if(os.match("FreeBSD")) {
-			dnssecLibName = "libDNSSECcore-freebsd.so";
-		} else if(os.match("Linux")) {
-			dnssecLibName = "libDNSSECcore-linux.so";
-		} else if(os.match("WINNT")) {
-			dnssecLibName = "libDNSSECcore-windows.dll";
-		} else {
-			if (cz.nic.extension.dnssecExtension.debugOutput) {
-				dump(cz.nic.extension.dnssecExtension.debugPrefix +
-				    "Error: Unsupported OS!\n");
-			}
-			return false;
-		}
-
-		try {
-			cz.nic.extension.dnssecLibCore._initDnssecLib(dnssecLibName);
-			if (cz.nic.extension.dnssecExtension.debugOutput) {
-				dump(cz.nic.extension.dnssecExtension.debugPrefix +
-				    "Loaded DNSSEC library:\n        " +
-				    dnssecLibName + "\n");
-			}
-			return true;
-		} catch(e) {
-			/*
-			 * Failed loading OS library. Fall back to library
-			 * distributed with the plug-in.
-			 */
-			if (cz.nic.extension.dnssecExtension.debugOutput) {
-				dump(cz.nic.extension.dnssecExtension.debugPrefix +
-				    "Warning: Cannot find DNSSEC system " +
-				    "library '" + dnssecLibName + "'! Library " +
-				    "distributed with plugin will be used.\n");
-			}
-		}
-
-		dnssecLibName = "unspecified";
-
-		var abiStr = "unspecified";
-		if (abi.match("x86_64")) {
-			abiStr = "x64";
-		} else if (abi.match("x86")) {
-			abiStr = "x86";
-		} else {
-			if (cz.nic.extension.dnssecExtension.debugOutput) {
-				dump(cz.nic.extension.dnssecExtension.debugPrefix +
-				    "Error: Unsupported OS architecture!\n");
-			}
-			return false;
-		}
-
-		if(os.match("Darwin")) {
-			dnssecLibName =
-			    "plugins/libDNSSECcore-macosx-" + abiStr + ".dylib";
-		} else if (os.match("FreeBSD")) {
-			dnssecLibName =
-			    "plugins/libDNSSECcore-freebsd-" + abiStr + ".so";
-		} else if(os.match("Linux")) {
-			dnssecLibName =
-			    "plugins/libDNSSECcore-linux-" + abiStr + ".so";
-		} else if(os.match("WINNT")) {
-			dnssecLibName =
-			    "plugins/libDNSSECcore-windows-x86.dll";
-		}
 		dnssecLibName = addon.getResourceURI(dnssecLibName)
 		    .QueryInterface(Components.interfaces.nsIFileURL).file
 		    .path;
