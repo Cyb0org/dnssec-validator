@@ -105,7 +105,7 @@
 		"message": "Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht. Ändern Sie bitte die Einstellungen des Resolvers (Wahl \"Ohne Resolver\")."
 		},
 "dm_errgen": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Es kam zu einem Fehler während Erwerbs der TLSA Validator core."},
-"dm_errgenInfo": { "message":  "Bitte Neustart Sie Ihren Web-Browser..."},
+"dm_errgenInfo": { "message":  "Bitte alle Browserfenster schließen und den Browser neu starten..."},
 "dm_rfesolverfailed": { "message":  "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Es kam zu einem Fehler während Erwerbs des TLSA Eintrags für diese Domäne."},
 "dm_rfesolverfailedInfo": { "message":  "Es kam zu einem Fehler während Erwerbs des TLSA Eintrags für diese Domäne. Dies kann durch einen Verbindungsausfall zum DNS-Server verursacht werden, oder die von Benutzer gewählte IP-Adresse eines validierenden Resolvers ist keine richtige Adresse eines validierenden Resolvers."},
 "dm_nohttps": { "message":  "Weil für diese Domäne keine HTTPS Verbindung hergestellt wurde, ist es nicht möglich eine Validierung des TLSA Eintrags auszuführen."},

@@ -90,7 +90,7 @@
 		"message": " kann nicht mit DNSSEC überprüft werden. Es kam zu einem Fehler während Erwerbs der DNSSEC Validator core."
 		},
          "dnssecgenericErrorInfo": {
-		"message": "Bitte Neustart Sie Ihren Web-Browser..."
+		"message": "Bitte alle Browserfenster schließen und den Browser neu starten..."
 		},
  	"dnssecwrongres": {
 		"message": "Resolver unterstützt DNSSEC nicht"

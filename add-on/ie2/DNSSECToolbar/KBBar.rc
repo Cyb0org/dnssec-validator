@@ -1205,7 +1205,7 @@ BEGIN
 			//state -1
 	IDS_DNSSEC_ERROR_GEN_TOOLTIP "DNSSEC-Zustand unbekannt"
 	IDS_DNSSEC_ERROR_GEN_DOMAIN  "kann nicht mit DNSSEC überprüft werden. Es kam zu einem Fehler während Erwerbs der DNSSEC Validator core."
-	IDS_DNSSEC_ERROR_GEN_MAIN	"Bitte Neustart Sie Ihren Web-Browser..."
+	IDS_DNSSEC_ERROR_GEN_MAIN	"Bitte alle Browserfenster schließen und den Browser neu starten..."
 			// state 10
 	IDS_DANE_STATE10_LABEL "Zertifikat entspricht TLSA"
 	IDS_DANE_STATE10_TEXT_MAIN "Das Serverzertifikat für diese Domäne wurde durch DANE Protokoll bestätigt. Das Zertifikat entspricht dem durch DNSSEC gesicherten TLSA Eintrag."
@@ -1289,7 +1289,7 @@ BEGIN
 	 	 	 // state -1
 	 IDS_DANE_ERROR_GEN_LABEL	"TLSA Status unbekannt"	
 	 IDS_DANE_ERROR_GEN_TEXT_MAIN	"Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Es kam zu einem Fehler während Erwerbs der TLSA Validator core."	 
-	 IDS_DANE_ERROR_GEN_TEXT_ADD	"Bitte Neustart Sie Ihren Web-Browser..."
+	 IDS_DANE_ERROR_GEN_TEXT_ADD	"Bitte alle Browserfenster schließen und den Browser neu starten..."
 
     IDS_NONE                " "
     IDS_ADDON_INIT          "Add-on initialisiert"
