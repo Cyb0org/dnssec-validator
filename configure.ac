@@ -83,15 +83,67 @@ AC_SEARCH_LIBS([ub_ctx_create], [unbound], [], [AC_MSG_ERROR([libunbound not fou
 # Optonal core dependencies
 ###############################################################################
 
-# TODO
-AM_CONDITIONAL([LOG_DFLT], [true])
-AM_CONDITIONAL([LOG_OSX], [false])
+# Pick correct CA store, auto is default.
+CA_STORE=-1
+AC_ARG_WITH([ca-store],
+  [AS_HELP_STRING(["--with-ca-store=[auto|directory|none|nss|nss_cert8|osx|win]"], [Which CA store to use, auto is default.])],
+  [
+    AS_CASE([$withval],
+      [auto], [CA_STORE=-1],
+      [none], [CA_STORE=0],
+      [directory], [CA_STORE=1],
+      [nss], [CA_STORE=2],
+      [nss_cert8], [CA_STORE=3],
+      [osx], [CA_STORE=4],
+      [win], [CA_STORE=5],
+      [*], [AC_MSG_WARN(["Unknown CA store option '$withval'."])]
+    )
+  ])
+# Set default value according to the target system.
+# FIXME: Missing MinGW.
+AS_IF([test $CA_STORE = -1], [
+  AS_CASE([$host_os],
+    [darwin*], [CA_STORE=4],
+    [*], [CA_STORE=1]
+  )
+])
+AS_IF([test $CA_STORE = -1], [
+  AC_MSG_ERROR(["CA store could not be determined."])
+])
+AC_DEFINE([CA_STORE], [$CA_STORE], [Select which CA store to use])
+AM_CONDITIONAL([CA_STORE_DIR], [test $CA_STORE = 1])
+AM_CONDITIONAL([CA_STORE_NSS], [test $CA_STORE = 2])
+AM_CONDITIONAL([CA_STORE_OSX], [test $CA_STORE = 4])
+
+# Select a log target.
+LOG_TGT=-1
+AC_ARG_WITH([log-tgt],
+  [AS_HELP_STRING(["--with-log-tgt=[auto,dflt,osx]"], [Which log target to use, auto is default.])],
+  [
+    AS_CASE([$withval],
+      [auto], [LOG_TGT=-1],
+      [dflt], [LOG_TGT=0],
+      [osx], [LOG_TGT=1],
+      [*], [AC_MSG_WARN(["Unknown log target option '$withval'."])]
+    )
+  ])
+# Set default value according to the target system.
+AS_IF([test $LOG_TGT = -1], [
+  AS_CASE([$host_os],
+    [darwin*], [LOG_TGT=1],
+    [*], [LOG_TGT=0]
+  )
+])
+AS_IF([test $LOG_TGT = -1], [
+  AC_MSG_ERROR(["Log target could not be determined."])
+])
+AM_CONDITIONAL([LOG_DFLT], [test $LOG_TGT = 0])
+AM_CONDITIONAL([LOG_OSX], [test $LOG_TGT = 1])
 
 
-# No parameters shall be passed via default variables.
-#CPPFLAGS=""
-#CFLAGS=""; CXXFLAGS="";
-#LDFLAGS=""; LIBS=""
+CPPFLAGS="${CORE_CPPFLAGS}"
+CFLAGS="${CORE_CFLAGS}"; CXXFLAGS="${CORE_CXXFLAGS}";
+LDFLAGS="${CORE_LDFLAGS}"; LIBS="${CORE_LIBS}"
 
 
 # Checks for header files.
@@ -136,6 +188,7 @@ AC_CHECK_FUNCS([ \
 # Default preprocessor flags.
 #AC_SUBST([AM_CPPFLAGS], [""])
 
+
 # Set Mozilla OS_TARGET
 # https://developer.mozilla.org/en-US/docs/OS_TARGET
 AS_CASE([$host_os],
@@ -148,6 +201,7 @@ AC_SUBST(OS_TARGET)
 # Set Mozilla XPCOM_ABI
 # https://developer.mozilla.org/en-US/docs/XPCOM_ABI
 AC_SUBST(XPCOM_ABI, [$host_cpu])
+
 
 AC_CONFIG_FILES([ \
   Makefile \
