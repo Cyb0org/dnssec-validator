@@ -4,7 +4,8 @@
 #ACLOCAL_AMFLAGS = -I $(top_srcdir)/m4
 
 SUBDIRS = \
-	core_js-ctypes
+	core_js-ctypes \
+	core_native-msg
 
 EXTRA_DIST = \
 	autogen.sh

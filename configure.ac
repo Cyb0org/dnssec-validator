@@ -55,6 +55,7 @@ AC_SUBST(CORE_LIBS)
 # Checks for programs.
 AM_PROG_AR
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
@@ -71,7 +72,7 @@ LT_INIT
 # Core dependencies
 ###############################################################################
 
-# TODO -- ssl
+AC_SEARCH_LIBS([SSL_get_peer_cert_chain], [ssl], [], [AC_MSG_ERROR([libssl not found])]) # Only DANE.
 AC_SEARCH_LIBS([OpenSSL_add_all_digests], [crypto], [], [AC_MSG_ERROR([libcrypto not found])])
 AC_SEARCH_LIBS([ldns_dname_new_frm_str], [ldns], [], [AC_MSG_ERROR([libldns not found])])
 AC_SEARCH_LIBS([ub_ctx_create], [unbound], [], [AC_MSG_ERROR([libunbound not found])])
@@ -143,7 +144,7 @@ AM_CONDITIONAL([LOG_OSX], [test $LOG_TGT = 1])
 
 CPPFLAGS="${CORE_CPPFLAGS}"
 CFLAGS="${CORE_CFLAGS}"; CXXFLAGS="${CORE_CXXFLAGS}";
-LDFLAGS="${CORE_LDFLAGS}"; LIBS="${CORE_LIBS}"
+#LDFLAGS="${CORE_LDFLAGS}"; LIBS="${CORE_LIBS}"
 
 
 # Checks for header files.
@@ -206,6 +207,7 @@ AC_SUBST(XPCOM_ABI, [$host_cpu])
 AC_CONFIG_FILES([ \
   Makefile \
   core_js-ctypes/Makefile \
+  core_native-msg/Makefile \
 ])
 
 AC_OUTPUT

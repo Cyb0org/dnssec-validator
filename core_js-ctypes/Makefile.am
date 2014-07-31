@@ -34,15 +34,12 @@ libDNSSECcore_la_SOURCES += \
 	$(top_srcdir)/plugin-source/common/log_osx.c
 endif
 
-libDNSSECcore_la_CPPFLAGS = \
-	@CORE_CPPFLAGS@
 libDNSSECcore_la_CFLAGS = \
-	-I$(top_srcdir)/plugin-source/common/ @CORE_CFLAGS@
+	-I$(top_srcdir)/plugin-source/common/
 
 libDNSSECcore_la_LDFLAGS = \
 	-avoid-version \
 	-export-symbols-regex "^(dnssec)_" \
-	-shared \
 	-rpath "/usr/lib"
 
 
@@ -81,7 +78,6 @@ libDANEcore_la_CFLAGS = \
 libDANEcore_la_LDFLAGS = \
 	-avoid-version \
 	-export-symbols-regex "^(dane)_" \
-	-shared \
 	-rpath "/usr/lib"
 
 
