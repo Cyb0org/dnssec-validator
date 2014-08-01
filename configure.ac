@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.60])
-AC_INIT([dnssec-validator], [2.1.1b], [dnssec-validator-users@lists.nic.cz])
+AC_INIT([dnssec-validator], [2.1.2], [dnssec-validator-users@lists.nic.cz])
 AC_CONFIG_SRCDIR([plugin-source/common/common.h])
 AC_CONFIG_HEADERS([plugin-source/config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -69,7 +69,7 @@ LT_INIT
 
 
 ###############################################################################
-# Core dependencies
+# Core dependencies.
 ###############################################################################
 
 AC_SEARCH_LIBS([SSL_get_peer_cert_chain], [ssl], [], [AC_MSG_ERROR([libssl not found])]) # Only DANE.
@@ -81,7 +81,7 @@ AC_SEARCH_LIBS([ub_ctx_create], [unbound], [], [AC_MSG_ERROR([libunbound not fou
 
 
 ###############################################################################
-# Optonal core dependencies
+# Optional core dependencies.
 ###############################################################################
 
 # Pick correct CA store, auto is default.
@@ -140,6 +140,13 @@ AS_IF([test $LOG_TGT = -1], [
 ])
 AM_CONDITIONAL([LOG_DFLT], [test $LOG_TGT = 0])
 AM_CONDITIONAL([LOG_OSX], [test $LOG_TGT = 1])
+
+
+###############################################################################
+# Extension packages.
+###############################################################################
+
+AM_CONDITIONAL([EXTPKG_MOZZ_JC], [true]) # Mozilla Firefox js-ctypes.
 
 
 CPPFLAGS="${CORE_CPPFLAGS}"
@@ -208,6 +215,8 @@ AC_CONFIG_FILES([ \
   Makefile \
   core_js-ctypes/Makefile \
   core_native-msg/Makefile \
+  add-on/Makefile \
+  Version
 ])
 
 AC_OUTPUT
