@@ -5,7 +5,8 @@
 
 SUBDIRS = \
 	core_js-ctypes \
-	core_native-msg
+	core_native-msg \
+	add-on
 
 EXTRA_DIST = \
 	autogen.sh
