@@ -79,7 +79,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 #tlsa-box.dm_action > #tlsa-icon {
   width: 19px;
   height: 19px;
-  list-style-image: url("chrome://dnssec/skin/tlsa_action.png"); /* 19x19 */
+  list-style-image: url("chrome://dnssec/skin/tlsa_action.gif"); /* 19x19 */
 }
 
 #tlsa-box.dm_certerr > #tlsa-icon,
