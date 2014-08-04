@@ -283,7 +283,7 @@ function setModeTLSA(newMode, tabId, domain, status, scheme) {
 			this.tlsaModes.DANE_TOOLTIP_DNSSEC_BOGUS);
               break;
 	    case this.tlsaModes.DANE_MODE_ACTION:
-              	icon = "tlsa_action.png";
+              	icon = "tlsa_action.gif";
 	      	title = this.tlsaModes.DANE_TOOLTIP_ACTION;
 	      	domainpre = scheme;	
         	tooltiptitle = chrome.i18n.getMessage(
@@ -484,6 +484,14 @@ function ExcludeDomainList(domain) {
 // Called when the TLSA status is retriving
 //****************************************************************
 function tlsavalidate(tabId, scheme, domain, port, domainport, action) {	  	
+
+	var icon = "tlsa_action.gif";
+        var tooltiptitle = chrome.i18n.getMessage(
+			this.tlsaModes.DANE_TOOLTIP_ACTION);
+
+	chrome.pageAction.setTitle({tabId: tabId, title: tooltiptitle});       	 
+	chrome.pageAction.setIcon({path: icon, tabId: tabId});
+	chrome.pageAction.show(tabId);
 	   
     	var c = this.tlsaExtNPAPIConst;
         var resolver = this.getResolver();

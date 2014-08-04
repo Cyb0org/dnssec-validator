@@ -196,7 +196,7 @@ function setModeDNSSEC(newMode, tabId, domain, status, addr, ipval) {
 		break;
 	// Getting security status
 	case this.dnssecModes.DNSSEC_MODE_ACTION:
-		icon = "dnssec_action.png";
+		icon = "dnssec_action.gif";
 		title = this.dnssecModes.DNSSEC_TOOLTIP_ACTION;
 		tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_ACTION);
 		break;
@@ -340,12 +340,20 @@ function setDNSSECSecurityState(tabId, domain, status, addr, ipval) {
 // Called when the DNSSEC status is retriving
 //****************************************************************
 function dnssecvalidate(domain, tabId, tab) {                  	
-     
+
+	var icon = "dnssec_action.gif";
+	var tooltiptitle = chrome.i18n.getMessage(
+				    this.dnssecModes.DNSSEC_TOOLTIP_ACTION);
+
+	chrome.pageAction.setTitle({tabId: tabId, title: tooltiptitle});       	 
+	chrome.pageAction.setIcon({path: icon, tabId: tabId});
+	chrome.pageAction.show(tabId);
+
 	// set custom resolver
 	var resolver = this.getResolver();
 	var currentURL = tab.url;
 	var c = this.dnssecExtNPAPIConst;
-      	 
+
 	var resolvipv4 = false; // No IPv4 resolving as default
 	var resolvipv6 = false; // No IPv6 resolving as default
 
@@ -562,7 +570,7 @@ function onUrlChange(tabId, changeInfo, tab) {
 
 	if (changeInfo.status != "loading") {
 		if (changeInfo.status != "complete") {
-			//chrome.pageAction.hide(tabId);
+			chrome.pageAction.hide(tabId);
 			return;
 		}
 	}
