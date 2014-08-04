@@ -34,7 +34,7 @@ var debuglogout = false;
 // variables for chrome IP API
 var currentIPList= new Array();
 var currentIPListDomain= new Array();
-var init = true;
+var initplugin = false;
 var native_msg_port = null;
 
 // DNSSEC NPAPI constant returned by binary plugin
@@ -626,6 +626,12 @@ function onUrlChange(tabId, changeInfo, tab) {
               return;
         }//if
 
+	if (!initplugin) {
+		setDNSSECSecurityState(tabId, domain, 
+		    this.dnssecExtNPAPIConst.DNSSEC_ERROR_GENERIC, "n/a", "n/a");
+		return;
+	}
+
         if (debuglogout) {
 		console.log("\nBrowser: onUrlChange(TabID: " + tabId 
 		    + ", Action: " + changeInfo.status 
@@ -657,6 +663,16 @@ function handle_native_response(resp) {
 	var retval = resp.split("~");
 
 	switch (retval[0]) {
+
+	case "initialiseRet":
+		initplugin = true;
+
+		if (debuglogout) {
+			console.log(DNSSEC 
+			    + "Load DNSSEC native messaging core");
+		}
+		break;
+
 	case "validateRet":
 
 		var dn = retval[1];
@@ -702,7 +718,7 @@ function handle_native_response(resp) {
 //****************************************************************  
 // Initialization of plugin     
 //****************************************************************
-if (init) {
+if (!initplugin) {
 
 	localStorage["deldnssecctx"] = false;
 
@@ -719,7 +735,17 @@ if (init) {
 		}
 	     });
 
-	init = false;
+
+	native_msg_port.postMessage("initialise");
+
+	setTimeout(function() {
+		if (!initplugin) {
+			if (debuglogout) {
+				console.log(DNSSEC 
+				    + "Cannot load DNSSEC native messaging core!");			
+			}
+		}
+	}, 1000);
 }
 
 

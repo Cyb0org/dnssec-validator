@@ -31,7 +31,7 @@ var CACHE_ITEM_EXPIR = 600;
 // debug pretext
 var DANE = "DANE: ";
 var debuglogout = false;
-var init = true;
+var initplugin = false;
 var native_msg_port = null;
 var wrongresolver = false;
 var checkall = false;
@@ -47,7 +47,6 @@ var tlsaExtCache = {
 	init: function() {
 		// Create new array for caching
 		this.data = new Array();
-		init = false;
 	},
 
 
@@ -641,7 +640,7 @@ function tlsaValidationPrepare(tabId, url, action) {
 	var portplugin = "443";
 	var portpopup = "443";
 	var domain = "";
-	var c = tlsaExtNPAPIConst; 
+	var c = this.tlsaExtNPAPIConst; 
 
 	if (debuglogout) {
 		console.log("\nBrowser: " + action + "(TabID: " + tabId 
@@ -670,6 +669,13 @@ function tlsaValidationPrepare(tabId, url, action) {
 	// return if domain will not validated
 	if (!ExcludeDomainList(domain)) {	
 		setTLSASecurityState(tabId, domain, c.DANE_OFF, scheme);
+		return;
+	}
+
+
+	if (!initplugin) {
+		setTLSASecurityState(tabId, domainport,
+			c.DANE_ERROR_GENERIC, scheme);
 		return;
 	}
 
@@ -880,8 +886,17 @@ function handle_native_response(resp) {
 	var retval = resp.split("~");
 
 	switch (retval[0]) {
-	case "validateRet":
 
+	case "initialiseRet":
+		initplugin = true;
+
+		if (debuglogout) {
+			console.log(DANE 
+			    + "Load DANE native messaging core");
+		}
+		break;
+
+	case "validateRet":
 		var domain = retval[1];
 		var port = retval[2];
 		var protocol = retval[3];
@@ -898,8 +913,8 @@ function handle_native_response(resp) {
 
 		setReceivedData(tabId, domain, port, protocol, status, scheme);
 		break;
-	case "validateBlockRet":
 
+	case "validateBlockRet":
 		var domain = retval[1];
 		var port = retval[2];
 		var protocol = retval[3];
@@ -919,9 +934,7 @@ function handle_native_response(resp) {
 		//blocking = false;
 		break;
 
-
 	case "validateBogusRet":
-
 		var domain = retval[1];
 		var port = retval[2];
 		var protocol = retval[3];
@@ -936,7 +949,6 @@ function handle_native_response(resp) {
 			+ "-------- ASYNC RESOLVING DONE -----------------");
 		}
 		checkBogusState(tabId, domain, port, protocol, status, scheme);
-
 		break;
 	default:
 		break;
@@ -997,7 +1009,7 @@ var callback = function () {
 //****************************************************************
 // Interenal initialization of plugin when browser starts
 //****************************************************************
-if (init) {
+if (!initplugin) {
 
 	localStorage["deltlsactx"] = false;
 
@@ -1017,8 +1029,6 @@ if (init) {
 	// internal javascript dane cache init
 	tlsaExtCache.init();
 
-	init = false;
-
 	if (StringToBool(localStorage["clearcache"])) {
 		if (chrome['browsingData'] && chrome['browsingData']['removeCache']) {
 			chrome.browsingData.removeCache( {'since': 0}, callback);
@@ -1027,6 +1037,17 @@ if (init) {
 			}
 		}
 	}
+
+	native_msg_port.postMessage("initialise");
+
+	setTimeout(function() {
+		if (!initplugin) {
+			if (debuglogout) {
+				console.log(DANE 
+				    + "Cannot load DANE native messaging core!");			
+			}
+		}
+	}, 1000);
 }
 
 
