@@ -55,5 +55,3 @@ const short DANE_INVALID_TYPE3		= 23; /* Certificate does not corresponds to TLS
 
 const unsigned short DANE_FLAG_DEBUG	= 1; /* debug output */
 const unsigned short DANE_FLAG_USEFWD	= 2; /* use forwarder/resolver */
-
-
