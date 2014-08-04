@@ -719,7 +719,7 @@ void _construct(void)
 	int global_debug_bak = global_debug;
 
 	global_debug = 1;
-	
+
 	printf_debug(DEBUG_PREFIX_DNSSEC, "Running inside PID %d.\n", getpid());
 
 	global_debug = global_debug_bak;
