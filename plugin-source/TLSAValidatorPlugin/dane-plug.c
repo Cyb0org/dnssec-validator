@@ -2043,6 +2043,28 @@ int wait_for_and_process_native_message(void)
 	if (strcmp(cmd, "finish") == 0) {
 		/* Just tell that exit is desired. */
 		return 1;
+	} else if (strcmp(cmd, "initialise") == 0) {
+		printf_debug(DEBUG_PREFIX_DANE, "%s\n", "Initialising.");
+
+		dane_validation_init();
+
+		/* Generate output. */
+		if (snprintf(outbuf, MAX_BUF_LEN, "\"%sRet~ok\"",
+		        cmd) >= MAX_BUF_LEN) {
+			/* Error. */
+			printf_debug(DEBUG_PREFIX_DANE, "%s\n",
+			    "Error while creating response string.");
+			return -1;
+		}
+
+		outlen = strlen(outbuf);
+
+		printf_debug(DEBUG_PREFIX_DANE, "OUT %d %s\n", outlen,
+		    outbuf);
+		/* Write and flush. */
+		fwrite(&outlen, 4, 1, stdout);
+		fputs(outbuf, stdout);
+		fflush(stdout);
 	} else if (strcmp(cmd, "reinitialise") == 0) {
 		printf_debug(DEBUG_PREFIX_DANE, "%s\n", "Reinitialising.");
 
@@ -2078,7 +2100,7 @@ int wait_for_and_process_native_message(void)
 		        "\"%sRet~%s~%s~%s~%d~%s~%s\"", cmd, dn, port, proto,
 		        val_ret, tab_id, schema) >= MAX_BUF_LEN) {
 			/* Error. */
-			printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n",
+			printf_debug(DEBUG_PREFIX_DANE, "%s\n",
 			    "Error while creating response string.");
 			return -1;
 		}

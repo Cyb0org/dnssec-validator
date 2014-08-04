@@ -48,7 +48,7 @@ var dnssecExtNPAPIConst = {
 
 	DNSSEC_DOMAIN_UNSECURED		: 1, /* domain is not secured */
 	DNSSEC_COT_DOMAIN_SECURED	: 2, /* both domain and connection are secured and IPs is valid */
-	DNSSEC_COT_DOMAIN_SECURED_BAD_IP: 3, /* both domain and connection are secured and IPs are differ */  
+	DNSSEC_COT_DOMAIN_SECURED_BAD_IP: 3, /* both domain and connection are secured and IPs are differ */
 	DNSSEC_COT_DOMAIN_BOGUS		: 4, /* domain signature is not valid or COT is not established */
 	DNSSEC_NXDOMAIN_UNSECURED	: 5, /* non-existent domain is not secured */
 	DNSSEC_NXDOMAIN_SIGNATURE_VALID	: 6, /* domain name does not exist and connection are secured */
@@ -78,13 +78,13 @@ var dnssecModes = {
 	DNSSEC_MODE_CONNECTION_DOMAIN_SECURED_INFO      : "2securedConnectionDomainInfo",
 	// Domain and also connection are secured but browser's IP address is invalid
 	DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED : "3securedConnectionDomainInvIPaddr",
-	DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED_INFO : "3securedConnectionDomainInvIPaddrInfo",         
+	DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED_INFO : "3securedConnectionDomainInvIPaddrInfo",
 	// Domain is secured, but it has an invalid signature
 	DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID            : "4invalidDomainSignature",
 	DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID_INFO       : "4invalidDomainSignatureInfo",
 	// No NSEC/NSEC3 for non-existent domain name
-	DNSSEC_MODE_NODOMAIN_UNSECURED                  : "5unsecuredNoDomain",          
-	DNSSEC_MODE_NODOMAIN_UNSECURED_INFO             : "5unsecuredNoDomainInfo", 
+	DNSSEC_MODE_NODOMAIN_UNSECURED                  : "5unsecuredNoDomain",
+	DNSSEC_MODE_NODOMAIN_UNSECURED_INFO             : "5unsecuredNoDomainInfo",
 	// Connection is secured, but domain name does not exist
 	DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED         : "6securedConnectionNoDomain",
 	DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED_INFO    : "6securedConnectionNoDomainInfo",
@@ -112,7 +112,7 @@ var dnssecModes = {
 	DNSSEC_TOOLTIP_ERROR    : "dnssecfail",
 	DNSSEC_TOOLTIP_BOGUS    : "dnssecbogus",
 	DNSSEC_TOOLTIP_WRONG_RES: "dnssecwrongres",
-	DNSSEC_TOOLTIP_DNSSEC_OFF: "validatoroff", 
+	DNSSEC_TOOLTIP_DNSSEC_OFF: "validatoroff",
 };
 
 //****************************************************************
@@ -133,7 +133,7 @@ function setModeDNSSEC(newMode, tabId, domain, status, addr, ipval) {
 	var title;
 	var domainpre;
       	var tooltiptitle;
-   
+
 	switch (newMode) {
 	/* green icon */
 	// Both domain and connection are secured
@@ -172,7 +172,7 @@ function setModeDNSSEC(newMode, tabId, domain, status, addr, ipval) {
 		title = this.dnssecModes.DNSSEC_TOOLTIP_UNSECURED;
 		domainpre = "domain";
 		tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_UNSECURED);
-		break; 
+		break;
 	case this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED:
 		icon = "dnssec_no.png";
 		title = this.dnssecModes.DNSSEC_TOOLTIP_UNSECURED;
@@ -225,31 +225,31 @@ function setModeDNSSEC(newMode, tabId, domain, status, addr, ipval) {
 	case this.dnssecModes.DNSSEC_MODE_ERROR:
 		icon = "dnssec_error.png";
 		title = this.dnssecModes.DNSSEC_TOOLTIP_ERROR;
-		domainpre = "domain";	
+		domainpre = "domain";
 		tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_ERROR);
 		break;
 	// Generic error -1
 	default:
 		icon = "dnssec_error.png";
 		title = this.dnssecModes.DNSSEC_TOOLTIP_ERROR;
-		domainpre = "domain";	
+		domainpre = "domain";
 		tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_ERROR);
 		break;
 	} // switch
 
-	chrome.pageAction.setTitle({tabId: tabId, title: tooltiptitle}); 
+	chrome.pageAction.setTitle({tabId: tabId, title: tooltiptitle});
 	chrome.pageAction.setIcon({path: icon, tabId: tabId});
 	chrome.pageAction.show(tabId);
 
 	if (debuglogout) {
-		console.log(DNSSEC + "Set mode: " + newMode + "; TabId: " + tabId 
+		console.log(DNSSEC + "Set mode: " + newMode + "; TabId: " + tabId
 			+ "; Doamin: " + domain + "; Status: " + status);
 	}
-     
+
 	// This is extremely fucking annoying, but chrome.extension.getViews() won't work
 	// unless popup is opened, so we set the validation result like GET parameters.
-	chrome.pageAction.setPopup({tabId: tabId, popup: "popup.html?" + domain 
-		+ "," + newMode + "," + icon + "," + title + "," + domainpre 
+	chrome.pageAction.setPopup({tabId: tabId, popup: "popup.html?" + domain
+		+ "," + newMode + "," + icon + "," + title + "," + domainpre
 		+ "," + addr + "," + ipval});
 }; // setMode
 
@@ -278,22 +278,22 @@ function getResolver() {
 //****************************************************************
 function setDNSSECSecurityState(tabId, domain, status, addr, ipval) {
 
-	var c = this.dnssecExtNPAPIConst;	
+	var c = this.dnssecExtNPAPIConst;
 
 	switch (status) {
-	case c.DNSSEC_COT_DOMAIN_SECURED: 
+	case c.DNSSEC_COT_DOMAIN_SECURED:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED,
 					tabId, domain, status, addr, ipval);
 		break;
-	case c.DNSSEC_COT_DOMAIN_SECURED_BAD_IP: 
+	case c.DNSSEC_COT_DOMAIN_SECURED_BAD_IP:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED,
 					tabId, domain, status, addr, ipval);
 		break;
-	case c.DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP: 
+	case c.DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID_BAD_IP,
 					tabId, domain, status, addr, ipval);
 		break;
-	case c.DNSSEC_NXDOMAIN_SIGNATURE_VALID: 
+	case c.DNSSEC_NXDOMAIN_SIGNATURE_VALID:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED,
 					tabId, domain, status, addr, ipval);
 		break;
@@ -339,13 +339,13 @@ function setDNSSECSecurityState(tabId, domain, status, addr, ipval) {
 //****************************************************************
 // Called when the DNSSEC status is retriving
 //****************************************************************
-function dnssecvalidate(domain, tabId, tab) {                  	
+function dnssecvalidate(domain, tabId, tab) {
 
 	var icon = "dnssec_action.gif";
 	var tooltiptitle = chrome.i18n.getMessage(
 				    this.dnssecModes.DNSSEC_TOOLTIP_ACTION);
 
-	chrome.pageAction.setTitle({tabId: tabId, title: tooltiptitle});       	 
+	chrome.pageAction.setTitle({tabId: tabId, title: tooltiptitle});
 	chrome.pageAction.setIcon({path: icon, tabId: tabId});
 	chrome.pageAction.show(tabId);
 
@@ -374,7 +374,7 @@ function dnssecvalidate(domain, tabId, tab) {
 		if (debuglogout) {
 			console.log(DNSSEC + "Browser Domain IP: " + addr);
 		}
-	} 
+	}
 
 	if (addr != undefined) {
 		// Check IP version
@@ -388,43 +388,43 @@ function dnssecvalidate(domain, tabId, tab) {
 		resolvipv6 = true;
 		resolvipv4 = true;
 	}
-   
+
 	var options = 0;
 	if (debuglogout) options |= c.DNSSEC_FLAG_DEBUG;
 	if (resolver != "nofwd") options |= c.DNSSEC_FLAG_USEFWD;
 	if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
-	if (resolvipv6) options |= c.DNSSEC_FLAG_RESOLVIPV6;	    
+	if (resolvipv6) options |= c.DNSSEC_FLAG_RESOLVIPV6;
 
 
 	if (debuglogout) {
 		if (resolver != "") {
-			console.log(DNSSEC + "DNSSEC plugin inputs: " + domain 
-			+ "; options: " + options  + "; resolver: " + resolver 
+			console.log(DNSSEC + "DNSSEC plugin inputs: " + domain
+			+ "; options: " + options  + "; resolver: " + resolver
 			+ "; IP-br: " + addr);
 		} else {
-			console.log(DNSSEC + "DNSSEC plugin inputs: " + domain 
-			+ "; options: " + options  
+			console.log(DNSSEC + "DNSSEC plugin inputs: " + domain
+			+ "; options: " + options
 			+ "; resolver: system; IP-br: " + addr);
 		}
-		console.log(DNSSEC 
+		console.log(DNSSEC
 		+ "-------- ASYNC RESOLVING START ----------------");
 	}
 
 	// Call of DNSSEC Validation plugin (async)
 	try {
-		var queryParams = "validate~" + domain + '~' + options 
+		var queryParams = "validate~" + domain + '~' + options
 				+ '~' + resolver + '~' + addr + '~' + tabId;
 		native_msg_port.postMessage(queryParams);
-	
+
 	} catch (ex) {
 		if (debuglogout) {
 			console.log(DNSSEC + "DNSSEC plugin call failed!");
 		}
-		setDNSSECSecurityState(tabId, domain, 
+		setDNSSECSecurityState(tabId, domain,
 					c.DNSSEC_ERROR_GENERIC, addr, "n/a");
-	}	
+	}
 };
-  
+
 
 //*****************************************************
 // Return true/false if domain name is in exclude domain list
@@ -432,7 +432,7 @@ function dnssecvalidate(domain, tabId, tab) {
 function ExcludeDomainList(domain) {
 
 	var result = true;
- 
+
 	if (StringToBool(localStorage["domainfilteron"])) {
 		var DomainSeparator = /[.]+/;
 		var DomainArray = domain.split(DomainSeparator);
@@ -461,7 +461,7 @@ function ExcludeDomainList(domain) {
 
 //******************************************************************
 // check returned validate data. If is not returned bogus, set state
-//****************************************************************** 
+//******************************************************************
 function checkValidatedData(tabId, domain, status, ipval, addr) {
 
 	var c = this.dnssecExtNPAPIConst;
@@ -472,7 +472,7 @@ function checkValidatedData(tabId, domain, status, ipval, addr) {
 
 	if (status == c.DNSSEC_COT_DOMAIN_BOGUS) {
 		if (debuglogout) {
-			console.log(DNSSEC 
+			console.log(DNSSEC
 			   + "Plugin returns DNSSEC bogus state: Testing why?");
 		}
 
@@ -484,10 +484,10 @@ function checkValidatedData(tabId, domain, status, ipval, addr) {
 		if (debuglogout) options |= c.DNSSEC_FLAG_DEBUG;
 		if (resolvipv4) options |= c.DNSSEC_FLAG_RESOLVIPV4;
 		if (resolvipv6) options |= c.DNSSEC_FLAG_RESOLVIPV6;
-			
+
 		if (debuglogout) {
-			console.log(DNSSEC + "   DNSSEC plugin inputs: " +domain 
-			    + "; options: " + options 
+			console.log(DNSSEC + "   DNSSEC plugin inputs: " +domain
+			    + "; options: " + options
 			    + "; resolver: nofwd; IP-br: " + addr);
 		}
 
@@ -502,10 +502,10 @@ function checkValidatedData(tabId, domain, status, ipval, addr) {
 
 		} catch (ex) {
 			if (debuglogout) {
-				console.log(DNSSEC 
+				console.log(DNSSEC
 				    + "DNSSEC plugin call failed!");
 			}
-			setDNSSECSecurityState(tabId, domain, 
+			setDNSSECSecurityState(tabId, domain,
 			    c.DNSSEC_ERROR_GENERIC, addr, "n/a");
 		}
 	} else {
@@ -517,7 +517,7 @@ function checkValidatedData(tabId, domain, status, ipval, addr) {
 
 //****************************************************************
 // check returned validate data, if was return bogus and set state
-//****************************************************************      
+//****************************************************************
 function setValidatedData(tabId, domain, status, ipval, addr) {
 
 	var c = this.dnssecExtNPAPIConst;
@@ -527,7 +527,7 @@ function setValidatedData(tabId, domain, status, ipval, addr) {
 	}
 
 	if (debuglogout) {
-		console.log(DNSSEC + "   DNSSEC plugin result: " + status 
+		console.log(DNSSEC + "   DNSSEC plugin result: " + status
 			+ "; " + ipval);
 	}
 
@@ -543,7 +543,7 @@ function setValidatedData(tabId, domain, status, ipval, addr) {
 			console.log(DNSSEC
 			    + "   Current resolver does not support DNSSEC!");
 		}
-		setDNSSECSecurityState(tabId, domain, 
+		setDNSSECSecurityState(tabId, domain,
 				c.DNSSEC_RESOLVER_NO_DNSSEC, addr, ipval);
 	}
 };
@@ -627,17 +627,17 @@ function onUrlChange(tabId, changeInfo, tab) {
         }//if
 
 	if (!initplugin) {
-		setDNSSECSecurityState(tabId, domain, 
+		setDNSSECSecurityState(tabId, domain,
 		    this.dnssecExtNPAPIConst.DNSSEC_ERROR_GENERIC, "n/a", "n/a");
 		return;
 	}
 
         if (debuglogout) {
-		console.log("\nBrowser: onUrlChange(TabID: " + tabId 
-		    + ", Action: " + changeInfo.status 
+		console.log("\nBrowser: onUrlChange(TabID: " + tabId
+		    + ", Action: " + changeInfo.status
 		    + ", Info: " + changeInfo.url + ");");
 	}
-	
+
 	if (ExcludeDomainList(domain)) {
 		if (debuglogout) {
 			console.log(DNSSEC + 'Validate this domain: YES');
@@ -668,7 +668,7 @@ function handle_native_response(resp) {
 		initplugin = true;
 
 		if (debuglogout) {
-			console.log(DNSSEC 
+			console.log(DNSSEC
 			    + "Load DNSSEC native messaging core");
 		}
 		break;
@@ -684,7 +684,7 @@ function handle_native_response(resp) {
 		tabId = parseInt(tabId, 10);
 
 		if (debuglogout) {
-			console.log(DNSSEC 
+			console.log(DNSSEC
 			+ "-------- ASYNC RESOLVING DONE -----------------");
 		}
 
@@ -702,7 +702,7 @@ function handle_native_response(resp) {
 		tabId = parseInt(tabId, 10);
 
 		if (debuglogout) {
-			console.log(DNSSEC 
+			console.log(DNSSEC
 			+ "-------- ASYNC RESOLVING DONE -----------------");
 		}
 
@@ -715,8 +715,8 @@ function handle_native_response(resp) {
 };
 
 
-//****************************************************************  
-// Initialization of plugin     
+//****************************************************************
+// Initialization of plug-in
 //****************************************************************
 if (!initplugin) {
 
@@ -726,10 +726,10 @@ if (!initplugin) {
 
 	native_msg_port =
 	    chrome.runtime.connectNative('cz.nic.validator.dnssec');
-	
+
 	native_msg_port.onMessage.addListener(handle_native_response);
 	native_msg_port.onDisconnect.addListener(
-	    function() { 
+	    function() {
 		if (debuglogout) {
 			console.log("Main host disconnected.");
 		}
@@ -741,16 +741,16 @@ if (!initplugin) {
 	setTimeout(function() {
 		if (!initplugin) {
 			if (debuglogout) {
-				console.log(DNSSEC 
-				    + "Cannot load DNSSEC native messaging core!");			
+				console.log(DNSSEC
+				    + "Cannot load DNSSEC native messaging core!");
 			}
 		}
 	}, 1000);
 }
 
 
-//****************************************************************  
-// get IP address of URL      
+//****************************************************************
+// get IP address of URL
 //****************************************************************
 chrome.webRequest.onResponseStarted.addListener(function(info) {
 	currentIPList[ info.url ] = info.ip;
@@ -758,9 +758,9 @@ chrome.webRequest.onResponseStarted.addListener(function(info) {
 	currentIPListDomain[ urldomain ] = info.ip;
 	/*
 	if (debuglogout) {
-		console.log("currentIPList: " + info.url 
+		console.log("currentIPList: " + info.url
 			+ " -- " + info.ip + ";");
-		console.log("currentIPListDomain: " + urldomain 
+		console.log("currentIPListDomain: " + urldomain
 			+ " -- " + info.ip + ";");
 	}
 	*/
