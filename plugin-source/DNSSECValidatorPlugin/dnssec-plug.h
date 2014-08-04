@@ -50,6 +50,26 @@ extern "C" {
 #endif
 
 
+struct dnssec_options_st { /* structure to save input options */
+	bool usefwd; // use of resolver
+	bool ds; // use root.key with DS record of root zone
+	bool resolvipv4; // IPv4 - validation of A record
+	bool resolvipv6; // IPv6 - validation of AAAA record
+};
+
+/* DNSSEC validation context. */
+struct dnssec_validation_ctx {
+	struct dnssec_options_st opts; /* Options. */
+	struct ub_ctx *ub; /*
+	                    * Unbound context.
+	                    * Initialised outside the context initialisation
+	                    * procedure.
+	                    */
+};
+extern
+struct dnssec_validation_ctx glob_val_ctx;
+
+
 /* Forward structure declaration. */
 struct dnssec_options_st;
 

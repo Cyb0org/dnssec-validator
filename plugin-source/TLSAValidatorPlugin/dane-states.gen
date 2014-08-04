@@ -29,6 +29,9 @@ such a combination shall include the source code for the parts of
 OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
+/*
+ * Also don't forget to edit dane-states.gen.h .
+ */
 
 const short DANE_RESOLVER_NO_DNSSEC	= -10; /* resolver does not support DNSSEC */
 const short DANE_ERROR_RESOLVER		= -2; /* bad resolver or wrong IP address of DNS*/

@@ -29,6 +29,9 @@ such a combination shall include the source code for the parts of
 OpenSSL used as well as that of the covered work.
 ***** END LICENSE BLOCK ***** */
 
+/*
+ * Also don't forget to edit dnssec-states.gen.h .
+ */
 
 const short DNSSEC_UNBOUND_NO_DATA		= -4; /* validator does not received data */
 const short DNSSEC_RESOLVER_NO_DNSSEC		= -3; /* resolver does not support DNSSEC */

@@ -63,7 +63,10 @@ checkDNSSEClib.o: checkDNSSEClib.c
 checkDNSSEClib: checkDNSSEClib.o libDNSSECcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF)
 	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDNSSECcore-$(OSNAME_LC)-$(HWARCH)
 
-dnssec-plug: dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
+dnssec-main.o: ../plugin-source/DNSSECValidatorPlugin/dnssec-main.c
+	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
+
+dnssec-plug: dnssec-main.o dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 checkDANElib.o: checkDANElib.c
@@ -72,7 +75,10 @@ checkDANElib.o: checkDANElib.c
 checkDANElib: checkDANElib.o libDANEcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF)
 	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDANEcore-$(OSNAME_LC)-$(HWARCH)
 
-dane-plug: dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
+dane-main.o: ../plugin-source/TLSAValidatorPlugin/dane-main.c
+	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
+
+dane-plug: dane-main.o dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 

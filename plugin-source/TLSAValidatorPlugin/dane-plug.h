@@ -51,6 +51,26 @@ extern "C" {
 #endif
 
 
+/* structure to save input options of validator */
+struct dane_options_st {
+	bool usefwd; // use of resolver
+	bool ds; // use root.key with DS record of root zone
+};
+
+/* DANE validation context. */
+struct dane_validation_ctx {
+	struct dane_options_st opts; /* Options. */
+	struct ub_ctx *ub; /*
+	                    * Unbound context.
+	                    * Initialised outside the context initialisation
+	                    * procedure.
+	                    */
+	/* SSL_CTX */ void *ssl_ctx; /* SSL context. */
+};
+extern
+struct dane_validation_ctx glob_val_ctx;
+
+
 /* Forward structure declaration. */
 struct dane_options_st;
 
