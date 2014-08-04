@@ -2145,10 +2145,18 @@ int main(int argc, char **argv)
 
 #define CHREXT_CALL "chrome-extension://"
 
-	global_debug = 1;
+//	global_debug = 1;
+
+	/*
+	 * On Windows the argument --parent-window= is passed before
+	 * chrome-extension://.
+	 */
 
 	if ((argc > 1) &&
-	    (strncmp(argv[1], CHREXT_CALL, strlen(CHREXT_CALL)) == 0)) {
+	    (((argc == 2) &&
+	      (strncmp(argv[1], CHREXT_CALL, strlen(CHREXT_CALL)) == 0)) ||
+	     ((strncmp(argv[1], CHREXT_CALL, strlen(CHREXT_CALL)) == 0) ||
+	      (strncmp(argv[2], CHREXT_CALL, strlen(CHREXT_CALL)) == 0)))) {
 		/* Native messaging call. */
 		printf_debug(DEBUG_PREFIX_DANE, "%s\n",
 		    "Calling via native messaging.");
