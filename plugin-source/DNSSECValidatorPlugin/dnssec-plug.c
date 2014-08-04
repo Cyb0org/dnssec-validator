@@ -949,9 +949,9 @@ int main(int argc, char **argv)
 	const char *dname = NULL;
 	const char *supplied_address = NULL;
 	const char *resolver_addresses = NULL;
-	short i;
 	char *tmp = NULL;
 	uint16_t options;
+	int i;
 	int ret;
 
 #define CHREXT_CALL "chrome-extension://"
@@ -960,14 +960,18 @@ int main(int argc, char **argv)
 
 	/*
 	 * On Windows the argument --parent-window= is passed before
-	 * chrome-extension://.
+	 * chrome-extension://. Therefore, test all command-line arguments.
 	 */
 
-	if ((argc > 1) &&
-	    (((argc == 2) &&
-	      (strncmp(argv[1], CHREXT_CALL, strlen(CHREXT_CALL)) == 0)) ||
-	     ((strncmp(argv[1], CHREXT_CALL, strlen(CHREXT_CALL)) == 0) ||
-	      (strncmp(argv[2], CHREXT_CALL, strlen(CHREXT_CALL)) == 0)))) {
+	ret = 0;
+	i = 1;
+	while ((0 == ret) && (i < argc)) {
+		ret =
+		    (strncmp(argv[i], CHREXT_CALL, strlen(CHREXT_CALL)) == 0);
+		++i;
+	}
+
+	if (0 != ret) {
 		/* Native messaging call. */
 		printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n",
 		    "Calling via native messaging.");
