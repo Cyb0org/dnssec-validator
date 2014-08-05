@@ -263,7 +263,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	res = dane_validate(certhex, 1, options, resolver_addresses, dname,
+	res = dane_validate(NULL, 0, options, resolver_addresses, dname,
 	    port, "tcp", 1);
 	printf(DEBUG_PREFIX_DANE "Main result: %i\n", res);
 

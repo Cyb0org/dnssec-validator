@@ -694,7 +694,7 @@ struct cert_tmp_ctx spkicert(const char *certder, int len)
 	len2 = i2d_PUBKEY(pkey, &buf2);
 	hex2 = bintohex((uint8_t*)buf2, len2);
 	tmp.spki_der = (char*) buf2;
-	tmp.spki_len =len2;
+	tmp.spki_len = len2;
 	tmp.spki_der_hex = hex2;
 	X509_free(cert);
 	EVP_PKEY_free(pkey);
@@ -1214,6 +1214,28 @@ const char * selectorData(uint8_t selector,
 }
 
 //*****************************************************************************
+// DANE algorithm  (selector)
+// return hex data of certificate or SPKI
+// ----------------------------------------------------------------------------
+static
+const char * selectorHex(uint8_t selector,
+    const struct cert_store_item *cert_item)
+{
+	printf_debug(DEBUG_PREFIX_DANE, "selector: %i \n",
+	    selector);
+	switch (selector) {
+	case FULL:
+		return cert_item->cert_der_hex;
+	case SPKI:
+		return cert_item->spki_der_hex;
+	default:
+		printf_debug(DEBUG_PREFIX_DANE,
+		    "Wrong value of selector parameter: %i \n", selector);
+		return NULL;
+	}
+}
+
+//*****************************************************************************
 // DANE algorithm (matching_type)
 // return copy of binary data of certificate or SPKI encode in SHA256, SHA512
 // Caller must ensure proper deallocation of memory.
@@ -1224,6 +1246,7 @@ char * matchingData(uint8_t matching_type, uint8_t selector,
 {
 	printf_debug(DEBUG_PREFIX_DANE, "matching_type: %i \n", matching_type);
 
+	const char *der_hex = selectorHex(selector, cert_item);
 	const char *data = selectorData(selector, cert_item);
 	char *der_copy;
 	unsigned i;
@@ -1233,13 +1256,13 @@ char * matchingData(uint8_t matching_type, uint8_t selector,
 	}
 	switch (matching_type) {
 	case EXACT:
-		der_copy = malloc(strlen(cert_item->cert_der_hex) + 1);
+		der_copy = malloc(strlen(der_hex) + 1);
 		if (der_copy == NULL) {
 			return NULL;
 		}
 		/* Convert hex string to upper case. */
-		for (i = 0; i < (strlen(cert_item->cert_der_hex) + 1); ++i) {
-			der_copy[i] = toupper(cert_item->cert_der_hex[i]);
+		for (i = 0; i < (strlen(der_hex) + 1); ++i) {
+			der_copy[i] = toupper(der_hex[i]);
 		}
 		return der_copy;
 	case SHA256:
