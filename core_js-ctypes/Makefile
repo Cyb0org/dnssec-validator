@@ -41,7 +41,8 @@ UNBOUND_LIB = $(BASEDIR)/$(LIBS_BUILT_DIR)/unbound
 
 
 # Determine OS type
-KERNEL = $(shell uname -s | tr '[:upper:]' '[:lower:]')
+KERNEL = $(shell uname -s)
+KERNEL_LC = $(shell uname -s | tr '[:upper:]' '[:lower:]')
 
 
 # OS dependent stuff.
@@ -59,7 +60,7 @@ ifeq ($(STATIC_LINKING),yes)
 
   STATIC_LIBS = $(OPENSSL_STATIC) $(LDNS_STATIC) $(UNBOUND_STATIC)
 
-  ifneq ($(KERNEL),darwin)
+  ifneq ($(KERNEL),Darwin)
     # On OS X the following flags should be omitted when linking statically.
     LDFLAGS += -lssl -lcrypto -lldns -lunbound
   endif
@@ -88,7 +89,7 @@ LDFLAGS += -lpthread
 LDFLAGS += $(LDFLAGS_VISIBILITY)
 
 # Which system is it compiled on.
-ifeq ($(KERNEL),darwin)
+ifeq ($(KERNEL),Darwin)
   CPPFLAGS += -DTGT_SYSTEM=TGT_OSX
   LOG_OBJ = log_osx.o
   SHLIB_SUFF = dylib
@@ -103,15 +104,15 @@ endif
 # Which CA store to use.
 CA_STORE ?= AUTO
 ifeq ($(CA_STORE),AUTO)
-  ifeq ($(KERNEL),linux)
+  ifeq ($(KERNEL),Linux)
     CPPFLAGS += -DCA_STORE=DIR_CA_STORE
     CA_STORE_OBJ = ca_store_directory.o
   else
-    ifeq ($(KERNEL),freebsd)
+    ifeq ($(KERNEL),FreeBSD)
       CPPFLAGS += -DCA_STORE=DIR_CA_STORE
       CA_STORE_OBJ = ca_store_directory.o
     else
-      ifeq ($(KERNEL),darwin)
+      ifeq ($(KERNEL),Darwin)
         CPPFLAGS += -DCA_STORE=OSX_CA_STORE
         CA_STORE_OBJ = ca_store_osx.o
         LDFLAGS += -framework Cocoa -framework Security
@@ -150,7 +151,7 @@ else
 endif
 
 
-TARGETS = libDNSSECcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF) libDANEcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF)
+TARGETS = libDNSSECcore-$(OSNAME)-$(HWARCH).$(SHLIB_SUFF) libDANEcore-$(OSNAME)-$(HWARCH).$(SHLIB_SUFF)
 
 all: $(TARGETS)
 
@@ -162,13 +163,13 @@ clean:
 common.o: ../plugin-source/common/common.c ../plugin-source/common/common.h
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
-libDNSSECcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF): dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
+libDNSSECcore-$(OSNAME)-$(HWARCH).$(SHLIB_SUFF): dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
 	$(CC) $^ -o $@ $(LDFLAGS) -shared $(LDFLAGS_DNSSEC_VISIBILITY) $(CFLAGS)
 
 dnssec-plug.o: ../plugin-source/DNSSECValidatorPlugin/dnssec-plug.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
-libDANEcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF): dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
+libDANEcore-$(OSNAME)-$(HWARCH).$(SHLIB_SUFF): dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
 	$(CC) $^ -o $@ $(LDFLAGS) -shared $(LDFLAGS_DANE_VISIBILITY) $(CFLAGS)
 
 dane-plug.o: ../plugin-source/TLSAValidatorPlugin/dane-plug.c

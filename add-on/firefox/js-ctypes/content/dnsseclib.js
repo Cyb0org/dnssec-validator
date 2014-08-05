@@ -43,24 +43,37 @@ dnssec_init: function() {
 		    .getService(Components.interfaces.nsIXULRuntime).OS;
 
 		var dnssecLibName = "unspecified";
+		var coreStr = "libDNSSECcore";
 
-		/* Try system location. */
-		if(os.match("Darwin")) {
-			dnssecLibName = "libDNSSECcore-macosx.dylib";
-		} else if(os.match("FreeBSD")) {
-			dnssecLibName = "libDNSSECcore-freebsd.so";
-		} else if(os.match("Linux")) {
-			dnssecLibName = "libDNSSECcore-linux.so";
-		} else if(os.match("WINNT")) {
-			dnssecLibName = "libDNSSECcore-windows.dll";
-		} else {
+		/* Set library name/suffix according to system. */
+		var osTgtStr = "unspecified";
+		var libSuffStr = "unspecified";
+		if (os.match("Darwin")) {
+			osTgtStr = "Darwin";
+			libSuffStr = "dylib";
+		} else if (os.match("FreeBSD")) {
+			osTgtStr = "FreeBSD";
+			libSuffStr = "so";
+		} else if (os.match("Linux")) {
+			osTgtStr = "Linux";
+			libSuffStr = "so";
+		} else if (os.match("WINNT")) {
+			osTgtStr = "WINNT";
+			libSuffStr = "dll";
+		}
+
+		/* Test for unsupported OS. */
+		if (("unspecified" == osTgtStr) ||
+		    ("unspecified" == libSuffStr)) {
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix +
-				    "Error: Unsupported OS!\n");
+				    "Error: Unsupported OS '" + os + "'!\n");
 			}
 			return false;
 		}
 
+		/* Try system location (core.lib). */
+		dnssecLibName = coreStr + "." + libSuffStr;
 		try {
 			cz.nic.extension.dnssecLibCore._initDnssecLib(dnssecLibName);
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
@@ -77,19 +90,42 @@ dnssec_init: function() {
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix +
 				    "Warning: Cannot find DNSSEC system " +
-				    "library '" + dnssecLibName + "'! Library " +
+				    "library '" + dnssecLibName + "'.\n");
+			}
+		}
+
+		/* Try system location (core-os.lib). */
+		dnssecLibName = coreStr + "-" + osTgtStr + "." + libSuffStr;
+		try {
+			cz.nic.extension.dnssecLibCore._initDnssecLib(dnssecLibName);
+			if (cz.nic.extension.dnssecExtension.debugOutput) {
+				dump(cz.nic.extension.dnssecExtension.debugPrefix +
+				    "Loaded DNSSEC library:\n        " +
+				    dnssecLibName + "\n");
+			}
+			return true;
+		} catch(e) {
+			/*
+			 * Failed loading OS library. Fall back to library
+			 * distributed with the plug-in.
+			 */
+			if (cz.nic.extension.dnssecExtension.debugOutput) {
+				dump(cz.nic.extension.dnssecExtension.debugPrefix +
+				    "Warning: Cannot find DNSSEC system " +
+				    "library '" + dnssecLibName + "'. Library " +
 				    "distributed with plugin will be used.\n");
 			}
 		}
 
-		dnssecLibName = "unspecified";
-
 		var abiStr = "unspecified";
 		if (abi.match("x86_64")) {
-			abiStr = "x64";
+			abiStr = "x86_64";
 		} else if (abi.match("x86")) {
 			abiStr = "x86";
-		} else {
+		}
+
+		/* Test for unsupported ABI. */
+		if ("unspecified" == abiStr) {
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix +
 				    "Error: Unsupported OS architecture!\n");
@@ -97,23 +133,17 @@ dnssec_init: function() {
 			return false;
 		}
 
-		if(os.match("Darwin")) {
-			dnssecLibName =
-			    "plugins/libDNSSECcore-macosx-" + abiStr + ".dylib";
-		} else if (os.match("FreeBSD")) {
-			dnssecLibName =
-			    "plugins/libDNSSECcore-freebsd-" + abiStr + ".so";
-		} else if(os.match("Linux")) {
-			dnssecLibName =
-			    "plugins/libDNSSECcore-linux-" + abiStr + ".so";
-		} else if(os.match("WINNT")) {
-			dnssecLibName =
-			    "plugins/libDNSSECcore-windows-x86.dll";
+		/* Only 32-bit Windows at the moment. */
+		if ("WINNT" == osTgtStr) {
+			abiStr = "x86";
 		}
+
+		/* Packaged library (plugins/core-os-arch.lib). */
+		dnssecLibName = "plugins/" + coreStr + "-" + osTgtStr +
+		    "-" + abiStr + "." + libSuffStr;
 		dnssecLibName = addon.getResourceURI(dnssecLibName)
 		    .QueryInterface(Components.interfaces.nsIFileURL).file
 		    .path;
-
 		try {
 			cz.nic.extension.dnssecLibCore._initDnssecLib(dnssecLibName);
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
@@ -133,23 +163,12 @@ dnssec_init: function() {
 			}
 		}
 
-		/* Last choice. Only for some OS. */
-		dnssecLibName = "unspecified";
-
-		if(os.match("Darwin")) {
-			/* Fat binary. */
-			dnssecLibName = "plugins/libDNSSECcore-macosx.dylib";
-		} else {
-			if (cz.nic.extension.dnssecExtension.debugOutput) {
-				dump(cz.nic.extension.dnssecExtension.debugPrefix +
-				    "Error: Sorry, no core found!\n");
-			}
-			return false;
-		}
+		/* Last option, packaged library (plugins/core-os.lib). */
+		dnssecLibName = "plugins/" + coreStr + "-" + osTgtStr +
+		    "." + libSuffStr;
 		dnssecLibName = addon.getResourceURI(dnssecLibName)
 		    .QueryInterface(Components.interfaces.nsIFileURL).file
 		    .path;
-
 		try {
 			cz.nic.extension.dnssecLibCore._initDnssecLib(dnssecLibName);
 			if (cz.nic.extension.dnssecExtension.debugOutput) {

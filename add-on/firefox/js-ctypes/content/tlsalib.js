@@ -43,24 +43,37 @@ dane_init: function() {
 		    .getService(Components.interfaces.nsIXULRuntime).OS;
 
 		var tlsaLibName = "unspecified";
+		var coreStr = "libDANEcore";
 
-		/* Try system location. */
-		if(os.match("Darwin")) {
-			tlsaLibName = "libDANEcore-macosx.dylib";
-		} else if(os.match("FreeBSD")) {
-			tlsaLibName = "libDANEcore-freebsd.so";
-		} else if(os.match("Linux")) {
-			tlsaLibName = "libDANEcore-linux.so";
-		} else if(os.match("WINNT")) {
-			tlsaLibName = "libDANEcore-windows.dll";
-		} else {
+		/* Set library name/suffix according to system. */
+		var osTgtStr = "unspecified";
+		var libSuffStr = "unspecified";
+		if (os.match("Darwin")) {
+			osTgtStr = "Darwin";
+			libSuffStr = "dylib";
+		} else if (os.match("FreeBSD")) {
+			osTgtStr = "FreeBSD";
+			libSuffStr = "so";
+		} else if (os.match("Linux")) {
+			osTgtStr = "Linux";
+			libSuffStr = "so";
+		} else if (os.match("WINNT")) {
+			osTgtStr = "WINNT";
+			libSuffStr = "dll";
+		}
+
+		/* Test for unsupported OS. */
+		if (("unspecified" == osTgtStr) ||
+		    ("unspecified" == libSuffStr)) {
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(cz.nic.extension.daneExtension.debugPrefix +
-				    "Error: Unsupported OS!\n");
+				    "Error: Unsupported OS '" + os + "'!\n");
 			}
 			return false;
 		}
 
+		/* Try system location (core.lib). */
+		tlsaLibName = coreStr + "." + libSuffStr;
 		try {
 			cz.nic.extension.daneLibCore._initTlsaLib(tlsaLibName);
 			if (cz.nic.extension.daneExtension.debugOutput) {
@@ -77,19 +90,42 @@ dane_init: function() {
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(cz.nic.extension.daneExtension.debugPrefix +
 				    "Warning: Cannot find DANE system " +
-				    "library '" + tlsaLibName + "'! Library " +
+				    "library '" + tlsaLibName + "'.\n");
+			}
+		}
+
+		/* Try system location (core-os.lib). */
+		tlsaLibName = coreStr + "-" + osTgtStr + "." + libSuffStr;
+		try {
+			cz.nic.extension.daneLibCore._initTlsaLib(tlsaLibName);
+			if (cz.nic.extension.daneExtension.debugOutput) {
+				dump(cz.nic.extension.daneExtension.debugPrefix +
+				    "Loaded DANE library:\n        " +
+				    tlsaLibName + "\n");
+			}
+			return true;
+		} catch(e) {
+			/*
+			 * Failed loading OS library. Fall back to library
+			 * distributed with the plug-in.
+			 */
+			if (cz.nic.extension.daneExtension.debugOutput) {
+				dump(cz.nic.extension.daneExtension.debugPrefix +
+				    "Warning: Cannot find DANE system " +
+				    "library '" + tlsaLibName + "'. Library " +
 				    "distributed with plugin will be used.\n");
 			}
 		}
 
-		tlsaLibName = "unspecified";
-
 		var abiStr = "unspecified";
 		if (abi.match("x86_64")) {
-			abiStr = "x64";
+			abiStr = "x86_64";
 		} else if (abi.match("x86")) {
 			abiStr = "x86";
-		} else {
+		}
+
+		/* Test for unsupported ABI. */
+		if ("unspecified" == abiStr) {
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(cz.nic.extension.daneExtension.debugPrefix +
 				    "Error: Unsupported OS architecture!\n");
@@ -97,23 +133,17 @@ dane_init: function() {
 			return false;
 		}
 
-		if(os.match("Darwin")) {
-			tlsaLibName =
-			    "plugins/libDANEcore-macosx-" + abiStr + ".dylib";
-		} else if (os.match("FreeBSD")) {
-			tlsaLibName =
-			    "plugins/libDANEcore-freebsd-" + abiStr + ".so";
-		} else if(os.match("Linux")) {
-			tlsaLibName =
-			    "plugins/libDANEcore-linux-" + abiStr + ".so";
-		} else if(os.match("WINNT")) {
-			tlsaLibName =
-			    "plugins/libDANEcore-windows-x86.dll";
+		/* Only 32-bit Windows at the moment. */
+		if ("WINNT" == osTgtStr) {
+			abiStr = "x86";
 		}
+
+		/* Packaged library (plugins/core-os-arch.lib). */
+		tlsaLibName = "plugins/" + coreStr + "-" + osTgtStr +
+		    "-" + abiStr + "." + libSuffStr;
 		tlsaLibName = addon.getResourceURI(tlsaLibName)
 		    .QueryInterface(Components.interfaces.nsIFileURL).file
 		    .path;
-
 		try {
 			cz.nic.extension.daneLibCore._initTlsaLib(tlsaLibName);
 			if (cz.nic.extension.daneExtension.debugOutput) {
@@ -133,23 +163,12 @@ dane_init: function() {
 			}
 		}
 
-		/* Last choice. Only for some OS.*/
-		tlsaLibName = "unspecified";
-
-		if(os.match("Darwin")) {
-			/* Fat binary. */
-			tlsaLibName = "plugins/libDANEcore-macosx.dylib";
-		} else {
-			if (cz.nic.extension.daneExtension.debugOutput) {
-				dump(cz.nic.extension.daneExtension.debugPrefix +
-				    "Error: Sorry, no core found!\n");
-			}
-			return false;
-		}
+		/* Last option, packaged library (plugins/core-os.lib). */
+		tlsaLibName = "plugins/" + coreStr + "-" + osTgtStr +
+		    "." + libSuffStr;
 		tlsaLibName = addon.getResourceURI(tlsaLibName)
 		    .QueryInterface(Components.interfaces.nsIFileURL).file
 		    .path;
-
 		try {
 			cz.nic.extension.daneLibCore._initTlsaLib(tlsaLibName);
 			if (cz.nic.extension.daneExtension.debugOutput) {

@@ -20,13 +20,13 @@ XPI_TGT = xpi_unknown
 ifeq ($(OS_TARGET),UNIX)
   MAKE_OS := Makefile.unix
   ifeq ($(BUILD_64BIT),1)
-    HWARCH = x64
-    CORE_TGT := sys_$(OSNAME_LC)_$(HWARCH)
+    HWARCH = x86_64
+    CORE_TGT := sys_$(OSNAME)_$(HWARCH)
     XPI_TGT = xpi_$(HWARCH)
     CFLAGS = -m64
   else
     HWARCH = x86
-    CORE_TGT := sys_$(OSNAME_LC)_$(HWARCH)
+    CORE_TGT := sys_$(OSNAME)_$(HWARCH)
     XPI_TGT = xpi_$(HWARCH)
     CFLAGS = -m32
   endif
@@ -34,18 +34,18 @@ endif
 ifeq ($(OS_TARGET),MAC)
   MAKE_OS := Makefile.mac
   ifeq ($(BUILD_MAC96),1)
-    CORE_TGT := sys_macosx
+    CORE_TGT := sys_Darwin
     XPI_TGT := xpi
     CFLAGS = -arch i386 -arch x86_64
-  else	
+  else
     ifeq ($(BUILD_64BIT),1)
-      HWARCH = x64
-      CORE_TGT := sys_macosx_$(HWARCH)
+      HWARCH = x86_64
+      CORE_TGT := sys_Darwin_$(HWARCH)
       XPI_TGT = xpi_$(HWARCH)
       CFLAGS = -m64 -arch x86_64
     else
       HWARCH = x86
-      CORE_TGT := sys_macosx_$(HWARCH)
+      CORE_TGT := sys_Darwin_$(HWARCH)
       XPI_TGT = xpi_$(HWARCH)
       CFLAGS = -m32 -arch i386
     endif 
@@ -54,7 +54,7 @@ endif
 ifeq ($(OS_TARGET),WINDOWS)
   MAKE_OS := Makefile.win
   HWARCH = x86
-  CORE_TGT := sys_windows_$(HWARCH)
+  CORE_TGT := sys_WINNT_$(HWARCH)
   XPI_TGT = xpi_$(HWARCH)
 endif
 

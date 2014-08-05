@@ -45,20 +45,20 @@ OSNAME_LC ?= unix
 MAKE_CMD ?= make
 SHELL_CMD ?= bash
 
-JSCTYPES_PLUGIN_NAME_DNSSEC = libDNSSECcore-$(OSNAME_LC)
-JSCTYPES_PLUGIN_NAME_DANE = libDANEcore-$(OSNAME_LC)
+JSCTYPES_PLUGIN_NAME_DNSSEC = libDNSSECcore-$(OSNAME)
+JSCTYPES_PLUGIN_NAME_DANE = libDANEcore-$(OSNAME)
 
 # Where to search for header files using -DCMAKE_LIBRARY_PATH_FLAG=$(CMAKE_LIBRARY_PATH_FLAG).
 # Rather use LIBRARY_LOC.
 #CMAKE_LIBRARY_PATH_FLAG = /usr/local/lib
 
-.PHONY: clean sys_$(OSNAME_LC)_x86 sys_$(OSNAME_LC)_x64 npapi_x86 npapi_x64 js-ctypes_x86 js-ctypes_x64 xpi_x86 xpi_x64
+.PHONY: clean sys_$(OSNAME)_x86 sys_$(OSNAME)_x86_64 npapi_x86 npapi_x86_64 js-ctypes_x86 js-ctypes_x86_64 xpi_x86 xpi_x86_64
 
-#all: sys_$(OSNAME_LC)_x86 sys_$(OSNAME_LC)_x64 xpi_x86 xpi_x64
+#all: sys_$(OSNAME)_x86 sys_$(OSNAME)_x86_64 xpi_x86 xpi_x86_64
 
-sys_$(OSNAME_LC)_x86: npapi_x86 js-ctypes_x86
+sys_$(OSNAME)_x86: npapi_x86 js-ctypes_x86
 
-sys_$(OSNAME_LC)_x64: npapi_x64 js-ctypes_x64
+sys_$(OSNAME)_x86_64: npapi_x86_64 js-ctypes_x86_64
 
 npapi_x86:
 	@echo '### ...Creating NPAPI plugin library for $(OSNAME) x86... ###'
@@ -101,7 +101,7 @@ xpi_x86:
 	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>$(OSNAME)<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/npapi_built/install.rdf.template > $(ADDON_PATH_FF)/npapi_built/install.rdf
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/npapi_built/about.template > $(ADDON_PATH_FF)/npapi_built/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
-	cd $(ADDON_PATH_FF)/npapi_built && $(SHELL_CMD) ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x86-npapi.xpi
+	cd $(ADDON_PATH_FF)/npapi_built && $(SHELL_CMD) ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86-npapi.xpi
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating js-ctypes package for Firefox $(OSNAME) x86... ###'
@@ -117,7 +117,7 @@ xpi_x86:
 	mv $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx $(ADDON_PATH_FF)/js-ctypes_built/install.rdf
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/js-ctypes_built/about.template > $(ADDON_PATH_FF)/js-ctypes_built/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
-	cd $(ADDON_PATH_FF)/js-ctypes_built && $(SHELL_CMD) ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x86-js-ctypes.xpi
+	cd $(ADDON_PATH_FF)/js-ctypes_built && $(SHELL_CMD) ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86-js-ctypes.xpi
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating NPAPI package for Chrome $(OSNAME) x86... ###'
@@ -133,8 +133,8 @@ xpi_x86:
 	cp $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86.so $(ADDON_PATH_CR_TLSA)/npapi_built
 	sed -e 's/dnssecplugin/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_DNSSEC)/npapi/manifest.json.template > $(ADDON_PATH_CR_DNSSEC)/npapi_built/manifest.json
 	sed -e 's/tlsaplugin/np$(NPAPI_PLUGIN_NAME_TLSA)_x86.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/npapi/manifest.json.template > $(ADDON_PATH_CR_TLSA)/npapi_built/manifest.json
-	cd $(ADDON_PATH_CR_DNSSEC) && mv npapi_built chrome2dnssec && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x86-npapi.tar.gz chrome2dnssec && mv chrome2dnssec npapi_built && mv CR-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x86-npapi.tar.gz ../../$(PLUGIN_ADD_ON)
-	cd $(ADDON_PATH_CR_TLSA) && mv npapi_built chrome2tlsa && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x86-npapi.tar.gz chrome2tlsa && mv chrome2tlsa npapi_built && mv CR-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x86-npapi.tar.gz ../../$(PLUGIN_ADD_ON)
+	cd $(ADDON_PATH_CR_DNSSEC) && mv npapi_built chrome2dnssec && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86-npapi.tar.gz chrome2dnssec && mv chrome2dnssec npapi_built && mv CR-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86-npapi.tar.gz ../../$(PLUGIN_ADD_ON)
+	cd $(ADDON_PATH_CR_TLSA) && mv npapi_built chrome2tlsa && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86-npapi.tar.gz chrome2tlsa && mv chrome2tlsa npapi_built && mv CR-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86-npapi.tar.gz ../../$(PLUGIN_ADD_ON)
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating native-msg package for Chrome $(OSNAME) x86... ###'
@@ -158,8 +158,8 @@ xpi_x86:
 	cp $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86.so $(ADDON_PATH_OP_TLSA)
 	sed -e 's/dnssecplugin/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_DNSSEC)/manifest.json.template > $(ADDON_PATH_OP_DNSSEC)/manifest.json
 	sed -e 's/tlsaplugin/np$(NPAPI_PLUGIN_NAME_TLSA)_x86.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_TLSA)/manifest.json.template > $(ADDON_PATH_OP_TLSA)/manifest.json
-	cd add-on && tar -czf OP-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x86.tar.gz opera2dnssec && mv OP-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x86.tar.gz ../$(PLUGIN_ADD_ON)
-	cd add-on && tar -czf OP-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x86.tar.gz opera2tlsa && mv OP-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x86.tar.gz ../$(PLUGIN_ADD_ON)
+	cd add-on && tar -czf OP-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86.tar.gz opera2dnssec && mv OP-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86.tar.gz ../$(PLUGIN_ADD_ON)
+	cd add-on && tar -czf OP-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86.tar.gz opera2tlsa && mv OP-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86.tar.gz ../$(PLUGIN_ADD_ON)
 	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86.so
 	cd $(ADDON_PATH_OP_TLSA) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_TLSA)_x86.so
 	@echo '### DONE... ###'
@@ -171,68 +171,67 @@ xpi_x86:
 	@echo
 	@echo
 
-npapi_x64:
-	@echo '### ...Creating NPAPI plugin library for $(OSNAME) x64... ###'
-	rm -rf $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.so $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x64.so $(PLUGIN_FB_S)
+npapi_x86_64:
+	@echo '### ...Creating NPAPI plugin library for $(OSNAME) x86_64... ###'
+	rm -rf $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86_64.so $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86_64.so $(PLUGIN_FB_S)
 	mkdir $(PLUGIN_NAME_LIB) || echo "$(PLUGIN_NAME_LIB) already exists."
 	cd FireBreath && mkdir projects && cd ..
 	cp -r plugin-source/* $(PLUGIN_FB_S)
 	$(SHELL_CMD) ./FireBreath/prepmake.sh $(PLUGIN_FB_S) $(PLUGIN_FB_B) -DSTATIC_LINKING=$(STATIC_LINKING) -DLIBS_BUILT_DIR=$(LIBS_BUILT_DIR) -DINCLUDE_LOC=$(INCLUDE_LOC) -DLIBRARY_LOC=$(LIBRARY_LOC) -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS=-m64 -DCMAKE_CXX_FLAGS=-m64 -DCMAKE_BUILD_TYPE=MinSizeRel
 	$(MAKE_CMD) -C $(PLUGIN_FB_B)
-	cp $(PLUGIN_FB_B)/bin/$(NPAPI_PLUGIN_NAME_DNSSEC)/np$(NPAPI_PLUGIN_NAME_DNSSEC).so $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.so
-	cp $(PLUGIN_FB_B)/bin/$(NPAPI_PLUGIN_NAME_TLSA)/np$(NPAPI_PLUGIN_NAME_TLSA).so $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x64.so
-	strip $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.so
-	strip $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x64.so
+	cp $(PLUGIN_FB_B)/bin/$(NPAPI_PLUGIN_NAME_DNSSEC)/np$(NPAPI_PLUGIN_NAME_DNSSEC).so $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86_64.so
+	cp $(PLUGIN_FB_B)/bin/$(NPAPI_PLUGIN_NAME_TLSA)/np$(NPAPI_PLUGIN_NAME_TLSA).so $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86_64.so
+	strip $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86_64.so
+	strip $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86_64.so
 	rm -rf $(PLUGIN_FB_B)
 	rm -rf $(PLUGIN_FB_S)
-	@echo '### ...NPAPI plugin x64 $(OSNAME) ... Done. ###'
+	@echo '### ...NPAPI plugin x86_64 $(OSNAME) ... Done. ###'
 
-js-ctypes_x64:
-	@echo '### ...Creating js-ctypes plugin library for $(OSNAME) x64... ###'
-	rm -rf $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.so $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.so
+js-ctypes_x86_64:
+	@echo '### ...Creating js-ctypes plugin library for $(OSNAME) x86_64... ###'
+	rm -rf $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x86_64.so $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x86_64.so
 	mkdir $(PLUGIN_NAME_LIB) || echo "$(PLUGIN_NAME_LIB) already exists."
-	echo $(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x64 clean all
-	CFLAGS="$(CFLAGS)" $(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x64 clean all
-	cp core_js-ctypes/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.so $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.so
-	cp core_js-ctypes/$(JSCTYPES_PLUGIN_NAME_DANE)-x64.so $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x64.so
-	strip $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.so
-	strip $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x64.so
-	$(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x64 clean
-	@echo '### ...js-ctypes plugin x64 $(OSNAME) ... Done. ###'
+	CFLAGS="$(CFLAGS)" $(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x86_64 clean all
+	cp core_js-ctypes/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x86_64.so $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x86_64.so
+	cp core_js-ctypes/$(JSCTYPES_PLUGIN_NAME_DANE)-x86_64.so $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x86_64.so
+	strip $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x86_64.so
+	strip $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x86_64.so
+	$(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x86_64 clean
+	@echo '### ...js-ctypes plugin x86_64 $(OSNAME) ... Done. ###'
 
-xpi_x64:
-	@echo '### Creating NPAPI package for Firefox $(OSNAME) x64... ###'
+xpi_x86_64:
+	@echo '### Creating NPAPI package for Firefox $(OSNAME) x86_64... ###'
 	rm -rf $(ADDON_PATH_FF)/npapi_built
 	mkdir $(ADDON_PATH_FF)/npapi_built
 	mkdir $(ADDON_PATH_FF)/npapi_built/plugins
 	cp -r $(ADDON_PATH_FF)/npapi/* $(ADDON_PATH_FF)/npapi_built
 	cp -r $(ADDON_PATH_FF)/common/* $(ADDON_PATH_FF)/npapi_built
 	chmod 777 $(ADDON_PATH_FF)/npapi_built/build.sh
-	cp $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.so $(ADDON_PATH_FF)/npapi_built/plugins
-	cp $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x64.so $(ADDON_PATH_FF)/npapi_built/plugins
+	cp $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86_64.so $(ADDON_PATH_FF)/npapi_built/plugins
+	cp $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86_64.so $(ADDON_PATH_FF)/npapi_built/plugins
 	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>$(OSNAME)<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/npapi_built/install.rdf.template > $(ADDON_PATH_FF)/npapi_built/install.rdf
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/npapi_built/about.template > $(ADDON_PATH_FF)/npapi_built/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
-	cd $(ADDON_PATH_FF)/npapi_built && $(SHELL_CMD) ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64-npapi.xpi
+	cd $(ADDON_PATH_FF)/npapi_built && $(SHELL_CMD) ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86_64-npapi.xpi
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
-	@echo '### Creating js-ctypes package for Firefox $(OSNAME) x64... ###'
+	@echo '### Creating js-ctypes package for Firefox $(OSNAME) x86_64... ###'
 	rm -rf $(ADDON_PATH_FF)/js-ctypes_built
 	mkdir $(ADDON_PATH_FF)/js-ctypes_built
 	mkdir $(ADDON_PATH_FF)/js-ctypes_built/plugins
 	cp -r $(ADDON_PATH_FF)/js-ctypes/* $(ADDON_PATH_FF)/js-ctypes_built
 	cp -r $(ADDON_PATH_FF)/common/* $(ADDON_PATH_FF)/js-ctypes_built
 	chmod 777 $(ADDON_PATH_FF)/js-ctypes_built/build.sh
-	cp $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x64.so $(ADDON_PATH_FF)/js-ctypes_built/plugins
-	cp $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x64.so $(ADDON_PATH_FF)/js-ctypes_built/plugins
+	cp $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DNSSEC)-x86_64.so $(ADDON_PATH_FF)/js-ctypes_built/plugins
+	cp $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x86_64.so $(ADDON_PATH_FF)/js-ctypes_built/plugins
 	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>$(OSNAME)<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/js-ctypes_built/install.rdf.template > $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx
 	mv $(ADDON_PATH_FF)/js-ctypes_built/install.rdfx $(ADDON_PATH_FF)/js-ctypes_built/install.rdf
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/js-ctypes_built/about.template > $(ADDON_PATH_FF)/js-ctypes_built/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
-	cd $(ADDON_PATH_FF)/js-ctypes_built && $(SHELL_CMD) ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64-js-ctypes.xpi
+	cd $(ADDON_PATH_FF)/js-ctypes_built && $(SHELL_CMD) ./build.sh && mv dnssec.xpi ../../../$(PLUGIN_ADD_ON)/MF-dnssec-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86_64-js-ctypes.xpi
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
-	@echo '### Creating NPAPI package for Chrome $(OSNAME) x64... ###'
+	@echo '### Creating NPAPI package for Chrome $(OSNAME) x86_64... ###'
 	rm -rf $(ADDON_PATH_CR_DNSSEC)/npapi_built
 	mkdir $(ADDON_PATH_CR_DNSSEC)/npapi_built
 	cp -r $(ADDON_PATH_CR_DNSSEC)/npapi/* $(ADDON_PATH_CR_DNSSEC)/npapi_built
@@ -241,15 +240,15 @@ xpi_x64:
 	mkdir $(ADDON_PATH_CR_TLSA)/npapi_built
 	cp -r $(ADDON_PATH_CR_TLSA)/npapi/* $(ADDON_PATH_CR_TLSA)/npapi_built
 	cp -r $(ADDON_PATH_CR_TLSA)/common/* $(ADDON_PATH_CR_TLSA)/npapi_built
-	cp $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.so $(ADDON_PATH_CR_DNSSEC)/npapi_built
-	cp $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x64.so $(ADDON_PATH_CR_TLSA)/npapi_built
-	sed -e 's/dnssecplugin/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_DNSSEC)/npapi/manifest.json.template > $(ADDON_PATH_CR_DNSSEC)/npapi_built/manifest.json
-	sed -e 's/tlsaplugin/np$(NPAPI_PLUGIN_NAME_TLSA)_x64.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/npapi/manifest.json.template > $(ADDON_PATH_CR_TLSA)/npapi_built/manifest.json
-	cd $(ADDON_PATH_CR_DNSSEC) && mv npapi_built chrome2dnssec && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64-npapi.tar.gz chrome2dnssec && mv chrome2dnssec npapi_built && mv CR-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64-npapi.tar.gz ../../$(PLUGIN_ADD_ON)
-	cd $(ADDON_PATH_CR_TLSA) && mv npapi_built chrome2tlsa && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64-npapi.tar.gz chrome2tlsa && mv chrome2tlsa npapi_built && mv CR-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64-npapi.tar.gz ../../$(PLUGIN_ADD_ON)
+	cp $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86_64.so $(ADDON_PATH_CR_DNSSEC)/npapi_built
+	cp $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86_64.so $(ADDON_PATH_CR_TLSA)/npapi_built
+	sed -e 's/dnssecplugin/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86_64.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_DNSSEC)/npapi/manifest.json.template > $(ADDON_PATH_CR_DNSSEC)/npapi_built/manifest.json
+	sed -e 's/tlsaplugin/np$(NPAPI_PLUGIN_NAME_TLSA)_x86_64.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/npapi/manifest.json.template > $(ADDON_PATH_CR_TLSA)/npapi_built/manifest.json
+	cd $(ADDON_PATH_CR_DNSSEC) && mv npapi_built chrome2dnssec && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86_64-npapi.tar.gz chrome2dnssec && mv chrome2dnssec npapi_built && mv CR-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86_64-npapi.tar.gz ../../$(PLUGIN_ADD_ON)
+	cd $(ADDON_PATH_CR_TLSA) && mv npapi_built chrome2tlsa && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86_64-npapi.tar.gz chrome2tlsa && mv chrome2tlsa npapi_built && mv CR-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86_64-npapi.tar.gz ../../$(PLUGIN_ADD_ON)
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
-	@echo '### Creating native-msg package for Chrome $(OSNAME) x64... ###'
+	@echo '### Creating native-msg package for Chrome $(OSNAME) x86_64... ###'
 	rm -rf $(ADDON_PATH_CR_DNSSEC)/native-msg_built
 	mkdir $(ADDON_PATH_CR_DNSSEC)/native-msg_built
 	cp -r $(ADDON_PATH_CR_DNSSEC)/native-msg/* $(ADDON_PATH_CR_DNSSEC)/native-msg_built
@@ -265,15 +264,15 @@ xpi_x64:
 	echo '# TODO -- Compile and bundle core application?'
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
-	@echo '### Creating package for Opera $(OSNAME) x64... ###'
-	cp $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.so $(ADDON_PATH_OP_DNSSEC)
-	cp $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x64.so $(ADDON_PATH_OP_TLSA)
-	sed -e 's/dnssecplugin/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_DNSSEC)/manifest.json.template > $(ADDON_PATH_OP_DNSSEC)/manifest.json
-	sed -e 's/tlsaplugin/np$(NPAPI_PLUGIN_NAME_TLSA)_x64.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_TLSA)/manifest.json.template > $(ADDON_PATH_OP_TLSA)/manifest.json
-	cd add-on && tar -czf OP-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64.tar.gz opera2dnssec && mv OP-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64.tar.gz ../$(PLUGIN_ADD_ON)
-	cd add-on && tar -czf OP-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64.tar.gz opera2tlsa && mv OP-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME_LC)-x64.tar.gz ../$(PLUGIN_ADD_ON)
-	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_DNSSEC)_x64.so
-	cd $(ADDON_PATH_OP_TLSA) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_TLSA)_x64.so
+	@echo '### Creating package for Opera $(OSNAME) x86_64... ###'
+	cp $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86_64.so $(ADDON_PATH_OP_DNSSEC)
+	cp $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86_64.so $(ADDON_PATH_OP_TLSA)
+	sed -e 's/dnssecplugin/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86_64.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_DNSSEC)/manifest.json.template > $(ADDON_PATH_OP_DNSSEC)/manifest.json
+	sed -e 's/tlsaplugin/np$(NPAPI_PLUGIN_NAME_TLSA)_x86_64.so/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_TLSA)/manifest.json.template > $(ADDON_PATH_OP_TLSA)/manifest.json
+	cd add-on && tar -czf OP-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86_64.tar.gz opera2dnssec && mv OP-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86_64.tar.gz ../$(PLUGIN_ADD_ON)
+	cd add-on && tar -czf OP-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86_64.tar.gz opera2tlsa && mv OP-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86_64.tar.gz ../$(PLUGIN_ADD_ON)
+	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86_64.so
+	cd $(ADDON_PATH_OP_TLSA) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_TLSA)_x86_64.so
 	@echo '### DONE... ###'
 	@echo
 	@echo

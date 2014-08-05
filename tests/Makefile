@@ -22,7 +22,8 @@
 
 .PHONY: all clean run
 
-OSNAME_LC = linux
+OSNAME = $(KERNEL)
+OSNAME_LC = $(KERNEL_LC)
 # Determine architecture.
 HWARCH = $(shell uname -m | tr '[:upper:]' '[:lower:]' | sed -e 's/amd64/x86_64/g')
 
@@ -45,7 +46,7 @@ endif
 
 CPPFLAGS += -DCMNDLINE_TEST
 
-ifneq ($(KERNEL),freebsd)
+ifneq ($(KERNEL),FreeBSD)
   LDFLAGS += -ldl
 endif
 
@@ -60,8 +61,8 @@ run: all
 checkDNSSEClib.o: checkDNSSEClib.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/DNSSECValidatorPlugin
 
-checkDNSSEClib: checkDNSSEClib.o libDNSSECcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF)
-	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDNSSECcore-$(OSNAME_LC)-$(HWARCH)
+checkDNSSEClib: checkDNSSEClib.o libDNSSECcore-$(OSNAME)-$(HWARCH).$(SHLIB_SUFF)
+	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDNSSECcore-$(OSNAME)-$(HWARCH)
 
 dnssec-main.o: ../plugin-source/DNSSECValidatorPlugin/dnssec-main.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
@@ -72,8 +73,8 @@ dnssec-plug: dnssec-main.o dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
 checkDANElib.o: checkDANElib.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/TLSAValidatorPlugin
 
-checkDANElib: checkDANElib.o libDANEcore-$(OSNAME_LC)-$(HWARCH).$(SHLIB_SUFF)
-	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDANEcore-$(OSNAME_LC)-$(HWARCH)
+checkDANElib: checkDANElib.o libDANEcore-$(OSNAME)-$(HWARCH).$(SHLIB_SUFF)
+	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDANEcore-$(OSNAME)-$(HWARCH)
 
 dane-main.o: ../plugin-source/TLSAValidatorPlugin/dane-main.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
