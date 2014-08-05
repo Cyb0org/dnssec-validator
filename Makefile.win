@@ -96,17 +96,17 @@ $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_LIB): $(PLUGIN_TMP)/common.o $(PLUGIN_TMP)/log_
 	$(X86_MINGW_CC) -shared -o $@ $^ $(PLUGIN_ROOT)/$(LIBS_BUILT_DIR)/windows/x86/libunbound.a $(PLUGIN_ROOT)/$(LIBS_BUILT_DIR)/windows/x86/libldns.a $(PLUGIN_ROOT)/$(LIBS_BUILT_DIR)/windows/x86/libssl.a $(PLUGIN_ROOT)/$(LIBS_BUILT_DIR)/windows/x86/libcrypto.a -Wl,--output-def,$(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_DEF),-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32,-lcrypt32
 	$(X86_MINGW_STRIP) -x -S $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_LIB)
 
-$(PLUGIN_TMP)/dnssec-plug_main.o: $(PLUGIN_SRC_DIR)/$(PLUGIN_NAME_DNSSEC)/dnssec-plug.c $(PLUGIN_TMP)
-	$(X86_MINGW_CC) -o $@ -c $< $(CPPFLAGS) -DCMNDLINE_TEST $(CFLAGS)
+$(PLUGIN_TMP)/dnssec-main.o: $(PLUGIN_SRC_DIR)/$(PLUGIN_NAME_DNSSEC)/dnssec-main.c $(PLUGIN_TMP)
+	$(X86_MINGW_CC) -o $@ -c $< $(CPPFLAGS) $(CFLAGS)
 
-$(PLUGIN_TMP)/dane-plug_main.o: $(PLUGIN_SRC_DIR)/$(PLUGIN_NAME_TLSA)/dane-plug.c $(PLUGIN_TMP)
-	$(X86_MINGW_CC) -o $@ -c $< $(CPPFLAGS) -DCMNDLINE_TEST $(CFLAGS)
+$(PLUGIN_TMP)/dane-main.o: $(PLUGIN_SRC_DIR)/$(PLUGIN_NAME_TLSA)/dane-main.c $(PLUGIN_TMP)
+	$(X86_MINGW_CC) -o $@ -c $< $(CPPFLAGS) $(CFLAGS)
 
-$(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_EXE): $(PLUGIN_TMP)/common.o $(PLUGIN_TMP)/log_dflt.o $(PLUGIN_TMP)/dnssec-plug_main.o
+$(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_EXE): $(PLUGIN_TMP)/dnssec-main.o $(PLUGIN_TMP)/common.o $(PLUGIN_TMP)/log_dflt.o $(PLUGIN_TMP)/dnssec-plug.o
 	$(X86_MINGW_CC) -o $@ $^ $(PLUGIN_ROOT)/$(LIBS_BUILT_DIR)/windows/x86/libunbound.a $(PLUGIN_ROOT)/$(LIBS_BUILT_DIR)/windows/x86/libldns.a $(PLUGIN_ROOT)/$(LIBS_BUILT_DIR)/windows/x86/libssl.a $(PLUGIN_ROOT)/$(LIBS_BUILT_DIR)/windows/x86/libcrypto.a -Wl,-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32
 	$(X86_MINGW_STRIP) -x -S $(PLUGIN_TMP)/$(PLUGIN_NAME_DNSSEC_EXE)
 
-$(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_EXE): $(PLUGIN_TMP)/common.o $(PLUGIN_TMP)/log_dflt.o $(PLUGIN_TMP)/dane-plug_main.o $(PLUGIN_TMP)/ca_store_win.o
+$(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_EXE): $(PLUGIN_TMP)/dane-main.o $(PLUGIN_TMP)/common.o $(PLUGIN_TMP)/log_dflt.o $(PLUGIN_TMP)/dane-plug.o $(PLUGIN_TMP)/ca_store_win.o
 	$(X86_MINGW_CC) -o $@ $^ $(PLUGIN_ROOT)/$(LIBS_BUILT_DIR)/windows/x86/libunbound.a $(PLUGIN_ROOT)/$(LIBS_BUILT_DIR)/windows/x86/libldns.a $(PLUGIN_ROOT)/$(LIBS_BUILT_DIR)/windows/x86/libssl.a $(PLUGIN_ROOT)/$(LIBS_BUILT_DIR)/windows/x86/libcrypto.a -Wl,-Bstatic,-Bsymbolic,-lws2_32,-liphlpapi,-lgdi32,-lcrypt32
 	$(X86_MINGW_STRIP) -x -S $(PLUGIN_TMP)/$(PLUGIN_NAME_TLSA_EXE)
 #:
