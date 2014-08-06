@@ -85,6 +85,7 @@ SCRIPT_STUB="install_chrome_stub.sh"
 rm -rf __tmp__ && mkdir __tmp__
 TEMP_DIR="__tmp__"
 
+PACKAGES_DIR="packages"
 
 cleanup ()
 {
@@ -116,10 +117,12 @@ rm ${TEMP_DIR}/chrome_dnssec_validator.pem
 cd ${TEMP_DIR}; tar -czf "${TARGZ_FILE}" cz.nic.validator.dnssec.json.in dnssec-plug dnssec-pkg.crx; cd ..
 cp "${SCRIPT_STUB}" "${TARGET_DNSSEC}"
 echo "PAYLOAD:" >> "${TARGET_DNSSEC}"
-cat "${TEMP_DIR}/${TARGZ_FILE}" >> "${TARGET_DNSSEC}"
-chmod +x "${TARGET_DNSSEC}"
+cat "${TEMP_DIR}/${TARGZ_FILE}" >> "${PACKAGES_DIR}/${TARGET_DNSSEC}"
+chmod +x "${PACKAGES_DIR}/${TARGET_DNSSEC}"
 rm -f ${TARGZ_FILE}
 
+# TODO -- Create a switch controllin the creation of crx files.
+cp "${TEMP_DIR}/dnssec-pkg.crx" "${PACKAGES_DIR}/"
 
 #cleanup
 if [ ! -d add-on/chrome-tlsa/native-msg_built ]; then
@@ -145,8 +148,12 @@ rm ${TEMP_DIR}/chrome_tlsa_validator.pem
 cd ${TEMP_DIR}; tar -czf "${TARGZ_FILE}" cz.nic.validator.tlsa.json.in dane-plug tlsa-pkg.crx; cd ..
 cp "${SCRIPT_STUB}" "${TARGET_TLSA}"
 echo "PAYLOAD:" >> "${TARGET_TLSA}"
-cat "${TEMP_DIR}/${TARGZ_FILE}" >> "${TARGET_TLSA}"
-chmod +x "${TARGET_TLSA}"
+cat "${TEMP_DIR}/${TARGZ_FILE}" >> "${PACKAGES_DIR}/${TARGET_TLSA}"
+chmod +x "${PACKAGES_DIR}/${TARGET_TLSA}"
+
+# TODO -- Create a switch controllin the creation of crx files.
+cp "${TEMP_DIR}/tlsa-pkg.crx" "${PACKAGES_DIR}/"
+
 rm -f ${TARGZ_FILE}
 
 rm -rf ${TEMP_DIR}
