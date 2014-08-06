@@ -6,18 +6,21 @@
 #cd tests && make clean && make && cd ..
 
 
-OPTS="h"
-GETOPT="h"
+OPTS="ch"
+GETOPT="ch"
 
 USAGE=""
 USAGE="${USAGE}Usage:\n"
 USAGE="${USAGE}\t$0 [-${OPTS}] chrome_executable\n"
 USAGE="${USAGE}\n"
 USAGE="${USAGE}Options:\n"
+USAGE="${USAGE}\t-c\tPreserve generated CRX file.\n"
 USAGE="${USAGE}\t-h\tPrints this message.\n"
 USAGE="${USAGE}\n"
 USAGE="${USAGE}\tchrome_executable\n"
 USAGE="${USAGE}\t\t-- name of the Chrome executable (e.g. chromium, google-chrome).\n"
+
+PRESERVE_CTX="no"
 
 # Parse options.
 set -- `getopt "${GETOPT}" "$@"`
@@ -27,6 +30,9 @@ if [ $# -lt 1 ]; then
 fi
 while [ $# -gt 0 ]; do
 	case "$1" in
+	-c)
+		PRESERVE_CTX="yes"
+		;;
 	-h)
 		echo >&2 -en "${USAGE}"
 		exit 0
@@ -121,8 +127,9 @@ cat "${TEMP_DIR}/${TARGZ_FILE}" >> "${PACKAGES_DIR}/${TARGET_DNSSEC}"
 chmod +x "${PACKAGES_DIR}/${TARGET_DNSSEC}"
 rm -f ${TARGZ_FILE}
 
-# TODO -- Create a switch controllin the creation of crx files.
-cp "${TEMP_DIR}/dnssec-pkg.crx" "${PACKAGES_DIR}/"
+if [ "x${PRESERVE_CTX}" = "xyes" ]; then
+	cp "${TEMP_DIR}/dnssec-pkg.crx" "${PACKAGES_DIR}/"
+fi
 
 #cleanup
 if [ ! -d add-on/chrome-tlsa/native-msg_built ]; then
@@ -151,8 +158,9 @@ echo "PAYLOAD:" >> "${TARGET_TLSA}"
 cat "${TEMP_DIR}/${TARGZ_FILE}" >> "${PACKAGES_DIR}/${TARGET_TLSA}"
 chmod +x "${PACKAGES_DIR}/${TARGET_TLSA}"
 
-# TODO -- Create a switch controllin the creation of crx files.
-cp "${TEMP_DIR}/tlsa-pkg.crx" "${PACKAGES_DIR}/"
+if [ "x${PRESERVE_CTX}" = "xyes" ]; then
+	cp "${TEMP_DIR}/tlsa-pkg.crx" "${PACKAGES_DIR}/"
+fi
 
 rm -f ${TARGZ_FILE}
 
