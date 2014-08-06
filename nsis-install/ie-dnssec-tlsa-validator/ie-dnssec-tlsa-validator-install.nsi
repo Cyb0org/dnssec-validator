@@ -1,4 +1,4 @@
-# The NSIS (http://nsis.sourceforge.net) install script.
+﻿# The NSIS (http://nsis.sourceforge.net) install script.
 # This script is BSD licensed.
 SetCompressor /solid /final lzma
 

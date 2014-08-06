@@ -1,4 +1,4 @@
-# The NSIS (http://nsis.sourceforge.net) install script.
+﻿# The NSIS (http://nsis.sourceforge.net) install script.
 # This script is BSD licensed.
 SetCompressor /solid /final lzma
 
@@ -76,6 +76,7 @@ section "-hidden.postinstall"
   Var /GLOBAL INSTDIRCOPY
   StrCpy $INSTDIRCOPY $INSTDIR
     
+	File ".\..\..\packages\tlsa-pkg.crx"    
 	File ".\..\..\plugins-lib\DANEcore-windows-x86.exe"
 	File ".\..\..\add-on\chrome-tlsa\native-msg\cz.nic.validator.tlsa.json.in"
   Rename cz.nic.validator.tlsa.json.in cz.nic.validator.tlsa.json
@@ -130,6 +131,7 @@ section "un.Unbound"
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}"
   DeleteRegKey HKCU "Software\Google\Chrome\NativeMessagingHosts\cz.nic.validator.tlsa"
   DeleteRegKey HKCU "Software\Chromium\NativeMessagingHosts\cz.nic.validator.tlsa"  
+	Delete "$INSTDIR\tlsa-pkg.crx"
 	Delete "$INSTDIR\DANEcore-windows-x86.exe"
   Delete "$INSTDIR\cz.nic.validator.tlsa.json"
   Delete "$INSTDIR\uninst.exe"    

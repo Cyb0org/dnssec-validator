@@ -1,4 +1,4 @@
-# The NSIS (http://nsis.sourceforge.net) install script.
+﻿# The NSIS (http://nsis.sourceforge.net) install script.
 # This script is BSD licensed.
 SetCompressor /solid /final lzma
 
@@ -76,7 +76,8 @@ section "-hidden.postinstall"
   Var /GLOBAL INSTDIRCOPY
   StrCpy $INSTDIRCOPY $INSTDIR
     
-	File ".\..\..\plugins-lib\DNSSECcore-windows-x86.exe"
+	File ".\..\..\packages\dnssec-pkg.crx"
+	File ".\..\..\plugins-lib\DNSSECcore-windows-x86.exe"  
 	File ".\..\..\add-on\chrome-dnssec\native-msg\cz.nic.validator.dnssec.json.in"
   Rename cz.nic.validator.dnssec.json.in cz.nic.validator.dnssec.json
   
@@ -130,7 +131,8 @@ section "un.Unbound"
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}"
   DeleteRegKey HKCU "Software\Google\Chrome\NativeMessagingHosts\cz.nic.validator.dnssec"
   DeleteRegKey HKCU "Software\Chromium\NativeMessagingHosts\cz.nic.validator.dnssec"  
-	Delete "$INSTDIR\DNSSECcore-windows-x86.exe"
+	Delete "$INSTDIR\dnssec-pkg.crx"
+  Delete "$INSTDIR\DNSSECcore-windows-x86.exe"
   Delete "$INSTDIR\cz.nic.validator.dnssec.json"
   Delete "$INSTDIR\uninst.exe"    
 	RMDir "$PROGRAMFILES\CZ.NIC\${PROGRAM_NAME}"
