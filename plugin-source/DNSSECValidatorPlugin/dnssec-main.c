@@ -227,8 +227,9 @@ int wait_for_and_process_native_message(void)
 		    &tmp);
 
 		/* Generate output. */
-		if (snprintf(outbuf, MAX_BUF_LEN, "\"%sRet~%s~%d~%s~%s~%s\"",
-		        cmd, dn, val_ret, tmp, addr, tab_id) >= MAX_BUF_LEN) {
+		if (snprintf(outbuf, MAX_BUF_LEN,
+		        "\"%sRet~%s~%d~%s~%s~%s~%s\"", cmd, dn, val_ret, tmp,
+		        addr, tab_id, VERSION) >= MAX_BUF_LEN) {
 			/* Error. */
 			printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n",
 			    "Error while creating response string.");

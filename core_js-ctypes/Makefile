@@ -44,6 +44,8 @@ UNBOUND_LIB = $(BASEDIR)/$(LIBS_BUILT_DIR)/unbound
 KERNEL = $(shell uname -s)
 KERNEL_LC = $(shell uname -s | tr '[:upper:]' '[:lower:]')
 
+VERSION = $(shell cat ../Version)
+
 
 # OS dependent stuff.
 STATIC_LINKING ?= yes
@@ -150,6 +152,7 @@ else
   endif
 endif
 
+CPPFLAGS += -DVERSION="\"$(VERSION)\""
 
 TARGETS = libDNSSECcore-$(OSNAME)-$(HWARCH).$(SHLIB_SUFF) libDANEcore-$(OSNAME)-$(HWARCH).$(SHLIB_SUFF)
 

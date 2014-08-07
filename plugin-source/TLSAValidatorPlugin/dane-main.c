@@ -149,8 +149,8 @@ int wait_for_and_process_native_message(void)
 
 		/* Generate output. */
 		if (snprintf(outbuf, MAX_BUF_LEN,
-		        "\"%sRet~%s~%s~%s~%d~%s~%s\"", cmd, dn, port, proto,
-		        val_ret, tab_id, schema) >= MAX_BUF_LEN) {
+		        "\"%sRet~%s~%s~%s~%d~%s~%s~%s\"", cmd, dn, port, proto,
+		        val_ret, tab_id, schema, VERSION) >= MAX_BUF_LEN) {
 			/* Error. */
 			printf_debug(DEBUG_PREFIX_DANE, "%s\n",
 			    "Error while creating response string.");
