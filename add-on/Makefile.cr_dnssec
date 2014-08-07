@@ -1,0 +1,93 @@
+
+TARGETS += \
+	dvcnm-directory-stamp
+
+dnssec_cs_CZ_LOCALE_CR = \
+	$(top_srcdir)/add-on/chrome-dnssec/common/_locales/cs/messages.json
+
+dnssec_de_DE_LOCALE_CR = \
+	$(top_srcdir)/add-on/chrome-dnssec/common/_locales/de/messages.json
+
+dnssec_en_US_LOCALE_CR = \
+	$(top_srcdir)/add-on/chrome-dnssec/common/_locales/en/messages.json
+
+dnssec_validator_LOCALES_CR = \
+	$(dnssec_cs_CZ_LOCALE_CR) \
+	$(dnssec_de_DE_LOCALE_CR) \
+	$(dnssec_en_US_LOCALE_CR)
+
+dnssec_validator_CONTENT_CR = \
+	$(top_srcdir)/add-on/chrome-dnssec/common/detail-info.html \
+	$(top_srcdir)/add-on/chrome-dnssec/common/dnssec_action.gif \
+	$(top_srcdir)/add-on/chrome-dnssec/common/dnssec_action.png \
+	$(top_srcdir)/add-on/chrome-dnssec/common/dnssec_bogus.png \
+	$(top_srcdir)/add-on/chrome-dnssec/common/dnssec_error.png \
+	$(top_srcdir)/add-on/chrome-dnssec/common/dnssec_init.png \
+	$(top_srcdir)/add-on/chrome-dnssec/common/dnssec_ip.png \
+	$(top_srcdir)/add-on/chrome-dnssec/common/dnssec_no.png \
+	$(top_srcdir)/add-on/chrome-dnssec/common/dnssec_off.png \
+	$(top_srcdir)/add-on/chrome-dnssec/common/dnssec_orange.png \
+	$(top_srcdir)/add-on/chrome-dnssec/common/dnssec_valid.png \
+	$(top_srcdir)/add-on/chrome-dnssec/common/icon.png \
+	$(top_srcdir)/add-on/chrome-dnssec/common/popup.html \
+	$(top_srcdir)/add-on/chrome-dnssec/common/popup.js \
+	$(top_srcdir)/add-on/chrome-dnssec/common/popup2.js
+
+dnssec_validator_BALLAST_CR = \
+	$(top_srcdir)/add-on/chrome-dnssec/common/COPYING
+
+if EXTPKG_CR_NM
+
+BUILT_SOURCES += \
+	$(top_srcdir)/add-on/chrome-dnssec/native-msg/manifest.json
+
+CLEANFILES += \
+	$(top_srcdir)/add-on/chrome-dnssec/native-msg/manifest.json
+
+$(top_srcdir)/add-on/chrome-dnssec/native-msg/manifest.json: $(top_srcdir)/add-on/chrome-dnssec/native-msg/manifest.json.in Makefile
+	$(do_subst) < $< > $@
+
+dnssec_validator_CONTENT_CR_NM = \
+	$(top_srcdir)/add-on/chrome-dnssec/native-msg/action.gif \
+	$(top_srcdir)/add-on/chrome-dnssec/native-msg/background.js \
+	$(top_srcdir)/add-on/chrome-dnssec/native-msg/manifest.json \
+	$(top_srcdir)/add-on/chrome-dnssec/native-msg/options.html \
+	$(top_srcdir)/add-on/chrome-dnssec/native-msg/options.js
+
+dvcnm-locales-stamp: $(dnssec_validator_LOCALES_CR)
+	-rm -rf _dtvcnm_workdir/dnssec/_locales
+	$(INSTALL) -d _dtvcnm_workdir/dnssec/_locales
+	for f in $^; do \
+		mkdir -p _dtvcnm_workdir/dnssec/_locales/$$(basename $$(dirname $$f))/; \
+		$(INSTALL) -m 644 $$f _dtvcnm_workdir/dnssec/_locales/$$(basename $$(dirname $$f))/; \
+	done
+	touch $@
+
+dvcnm-content-stamp: $(dnssec_validator_CONTENT_CR) $(dnssec_validator_CONTENT_CR_NM)
+	for f in $^; do \
+		$(INSTALL) -m 644 $$f _dtvcnm_workdir/dnssec/; \
+	done
+	touch $@
+
+dvcnm-ballast-stamp: $(dnssec_validator_BALLAST_CR)
+	for f in $^; do \
+		$(INSTALL) -m 644 $$f _dtvcnm_workdir/dnssec/; \
+	done
+	touch $@
+
+# FIXME -- dvcnm-directory-stamp is only a temporary solution.
+dvcnm-directory-stamp: dvcnm-locales-stamp dvcnm-content-stamp dvcnm-ballast-stamp $(top_srcdir)/add-on/chrome-dnssec/native-msg/cz.nic.validator.dnssec.json.in
+	$(INSTALL) -m 644 $(top_srcdir)/add-on/chrome-dnssec/native-msg/cz.nic.validator.dnssec.json.in _dtvcnm_workdir
+	$(INSTALL) -m 755 $(top_srcdir)/core_native-msg/dnssec-plug* _dtvcnm_workdir
+	touch $@
+
+WORKDIRS += \
+	_dtvcnm_workdir
+
+CLEANFILES += \
+	dvcnm-locales-stamp \
+	dvcnm-content-stamp \
+	dvcnm-ballast-stamp \
+	dvcnm-directory-stamp
+
+endif

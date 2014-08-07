@@ -22,5 +22,5 @@
    "manifest_version": 2,
    "minimum_chrome_version": "18",
    "permissions": [ "tabs", "webRequest", "webRequestBlocking", "browsingData", "nativeMessaging", "*://*/*" ],
-   "version": "version-of-add-on"
+   "version": "@VERSION@"
 }

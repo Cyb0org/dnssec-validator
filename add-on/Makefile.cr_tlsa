@@ -1,0 +1,94 @@
+
+TARGETS += \
+	tvcnm-directory-stamp
+
+tlsa_cs_CZ_LOCALE_CR = \
+	$(top_srcdir)/add-on/chrome-tlsa/common/_locales/cs/messages.json
+
+tlsa_de_DE_LOCALE_CR = \
+	$(top_srcdir)/add-on/chrome-tlsa/common/_locales/de/messages.json
+
+tlsa_en_US_LOCALE_CR = \
+	$(top_srcdir)/add-on/chrome-tlsa/common/_locales/en/messages.json
+
+tlsa_validator_LOCALES_CR = \
+	$(tlsa_cs_CZ_LOCALE_CR) \
+	$(tlsa_de_DE_LOCALE_CR) \
+	$(tlsa_en_US_LOCALE_CR)
+
+tlsa_validator_CONTENT_CR = \
+	$(top_srcdir)/add-on/chrome-tlsa/common/detail-tlsa.html \
+	$(top_srcdir)/add-on/chrome-tlsa/common/icon.png \
+	$(top_srcdir)/add-on/chrome-tlsa/common/popuptlsa.html \
+	$(top_srcdir)/add-on/chrome-tlsa/common/popuptlsa.js \
+	$(top_srcdir)/add-on/chrome-tlsa/common/popuptlsa2.js \
+	$(top_srcdir)/add-on/chrome-tlsa/common/tlsa_action.gif \
+	$(top_srcdir)/add-on/chrome-tlsa/common/tlsa_action.png \
+	$(top_srcdir)/add-on/chrome-tlsa/common/tlsa_error.png \
+	$(top_srcdir)/add-on/chrome-tlsa/common/tlsa_init.png \
+	$(top_srcdir)/add-on/chrome-tlsa/common/tlsa_invalid.png \
+	$(top_srcdir)/add-on/chrome-tlsa/common/tlsa_no.png \
+	$(top_srcdir)/add-on/chrome-tlsa/common/tlsa_nodnssec.png \
+	$(top_srcdir)/add-on/chrome-tlsa/common/tlsa_nohttps.png \
+	$(top_srcdir)/add-on/chrome-tlsa/common/tlsa_off.png \
+	$(top_srcdir)/add-on/chrome-tlsa/common/tlsa_orange.png \
+	$(top_srcdir)/add-on/chrome-tlsa/common/tlsa_valid.png
+
+tlsa_validator_BALLAST_CR = \
+	$(top_srcdir)/add-on/chrome-tlsa/common/COPYING
+
+if EXTPKG_CR_NM
+
+BUILT_SOURCES += \
+	$(top_srcdir)/add-on/chrome-tlsa/native-msg/manifest.json
+
+CLEANFILES += \
+	$(top_srcdir)/add-on/chrome-tlsa/native-msg/manifest.json
+
+$(top_srcdir)/add-on/chrome-tlsa/native-msg/manifest.json: $(top_srcdir)/add-on/chrome-tlsa/native-msg/manifest.json.in Makefile
+	$(do_subst) < $< > $@
+
+tlsa_validator_CONTENT_CR_NM = \
+	$(top_srcdir)/add-on/chrome-tlsa/native-msg/action.gif \
+	$(top_srcdir)/add-on/chrome-tlsa/native-msg/background.js \
+	$(top_srcdir)/add-on/chrome-tlsa/native-msg/manifest.json \
+	$(top_srcdir)/add-on/chrome-tlsa/native-msg/options.html \
+	$(top_srcdir)/add-on/chrome-tlsa/native-msg/options.js
+
+tvcnm-locales-stamp: $(tlsa_validator_LOCALES_CR)
+	-rm -rf _dtvcnm_workdir/tlsa/_locales
+	$(INSTALL) -d _dtvcnm_workdir/tlsa/_locales
+	for f in $^; do \
+		mkdir -p _dtvcnm_workdir/tlsa/_locales/$$(basename $$(dirname $$f))/; \
+		$(INSTALL) -m 644 $$f _dtvcnm_workdir/tlsa/_locales/$$(basename $$(dirname $$f))/; \
+	done
+	touch $@
+
+tvcnm-content-stamp: $(tlsa_validator_CONTENT_CR) $(tlsa_validator_CONTENT_CR_NM)
+	for f in $^; do \
+		$(INSTALL) -m 644 $$f _dtvcnm_workdir/tlsa/; \
+	done
+	touch $@
+
+tvcnm-ballast-stamp: $(tlsa_validator_BALLAST_CR)
+	for f in $^; do \
+		$(INSTALL) -m 644 $$f _dtvcnm_workdir/tlsa/; \
+	done
+	touch $@
+
+# FIXME -- tvcnm-directory-stamp is only a temporary solution.
+tvcnm-directory-stamp: tvcnm-locales-stamp tvcnm-content-stamp tvcnm-ballast-stamp $(top_srcdir)/add-on/chrome-tlsa/native-msg/cz.nic.validator.tlsa.json.in
+	$(INSTALL) -m 644 $(top_srcdir)/add-on/chrome-tlsa/native-msg/cz.nic.validator.tlsa.json.in _dtvcnm_workdir
+	$(INSTALL) -m 755 $(top_srcdir)/core_native-msg/dane-plug* _dtvcnm_workdir
+	touch $@
+
+WORKDIRS += \
+	_dtvcnm_workdir
+
+CLEANFILES += \
+	tvcnm-locales-stamp \
+	tvcnm-content-stamp \
+	tvcnm-ballast-stamp \
+	tvcnm-directory-stamp
+
+endif
