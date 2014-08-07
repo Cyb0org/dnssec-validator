@@ -204,12 +204,19 @@ AS_CASE([$host_os],
   [linux*], [OS_TARGET=Linux],
   [freebsd*], [OS_TARGET=FreeBSD],
   [dragonfly*], [OS_TARGET=DragonFly],
-  [mingw*], [OS_TARGET=WINNT])
+  [mingw*], [OS_TARGET=WINNT]
+)
 AC_SUBST(OS_TARGET)
 
 # Set Mozilla XPCOM_ABI
 # https://developer.mozilla.org/en-US/docs/XPCOM_ABI
-AC_SUBST(XPCOM_ABI, [$host_cpu])
+#AS_CASE([$host_cpu],
+#)
+AS_CASE([$host_cpu],
+  [i[[3456]]86], [XPCOM_ABI=x86],
+  [amd64|x86_64], [XPCOM_ABI=x86_64],
+)
+AC_SUBST(XPCOM_ABI)
 
 
 AC_CONFIG_FILES([ \
