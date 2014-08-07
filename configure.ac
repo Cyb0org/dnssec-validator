@@ -89,6 +89,7 @@ CA_STORE=-1
 AC_ARG_WITH([ca-store],
   [AS_HELP_STRING(["--with-ca-store=[auto|directory|none|nss|nss_cert8|osx|win]"], [Which CA store to use, auto is default.])],
   [
+    # Values are defined in dane-plug.c .
     AS_CASE([$withval],
       [auto], [CA_STORE=-1],
       [none], [CA_STORE=0],
@@ -111,7 +112,7 @@ AS_IF([test $CA_STORE = -1], [
 AS_IF([test $CA_STORE = -1], [
   AC_MSG_ERROR(["CA store could not be determined."])
 ])
-AC_DEFINE([CA_STORE], [$CA_STORE], [Select which CA store to use])
+AC_DEFINE_UNQUOTED([CA_STORE], [${CA_STORE}], [Select which CA store to use])
 AM_CONDITIONAL([CA_STORE_DIR], [test $CA_STORE = 1])
 AM_CONDITIONAL([CA_STORE_NSS], [test $CA_STORE = 2])
 AM_CONDITIONAL([CA_STORE_OSX], [test $CA_STORE = 4])
