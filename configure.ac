@@ -26,7 +26,7 @@ PASSED_LDFLAGS="$LDFLAGS"
 CORE_CPPFLAGS="$PASSED_CPPFLAGS"
 CORE_CFLAGS="$PASSED_CFLAGS -Wall -Wextra -pedantic -std=c99 -Wno-variadic-macros"
 CORE_CXXFLAGS="$PASSED_CXXFLAGS -Wall -Wextra -pedantic -std=c++98 -Wno-variadic-macros -fno-exceptions -fno-rtti -fno-common"
-CORE_LDFLAGS="$PASSED_LDFLAGS $ADDED_LDFLAGS"
+CORE_LDFLAGS="$PASSED_LDFLAGS"
 CORE_LIBS=""
 
 # Debugging
@@ -68,14 +68,117 @@ AC_PROG_LIBTOOL
 LT_INIT
 
 
+# Set Mozilla OS_TARGET
+# https://developer.mozilla.org/en-US/docs/OS_TARGET
+AS_CASE([$host_os],
+  [darwin*], [OS_NAME=Darwin],
+  [linux*], [OS_TARGET=Linux],
+  [freebsd*], [OS_TARGET=FreeBSD],
+  [dragonfly*], [OS_TARGET=DragonFly],
+  [mingw*], [OS_TARGET=WINNT]
+)
+AC_SUBST(OS_TARGET)
+
+# Set Mozilla XPCOM_ABI
+# https://developer.mozilla.org/en-US/docs/XPCOM_ABI
+#AS_CASE([$host_cpu],
+#)
+AS_CASE([$host_cpu],
+  [i[[3456]]86], [XPCOM_ABI=x86],
+  [amd64|x86_64], [XPCOM_ABI=x86_64],
+)
+AC_SUBST(XPCOM_ABI)
+
+
+###############################################################################
+# Force bits.
+###############################################################################
+
+BITS=auto
+AC_ARG_WITH([force-bits],
+  [AS_HELP_STRING(["--with-force-bits=[auto|32|64|fat]"], [Architecture bits, auto is default.])],
+  [
+    # Values are defined in dane-plug.c .
+    AS_CASE([$withval],
+      [auto], [BITS=auto],
+      [32], [BITS=32],
+      [64], [BITS=64],
+      [fat], [BITS=fat],
+      [*], [AC_MSG_WARN(["Unknown force bits option '$withval'."])]
+    )
+  ])
+AS_IF([test "x${BITS}" = "xauto"], [
+  AS_CASE([$XPCOM_ABI],
+    [x86], [BITS=32],
+    [x86_64], [BITS=64],
+    [*], [AC_MSG_ERROR([Could not determine architecture.])]
+  )
+])
+
+
 ###############################################################################
 # Core dependencies.
 ###############################################################################
 
-AC_SEARCH_LIBS([SSL_get_peer_cert_chain], [ssl], [], [AC_MSG_ERROR([libssl not found])]) # Only DANE.
-AC_SEARCH_LIBS([OpenSSL_add_all_digests], [crypto], [], [AC_MSG_ERROR([libcrypto not found])])
-AC_SEARCH_LIBS([ldns_dname_new_frm_str], [ldns], [], [AC_MSG_ERROR([libldns not found])])
-AC_SEARCH_LIBS([ub_ctx_create], [unbound], [], [AC_MSG_ERROR([libunbound not found])])
+# Check whether to build and statically link core library dependencies -- default off.
+AC_MSG_CHECKING([Whether to build core with statically linked libraries.])
+AC_ARG_ENABLE([static-linking],
+  AS_HELP_STRING([--enable-static-linking], [Enable statically linked core.]))
+AS_IF([test "x$enable_static_linking" = "xyes"], [
+  AC_MSG_RESULT([yes])
+
+  # FIXME: get the CONFIGURE_FLAGS from the environment.
+
+  LIB_CFLAGS=""
+  OPENSSL_ARGS=""
+  CONFIGURE_ARGS=""
+  AS_CASE([$host_os],
+    [darwin*], [
+      AS_CASE([${BITS}],
+        [32], [],
+        [64], [],
+        [fat], []
+      )
+    ],
+    [linux*], [
+      AS_CASE([${BITS}],
+        [32], [
+          CONFIGURE_ARGS="--target=i686-pc-linux-gnu"
+          LIB_CFLAGS="-fPIC -m32"
+          OPENSSL_ARGS="linux-elf ${LIB_CFLAGS}"
+        ],
+        [64], [
+          CONFIGURE_ARGS="--target=x86_64-pc-linux-gnu"
+          LIB_CFLAGS="-fPIC -m64"
+          OPENSSL_ARGS="linux-x86_64 ${LIB_CFLAGS}"
+        ]
+      )
+    ],
+    [freebsd*], [
+    ],
+    [mingw*], [
+    ]
+  )
+  AC_SUBST(LIB_CFLAGS)
+  AC_SUBST(OPENSSL_ARGS)
+  AC_SUBST(CONFIGURE_ARGS)
+
+  ], [
+  AC_MSG_RESULT([no])
+
+  CPPFLAGS="$PASSED_CPPFLAGS"
+  CFLAGS="$PASSED_CFLAGS"; CXXFLAGS="$PASSED_CXXFLAGS";
+  LDFLAGS="$PASSED_LDFLAGS"; LIBS=""
+  AC_SEARCH_LIBS([SSL_get_peer_cert_chain], [ssl], [], [AC_MSG_ERROR([libssl not found])]) # Only DANE.
+  AC_SEARCH_LIBS([OpenSSL_add_all_digests], [crypto], [], [AC_MSG_ERROR([libcrypto not found])])
+  AC_SEARCH_LIBS([ldns_dname_new_frm_str], [ldns], [], [AC_MSG_ERROR([libldns not found])])
+  AC_SEARCH_LIBS([ub_ctx_create], [unbound], [], [AC_MSG_ERROR([libunbound not found])])
+
+  CORE_LDFLAGS+=" $LDFLAGS"
+  CORE_LIBS+=" $LIBS"
+  ])
+dnl conditional compilation
+AM_CONDITIONAL([STATIC_CORE], [test "x$enable_static_linking" = "xyes"])
 
 #AC_SEARCH_LIBS([pthread_create], [pthread], [], [AC_MSG_ERROR([pthreads not found])])
 
@@ -195,33 +298,18 @@ AC_CHECK_FUNCS([ \
   strstr \
 ])
 
+# No parameters shall be passed via default variables.
+#CPPFLAGS=""
+#CFLAGS=""; CXXFLAGS="";
+LDFLAGS=""; LIBS=""
+
 # Default preprocessor flags.
 #AC_SUBST([AM_CPPFLAGS], [""])
 
 
-# Set Mozilla OS_TARGET
-# https://developer.mozilla.org/en-US/docs/OS_TARGET
-AS_CASE([$host_os],
-  [linux*], [OS_TARGET=Linux],
-  [freebsd*], [OS_TARGET=FreeBSD],
-  [dragonfly*], [OS_TARGET=DragonFly],
-  [mingw*], [OS_TARGET=WINNT]
-)
-AC_SUBST(OS_TARGET)
-
-# Set Mozilla XPCOM_ABI
-# https://developer.mozilla.org/en-US/docs/XPCOM_ABI
-#AS_CASE([$host_cpu],
-#)
-AS_CASE([$host_cpu],
-  [i[[3456]]86], [XPCOM_ABI=x86],
-  [amd64|x86_64], [XPCOM_ABI=x86_64],
-)
-AC_SUBST(XPCOM_ABI)
-
-
 AC_CONFIG_FILES([ \
   Makefile \
+  static-libs/Makefile \
   core_js-ctypes/Makefile \
   core_native-msg/Makefile \
   add-on/Makefile \

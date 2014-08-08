@@ -40,7 +40,19 @@ libDNSSECcore_la_CFLAGS = \
 libDNSSECcore_la_LDFLAGS = \
 	-avoid-version \
 	-export-symbols-regex "^(dnssec)_" \
-	-rpath "/usr/lib"
+	-rpath "/usr/lib" \
+	@CORE_LDFLAGS@
+
+libDNSSECcore_la_LIBADD = \
+	@CORE_LIBS@
+
+if STATIC_CORE
+libDNSSECcore_la_LIBADD += \
+	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libcrypto.a \
+	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libssl.a \
+	$(abs_top_builddir)/static-libs/libs-built/ldns/lib/libldns.a \
+	$(abs_top_builddir)/static-libs/libs-built/unbound/lib/libunbound.a
+endif
 
 
 libDANEcore_la_SOURCES = \
@@ -78,7 +90,19 @@ libDANEcore_la_CFLAGS = \
 libDANEcore_la_LDFLAGS = \
 	-avoid-version \
 	-export-symbols-regex "^(dane)_" \
-	-rpath "/usr/lib"
+	-rpath "/usr/lib" \
+	@CORE_LDFLAGS@
+
+libDANEcore_la_LIBADD = \
+	@CORE_LIBS@
+
+if STATIC_CORE
+libDANEcore_la_LIBADD += \
+	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libcrypto.a \
+	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libssl.a \
+	$(abs_top_builddir)/static-libs/libs-built/ldns/lib/libldns.a \
+	$(abs_top_builddir)/static-libs/libs-built/unbound/lib/libunbound.a
+endif
 
 
 libDNSSECcore.so: libDNSSECcore.la

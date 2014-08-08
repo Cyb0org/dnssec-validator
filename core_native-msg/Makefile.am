@@ -20,6 +20,17 @@ dnssec_plug_CFLAGS = \
 dnssec_plug_LDADD = \
 	$(top_srcdir)/core_js-ctypes/.libs/libDNSSECcore.a
 
+dnssec_plug_LDADD += \
+	@CORE_LIBS@
+
+if STATIC_CORE
+dnssec_plug_LDADD += \
+	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libcrypto.a \
+	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libssl.a \
+	$(abs_top_builddir)/static-libs/libs-built/ldns/lib/libldns.a \
+	$(abs_top_builddir)/static-libs/libs-built/unbound/lib/libunbound.a
+endif
+
 
 dane_plug_SOURCES = \
 	$(top_srcdir)/plugin-source/TLSAValidatorPlugin/dane-main.c
@@ -29,3 +40,14 @@ dane_plug_CFLAGS = \
 
 dane_plug_LDADD = \
 	$(top_srcdir)/core_js-ctypes/.libs/libDANEcore.a
+
+dane_plug_LDADD += \
+	@CORE_LIBS@
+
+if STATIC_CORE
+dane_plug_LDADD += \
+	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libcrypto.a \
+	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libssl.a \
+	$(abs_top_builddir)/static-libs/libs-built/ldns/lib/libldns.a \
+	$(abs_top_builddir)/static-libs/libs-built/unbound/lib/libunbound.a
+endif

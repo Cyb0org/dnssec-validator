@@ -4,6 +4,7 @@
 #ACLOCAL_AMFLAGS = -I $(top_srcdir)/m4
 
 SUBDIRS = \
+	static-libs \
 	core_js-ctypes \
 	core_native-msg \
 	add-on
