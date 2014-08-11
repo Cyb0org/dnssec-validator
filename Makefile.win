@@ -49,6 +49,7 @@ X86_MINGW_CC = i586-mingw32msvc-gcc
 X86_MINGW_STRIP = i586-mingw32msvc-strip
 
 LIBS_BUILT_DIR = libs-win
+VERSION = $(shell cat Version)
 
 COMMON_INCLUDE = $(PLUGIN_SRC_DIR)/common
 OPENSSL_INCLUDE = $(PLUGIN_ROOT)/$(LIBS_BUILT_DIR)/openssl/include
@@ -62,6 +63,7 @@ CPPFLAGS = $(DEFINE_FLAGS)
 INCLUDE_FLAGS = -I$(PLUGIN_ROOT)/$(LIBS_BUILT_DIR)/windows/x86 -I$(LDNS_INCLUDE) -I$(UNBOUND_INCLUDE) -I$(OPENSSL_INCLUDE) -I$(COMMON_INCLUDE)
 CFLAGS = -Wall -fPIC $(INCLUDE_FLAGS)
 LDFLAGS = -shared
+CPPFLAGS += -DVERSION="\"$(VERSION)\""
 
 .PHONY: all clean sys_windiows_all xpi_x86
 
