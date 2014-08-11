@@ -26,7 +26,7 @@ document.write("</head>");
 document.write("<body>");
 document.write("<script>");
 
-var ADDON_VERSION = "2.1.2";
+var ADDON_VERSION = "version-of-add-on";
 // debug pretext
 var DNSSEC = "DNSSEC: ";
 // enable print debug info into debug console

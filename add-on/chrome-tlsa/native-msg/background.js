@@ -26,7 +26,7 @@ document.write("</head>");
 document.write("<body>");
 document.write("<script>");
 
-var ADDON_VERSION = "2.1.2";
+var ADDON_VERSION = "version-of-add-on";
 // expirate time of one item in the cache [seconds]
 var CACHE_ITEM_EXPIR = 600;
 // debug pretext

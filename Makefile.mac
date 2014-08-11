@@ -143,13 +143,17 @@ xpi_x86:
 	cp -r $(ADDON_PATH_CR_DNSSEC)/native-msg/* $(ADDON_PATH_CR_DNSSEC)/native-msg_built
 	cp -r $(ADDON_PATH_CR_DNSSEC)/common/* $(ADDON_PATH_CR_DNSSEC)/native-msg_built
 	rm $(ADDON_PATH_CR_DNSSEC)/native-msg_built/manifest.json.template
+	rm $(ADDON_PATH_CR_DNSSEC)/native-msg_built/background.js
 	rm -rf $(ADDON_PATH_CR_TLSA)/native-msg_built
 	mkdir $(ADDON_PATH_CR_TLSA)/native-msg_built
 	cp -r $(ADDON_PATH_CR_TLSA)/native-msg/* $(ADDON_PATH_CR_TLSA)/native-msg_built
 	cp -r $(ADDON_PATH_CR_TLSA)/common/* $(ADDON_PATH_CR_TLSA)/native-msg_built
 	rm $(ADDON_PATH_CR_TLSA)/native-msg_built/manifest.json.template
+	rm $(ADDON_PATH_CR_TLSA)/native-msg_built/background.js
 	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_DNSSEC)/native-msg/manifest.json.template > $(ADDON_PATH_CR_DNSSEC)/native-msg_built/manifest.json
 	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/native-msg/manifest.json.template > $(ADDON_PATH_CR_TLSA)/native-msg_built/manifest.json
+	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_DNSSEC)/native-msg/background.js > $(ADDON_PATH_CR_DNSSEC)/native-msg_built/background.js
+	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/native-msg/background.js > $(ADDON_PATH_CR_TLSA)/native-msg_built/background.js
 	echo '# TODO -- Compile and bundle core application?'
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
@@ -254,13 +258,17 @@ xpi_x86_64:
 	cp -r $(ADDON_PATH_CR_DNSSEC)/native-msg/* $(ADDON_PATH_CR_DNSSEC)/native-msg_built
 	cp -r $(ADDON_PATH_CR_DNSSEC)/common/* $(ADDON_PATH_CR_DNSSEC)/native-msg_built
 	rm $(ADDON_PATH_CR_DNSSEC)/native-msg_built/manifest.json.template
+	rm $(ADDON_PATH_CR_DNSSEC)/native-msg_built/background.js
 	rm -rf $(ADDON_PATH_CR_TLSA)/native-msg_built
 	mkdir $(ADDON_PATH_CR_TLSA)/native-msg_built
 	cp -r $(ADDON_PATH_CR_TLSA)/native-msg/* $(ADDON_PATH_CR_TLSA)/native-msg_built
 	cp -r $(ADDON_PATH_CR_TLSA)/common/* $(ADDON_PATH_CR_TLSA)/native-msg_built
 	rm $(ADDON_PATH_CR_TLSA)/native-msg_built/manifest.json.template
+	rm $(ADDON_PATH_CR_TLSA)/native-msg_built/background.js
 	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_DNSSEC)/native-msg/manifest.json.template > $(ADDON_PATH_CR_DNSSEC)/native-msg_built/manifest.json
 	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/native-msg/manifest.json.template > $(ADDON_PATH_CR_TLSA)/native-msg_built/manifest.json
+	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_DNSSEC)/native-msg/background.js > $(ADDON_PATH_CR_DNSSEC)/native-msg_built/background.js
+	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/native-msg/background.js > $(ADDON_PATH_CR_TLSA)/native-msg_built/background.js
 	echo '# TODO -- Compile and bundle core application?'
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
