@@ -1,136 +1,251 @@
 {
-	"preftitle": {
-		"message": "Ustawienia Walidatora TLSA"
-		},
-	"prefresolver": {
-		"message": "Resolver(y) DNS wykorzystywane do rozwiązywania nazw:"
-		},
-	"groupboxfilter": {
-		"message": "Lista wykluczonych domen i TLD"
-		},
-	"usefilter": {
-		"message": "Wyklucz wymienione domeny"
-		},
-	"blockhttpstext": {
-		"message": "Przerwij połączenie HTTPS, jeśli walidacja TLSA nie powiedzie się"
-		},
-	"AllHttpstext": {
-		"message": "Włącz walidację TLSA dla wszystkich żądań HTTPS na stronie"
-		},
-	"filtertext": {
-		"message": "Lista domen i/lub TLD (oddzielonych przecinkami)"
-		},
-	"clearcachetext": {
-		"message": "Czyść pamięć podręczną przeglądarki podczas startu"
-		},
-	"debugoutputtext": {
-		"message": "Wyświetlaj informacje diagnostyczne w konsoli narzędzi dla programistów"
-		},
-	"legend": {
-		"message": "Ustawienia resolvera"
-		},
-	"resolver0": {
-		"message": "Użyj ustawień systemowych"
-		},
-	"resolver1": {
-		"message": "Publiczne resolvery CZ.NIC"
-		},
-	"resolver2": {
-		"message": "Publiczne resolvery OARC"
-		},
-	"resolver3": {
-		"message": " Własne: "
-		},
-	"resolver4": {
-		"message": "Bez resolvera"
-		},
-	"savebutton": {
-		"message": "Zapisz ustawienia"
-		},
-	"testbutton": {
-		"message": "Przetestuj obecne ustawienia"
-		},
-	"cancelbutton": {
-		"message": "Anuluj"
-		},
-	"messageok": {
-		"message": "Sukces - obecne ustawienia umożliwiają walidację DNSSEC."
-		},
-	"messagebogus": {
-		"message": "Niepowodzenie - fałszywa odpowiedź DNSSEC, walidacja DNSSEC niemożliwa przy obecnych ustawieniach."
-		},
-	"messageerror": {
-		"message": "Niepowodzenie - brak odpowiedzi DNS, możliwy błąd sieci lub niewłaściwy adres serwera."
-		},
-	"messageip": {
-		"message": "Błąd - podany ciąg znaków nie zawiera poprawnego adresu IP."
-		},
-	"moreinfo": {
-		"message": "Więcej informacji"
-		},
-	"homepage": {
-		"message": "Przejdź do strony domowej wtyczki, aby uzyskać więcej informacji"
-		},
-	"dnssecwrongres": {
-		"message": "Resolver nie obsługuje DNSSEC"
-		},
-         "dnssecWrongResolver": {
-		"message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla nazwy domenowej nie mogła zostać zweryfikowana przy użyciu protokołu DANE."
-		},
-         "dnssecWrongResolverInfo": {
-		"message": "Obecny serwer DNS lub resolver nie obsługuje technologii DNSSEC. Proszę zmienić ustawienia walidatora (opcja \"Bez resolvera\")."
-		},
-"dm_errgen": { "message":  "Certyfikat zdalnego serwera dla tej nazwy domenowej nie mógł zostać zweryfikowany przy użyciu protokołu DANE, ponieważ wystąpił błąd w rdzeniu walidatora TLSA."},
-"dm_errgenInfo": { "message":  "Proszę zrestartować przeglądarkę..."},
-"dm_rfesolverfailed": { "message":  "Certyfikat zdalnego serwera dla tej nazwy domenowej nie mógł zostać zweryfikowany przy użyciu protokołu DANE, ponieważ wystąpił błąd podczas pobierania rekordu TLSA dla tej nazwy domenowej."},
-"dm_rfesolverfailedInfo": { "message":  "Wystąpił błąd poczas pobierania rekordu TLSA dla tej nazwy domenowej. Może to być spowodowane utratą łączności z serwerem DNS lub tym, że podany przez użytkownika adres IP walidującego resolvera nie jest adresem walidującego resolvera."},
-"dm_nohttps": { "message":  "Ze zdalnym serwerem nie nawiązano żadnego połączenia zabezpieczonego przez HTTPS, więc nie można przeprowadzić walidacji rekordu TLSA."},
-"dm_nohttpsInfo": { "message":  "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla nazwy domenowej nie mogła zostać zweryfikowana przy użyciu protokołu DANE, ponieważ połączenie ze zdalnym serwerem nie jest realizowane przy użyciu protokołu HTTPS."},
-"dm_notlsarecord": { "message":  "Certyfikat zdalnego serwera dla tej nazwy domenowej nie mógł zostać zweryfikowany przy użyciu protokołu DANE, ponieważ dla tej nazwy domenowej nie istnieje rekord TLSA."},
-"dm_notlsarecordInfo": { "message":  "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla nazwy domenowej nie mogła zostać zweryfikowana przy użyciu protokołu DANE, ponieważ dla tej nazwy domenowej nie istnieje rekord TLSA."},
-"dm_dnssecunsecured": { "message":  "Ta nazwa domenowa nie jest zabezpieczona przez DNSSEC, więc nie jest możliwe zweryfikowanie poprawności certyfikatu zdalnego serwera przy użyciu protokołu DANE."},
-"dm_dnssecunsecuredInfo": { "message":  "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie mogła zostać zweryfikowana przy użyciu protokołu DANE, ponieważ ta nazwa domenowa nie jest zabezpieczona przez DNSSEC."},
-"dm_dnssecbogus": { "message":  "Ta nazwa domenowa jest zabezpieczona przez DNSSEC, ale wykryto niewłaściwy podpis nazwy domenowej, więc nie jest możliwe zweryfikowanie poprawności certyfikatu serwera przy użyciu protokołu DANE."},
-"dm_dnssecbogusInfo": { "message":  "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie może zostać zweryfikowana przy użyciu protokołu DANE, ponieważ wykryto niewłaściwy podpis DNSSEC nazwy domenowej."},
-"dm_certchain": { "message":  "Certyfikat zdalnego serwera dla tej nazwy domenowej nie może zostać zweryfikowany przy użyciu protokołu DANE, ponieważ nie udało się pobrać łańcucha certyfikatów."},
-"dm_certchainInfo": { "message":  "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie może zostać zweryfikowana przy użyciu protokołu DANE, ponieważ nie udało się pobrać łańcucha certyfkatów."},
-"dm_certerr": { "message":  "Certyfikat zdalnego serwera dla tej nazwy domenowej nie mógł zostać zweryfikowany przy użyciu protokołu DANE, ponieważ nie udało się pobrać certyfikatu serwera."},
-"dm_certerrInfo": { "message":  "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie może zostać zweryfikowana przy użyciu protokołu DANE, ponieważ nie udało się pobrać certyfikatu serwera."},
-"dm_tlsapramwrong": { "message":  "Certyfikat zdalnego serwera dla tej nazwy domenowej nie mógł zostać zweryfikowany przy użyciu protokołu DANE, ponieważ rekord TLSA zawiera niewłaściwe wartości parametrów."},
-"dm_tlsapramwrongInfo": { "message":  "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie mogła zostać zweryfikowana przy użyciu protokołu DANE, ponieważ rekord TLSA zawiera niewłaściwe wartości parametrów. Może to oznaczać sfałszowanie informacji TLSA."},
-"dm_vf": { "message":  "Weryfikacja certyfikatu zdalnego serwera dla tej nazwy domenowej przy użyciu protokołu DANE nie powiodła się. Certyfikat nie odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."},
-"dm_vfInfo": { "message":  "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie została zweryfikowana przy użyciu protokołu DANE. Certyfikat nie odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."},
-"dm_vf0": { "message":  "Weryfikacja certyfikatu zdalnego serwera dla tej nazwy domenowej przy użyciu protokołu DANE nie powiodła się. Certyfikat nie odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."},
-"dm_vf0Info": { "message":  "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie została zweryfikowana przy użyciu protokołu DANE. Certyfikat nie odpowiada certyfikatowi CA w rekordzie TLSA (typu 0). Rekord TLSA jest zabezpieczony przez technologię DNSSEC."},
-"dm_vf1": { "message":  "Weryfikacja certyfikatu zdalnego serwera dla tej nazwy domenowej przy użyciu protokołu DANE nie powiodła się. Certyfikat nie odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."},
-"dm_vf1Info": { "message":  "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie została zweryfikowana przy użyciu protokołu DANE. Certyfikat nie odpowiada certyfikatowi EE w rekordzie TLSA (typu 1). Rekord TLSA jest zabezpieczony przez technologię DNSSEC."},
-"dm_vf2": { "message":  "Weryfikacja certyfikatu zdalnego serwera dla tej nazwy domenowej przy użyciu protokołu DANE nie powiodła się. Certyfikat nie odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."},
-"dm_vf2Info": { "message":  "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie została zweryfikowana przy użyciu protokołu DANE. Certyfikat nie odpowiada certyfikatowi CA w rekordzie TLSA (typu 2). Rekord TLSA jest zabezpieczony przez technologię DNSSEC."},
-"dm_vf3": { "message":  "Weryfikacja certyfikatu zdalnego serwera dla tej nazwy domenowej przy użyciu protokołu DANE nie powiodła się. Certyfikat nie odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."},
-"dm_vf3Info": { "message":  "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie została zweryfikowana przy użyciu protokołu DANE. Certyfikat nie odpowiada certyfikatowi EE w rekordzie TLSA (typu 3). Rekord TLSA jest zabezpieczony przez technologię DNSSEC."},
-"dm_vs0": { "message":  "Certyfikat zdalnego serwera dla tej nazwy domenowej został zweryfikowany przy użyciu protokołu DANE. Certyfikat odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."},
-"dm_vs0Info": { "message":  "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej została zweryfikowana przy użyciu protokołu DANE. Certyfikat przeszedł walidację PKIX i odpowiada certyfikatowi CA w rekordzie TLSA (typu 0). Rekord TLSA jest zabezpieczony przez technologię DNSSEC."},
-"dm_vs1": { "message":  "Certyfikat zdalnego serwera dla tej nazwy domenowej został zweryfikowany przy użyciu protokołu DANE. Certyfikat odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."},
-"dm_vs1Info": { "message":  "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej została zweryfikowana przy użyciu protokołu DANE. Certyfikat przeszedł walidację PKIX i odpowiada certyfikatowi EE w rekordzie TLSA (typu 1). Rekord TLSA jest zabezpieczony przez technologię DNSSEC."},
-"dm_vs2": { "message":  "Certyfikat zdalnego serwera dla tej nazwy domenowej został zweryfikowany przy użyciu protokołu DANE. Certyfikat odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."},
-"dm_vs2Info": { "message":  "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej została zweryfikowana przy użyciu protokołu DANE. Certyfikat przeszedł walidację PKIX i odpowiada certyfikatowi CA w rekordzie TLSA (typu 2). Rekord TLSA jest zabezpieczony przez technologię DNSSEC."},
-"dm_vs3": { "message":  "Certyfikat zdalnego serwera dla tej nazwy domenowej został zweryfikowany przy użyciu protokołu DANE. Certyfikat odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."},
-"dm_vs3Info": { "message":  "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej została zweryfikowana przy użyciu protokołu DANE. Certyfikat przeszedł walidację PKIX i odpowiada certyfikatowi EE w rekordzie TLSA (typu 3). Rekord TLSA jest zabezpieczony przez technologię DNSSEC."},
-"dm_validationoff": { "message":  "Certyfikat zdalnego serwera dla tej nazwy domenowej nie został zweryfikowany przy użyciu protokołu DANE. Walidacja TLSA nie została przeprowadzona, ponieważ ta domena jest wymieniona na liście wykluczonych domen."},
-"dm_validationoffInfo": { "message":  "Poprawność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie została zweryfikowana przy użyciu protokołu DANE. Walidacja TLSA nie została przeprowadzona, ponieważ ta domena jest wymieniona na liście wykluczonych domen."},
-           "dmvsTooltip": {"message": "Certyfikat odpowiada TLSA"},
-           "dmvfTooltip": {"message": "Walidacja TLSA nie powiodła się"},
-           "dmaTooltip": {"message": "Walidacja TLSA w toku"},
-           "dmfsTooltip": {"message": "Stan TLSA nieznany"},
-           "dmwpTooltip": {"message": "Niewłaściwe parametry TLSA"},
-           "dmntrTooltip": {"message": "Nieobecny rekord TLSA"},
-           "dmnccTooltip": {"message": "Nie udało się pobrać certyfikatu"},
-           "dmoffTooltip": {"message": "Walidacja TLSA wyłączona"},
-           "dmnohttpsTooltip": {"message": "Brak połączeń HTTPS"},
-           "dmdnssecbogusTooltip": {"message": "Fałszywy podpis DNSSEC"},
-           "dmdnssecunsecTooltip": {"message": "Niezabezpieczona przez DNSSEC"},
-           "dmerrorgenericTooltip": {"message": "Błąd walidatora"},
-	   "warningpre" : {"message": "Ostrzeżenie od walidatora TLSA!\n\nCertyfikat zdalnego serwera dla https://"},
-	   "warningpost" : {"message": "\nnie odpowiada rekordowi TLSA. Może to być spowodowane:\n- próbą nawiązania połączenia z niezaufanym zdalnym serwerem\n- niewłaściwym lub niezaufanym certyfikatem serwera\n\nCzy chcesz zakończyć połączenie z tym serwerem?"}
+    "preftitle": {
+        "message": "Ustawienia Walidatora TLSA"
+    },
+    "prefresolver": {
+        "message": "Resolver(y) DNS wykorzystywane do rozwiązywania nazw:"
+    },
+    "groupboxfilter": {
+        "message": "Lista wykluczonych domen i TLD"
+    },
+    "usefilter": {
+        "message": "Wyklucz wymienione domeny"
+    },
+    "blockhttpstext": {
+        "message": "Przerwij połączenie HTTPS, jeśli walidacja TLSA nie powiedzie się"
+    },
+    "AllHttpstext": {
+        "message": "Włącz walidację TLSA dla wszystkich żądań HTTPS na stronie"
+    },
+    "filtertext": {
+        "message": "Lista domen i/lub TLD (oddzielonych przecinkami)"
+    },
+    "clearcachetext": {
+        "message": "Czyść pamięć podręczną przeglądarki podczas startu"
+    },
+    "debugoutputtext": {
+        "message": "Wyświetlaj informacje diagnostyczne w konsoli narzędzi dla programistów"
+    },
+    "legend": {
+        "message": "Ustawienia resolvera"
+    },
+    "resolver0": {
+        "message": "Użyj ustawień systemowych"
+    },
+    "resolver1": {
+        "message": "Publiczne resolvery CZ.NIC"
+    },
+    "resolver2": {
+        "message": "Publiczne resolvery OARC"
+    },
+    "resolver3": {
+        "message": " Własne: "
+    },
+    "resolver4": {
+        "message": "Bez resolvera"
+    },
+    "savebutton": {
+        "message": "Zapisz ustawienia"
+    },
+    "testbutton": {
+        "message": "Przetestuj obecne ustawienia"
+    },
+    "cancelbutton": {
+        "message": "Anuluj"
+    },
+    "messageok": {
+        "message": "Sukces - obecne ustawienia umożliwiają walidację DNSSEC."
+    },
+    "messagebogus": {
+        "message": "Niepowodzenie - fałszywa odpowiedź DNSSEC, walidacja DNSSEC niemożliwa przy obecnych ustawieniach."
+    },
+    "messageerror": {
+        "message": "Niepowodzenie - brak odpowiedzi DNS, możliwy błąd sieci lub niewłaściwy adres serwera."
+    },
+    "messageip": {
+        "message": "Błąd - podany ciąg znaków nie zawiera poprawnego adresu IP."
+    },
+    "moreinfo": {
+        "message": "Więcej informacji"
+    },
+    "homepage": {
+        "message": "Przejdź do strony domowej wtyczki, aby uzyskać więcej informacji"
+    },
+    "dnssecwrongres": {
+        "message": "Resolver nie obsługuje DNSSEC"
+    },
+    "dnssecWrongResolver": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla nazwy domenowej nie mogła zostać zweryfikowana przy użyciu protokołu DANE."
+    },
+    "dnssecWrongResolverInfo": {
+        "message": "Obecny serwer DNS lub resolver nie obsługuje technologii DNSSEC. Proszę zmienić ustawienia walidatora (opcja \"Bez resolvera\")."
+    },
+    "dm_errgen": {
+        "message": "Certyfikat zdalnego serwera dla tej nazwy domenowej nie mógł zostać zweryfikowany przy użyciu protokołu DANE, ponieważ wystąpił błąd w rdzeniu walidatora TLSA."
+    },
+    "dm_errgenInfo": {
+        "message": "Proszę zrestartować przeglądarkę..."
+    },
+    "dm_rfesolverfailed": {
+        "message": "Certyfikat zdalnego serwera dla tej nazwy domenowej nie mógł zostać zweryfikowany przy użyciu protokołu DANE, ponieważ wystąpił błąd podczas pobierania rekordu TLSA dla tej nazwy domenowej."
+    },
+    "dm_rfesolverfailedInfo": {
+        "message": "Wystąpił błąd poczas pobierania rekordu TLSA dla tej nazwy domenowej. Może to być spowodowane utratą łączności z serwerem DNS lub tym, że podany przez użytkownika adres IP walidującego resolvera nie jest adresem walidującego resolvera."
+    },
+    "dm_nohttps": {
+        "message": "Ze zdalnym serwerem nie nawiązano żadnego połączenia zabezpieczonego przez HTTPS, więc nie można przeprowadzić walidacji rekordu TLSA."
+    },
+    "dm_nohttpsInfo": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla nazwy domenowej nie mogła zostać zweryfikowana przy użyciu protokołu DANE, ponieważ połączenie ze zdalnym serwerem nie jest realizowane przy użyciu protokołu HTTPS."
+    },
+    "dm_notlsarecord": {
+        "message": "Certyfikat zdalnego serwera dla tej nazwy domenowej nie mógł zostać zweryfikowany przy użyciu protokołu DANE, ponieważ dla tej nazwy domenowej nie istnieje rekord TLSA."
+    },
+    "dm_notlsarecordInfo": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla nazwy domenowej nie mogła zostać zweryfikowana przy użyciu protokołu DANE, ponieważ dla tej nazwy domenowej nie istnieje rekord TLSA."
+    },
+    "dm_dnssecunsecured": {
+        "message": "Ta nazwa domenowa nie jest zabezpieczona przez DNSSEC, więc nie jest możliwe zweryfikowanie poprawności certyfikatu zdalnego serwera przy użyciu protokołu DANE."
+    },
+    "dm_dnssecunsecuredInfo": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie mogła zostać zweryfikowana przy użyciu protokołu DANE, ponieważ ta nazwa domenowa nie jest zabezpieczona przez DNSSEC."
+    },
+    "dm_dnssecbogus": {
+        "message": "Ta nazwa domenowa jest zabezpieczona przez DNSSEC, ale wykryto niewłaściwy podpis nazwy domenowej, więc nie jest możliwe zweryfikowanie poprawności certyfikatu serwera przy użyciu protokołu DANE."
+    },
+    "dm_dnssecbogusInfo": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie może zostać zweryfikowana przy użyciu protokołu DANE, ponieważ wykryto niewłaściwy podpis DNSSEC nazwy domenowej."
+    },
+    "dm_certchain": {
+        "message": "Certyfikat zdalnego serwera dla tej nazwy domenowej nie może zostać zweryfikowany przy użyciu protokołu DANE, ponieważ nie udało się pobrać łańcucha certyfikatów."
+    },
+    "dm_certchainInfo": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie może zostać zweryfikowana przy użyciu protokołu DANE, ponieważ nie udało się pobrać łańcucha certyfkatów."
+    },
+    "dm_certerr": {
+        "message": "Certyfikat zdalnego serwera dla tej nazwy domenowej nie mógł zostać zweryfikowany przy użyciu protokołu DANE, ponieważ nie udało się pobrać certyfikatu serwera."
+    },
+    "dm_certerrInfo": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie może zostać zweryfikowana przy użyciu protokołu DANE, ponieważ nie udało się pobrać certyfikatu serwera."
+    },
+    "dm_tlsapramwrong": {
+        "message": "Certyfikat zdalnego serwera dla tej nazwy domenowej nie mógł zostać zweryfikowany przy użyciu protokołu DANE, ponieważ rekord TLSA zawiera niewłaściwe wartości parametrów."
+    },
+    "dm_tlsapramwrongInfo": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie mogła zostać zweryfikowana przy użyciu protokołu DANE, ponieważ rekord TLSA zawiera niewłaściwe wartości parametrów. Może to oznaczać sfałszowanie informacji TLSA."
+    },
+    "dm_vf": {
+        "message": "Weryfikacja certyfikatu zdalnego serwera dla tej nazwy domenowej przy użyciu protokołu DANE nie powiodła się. Certyfikat nie odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vfInfo": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie została zweryfikowana przy użyciu protokołu DANE. Certyfikat nie odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vf0": {
+        "message": "Weryfikacja certyfikatu zdalnego serwera dla tej nazwy domenowej przy użyciu protokołu DANE nie powiodła się. Certyfikat nie odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vf0Info": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie została zweryfikowana przy użyciu protokołu DANE. Certyfikat nie odpowiada certyfikatowi CA w rekordzie TLSA (typu 0). Rekord TLSA jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vf1": {
+        "message": "Weryfikacja certyfikatu zdalnego serwera dla tej nazwy domenowej przy użyciu protokołu DANE nie powiodła się. Certyfikat nie odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vf1Info": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie została zweryfikowana przy użyciu protokołu DANE. Certyfikat nie odpowiada certyfikatowi EE w rekordzie TLSA (typu 1). Rekord TLSA jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vf2": {
+        "message": "Weryfikacja certyfikatu zdalnego serwera dla tej nazwy domenowej przy użyciu protokołu DANE nie powiodła się. Certyfikat nie odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vf2Info": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie została zweryfikowana przy użyciu protokołu DANE. Certyfikat nie odpowiada certyfikatowi CA w rekordzie TLSA (typu 2). Rekord TLSA jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vf3": {
+        "message": "Weryfikacja certyfikatu zdalnego serwera dla tej nazwy domenowej przy użyciu protokołu DANE nie powiodła się. Certyfikat nie odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vf3Info": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie została zweryfikowana przy użyciu protokołu DANE. Certyfikat nie odpowiada certyfikatowi EE w rekordzie TLSA (typu 3). Rekord TLSA jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vs0": {
+        "message": "Certyfikat zdalnego serwera dla tej nazwy domenowej został zweryfikowany przy użyciu protokołu DANE. Certyfikat odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vs0Info": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej została zweryfikowana przy użyciu protokołu DANE. Certyfikat przeszedł walidację PKIX i odpowiada certyfikatowi CA w rekordzie TLSA (typu 0). Rekord TLSA jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vs1": {
+        "message": "Certyfikat zdalnego serwera dla tej nazwy domenowej został zweryfikowany przy użyciu protokołu DANE. Certyfikat odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vs1Info": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej została zweryfikowana przy użyciu protokołu DANE. Certyfikat przeszedł walidację PKIX i odpowiada certyfikatowi EE w rekordzie TLSA (typu 1). Rekord TLSA jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vs2": {
+        "message": "Certyfikat zdalnego serwera dla tej nazwy domenowej został zweryfikowany przy użyciu protokołu DANE. Certyfikat odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vs2Info": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej została zweryfikowana przy użyciu protokołu DANE. Certyfikat przeszedł walidację PKIX i odpowiada certyfikatowi CA w rekordzie TLSA (typu 2). Rekord TLSA jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vs3": {
+        "message": "Certyfikat zdalnego serwera dla tej nazwy domenowej został zweryfikowany przy użyciu protokołu DANE. Certyfikat odpowiada rekordowi TLSA, który jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_vs3Info": {
+        "message": "Autentyczność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej została zweryfikowana przy użyciu protokołu DANE. Certyfikat przeszedł walidację PKIX i odpowiada certyfikatowi EE w rekordzie TLSA (typu 3). Rekord TLSA jest zabezpieczony przez technologię DNSSEC."
+    },
+    "dm_validationoff": {
+        "message": "Certyfikat zdalnego serwera dla tej nazwy domenowej nie został zweryfikowany przy użyciu protokołu DANE. Walidacja TLSA nie została przeprowadzona, ponieważ ta domena jest wymieniona na liście wykluczonych domen."
+    },
+    "dm_validationoffInfo": {
+        "message": "Poprawność certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej nie została zweryfikowana przy użyciu protokołu DANE. Walidacja TLSA nie została przeprowadzona, ponieważ ta domena jest wymieniona na liście wykluczonych domen."
+    },
+    "dm_errorversion": {
+        "message": "Certyfikat zdalnego serwera dla tej nazwy domenowej nie mógł zostać zweryfikowany przy użyciu protokołu DANE, ponieważ wystąpił błąd w rdzeniu walidatora TLSA."
+    },
+    "dm_errorversionInfo": {
+        "message": "The add-on version and version of validation core are different, which may lead to undesirable behavior of the validator. Please, reinstall add-on and restart your browser."
+    },
+    "addonversiontext": {
+        "message": "Dodatek wersji:"
+    },
+    "coreversiontext": {
+        "message": "Rdzeń wersji wtyczki:"
+    },
+    "dmvsTooltip": {
+        "message": "Certyfikat odpowiada TLSA"
+    },
+    "dmvfTooltip": {
+        "message": "Walidacja TLSA nie powiodła się"
+    },
+    "dmaTooltip": {
+        "message": "Walidacja TLSA w toku"
+    },
+    "dmfsTooltip": {
+        "message": "Stan TLSA nieznany"
+    },
+    "dmwpTooltip": {
+        "message": "Niewłaściwe parametry TLSA"
+    },
+    "dmntrTooltip": {
+        "message": "Nieobecny rekord TLSA"
+    },
+    "dmnccTooltip": {
+        "message": "Nie udało się pobrać certyfikatu"
+    },
+    "dmoffTooltip": {
+        "message": "Walidacja TLSA wyłączona"
+    },
+    "dmnohttpsTooltip": {
+        "message": "Brak połączeń HTTPS"
+    },
+    "dmdnssecbogusTooltip": {
+        "message": "Fałszywy podpis DNSSEC"
+    },
+    "dmdnssecunsecTooltip": {
+        "message": "Niezabezpieczona przez DNSSEC"
+    },
+    "dmerrorgenericTooltip": {
+        "message": "Błąd walidatora"
+    },
+    "warningpre": {
+        "message": "Ostrzeżenie od walidatora TLSA!\n\nCertyfikat zdalnego serwera dla https://"
+    },
+    "warningpost": {
+        "message": "\nnie odpowiada rekordowi TLSA. Może to być spowodowane:\n- próbą nawiązania połączenia z niezaufanym zdalnym serwerem\n- niewłaściwym lub niezaufanym certyfikatem serwera\n\nCzy chcesz zakończyć połączenie z tym serwerem?"
+    }
 }
-

@@ -305,8 +305,9 @@ function setModeTLSA(newMode, tabId, domain, status, scheme) {
             
         // This is extremely fucking annoying, but chrome.extension.getViews() won't work
         // unless popup is opened, so we set the validation result like GET parameters.
-        chrome.pageAction.setPopup({tabId: tabId, popup: "popuptlsa.html?" + domain + "," 
-		+ newMode + "," + icon + "," + title + "," + domainpre});
+        chrome.pageAction.setPopup({tabId: tabId, popup: "popuptlsa.html?"
+	+ domain + "," + newMode + "," + icon + "," + title + "," + domainpre
+	+ ",n/a,n/a"});
 	    	   
      }; // setMode
 

@@ -26,6 +26,7 @@ document.write("</head>");
 document.write("<body>");
 document.write("<script>");
 
+var ADDON_VERSION = "2.1.2";
 // expirate time of one item in the cache [seconds]
 var CACHE_ITEM_EXPIR = 600;
 // debug pretext
@@ -140,6 +141,7 @@ var tlsaExtNPAPIConst = {
 
 var tlsaModes = {
   // DANE/TLSA MODE
+	DANE_MODE_VERSION_ERROR			: "dm_errorversion",
 	DANE_MODE_INACTION 			: "dm_inaction",
 	DANE_MODE_VALIDATION_OFF   		: "dm_validationoff",
 	DANE_MODE_ACTION   			: "dm_action",
@@ -195,17 +197,11 @@ function StringToBool(value) {
 //****************************************************************
 // this function sets TLSA mode. status ICON and popup text
 //****************************************************************
-function setModeTLSA(newMode, tabId, domain, status, scheme) {
+function setModeTLSA(newMode, tabId, domain, scheme, addonv, pluginv) {
 	var icon;
 	var title;
 	var domainpre;
 	var tooltiptitle;
-
-	if (debuglogout) {
-		console.log(DANE + "Set mode: " + newMode + "; TabId: " + tabId
-		+ "; Domain: " + domain + "; Status: " + status + "; Scheme: "
-		+ scheme);
-	}
 
 	switch (newMode) {
             /* green icon */
@@ -302,6 +298,14 @@ function setModeTLSA(newMode, tabId, domain, status, scheme) {
 		tooltiptitle = chrome.i18n.getMessage(
 			this.tlsaModes.DANE_TOOLTIP_WRONG_RES);
               break;
+		// version mismasch
+		case this.tlsaModes.DANE_MODE_VERSION_ERROR:
+		icon = "tlsa_error.png";
+		title = this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC;
+		domainpre = scheme;
+		tooltiptitle = chrome.i18n.getMessage(
+			this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC);
+		break;
             default:
 		icon = "tlsa_error.png";
 		title = this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC;
@@ -310,13 +314,18 @@ function setModeTLSA(newMode, tabId, domain, status, scheme) {
 			this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC);
      	}
 
+	if (debuglogout) {
+		console.log(DANE + "Set mode: " + newMode + "; TabId: " + tabId
+		+ "; Domain: " + domain + "; Scheme: " + scheme);
+	}
+
         chrome.pageAction.setTitle({tabId: tabId, title: tooltiptitle});
         chrome.pageAction.setIcon({path: icon, tabId: tabId});
         chrome.pageAction.show(tabId);
 
         chrome.pageAction.setPopup({tabId: tabId, popup: "popuptlsa.html?"
-	+ domain + "," + newMode + "," + icon + "," + title + "," + domainpre});
-
+	+ domain + "," + newMode + "," + icon + "," + title + "," + domainpre
+	+ "," + addonv + "," + pluginv});
 }
 
 
@@ -352,83 +361,83 @@ function setTLSASecurityState(tabId, domain, status, scheme) {
      	switch (status) {
 	    case c.DANE_VALID_TYPE0:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE0,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_VALID_TYPE1:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE1,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_VALID_TYPE2:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE1,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_VALID_TYPE3:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE3,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_DNSSEC_SECURED:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_DNSSEC_SECURED,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_OFF:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_OFF,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_ERROR_RESOLVER:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_RESOLVER_FAILED,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_NO_HTTPS:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_NO_HTTPS,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_NO_TLSA:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_NO_TLSA_RECORD,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_DNSSEC_UNSECURED:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_DNSSEC_UNSECURED,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_DNSSEC_BOGUS:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_DNSSEC_BOGUS,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_NO_CERT_CHAIN:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_NO_CERT_CHAIN,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_CERT_ERROR:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_CERT_ERROR,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_TLSA_PARAM_ERR:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_TLSA_PARAM_WRONG,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_INVALID_TYPE0:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE0,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_INVALID_TYPE1:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE1,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_INVALID_TYPE2:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE2,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_INVALID_TYPE3:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE3,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    case c.DANE_RESOLVER_NO_DNSSEC:
 		this.setModeTLSA(this.tlsaModes.DANE_MODE_WRONG_RES,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
     		break;
 	    default:
 	        this.setModeTLSA(this.tlsaModes.DANE_MODE_ERROR_GENERIC,
-			tabId, domain, status, scheme);
+			tabId, domain, scheme, "n/a", "n/a");
                 break;
 	    }
 }
@@ -903,6 +912,7 @@ function handle_native_response(resp) {
 		var status = retval[4];
 		var tabId = retval[5];
 		var scheme = retval[6];
+		var coreversion = retval[7];
 		status = parseInt(status, 10);
 		tabId = parseInt(tabId, 10);
 
@@ -910,6 +920,19 @@ function handle_native_response(resp) {
 			console.log(DANE
 			+ "-------- ASYNC RESOLVING DONE -----------------");
 		}
+
+		// version compatability test
+		if (ADDON_VERSION != coreversion) {
+			if (debuglogout) {
+				console.log(DANE
+				    + "Version mismatch!\n" +
+				    + "        Core is version " + coreversion + "\n" +
+				    + "        Add-on is version " + ADDON_VERSION);
+			}
+			setModeTLSA(this.tlsaModes.DANE_MODE_VERSION_ERROR,
+			    tabId, domain, scheme, ADDON_VERSION, coreversion);
+			return;
+		} 
 
 		setReceivedData(tabId, domain, port, protocol, status, scheme);
 		break;

@@ -41,16 +41,18 @@ function NextLevel(overall){
 	pic.href = "detail-tlsa.html?"+overall;
 }
 
-	resultRegexp = /\?([^?,]+),([^,]+),([^,]+),([^,]+),([^,]+)$/;
+	resultRegexp = /\?([^?,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)$/;
 	matches = resultRegexp.exec(document.location.href);
 	domain = matches[1];
 	statusString = matches[2];
 	icon = matches[3];
 	status = matches[4];
-	domainpre = matches[5];
+	domainpre = matches[5];	
+	addonv = matches[6];
+	pluginv = matches[7];
 	var domaintmp = domain;
 	domaintmp=domainpre+"://"+domain;
-	overall = domain + "," + statusString + "," + icon + "," + status + "," + domainpre + "," + statusString + "Info";      
+	overall = domain + "," + statusString + "," + icon + "," + status + "," + domainpre + "," + statusString + "Info" + "," + addonv + "," + pluginv;      
 	addText("domain-name-title-tlsa", domaintmp);
 	addText("long-text-tlsa", chrome.i18n.getMessage(statusString));
 	addText("tlsa-title", chrome.i18n.getMessage(status));

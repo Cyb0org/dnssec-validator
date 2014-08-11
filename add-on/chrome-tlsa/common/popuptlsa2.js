@@ -35,7 +35,7 @@ function TLSAicon2(icon){
 }
 
 	// this code set text into popup window
-        resultRegexp = /\?([^?,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)$/;
+        resultRegexp = /\?([^?,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)$/;
         matches = resultRegexp.exec(document.location.href);
 	domain = matches[1];
         statusString = matches[2];
@@ -43,11 +43,30 @@ function TLSAicon2(icon){
 	status = matches[4];
 	domainpre = matches[5];
 	info = matches[6];
+	addonv = matches[7];
+	pluginv = matches[8];
 	var domaintmp = domain;
 	domaintmp=domainpre+"://"+domain;   
 	addText("domain-name-title-tlsa", domaintmp);
 	addText("long-text-tlsa", chrome.i18n.getMessage(statusString));
 	addText("tlsa-title", chrome.i18n.getMessage(status));
 	addText("tlsa-info", chrome.i18n.getMessage(info));
-	addText("homepage", chrome.i18n.getMessage("homepage"));	
+	addText("homepage", chrome.i18n.getMessage("homepage"));
+
+	if (statusString == "dm_errorversion") {
+		document.getElementById("ver-info-ah").style.display = 'block';
+		document.getElementById("ver-info-a").style.display = 'block';
+	  	document.getElementById("ver-info-ph").style.display = 'block';
+		document.getElementById("ver-info-p").style.display = 'block';
+	    	addText("ver-info-a", decodeURIComponent(addonv));
+		addText("ver-info-p", decodeURIComponent(pluginv));
+		addText("ver-info-ah", chrome.i18n.getMessage("addonversiontext"));
+		addText("ver-info-ph", chrome.i18n.getMessage("coreversiontext"));
+	} else {
+		document.getElementById("ver-info-ah").style.display = 'none';
+		document.getElementById("ver-info-a").style.display = 'none';
+		document.getElementById("ver-info-ph").style.display = 'none';
+		document.getElementById("ver-info-p").style.display = 'none';
+	}  
+
 	TLSAicon2(icon);
