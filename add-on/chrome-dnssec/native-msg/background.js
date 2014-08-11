@@ -693,7 +693,7 @@ function handle_native_response(resp) {
 		}
 
 		// version compatability test
-		if (ADDON_VERSION != version) {
+		if (ADDON_VERSION != coreversion) {
 			if (debuglogout) {
 				console.log(DNSSEC
 				    + "Version mismatch!\n" +
