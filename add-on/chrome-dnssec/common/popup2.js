@@ -62,8 +62,19 @@ function DNSSECicon2(icon){
 		addText("ip-info-v", decodeURIComponent(ipvalidator));
 		addText("ip-info-bh", chrome.i18n.getMessage("ipbrowsertext"));
 		addText("ip-info-vh", chrome.i18n.getMessage("ipvalidatortext"));
-  	}
-	else {
+  	} else if (statusString == "dnssecErrorVersion") {
+		document.getElementById("ip-info-b").style.display = 'block';
+		document.getElementById("ip-info-v").style.display = 'block';
+	  	document.getElementById("ip-info-bh").style.display = 'block';
+		document.getElementById("ip-info-vh").style.display = 'block';
+		// in this mode, ipbrowser and ipvalidator variables content the 
+		// version strings
+		// ipbrowser == add-on version, ipvalidator == plugin version
+	    	addText("ip-info-b", decodeURIComponent(ipbrowser));
+		addText("ip-info-v", decodeURIComponent(ipvalidator));
+		addText("ip-info-bh", chrome.i18n.getMessage("addonversiontext"));
+		addText("ip-info-vh", chrome.i18n.getMessage("coreversiontext"));
+	} else {
 		document.getElementById("ip-info-b").style.display = 'none';
 		document.getElementById("ip-info-v").style.display = 'none';
 		document.getElementById("ip-info-bh").style.display = 'none';

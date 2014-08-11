@@ -26,7 +26,7 @@ document.write("</head>");
 document.write("<body>");
 document.write("<script>");
 
-
+var ADDON_VERSION = "2.1.2";
 // debug pretext
 var DNSSEC = "DNSSEC: ";
 // enable print debug info into debug console
@@ -61,49 +61,40 @@ var dnssecExtNPAPIConst = {
 	DNSSEC_FLAG_RESOLVIPV6		: 8, /* use IPv6, AAAA for validation */
 };
 
+// DNSSEC Modes (address bar icon, tooltip and popup)
 var dnssecModes = {
-	DNSSEC_MODE_UNBOUND_NO_DATA			: "unboundnodata",
-	DNSSEC_MODE_UNBOUND_NO_DATA_INFO		: "unboundnodataInfo",
-	// DNSSEC Validation OFF
-	DNSSEC_MODE_OFF					: "dnsseOff",
-	DNSSEC_MODE_OFF_INFO               		: "dnsseOffInfo",
-	// Wrong resovler for DNSSEC
-	DNSSEC_MODE_WRONG_RES				: "dnssecWrongResolver",
-	DNSSEC_MODE_WRONG_RES_INFO			: "dnssecWrongResolverInfo",
+	// Error or unknown state occured
+	DNSSEC_MODE_ERROR 	 			: "0dnssecError",
 	// No DNSSEC signature
 	DNSSEC_MODE_DOMAIN_UNSECURED                    : "1unsecuredDomain",
-	DNSSEC_MODE_DOMAIN_UNSECURED_INFO               : "1unsecuredDomainInfo",
 	// Domain and also connection are secured
 	DNSSEC_MODE_CONNECTION_DOMAIN_SECURED           : "2securedConnectionDomain",
-	DNSSEC_MODE_CONNECTION_DOMAIN_SECURED_INFO      : "2securedConnectionDomainInfo",
 	// Domain and also connection are secured but browser's IP address is invalid
 	DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED : "3securedConnectionDomainInvIPaddr",
-	DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED_INFO : "3securedConnectionDomainInvIPaddrInfo",
 	// Domain is secured, but it has an invalid signature
 	DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID            : "4invalidDomainSignature",
-	DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID_INFO       : "4invalidDomainSignatureInfo",
 	// No NSEC/NSEC3 for non-existent domain name
 	DNSSEC_MODE_NODOMAIN_UNSECURED                  : "5unsecuredNoDomain",
-	DNSSEC_MODE_NODOMAIN_UNSECURED_INFO             : "5unsecuredNoDomainInfo",
 	// Connection is secured, but domain name does not exist
 	DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED         : "6securedConnectionNoDomain",
-	DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED_INFO    : "6securedConnectionNoDomainInfo",
 	// Non-existent domain is secured, but it has an invalid signature
 	DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID          : "7invalidNoDomainSignature",
-	DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID_INFO     : "7invalidNoDomainSignatureInfo",
 	// Connection is secured, but domain name does not exist, ip wrong
-	DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID_BAD_IP          : "8securedConnectionNoDomainIPaddr",
-	DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID_BAD_IP_INFO     : "8securedConnectionNoDomainIPaddrInfo",
+	DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID_BAD_IP	: "8securedConnectionNoDomainIPaddr",
+	// Diferent version of Add-on and plugin core 
+	DNSSEC_MODE_VERSION_ERROR			: "dnssecErrorVersion",
 	// Getting security status
 	DNSSEC_MODE_ACTION     			  	: "actionDnssec",
 	// Inaction status
 	DNSSEC_MODE_INACTION   			  	: "inactionDnssec",
-	// Error or unknown state occured
-	DNSSEC_MODE_ERROR 	 			: "0dnssecError",
-	DNSSEC_MODE_ERROR_INFO 			  	: "0dnssecErrorInfo",
-	// Error or unknown state occured
+	// Error of plugin core
 	DNSSEC_MODE_GENERIC_ERROR			: "dnssecgenericError",
-	DNSSEC_MODE_GENERIC_ERROR_INFO 			: "dnssecgenericErrorInfo",
+	// Unbound has not data
+	DNSSEC_MODE_UNBOUND_NO_DATA			: "unboundnodata",
+	// DNSSEC Validation OFF
+	DNSSEC_MODE_OFF					: "dnsseOff",
+	// Wrong resovler for DNSSEC
+	DNSSEC_MODE_WRONG_RES				: "dnssecWrongResolver",
 
 	// Tooltips states
 	DNSSEC_TOOLTIP_SECURED	: "dnssecok",
@@ -115,6 +106,7 @@ var dnssecModes = {
 	DNSSEC_TOOLTIP_DNSSEC_OFF: "validatoroff",
 };
 
+
 //****************************************************************
 // text bool value from LocalStorage to bool
 //****************************************************************
@@ -125,10 +117,11 @@ function StringToBool(value) {
 	else return false;
 }
 
+
 //****************************************************************
-// this function sets DNSSEC mode. status ICON and popup text
+// this function sets DNSSEC mode, ICON and popup text
 //****************************************************************
-function setModeDNSSEC(newMode, tabId, domain, status, addr, ipval) {
+function setModeDNSSEC(newMode, tabId, domain, addr, ipval) {
 	var icon;
 	var title;
 	var domainpre;
@@ -228,6 +221,13 @@ function setModeDNSSEC(newMode, tabId, domain, status, addr, ipval) {
 		domainpre = "domain";
 		tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_ERROR);
 		break;
+	// version mismasch
+	case this.dnssecModes.DNSSEC_MODE_VERSION_ERROR:
+		icon = "dnssec_error.png";
+		title = this.dnssecModes.DNSSEC_TOOLTIP_ERROR;
+		domainpre = "domain";
+		tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_ERROR);
+		break;
 	// Generic error -1
 	default:
 		icon = "dnssec_error.png";
@@ -235,7 +235,7 @@ function setModeDNSSEC(newMode, tabId, domain, status, addr, ipval) {
 		domainpre = "domain";
 		tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_ERROR);
 		break;
-	} // switch
+	}
 
 	chrome.pageAction.setTitle({tabId: tabId, title: tooltiptitle});
 	chrome.pageAction.setIcon({path: icon, tabId: tabId});
@@ -243,7 +243,7 @@ function setModeDNSSEC(newMode, tabId, domain, status, addr, ipval) {
 
 	if (debuglogout) {
 		console.log(DNSSEC + "Set mode: " + newMode + "; TabId: " + tabId
-			+ "; Doamin: " + domain + "; Status: " + status);
+			+ "; Doamin: " + domain + ";");
 	}
 
 	// This is extremely fucking annoying, but chrome.extension.getViews() won't work
@@ -251,7 +251,8 @@ function setModeDNSSEC(newMode, tabId, domain, status, addr, ipval) {
 	chrome.pageAction.setPopup({tabId: tabId, popup: "popup.html?" + domain
 		+ "," + newMode + "," + icon + "," + title + "," + domainpre
 		+ "," + addr + "," + ipval});
-}; // setMode
+}
+
 
 //****************************************************************
 // get information about custom resolver
@@ -271,7 +272,8 @@ function getResolver() {
 		}
 	}
 	return resolver;
-}; // getResolver
+}
+
 
 //****************************************************************
 // SET DNSSEC status
@@ -283,58 +285,59 @@ function setDNSSECSecurityState(tabId, domain, status, addr, ipval) {
 	switch (status) {
 	case c.DNSSEC_COT_DOMAIN_SECURED:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_SECURED,
-					tabId, domain, status, addr, ipval);
+					tabId, domain, addr, ipval);
 		break;
 	case c.DNSSEC_COT_DOMAIN_SECURED_BAD_IP:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_CONNECTION_DOMAIN_INVIPADDR_SECURED,
-					tabId, domain, status, addr, ipval);
+					tabId, domain, addr, ipval);
 		break;
 	case c.DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_VALID_BAD_IP,
-					tabId, domain, status, addr, ipval);
+					tabId, domain, addr, ipval);
 		break;
 	case c.DNSSEC_NXDOMAIN_SIGNATURE_VALID:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_CONNECTION_NODOMAIN_SECURED,
-					tabId, domain, status, addr, ipval);
+					tabId, domain, addr, ipval);
 		break;
 	case c.DNSSEC_COT_DOMAIN_BOGUS:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_DOMAIN_SIGNATURE_INVALID,
-					tabId, domain, status, addr, ipval);
+					tabId, domain, addr, ipval);
 		break;
 	case c.DNSSEC_NXDOMAIN_SIGNATURE_INVALID:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_NODOMAIN_SIGNATURE_INVALID,
-					tabId, domain, status, addr, ipval);
+					tabId, domain, addr, ipval);
 		break;
 	case c.DNSSEC_DOMAIN_UNSECURED:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_DOMAIN_UNSECURED,
-					tabId, domain, status, addr, ipval);
+					tabId, domain, addr, ipval);
 		break;
 	case c.DNSSEC_NXDOMAIN_UNSECURED:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_NODOMAIN_UNSECURED,
-					tabId, domain, status, addr, ipval);
+					tabId, domain,  addr, ipval);
 		break;
 	case c.DNSSEC_OFF:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_OFF,
-					tabId, domain, status, addr, ipval);
+					tabId, domain, addr, ipval);
 		break;
 	case c.DNSSEC_RESOLVER_NO_DNSSEC:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_WRONG_RES,
-					tabId, domain, status, addr, ipval);
+					tabId, domain, addr, ipval);
 		break;
 	case c.DNSSEC_ERROR_RESOLVER:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_ERROR,
-					tabId, domain, status, addr, ipval);
+					tabId, domain, addr, ipval);
 		break;
 	case c.DNSSEC_UNBOUND_NO_DATA:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_UNBOUND_NO_DATA,
-					tabId, domain, status, addr, ipval);
+					tabId, domain, addr, ipval);
 		break;
 	default:
 		this.setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_GENERIC_ERROR,
-					tabId, domain, status, addr, ipval);
+					tabId, domain, addr, ipval);
 		break;
 	}
-};
+}
+
 
 //****************************************************************
 // Called when the DNSSEC status is retriving
@@ -423,7 +426,7 @@ function dnssecvalidate(domain, tabId, tab) {
 		setDNSSECSecurityState(tabId, domain,
 					c.DNSSEC_ERROR_GENERIC, addr, "n/a");
 	}
-};
+}
 
 
 //*****************************************************
@@ -456,7 +459,7 @@ function ExcludeDomainList(domain) {
 		}
 	}
 	return result;
-};
+}
 
 
 //******************************************************************
@@ -512,7 +515,7 @@ function checkValidatedData(tabId, domain, status, ipval, addr) {
 		setDNSSECSecurityState(tabId, domain, status, addr, ipval);
 	}
 
-};
+}
 
 
 //****************************************************************
@@ -546,7 +549,8 @@ function setValidatedData(tabId, domain, status, ipval, addr) {
 		setDNSSECSecurityState(tabId, domain,
 				c.DNSSEC_RESOLVER_NO_DNSSEC, addr, ipval);
 	}
-};
+}
+
 
 //****************************************************************
 // Called when the url of a tab changes.
@@ -652,7 +656,7 @@ function onUrlChange(tabId, changeInfo, tab) {
 		var status = c.DNSSEC_OFF;
 		setDNSSECSecurityState(tabId, domain, status, "n/a", "n/a");
 	}
-};
+}
 
 
 //****************************************************************
@@ -666,7 +670,6 @@ function handle_native_response(resp) {
 
 	case "initialiseRet":
 		initplugin = true;
-
 		if (debuglogout) {
 			console.log(DNSSEC
 			    + "Load DNSSEC native messaging core");
@@ -680,6 +683,7 @@ function handle_native_response(resp) {
 		var ip = retval[3];
 		var addr = retval[4];
 		var tabId = retval[5];
+		var coreversion = retval[6];
 		status = parseInt(status, 10);
 		tabId = parseInt(tabId, 10);
 
@@ -687,6 +691,19 @@ function handle_native_response(resp) {
 			console.log(DNSSEC
 			+ "-------- ASYNC RESOLVING DONE -----------------");
 		}
+
+		// version compatability test
+		if (ADDON_VERSION != version) {
+			if (debuglogout) {
+				console.log(DNSSEC
+				    + "Version mismatch!\n" +
+				    + "        Core is version " + coreversion + "\n" +
+				    + "        Add-on is version " + ADDON_VERSION);
+			}
+			setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_VERSION_ERROR,
+			    tabId, dn, ADDON_VERSION, coreversion);
+			return;
+		} 
 
 		checkValidatedData(tabId, dn, status, ip, addr);
 		break;
