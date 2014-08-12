@@ -1,0 +1,42 @@
+HKCR
+{
+	DNSSECToolBar.DNSSECToolBarBand.1 = s 'DNSSECToolBarBand'
+	{
+		CLSID = s '{669695BC-A811-4A9D-8CDF-BA8C795F261C}'
+	}
+	DNSSECToolBar.DNSSECToolBarBand = s 'DNSSECToolBarBand'
+	{
+		CLSID = s '{669695BC-A811-4A9D-8CDF-BA8C795F261C}'
+		CurVer = s 'DNSSECToolBar.DNSSECToolBarBand.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {669695BC-A811-4A9D-8CDF-BA8C795F261C} = s 'DNSSEC/TLSA Validator for IE'
+		{
+			ProgID = s 'DNSSECToolBar.DNSSECToolBarBand.1'
+			VersionIndependentProgID = s 'DNSSECToolBar.DNSSECToolBarBand'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			'TypeLib' = s '{37686C62-D497-42E3-BAAB-78D89A74E151}'
+		}
+	}
+}
+
+HKLM
+{
+	NoRemove Software
+	{
+		NoRemove Microsoft
+		{
+			NoRemove 'Internet Explorer'
+			{
+				NoRemove Toolbar
+				{
+					val '{669695BC-A811-4A9D-8CDF-BA8C795F261C}' = s 'DNSSEC/TLSA Validator for IE'
+				}
+			}
+		}
+	}
+}

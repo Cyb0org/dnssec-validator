@@ -1,0 +1,1 @@
+regsvr32 ie-dnssec-tlsa-validator.dll

@@ -1,0 +1,1339 @@
+/* ***** BEGIN LICENSE BLOCK *****
+Copyright 2012 CZ.NIC, z.s.p.o.
+
+Authors: Martin Straka <martin.straka@nic.cz>
+
+This file is part of DNSSEC/TLSA Validator Add-on.
+
+DNSSEC/TLSA Validator Add-on is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+DNSSEC/TLSA Validator Add-on is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+DNSSEC/TLSA Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
+
+Some parts of these codes are based on the DNSSECVerify4IENav project
+<http://cs.mty.itesm.mx/dnssecmx>, which is distributed under the Code Project
+Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
+***** END LICENSE BLOCK ***** */
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// INIT Bitmap
+//
+IDI_BMP_INIT0		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT1		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT2		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT3		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT4		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT5		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT6		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT7		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT8		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT9		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT10		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT11		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT12		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT13		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT14		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT15		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT16		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT17		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+IDI_BMP_INIT18		BITMAP  DISCARDABLE     "res\\dnssec_init.bmp"
+/////////////////////////////////////////////////////////////////////////////
+//
+// ICONS
+//
+// DNSSEC ICONS
+IDI_DNSSEC_ICON_INIT		ICON	"res\\dnssec_init.ico"
+IDI_DNSSEC_ICON_ACTION		ICON	"res\\dnssec_action.ico"
+IDI_DNSSEC_ICON_OFF			ICON	"res\\dnssec_off.ico"
+IDI_DNSSEC_ICON_ERROR		ICON	"res\\dnssec_error.ico"
+IDI_DNSSEC_ICON_NO			ICON	"res\\dnssec_no.ico"
+IDI_DNSSEC_ICON_VALID		ICON	"res\\dnssec_valid.ico"
+IDI_DNSSEC_ICON_BOGUS		ICON	"res\\dnssec_bogus.ico"
+IDI_DNSSEC_ICON_IP			ICON	"res\\dnssec_ip.ico"
+IDI_DNSSEC_ICON_ORANGE		ICON	"res\\dnssec_orange.ico"
+// TLSA ICONS
+IDI_TLSA_ICON_INIT			ICON	"res\\tlsa_init.ico"
+IDI_TLSA_ICON_ACTION		ICON	"res\\tlsa_action.ico"
+IDI_TLSA_ICON_OFF			ICON	"res\\tlsa_off.ico"
+IDI_TLSA_ICON_ERROR			ICON	"res\\tlsa_error.ico"
+IDI_TLSA_ICON_NO			ICON	"res\\tlsa_no.ico"
+IDI_TLSA_ICON_NOHTTPS		ICON	"res\\tlsa_nohttps.ico"
+IDI_TLSA_ICON_VALID			ICON	"res\\tlsa_valid.ico"
+IDI_TLSA_ICON_INVALID		ICON	"res\\tlsa_invalid.ico"
+IDI_TLSA_ICON_ORANGE		ICON	"res\\tlsa_orange.ico"
+IDI_TLSA_ICON_NODNSSEC		ICON	"res\\tlsa_nodnssec.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "1 TYPELIB ""DNSSECToolBar.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 2,1
+ PRODUCTVERSION 2,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "CZ.NIC Labs"
+            VALUE "FileDescription", "DNSSEC/TLSA Validator for IE\0"
+            VALUE "FileVersion", "2,1\0"
+            VALUE "InternalName", "IEdnssec.dll\0"
+            VALUE "LegalCopyright", "Copyright 2012\0"
+            VALUE "OriginalFilename", "IEdnssec.dll\0"
+            VALUE "ProductName", "DNSSEC/TLSA Validator for IE\0"
+            VALUE "ProductVersion", "2,1\0"
+            VALUE "OLESelfRegister", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG_MAIN_ABOUT DIALOGEX 0, 0, 250, 110
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "DNSSEC/TLSA Validator for IE"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,180,92,50,14
+	ICON            IDI_DNSSEC_ICON_VALID,IDC_STATIC,20,20,0,0
+	GROUPBOX        "About plugin",IDC_STATIC,10,7,230,80
+    LTEXT           "DNSSEC/TLSA Validator for Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
+    LTEXT           "Add-on plugin for DNSSEC and TLSA checking",IDC_STATIC,50,30,180,10
+    LTEXT           "Support browsers: 32-bit version of IE6 - IE11",IDC_STATIC,50,40,180,10
+    LTEXT           "Version 2.1.1", IDC_STATIC,50,50,180,10
+    LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
+	LTEXT           "2013", IDC_STATIC,50,70,100,10
+	LTEXT           "http://www.dnssec-validator.cz/", IDC_LINK,10,95,120,10
+END
+
+IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 260
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Validator settings"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+	GROUPBOX        "Resolver settings",IDC_STATIC,10,7,190,75
+	LTEXT           "DNS resolver(s) used for name resolution:", IDC_STATIC,15,20,180,10
+	CONTROL			" Use system settings",		  IDC_R1,"Button",BS_AUTORADIOBUTTON | WS_GROUP, 15, 35, 100, 10  
+	//CONTROL			" Public DNSSEC resolvers:", IDC_R2,"Button",BS_AUTORADIOBUTTON, 15, 50, 105, 10    
+	//COMBOBOX        IDC_COMBO, 122, 47, 70, 120 ,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+	CONTROL			" Custom:",					 IDC_R3,"Button",BS_AUTORADIOBUTTON, 15, 50, 40, 10
+	EDITTEXT        IDC_EDIT, 60, 50, 120 ,12 ,ES_AUTOHSCROLL
+	CONTROL			" Without resolver", IDC_R4,"Button",BS_AUTORADIOBUTTON, 15, 65, 180, 10
+	PUSHBUTTON      "Test current settings",IDC_IDDNSSEC,10, 75+10 ,190,14
+	LTEXT           " ", IDC_DNSSEC_R,10,75+10+14+5,180,20
+
+	GROUPBOX        "List of excluded domains and TLDs",IDC_STATIC,10,125,190,78
+	CONTROL			"Exclude domains in list", IDC_DOM_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 15, 125+12, 165 ,10
+	LTEXT           "List of domains or TLDs (separated by commas)", IDC_STATIC,15,125+12+13,182,10
+	EDITTEXT		IDT_DOM_LIST, 15, 160, 180, 36, ES_LEFT | ES_AUTOVSCROLL | ES_MULTILINE | WS_VSCROLL, WS_EX_CLIENTEDGE
+
+	CONTROL			"Display text status besides the key icon", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 125+75+10, 165 ,10
+	CONTROL			"Enable TLSA records validation", IDC_ENABLETLSA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 125+75+10+12, 165 ,10
+
+	DEFPUSHBUTTON   "Save settings",IDOK,60,125+75+30+10,80,14
+    PUSHBUTTON      "Cancel",IDCANCEL,150,125+75+30+10,50,14
+END
+
+IDD_DIALOG_DNSSEC DIALOGEX 0, 0, 220, 75
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP  
+FONT 8, "Arial", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON		"x",IDOK,205,3,10,9
+	ICON			IDI_DNSSEC_ICON_VALID, IDC_ST6, 10,5,20,20
+	CONTROL         "www.nic.cz",IDC_ST1,"Static",SS_LEFT,40,5,160,10
+    CONTROL			"DNSSEC header",IDC_ST2,"Static",SS_LEFT,40,13,160,20
+    CONTROL         "Text1",IDC_ST3,"Static",SS_LEFT,10,30,200,25
+    CONTROL         "",IDC_ST5,"Static",SS_LEFT,10,58,200,65
+	PUSHBUTTON      "More info",IDC_ST4, 10,58,50,12
+	LTEXT           "Go to plugin homepage for additional information", IDC_LINK,10,80,200,10
+	CONTROL         "IP addresses obtained by browser:",IDC_STIPBH,"Static",SS_LEFT,10,100,200,10
+	CONTROL         "",IDC_STIPB,"Static",SS_LEFT,10,110,200,10
+	CONTROL         "IP addresses obtained by add-on:",IDC_STIPVH,"Static",SS_LEFT,10,120,200,10
+    CONTROL         "",IDC_STIPV,"Static",SS_LEFT,10,130,200,18
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_MAIN_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 211
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_MAIN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 211
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_DNSSEC, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 211
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+END
+#endif    // APSTUDIO_INVOKED	
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_DNSSECToolBarBAND         REGISTRY DISCARDABLE    "DNSSECToolBarBand.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+IDR_MENU_POPUP MENU
+BEGIN
+    POPUP "Popup"
+    BEGIN
+		MENUITEM "About...",                    ID_ABOUT
+		MENUITEM "Home page...",             ID_HOME
+		MENUITEM SEPARATOR
+        MENUITEM "Settings...",                  ID_SET
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+
+	// Deafult
+	IDS_PRE_TEXT_ERROR		"Security of the domain name"
+	IDS_PRE_TEXT_DOMAIN		"Domain name"	
+	IDS_PRE_TEXT_NODOMAIN	"Nonexistence of the domain name"
+    
+	// state 0 - GREY ? 
+	IDS_STATE0_TEXT_TOOLTIP "DNSSEC status unknown"
+	IDS_STATE0_TEXT_DOMAIN  "can not be verified by DNSSEC."
+	IDS_STATE0_TEXT_MAIN	"An error occurred while getting the DNSSEC status of this domain name. This may be caused by loss of connection to the DNS server or the user-chosen validating resolver IP address is not an address of a validating resolver."	
+
+	IDS_STATEx4_TEXT_MAIN "An error occurred while getting the DNSSEC status of this domain name. This may be caused by using a proxy server in your network. The validator is in such cases unable to prove the server's IP-address records."
+
+	//state 1 - GREY	
+	IDS_STATE1_TEXT_TOOLTIP "Not secured by DNSSEC"
+	IDS_STATE1_TEXT_DOMAIN  "is not secured by DNSSEC."
+	IDS_STATE1_TEXT_MAIN	"This domain name is not secured by DNSSEC, so it is not possible to verify validity of obtained data and you are not secured against domain name spoofing."
+
+	//state 2 - GREEN
+	IDS_STATE2_TEXT_TOOLTIP "Secured by DNSSEC"
+	IDS_STATE2_TEXT_DOMAIN  "is correctly secured by DNSSEC."
+	IDS_STATE2_TEXT_MAIN	"Information about the IP address of this domain name was validated using DNSSEC. Because this domain name is secured by DNSSEC, you are protected against domain name spoofing."
+
+	//state 3 - RED IP
+	IDS_STATE3_TEXT_TOOLTIP "Secured by DNSSEC"
+	IDS_STATE3_TEXT_DOMAIN  "is correctly secured by DNSSEC but browser's IP address is invalid."
+	IDS_STATE3_TEXT_MAIN	"This domain name is secured by DNSSEC but the IP address which the browser is using differs from the address obtained by the DNSSEC add-on. This may have a legitimate reason but can also point at a DNS spoofing attempt!"
+
+	//state 4 - RED
+	IDS_STATE4_TEXT_TOOLTIP "Bogus DNSSEC signature"
+	IDS_STATE4_TEXT_DOMAIN  "is secured by DNSSEC but invalid domain name signature has been detected!"
+	IDS_STATE4_TEXT_MAIN	"This domain name is secured by DNSSEC but invalid domain name signature has been detected. It could indicate spoofed domain name!"
+
+	//state 5 - GREY
+	IDS_STATE5_TEXT_TOOLTIP "Not secured by DNSSEC"
+	IDS_STATE5_TEXT_DOMAIN  "can not be verified with DNSSEC."
+	IDS_STATE5_TEXT_MAIN	"The parent domain is not secured by DNSSEC, thus it was not possible to verify nonexistence of this domain name."
+
+	//state 6 - GREEN
+	IDS_STATE6_TEXT_TOOLTIP "Secured by DNSSEC"
+	IDS_STATE6_TEXT_DOMAIN  "was validated by DNSSEC."
+	IDS_STATE6_TEXT_MAIN	"The parent domain is secured by DNSSEC, thus it was possible to successfully verify nonexistence of this domain name."
+
+	//state 7 - RED
+	IDS_STATE7_TEXT_TOOLTIP "Bogus DNSSEC signature"
+	IDS_STATE7_TEXT_DOMAIN  "was not correctly validated by DNSSEC because invalid signature has been detected!"
+	IDS_STATE7_TEXT_MAIN	"The parent domain is secured by DNSSEC but the received domain name nonexistence response does not contain a valid signature. This may signalise a domain name spoofing attempt in order to deny the access to the domain."
+
+		//state -1 - WHITE
+	IDS_STATE01_TEXT_TOOLTIP "Not verified by DNSSEC"
+	IDS_STATE01_TEXT_DOMAIN  "was not verified by DNSSEC."
+	IDS_STATE01_TEXT_MAIN	"DNSSEC validation was not performed because this domain or its parent domain is mentioned in the list of excluded domains."
+
+		//state -2 - WHITE
+	IDS_STATE02_TEXT_TOOLTIP "DNSSEC status unknown"
+	IDS_STATE02_TEXT_DOMAIN  "can not be verified by DNSSEC."
+	IDS_STATE02_TEXT_MAIN	"Current DNS server or resolver does not support DNSSEC technology. Please, change the validator settings (choice 'Without resolver')."
+	
+	//state -1
+	IDS_DNSSEC_ERROR_GEN_TOOLTIP "DNSSEC status unknown"
+	IDS_DNSSEC_ERROR_GEN_DOMAIN  "can not be verified by DNSSEC because an error occurred in DNSSEC validator core."
+	IDS_DNSSEC_ERROR_GEN_MAIN	"Please, restart your web-browser..."
+
+		// state 10
+	IDS_DANE_STATE10_LABEL "Certificate corresponds to TLSA"
+	IDS_DANE_STATE10_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE protocol. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
+	IDS_DANE_STATE10_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate passed the PKIX validation and corresponds with the CA certificate in the TLSA record (type 0). TLSA record is secured by DNSSEC technology."
+    // state 11
+	IDS_DANE_STATE11_LABEL "Certificate corresponds to TLSA"
+	IDS_DANE_STATE11_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE protocol. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
+	IDS_DANE_STATE11_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate passed the PKIX validation and corresponds with the EE certificate in the TLSA record (type 1). TLSA record is secured by DNSSEC technology."
+    // state 12
+	IDS_DANE_STATE12_LABEL	"Certificate corresponds to TLSA"
+	IDS_DANE_STATE12_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE protocol. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
+	IDS_DANE_STATE12_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate passed the PKIX validation and corresponds with the CA certificate in the TLSA record (type 2). TLSA record is secured by DNSSEC technology."
+    // state 13
+	IDS_DANE_STATE13_LABEL "Certificate corresponds to TLSA"	
+	IDS_DANE_STATE13_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE protocol. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
+	IDS_DANE_STATE13_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate is corresponding with the EE certificate in the TLSA record (type 3). TLSA record is secured by DNSSEC technology."
+    // state -9	
+	IDS_DANE_STATEx9_LABEL	"Certificate doesn't correspond to TLSA"
+	IDS_DANE_STATEx9_TEXT_MAIN "The DANE protocol verification of remote server's certificate for this domain name failed. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."
+	IDS_DANE_STATEx9_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name was not verified by DANE protocol. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."
+   // state -10
+	IDS_DANE_STATEx10_LABEL	"Certificate doesn't correspond to TLSA"	
+	IDS_DANE_STATEx10_TEXT_MAIN	"The DANE protocol verification of remote server's certificate for this domain name failed. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."
+	IDS_DANE_STATEx10_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name couldn't be verified by DANE protocol. The certificate does not correspond with the CA certificate in the TLSA record (type 0). TLSA record is secured by DNSSEC technology."
+    // state -11
+	IDS_DANE_STATEx11_LABEL "Certificate doesn't correspond to TLSA"		
+	IDS_DANE_STATEx11_TEXT_MAIN "The DANE protocol verification of remote server's certificate for this domain name failed. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."		 
+	IDS_DANE_STATEx11_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name couldn't be verified by DANE protocol. The certificate does not correspond with the EE certificate in the TLSA record (type 1). TLSA record is secured by DNSSEC technology."	
+    // state -12
+	IDS_DANE_STATEx12_LABEL "Certificate doesn't correspond to TLSA"		
+	IDS_DANE_STATEx12_TEXT_MAIN "The DANE protocol verification of remote server's certificate for this domain name failed. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."		 
+	IDS_DANE_STATEx12_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name couldn't be verified by DANE protocol. The certificate does not correspond with the CA certificate in the TLSA record (type 2). TLSA record is secured by DNSSEC technology."	
+    // state -13
+	IDS_DANE_STATEx13_LABEL "Certificate doesn't correspond to TLSA"		
+	IDS_DANE_STATEx13_TEXT_MAIN "The DANE protocol verification of remote server's certificate for this domain name failed. The certificate does not correspond to the TLSA record which is secured by DNSSEC technology."		 
+	IDS_DANE_STATEx13_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name couldn't be verified by DANE protocol. The certificate does not correspond with the EE certificate in the TLSA record (type 3). TLSA record is secured by DNSSEC technology."	
+    // state 1
+	IDS_DANE_STATE1_LABEL "Secured by DNSSEC"
+	IDS_DANE_STATE1_TEXT_MAIN "Secured by DNSSEC."	 
+	IDS_DANE_STATE1_TEXT_ADD "Secured by DNSSEC."	
+    // state 0
+	IDS_DANE_STATE0_LABEL "TLSA validation disabled"	
+	IDS_DANE_STATE0_TEXT_MAIN "The remote server certificate for this domain name was not verified by DANE protocol. The TLSA validation has not been performed because TLSA validation is disabled or this domain is mentioned in the list of excluded domains."	 
+	IDS_DANE_STATE0_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for the domain name was not verified by DANE protocol. The TLSA validation has not been performed because TLSA validation is disabled or this domain name or TLD is mentioned in the list of excluded domains."	
+	// state -2
+	IDS_DANE_STATEx2_LABEL "No HTTPS connection"	
+	IDS_DANE_STATEx2_TEXT_MAIN "No HTTPS secured connection to the remote server was established. Therefore, you can not perform TLSA record validation."	 
+	IDS_DANE_STATEx2_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for the domain name could not be verified by DANE protocol because the connection to the remote server is not realized via HTTPS protocol."	
+	// state -3
+	IDS_DANE_STATEx3_LABEL "TLSA record does not exist"	
+	IDS_DANE_STATEx3_TEXT_MAIN "The remote server certificate for this domain name could not be verified by DANE protocol because there is no TLSA record for this domain name."	 
+	IDS_DANE_STATEx3_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name could not be verified by DANE protocol because there is no TLSA record for this domain name."	
+	// state -4
+	 IDS_DANE_STATEx4_LABEL	"Not secured by DNSSEC"	
+	 IDS_DANE_STATEx4_TEXT_MAIN "This domain name is not secured by DNSSEC, therefore it is not possible to verify the validity of remote server certifcate by DANE protocol."		 
+	 IDS_DANE_STATEx4_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name could not be verified by DANE protocol because this domain name is not secured by DNSSEC."	
+	// state -5
+	 IDS_DANE_STATEx5_LABEL	"Bogus DNSSEC signature"	
+	 IDS_DANE_STATEx5_TEXT_MAIN "This domain name is secured by DNSSEC but an invalid domain name signature has been detected. Therefore, the validation of the server certificate can not be verified by DANE protocol."		 
+	 IDS_DANE_STATEx5_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name can not be verified by DANE protocol because an invalid domain name signature has been detected by DNSSEC."	
+	// state -6
+	 IDS_DANE_STATEx6_LABEL	"Unable to get certificate"	
+	 IDS_DANE_STATEx6_TEXT_MAIN "The remote server certificate for this domain name can not be verified by DANE protocol because the certificate chain could not be obtained."		 
+	 IDS_DANE_STATEx6_TEXT_ADD	"The authenticity of TLS/SSL remote server certificate for the domain name can not be verified by DANE protocol because the certificate chain could not be obtained."
+	// state -7
+	 IDS_DANE_STATEx7_LABEL	"Unable to get certificate"	
+	 IDS_DANE_STATEx7_TEXT_MAIN "The remote server certificate for this domain name could not be verified by DANE protocol because the server certificate could not be obtained."		 
+	 IDS_DANE_STATEx7_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for the domain name can not be verified by DANE protocol because the server certificate could not be obtained."	
+	// state -8
+	 IDS_DANE_STATEx8_LABEL	"Wrong TLSA parameters"	
+	 IDS_DANE_STATEx8_TEXT_MAIN "The remote server certificate for this domain name was not verified by DANE protocol because the TLSA record contains wrong parameter values."  
+	 IDS_DANE_STATEx8_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name could not be verified by DANE protocol because the TLSA record has wrong parameter values. It could indicate spoofing of TLSA information."	
+	// state -1
+	 IDS_DANE_STATEx1_LABEL	"TLSA status unknown"	
+	 IDS_DANE_STATEx1_TEXT_MAIN	"The remote server certificate for this domain name could not be verified by DANE protocol because an error occurred while retrieving the TLSA record for this domain name."	 
+	 IDS_DANE_STATEx1_TEXT_ADD	"An error occurred while retrieving the TLSA record for this domain name. This may be caused by loss of connection to the DNS server or the user-chosen validating resolver IP address is not an address of a validating resolver."
+	// state -99
+	 IDS_DANE_STATEx99_LABEL "TLSA status unknown"	
+	 IDS_DANE_STATEx99_TEXT_MAIN "The remote server certificate for this domain name could not be verified by DANE protocol because actual DNS server or resolver does not support DNSSEC technology."	 
+	 IDS_DANE_STATEx99_TEXT_ADD	 "Current DNS server or resolver does not support DNSSEC technology. Please, change the validator settings (choice Without resolver)."	
+	 // state -1
+	 IDS_DANE_ERROR_GEN_LABEL	"TLSA status unknown"	
+	 IDS_DANE_ERROR_GEN_TEXT_MAIN	"The remote server certificate for this domain name could not be verified by DANE protocol because an error occurred in TLSA validator core."	 
+	 IDS_DANE_ERROR_GEN_TEXT_ADD	"Please, restart your web-browser..."
+
+	IDS_NONE                " "
+    IDS_ADDON_INIT          "Add-on initialized"
+    
+	IDS_DNSSEC_OK			 "Secured by DNSSEC"
+    IDS_DNSSEC_FAIL			 "Not secured by DNSSEC"
+
+	// DNSSEC TEST messages in settings dialog
+	IDS_DNSSECTEST_IP		"Error - string contains no valid IP address."
+	IDS_DNSSECTEST_OK		"Success - current settings allows DNSSEC validation."
+	IDS_DNSSECTEST_BOGUS	"Failure - bogus DNSSEC reply, DNSSEC validation not possible with current settings."
+	IDS_DNSSECTEST_ERROR	"Failure - no DNS reply, possible network error or wrong server address."
+	IDS_DNSSECTEST_RUN      "Testing..."
+
+	END
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_PROJNAME            "DNSSECToolBar"
+    IDS_TOOLBARNAME         " "
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_BUTTON1              "Button 1"
+    ID_BUTTON2		        "Button 2"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+//*************************************************************************
+//*************************************************************************
+//*************************************************************************
+//*************************************************************************
+
+/////////////////////////////////////////////////////////////////////////////
+//CZECH resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CSY)
+#ifdef _WIN32
+LANGUAGE LANG_CZECH, SUBLANG_DEFAULT
+#pragma code_page(1250)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "1 TYPELIB ""DNSSECToolBar.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 2,1
+ PRODUCTVERSION 2,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "CZ.NIC Labs"
+            VALUE "FileDescription", "DNSSEC/TLSA Valid·tor pro IE\0"
+            VALUE "FileVersion", "2.1\0"
+            VALUE "InternalName", "IEdnssec.dll\0"
+            VALUE "LegalCopyright", "Copyright 2012\0"
+            VALUE "OriginalFilename", "IEdnssec.dll\0"
+            VALUE "ProductName", "DNSSEC/TLSA Valid·tor pro IE\0"
+            VALUE "ProductVersion", "2.1\0"
+            VALUE "OLESelfRegister", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_DNSSECToolBarBAND         REGISTRY DISCARDABLE    "DNSSECToolBarBand.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+IDR_MENU_POPUP MENU
+BEGIN
+    POPUP "Popup"
+    BEGIN
+		MENUITEM "O pluginu...",                    ID_ABOUT
+		MENUITEM "Domovsk· str·nka...",             ID_HOME
+		MENUITEM SEPARATOR
+        MENUITEM "NastavenÌ...",					ID_SET
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+
+	// Deafult
+	IDS_PRE_TEXT_ERROR		"ZabezpeËenÌ domÈnovÈho jmÈna"
+	IDS_PRE_TEXT_DOMAIN		"DomÈnovÈ jmÈno"	
+	IDS_PRE_TEXT_NODOMAIN	"Neexistence domÈnovÈho jmÈna"
+    
+	// state 0 - GREY ? 
+	IDS_STATE0_TEXT_TOOLTIP "Stav DNSSEC nezn·m˝"
+	IDS_STATE0_TEXT_DOMAIN  "nelze ovÏ¯it pomocÌ DNSSEC technologie."
+	IDS_STATE0_TEXT_MAIN	"P¯i zjiöùov·nÌ stavu zabezpeËenÌ domÈnovÈho jmÈna technologiÌ DNSSEC doölo k chybÏ. P¯ÌËinou m˘ûe b˝t buÔ v˝padek spojenÌ ke vzd·lenÈmu serveru nebo aktu·lnÏ nastaven· IP adresa DNS serveru nenÌ platnou adresou serveru pro p¯eklad domÈnovÈho jmÈna."	
+
+	IDS_STATEx4_TEXT_MAIN "P¯i zjiöùov·nÌ stavu zabezpeËenÌ domÈnovÈho jmÈna technologiÌ DNSSEC doölo k chybÏ. Chyba m˘ûe b˝t zp˘sobena pouûitÌm proxy serveru ve vaöÌ sÌti. DNSSEC valid·tor v tomto p¯ÌpadÏ nenÌ schopen ovÏ¯it z·znamy o IP adrese serveru."
+
+
+	//state 1 - GREY	
+	IDS_STATE1_TEXT_TOOLTIP "NezabezpeËeno DNSSEC"
+	IDS_STATE1_TEXT_DOMAIN  "nenÌ zabezpeËeno DNSSEC technologiÌ."
+	IDS_STATE1_TEXT_MAIN	"Jelikoû toto domÈnovÈ jmÈno nenÌ zabezpeËeno technologiÌ DNSSEC, neexistuje moûnost ovÏ¯enÌ platnosti zÌskan˝ch ˙daj˘ a nejste tedy chr·nÏni proti podvrûenÌ domÈnovÈho jmÈna."
+
+	//state 2 - GREEN
+	IDS_STATE2_TEXT_TOOLTIP "ZabezpeËeno DNSSEC"
+	IDS_STATE2_TEXT_DOMAIN  "je korektnÏ zabezpeËeno DNSSEC technologiÌ."
+	IDS_STATE2_TEXT_MAIN	"Informace o IP adrese pro toto domÈnovÈ jmÈno byla ovÏ¯ena technologiÌ DNSSEC. Jelikoû je domÈnovÈ jmÈno touto technologiÌ korektnÏ zabezpeËeno, jste ochr·nÏnÌ proti podvrûenÌ domÈnovÈho jmÈna."
+
+	//state 3 - RED IP
+	IDS_STATE3_TEXT_TOOLTIP "ZabezpeËeno DNSSEC"
+	IDS_STATE3_TEXT_DOMAIN  "je zabezpeËeno DNSSEC technologiÌ, ale IP adresa prohlÌûeËe je odliön·."
+	IDS_STATE3_TEXT_MAIN	"Toto domÈnovÈ jmÈno je zabezpeËeno technologiÌ DNSSEC, avöak IP adresa serveru zÌskan· prohlÌûeËem je odliön· od IP adresy zÌskanÈ DNSSEC doplÚkem. To m˘ûe mÌt legitimnÌ d˘vod, ale m˘ûe se takÈ jednat o podvrûenÌ domÈnovÈho jmÈna!"
+
+	//state 4 - RED
+	IDS_STATE4_TEXT_TOOLTIP "Neplatn˝ DNSSEC podpis"
+	IDS_STATE4_TEXT_DOMAIN  "je zabezpeËeno DNSSEC technologiÌ, byl vöak odhalen neplatn˝ podpis!"
+	IDS_STATE4_TEXT_MAIN	"Toto domÈnovÈ jmÈno je zabezpeËeno technologiÌ DNSSEC, nebylo vöak moûnÈ vytvo¯it ¯etÏzec d˘vÏry a ovÏ¯it tak platnost podpisu nebo podpis z·znam˘ je neplatn˝. To m˘ûe signalizovat podvrûenÌ domÈnovÈho jmÈna ˙toËnÌkem!"
+
+	//state 5 - GREY
+	IDS_STATE5_TEXT_TOOLTIP "NezabezpeËeno DNSSEC"
+	IDS_STATE5_TEXT_DOMAIN  "nemohla b˝t ovÏ¯ena pomocÌ technologie DNSSEC."
+	IDS_STATE5_TEXT_MAIN	"Nad¯azen· domÈna nenÌ zabezpeËena technologiÌ DNSSEC. NenÌ tedy moûnÈ ovÏ¯it, zdali toto domÈnovÈ jmÈno skuteËnÏ neexistuje."
+
+	//state 6 - GREEN
+	IDS_STATE6_TEXT_TOOLTIP "ZabezpeËeno DNSSEC"
+	IDS_STATE6_TEXT_DOMAIN  "byla korektnÏ ovÏ¯ena technologiÌ DNSSEC."
+	IDS_STATE6_TEXT_MAIN	"Nad¯azen· domÈna je zabezpeËena technologiÌ DNSSEC. Bylo tedy moûno ˙spÏönÏ ovÏ¯it neexistenci tohoto domÈnovÈho jmÈna."
+
+	//state 7 - RED
+	IDS_STATE7_TEXT_TOOLTIP "Neplatn˝ DNSSEC podpis"
+	IDS_STATE7_TEXT_DOMAIN  "nebyla korektnÏ ovÏ¯ena technologiÌ DNSSEC, protoûe byl odhalen neplatn˝ podpis z·znam˘!"
+	IDS_STATE7_TEXT_MAIN	"Nad¯azen· domÈna je zabezpeËena technologiÌ DNSSEC, ale zÌskan· odpovÏÔ dokazujÌcÌ neexistenci domÈny neobsahuje platn˝ podpis. M˘ûe se jednat o podvrûenÌ domÈnovÈho jmÈna za ˙Ëelem odep¯enÌ p¯Ìstupu k domÈnÏ."
+
+	//state -1 - WHITE
+	IDS_STATE01_TEXT_TOOLTIP "NeovÏ¯eno DNSSEC"
+	IDS_STATE01_TEXT_DOMAIN  "nebylo ovÏ¯eno pomocÌ technologie DNSSEC."
+	IDS_STATE01_TEXT_MAIN	"DNSSEC validace nebyla provedena, protoûe tato domÈna nebo jejÌ nad¯azen· domÈna je uvedena v seznamu vylouËen˝ch domÈnov˝ch jmen."
+
+	//state -2 - WHITE
+	IDS_STATE02_TEXT_TOOLTIP "Stav DNSSEC nezn·m˝"
+	IDS_STATE02_TEXT_DOMAIN  "nelze ovÏ¯it pomocÌ DNSSEC technologie."
+	IDS_STATE02_TEXT_MAIN	"Aktu·lnÏ nastaven˝ resolver nepodporuje DNSSEC technologii. ProsÌm, zmÏÚte nastavenÌ valid·toru (nastavte volbu 'Bez resolveru')."
+
+		//state -1
+	IDS_DNSSEC_ERROR_GEN_TOOLTIP "Stav DNSSEC nezn·m˝"
+	IDS_DNSSEC_ERROR_GEN_DOMAIN  "nelze ovÏ¯it pomocÌ DNSSEC technologie, protoûe doölo k selh·nÌ DNSSEC valid·toru."
+	IDS_DNSSEC_ERROR_GEN_MAIN	"ProsÌm, restartujte webov˝ prohlÌûeË pro jeho opÏtovnou inicializaci..."
+
+		// state 10
+	IDS_DANE_STATE10_LABEL "Certifik·t odpovÌd· TLSA"
+	IDS_DANE_STATE10_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en protokolem DANE. Certifik·t odpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."
+	IDS_DANE_STATE10_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena protokolem DANE. Certifik·t proöel validacÌ PKIX a odpovÌd· CA certifik·tu v TLSA z·znamu (typ 0). Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."
+    // state 11
+	IDS_DANE_STATE11_LABEL "Certifik·t odpovÌd· TLSA"
+	IDS_DANE_STATE11_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en protokolem DANE. Certifik·t odpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."
+	IDS_DANE_STATE11_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena protokolem DANE. Certifik·t proöel validacÌ PKIX a odpovÌd· EE certifik·tu v TLSA z·znamu (typ 1). Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."
+    // state 12
+	IDS_DANE_STATE12_LABEL	"Certifik·t odpovÌd· TLSA"
+	IDS_DANE_STATE12_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en protokolem DANE. Certifik·t odpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."	 
+	IDS_DANE_STATE12_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena protokolem DANE. Certifik·t proöel validacÌ PKIX a odpovÌd· CA certifik·tu v TLSA z·znamu (typ 2). Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."	
+    // state 13
+	IDS_DANE_STATE13_LABEL "Certifik·t odpovÌd· TLSA"	
+	IDS_DANE_STATE13_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byl ovÏ¯en protokolem DANE. Certifik·t odpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."
+	IDS_DANE_STATE13_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno byla ovÏ¯ena protokolem DANE. Serverov˝ certifik·t odpovÌd· EE certifik·tu v TLSA z·znamu (typ 3). Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."	 		
+    // state -9	
+	IDS_DANE_STATEx9_LABEL	"Certifik·t neodpovÌd· TLSA"
+	IDS_DANE_STATEx9_TEXT_MAIN "Pokus o ovÏ¯enÌ certifik·tu serveru pro toto spojenÌ protokolem DANE se nezda¯il. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."	 
+	IDS_DANE_STATEx9_TEXT_ADD "OvÏ¯enÌ d˘vÏryhodnosti TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno protokolem DANE se nezda¯ilo. Serverov˝ certifik·t neodpovÌd· TLSA z·znamu. Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."	 		
+   // state -10
+	IDS_DANE_STATEx10_LABEL	"Certifik·t neodpovÌd· TLSA"	
+	IDS_DANE_STATEx10_TEXT_MAIN	"Pokus o ovÏ¯enÌ certifik·tu serveru pro toto spojenÌ protokolem DANE se nezda¯il. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC." 	 
+	IDS_DANE_STATEx10_TEXT_ADD "OvÏ¯enÌ d˘vÏryhodnosti TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno protokolem DANE se nezda¯ilo. Serverov˝ certifik·t neodpovÌd· CA certifik·tu v TLSA z·znamu (typ 0). Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."	 		
+    // state -11
+	IDS_DANE_STATEx11_LABEL "Certifik·t neodpovÌd· TLSA"		
+	IDS_DANE_STATEx11_TEXT_MAIN "Pokus o ovÏ¯enÌ certifik·tu serveru pro toto spojenÌ protokolem DANE se nezda¯il. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."		 
+	IDS_DANE_STATEx11_TEXT_ADD "OvÏ¯enÌ d˘vÏryhodnosti TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno protokolem DANE se nezda¯ilo. Serverov˝ certifik·t neodpovÌd· EE certifik·tu v TLSA z·znamu (typ 1). Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."	
+    // state -12
+	IDS_DANE_STATEx12_LABEL "Certifik·t neodpovÌd· TLSA"		
+	IDS_DANE_STATEx12_TEXT_MAIN "Pokus o ovÏ¯enÌ certifik·tu serveru pro toto spojenÌ protokolem DANE se nezda¯il. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."		 
+	IDS_DANE_STATEx12_TEXT_ADD "OvÏ¯enÌ d˘vÏryhodnosti TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno protokolem DANE se nezda¯ilo. Serverov˝ certifik·t neodpovÌd· CA certifik·tu v TLSA z·znamu (typ 2). Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."	
+    // state -13
+	IDS_DANE_STATEx13_LABEL "Certifik·t neodpovÌd· TLSA"		
+	IDS_DANE_STATEx13_TEXT_MAIN "Pokus o ovÏ¯enÌ certifik·tu serveru pro toto spojenÌ protokolem DANE se nezda¯il. Certifik·t neodpovÌd· z·znamu TLSA, kter˝ je zabezpeËen technologiÌ DNSSEC."		 
+	IDS_DANE_STATEx13_TEXT_ADD "OvÏ¯enÌ d˘vÏryhodnosti TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno protokolem DANE se nezda¯ilo. Serverov˝ certifik·t neodpovÌd· EE certifik·tu v TLSA z·znamu (typ 3). Obdrûen˝ TLSA z·znam je korektnÏ podeps·n technologiÌ DNSSEC."	
+    // state 1
+	IDS_DANE_STATE1_LABEL "ZabezpeËeno DNSSEC"
+	IDS_DANE_STATE1_TEXT_MAIN "ZabezpeËeno DNSSEC."	 
+	IDS_DANE_STATE1_TEXT_ADD "ZabezpeËeno DNSSEC."	
+    // state 0
+	IDS_DANE_STATE0_LABEL "TLSA validace vypnuta"	
+	IDS_DANE_STATE0_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyl ovÏ¯en protokolem DANE, protoûe validace TLSA z·znamu nenÌ povolena nebo toto domÈnovÈ jmÈno je z validace vylouËeno."	 
+	IDS_DANE_STATE0_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyla ovÏ¯ena protokolem DANE, protoûe validace TLSA z·znamu je vypnuta nebo toto domÈnovÈ jmÈno nebo jeho TLD je na seznamu domÈn vy¯azen˝ch z validace."	
+	// state -2
+	IDS_DANE_STATEx2_LABEL "NenÌ HTTPS spojenÌ"	
+	IDS_DANE_STATEx2_TEXT_MAIN "Jelikoû pro toto domÈnovÈ jmÈno nenÌ nav·z·no zabezpeËenÈ spojenÌ ke vzd·lenÈmu serveru protokolem HTTPS, nenÌ moûnÈ provÈst validaci TLSA z·znamu."	 
+	IDS_DANE_STATEx2_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe p¯ipojenÌ ke vzd·lenÈmu serveru nenÌ realizov·no protokolem HTTPS."	
+	// state -3
+	IDS_DANE_STATEx3_LABEL "Neexistuje TLSA z·znam"	
+	IDS_DANE_STATEx3_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe pro toto domÈnovÈ jmÈno neexistuje TLSA z·znam."	 
+	IDS_DANE_STATEx3_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyla ovÏ¯ena protokolem DANE, protoûe pro toto domÈnovÈ jmÈno neexistuje TLSA z·znam."	
+	// state -4
+	 IDS_DANE_STATEx4_LABEL	"NezabezpeËeno DNSSEC"	
+	 IDS_DANE_STATEx4_TEXT_MAIN "Jelikoû toto domÈnovÈ jmÈno nenÌ zabezpeËeno technologiÌ DNSSEC, nelze ovÏ¯it d˘vÏryhodnost serverovÈho certifik·tu protokolem DANE."		 
+	 IDS_DANE_STATEx4_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe toto domÈnovÈ jmÈno nenÌ zabezpeËeno technologiÌ DNSSEC."	
+	// state -5
+	 IDS_DANE_STATEx5_LABEL	"Neplatn˝ DNSSEC podpis"	
+	 IDS_DANE_STATEx5_TEXT_MAIN "DomÈnovÈ jmÈno je zabezpeËeno technologiÌ DNSSEC, byl vöak odhalen neplatn˝ podpis z·znam˘, proto nelze ovÏ¯it d˘vÏryhodnost serverovÈho certifik·tu protokolem DANE."		 
+	 IDS_DANE_STATEx5_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe DNS z·znamy pro toto domÈnovÈ jmÈno majÌ neplatn˝ DNSSEC podpis."	
+	// state -6
+	 IDS_DANE_STATEx6_LABEL	"Nelze zÌskat certifik·t"	
+	 IDS_DANE_STATEx6_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe se nepoda¯ilo zÌskat ¯etÏzec certifik·t˘."		 
+	 IDS_DANE_STATEx6_TEXT_ADD	"The authenticity of TLS/SSL remote server certificate for the domain name can not be verified by DANE protocol because the certificate chain could not be obtained."
+	// state -7
+	 IDS_DANE_STATEx7_LABEL	"Nelze zÌskat certifik·t"	
+	 IDS_DANE_STATEx7_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe se nepoda¯ilo zÌskat certifik·t vzd·lenÈho serveru."		 
+	 IDS_DANE_STATEx7_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nelze ovÏ¯it protokolem DANE, protoûe se nepoda¯ilo zÌskat certifik·t vzd·lenÈho serveru."	
+	// state -8
+	 IDS_DANE_STATEx8_LABEL	"NeplatnÈ hodnoty TLSA"	
+	 IDS_DANE_STATEx8_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyl ovÏ¯en protokolem DANE, protoûe zÌskan˝ TLSA z·znam obsahuje neplatnÈ hodnoty parametr˘."  
+	 IDS_DANE_STATEx8_TEXT_ADD "D˘vÏryhodnost TLS/SSL certifik·tu vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyla ovÏ¯ena protokolem DANE, protoûe zÌskan˝ TLSA z·znam obsahuje neplatnÈ hodnoty parametr˘. To m˘ûe signalizovat podvrûenÌ TLSA z·znamu."	
+	// state -1
+	 IDS_DANE_STATEx1_LABEL	"Stav TLSA nezn·m˝"	
+	 IDS_DANE_STATEx1_TEXT_MAIN	"Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyl ovÏ¯en protokolem DANE, protoûe p¯Ì zÌsk·nÌ TLSA z·znamu pro toto domÈnovÈ jmÈno doölo k chybÏ."	 
+	 IDS_DANE_STATEx1_TEXT_ADD	"P¯i zjiöùov·nÌ TLSA z·znamu pro toto domÈnovÈ jmÈno doölo k chybÏ. P¯ÌËinou m˘ûe b˝t buÔ v˝padek spojenÌ ke vzd·lenÈmu serveru, nebo aktu·lnÏ nastaven· IP adresa DNS serveru nenÌ platnou adresou serveru pro p¯eklad domÈnovÈho jmÈna."
+	// state -99
+	 IDS_DANE_STATEx99_LABEL "Stav TLSA nezn·m˝"	
+	 IDS_DANE_STATEx99_TEXT_MAIN "Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyl ovÏ¯en pomocÌ protokolu DANE, protoûe nastaven˝ resolver nepodporuje DNSSEC technologii."	 
+	 IDS_DANE_STATEx99_TEXT_ADD	 "Aktu·lnÏ nastaven˝ DNS server nebo resolver nepodporuje DNSSEC technologii. ProsÌm, zmÏÚte nastavenÌ valid·toru (nastavte volbu Bez resolveru)."	
+	 	 // state -1
+	 IDS_DANE_ERROR_GEN_LABEL	"Stav TLSA nezn·m˝"	
+	 IDS_DANE_ERROR_GEN_TEXT_MAIN	"Certifik·t vzd·lenÈho serveru pro toto domÈnovÈ jmÈno nebyl ovÏ¯en protokolem DANE, protoûe doölo k selh·nÌ TLSA valid·toru."	 
+	 IDS_DANE_ERROR_GEN_TEXT_ADD	"ProsÌm, restartujte webov˝ prohlÌûeË pro jeho opÏtovnou inicializaci..."
+
+	IDS_NONE                " "
+    IDS_ADDON_INIT          "DoplnÏk inicializov·n"
+    
+	IDS_DNSSEC_OK			 "ZabezpeËeno DNSSEC"
+  IDS_DNSSEC_FAIL			 "NezabezpeËeno DNSSEC"
+
+	// DNSSEC TEST messages in settings dialog
+	IDS_DNSSECTEST_IP		"Chyba - öpatn˝ form·t nastavenÈ IP adresy."
+	IDS_DNSSECTEST_OK		"⁄spÏch ñ souËasnÈ nastavenÌ umoûÚuje DNSSEC validaci."
+	IDS_DNSSECTEST_BOGUS	"Selh·nÌ - öpatn· DNSSEC odpovÏÔ, DNSSEC validace nenÌ moûn· s aktu·lnÌm nastavenÌm."
+	IDS_DNSSECTEST_ERROR	"Selh·nÌ - nenÌ DNS odpovÏÔ, IP adresa resolveru je buÔ öpatn· nebo selhalo p¯ipojenÌ k sÌti."
+	IDS_DNSSECTEST_RUN      "Testuji..."
+
+	END
+
+
+	/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 260
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "NastavenÌ valid·toru"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+	GROUPBOX        "NastavenÌ resolveru",IDC_STATIC,10,7,190,75
+	LTEXT           "DNS resolver(y) pouûÌvanÈ pro p¯eklad jmen:", IDC_STATIC,15,20,180,10
+	CONTROL			" NaËÌst ze systÈmu",			 IDC_R1,"Button",BS_AUTORADIOBUTTON | WS_GROUP, 15, 35, 100, 10  
+	//CONTROL			" DNSSEC validujÌcÌ resolver:", IDC_R2,"Button",BS_AUTORADIOBUTTON, 15, 50, 105, 10    
+	//COMBOBOX        IDC_COMBO, 122, 47, 70, 120 ,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+	CONTROL			" VlastnÌ:",					 IDC_R3,"Button",BS_AUTORADIOBUTTON, 15, 50, 40, 10
+	EDITTEXT        IDC_EDIT, 60, 50, 120 ,12 ,ES_AUTOHSCROLL
+	CONTROL			" Bez resolveru", IDC_R4,"Button",BS_AUTORADIOBUTTON, 15, 65, 180, 10
+	PUSHBUTTON      "Test souËasnÈho nastavenÌ",IDC_IDDNSSEC,10, 75+10 ,190,14
+	LTEXT           ".", IDC_DNSSEC_R,10,75+10+14+5,180,20
+
+	GROUPBOX        "DomÈny vy¯azenÈ z validace",IDC_STATIC,10,125,190,78
+	CONTROL			"Nevalidovat domÈny uvedenÈ v seznamu", IDC_DOM_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 15, 125+12, 165 ,10
+	LTEXT           "Seznam vy¯azen˝ch domÈn a TLD (oddÏlenÈ Ë·rkami)", IDC_STATIC,15,125+12+13,182,10
+	EDITTEXT		IDT_DOM_LIST, 15, 160, 180, 36, ES_LEFT | ES_AUTOVSCROLL | ES_MULTILINE | WS_VSCROLL, WS_EX_CLIENTEDGE
+
+	CONTROL			"Zobrazovat texty za ikonou klÌËku", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 125+75+10, 165 ,10
+	CONTROL			"Povolit validaci TLSA z·znam˘", IDC_ENABLETLSA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 125+75+10+12, 165 ,10
+
+	DEFPUSHBUTTON   "Uloûit nastavenÌ",IDOK,60,125+75+30+10,80,14
+    PUSHBUTTON      "Zruöit",IDCANCEL,150,125+75+30+10,50,14
+END
+
+IDD_DIALOG_MAIN_ABOUT DIALOGEX 0, 0, 250, 110
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP |  
+    WS_CAPTION | WS_SYSMENU
+CAPTION "DNSSEC/TLSA Valid·tor pro IE"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,180,92,50,14
+	ICON            IDI_DNSSEC_ICON_VALID,IDC_STATIC,20,20,0,0
+	GROUPBOX        "O pluginu",IDC_STATIC,10,7,230,80
+    LTEXT           "DNSSEC/TLSA Valid·tor pro Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
+    LTEXT           "Z·suvn˝ plugin pro kontrolu DNSSEC a TLSA",IDC_STATIC,50,30,180,10
+    LTEXT           "PodporovanÈ prohlÌûeËe: 32-bit verze IE6 - IE11",IDC_STATIC,50,40,180,10
+    LTEXT           "Verze 2.1.1", IDC_STATIC,50,50,180,10
+    LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
+	LTEXT           "2013", IDC_STATIC,50,70,100,10
+	LTEXT           "http://www.dnssec-validator.cz/", IDC_LINK,10,95,120,10
+END
+
+IDD_DIALOG_DNSSEC DIALOGEX 0, 0, 220, 75
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP  
+FONT 8, "Arial", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON		"x",IDOK,205,3,10,9
+	ICON			IDI_DNSSEC_ICON_VALID, IDC_ST6, 10,5,20,20
+	CONTROL         "www.nic.cz",IDC_ST1,"Static",SS_LEFT,40,5,160,10
+    CONTROL			"DNSSEC hlaviËka",IDC_ST2,"Static",SS_LEFT,40,13,160,20
+    CONTROL         "Text1",IDC_ST3,"Static",SS_LEFT,10,30,200,25
+    CONTROL         "",IDC_ST5,"Static",SS_LEFT,10,58,200,65
+	PUSHBUTTON      "VÌce info",IDC_ST4, 10,58,50,12
+	LTEXT           "JÌt na domovskou str·nku doplÚku pro dalöÌ informace", IDC_LINK,10,80,200,10
+	CONTROL         "IP adresy pouûitÈ prohlÌûeËem:",IDC_STIPBH,"Static",SS_LEFT,10,100,200,10
+	CONTROL         "",IDC_STIPB,"Static",SS_LEFT,10,110,200,10
+	CONTROL         "IP adresy ovÏ¯enÈ doplÚkem:",IDC_STIPVH,"Static",SS_LEFT,10,120,200,10
+    CONTROL         "",IDC_STIPV,"Static",SS_LEFT,10,130,200,18
+END
+
+
+IDD_DIALOG_TLSA DIALOGEX 0, 0, 220, 75
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP  
+FONT 8, "Arial", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON		"x",IDOK,205,3,10,9
+	ICON			IDI_DNSSEC_ICON_VALID, IDC_ST6_TLSA, 10,5,20,20
+	CONTROL         "www.nic.cz",IDC_ST1_TLSA,"Static",SS_LEFT,40,5,160,10
+    CONTROL			"DNSSEC hlaviËka",IDC_ST2_TLSA,"Static",SS_LEFT,40,13,160,20
+    CONTROL         "Text1",IDC_ST3_TLSA,"Static",SS_LEFT,10,30,200,25
+    CONTROL         "",IDC_ST5_TLSA,"Static",SS_LEFT,10,58,200,65
+	PUSHBUTTON      "VÌce info",IDC_ST4_TLSA, 10,58,50,12
+	LTEXT           "JÌt na domovskou str·nku doplÚku pro dalöÌ informace", IDC_LINK,10,80,200,10
+	CONTROL         "IP adresy pouûitÈ prohlÌûeËem:",IDC_STIPBH_TLSA,"Static",SS_LEFT,10,100,200,10
+	CONTROL         "",IDC_STIPB_TLSA,"Static",SS_LEFT,10,110,200,10
+	CONTROL         "IP adresy ovÏ¯enÈ doplÚkem:",IDC_STIPVH_TLSA,"Static",SS_LEFT,10,120,200,10
+    CONTROL         "",IDC_STIPV_TLSA,"Static",SS_LEFT,10,130,200,18
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_MAIN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 211
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_MAIN_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 211
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_DNSSEC, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 211
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+END
+#endif    // APSTUDIO_INVOKED	
+	
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_PROJNAME            "DNSSECToolBar"
+    IDS_TOOLBARNAME         " "
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_BUTTON1              "TlaËÌtko 1"
+    ID_BUTTON2		        "TlaËÌtko 2"
+END
+
+#endif    // CZECH resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+//*************************************************************************
+//*************************************************************************
+//*************************************************************************
+//*************************************************************************
+
+/////////////////////////////////////////////////////////////////////////////
+// GERMANY resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "1 TYPELIB ""DNSSECToolBar.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 2,1
+ PRODUCTVERSION 2,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "CZ.NIC Labs"
+            VALUE "FileDescription", "DNSSEC/TLSA Validator f¸r IE\0"
+            VALUE "FileVersion", "2,1\0"
+            VALUE "InternalName", "IEdnssec.dll\0"
+            VALUE "LegalCopyright", "Copyright 2012\0"
+            VALUE "OriginalFilename", "IEdnssec.dll\0"
+            VALUE "ProductName", "DNSSEC/TLSA Validator f¸r IE\0"
+            VALUE "ProductVersion", "2,1\0"
+            VALUE "OLESelfRegister", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG_MAIN_ABOUT DIALOGEX 0, 0, 250, 110
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "DNSSEC/TLSA Validator f¸r IE"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Ja",IDOK,180,92,50,14
+	ICON            IDI_DNSSEC_ICON_VALID,IDC_STATIC,20,20,0,0
+	GROUPBOX        "‹ber plugin",IDC_STATIC,10,7,230,80
+    LTEXT           "DNSSEC/TLSA Validator f¸r Microsoft Internet Explorer",IDC_STATIC,50,20,180,10
+    LTEXT           "Add-on f¸r DNSSEC/TLSA Validierung",IDC_STATIC,50,30,180,10
+    LTEXT           "Unterst¸tzte Versionen: 32-bit Versionen von IE6 - IE11",IDC_STATIC,50,40,180,10
+    LTEXT           "Version 2.1.1", IDC_STATIC,50,50,180,10
+    LTEXT           "CZ.NIC Labs", IDC_STATIC,50,60,100,10
+	LTEXT           "2013", IDC_STATIC,50,70,100,10
+	LTEXT           "http://www.dnssec-validator.cz/", IDC_LINK,10,95,120,10
+END
+
+
+
+IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 260
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Validator-Einstellungen"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+	GROUPBOX        "Resolver-Einstellungen",IDC_STATIC,10,7,190,75
+	LTEXT           "Zur Namensauflˆsung benutzte DNS-Server:", IDC_STATIC,15,20,180,10
+	CONTROL			" Systemeinstellungen benutzen",			 IDC_R1,"Button",BS_AUTORADIOBUTTON | WS_GROUP, 15, 35, 100, 10  
+	//CONTROL			" ÷ffentliche validierende Resolver:", IDC_R2,"Button",BS_AUTORADIOBUTTON, 15, 50, 105, 10    
+	//COMBOBOX        IDC_COMBO, 122, 47, 70, 120 ,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+	CONTROL			" Eigener:",					 IDC_R3,"Button",BS_AUTORADIOBUTTON, 15, 50, 40, 10
+	EDITTEXT        IDC_EDIT, 60, 50, 120 ,12 ,ES_AUTOHSCROLL
+	CONTROL			" Ohne Resolver", IDC_R4,"Button",BS_AUTORADIOBUTTON, 15, 65, 180, 10
+	PUSHBUTTON      "Bestehende Einstellungen testen",IDC_IDDNSSEC,10, 75+10 ,190,14
+	LTEXT           "", IDC_DNSSEC_R,10,75+10+14+5,180,20
+
+	GROUPBOX        "Ausgeschlossene Dom‰nen",IDC_STATIC,10,125,190,78
+	CONTROL			"Schliesse Dom‰nen aus dieser Liste aus", IDC_DOM_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 15, 125+12, 165 ,10
+	LTEXT           "Liste ausgeschlossener Dom‰nen, TLDs (mit Komma abgetrennt)", IDC_STATIC,15,125+12+13,182,10
+	EDITTEXT		IDT_DOM_LIST, 15, 160, 180, 36, ES_LEFT | ES_AUTOVSCROLL | ES_MULTILINE | WS_VSCROLL, WS_EX_CLIENTEDGE
+
+	CONTROL			"Legende neben dem Schl¸ssel-Symbol zeigen", IDC_SHOWTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 125+75+10, 165 ,10
+	CONTROL			"Aktivieren Sie TLSA Aufzeichnungen Validierung", IDC_ENABLETLSA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP, 10, 125+75+10+12, 165 ,10
+
+	DEFPUSHBUTTON   "Setzen",IDOK,60,125+75+30+10,80,14
+    PUSHBUTTON      "Stornieren",IDCANCEL,150,125+75+30+10,50,14
+END
+
+IDD_DIALOG_DNSSEC DIALOGEX 0, 0, 220, 75
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP  
+FONT 8, "Arial", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON		"x",IDOK,205,3,10,9
+	ICON			IDI_DNSSEC_ICON_VALID, IDC_ST6, 10,5,20,20
+	CONTROL         "www.nic.cz",IDC_ST1,"Static",SS_LEFT,40,5,160,10
+    CONTROL			"DNSSEC header",IDC_ST2,"Static",SS_LEFT,40,13,160,20
+    CONTROL         "Text1",IDC_ST3,"Static",SS_LEFT,10,30,200,25
+    CONTROL         "",IDC_ST5,"Static",SS_LEFT,10,58,200,65
+	PUSHBUTTON      "Mehr info",IDC_ST4, 10,58,50,12
+	LTEXT           "F¸r mehr Informationen gehe zur Plugin Homepage", IDC_LINK,10,80,200,10
+	CONTROL         "Von Webbrowser benutzte IP-Adresse:",IDC_STIPBH,"Static",SS_LEFT,10,100,200,10
+	CONTROL         "",IDC_STIPB,"Static",SS_LEFT,10,110,200,10
+	CONTROL         "Von Add-on erworbene IP-Adresse:",IDC_STIPVH,"Static",SS_LEFT,10,120,200,10
+    CONTROL         "",IDC_STIPV,"Static",SS_LEFT,10,130,200,18
+END
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_MAIN_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 211
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_MAIN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 211
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_DNSSEC, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 211
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+END
+#endif    // APSTUDIO_INVOKED	
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_DNSSECToolBarBAND         REGISTRY DISCARDABLE    "DNSSECToolBarBand.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+IDR_MENU_POPUP MENU
+BEGIN
+    POPUP "Popup"
+    BEGIN
+		MENUITEM "‹ber...",                    ID_ABOUT
+		MENUITEM "Startseite...",             ID_HOME
+		MENUITEM SEPARATOR
+        MENUITEM "Einstellungen...",                  ID_SET
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+STRINGTABLE
+BEGIN
+		// Deafult
+	IDS_PRE_TEXT_ERROR		"Der Dom‰nenname"
+	IDS_PRE_TEXT_DOMAIN		"Der Dom‰nenname"	
+	IDS_PRE_TEXT_NODOMAIN	"Die Nichtexistenz des Dom‰nennamen"
+
+
+	// state 0 - GREY ? 
+	IDS_STATE0_TEXT_TOOLTIP "DNSSEC-Zustand unbekannt"
+	IDS_STATE0_TEXT_DOMAIN  "kann nicht mit DNSSEC ¸berpr¸ft werden."
+	IDS_STATE0_TEXT_MAIN	"W‰hrend der Ermittlung des DNSSEC-Zustandes kam es zu einem Fehler. Dieser kann durch einen Anschlussausfall zum DNS-Server oder eine falsch angegebene IP-Adresse eines validierenden Resolvers verursacht sein."	
+
+	IDS_STATEx4_TEXT_MAIN "Die DNSSEC-Validierung wurde nicht ausgef¸hrt. Dies kann durch eine Anwesenheit eines Proxy-Servers in ihrem Netzwerk verursacht werden. In diesem Fall kˆnnen die IP-Adresseneintr‰ge des Servers nicht best‰tigt werden."
+
+	//state 1 - GREY	
+	IDS_STATE1_TEXT_TOOLTIP "Nicht durch DNSSEC gesichert"
+	IDS_STATE1_TEXT_DOMAIN  "ist nicht durch DNSSEC gesichert."
+	IDS_STATE1_TEXT_MAIN	"Weil der Dom‰nenname nicht durch DNSSEC gesichert ist, gibt es keinen Weg die G¸ltigkeit der gewonnenen IP-Adressdaten zu gew‰hrleisten. Sie sind somit nicht gegen DNS-Spoofing gesichert."
+
+	//state 2 - GREEN
+	IDS_STATE2_TEXT_TOOLTIP "Gesichert durch DNSSEC"
+	IDS_STATE2_TEXT_DOMAIN  "ist korrekt durch DNSSEC gesichert."
+	IDS_STATE2_TEXT_MAIN	"Die zu diesem Dom‰nennamen angehˆrige IP-Adresse war mit DNSSEC ¸berpr¸ft und best‰tigt. Diese Dom‰ne ist durch DNSSEC gesichert, sie sind somit gegen DNS-Spoofing gesichert."
+
+	//state 3 - RED IP
+	IDS_STATE3_TEXT_TOOLTIP "Gesichert durch DNSSEC"
+	IDS_STATE3_TEXT_DOMAIN  "ist durch DNSSEC gesichert, aber die vom Webbrowser benutzte IP-Adresse ist ung¸ltig."
+	IDS_STATE3_TEXT_MAIN	"Die zu diesem Dom‰nennamen angehˆrige IP-Adresse war mit DNSSEC ¸berpr¸ft und nicht best‰tigt. Es mag einen legitimen Grund f¸r die Verwendung einer anderen IP-Adresse geben, es kann sich auch allerdings um DNS-Spoofing handeln."
+
+	//state 4 - RED
+	IDS_STATE4_TEXT_TOOLTIP "Ung¸ltige DNSSEC-Signatur"
+	IDS_STATE4_TEXT_DOMAIN  "ist durch DNSSEC gesichert, allerdings ist die DNSSEC-Signatur inkorrekt."
+	IDS_STATE4_TEXT_MAIN	"Dieser Dom‰nenname ist durch DNSSEC gesichert, aber keine g¸ltige Vertrauenskette konnte zusammengestellt werden. Dies kann auf DNS-Spoofing hindeuten."
+
+	//state 5 - GREY
+	IDS_STATE5_TEXT_TOOLTIP "Nicht durch DNSSEC gesichert"
+	IDS_STATE5_TEXT_DOMAIN  "kann nicht mit DNSSEC ¸berpr¸ft werden."
+	IDS_STATE5_TEXT_MAIN	"Die ¸bergeordnete Dom‰ne ist nicht durch DNSSEC gesichert, deswegen kann dieser Dom‰nenname nicht ¸berpr¸ft werden."
+
+	//state 6 - GREEN
+	IDS_STATE6_TEXT_TOOLTIP "Gesichert durch DNSSEC"
+	IDS_STATE6_TEXT_DOMAIN  "war mit DNSSEC ¸berpr¸ft und best‰tigt."
+	IDS_STATE6_TEXT_MAIN	"Die ¸bergeordnete Dom‰ne ist durch DNSSEC gesichert, darum ist es mˆglich die Nichtexistenz des Dom‰nennamen zu best‰tigen."
+
+	//state 7 - RED
+	IDS_STATE7_TEXT_TOOLTIP "Ung¸ltige DNSSEC-Signatur"
+	IDS_STATE7_TEXT_DOMAIN  "war mit DNSSEC ¸berpr¸ft, konnte aber wegen einer ung¸ltigen Signatur nicht best‰tigt werden."
+	IDS_STATE7_TEXT_MAIN	"Die ¸bergeordnete Dom‰ne ist durch DNSSEC gesichert. Die erworbene Antwort, welche die Nichtexistenz der Dom‰ne best‰tigen soll, enth‰lt eine ung¸ltige Signatur. Dies deutet auf einen DNS-Spoofing Versuch zur Anschlussverweigerung hin."
+
+	//state -1 - WHITE
+	IDS_STATE01_TEXT_TOOLTIP "Nicht durch DNSSEC gepr¸ft"
+	IDS_STATE01_TEXT_DOMAIN  "wurde nicht durch DNSSEC ¸berpr¸ft."
+	IDS_STATE01_TEXT_MAIN	"Die DNSSEC-Validierung wurde nicht ausgef¸hrt, weil diese Dom‰ne oder ihre ¸bergeordnete Dom‰ne in der Liste der ausgeschlossenen Dom‰nen erw‰hnt ist."
+
+			//state -2 - WHITE
+	IDS_STATE02_TEXT_TOOLTIP "DNSSEC-Zustand unbekannt"
+	IDS_STATE02_TEXT_DOMAIN  "kann nicht mit DNSSEC ¸berpr¸ft werden."
+	IDS_STATE02_TEXT_MAIN	"Der zur Zeit eingestellte Resolver unterst¸tzt DNSSEC nicht. ƒndern Sie bitte die Einstellungen des Resolvers (Wahl 'Ohne Resolver')."
+			//state -1
+	IDS_DNSSEC_ERROR_GEN_TOOLTIP "DNSSEC-Zustand unbekannt"
+	IDS_DNSSEC_ERROR_GEN_DOMAIN  "kann nicht mit DNSSEC ¸berpr¸ft werden. Es kam zu einem Fehler w‰hrend Erwerbs der DNSSEC Validator core."
+	IDS_DNSSEC_ERROR_GEN_MAIN	"Bitte alle Browserfenster schlieﬂen und den Browser neu starten..."
+			// state 10
+	IDS_DANE_STATE10_LABEL "Zertifikat entspricht TLSA"
+	IDS_DANE_STATE10_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne wurde durch DANE Protokoll best‰tigt. Das Zertifikat entspricht dem durch DNSSEC gesicherten TLSA Eintrag."
+	IDS_DANE_STATE10_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat wurde durch DANE Protokoll best‰tigt. Das Zertifikat lief eine PKIX Validierung durch und entspricht dem CA Zertifikat im TLSA Eintrag (Typ 0). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."
+    // state 11
+	IDS_DANE_STATE11_LABEL "Zertifikat entspricht TLSA"
+	IDS_DANE_STATE11_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne wurde durch DANE Protokoll best‰tigt. Das Zertifikat entspricht dem durch DNSSEC gesicherten TLSA Eintrag."
+	IDS_DANE_STATE11_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat wurde durch DANE Protokoll best‰tigt. Das Zertifikat lief eine PKIX Validierung durch und entspricht dem EE Zertifikat im TLSA Eintrag (Typ 1). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."
+    // state 12
+	IDS_DANE_STATE12_LABEL	"Zertifikat entspricht TLSA"
+	IDS_DANE_STATE12_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne wurde durch DANE Protokoll best‰tigt. Das Zertifikat entspricht dem durch DNSSEC gesicherten TLSA Eintrag."
+	IDS_DANE_STATE12_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat wurde durch DANE Protokoll best‰tigt. Das Zertifikat lief eine PKIX Validierung durch und entspricht dem CA Zertifikat im TLSA Eintrag (Typ 2). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."
+    // state 13
+	IDS_DANE_STATE13_LABEL "Zertifikat entspricht TLSA"	
+	IDS_DANE_STATE13_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne wurde durch DANE Protokoll best‰tigt. Das Zertifikat entspricht dem durch DNSSEC gesicherten TLSA Eintrag."
+	IDS_DANE_STATE13_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat wurde durch DANE Protokoll best‰tigt. Das Zertifikat entspricht dem EE Zertifikat im TLSA Eintrag (Typ 3). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."
+    // state -9	
+	IDS_DANE_STATEx9_LABEL	"Zertifikat entspricht nicht TLSA"
+	IDS_DANE_STATEx9_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem durch DNSSEC gesicherten TLSA Eintrag."
+	IDS_DANE_STATEx9_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Das Serverzertifikat entspricht nicht dem TLSA Eintrag. Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."
+   // state -10
+	IDS_DANE_STATEx10_LABEL	"Zertifikat entspricht nicht TLSA"	
+	IDS_DANE_STATEx10_TEXT_MAIN	"Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem durch DNSSEC gesicherten TLSA Eintrag."
+	IDS_DANE_STATEx10_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem CA Zertifikat im TLSA Eintrag (Typ 0). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."
+    // state -11
+	IDS_DANE_STATEx11_LABEL "Zertifikat entspricht nicht TLSA"		
+	IDS_DANE_STATEx11_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem durch DNSSEC gesicherten TLSA Eintrag."		 
+	IDS_DANE_STATEx11_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem EE Zertifikat im TLSA Eintrag (Typ 1). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."	
+    // state -12
+	IDS_DANE_STATEx12_LABEL "Zertifikat entspricht nicht TLSA"		
+	IDS_DANE_STATEx12_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem durch DNSSEC gesicherten TLSA Eintrag."		 
+	IDS_DANE_STATEx12_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem CA Zertifikat im TLSA Eintrag (Typ 2). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."	
+    // state -13
+	IDS_DANE_STATEx13_LABEL "Zertifikat entspricht nicht TLSA"		
+	IDS_DANE_STATEx13_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem durch DNSSEC gesicherten TLSA Eintrag."		 
+	IDS_DANE_STATEx13_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Das Zertifikat entspricht nicht dem EE Zertifikat im TLSA Eintrag (Typ 3). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."	
+    // state 1
+	IDS_DANE_STATE1_LABEL "Gesichert durch DNSSEC"
+	IDS_DANE_STATE1_TEXT_MAIN "Gesichert durch DNSSEC."	 
+	IDS_DANE_STATE1_TEXT_ADD "Gesichert durch DNSSEC."	
+    // state 0
+	IDS_DANE_STATE0_LABEL "TLSA Validierung ausgeschaltet"	
+	IDS_DANE_STATE0_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Die Validierung von TLSA Eintr‰gen ist nicht genehmigt, oder diese Dom‰ne ist von der Validierung ausgeschlossen."	 
+	IDS_DANE_STATE0_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Die Validierung von TLSA Eintr‰gen ist nicht genehmigt, oder diese Dom‰ne, oder die TLD, ist in der Liste der ausgeschlossenen Dom‰nen erw‰hnt."	
+	// state -2
+	IDS_DANE_STATEx2_LABEL "Keine HTTPS Verbindung"	
+	IDS_DANE_STATEx2_TEXT_MAIN "Weil f¸r diese Dom‰ne keine HTTPS Verbindung hergestellt wurde, ist es nicht mˆglich eine Validierung des TLSA Eintrags auszuf¸hren."	 
+	IDS_DANE_STATEx2_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Die Verbindung zum Server ist nicht mittels HTTPS Protokoll realisiert."	
+	// state -3
+	IDS_DANE_STATEx3_LABEL "Kein TLSA Eintrag vorhanden"	
+	IDS_DANE_STATEx3_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Es gibt keinen TLSA Eintrag f¸r diese Dom‰ne."	 
+	IDS_DANE_STATEx3_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Kein TLSA Eintrag f¸r diese Dom‰ne konnte ermittelt werden."	
+	// state -4
+	 IDS_DANE_STATEx4_LABEL	"Nicht durch DNSSEC gesichert"	
+	 IDS_DANE_STATEx4_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Diese Dom‰ne ist nicht durch DNSSEC gesichert."		 
+	 IDS_DANE_STATEx4_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Diese Dom‰ne ist nicht durch DNSSEC gesichert."	
+	// state -5
+	 IDS_DANE_STATEx5_LABEL	"Ung¸ltige DNSSEC Signatur"	
+	 IDS_DANE_STATEx5_TEXT_MAIN "Die Dom‰ne ist durch DNSSEC gesichert, aber die Signatur ist ung¸ltig. Darum kann man die Vertrauensw¸rdigkeit des Serverzertifikats nicht mittels DANE best‰tigen."		 
+	 IDS_DANE_STATEx5_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Die DNS Eintr‰ge f¸r diese Dom‰ne haben eine ung¸ltige DNSSEC Signatur."	
+	// state -6
+	 IDS_DANE_STATEx6_LABEL	"Zertifikat unverf¸gbar"	
+	 IDS_DANE_STATEx6_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Die Zertifikatskette konnte nicht hergestellt werden."		 
+	 IDS_DANE_STATEx6_TEXT_ADD	"Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Die Vertrauenskette konnte nicht hergestellt werden, weil zurzeit nicht alle nˆtige Zertifikate vorhanden sind."
+	// state -7
+	 IDS_DANE_STATEx7_LABEL	"Zertifikat unverf¸gbar"	
+	 IDS_DANE_STATEx7_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Das Serverzertifikat konnte nicht empfangen werden."		 
+	 IDS_DANE_STATEx7_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Das Serverzertifikat kann zurzeit nicht empfangen werden."	
+	// state -8
+	 IDS_DANE_STATEx8_LABEL	"Ung¸ltige TLSA Parametern"	
+	 IDS_DANE_STATEx8_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Der erhaltene TLSA Eintrag enth‰lt ung¸ltige Parameterwerte."  
+	 IDS_DANE_STATEx8_TEXT_ADD "Die Vertrauensw¸rdigkeit des TLS/SSL Serverzertifikat konnte nicht durch DANE Protokoll best‰tigt werden. Der erhaltene TLSA Eintrag enth‰lt ung¸ltige Parameterwerte. Dies kann an ein TLSA Manipulationsversuch (Spoofing) hindeuten."	
+	// state -1
+	 IDS_DANE_STATEx1_LABEL	"TLSA Status unbekannt"	
+	 IDS_DANE_STATEx1_TEXT_MAIN	"Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Es kam zu einem Fehler w‰hrend Erwerbs des TLSA Eintrags f¸r diese Dom‰ne."	 
+	 IDS_DANE_STATEx1_TEXT_ADD	"Es kam zu einem Fehler w‰hrend Erwerbs des TLSA Eintrags f¸r diese Dom‰ne. Dies kann durch einen Verbindungsausfall zum DNS-Server verursacht werden, oder die von Benutzer gew‰hlte IP-Adresse eines validierenden Resolvers ist keine richtige Adresse eines validierenden Resolvers."
+	// state -99
+	 IDS_DANE_STATEx99_LABEL "TLSA Status unbekannt"	
+	 IDS_DANE_STATEx99_TEXT_MAIN "Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Der zur Zeit eingestellte Resolver unterst¸tzt DNSSEC nicht."	 
+	 IDS_DANE_STATEx99_TEXT_ADD	 "Der zur Zeit eingestellte Resolver unterst¸tzt DNSSEC nicht. ƒndern Sie bitte die Einstellungen des Resolvers (Wahl 'Ohne Resolver')."	
+	 	 	 // state -1
+	 IDS_DANE_ERROR_GEN_LABEL	"TLSA Status unbekannt"	
+	 IDS_DANE_ERROR_GEN_TEXT_MAIN	"Das Serverzertifikat f¸r diese Dom‰ne konnte nicht durch DANE Protokoll best‰tigt werden. Es kam zu einem Fehler w‰hrend Erwerbs der TLSA Validator core."	 
+	 IDS_DANE_ERROR_GEN_TEXT_ADD	"Bitte alle Browserfenster schlieﬂen und den Browser neu starten..."
+
+    IDS_NONE                " "
+    IDS_ADDON_INIT          "Add-on initialisiert"
+    
+	IDS_DNSSEC_OK			 "Gesichert durch DNSSEC"
+    IDS_DNSSEC_FAIL			 "Nicht durch DNSSEC gesichert"
+
+	// DNSSEC TEST messages in settings dialog
+	IDS_DNSSECTEST_IP		"Fehler ñ Zeichenkette enth‰lt keine g¸ltige IP-Adresse."
+	IDS_DNSSECTEST_OK		"Erfolg ñ Die bestehenden Einstellungen ermˆglichen Validierung durch DNSSEC."
+	IDS_DNSSECTEST_BOGUS	"Versagen ñ ung¸ltige DNSSEC Antwort, die DNSSEC-Validierung ist nicht mit bestehenden Einstellungen mˆglich."
+	IDS_DNSSECTEST_ERROR	"Versagen ñ keine DNSSEC Antwort, die eingegebene IP-Adesse des Resolvers ist ung¸ltig, oder es gibt einen Netzwerkfehler."
+	IDS_DNSSECTEST_RUN      "Testen..."
+
+END
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_PROJNAME            "DNSSECToolBar"
+    IDS_TOOLBARNAME         " "
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_BUTTON1              "Button 1"
+    ID_BUTTON2		        "Button 2"
+END
+
+#endif    // Germany resources
+/////////////////////////////////////////////////////////////////////////////
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "DNSSECToolBar.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

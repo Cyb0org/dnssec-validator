@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{fcb9c879-12af-4df5-b2c4-13ffb858cb48}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{23997b23-893e-45d4-879e-39a1109553d7}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{3ca75aee-870e-4610-9849-d1c55bcff8be}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DNSSECToolBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DNSSECToolBarBand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KBToolBarCtrl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hyperlink.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="DNSSECToolBar.idl">
+      <Filter>Source Files</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DNSSECToolBar.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DNSSECToolBarBand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KBToolBarCtrl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hyperlink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="DNSSECToolBar.def">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="DNSSECToolBarBand.rgs">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\key_action.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\key_green.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\key_grey.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\key_grey_rc.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\key_grey_yt.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\key_orange.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\key_red.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\mirror_key.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\key_action.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\key_green.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\key_grey_rc.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\key_grey_yt.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\key_orange.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\key_red.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>
