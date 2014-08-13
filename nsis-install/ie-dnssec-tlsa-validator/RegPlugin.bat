@@ -1,1 +1,1 @@
-regsvr32 IEdnssec.dll
+regsvr32 ie-dnssec-tlsa-validator.dll

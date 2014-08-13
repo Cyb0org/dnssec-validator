@@ -1,30 +1,66 @@
-This file describes DNSSEC Internet Explorer add-on build dependencies and build instructions.
+This file describes DNSSEC Internet Explorer add-on dependencies and build instructions.
+Texts in this file are in UNIX UTF-8.
 
 ### GENERAL REQUIREMENTS ###
+
   - OS: GNU/Linux | MS Windows
-  - compilers:	MinGW on Linux | MSVS on Windows
+  - Compilers:	MinGW32 on Linux | MSVS on Windows
+  - App: GIT, sed, make on Linux | NSIS on Windows
   
+
 ### BUILD ###
 
-Part 1 - to be built on Linux (build libs and dll plugins):
-	# apt-get install gcc-mingw32 make git sed
+1) PART 1 - to be build on Linux
+   (build dll library by MinGW32):
+----------------------------------------------------------------
+	# install: gcc-mingw32 make git sed
+
 	$ make -f Makefile.libwin
-	$ make -f Makefile.win sys_windows_pre
-	- copy *.dll files from linux to Windows into "ie2\NSIS installer" folder
-	- copy *.dll and *.def files from Linux to Windows "ie2\DNSSECToolbar" and try to Part 2 
+	$ make -f Makefile.win
+  
+  In "plugins-lib" you find *.dll, *.def and *.exe files.
+  - copy all files from "plugins-lib" on Linux to Windows into same directory
+---------------------- PART 1 DONE ------------------------------
+ 
 
-Part 2 - to be built on Windows (build IEdnssec project -> "IEdnssec.dll"):
-	- install Microsoft Visual Studio 2010 Professional Edition or Visual Studio Exppress
+2) PART 2 - to be build on Windows by VS
+   (build ie-dnssec-tlsa-validator project -> "ie-dnssec-tlsa-validator.dll"):
+------------------------------------------------------------------------------
+	- install Microsoft Visual Studio 2010 / Visual Studio Exppress
 	      <http://www.microsoft.com/visualstudio/en-us/home>
-	- run "Visual Studio Command Prompt" (Start -> Programs -> Microsoft Visual Studio -> Visual Studio Tools)
-		1. set Command Prompt path into folder "ie2\DNSSECToolbar" 
-		2a. enter: "lib.exe /DEF:DANEcore-windows-x86.def /MACHINE:x86" for generating "DANEcore-windows-x86.lib"
-		2b. enter: "lib.exe /DEF:DNSSECcore-windows-x86.def /MACHINE:x86" for generating "DNSSECcore-windows-x86.lib"  
-	- run VS and open project ie2\DNSSECToolbar\IEdnssec.sln, select "Release MinSize" configuration (Build -> Configuration Manager...) and build it 
-	- copy new file "ie2\DNSSECToolbar\ReleaseMinSize\IEdnssec.dll" to "..\ie2\NSIS installer" and try to Part 3
 
-  Part 3 - to be built on Windows (create NSIS installer):
+	- run "Visual Studio Command Prompt"
+        (Start -> Programs -> Microsoft Visual Studio -> Visual Studio Tools)
+    		1. set Command Prompt path into folder "plugins-lib" 
+		    2a. enter: "lib.exe /DEF:libDANEcore-windows-x86.def /MACHINE:x86"         
+            into commandline for generating "libDANEcore-windows-x86.lib"
+		    2b. enter: "lib.exe /DEF:libDNSSECcore-windows-x86.def /MACHINE:x86"
+            into commandline for generating "libDNSSECcore-windows-x86.lib"  
+
+	- run VS and open project (ie-dnssec-tlsa-validator.sln)
+  - in "Project Property Manager"
+        1. add to "Additional Include Directories" paths to all header files in 
+           "plugins-source"
+        2. add to "Linker->Input" paths to "plugins-lib"
+  - select "Release MinSize" configuration (Build -> Configuration Manager...)
+    and build it 
+	- copy new file "ie\...\ReleaseMinSize\ie-dnssec-tlsa-validator.dll"
+    to "plugins-lib" and try to Part 3
+------------------------ PART 2 DONE -----------------------------------------
+
+
+3) PART 3 - to be build on Windows by NSIS
+   (create installation package):
+-----------------------------------------------------------------
      - install NSIS (Nullsoft Scriptable Install System)
        <http://nsis.sourceforge.net/Download>
-     - run NSIS and open file "ie2\NSIS installer\dnssec-setup.nsi" and build it 
-     - run "IE-dnssec-tlsa-validator-${VERSION}-windows-x86.exe" and install plugin on your computer
+     - run NSIS and open file:
+       "nsis-install\ie-dnssec-tlsa-validator\ie-dnssec-tlsa-validator-install.nsi"
+       and build it 
+------------------------ PART 3 DONE ----------------------------
+
+
+
+### INSTALL ###
+
+Run "IE-dnssec-tlsa-validator-windows-x86.exe" and install plugin on your computer

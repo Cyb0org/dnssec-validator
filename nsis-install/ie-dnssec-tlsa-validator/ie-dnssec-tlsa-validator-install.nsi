@@ -73,7 +73,7 @@ section "-hidden.postinstall"
 	setOutPath $INSTDIR
 	File ".\..\..\plugins-lib\libDNSSECcore-windows-x86.dll"
 	File ".\..\..\plugins-lib\libDANEcore-windows-x86.dll"
-	File ".\..\..\plugins-lib\IEdnssec.dll"
+	File ".\..\..\plugins-lib\ie-dnssec-tlsa-validator.dll"
 	File ".\key.ico"
 	File ".\RegPlugin.bat"
 	File ".\UnRegPlugin.bat"
@@ -108,7 +108,7 @@ section "-hidden.postinstall"
 	!insertmacro MUI_STARTMENU_WRITE_END
 
 	# register DNSSEC toolbar
-	RegDLL "$INSTDIR\IEdnssec.dll"
+	RegDLL "$INSTDIR\ie-dnssec-tlsa-validator.dll"
 sectionEnd
 
 # setup macros for uninstall functions.
@@ -119,12 +119,12 @@ sectionEnd
 
 # uninstaller section
 section "un.Unbound"
-	UnRegDLL "$INSTDIR\IEdnssec.dll"
+	UnRegDLL "$INSTDIR\ie-dnssec-tlsa-validator.dll"
   	# deregister uninstall
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}"
 	Delete "$INSTDIR\libDNSSECcore-windows-x86.dll" 
 	Delete "$INSTDIR\libDANEcore-windows-x86.dll"    
-	Delete "$INSTDIR\IEdnssec.dll"
+	Delete "$INSTDIR\ie-dnssec-tlsa-validator.dll"
 	Delete "$INSTDIR\key.ico"
 	Delete "$INSTDIR\RegPlugin.bat"
 	Delete "$INSTDIR\UnRegPlugin.bat"
