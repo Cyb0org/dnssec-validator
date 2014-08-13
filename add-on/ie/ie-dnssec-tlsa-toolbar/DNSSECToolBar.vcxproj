@@ -558,6 +558,7 @@ echo Warning : Cannot register Unicode DLL on Windows 95
       <AdditionalDependencies>shlwapi.lib;e:\Git\dnssec-validator\plugins-lib\libDNSSECcore-windows-x86.lib;e:\Git\dnssec-validator\plugins-lib\libDANEcore-windows-x86.lib;Crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>E:\Git\dnssec-validator\dll_build;E:\Git\dnssec-validator\plugin-source\common;E:\Git\dnssec-validator\plugin-source\DNSSECValidatorPlugin;E:\Git\dnssec-validator\plugin-source\TLSAValidatorPlugin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <TargetMachine>MachineX86</TargetMachine>
+      <ModuleDefinitionFile>.\DNSSECToolBar.def</ModuleDefinitionFile>
     </Link>
     <CustomBuildStep>
       <Message>Performing registration</Message>
