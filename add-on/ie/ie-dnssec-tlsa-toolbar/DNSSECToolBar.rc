@@ -31,9 +31,67 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 // Generated from the TEXTINCLUDE 2 resource.
 //
 #include "afxres.h"
+#undef APSTUDIO_READONLY_SYMBOLS
+
 
 /////////////////////////////////////////////////////////////////////////////
-#undef APSTUDIO_READONLY_SYMBOLS
+//
+// Version
+//
+#define APS_MAJORNUMBER          2
+#define APS_MINORNUMBER          1
+#define APS_BUILDNUMBER          2
+#define APS_MODIFICATIONNUMBER   0
+
+#define STR(value) #value
+#define STRINGIZE(value) STR(value)
+#define APS_FULLVERSION_STR \
+  STRINGIZE(APS_MAJORNUMBER) "." \
+  STRINGIZE(APS_MINORNUMBER) "." \
+  STRINGIZE(APS_BUILDNUMBER) "." \
+  STRINGIZE(APS_MODIFICATIONNUMBER)
+
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION APS_MAJORNUMBER,APS_MINORNUMBER,APS_BUILDNUMBER,APS_MODIFICATIONNUMBER
+ PRODUCTVERSION APS_MAJORNUMBER,APS_MINORNUMBER,APS_BUILDNUMBER,APS_MODIFICATIONNUMBER
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "CZ.NIC Labs"
+            VALUE "FileDescription", "DNSSEC/TLSA Validator"
+            VALUE "FileVersion", APS_FULLVERSION_STR
+            VALUE "LegalCopyright", "Copyright © 2014 CZ.NIC"
+            VALUE "InternalName", "dnssec-tlsa-validator.dll"
+            VALUE "OriginalFilename", "dnssec-tlsa-validator.dll"
+            VALUE "ProductName", "DNSSEC/TLSA Validator"
+            VALUE "ProductVersion", APS_FULLVERSION_STR
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_DNSSECToolBarBAND         REGISTRY DISCARDABLE    "DNSSECToolBarBand.rgs"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -84,21 +142,12 @@ IDI_TLSA_ICON_INVALID		ICON	"res\\tlsa_invalid.ico"
 IDI_TLSA_ICON_ORANGE		ICON	"res\\tlsa_orange.ico"
 IDI_TLSA_ICON_NODNSSEC		ICON	"res\\tlsa_nodnssec.ico"
 
-/////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // TEXTINCLUDE
 //
-
 1 TEXTINCLUDE DISCARDABLE 
 BEGIN
     "resource.h\0"
@@ -115,49 +164,20 @@ BEGIN
     "1 TYPELIB ""DNSSECToolBar.tlb""\r\n"
     "\0"
 END
-
 #endif    // APSTUDIO_INVOKED
 
 
+//*************************************************************************
+//*************************************************************************
+// English (U.S.) resources
+//*************************************************************************
+//*************************************************************************
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,1
- PRODUCTVERSION 2,1
- FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x2L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904B0"
-        BEGIN
-            VALUE "CompanyName", "CZ.NIC Labs"
-            VALUE "FileDescription", "DNSSEC/TLSA Validator for IE\0"
-            VALUE "FileVersion", "2,1\0"
-            VALUE "InternalName", "IEdnssec.dll\0"
-            VALUE "LegalCopyright", "Copyright 2012\0"
-            VALUE "OriginalFilename", "IEdnssec.dll\0"
-            VALUE "ProductName", "DNSSEC/TLSA Validator for IE\0"
-            VALUE "ProductVersion", "2,1\0"
-            VALUE "OLESelfRegister", "\0"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1200
-    END
-END
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -233,7 +253,6 @@ END
 //
 // DESIGNINFO
 //
-
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO 
 BEGIN
@@ -274,14 +293,6 @@ END
 #endif    // APSTUDIO_INVOKED	
 
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// REGISTRY
-//
-
-IDR_DNSSECToolBarBAND         REGISTRY DISCARDABLE    "DNSSECToolBarBand.rgs"
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
@@ -290,10 +301,10 @@ IDR_MENU_POPUP MENU
 BEGIN
     POPUP "Popup"
     BEGIN
-		MENUITEM "About...",                    ID_ABOUT
-		MENUITEM "Home page...",             ID_HOME
+		MENUITEM "About...",			ID_ABOUT
+		MENUITEM "Home page...",		ID_HOME
 		MENUITEM SEPARATOR
-        MENUITEM "Settings...",                  ID_SET
+        MENUITEM "Settings...",			ID_SET
     END
 END
 
@@ -302,7 +313,6 @@ END
 //
 // String Table
 //
-
 STRINGTABLE
 BEGIN
 
@@ -466,13 +476,7 @@ BEGIN
 	IDS_DNSSECTEST_ERROR	"Failure - no DNS reply, possible network error or wrong server address."
 	IDS_DNSSECTEST_RUN      "Testing..."
 
-	END
-
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
+END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
@@ -487,92 +491,22 @@ BEGIN
 END
 
 #endif    // English (U.S.) resources
-/////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
 
 //*************************************************************************
 //*************************************************************************
+// CZECH resources
 //*************************************************************************
 //*************************************************************************
-
-/////////////////////////////////////////////////////////////////////////////
-//CZECH resources
-
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CSY)
 #ifdef _WIN32
 LANGUAGE LANG_CZECH, SUBLANG_DEFAULT
 #pragma code_page(1250)
 #endif //_WIN32
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "1 TYPELIB ""DNSSECToolBar.tlb""\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,1
- PRODUCTVERSION 2,1
- FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x2L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904B0"
-        BEGIN
-            VALUE "CompanyName", "CZ.NIC Labs"
-            VALUE "FileDescription", "DNSSEC/TLSA Validátor pro IE\0"
-            VALUE "FileVersion", "2.1\0"
-            VALUE "InternalName", "IEdnssec.dll\0"
-            VALUE "LegalCopyright", "Copyright 2012\0"
-            VALUE "OriginalFilename", "IEdnssec.dll\0"
-            VALUE "ProductName", "DNSSEC/TLSA Validátor pro IE\0"
-            VALUE "ProductVersion", "2.1\0"
-            VALUE "OLESelfRegister", "\0"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1200
-    END
-END
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// REGISTRY
-//
-
-IDR_DNSSECToolBarBAND         REGISTRY DISCARDABLE    "DNSSECToolBarBand.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -593,7 +527,6 @@ END
 //
 // String Table
 //
-
 STRINGTABLE
 BEGIN
 
@@ -758,10 +691,22 @@ BEGIN
 	IDS_DNSSECTEST_ERROR	"Selhání - není DNS odpovìï, IP adresa resolveru je buï špatná nebo selhalo pøipojení k síti."
 	IDS_DNSSECTEST_RUN      "Testuji..."
 
-	END
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_PROJNAME            "DNSSECToolBar"
+    IDS_TOOLBARNAME         " "
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_BUTTON1              "Tlaèítko 1"
+    ID_BUTTON2		        "Tlaèítko 2"
+END
 
 
-	/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
@@ -893,36 +838,18 @@ BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED	
-	
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_PROJNAME            "DNSSECToolBar"
-    IDS_TOOLBARNAME         " "
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    ID_BUTTON1              "Tlaèítko 1"
-    ID_BUTTON2		        "Tlaèítko 2"
-END
 
 #endif    // CZECH resources
-/////////////////////////////////////////////////////////////////////////////
 
 
-//*************************************************************************
-//*************************************************************************
-//*************************************************************************
-//*************************************************************************
 
-/////////////////////////////////////////////////////////////////////////////
+
+
+//*************************************************************************
+//*************************************************************************
 // GERMANY resources
+//*************************************************************************
+//*************************************************************************
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
 #ifdef _WIN32
@@ -930,77 +857,10 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 #pragma code_page(1252)
 #endif //_WIN32
 
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "1 TYPELIB ""DNSSECToolBar.tlb""\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,1
- PRODUCTVERSION 2,1
- FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x2L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904B0"
-        BEGIN
-            VALUE "CompanyName", "CZ.NIC Labs"
-            VALUE "FileDescription", "DNSSEC/TLSA Validator für IE\0"
-            VALUE "FileVersion", "2,1\0"
-            VALUE "InternalName", "IEdnssec.dll\0"
-            VALUE "LegalCopyright", "Copyright 2012\0"
-            VALUE "OriginalFilename", "IEdnssec.dll\0"
-            VALUE "ProductName", "DNSSEC/TLSA Validator für IE\0"
-            VALUE "ProductVersion", "2,1\0"
-            VALUE "OLESelfRegister", "\0"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1200
-    END
-END
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
-
 IDD_DIALOG_MAIN_ABOUT DIALOGEX 0, 0, 250, 110
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
@@ -1018,7 +878,6 @@ BEGIN
 	LTEXT           "2013", IDC_STATIC,50,70,100,10
 	LTEXT           "http://www.dnssec-validator.cz/", IDC_LINK,10,95,120,10
 END
-
 
 
 IDD_DIALOG_MAIN DIALOGEX 0, 0, 210, 260
@@ -1050,6 +909,7 @@ BEGIN
     PUSHBUTTON      "Stornieren",IDCANCEL,150,125+75+30+10,50,14
 END
 
+
 IDD_DIALOG_DNSSEC DIALOGEX 0, 0, 220, 75
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP  
 FONT 8, "Arial", 400, 0, 0x1
@@ -1074,7 +934,6 @@ END
 //
 // DESIGNINFO
 //
-
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO 
 BEGIN
@@ -1115,14 +974,6 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED	
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// REGISTRY
-//
-
-IDR_DNSSECToolBarBAND         REGISTRY DISCARDABLE    "DNSSECToolBarBand.rgs"
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
@@ -1131,10 +982,10 @@ IDR_MENU_POPUP MENU
 BEGIN
     POPUP "Popup"
     BEGIN
-		MENUITEM "Über...",                    ID_ABOUT
-		MENUITEM "Startseite...",             ID_HOME
+		MENUITEM "Über...",					ID_ABOUT
+		MENUITEM "Startseite...",			ID_HOME
 		MENUITEM SEPARATOR
-        MENUITEM "Einstellungen...",                  ID_SET
+        MENUITEM "Einstellungen...",		ID_SET
     END
 END
 
@@ -1303,14 +1154,8 @@ BEGIN
 	IDS_DNSSECTEST_BOGUS	"Versagen – ungültige DNSSEC Antwort, die DNSSEC-Validierung ist nicht mit bestehenden Einstellungen möglich."
 	IDS_DNSSECTEST_ERROR	"Versagen – keine DNSSEC Antwort, die eingegebene IP-Adesse des Resolvers ist ungültig, oder es gibt einen Netzwerkfehler."
 	IDS_DNSSECTEST_RUN      "Testen..."
-
+	
 END
-
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
 
 STRINGTABLE DISCARDABLE 
 BEGIN
@@ -1325,7 +1170,9 @@ BEGIN
 END
 
 #endif    // Germany resources
-/////////////////////////////////////////////////////////////////////////////
+
+
+
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
