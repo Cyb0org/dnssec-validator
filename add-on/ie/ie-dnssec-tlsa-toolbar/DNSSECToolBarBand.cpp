@@ -29,37 +29,34 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #include "resource.h"
 #include "shlobj.h"
 #include <string>
-
 #include <windows.h>  /* for shared memory */
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iphlpapi.h> /* for IP Helper API */
 #include <winreg.h>
 
-//#include <CommCtrl.h>
-// size of buffer for URL parts save
-#define STR_BUF_SIZE	512
-#define SM_NAME_LOCAL "Local\\SharedCacheTLSADNSSEC" /* share memory name for Windows*/
+
 // default icon status 
-WORD statdnssecicon=IDI_DNSSEC_ICON_INIT;
+WORD statdnssecicon = IDI_DNSSEC_ICON_INIT;
 // for ICON KEY status - not used
 WORD dnsseciconBar;
 bool debug = true;
 char * temp = "";
-short textkey = KEYTEXT;
-short choice = RESOLVER;
-short choice2 = RESOLVER2;
-short tlsaenable = TLSAENABLE;
+short textkey = 0;
+short choice = 0;
+short choice2 = 0;
+short tlsaenable = 1;
 char dnssecseradr[IPADDR_MLEN] = "000.000.000.000 0000:0000:0000:0000:0000:0000:0000:0000";
-char* nic = IPNIC;
-char* oarc = IPOARC;
-short usedfwd = TCPUDP;
-short debugoutput = DEBUGVAL;
-short debugoutput_enable = DEBUGVAL_ENABLE;
-short cache_enable = CACHE;
-short ipv4 = IPv4;
-short ipv6 = IPv6;
-short ipv46 = IPv4;
+char* nic = "217.31.204.130";
+char* oarc = "149.20.64.20";
+short usedfwd = 0;
+
+short debugoutput = 1;
+short debugoutput_enable = 1;
+short cache_enable = 1;
+short ipv4 = 1;
+short ipv6 = 0;
+short ipv46 = 1;
 short ipresult = 0;
 short res;
 short tlsaicon = 9;
@@ -105,19 +102,12 @@ CRITICAL_SECTION CDNSSECToolBarBand::cs;
 // for tooltip creation
 bool CDNSSECToolBarBand::csInitialized = false;
 bool csInitialized = false;
-char DefaultIniData[] = "[DNSSEC]\ntlsaenable=1\nkeytext=0\nchoice=3\nchoicedns=0\nuserip=8.8.8.8\nfilteron=0\nlisttld="; 
 char str[INET6_ADDRSTRLEN];
-
-//----BEGIN of CACHE MEMORY ---------------------------------------------------
-#define CACHE_ITEMS_MAX 64          // max items in cache
-#define DOMAIN_NAME_LENGTH_MAX 270   // max lenght of domain name include port number
-#define PORT_LENGTH_MAX 6            // max lenght of port record
-#define NO_ITEM_IN_CACHE -99         // the item is not in cache           
-
 
 //----------------------------------------------------------------------------
 static char byteMap[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 static int byteMapLen = sizeof(byteMap);
+//----------------------------------------------------------------------------
 
 
 //*****************************************************************************
@@ -154,6 +144,9 @@ char * bintohex(const uint8_t *bytes, size_t buflen)
 	return retval;
 }
 
+
+
+//---- CACHE MEMORY ----------------------------------------------------
 // cache item structure
 typedef struct Record {
 	char key[DOMAIN_NAME_LENGTH_MAX];
@@ -814,10 +807,11 @@ bool CDNSSECToolBarBand::CreateToolWindow()
 	
 	int ret;
 	ret = dnssec_validation_init(); 
-	if (debug) ATLTRACE("dnssec_validation_init(%d):\n",ret);
+	if (debug) ATLTRACE("dnssec_validation_init(%d):\n", ret);
 
 	ret =  dane_validation_init();
-	if (debug) ATLTRACE("dane_validation_init(%d):\n",ret);
+	if (debug) ATLTRACE("dane_validation_init(%d):\n", ret);
+	
 	// Create ini file if not exists
 	CreateIniFile();
 
@@ -828,177 +822,19 @@ bool CDNSSECToolBarBand::CreateToolWindow()
 	LoadOptionsFromFile();
 
 	// We need to create a reflection window in between our toolbar control
-	if (!m_wndReflectionWnd.CreateEx(NULL, TOOLBARCLASSNAME,"DNSSEC BAR Module",WS_CHILD | WS_CLIPSIBLINGS | WS_BORDER,rcClientParent.left,rcClientParent.top,rcClientParent.right-rcClientParent.left,rcClientParent.bottom-rcClientParent.top,*pWndParent,NULL,0))
-	return false;
+	if (!m_wndReflectionWnd.CreateEx(NULL, TOOLBARCLASSNAME,"DNSSEC BAR Module",WS_CHILD | WS_CLIPSIBLINGS | WS_BORDER,rcClientParent.left,rcClientParent.top,rcClientParent.right-rcClientParent.left,rcClientParent.bottom-rcClientParent.top,*pWndParent,NULL,0)) {
+		return false;
+	}
+
 	// and the rebar in order to get WM_COMMAND messages sent from the toolbar to its
 	// parent. 
-	if (!m_wndToolBar.Create(rcClientParent, &m_wndReflectionWnd, this, GHins))
-	return false;
-	// Set toolbar button bitmap size
-	//if (!SendMessage(m_wndToolBar, TB_SETBITMAPSIZE, 0, MAKELPARAM(ICON_KEY_WIDTH, ICON_KEY_HEIGHT)))
-	//return false;
-
-	//CreateStatusBarKey();
-	/*
-	// Get cuurent version of IE
-	iRes = GetMSIEversion(&iMajor,&iMinor);		
-	
-	// if IE is 9.xx
-	if (iMajor==9) {
-		CreateIconTooltip(m_wndToolBar);
-		return true;
+	if (!m_wndToolBar.Create(rcClientParent, &m_wndReflectionWnd, this, GHins)) {
+		return false;
 	}
-	// if IE is 7.xx
-	if (iMajor==7) {
-		CreateIconTooltip(m_wndToolBar);
-		return true;
-	}
-	*/
 
 	return true;
 }
 
-/**************************************************************************/
-// Get IE version
-/**************************************************************************/
-int CDNSSECToolBarBand::GetMSIEversion(int *iMajor, int *iMinor)
-{
-	LONG lResult;
-	int iPos,iPos2;
-    HKEY hKey;
-	DWORD dwSize=100,dwType;
-	char szVAL[100],szTemp[5];
-	char *pDec,*pDec2;
-
-    // Open the key for query access
-	lResult = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-                    LPCTSTR("SOFTWARE\\Microsoft\\Internet Explorer"),
-					0,KEY_QUERY_VALUE,&hKey);
-
-	if(lResult != ERROR_SUCCESS)   // Unable to open Key
-	{
-		return 644;
-	}
-
-    // OK, read the value
-	lResult=::RegQueryValueEx(hKey,LPTSTR("Version"),NULL,
-			&dwType, LPBYTE(szVAL),&dwSize);
-
-	if(lResult != ERROR_SUCCESS)    // Unable to get value
-	{
-	  // Close the key before quitting
-		lResult=::RegCloseKey(hKey);
-	  return 645;
-	}
-
-	// Close the key
-    lResult=::RegCloseKey(hKey);
-
-	// Extract major version by looking for the first decimal
-	pDec=strstr(szVAL,".");
-	if(pDec==NULL)
-		return 650;         // Unable to decipher version number
-	iPos=pDec-szVAL+1;
-	ZeroMemory(szTemp,5);
-	strncpy_s(szTemp,szVAL,iPos-1);
-	*iMajor=atoi(szTemp);
-
-	// Find the Minor version number, look for second decimal
-	pDec++;
-	pDec2=strstr(pDec,".");
-	if(pDec2==NULL)
-	{
-		*iMinor=0;          // Minor version not found
-		return 0;
-	}
-	iPos2=pDec2-szVAL+1;
-	ZeroMemory(szTemp,5);
-	strncpy_s(szTemp,pDec,iPos2-iPos-1);
-	*iMinor=atoi(szTemp);
-
-	return 0;
-}
-
-/**************************************************************************/
-// Status bar KEY creator
-/**************************************************************************/
-bool CDNSSECToolBarBand::CreateStatusBarKey()
-{
-//if (debug) ATLTRACE("CreateStatusBar():\n");
-HWND hWndNewPane = CreateWindowEx(
-	0,					// no extended styles
-	STATUSCLASSNAME,	// name of status bar class
-	(LPCTSTR) " ",		// no text when first created
-	WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP | SBARS_TOOLTIPS,
-	0, 0, 0, 0,			// ignores size and position
-	m_wndToolBar,			// handle to parent window
-	NULL,				// child window identifier
-	GHins,				// handle to application instance
-	NULL);	
-
-	//::SetWindowLongPtr(hWndNewPane, GWL_WNDPROC, reinterpret_cast<LONG_PTR>(&WndProc));
-	RedrawWindow(hWndNewPane, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
-	MoveWindow(hWndNewPane, SBAR_POSITION_LEFT, SBAR_POSITION_TOP, SBAR_POSITION_LENGTH, SBAR_POSITION_HEIGHT, TRUE);
-
-return true;
-}
-
-/**************************************************************************/
-// Status bar TEXT creator
-/**************************************************************************/
-bool CDNSSECToolBarBand::CreateStatusBarText()
-{
-//if (debug) ATLTRACE("CreateStatusBar():\n");
-HWND hWndNewPane2 = CreateWindowEx(
-	0,					// no extended styles
-	STATUSCLASSNAME,	// name of status bar class
-	(LPCTSTR) "DNSSEC Text",		// no text when first created
-	WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP,
-	0, 0, 0, 0,			// ignores size and position
-	m_wndToolBar,			// handle to parent window
-	NULL,				// child window identifier
-	GHins,				// handle to application instance
-	NULL);	
-
-	//::SetWindowLongPtr(hWndNewPane2, GWL_WNDPROC, reinterpret_cast<LONG_PTR>(&WndProc));
-	RedrawWindow(hWndNewPane2, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
-	MoveWindow(hWndNewPane2, 100, 3, 300, ICON_KEY_HEIGHT, TRUE);
-	SendMessage((HWND) hWndNewPane2, (UINT) SB_SETBKCOLOR, 0, 0x00FF0000);
-	SendMessage((HWND) hWndNewPane2, (UINT) SB_SETTEXT, (WPARAM)(INT) 0 | 0, (LPARAM) (LPSTR) TEXT("DNSSEC Validator"));	 
-
-return true;
-}
-
-/**************************************************************************/
-// Tooltip bubble creator
-/**************************************************************************/
-void CDNSSECToolBarBand::CreateIconTooltip(HWND hwndParent)
-{
-   // if (debug) ATLTRACE("CreateIconTooltip() call\n");	
-	// Create a tooltip.
-    hwndTT = CreateWindowEx(NULL, TOOLTIPS_CLASS, NULL, 
-                                 WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP | TTS_BALLOON,
-                                 CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 
-                                 hwndParent, NULL, GHins, NULL);
-
-    SetWindowPos(hwndTT, HWND_TOPMOST, 0, 0, 0, 0, 
-                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-
-    // Set up "tool" information. In this case, the "tool" is the entire parent window.
-    //TOOLINFO ti = { 0 };
-	ti.cbSize   = TTTOOLINFOA_V2_SIZE;
-    ti.uFlags   = TTF_SUBCLASS;
-    ti.hwnd     = hwndParent;
-    ti.hinst    = NULL;
-    ti.lpszText = MAKEINTRESOURCE(IDS_ADDON_INIT);
-    
-    GetClientRect(hwndParent, &ti.rect);
-
-    SendMessage(hwndTT, TTM_SETMAXTIPWIDTH, 0, 300);
-	
-	// Associate the tooltip with the tool window.
-    SendMessage(hwndTT, TTM_ADDTOOL, 0, (LPARAM) (LPTOOLINFO) &ti);
-} 
 
 /**************************************************************************/
 // Bitmap index convert
@@ -1722,231 +1558,6 @@ short CDNSSECToolBarBand::TestResolver(char *domain, char *ipbrowser, char IPv)
 	return res;
 }
 
-void CDNSSECToolBarBand::ShowFwdTooltip() 
-{
-	if (iMajor==8) {
-		if (!tiInitialized1) {
-			CreateIconTooltip(m_wndToolBar);
-			tiInitialized1 = true;
-		}
-	}
-	// if IE is version 6.xx, create tooltip	
-	if (iMajor==6) {
-		if (!tiInitialized1) {
-			CreateIconTooltip(m_wndToolBar);
-			tiInitialized1 = true;
-		}
-	}
-	
-
-	char tibuf[STR_BUF_SIZE] = TEXT("DNSSEC Upozornìní"); // buffer to store tooltip string
-	char tibuf2[STR_BUF_SIZE] = TEXT("Aktuálnì nastavený resolver nepodporuje DNSSEC technologii. Prosím, zmìòte nastavení validátoru."); // buffer to store tooltip string
-	ti.lpszText = tibuf2;
-	SendMessage(hwndTT, TTM_SETTITLE, TTI_WARNING, (LPARAM) tibuf);
-	SendMessage(hwndTT, TTM_UPDATETIPTEXT, 0, (LPARAM) (LPTOOLINFO) &ti);
-}
-
-/**************************************************************************/
-// Load CA certificate from windows cet store - not used since 2.1.0
-/**************************************************************************/
-bool CDNSSECToolBarBand::LoadCaCertFromStore() {
-
-	if (debug) ATLTRACE("\n----------------------------------------------------\n");	
-	if (debug) ATLTRACE("LoadCaCertFromStore() call\n");	
-
-	HCERTSTORE hSysStore = NULL;
-	if (hSysStore = CertOpenStore(
-		CERT_STORE_PROV_SYSTEM,          // The store provider type
-		0,                               // The encoding type is not needed
-		NULL,                            // Use the default HCRYPTPROV
-		CERT_SYSTEM_STORE_CURRENT_USER,  // Set the store location in a registry location
-		L"Root"                            // The store name as a Unicode string
-   ))
-	{
-		ATLTRACE("The system store was created successfully.\n");
-	}
-	else {
-		ATLTRACE("An error occurred during creation of the system store!\n");
-		return false;
-	}
-
-	int i = 0;
-	PCCERT_CONTEXT  pCertContext = NULL; 
-	//CRYPT_BIT_BLOB  SubjectUniqueId;
-	while(pCertContext= CertEnumCertificatesInStore(
-      hSysStore,
-      pCertContext)) // on the first call to the function,
-                     // this parameter is NULL 
-                     // on all subsequent calls, 
-                     // this parameter is the last pointer 
-                     // returned by the function
-{
-    //----------------------------------------------------------------
-    // Do whatever is needed for a current certificate.
-	char * cerhex = bintohex(pCertContext->pbCertEncoded, pCertContext->cbCertEncoded);
-	i++;
-	LPTSTR outtext = new TCHAR[256];
-	CertNameToStr(X509_ASN_ENCODING,&pCertContext->pCertInfo->Subject,CERT_SIMPLE_NAME_STR,outtext,256); 
-	ATLTRACE("%i) %s |%lu|\n%s",i, outtext, pCertContext->cbCertEncoded, cerhex);
-	ATLTRACE("'\n\n");
-} // End of while.
-
-	if(CertCloseStore(
-        hSysStore, 
-        CERT_CLOSE_STORE_CHECK_FLAG))
-{
-     ATLTRACE("The file store was closed successfully.\n");
-}
-else
-{
-     ATLTRACE("An error occurred during closing of the file store.\n");
-}
-
-if (pCertContext)
-    CertFreeCertificateContext(pCertContext);
-
-if (debug) ATLTRACE("----------------------------------------------------\n\n");
-return true;
-}
-
-/**************************************************************************/
-// Load settings from the Windows registry
-/**************************************************************************/
-void CDNSSECToolBarBand::LoadOptionsFromRegistry(void) {
-	
-	//if (debug) ATLTRACE("LoadOptionsFromRegistry() call\n");	
-
-	DWORD dwRet;
-	HKEY hKey;
-	LPTSTR szVal;
-	DWORD dwVal;
-	HRESULT hr;
-	// open DNSSEC Validator registry key if exists
-	dwRet = RegOpenKeyEx(HKEY_USERS, HKU_REG_KEY, 0, KEY_QUERY_VALUE, &hKey);
-	if (dwRet == ERROR_SUCCESS) {
-
-		//if (debug) ATLTRACE("LoadOptionsFromRegistry() - ERROR_SUCCESS\n");
-
-		// Get the registry values...
-		hr = RegGetString(hKey,"userip", &szVal);
-		if (FAILED(hr)) return;
-		//else dnssecseradr=szVal;
-
-		// Get the registry values...
-		hr = RegGetString(hKey,"nicip", &szVal);
-		if (FAILED(hr)) return;
-		else nic=(char*)szVal;
-
-		// Get the registry values...
-		hr = RegGetString(hKey,"oarcip", &szVal);
-		if (FAILED(hr)) return;
-		else oarc=(char*)szVal;
-
-		// Get the registry values...
-		hr = RegGetDWord(hKey,"choice", &dwVal);
-		if (FAILED(hr)) return;
-		else if (dwVal==0x00000000) choice = 0;
-		else if (dwVal==0x00000001) choice = 1;
-		else if (dwVal==0x00000002) choice = 2;
-		else choice = 3;
-
-		// Get the registry values...
-		hr = RegGetDWord(hKey,"keytext", &dwVal);
-		if (FAILED(hr)) return;
-		else if (dwVal==0x00000001) textkey = 1;
-		else textkey = 0;
-
-		// Get the registry values...
-		hr = RegGetDWord(hKey,"tcpudp", &dwVal);
-		if (FAILED(hr)) return;
-		else if (dwVal==0x00000001) usedfwd = 1;
-		else usedfwd = 0;
-
-		// Get the registry values...
-		hr = RegGetDWord(hKey,"choicedns", &dwVal);
-		if (FAILED(hr)) return;
-		else if (dwVal==0x00000001) choice2 = 1;
-		else choice2 = 0;
-
-		// Get the registry values...
-		hr = RegGetDWord(hKey,"debugoutput", &dwVal);
-		if (FAILED(hr)) return;
-		else if (dwVal==0x00000001) debugoutput = 1;
-		else debugoutput = 0;
-
-		RegCloseKey(hKey);
-
-	} else {
-		//if (debug) ATLTRACE("Cannot open DNSSEC Validator's registry key\n");
-	}
-}
-
-/**************************************************************************/
-// Get string from Windows registry
-/**************************************************************************/
-HRESULT CDNSSECToolBarBand::RegGetString(HKEY hKey, LPCTSTR szValueName, LPTSTR * lpszResult) {
- 
-    // Given a HKEY and value name returns a string from the registry.
-    // Upon successful return the string should be freed using free()
-    // eg. RegGetString(hKey, TEXT("my value"), &szString);
- 
-    DWORD dwType=1, dwDataSize=0, dwBufSize=0;
-    LONG lResult;
- 
-    // Incase we fail set the return string to null...
-    if (lpszResult != NULL) *lpszResult = NULL;	
-    // Check input parameters...
-    if (hKey == NULL || lpszResult == NULL) return E_INVALIDARG;
-    // Get the length of the string in bytes (placed in dwDataSize)...
-    lResult = RegQueryValueEx(hKey, szValueName, 0, &dwType, NULL, &dwDataSize );
-    // Check result and make sure the registry value is a string(REG_SZ)...
-    if (lResult != ERROR_SUCCESS) return HRESULT_FROM_WIN32(lResult);
-    else if (dwType != REG_SZ)    return DISP_E_TYPEMISMATCH;
-    // Allocate memory for string - We add space for a null terminating character...
-    dwBufSize = dwDataSize + (1 * sizeof(TCHAR));
-    *lpszResult = (CHAR *)malloc(dwBufSize);
-    if (*lpszResult == NULL) return E_OUTOFMEMORY;
-    // Now get the actual string from the registry...
-    lResult = RegQueryValueEx(hKey, szValueName, 0, &dwType, (LPBYTE) *lpszResult, &dwDataSize );
-    // Check result and type again.
-    // If we fail here we must free the memory we allocated...
-    if (lResult != ERROR_SUCCESS) { 
-			free(*lpszResult); 
-			return HRESULT_FROM_WIN32(lResult); 
-	}
-    else if (dwType != REG_SZ)    { 
-			free(*lpszResult); return DISP_E_TYPEMISMATCH; 
-	}
-    // We are not guaranteed a null terminated string from RegQueryValueEx.
-    // Explicitly null terminate the returned string...
-    (*lpszResult)[(dwBufSize / sizeof(TCHAR)) - 1] = TEXT('\0');
-	free(*lpszResult);
-
-    return NOERROR;
-}
- 
-/**************************************************************************/
-// Get DWORD value from Windows registry
-/**************************************************************************/
-HRESULT CDNSSECToolBarBand::RegGetDWord(HKEY hKey, LPCTSTR szValueName, DWORD * lpdwResult) {
-    // Given a value name and an hKey returns a DWORD from the registry.
-    // eg. RegGetDWord(hKey, TEXT("my dword"), &dwMyValue);
-    LONG lResult;
-    DWORD dwDataSize = sizeof(DWORD);
-    DWORD dwType = 0;
- 
-    // Check input parameters...
-    if (hKey == NULL || lpdwResult == NULL) return E_INVALIDARG;
- 
-    // Get dword value from the registry...
-    lResult = RegQueryValueEx(hKey, szValueName, 0, &dwType, (LPBYTE) lpdwResult, &dwDataSize );
- 
-    // Check result and make sure the registry value is a DWORD(REG_DWORD)...
-    if (lResult != ERROR_SUCCESS) return HRESULT_FROM_WIN32(lResult);
-    else if (dwType != REG_DWORD) return DISP_E_TYPEMISMATCH;
- 
-    return NOERROR;
-}
 
 /**************************************************************************/
 // loads preference settings from the ini file
@@ -1999,7 +1610,7 @@ void CDNSSECToolBarBand::CreateIniFile()
 			
 			HANDLE hFile = NULL;
 			  
-			DWORD dwBytesToWrite = (DWORD)strlen(DefaultIniData);
+			DWORD dwBytesToWrite = (DWORD)strlen(DEFAULT_INI_DATA);
 			DWORD dwBytesWritten = 0;
 			BOOL bErrorFlag = FALSE;
 			// Open the file.
@@ -2008,7 +1619,7 @@ void CDNSSECToolBarBand::CreateIniFile()
             // Write temporary data (code omitted).
 			   bErrorFlag = WriteFile( 
                     hFile,           // open file handle
-                    DefaultIniData,      // start of data to write
+                    DEFAULT_INI_DATA,      // start of data to write
                     dwBytesToWrite,  // number of bytes to write
                     &dwBytesWritten, // number of bytes that were written
                     NULL);            // no overlapped structure
