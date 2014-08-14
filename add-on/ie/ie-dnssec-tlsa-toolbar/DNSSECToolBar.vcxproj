@@ -105,9 +105,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release MinSize|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseOfMfc>Static</UseOfMfc>
+    <UseOfMfc>Dynamic</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <UseOfAtl>Static</UseOfAtl>
+    <UseOfAtl>Dynamic</UseOfAtl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release MinSize|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -329,7 +329,7 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg" </Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release MinSize|Win32'">
     <ClCompile>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <StringPooling>true</StringPooling>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -343,7 +343,7 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg" </Command>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <ObjectFileName>.\ReleaseMinSize\</ObjectFileName>
       <ProgramDataBaseFileName>.\ReleaseMinSize\</ProgramDataBaseFileName>
-      <AdditionalIncludeDirectories>./;E:\Git\dnssec-validator\plugin-source\common;E:\Git\dnssec-validator\plugin-source\DNSSECValidatorPlugin;E:\Git\dnssec-validator\plugin-source\TLSAValidatorPlugin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;..\..\..\plugin-source\common;..\..\..\plugin-source\DNSSECValidatorPlugin;..\..\..\plugin-source\TLSAValidatorPlugin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <TypeLibraryName>.\ReleaseMinSize\DNSSECToolBar.tlb</TypeLibraryName>
@@ -360,11 +360,10 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg" </Command>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>.\ReleaseMinSize\IEdnssec.dll</OutputFile>
       <ImportLibrary>.\ReleaseMinSize\DNSSECToolBar.lib</ImportLibrary>
-      <AdditionalDependencies>shlwapi.lib;DNSSECcore-windows-x86.lib;DANEcore-windows-x86.lib;Crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;libDNSSECcore-windows-x86.lib;libDANEcore-windows-x86.lib;Crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\DNSSECToolBar.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>.\;E:\Git\dnssec-validator\dll_build</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\;..\..\..\plugins-lib</AdditionalLibraryDirectories>
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
       <EnableUAC>false</EnableUAC>
     </Link>
@@ -535,7 +534,7 @@ echo Warning : Cannot register Unicode DLL on Windows 95
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <AdditionalIncludeDirectories>E:\Git\dnssec-validator\plugin-source\common;E:\Git\dnssec-validator\plugin-source\DNSSECValidatorPlugin;E:\Git\dnssec-validator\plugin-source\TLSAValidatorPlugin;./;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\plugin-source\common;..\..\..\plugin-source\DNSSECValidatorPlugin;..\..\..\plugin-source\TLSAValidatorPlugin;./;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Midl>
@@ -555,8 +554,8 @@ echo Warning : Cannot register Unicode DLL on Windows 95
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>shlwapi.lib;e:\Git\dnssec-validator\plugins-lib\libDNSSECcore-windows-x86.lib;e:\Git\dnssec-validator\plugins-lib\libDANEcore-windows-x86.lib;Crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>E:\Git\dnssec-validator\dll_build;E:\Git\dnssec-validator\plugin-source\common;E:\Git\dnssec-validator\plugin-source\DNSSECValidatorPlugin;E:\Git\dnssec-validator\plugin-source\TLSAValidatorPlugin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>shlwapi.lib;libDNSSECcore-windows-x86.lib;libDANEcore-windows-x86.lib;Crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\plugins-lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <TargetMachine>MachineX86</TargetMachine>
       <ModuleDefinitionFile>.\DNSSECToolBar.def</ModuleDefinitionFile>
     </Link>

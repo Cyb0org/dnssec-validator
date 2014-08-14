@@ -28,7 +28,7 @@ Texts in this file are in UNIX UTF-8.
 ------------------------------------------------------------------------------
 	- install Microsoft Visual Studio 2010 / Visual Studio Exppress
 	      <http://www.microsoft.com/visualstudio/en-us/home>
-
+        
 	- run "Visual Studio Command Prompt"
         (Start -> Programs -> Microsoft Visual Studio -> Visual Studio Tools)
     		1. set Command Prompt path into folder "plugins-lib" 
@@ -36,12 +36,7 @@ Texts in this file are in UNIX UTF-8.
             into commandline for generating "libDANEcore-windows-x86.lib"
 		    2b. enter: "lib.exe /DEF:libDNSSECcore-windows-x86.def /MACHINE:x86"
             into commandline for generating "libDNSSECcore-windows-x86.lib"  
-
 	- run VS and open project (ie-dnssec-tlsa-validator.sln)
-  - in "Project Property Manager"
-        1. add to "Additional Include Directories" paths to all header files in 
-           "plugins-source"
-        2. add to "Linker->Input" paths to "plugins-lib"
   - select "Release MinSize" configuration (Build -> Configuration Manager...)
     and build it 
 	- copy new file "ie\...\ReleaseMinSize\ie-dnssec-tlsa-validator.dll"
@@ -54,6 +49,7 @@ Texts in this file are in UNIX UTF-8.
 -----------------------------------------------------------------
      - install NSIS (Nullsoft Scriptable Install System)
        <http://nsis.sourceforge.net/Download>
+       
      - run NSIS and open file:
        "nsis-install\ie-dnssec-tlsa-validator\ie-dnssec-tlsa-validator-install.nsi"
        and build it 
