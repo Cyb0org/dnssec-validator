@@ -28,27 +28,31 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #define __DNSSECToolBarBAND_H_
 #include "Winuser.h"
 #include "Wincrypt.h"
-#include "resource.h"       // main symbols
-#include "hyperlink.h"
+#include "resource.h"	// main symbols
+#include "hyperlink.h"	// a href link
+#include "KBToolBarCtrl.h"
+
+#include <shlguid.h>	// IID_IWebBrowser2, DIID_DWebBrowserEvents2, etc
+#include <exdispid.h>	// DISPID_DOCUMENTCOMPLETE, etc.
+#include <shlobj.h>
+#include <ctime>
+#include <list>
+#include <shlwapi.h>
+
 #include "dnssec-states.gen"		// DNSSEC state constants
 #include "dane-states.gen"		// TLSA state constants
 extern "C" {					// use C language linkage
   #include "dnssec-plug.h"
   #include "dane-plug.h"
 }
-#include "KBToolBarCtrl.h"
-#include <shlguid.h>     // IID_IWebBrowser2, DIID_DWebBrowserEvents2, etc
-#include <exdispid.h> // DISPID_DOCUMENTCOMPLETE, etc.
-#include <shlobj.h>
-#include <ctime>
-#include <list>
-#include <shlwapi.h>
+
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib, "crypt32.lib")
-using namespace std;
-#define MY_ENCODING_TYPE  (PKCS_7_ASN_ENCODING | X509_ASN_ENCODING)
-#define CACHE_EXPIR_TIME 300 // seconds = 5 min is expir time of item in DANE cache
 
+using namespace std;
+
+//#define MY_ENCODING_TYPE  (PKCS_7_ASN_ENCODING | X509_ASN_ENCODING)
+#define CACHE_EXPIR_TIME 300 // seconds = 5 min is expir time of item in DANE cache
 #define TB_MIN_SIZE_X   100
 #define TB_MIN_SIZE_Y   22
 #define TB_MAX_SIZE_Y   40
@@ -122,13 +126,10 @@ extern bool wrong;
 
 // variable for IE version check
 extern int iRes,iMajor,iMinor;
-//#if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
-//#error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
-//#endif
-//class CIPAddressCtrl;
 class CHyperLink;
 extern CHyperLink m_link;
-//extern CIPAddressCtrl m_ip; 
+
+
 /////////////////////////////////////////////////////////////////////////////
 // CDNSSECToolBarBand
 class ATL_NO_VTABLE CDNSSECToolBarBand : 

@@ -6,15 +6,10 @@
 //      run nmake -f DNSSECToolBarps.mk in the project directory.
 
 #include "stdafx.h"
-#include "resource.h"
 #include <initguid.h>
 #include "DNSSECToolBar.h"
-//extern "C" {					// use C language linkage
-//  #include "ds.h"
-//}
 #include "DNSSECToolBar_i.c"
 #include "DNSSECToolBarBand.h"
-
 
 CComModule _Module;
 HINSTANCE GHins;
