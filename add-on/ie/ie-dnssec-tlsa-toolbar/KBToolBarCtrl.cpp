@@ -1,26 +1,22 @@
 /* ***** BEGIN LICENSE BLOCK *****
-Copyright 2012 CZ.NIC, z.s.p.o.
+Copyright 2014 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz>
 
-This file is part of DNSSEC Validator Add-on.
+This file is part of DNSSEC Validator Add-on 2.x.
 
-DNSSEC Validator Add-on is free software: you can redistribute it and/or
+DNSSEC Validator Add-on 2.x is free software: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or (at your
 option) any later version.
 
-DNSSEC Validator Add-on is distributed in the hope that it will be useful,
+DNSSEC Validator Add-on 2.x is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 more details.
 
 You should have received a copy of the GNU General Public License along with
-DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
-
-Some parts of these codes are based on the DNSSECVerify4IENav project
-<http://cs.mty.itesm.mx/dnssecmx>, which is distributed under the Code Project
-Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
+DNSSEC Validator Add-on 2.x.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
 #include "stdafx.h"
@@ -34,8 +30,9 @@ CHyperLink m_link;
 CDNSSECToolBarBand* m_pBarBand;
 LANGID lang;
 wchar_t* BUTTONTEXT = L"";
-int dx,dy=0;
+int dx, dy = 0;
 short cache_del = 0;
+
 //-------------------------------------------------------------------
 // Definition of toolbar style
 //-------------------------------------------------------------------
@@ -69,6 +66,11 @@ END_MESSAGE_MAP()
 /**************************************************************************/
 bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CDNSSECToolBarBand* pBand, HINSTANCE GHins) 
 {
+
+	// set handle on this toolbar window
+	m_pBand = pBand;
+	m_pBarBand = pBand;
+
 	//if (debug) ATLTRACE("CreateToolbar():\n");
 	if (!CToolBarCtrl::Create(DEFAULT_TOOLBAR_STYLE, rcClientParent, pWndParent, NULL))
 		return false;	
@@ -114,7 +116,7 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CDNSSECToolB
 	// add button into toolbar
 	if (!AddButtons(1, &tbs)) return false;
 
-	if (tlsaenable == 1) {
+	if (m_pBand->tlsaenable == 1) {
 		tbs.dwData = 0;
 		tbs.fsState = TBSTATE_ENABLED;
 		tbs.fsStyle = BTNS_DROPDOWN;
@@ -125,8 +127,7 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CDNSSECToolB
 	}
 
 	CToolBarCtrl::SetExtendedStyle(TBSTYLE_EX_DRAWDDARROWS);
-	// set handle on this window
-	m_pBand = pBand;
+
 			// set ICON instead BMP
 	HICON hIcon;
 	CImageList *pList = CKBToolBarCtrl::GetImageList();
@@ -197,7 +198,7 @@ void CKBToolBarCtrl::OnTbnDropDown(NMHDR *pNMHDR, LRESULT *pResult)
 					 HMENU hMenuStatusBar;
 	switch (pNMTB->iItem) 	{
 	case ID_BUTTON1:
-		if (debug) ATLTRACE("ID_BUTTON1():\n");	
+		if (m_pBand->debug) ATLTRACE("ID_BUTTON1():\n");	
 		SendMessage(TB_GETRECT, ID_BUTTON1, (LPARAM)&rc);
 		::MapWindowPoints(m_pBand->m_wndToolBar, HWND_DESKTOP, (LPPOINT)&rc, 2);
 
@@ -231,7 +232,7 @@ void CKBToolBarCtrl::OnTbnDropDown(NMHDR *pNMHDR, LRESULT *pResult)
 		break;
 			
 	case ID_BUTTON2:
-		if (debug) ATLTRACE("ID_BUTTON2():\n");
+		if (m_pBand->debug) ATLTRACE("ID_BUTTON2():\n");
 
 		SendMessage(TB_GETRECT, ID_BUTTON2, (LPARAM)&rc);
 		::MapWindowPoints(m_pBand->m_wndToolBar, HWND_DESKTOP, (LPPOINT)&rc, 2);
@@ -278,7 +279,7 @@ int CKBToolBarCtrl::WrongResolver()
 		else if (lang==0x0407) msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht. Ändern Sie bitte die Einstellungen des Resolvers.\n\nWollen Sie zu den Einstellungen weitergehen?", (LPCWSTR)L"Warnung DNSSEC Valiator", MB_YESNO |  MB_ICONWARNING);
 		else msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Current DNS server or resolver does not support DNSSEC technology. Please, change the validator settings.\n\nDo you want to proceed to settings?", (LPCWSTR)L"DNSSEC Valiadtor warning", MB_YESNO |  MB_ICONWARNING);
 		
-		wrong = false;
+		m_pBand->wrong = false;
 		switch (msgboxID) {
 
 					case IDYES : {
@@ -327,7 +328,7 @@ void CKBToolBarCtrl::OnCommand()
 				dy = (int)rc.bottom;
 			}
 			//if (debug) ATLTRACE("PWProc3: rcClient l: %d; b: %d; r: %d; t: %d\n",dx, dy, rc.right, rc.top);
-			if (keylogo==3 || keylogo==0) ;
+			if (m_pBand->keylogo==3 || m_pBand->keylogo==0) ;
 			else DialogBox(GHins, MAKEINTRESOURCE(IDD_DIALOG_DNSSEC), NULL, (DLGPROC)DialogProcDnssec);
 		break;
 		}
@@ -370,7 +371,7 @@ void CKBToolBarCtrl::OnCommand()
 // Redraw of button bitmap when DNSSEC status was changed
 /**************************************************************************/
 bool CKBToolBarCtrl::RepaintButtonDNSSEC(int bindex, int iconindex){
-	if (debug) ATLTRACE("RepaintButtonDNSSEC(%d,%d):\n", bindex,iconindex);
+	if (m_pBand->debug) ATLTRACE("RepaintButtonDNSSEC(%d,%d):\n", bindex,iconindex);
 	//delete of last button from toolbar
 	if (!DeleteButton(bindex))
 	return false;
@@ -381,7 +382,7 @@ bool CKBToolBarCtrl::RepaintButtonDNSSEC(int bindex, int iconindex){
 		tbs.fsStyle = BTNS_DROPDOWN;
 		tbs.iBitmap = iconindex;
 		tbs.idCommand = ID_BUTTON1;
-		if (textkey) tbs.iString = iconindex;
+		if (m_pBand->textkey) tbs.iString = iconindex;
 		else {
 			tbs.iString = BITMAP_NUMBER;
 			tbs.fsStyle = BTNS_AUTOSIZE | BTNS_DROPDOWN;
@@ -398,10 +399,10 @@ bool CKBToolBarCtrl::RepaintButtonDNSSEC(int bindex, int iconindex){
 // Redraw of button bitmap when TLSA status was changed
 /**************************************************************************/
 bool CKBToolBarCtrl::RepaintButtonTLSA(int bindex, int iconindex){
-	if (debug) ATLTRACE("RepaintButtonTLSA(%d,%d):\n",bindex,iconindex);
+	if (m_pBand->debug) ATLTRACE("RepaintButtonTLSA(%d,%d):\n",bindex,iconindex);
 	//delete of last button from toolbar
 
-	if (tlsaenable==1) {
+	if (m_pBand->tlsaenable==1) {
 		if (IsButtonHidden(ID_BUTTON2)) HideButton(ID_BUTTON2, FALSE);
 		if (!DeleteButton(bindex)) return false;
 	//set new parameters for nu button 
@@ -411,7 +412,7 @@ bool CKBToolBarCtrl::RepaintButtonTLSA(int bindex, int iconindex){
 		tbs.fsStyle = BTNS_DROPDOWN;
 		tbs.iBitmap = iconindex;
 		tbs.idCommand = ID_BUTTON2;
-		if (textkey) tbs.iString = iconindex;
+		if (m_pBand->textkey) tbs.iString = iconindex;
 		else {
 			tbs.iString = BITMAP_NUMBER+1;
 			tbs.fsStyle = BTNS_AUTOSIZE | BTNS_DROPDOWN;
@@ -425,7 +426,7 @@ bool CKBToolBarCtrl::RepaintButtonTLSA(int bindex, int iconindex){
 	}
 	else {
 		if (!IsButtonHidden(ID_BUTTON2)) HideButton(ID_BUTTON2, TRUE);
-		tlsaresult = DANE_OFF;
+		m_pBand->tlsaresult = DANE_OFF;
 	}
 
   return true;
@@ -445,34 +446,34 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 		::SendDlgItemMessage(hwndDlg, IDC_COMBO, CB_INITSTORAGE, 2, 10);
 		::SendDlgItemMessage(hwndDlg, IDC_COMBO, CB_INSERTSTRING, 0, (LPARAM)"CZ.NIC");
 		::SendDlgItemMessage(hwndDlg, IDC_COMBO, CB_INSERTSTRING, 1, (LPARAM)"OARC");
-		if (choice2) ::SendDlgItemMessage(hwndDlg, IDC_COMBO, CB_SETCURSEL, 1, 0);
+		if (m_pBarBand->choice2) ::SendDlgItemMessage(hwndDlg, IDC_COMBO, CB_SETCURSEL, 1, 0);
 		else ::SendDlgItemMessage(hwndDlg, IDC_COMBO, CB_SETCURSEL, 0, 0);
 		::EnableWindow(::GetDlgItem(hwndDlg,IDC_COMBO), FALSE);
 		//if (debug) ATLTRACE("%d", textkey);		
-		::SetWindowText(::GetDlgItem(hwndDlg,IDC_EDIT),dnssecseradr);
+		::SetWindowText(::GetDlgItem(hwndDlg,IDC_EDIT), m_pBarBand->dnssecseradr);
 		::EnableWindow(::GetDlgItem(hwndDlg,IDC_EDIT), FALSE);			
 		::EnableWindow(::GetDlgItem(hwndDlg,IDC_COMBO), FALSE);		
 		//if (debug) ATLTRACE("%d", choice);
-		if (choice==2) {
+		if (m_pBarBand->choice==2) {
 			::CheckRadioButton(hwndDlg, IDC_R1, IDC_R4, IDC_R3);
 			::EnableWindow(::GetDlgItem(hwndDlg,IDC_EDIT), TRUE);			
 		}
-		else if (choice==1){
+		else if (m_pBarBand->choice==1){
 			::CheckRadioButton(hwndDlg, IDC_R1, IDC_R4, IDC_R2);
 			::EnableWindow(::GetDlgItem(hwndDlg,IDC_COMBO), TRUE);			
 		}
-		else if (choice==3) {
+		else if (m_pBarBand->choice==3) {
 			::CheckRadioButton(hwndDlg, IDC_R1, IDC_R4, IDC_R4);
 		} 
 		else {
 			::CheckRadioButton(hwndDlg, IDC_R1, IDC_R4, IDC_R1);
 		} // if choice
-		::SendMessage(::GetDlgItem(hwndDlg, IDC_DOM_ENABLE), BM_SETCHECK,  filteron ? BST_CHECKED : BST_UNCHECKED, 0);
-		::SetWindowText(::GetDlgItem(hwndDlg,IDT_DOM_LIST),listtld);
+		::SendMessage(::GetDlgItem(hwndDlg, IDC_DOM_ENABLE), BM_SETCHECK,  m_pBarBand->filteron ? BST_CHECKED : BST_UNCHECKED, 0);
+		::SetWindowText(::GetDlgItem(hwndDlg,IDT_DOM_LIST), m_pBarBand->listtld);
 		::EnableWindow(::GetDlgItem(hwndDlg,IDT_DOM_LIST), FALSE);
-		if (filteron) ::EnableWindow(::GetDlgItem(hwndDlg,IDT_DOM_LIST), TRUE);
-		::SendMessage(::GetDlgItem(hwndDlg, IDC_SHOWTEXT), BM_SETCHECK,  textkey ? BST_CHECKED : BST_UNCHECKED, 0);
-		::SendMessage(::GetDlgItem(hwndDlg, IDC_ENABLETLSA), BM_SETCHECK,  tlsaenable ? BST_CHECKED : BST_UNCHECKED, 0);
+		if (m_pBarBand->filteron) ::EnableWindow(::GetDlgItem(hwndDlg,IDT_DOM_LIST), TRUE);
+		::SendMessage(::GetDlgItem(hwndDlg, IDC_SHOWTEXT), BM_SETCHECK,  m_pBarBand->textkey ? BST_CHECKED : BST_UNCHECKED, 0);
+		::SendMessage(::GetDlgItem(hwndDlg, IDC_ENABLETLSA), BM_SETCHECK,  m_pBarBand->tlsaenable ? BST_CHECKED : BST_UNCHECKED, 0);
         break;
 		}	
 	
@@ -492,25 +493,25 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 								int msgboxID;
 								// save keytext setting into Register
 								dwVal = (short)::SendMessage(::GetDlgItem(hwndDlg, IDC_DOM_ENABLE), BM_GETCHECK, 0, 0);
-								filteron = dwVal;
+								m_pBarBand->filteron = dwVal;
 								if (dwVal) WritePrivateProfileString("DNSSEC", "filteron", "1", szPath);
 								else WritePrivateProfileString("DNSSEC", "filteron", "0", szPath);
 
 								dwVal = (short)::SendMessage(::GetDlgItem(hwndDlg, IDC_SHOWTEXT), BM_GETCHECK, 0, 0);
-								textkey = dwVal;
+								m_pBarBand->textkey = dwVal;
 								if (dwVal) WritePrivateProfileString("DNSSEC", "keytext", "1", szPath);
 								else WritePrivateProfileString("DNSSEC", "keytext", "0", szPath);
 
 								dwVal = (short)::SendMessage(::GetDlgItem(hwndDlg, IDC_ENABLETLSA), BM_GETCHECK, 0, 0);
-								tlsaenable = dwVal;
+								m_pBarBand->tlsaenable = dwVal;
 								if (dwVal) WritePrivateProfileString("DNSSEC", "tlsaenable", "1", szPath);
 								else {WritePrivateProfileString("DNSSEC", "tlsaenable", "0", szPath);																														
 								}
 
 								// save debugoutput DWORD into Register
-								if (debugoutput_enable!=0) {
+								if (m_pBarBand->debugoutput_enable!=0) {
 									dwVal = (short)::SendMessage(::GetDlgItem(hwndDlg, IDC_DEBUG), BM_GETCHECK, 0, 0);
-									debugoutput = dwVal;
+									m_pBarBand->debugoutput = dwVal;
 									if (dwVal) WritePrivateProfileString("DNSSEC", "debugoutput", "1", szPath);
 									else WritePrivateProfileString("DNSSEC", "debugoutput", "0", szPath);									
 								}
@@ -527,7 +528,7 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 									short ch;
 									dwVal = 1;
 									ch =(short)::SendMessage(::GetDlgItem(hwndDlg, IDC_COMBO), CB_GETCURSEL,  0 , 0);
-									choice2 = ch;
+									m_pBarBand->choice2 = ch;
 									if (ch) WritePrivateProfileString("DNSSEC", "choicedns", "1", szPath);
 									else WritePrivateProfileString("DNSSEC", "choicedns", "0", szPath);														
 								}
@@ -547,87 +548,18 @@ LRESULT CKBToolBarCtrl::DialogProcSettings(HWND hwndDlg, UINT uMsg, WPARAM wPara
 									WritePrivateProfileString("DNSSEC", "userip", szVal, szPath);
 								}// id IsDlgButtonChecked
 								else dwVal = 3; 
-								choice = dwVal;
+								m_pBarBand->choice = dwVal;
 								if (dwVal==2) WritePrivateProfileString("DNSSEC", "choice", "2", szPath);
 								else if (dwVal==1) WritePrivateProfileString("DNSSEC", "choice", "1", szPath);
 								else if (dwVal==3) WritePrivateProfileString("DNSSEC", "choice", "3", szPath);	
 								else WritePrivateProfileString("DNSSEC", "choice", "0", szPath);
 
-								
-
-								
 								TCHAR chTexttld[TLD_LIST_MLEN];
 									::GetDlgItemText(hwndDlg, IDT_DOM_LIST, chTexttld, TLD_LIST_MLEN);
 									char* szVal=(char*)chTexttld;
 									WritePrivateProfileString("DNSSEC", "listtld", szVal, szPath);
-
-
-								// save setting IPv4 IPv6 resolver
-								/*
-								if (::IsDlgButtonChecked(hwndDlg, IDC_IPv4)) WritePrivateProfileString("DNSSEC", "IPv4", "1", szPath);
-								else WritePrivateProfileString("DNSSEC", "IPv4", "0", szPath);
-								if (::IsDlgButtonChecked(hwndDlg, IDC_IPv6)) WritePrivateProfileString("DNSSEC", "IPv6", "1", szPath);
-								else WritePrivateProfileString("DNSSEC", "IPv6", "0", szPath);
-								if (::IsDlgButtonChecked(hwndDlg, IDC_IPv46)) 
-									{
-									WritePrivateProfileString("DNSSEC", "IPv4", "1", szPath);
-									WritePrivateProfileString("DNSSEC", "IPv6", "1", szPath);
-									}
-								*/
 							}
-						/*
-						    // code for windows register write
-							DWORD dwRet;
-							HKEY hKey;
-							DWORD dwVal;
-							int msgboxID;
-							// open DNSSEC Validator registry key if exists
-							dwRet = RegOpenKeyEx(HKEY_USERS, HKU_REG_KEY, 0, KEY_ALL_ACCESS, &hKey);
-							if (dwRet == ERROR_SUCCESS) {							   
-							
-								// save keytext setting into Register
-								dwVal = (DWORD)::SendMessage(::GetDlgItem(hwndDlg, IDC_SHOWTEXT), BM_GETCHECK, 0, 0);
-								dwRet = RegSetValueEx(hKey, "keytext", NULL, REG_DWORD, (CONST BYTE*)&dwVal, sizeof(dwVal));
-								//if (dwRet != ERROR_SUCCESS)  //if (debug) ATLTRACE("\nmam1\n");
-								// save tcpudp DWORD into Register
-								dwVal = (DWORD)::SendMessage(::GetDlgItem(hwndDlg, IDC_TCP), BM_GETCHECK, 0, 0);
-								dwRet = RegSetValueEx(hKey, "tcpudp", NULL, REG_DWORD, (CONST BYTE*)&dwVal, sizeof(dwVal));
-
-								// save debugoutput DWORD into Register
-								if (debugoutput_enable!=0) {
-									dwVal = (DWORD)::SendMessage(::GetDlgItem(hwndDlg, IDC_DEBUG), BM_GETCHECK, 0, 0);
-									dwRet = RegSetValueEx(hKey, "debugoutput", NULL, REG_DWORD, (CONST BYTE*)&dwVal, sizeof(dwVal));
-								}
-
 		
-								// save choice setting resolver into Register
-								if (::IsDlgButtonChecked(hwndDlg, IDC_R1))
-								    dwVal = 0;
-								else if (::IsDlgButtonChecked(hwndDlg, IDC_R2))
-								{	
-									dwVal = 1;
-									DWORD ch = ::SendMessage(::GetDlgItem(hwndDlg, IDC_COMBO), CB_GETCURSEL,  0 , 0);
-									dwRet = RegSetValueEx(hKey, "choicedns", NULL, REG_DWORD, (CONST BYTE*)&ch, sizeof(ch));														
-								}
-								else if (::IsDlgButtonChecked(hwndDlg, IDC_R3))
-								{
-									dwVal = 2;									
-									TCHAR chText[100];
-									::GetDlgItemText(hwndDlg, IDC_EDIT, chText, 100);
-									char* szVal=(char*)chText;
-									
-									if (ValidateIP(szVal)) dwRet = RegSetValueEx(hKey, "userip", NULL, REG_SZ, (CONST BYTE*)(LPCTSTR)szVal, strlen(szVal)+1);
-									else msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Invalid IPv4 format!\nThe IPv4 address is not stored.", (LPCWSTR)L"Invalid IPv4 format", MB_OK | MB_ICONERROR);
-								}// id IsDlgButtonChecked
-								dwRet = RegSetValueEx(hKey, "choice", NULL, REG_DWORD, (CONST BYTE*)&dwVal, sizeof(dwVal));								
-							
-								} //if dwRet							
-								if (dwRet == ERROR_ACCESS_DENIED) {	
-								msgboxID = MessageBoxW( NULL, (LPCWSTR)L"Access Denied!\nYou must be logged as Administartor.", (LPCWSTR)L"Access Denied", MB_OK | MB_ICONERROR);
-								}
-								RegCloseKey(hKey);	
-
-								*/					
 					EndDialog(hwndDlg, LOWORD(wParam));					
 					// flush all cache items
 					if (cache_del) {
@@ -799,18 +731,18 @@ LRESULT CKBToolBarCtrl::DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam,
 			::SendMessage(::GetDlgItem(hwndDlg, IDOK), BST_UNCHECKED, NULL, NULL);
 
 			// print domain name 
-			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST1),paneldomainname);
+			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST1), m_pBarBand->paneldomainname);
 
 			// load and print titletext from resources
-			LoadStringA(GHins, paneltitle, strbuf, STR_BUF_S);
+			LoadStringA(GHins, m_pBarBand->paneltitle, strbuf, STR_BUF_S);
 			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST2),strbuf);
 
-			LoadStringA(GHins, panelpredonain, strbuf, STR_BUF_S);
+			LoadStringA(GHins, m_pBarBand->panelpredonain, strbuf, STR_BUF_S);
 			strncat_s(strbuf2, strbuf, STR_BUF_S*2);
 			strncat_s(strbuf2, TEXT(" "), 1);
-			strncat_s(strbuf2, paneldomainname, strlen(paneldomainname));
+			strncat_s(strbuf2, m_pBarBand->paneldomainname, strlen(m_pBarBand->paneldomainname));
 			strncat_s(strbuf2, TEXT(" "), 1);
-			LoadStringA(GHins, panelpostdomain, strbuf, STR_BUF_S);
+			LoadStringA(GHins, m_pBarBand->panelpostdomain, strbuf, STR_BUF_S);
 			strncat_s(strbuf2, strbuf, STR_BUF_S*2);
 			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST3),strbuf2);			
 
@@ -850,7 +782,7 @@ LRESULT CKBToolBarCtrl::DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam,
 			::SendMessage(::GetDlgItem(hwndDlg, IDC_ST4), WM_SETFONT, (int)hFont, MAKELONG( TRUE, 0 ) );
 			
 			// load ico bitmap from resources
-			HICON hicon = (HICON)LoadImage(GHins,MAKEINTRESOURCE(keylogo2), IMAGE_ICON,0,0,0);
+			HICON hicon = (HICON)LoadImage(GHins, MAKEINTRESOURCE(m_pBarBand->keylogo2), IMAGE_ICON,0,0,0);
 			// set icon in popup window
 			::SendMessage(::GetDlgItem(hwndDlg, IDC_ST6), STM_SETICON, (WPARAM)hicon, (LPARAM)NULL);
 	
@@ -869,11 +801,11 @@ LRESULT CKBToolBarCtrl::DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam,
 			int mlength;
 			short popupheight;
 				//if (debug) ATLTRACE("sfdfsdf");	
-				LoadStringA(GHins, paneltext, strbuf, STR_BUF_S);
+				LoadStringA(GHins, m_pBarBand->paneltext, strbuf, STR_BUF_S);
 				mlength = strlen(strbuf); 
 				//if (debug) ATLTRACE("\n%d\n",mlength);
 
-			if (res == 3) {
+			if (m_pBarBand->res == 3) {
 				if (mlength < 240) popupheight = 200;
 				else if (mlength < 270) popupheight = 220;
 				else popupheight = 250;
@@ -886,11 +818,11 @@ LRESULT CKBToolBarCtrl::DialogProcDnssec(HWND hwndDlg, UINT uMsg, WPARAM wParam,
 				const int STR_BUF_S = 512;
 				char strbufb[STR_BUF_S] = TEXT("");
 				char strbufv[STR_BUF_S] = TEXT("");
-				strcpy_s(strbufb, ipbrowser4);
+				strcpy_s(strbufb, m_pBarBand->ipbrowser4);
 				strncat_s(strbufb, TEXT(" "), 1);
-				strncat_s(strbufb, ipbrowser6, strlen(ipbrowser6));
-				strcpy_s(strbufv, ipvalidator4);
-				strncat_s(strbufv, ipvalidator6, strlen(ipvalidator6));		
+				strncat_s(strbufb, m_pBarBand->ipbrowser6, strlen(m_pBarBand->ipbrowser6));
+				strcpy_s(strbufv, m_pBarBand->ipvalidator4);
+				strncat_s(strbufv, m_pBarBand->ipvalidator6, strlen(m_pBarBand->ipvalidator6));		
 				::SetWindowPos(::GetDlgItem(hwndDlg,IDC_STIPBH),NULL,15,popupheight-85,0,0,SWP_NOSIZE);
 				::SetWindowText(::GetDlgItem(hwndDlg,IDC_STIPB),strbufb);				
 				::SetWindowPos(::GetDlgItem(hwndDlg,IDC_STIPB),NULL,15,popupheight-70,0,0,SWP_NOSIZE);
@@ -951,14 +883,14 @@ LRESULT CKBToolBarCtrl::DialogProcTlsa(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
 			::SendMessage(::GetDlgItem(hwndDlg, IDOK), BST_UNCHECKED, NULL, NULL);
 
 			// print domain name 
-			if (debug) ATLTRACE("TLSA Panel Title: %s\n", tlsapaneldomainname);
-			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST1_TLSA),tlsapaneldomainname);
+			if (m_pBarBand->debug) ATLTRACE("TLSA Panel Title: %s\n", m_pBarBand->tlsapaneldomainname);
+			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST1_TLSA), m_pBarBand->tlsapaneldomainname);
 
 			// load and print titletext from resources
-			LoadStringA(GHins, paneltitletlsa, strbuf, STR_BUF_S);
+			LoadStringA(GHins, m_pBarBand->paneltitletlsa, strbuf, STR_BUF_S);
 			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST2_TLSA),strbuf);
 
-			LoadStringA(GHins, paneltextmain, strbuf2, STR_BUF_S);
+			LoadStringA(GHins, m_pBarBand->paneltextmain, strbuf2, STR_BUF_S);
 			::SetWindowText(::GetDlgItem(hwndDlg,IDC_ST3_TLSA),strbuf2);			
 
 			// load and print posttext from resources
@@ -997,7 +929,7 @@ LRESULT CKBToolBarCtrl::DialogProcTlsa(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
 			::SendMessage(::GetDlgItem(hwndDlg, IDC_ST4_TLSA), WM_SETFONT, (int)hFont, MAKELONG( TRUE, 0 ) );
 			
 			// load ico bitmap from resources
-			HICON hicon = (HICON)LoadImage(GHins,MAKEINTRESOURCE(tlsaiconres), IMAGE_ICON,0,0,0);
+			HICON hicon = (HICON)LoadImage(GHins, MAKEINTRESOURCE(m_pBarBand->tlsaiconres), IMAGE_ICON,0,0,0);
 			// set icon in popup window
 			::SendMessage(::GetDlgItem(hwndDlg, IDC_ST6_TLSA), STM_SETICON, (WPARAM)hicon, (LPARAM)NULL);
 	
@@ -1016,7 +948,7 @@ LRESULT CKBToolBarCtrl::DialogProcTlsa(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
 			int mlength;
 			short popupheight;
 				//if (debug) ATLTRACE("sfdfsdf");	
-				LoadStringA(GHins, paneltextadd, strbuf, STR_BUF_S);
+				LoadStringA(GHins, m_pBarBand->paneltextadd, strbuf, STR_BUF_S);
 				mlength = strlen(strbuf); 
 				//if (debug) ATLTRACE("\n%d\n",mlength);
 	

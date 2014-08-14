@@ -1,26 +1,22 @@
 /* ***** BEGIN LICENSE BLOCK *****
-Copyright 2012 CZ.NIC, z.s.p.o.
+Copyright 2014 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz>
 
-This file is part of DNSSEC Validator Add-on.
+This file is part of DNSSEC Validator Add-on 2.x.
 
-DNSSEC Validator Add-on is free software: you can redistribute it and/or
+DNSSEC Validator Add-on 2.x is free software: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or (at your
 option) any later version.
 
-DNSSEC Validator Add-on is distributed in the hope that it will be useful,
+DNSSEC Validator Add-on 2.x is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 more details.
 
 You should have received a copy of the GNU General Public License along with
-DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
-
-Some parts of these codes are based on the DNSSECVerify4IENav project
-<http://cs.mty.itesm.mx/dnssecmx>, which is distributed under the Code Project
-Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
+DNSSEC Validator Add-on 2.x.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
 #include "stdafx.h"
@@ -35,71 +31,8 @@ Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
 #include <iphlpapi.h> /* for IP Helper API */
 #include <winreg.h>
 
-
-// default icon status 
-WORD statdnssecicon = IDI_DNSSEC_ICON_INIT;
-// for ICON KEY status - not used
-WORD dnsseciconBar;
-bool debug = true;
-char * temp = "";
-short textkey = 0;
-short choice = 0;
-short choice2 = 0;
-short tlsaenable = 1;
-char dnssecseradr[IPADDR_MLEN] = "000.000.000.000 0000:0000:0000:0000:0000:0000:0000:0000";
-char* nic = "217.31.204.130";
-char* oarc = "149.20.64.20";
-short usedfwd = 0;
-
-short debugoutput = 1;
-short debugoutput_enable = 1;
-short cache_enable = 1;
-short ipv4 = 1;
-short ipv6 = 0;
-short ipv46 = 1;
-short ipresult = 0;
-short res;
-short tlsaicon = 9;
-short tlsaresult;
-char*  ipbrowser4;
-char*  ipbrowser6;
-char ipvalidator4[256];
-char*  ipvalidator6;
-bool wrong = false;
-// global state info
-WORD paneltitletlsa  = 0;
-WORD paneltextmain  = 0;
-WORD paneltextadd  = 0;
-WORD paneltitle  = 0;
-WORD panelpredonain  = 0;
-char* paneldomainname  = 0;
-char tlsapaneldomainname[280]; 
-WORD panelpostdomain  = 0;
-WORD paneltext  = 0;
-short paneltextip  = 1;
-WORD keylogo  = 0;
-WORD keylogo2  = 0;
-WORD tlsaiconres = 0;
-int err = 0;
-short filteron;
-char listtld[TLD_LIST_MLEN] = "";
-// key state memory
-int state;
-// url address memory
-char * urladdr = " ";
-// variable for IE version check
-int iRes,iMajor=0,iMinor=0;
- // key icon dimension
-int ICON_KEY_WIDTH = 16;
-int ICON_KEY_HEIGHT = 16;
-int SBAR_POSITION_LEFT = 47;
-int SBAR_POSITION_TOP = 10;
-int SBAR_POSITION_LENGTH = 620;
-int SBAR_POSITION_HEIGHT = 14;
-short ipcmpresults = -1;
 // ctritical section for resolver
 CRITICAL_SECTION CDNSSECToolBarBand::cs;
-// for tooltip creation
 bool CDNSSECToolBarBand::csInitialized = false;
 bool csInitialized = false;
 char str[INET6_ADDRSTRLEN];
@@ -1238,7 +1171,6 @@ void CDNSSECToolBarBand::SetSecurityDNSSECStatus()
 	paneldomainname = (char *)domain;
 	panelpostdomain  = tistatus;
 	paneltext  = titext;
-	paneltextip = ipresult;
 	res=dnssecresult;
 }//
 

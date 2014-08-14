@@ -1,29 +1,26 @@
 /* ***** BEGIN LICENSE BLOCK *****
-Copyright 2012 CZ.NIC, z.s.p.o.
+Copyright 2014 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz>
 
-This file is part of DNSSEC Validator Add-on.
+This file is part of DNSSEC Validator Add-on 2.x.
 
-DNSSEC Validator Add-on is free software: you can redistribute it and/or
+DNSSEC Validator Add-on 2.x is free software: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or (at your
 option) any later version.
 
-DNSSEC Validator Add-on is distributed in the hope that it will be useful,
+DNSSEC Validator Add-on 2.x is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 more details.
 
 You should have received a copy of the GNU General Public License along with
-DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
-
-Some parts of these codes are based on the DNSSECVerify4IENav project
-<http://cs.mty.itesm.mx/dnssecmx>, which is distributed under the Code Project
-Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
+DNSSEC Validator Add-on 2.x.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
 // DNSSECToolBarBand.h : Declaration of the CDNSSECToolBarBand
+
 #ifndef __DNSSECToolBarBAND_H_
 #define __DNSSECToolBarBAND_H_
 #include "Winuser.h"
@@ -77,44 +74,15 @@ using namespace std;
 #define TB_MIN_SIZE_X   100
 #define TB_MIN_SIZE_Y   22
 #define TB_MAX_SIZE_Y   40
+ // key icon dimension
+#define ICON_KEY_WIDTH 16
+#define ICON_KEY_HEIGHT 16
+#define SBAR_POSITION_LEFT 47
+#define SBAR_POSITION_TOP 10
+#define SBAR_POSITION_LENGTH 620
+#define SBAR_POSITION_HEIGHT 14
 
 extern HINSTANCE GHins;
-
-// settings
-extern bool debug;
-extern short textkey;
-extern short choice;
-extern short choice2;
-extern short tlsaenable;
-extern char dnssecseradr[IPADDR_MLEN];
-extern short debugoutput;
-extern short debugoutput_enable;
-extern char ipvalidator4[256];
-extern char* ipbrowser4;
-extern char* ipvalidator6;
-extern char* ipbrowser6;
-
-// TLSA panel text
-extern WORD paneltitletlsa;
-extern WORD paneltextmain;
-extern WORD paneltextadd;
-extern WORD keylogo2;
-extern WORD tlsaiconres;
-extern short tlsaresult;
-
-// DNSSEC panel text
-extern WORD paneltitle;
-extern WORD panelpredonain;
-extern char* paneldomainname;
-extern char tlsapaneldomainname[280];
-extern WORD panelpostdomain;
-extern WORD paneltext;
-extern WORD keylogo;
-extern short res;
-extern short filteron;
-extern char listtld[TLD_LIST_MLEN];
-extern bool wrong;
-
 class CHyperLink;
 extern CHyperLink m_link;
 
@@ -129,14 +97,42 @@ class ATL_NO_VTABLE CDNSSECToolBarBand :
 	public IDispEventImpl<0, CDNSSECToolBarBand,&__uuidof(DWebBrowserEvents2), &LIBID_SHDocVw, 1, 0>,
 	public IDispatchImpl<IDNSSECToolBarBand, &IID_IDNSSECToolBarBand, &LIBID_DNSSECToolBarLib, /*wMajor =*/ 1, /*wMinor =*/ 0>,
 	public IInputObject,
-	public IDeskBand
-
-		
+	public IDeskBand		
 {
    typedef IDispEventImpl<0, CDNSSECToolBarBand, &__uuidof(DWebBrowserEvents2), &LIBID_SHDocVw, 1, 0> tDispEvent;
 public:
 	CDNSSECToolBarBand()
 	{
+		// initialisation and set default values
+		statdnssecicon = IDI_DNSSEC_ICON_INIT;
+		debug = true;
+		temp = "";
+		textkey = 0;
+		choice = 0;
+		choice2 = 0;
+		tlsaenable = 1;
+		nic = "217.31.204.130";
+		oarc = "149.20.64.20";
+		usedfwd = 0;
+		debugoutput = 1;
+		debugoutput_enable = 1;
+		wrong = false;
+		paneltitletlsa  = 0;
+		paneltextmain  = 0;
+		paneltextadd  = 0;
+		paneltitle  = 0;
+		panelpredonain  = 0;
+		paneldomainname  = 0;
+		tlsapaneldomainname[280]; 
+		panelpostdomain  = 0;
+		paneltext  = 0;
+		keylogo  = 0;
+		keylogo2  = 0;
+		tlsaiconres = 0;
+		tlsaicon = 0;
+		err = 0;
+		state = 0;
+
 		if (!csInitialized) {
 			InitializeCriticalSectionAndSpinCount(&cs, 0x00000400);
 			csInitialized = true;
@@ -218,14 +214,12 @@ public:
 	short TestResolver(char *domain, char *ipbrowser, char IPv);
 	bool ExcludeDomainList(char *domain, short ExcludeOn, char domainlist[TLD_LIST_MLEN]);
 
-// global variables
+// variables
 	HWND m_hWndParent;
 	DWORD m_dwBandID;
 	DWORD m_dwViewMode;
-	char domain[2048];// current domain for each tab
+	char domain[2048];
 	static CRITICAL_SECTION cs;
-	short dnssecresult; //the DNSSEC validation result
-	int dnssecicon;
 	CKBToolBarCtrl m_wndToolBar;
 	IInputObjectSite* inputObjectSite;
 	IServiceProviderPtr m_pIOSite;
@@ -233,6 +227,50 @@ public:
 	CRect rcClientParent2;	
 	static bool csInitialized;
 	CComPtr< IWebBrowser2 > webBrowser2;
+	// settings
+	bool debug;
+	char * temp;
+	short textkey;
+	short choice;
+	short choice2;
+	short tlsaenable;
+	char dnssecseradr[IPADDR_MLEN];
+	char* nic;
+	char* oarc;
+	short usedfwd;
+	short debugoutput;
+	short debugoutput_enable;
+	// browser
+	char ipvalidator4[256];
+	char* ipbrowser4;
+	char* ipvalidator6;
+	char* ipbrowser6;
+	int err;
+	int state;
+	// TLSA panel text
+	WORD paneltitletlsa;
+	WORD paneltextmain;
+	WORD paneltextadd;
+	char tlsapaneldomainname[280];
+	WORD keylogo2;
+	WORD tlsaiconres;
+	short tlsaresult;
+	int tlsaicon;
+	// DNSSEC panel text
+	short dnssecresult;
+	int dnssecicon;	
+	WORD statdnssecicon;	
+	WORD dnsseciconBar;
+	WORD paneltitle;
+	WORD panelpredonain;
+	char* paneldomainname;
+	WORD panelpostdomain;
+	WORD paneltext;
+	WORD keylogo;
+	short res;
+	short filteron;
+	char listtld[TLD_LIST_MLEN];
+	bool wrong;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(DNSSECToolBarBand), CDNSSECToolBarBand)

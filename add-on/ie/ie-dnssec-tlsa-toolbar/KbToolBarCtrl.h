@@ -1,34 +1,24 @@
 /* ***** BEGIN LICENSE BLOCK *****
-Copyright 2012 CZ.NIC, z.s.p.o.
+Copyright 2014 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz>
 
-This file is part of DNSSEC Validator Add-on.
+This file is part of DNSSEC Validator Add-on 2.x.
 
-DNSSEC Validator Add-on is free software: you can redistribute it and/or
+DNSSEC Validator Add-on 2.x is free software: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or (at your
 option) any later version.
 
-DNSSEC Validator Add-on is distributed in the hope that it will be useful,
+DNSSEC Validator Add-on 2.x is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 more details.
 
 You should have received a copy of the GNU General Public License along with
-DNSSEC Validator Add-on.  If not, see <http://www.gnu.org/licenses/>.
-
-Some parts of these codes are based on the DNSSECVerify4IENav project
-<http://cs.mty.itesm.mx/dnssecmx>, which is distributed under the Code Project
-Open License (CPOL), see <http://www.codeproject.com/info/cpol10.aspx>.
+DNSSEC Validator Add-on 2.x.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
-/*
-#if !defined(AFX_IETOOLBARCTRL_H__92D63B35_5805_4960_9770_B455E11FF4A7__INCLUDED_)
-#define AFX_IETOOLBARCTRL_H__92D63B35_5805_4960_9770_B455E11FF4A7__INCLUDED_
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
-*/
+
 #pragma once
 const int BITMAP_NUMBER = 19;
 const int StatusBitmap[BITMAP_NUMBER] = {IDI_BMP_INIT0, IDI_BMP_INIT1, IDI_BMP_INIT2, IDI_BMP_INIT3, IDI_BMP_INIT4,
@@ -72,6 +62,7 @@ public:
 	CKBToolBarCtrl();
 	BEGIN_MSG_MAP(CToolBarCtrl)
 	END_MSG_MAP()
+
 // Attributes
 public:
 	CDNSSECToolBarBand* m_pBand;
@@ -93,23 +84,9 @@ public:
 	static bool CKBToolBarCtrl::ValidateIP6(char *ipadd);
 	void OnTbnDropDown(NMHDR *pNMHDR, LRESULT *pResult);
 	void OnTbnDropDown2(NMHDR *pNMHDR, LRESULT *pResult);
-private:             ///< the hyperlink used in the 		 
-		 // Implementation
-public:
-//	CKBComboBox m_wndCombo;
 	virtual ~CKBToolBarCtrl();
-	// Generated message map functions
+
 protected:
-	//LRESULT CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	afx_msg void OnCommand();
-	//afx_msg void OnTbnDropDownToolBar1( NMHDR * pNotifyStruct, LRESULT * result );
-	//afx_msg LRESULT onNotify(WPARAM wParam, LPNMHDR pNMHDR, BOOL& bHandled);
 	DECLARE_MESSAGE_MAP()
 };
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-//#endif // !defined(AFX_IETOOLBARCTRL_H__92D63B35_5805_4960_9770_B455E11FF4A7__INCLUDED_)
