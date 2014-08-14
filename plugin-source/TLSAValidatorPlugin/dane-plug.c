@@ -204,7 +204,7 @@ struct cert_tmp_ctx {
 };
 
 
-struct dane_validation_ctx glob_val_ctx = {
+struct dane_validation_ctx dane_glob_val_ctx = {
 	{false, false}, NULL, NULL
 };
 //----------------------------------------------------------------------------
@@ -1776,10 +1776,10 @@ int dane_validation_init(void)
 {
 	printf_debug(DEBUG_PREFIX_DANE, "%s\n", "Initialising DANE.");
 
-	glob_val_ctx.ub = NULL; /* Has separate initialisation procedure. */
-	glob_val_ctx.ssl_ctx = ssl_context_init();
+	dane_glob_val_ctx.ub = NULL; /* Has separate initialisation procedure. */
+	dane_glob_val_ctx.ssl_ctx = ssl_context_init();
 
-	return (glob_val_ctx.ssl_ctx != NULL) ? 0 : -1;
+	return (dane_glob_val_ctx.ssl_ctx != NULL) ? 0 : -1;
 }
 
 //*****************************************************************************
@@ -1819,7 +1819,7 @@ int dane_validate(const char *certchain[], int certcount, uint16_t options,
 	int exitcode = DANE_ERROR_RESOLVER;
 	char *dn = NULL;
 
-	dane_set_validation_options(&glob_val_ctx.opts, options);
+	dane_set_validation_options(&dane_glob_val_ctx.opts, options);
 
 	printf_debug(DEBUG_PREFIX_TLSA, "Input parameters: domain='%s'; port='%s'; "
 	    "protocol='%s'; options=%u; resolver_address='%s';\n",
@@ -1857,11 +1857,11 @@ int dane_validate(const char *certchain[], int certcount, uint16_t options,
 
 	/* ----------------------------------------------- */
 	/* Unbound resolver initialization, set forwarder. */
-	if (glob_val_ctx.ub == NULL) {
-		glob_val_ctx.ub = unbound_resolver_init(optdnssrv, &exitcode,
-		    glob_val_ctx.opts.usefwd, glob_val_ctx.opts.ds,
+	if (dane_glob_val_ctx.ub == NULL) {
+		dane_glob_val_ctx.ub = unbound_resolver_init(optdnssrv, &exitcode,
+		    dane_glob_val_ctx.opts.usefwd, dane_glob_val_ctx.opts.ds,
 		    DEBUG_PREFIX_TLSA);
-		if(glob_val_ctx.ub == NULL) {
+		if(dane_glob_val_ctx.ub == NULL) {
 			printf_debug(DEBUG_PREFIX_TLSA, "%s\n",
 			    "Error: could not create unbound context.");
 			switch (exitcode) {
@@ -1877,13 +1877,13 @@ int dane_validate(const char *certchain[], int certcount, uint16_t options,
 	/* ----------------------------------------------- */
 
 	/* Initialise SSL context if not initialised. */
-	if (NULL == glob_val_ctx.ssl_ctx) {
-		glob_val_ctx.ssl_ctx = ssl_context_init();
+	if (NULL == dane_glob_val_ctx.ssl_ctx) {
+		dane_glob_val_ctx.ssl_ctx = ssl_context_init();
 	}
 
 	/* Create TLSA query. */
 	dn = create_tlsa_qname(domain, port_str, protocol);
-	retval = ub_resolve(glob_val_ctx.ub, dn, LDNS_RR_TYPE_TLSA,
+	retval = ub_resolve(dane_glob_val_ctx.ub, dn, LDNS_RR_TYPE_TLSA,
 	    LDNS_RR_CLASS_IN, &ub_res);
 	free(dn); dn = NULL;
 
@@ -1935,7 +1935,7 @@ int dane_validate(const char *certchain[], int certcount, uint16_t options,
 
 		memcpy(uri, "https://", HTTPS_PREF_LEN + 1);
 		strncat(uri, domain, MAX_URI_LEN - HTTPS_PREF_LEN - 1);
-		retval = get_cert_list(glob_val_ctx.ssl_ctx,
+		retval = get_cert_list(dane_glob_val_ctx.ssl_ctx,
 		    uri, domain, port_str, &cert_list);
 		if (retval != 0) {
 			free_tlsalist(&tlsa_list);
@@ -1968,14 +1968,14 @@ int dane_validation_deinit(void)
 {
 	printf_debug(DEBUG_PREFIX_DANE, "%s\n", "Deinitialising DANE.");
 
-	if (glob_val_ctx.ub != NULL) {
-		ub_ctx_delete(glob_val_ctx.ub);
-		glob_val_ctx.ub = NULL;
+	if (dane_glob_val_ctx.ub != NULL) {
+		ub_ctx_delete(dane_glob_val_ctx.ub);
+		dane_glob_val_ctx.ub = NULL;
 	}
 
-	if (glob_val_ctx.ssl_ctx != NULL) {
-		SSL_CTX_free(glob_val_ctx.ssl_ctx);
-		glob_val_ctx.ssl_ctx = NULL;
+	if (dane_glob_val_ctx.ssl_ctx != NULL) {
+		SSL_CTX_free(dane_glob_val_ctx.ssl_ctx);
+		dane_glob_val_ctx.ssl_ctx = NULL;
 	}
 
 	return 0;

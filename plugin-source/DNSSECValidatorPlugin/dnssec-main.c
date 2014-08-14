@@ -344,7 +344,7 @@ int main(int argc, char **argv)
 	    DNSSEC_FLAG_RESOLVIPV6;
 
 	/* Apply options. */
-	dnssec_set_validation_options(&glob_val_ctx.opts, options);
+	dnssec_set_validation_options(&dnssec_glob_val_ctx.opts, options);
 
 	if (dnssec_validation_init() != 0) {
 		//printf(DEBUG_PREFIX_DNSSEC "Error initialising context.\n");

@@ -256,7 +256,7 @@ int main(int argc, char **argv)
 	    DANE_FLAG_USEFWD;
 
 	/* Apply options. */
-	dane_set_validation_options(&glob_val_ctx.opts, options);
+	dane_set_validation_options(&dane_glob_val_ctx.opts, options);
 
 	if (dane_validation_init() != 0) {
 		printf(DEBUG_PREFIX_DANE "Error initialising context.\n");

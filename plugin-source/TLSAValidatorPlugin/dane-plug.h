@@ -68,7 +68,7 @@ struct dane_validation_ctx {
 	/* SSL_CTX */ void *ssl_ctx; /* SSL context. */
 };
 extern
-struct dane_validation_ctx glob_val_ctx;
+struct dane_validation_ctx dane_glob_val_ctx;
 
 
 /* Forward structure declaration. */

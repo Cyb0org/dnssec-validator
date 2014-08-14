@@ -81,7 +81,7 @@ OpenSSL used as well as that of the covered work.
  * cases buffer overflow may occur. */
 char ip_validated[256]; // holds resolved and validated IP address(es)
 
-struct dnssec_validation_ctx glob_val_ctx = {
+struct dnssec_validation_ctx dnssec_glob_val_ctx = {
 	{false, false, false, false}, NULL
 };
 
@@ -532,7 +532,7 @@ short examine_result(const struct ub_result *ub_res, const char *ipbrowser)
 // ----------------------------------------------------------------------------
 int dnssec_validation_init(void)
 {
-	glob_val_ctx.ub = NULL; /* Has separate initialisation procedure. */
+	dnssec_glob_val_ctx.ub = NULL; /* Has separate initialisation procedure. */
 
 	printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n", "Initialising DNSSEC.");
 
@@ -572,7 +572,7 @@ int dnssec_validate(const char *domain, uint16_t options,
 	}
 
 	/* options init - get integer values send from browser */
-	dnssec_set_validation_options(&glob_val_ctx.opts, options);
+	dnssec_set_validation_options(&dnssec_glob_val_ctx.opts, options);
 
 	printf_debug(DEBUG_PREFIX_DNSSEC,
 	    "Input parameters: domain='%s'; options=%u; "
@@ -591,11 +591,11 @@ int dnssec_validate(const char *domain, uint16_t options,
 	}
 
 	// if context is not created
-	if (glob_val_ctx.ub == NULL) {
-		glob_val_ctx.ub = unbound_resolver_init(optdnssrv, &exitcode,
-		    glob_val_ctx.opts.usefwd, glob_val_ctx.opts.ds,
+	if (dnssec_glob_val_ctx.ub == NULL) {
+		dnssec_glob_val_ctx.ub = unbound_resolver_init(optdnssrv, &exitcode,
+		    dnssec_glob_val_ctx.opts.usefwd, dnssec_glob_val_ctx.opts.ds,
 		    DEBUG_PREFIX_DNSSEC);
-		if(glob_val_ctx.ub == NULL) {
+		if(dnssec_glob_val_ctx.ub == NULL) {
 			printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n",
 			    "Error: could not create unbound context.");
 			switch (exitcode) {
@@ -609,9 +609,9 @@ int dnssec_validate(const char *domain, uint16_t options,
 		}
 	}
 
-	if (glob_val_ctx.opts.resolvipv6 && !glob_val_ctx.opts.resolvipv4) {
+	if (dnssec_glob_val_ctx.opts.resolvipv6 && !dnssec_glob_val_ctx.opts.resolvipv4) {
 		/* query for AAAA only*/
-		ub_retval = ub_resolve(glob_val_ctx.ub, domain,
+		ub_retval = ub_resolve(dnssec_glob_val_ctx.ub, domain,
 		    LDNS_RR_TYPE_AAAA, LDNS_RR_CLASS_IN, &ub_res);
 		if(ub_retval != 0) {
 			printf_debug(DEBUG_PREFIX_DNSSEC,
@@ -622,10 +622,10 @@ int dnssec_validate(const char *domain, uint16_t options,
 		retval_ipv6 = examine_result(ub_res, ipbrowser);
 		exitcode = retval_ipv6;
 		ub_resolve_free(ub_res);
-	} else if (!glob_val_ctx.opts.resolvipv6 &&
-	           glob_val_ctx.opts.resolvipv4) {
+	} else if (!dnssec_glob_val_ctx.opts.resolvipv6 &&
+	           dnssec_glob_val_ctx.opts.resolvipv4) {
 		/* query for A only */
-		ub_retval = ub_resolve(glob_val_ctx.ub, domain, LDNS_RR_TYPE_A,
+		ub_retval = ub_resolve(dnssec_glob_val_ctx.ub, domain, LDNS_RR_TYPE_A,
 		    LDNS_RR_CLASS_IN, &ub_res);
 		if(ub_retval != 0) {
 			printf_debug(DEBUG_PREFIX_DNSSEC,
@@ -638,7 +638,7 @@ int dnssec_validate(const char *domain, uint16_t options,
 		ub_resolve_free(ub_res);
 	} else {
 		/* query for A and AAAA */
-		ub_retval = ub_resolve(glob_val_ctx.ub, domain,
+		ub_retval = ub_resolve(dnssec_glob_val_ctx.ub, domain,
 		    LDNS_RR_TYPE_AAAA, LDNS_RR_CLASS_IN, &ub_res);
 		if(ub_retval != 0) {
 			printf_debug(DEBUG_PREFIX_DNSSEC,
@@ -649,7 +649,7 @@ int dnssec_validate(const char *domain, uint16_t options,
 		retval_ipv6 = examine_result(ub_res, ipbrowser);
 		ub_resolve_free(ub_res);
 
-		ub_retval = ub_resolve(glob_val_ctx.ub, domain, LDNS_RR_TYPE_A,
+		ub_retval = ub_resolve(dnssec_glob_val_ctx.ub, domain, LDNS_RR_TYPE_A,
 		    LDNS_RR_CLASS_IN, &ub_res);
 		if(ub_retval != 0) {
 			printf_debug(DEBUG_PREFIX_DNSSEC,
@@ -682,9 +682,9 @@ int dnssec_validation_deinit(void)
 {
 	printf_debug(DEBUG_PREFIX_DNSSEC, "%s\n", "De-initialising DNSSEC.");
 
-	if (glob_val_ctx.ub != NULL) {
-		ub_ctx_delete(glob_val_ctx.ub);
-		glob_val_ctx.ub = NULL;
+	if (dnssec_glob_val_ctx.ub != NULL) {
+		ub_ctx_delete(dnssec_glob_val_ctx.ub);
+		dnssec_glob_val_ctx.ub = NULL;
 	}
 
 	return 0;

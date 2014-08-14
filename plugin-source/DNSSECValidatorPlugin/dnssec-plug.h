@@ -67,7 +67,7 @@ struct dnssec_validation_ctx {
 	                    */
 };
 extern
-struct dnssec_validation_ctx glob_val_ctx;
+struct dnssec_validation_ctx dnssec_glob_val_ctx;
 
 
 /* Forward structure declaration. */
