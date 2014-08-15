@@ -20,7 +20,9 @@ DNSSEC Validator Add-on 2.x.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
 #pragma once
+
 const int BITMAP_NUMBER = 19;
+
 const int StatusBitmap[BITMAP_NUMBER] = {IDI_BMP_INIT0, IDI_BMP_INIT1, IDI_BMP_INIT2, IDI_BMP_INIT3, IDI_BMP_INIT4,
 			IDI_BMP_INIT5, IDI_BMP_INIT6, IDI_BMP_INIT7, IDI_BMP_INIT8, IDI_BMP_INIT9, IDI_BMP_INIT10, IDI_BMP_INIT11,
 			IDI_BMP_INIT12, IDI_BMP_INIT13, IDI_BMP_INIT14, IDI_BMP_INIT15, IDI_BMP_INIT16, IDI_BMP_INIT17, IDI_BMP_INIT18
@@ -42,7 +44,6 @@ const LPCTSTR stringtextEN[BITMAP_NUMBER+2] = {_T("& DNSSEC Validator\0") /*0*/,
 	_T("& Certificate corresponds to TLSA\0") /*14*/, _T("& Certificate doesn't correspond to TLSA\0") /*15*/, _T("& No HTTPS connection\0") /*16*/,
 	_T("& TLSA record does not exist\0") /*17*/, _T("& Bogus DNSSEC signature\0") /*18*/, _T("& DNSSEC\0") /*19*/, _T("& TLSA\0") /*20*/};
 
-
 const LPCTSTR stringtextDE[BITMAP_NUMBER+2] = {_T("& DNSSEC-Validator\0") /*0*/, _T("& Nicht durch DNSSEC geprüft\0") /*1*/,
 	_T("& DNSSEC-Zustand unbekannt\0") /*2*/, _T("& Erwerbung des DNSSEC-Zustandes\0") /*3*/,  _T("& Nicht durch DNSSEC gesichert\0") /*4*/, 
 	_T("& Gesichert durch DNSSEC\0") /*5*/, _T("& Ungültige DNSSEC-Signatur\0") /*6*/, _T("& Gesichert durch DNSSEC\0") /*7*/,
@@ -50,11 +51,19 @@ const LPCTSTR stringtextDE[BITMAP_NUMBER+2] = {_T("& DNSSEC-Validator\0") /*0*/,
 	_T("& TLSA Status unbekannt\0") /*11*/, _T("& TLSA Validierung wird durchgeführt\0") /*12*/,  _T("& Nicht durch DNSSEC gesichert\0") /*13*/, 
 	_T("& Zertifikat entspricht TLSA\0") /*14*/, _T("& Zertifikat entspricht nicht TLSA\0") /*15*/, _T("& Keine HTTPS Verbindung\0") /*16*/,
 	_T("& Kein TLSA Eintrag vorhanden\0") /*17*/, _T("& Ungültige DNSSEC Signatur\0") /*18*/, _T("& DNSSEC\0") /*19*/, _T("& TLSA\0") /*20*/};
+
+const LPCTSTR stringtextPL[BITMAP_NUMBER+2] = {_T("& DNSSEC Validator\0") /*0*/, _T("& Nie zweryfikowane przez DNSSEC\0") /*1*/,
+	_T("& Stan DNSSEC nieznany\0") /*2*/, _T("& Sprawdzanie stanu DNSSEC\0") /*3*/,  _T("& Niezabezpieczona przez DNSSEC\0") /*4*/, 
+	_T("& Zabezpieczona przez DNSSEC\0") /*5*/, _T("& Fa³szywy podpis DNSSEC\0") /*6*/, _T("& Zabezpieczona przez DNSSEC\0") /*7*/,
+	_T("& Nie zweryfikowane przez DNSSEC\0") /*8*/, _T("& TLSA Validator\0") /*9*/, _T("& Walidacja TLSA wy³¹czona\0") /*10*/,
+	_T("& Stan TLSA nieznany\0") /*11*/, _T("& Sprawdzanie stanu TLSA\0") /*12*/,  _T("& Niezabezpieczona przez DNSSEC\0") /*13*/, 
+	_T("& Certyfikat odpowiada TLSA\0") /*14*/, _T("& Walidacja TLSA nie powiod³a siê\0") /*15*/, _T("& Brak po³¹czeñ HTTPS\0") /*16*/,
+	_T("& Nieobecny rekord TLSA\0") /*17*/, _T("& Fa³szywy podpis DNSSEC\0") /*18*/, _T("& DNSSEC\0") /*19*/, _T("& TLSA\0") /*20*/};
+
 class CDNSSECToolBarBand;
+
 /////////////////////////////////////////////////////////////////////////////
 // CKBToolBarCtrl window
-
-
 class CKBToolBarCtrl : public CToolBarCtrl
 {
 // Construction

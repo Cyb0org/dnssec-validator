@@ -99,9 +99,11 @@ bool CKBToolBarCtrl::Create(CRect rcClientParent, CWnd* pWndParent, CDNSSECToolB
 	else if (lang==0x0407) {
 		for (int i=0; i<BITMAP_NUMBER+2; i++) res = AddStrings(stringtextDE[i]);
 	}
-	else
-	{
-	// Generation of String List Index EN
+	// 0x0407 PL
+	else if (lang==0x0415) {
+		for (int i=0; i<BITMAP_NUMBER+2; i++) res = AddStrings(stringtextPL[i]);
+	} else {
+	// default EN
 		for (int i=0; i<BITMAP_NUMBER+2; i++) res = AddStrings(stringtextEN[i]);
 	} // if
 
