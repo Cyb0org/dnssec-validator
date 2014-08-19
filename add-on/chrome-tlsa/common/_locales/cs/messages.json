@@ -201,7 +201,7 @@
         "message": "Certifikát vzdáleného serveru pro toto doménové jméno nebyl ověřen protokolem DANE, protože došlo k selhání TLSA validátoru."
     },
     "dm_errorversionInfo": {
-        "message": "Verze doplňku a validujícího pluginu jsou rozdílné, což může vést k nežádoucímu chování validátoru. Prosím, přeinstalujte doplněk a restartujte prohlížeč."
+        "message": "Verze doplňku a validujícího pluginu jsou rozdílné, což může vést k nežádoucímu chování validátoru. Prosím, přeinstalujte doplněk a/nebo validující plugin a restartujte prohlížeč."
     },
     "addonversiontext": {
         "message": "Verze doplňku:"

@@ -171,7 +171,7 @@
         "message": " was not verified by DNSSEC."
     },
     "dnssecErrorVersionInfo": {
-        "message": "The add-on version and version of validation core are different, which may lead to undesirable behavior of the validator. Please, reinstall add-on and restart your browser."
+        "message": "The add-on version and version of validator core are different, which may lead to undesirable behavior of the validator. Please, reinstall the add-on and/or the validator core and restart your browser."
     },
     "ipbrowsertext": {
         "message": "IP addresses obtained by browser:"

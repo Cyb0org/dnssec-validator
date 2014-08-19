@@ -222,13 +222,13 @@
         "message": "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Es kam zu einem Fehler während Erwerbs der TLSA Validator core."
     },
     "dm_errorversionInfo": {
-        "message": "Verze doplňku a validujícího pluginu jsou rozdílné, což může vést k nežádoucímu chování validátoru. Prosím, přeinstalujte doplněk a restartujte prohlížeč."
+        "message": "Die Versionen des Add-ons und des Validatorkerns unterscheiden sich, dies kann zu unerwünschtem Verhalten führen. Installieren sie das Add-on und/oder das Validatorkern wieder und starten sie ihren Browser von neuem."
     },
     "addonversiontext": {
         "message": "Add-on-Version:"
     },
     "coreversiontext": {
-        "message": "Plugin Core-Version:"
+        "message": "Plugin-Kernersion:"
     },
     "dmvsTooltip": {
         "message": "Zertifikat entspricht TLSA"

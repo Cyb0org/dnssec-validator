@@ -168,10 +168,10 @@
         "message": "Der Browser erwarb eine IP-Adresse für eine Domäne, welche nachweisbar nicht in der DNS-Hierarchie existiert. Womöglich benutzt der Validator den im Betriebssystem eingebauten Resolver nicht und benutzt einen anderen Resolver. Mit großer Wahrscheinlichkeit benutzt der Browser einen modifizierten Resolver. Diese Praktik wird manchmal angewendet, um schwer zugängliche Netzwerkteile erreichbarer zu machen."
     },
     "dnssecErrorVersion": {
-        "message": " was not verified by DNSSEC."
+        "message": " war nicht mit DNSSEC überprüft."
     },
     "dnssecErrorVersionInfo": {
-        "message": "The add-on version and version of validation core are different, which may lead to undesirable behavior of the validator. Please, reinstall add-on and restart your browser."
+        "message": "Die Versionen des Add-ons und des Validatorkerns unterscheiden sich, dies kann zu unerwünschtem Verhalten führen. Installieren sie das Add-on und/oder das Validatorkern wieder und starten sie ihren Browser von neuem."
     },
     "ipbrowsertext": {
         "message": "Von Webbrowser benutzte IP-Adresse:"
@@ -183,13 +183,13 @@
         "message": "Add-on-Version:"
     },
     "coreversiontext": {
-        "message": "Plugin Core-Version:"
+        "message": "Plugin-Kernversion:"
     },
     "actionDnssec": {
         "message": "Erwerbung des DNSSEC-Zustandes"
     },
     "inactionDnssec": {
-        "message": "Idle."
+        "message": "Inaktiv."
     },
     "errorDnssec": {
         "message": "DNSSEC-Zustand unbekannt"

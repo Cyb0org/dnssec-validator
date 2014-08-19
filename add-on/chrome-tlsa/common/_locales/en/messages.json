@@ -198,7 +198,7 @@
         "message": "The remote server certificate for this domain name could not be verified by DANE protocol because an error occurred in TLSA validator core."
     },
     "dm_errorversionInfo": {
-        "message": "The add-on version and version of validation core are different, which may lead to undesirable behavior of the validator. Please, reinstall add-on and restart your browser."
+        "message": "The add-on version and version of validator core are different, which may lead to undesirable behavior of the validator. Please, reinstall the add-on and/or the validator core and restart your browser."
     },
     "addonversiontext": {
         "message": "Add-on version:"
