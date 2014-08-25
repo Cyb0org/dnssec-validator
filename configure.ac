@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.60])
-AC_INIT([dnssec-validator], [2.1.2], [dnssec-validator-users@lists.nic.cz])
+AC_INIT([dnssec-validator], [2.2.0], [dnssec-validator-users@lists.nic.cz])
 AC_CONFIG_SRCDIR([plugin-source/common/common.h])
 AC_CONFIG_HEADERS([plugin-source/config.h])
 AC_CONFIG_MACRO_DIR([m4])
