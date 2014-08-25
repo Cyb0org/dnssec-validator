@@ -138,8 +138,8 @@ dane_init: function() {
 			abiStr = "x86";
 		}
 
-		/* Packaged library (plugins/core-os-arch.lib). */
-		tlsaLibName = "plugins/" + coreStr + "-" + osTgtStr +
+		/* Packaged library (platform/core-os-arch.lib). */
+		tlsaLibName = "platform/" + coreStr + "-" + osTgtStr +
 		    "-" + abiStr + "." + libSuffStr;
 		tlsaLibName = addon.getResourceURI(tlsaLibName)
 		    .QueryInterface(Components.interfaces.nsIFileURL).file
@@ -163,8 +163,8 @@ dane_init: function() {
 			}
 		}
 
-		/* Last option, packaged library (plugins/core-os.lib). */
-		tlsaLibName = "plugins/" + coreStr + "-" + osTgtStr +
+		/* Last option, packaged library (platform/core-os.lib). */
+		tlsaLibName = "platform/" + coreStr + "-" + osTgtStr +
 		    "." + libSuffStr;
 		tlsaLibName = addon.getResourceURI(tlsaLibName)
 		    .QueryInterface(Components.interfaces.nsIFileURL).file

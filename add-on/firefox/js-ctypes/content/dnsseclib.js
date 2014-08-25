@@ -138,8 +138,8 @@ dnssec_init: function() {
 			abiStr = "x86";
 		}
 
-		/* Packaged library (plugins/core-os-arch.lib). */
-		dnssecLibName = "plugins/" + coreStr + "-" + osTgtStr +
+		/* Packaged library (platform/core-os-arch.lib). */
+		dnssecLibName = "platform/" + coreStr + "-" + osTgtStr +
 		    "-" + abiStr + "." + libSuffStr;
 		dnssecLibName = addon.getResourceURI(dnssecLibName)
 		    .QueryInterface(Components.interfaces.nsIFileURL).file
@@ -163,8 +163,8 @@ dnssec_init: function() {
 			}
 		}
 
-		/* Last option, packaged library (plugins/core-os.lib). */
-		dnssecLibName = "plugins/" + coreStr + "-" + osTgtStr +
+		/* Last option, packaged library (platform/core-os.lib). */
+		dnssecLibName = "platform/" + coreStr + "-" + osTgtStr +
 		    "." + libSuffStr;
 		dnssecLibName = addon.getResourceURI(dnssecLibName)
 		    .QueryInterface(Components.interfaces.nsIFileURL).file

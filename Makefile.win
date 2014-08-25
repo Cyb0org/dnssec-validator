@@ -128,12 +128,12 @@ xpi_x86:
 	@echo '### Creating js-ctypes package for Firefox $(OSNAME) x86... ###'
 	rm -rf $(ADDON_PATH_FF)/js-ctypes_built
 	mkdir $(ADDON_PATH_FF)/js-ctypes_built
-	mkdir $(ADDON_PATH_FF)/js-ctypes_built/plugins
+	mkdir $(ADDON_PATH_FF)/js-ctypes_built/platform
 	cp -r $(ADDON_PATH_FF)/js-ctypes/* $(ADDON_PATH_FF)/js-ctypes_built
 	cp -r $(ADDON_PATH_FF)/common/* $(ADDON_PATH_FF)/js-ctypes_built
 	chmod 777 $(ADDON_PATH_FF)/js-ctypes_built/build.sh
-	cp $(PLUGIN_LIB_DEST)/$(PLUGIN_NAME_DNSSEC_LIB) $(ADDON_PATH_FF)/js-ctypes_built/plugins
-	cp $(PLUGIN_LIB_DEST)/$(PLUGIN_NAME_TLSA_LIB) $(ADDON_PATH_FF)/js-ctypes_built/plugins
+	cp $(PLUGIN_LIB_DEST)/$(PLUGIN_NAME_DNSSEC_LIB) $(ADDON_PATH_FF)/js-ctypes_built/platform
+	cp $(PLUGIN_LIB_DEST)/$(PLUGIN_NAME_TLSA_LIB) $(ADDON_PATH_FF)/js-ctypes_built/platform
 	sed -e 's/<em:version><\/em:version>/<em:version>$(EXTENSION_VERSION)<\/em:version>/g' -e 's/<em:targetPlatform><\/em:targetPlatform>/<em:targetPlatform>WINNT_x86-msvc<\/em:targetPlatform>/g' $(ADDON_PATH_FF)/js-ctypes_built/install.rdf.template > $(ADDON_PATH_FF)/js-ctypes_built/install.rdf
 	sed -e 's/xversionx/$(EXTENSION_VERSION)/g' $(ADDON_PATH_FF)/js-ctypes_built/about.template > $(ADDON_PATH_FF)/js-ctypes_built/content/about.xul
 	if [ ! -d "$(PLUGIN_ADD_ON)" ]; then mkdir $(PLUGIN_ADD_ON); fi
