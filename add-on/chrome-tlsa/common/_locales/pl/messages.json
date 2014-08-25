@@ -198,7 +198,7 @@
         "message": "Certyfikat zdalnego serwera dla tej nazwy domenowej nie mógł zostać zweryfikowany przy użyciu protokołu DANE, ponieważ wystąpił błąd w rdzeniu walidatora TLSA."
     },
     "dm_errorversionInfo": {
-        "message": "The add-on version and version of validation core are different, which may lead to undesirable behavior of the validator. Please, reinstall add-on and restart your browser."
+        "message": "Dodatek wersja i wersja rdzenia walidatora są różne, co może prowadzić do niepożądanego zachowania walidator. Proszę, zainstaluj dodatek i / lub weryfikatora rdzeń i uruchom ponownie przeglądarkę"
     },
     "addonversiontext": {
         "message": "Dodatek wersji:"

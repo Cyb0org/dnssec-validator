@@ -165,13 +165,13 @@
         "message": " została zweryfikowana przy użyciu DNSSEC."
     },
     "8securedConnectionNoDomainIPaddrInfo": {
-        "message": "Przeglądarka uzyskać adres IP dla nazwy domeny, której rekord DNS wyraźnie istnieją w hierarchii DNS. Może to być spowodowane faktem, że weryfikator zastosowań innych niż program rozpoznawania systemu, a przeglądarki wykorzystuje mechanizm rozwiązywania, które mogą być modyfikowane. Ta praktyka jest czasem używany do dostępu do części sieci, które nie są łatwo dostępne."
+        "message": "Przeglądarka otrzymała adres IP dla nazwy domeny, której zapis DNS najwyraźniej nie istnieje w hierarchii DNS. Może to być spowodowane faktem, iż weryfikator stosuje inny niż systemowy resolwer, podczas gdy przeglądarka korzysta z resolwera, który był prawdopodobnie zmodyfikowany. Ta praktyka jest czasem używana do dostępu części sieci, które nie są powszechnie dostępne."
     },
     "dnssecErrorVersion": {
-        "message": " was not verified by DNSSEC."
+        "message": " nie potwierdzono przez DNSSEC."
     },
     "dnssecErrorVersionInfo": {
-        "message": "The add-on version and version of validation core are different, which may lead to undesirable behavior of the validator. Please, reinstall add-on and restart your browser."
+        "message": "Dodatek wersja i wersja rdzenia walidatora są różne, co może prowadzić do niepożądanego zachowania walidator. Proszę, zainstaluj dodatek i / lub weryfikatora rdzeń i uruchom ponownie przeglądarkę"
     },
     "ipbrowsertext": {
         "message": "Adres IP uzyskany przez przeglądarkę:"
