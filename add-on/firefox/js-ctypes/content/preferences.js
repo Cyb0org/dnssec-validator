@@ -31,356 +31,436 @@ Components.utils.import("resource://gre/modules/AddonManager.jsm");
 cz.nic.extension.dnssecExtPrefs = {
 
 instantApply : true, // default value that changes on pref window load
-	 	// Some parts of next code are used from UrlbarExt project
+// Some parts of following code are used from UrlbarExt project
 prefObj : Components.classes["@mozilla.org/preferences-service;1"]
-		.getService(Components.interfaces.nsIPrefBranch),
+    .getService(Components.interfaces.nsIPrefBranch),
 prefBranch : "extensions.dnssec.",
 pluginlib : null,
+coreFileName : null,
 
-dnssec_path: function() {
+/* Sets pluginlib, synchronously. */
+sync_dnssec_init: function() {
 
-	var addonObj = null;			
+	/* Initialise add-on. */
+	var addonObj = null;
+	AddonManager.getAddonByID("dnssec@nic.cz", function(addon) {
+		addonObj = addon;
+	});
 	var Cc = Components.classes;
-	var dnssecLibName = "unspecified";
-
-	AddonManager.getAddonByID("dnssec@nic.cz",function(addon) {addonObj = addon;});
-	var thread = Cc["@mozilla.org/thread-manager;1"].getService().currentThread;
+	var thread = Cc["@mozilla.org/thread-manager;1"]
+	    .getService().currentThread;
+	/* Wait till add-on initialisation finishes. */
 	while (addonObj == null) {
+		/* We don't want to block other events. */
 		thread.processNextEvent(true);
 	}
-		
+
 	var abi = Components.classes["@mozilla.org/xre/app-info;1"]
-	   .getService(Components.interfaces.nsIXULRuntime).XPCOMABI;
+	    .getService(Components.interfaces.nsIXULRuntime).XPCOMABI;
 	var os = Components.classes["@mozilla.org/xre/app-info;1"]
 	    .getService(Components.interfaces.nsIXULRuntime).OS;
 
+	var dnssecLibName = "unspecified";
+	var coreStr = "libDNSSECcore";
 
-	/* Try system location. */
-	if(os.match("Darwin")) {
-		dnssecLibName = "libDNSSECcore-macosx.dylib";
-	} else if(os.match("FreeBSD")) {
-		dnssecLibName = "libDNSSECcore-freebsd.so";
-	} else if(os.match("Linux")) {
-		dnssecLibName = "libDNSSECcore-linux.so";
-	} else if(os.match("WINNT")) {
-		dnssecLibName = "libDNSSECcore-windows.dll";
+	/* Set library name/suffix according to system. */
+	var osTgtStr = "unspecified";
+	var libSuffStr = "unspecified";
+	if (os.match("Darwin")) {
+		osTgtStr = "Darwin";
+		libSuffStr = "dylib";
+	} else if (os.match("FreeBSD")) {
+		osTgtStr = "FreeBSD";
+		libSuffStr = "so";
+	} else if (os.match("Linux")) {
+		osTgtStr = "Linux";
+		libSuffStr = "so";
+	} else if (os.match("WINNT")) {
+		osTgtStr = "WINNT";
+		libSuffStr = "dll";
 	}
 
-	try {
-		this.pluginlib = ctypes.open(dnssecLibName);
-	} catch(e) {
-
-		var abiStr = "unspecified";
-		if (abi.match("x86_64")) {
-			abiStr = "-x64";
-		} else if (abi.match("x86")) {
-			abiStr = "-x86";
-		} else {
-			abiStr = "";
-		} 
-
-		if (os.match("Darwin")) {
-			dnssecLibName =
-			    "platform/libDNSSECcore-macosx" + abiStr + ".dylib";
-		} else if (os.match("FreeBSD")) {
-			dnssecLibName =
-			    "platform/libDNSSECcore-freebsd" + abiStr + ".so";
-		} else if(os.match("Linux")) {
-			dnssecLibName =
-			    "platform/libDNSSECcore-linux" + abiStr + ".so";
-		} else if(os.match("WINNT")) {
-			dnssecLibName =
-			    "platform/libDNSSECcore-windows-x86.dll";
+	/* Test for unsupported OS. */
+	if (("unspecified" == osTgtStr) ||
+	    ("unspecified" == libSuffStr)) {
+		if (cz.nic.extension.dnssecExtension.debugOutput) {
+			dump(cz.nic.extension.dnssecExtension.debugPrefix +
+			    "Error: Unsupported OS '" + os + "'!\n");
 		}
-	
-		dnssecLibName = addonObj.getResourceURI(dnssecLibName)
-	    	.QueryInterface(Components.interfaces.nsIFileURL).file
-		    .path;
-		
-		this.pluginlib = ctypes.open(dnssecLibName);
+		return false;
 	}
+
+	/* Try system location (core.lib). */
+	dnssecLibName = coreStr + "." + libSuffStr;
+	try {
+		cz.nic.extension.dnssecExtPrefs._initDnssecLib(dnssecLibName);
+		return true;
+	} catch(e) {
+		/*
+		 * Failed loading OS library. Fall back to library
+		 * distributed with the plug-in.
+		 */
+		if (cz.nic.extension.dnssecExtension.debugOutput) {
+			dump(cz.nic.extension.dnssecExtension.debugPrefix +
+			    "Warning: Cannot find DNSSEC system " +
+			    "library '" + dnssecLibName + "'.\n");
+		}
+	}
+
+	/* Try system location (core-os.lib). */
+	dnssecLibName = coreStr + "-" + osTgtStr + "." + libSuffStr;
+	try {
+		cz.nic.extension.dnssecExtPrefs._initDnssecLib(dnssecLibName);
+		return true;
+	} catch(e) {
+		/*
+		 * Failed loading OS library. Fall back to library
+		 * distributed with the plug-in.
+		 */
+		if (cz.nic.extension.dnssecExtension.debugOutput) {
+			dump(cz.nic.extension.dnssecExtension.debugPrefix +
+			    "Warning: Cannot find DNSSEC system " +
+			    "library '" + dnssecLibName + "'. Library " +
+			    "distributed with plugin will be used.\n");
+		}
+	}
+
+	var abiStr = "unspecified";
+	if (abi.match("x86_64")) {
+		abiStr = "x86_64";
+	} else if (abi.match("x86")) {
+		abiStr = "x86";
+	}
+
+	/* Test for unsupported ABI. */
+	if ("unspecified" == abiStr) {
+		if (cz.nic.extension.dnssecExtension.debugOutput) {
+			dump(cz.nic.extension.dnssecExtension.debugPrefix +
+			    "Error: Unsupported OS architecture!\n");
+		}
+		return false;
+	}
+
+	/* Only 32-bit Windows at the moment. */
+	if ("WINNT" == osTgtStr) {
+		abiStr = "x86";
+	}
+
+	/* Packaged library (platform/core-os-arch.lib). */
+	dnssecLibName = "platform/" + coreStr + "-" + osTgtStr +
+	    "-" + abiStr + "." + libSuffStr;
+	dnssecLibName = addon.getResourceURI(dnssecLibName)
+	    .QueryInterface(Components.interfaces.nsIFileURL).file
+	    .path;
+	try {
+		cz.nic.extension.dnssecExtPrefs._initDnssecLib(dnssecLibName);
+		return true;
+	} catch(e) {
+		/*
+		 * Failed loading plug-in distributed library.
+		 */
+		if (cz.nic.extension.dnssecExtension.debugOutput) {
+			dump(cz.nic.extension.dnssecExtension.debugPrefix +
+			    "Warning: Cannot load plug-in core " +
+			    "library '" + dnssecLibName + "'.\n");
+		}
+	}
+
+	/* Last option, packaged library (platform/core-os.lib). */
+	dnssecLibName = "platform/" + coreStr + "-" + osTgtStr +
+	    "." + libSuffStr;
+	dnssecLibName = addon.getResourceURI(dnssecLibName)
+	    .QueryInterface(Components.interfaces.nsIFileURL).file
+	    .path;
+	try {
+		cz.nic.extension.dnssecExtPrefs._initDnssecLib(dnssecLibName);
+		return true;
+	} catch(e) {
+		if (cz.nic.extension.dnssecExtension.debugOutput) {
+			dump(cz.nic.extension.dnssecExtension.debugPrefix +
+			    "Error: Cannot load plug-in core " +
+			    "library '" + dnssecLibName + "'.\n");
+		}
+	}
+
+	return false;
+
+},
+
+_initDnssecLib: function(dnssecLibName) {
+
+	++this.initAttempt;
+
+	//open library
+	this.pluginlib = ctypes.open(dnssecLibName);
 
 	//declare dnssec API functions
-	this.pluginlib.dnssec_validation_init =
-	this.pluginlib.declare("dnssec_validation_init",
-		ctypes.default_abi,
-		ctypes.int);
-	this.pluginlib.dnssec_validation_deinit =
-	this.pluginlib.declare("dnssec_validation_deinit",
-		ctypes.default_abi,
-		ctypes.int);
-	this.pluginlib.dnssec_validate =
-    	this.pluginlib.declare("dnssec_validate",
-		ctypes.default_abi,
-		ctypes.int,		//return state
-		ctypes.char.ptr,	//doamin
-		ctypes.uint16_t,	//options
-		ctypes.char.ptr,	//optdnssrv
-		ctypes.char.ptr,	//ipbrowser
-		ctypes.char.ptr.ptr //ipvalidator out
-		);
+	this.dnssec_validation_init =
+	    this.pluginlib.declare("dnssec_validation_init",
+	    ctypes.default_abi,
+	    ctypes.int);
+
+	this.dnssec_validation_deinit =
+	    this.pluginlib.declare("dnssec_validation_deinit",
+	    ctypes.default_abi,
+	    ctypes.int);
+
+	this.dnssec_validate =
+	    this.pluginlib.declare("dnssec_validate",
+	    ctypes.default_abi,
+	    ctypes.int,		//return state
+	    ctypes.char.ptr,	//doamin
+	    ctypes.uint16_t,	//options
+	    ctypes.char.ptr,	//optdnssrv
+	    ctypes.char.ptr,	//ipbrowser
+	    ctypes.char.ptr.ptr //ipvalidator out
+	    );
+
+	this.coreFileName = dnssecLibName;
+},
+
+getInt : function(prefName) {
+	try {
+		return this.prefObj.getIntPref(this.prefBranch + prefName);
+	} catch (ex) {
+		return null;
+	}
+},
+
+getBool : function(prefName) {
+	try {
+		return this.prefObj.getBoolPref(this.prefBranch + prefName);
+	} catch (ex) {
+		return null;
+	}
+},
+
+getChar : function(prefName) {
+	try {
+		return this.prefObj.getCharPref(this.prefBranch + prefName);
+	} catch (ex) {
+		return null;
+	}
+},
+
+setChar : function(prefName, prefValue) {
+	try {
+		return this.prefObj.setCharPref(this.prefBranch + prefName,
+		    prefValue);
+	} catch (ex) {
+		return null;
+	}
+},
+
+setBool : function(prefName, prefValue) {
+	try {
+		return this.prefObj.setBoolPref(this.prefBranch + prefName,
+		    prefValue);
+	} catch (ex) {
+		return null;
+	}
+},
+
+setInt : function(prefName, prefValue) {
+	try {
+		return this.prefObj.setIntPref(this.prefBranch + prefName,
+		    prefValue);
+	} catch (ex) {
+		return null;
+	}
+},
+
+resetUserPref : function(prefName) {
+	try {
+		this.prefObj.clearUserPref(this.prefBranch + prefName);
+	} catch (ex) {
+	}
+},
+
+hasUserValue : function(prefName) {
+	try {
+		return this.prefObj.prefHasUserValue(this.prefBranch + prefName);
+	} catch (ex) {
+		return null;
+	}
+},
+
+checkOptdnsserveraddr : function() {
+	var str = document.getElementById("dnssec-pref-optdnsserveraddr").value;
+	var n = str.split(" ");
+	var c = 0;
+	for(c = 0; c < n.length; c++) {
+		if (!this.test_ip(n[c])) {
+			return false;
+		} //if
+	} //for
+	return true;
 },
 
 
-getInt :
-	function(prefName) {
-		try {
-			return this.prefObj.getIntPref(this.prefBranch + prefName);
-		} catch (ex) {
-			return null;
+checkdomainlist : function() {
+	var str=document.getElementById("dnssec-pref-domains").value;
+	var match = str.match(/^[a-z0-9.-]+(, [a-z0-9.-]+)*$/);
+	return match != null;
+},
+
+savePrefs : function() {
+	switch (document.getElementById("dnssec-pref-dnsserverchoose").value) {
+	case '2': // Custom resolver
+		if (this.checkOptdnsserveraddr()) {
+			this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-optdnsserveraddr").value);
+			document.getElementById("dnssec-pref-optdnsserveraddr").setAttribute("style", "color: black");
+		} else {
+			document.getElementById("dnssec-pref-optdnsserveraddr").setAttribute("style", "color: red");
 		}
-	},
-
-getBool :
-	function(prefName) {
-		try {
-			return this.prefObj.getBoolPref(this.prefBranch + prefName);
-		} catch (ex) {
-			return null;
+		break;
+	case '3': // System
+		this.setChar("dnsserveraddr", "nofwd"); // empty string for using system resolver conf
+		break;
+	case '0': // System
+	default:
+		this.setChar("dnsserveraddr", ""); // empty string for using system resolver conf
+		break;
+	}
+	if (!document.getElementById("dnssec-pref-domains").disabled)
+	{
+		if (this.checkdomainlist()) {
+			this.setChar("domainlist", document.getElementById("dnssec-pref-domains").value);
+			document.getElementById("dnssec-pref-domains").setAttribute("style", "color: black");
+		} else {
+			document.getElementById("dnssec-pref-domains").setAttribute("style", "color: red");
 		}
-	},
+	}
+},
 
-getChar :
-	function(prefName) {
-		try {
-			return this.prefObj.getCharPref(this.prefBranch + prefName);
-		} catch (ex) {
-			return null;
+setElementsattributes : function() {
+	var tmpCheck;
+	document.getElementById("dnssecok").style.display = 'none';
+	document.getElementById("dnssecbogus").style.display = 'none';
+	document.getElementById("dnssecerror").style.display = 'none';
+	document.getElementById("wrongip").style.display = 'none';
+	document.getElementById("space").style.display = 'block';
+
+
+	// enable optional DNS address textbox only if appropriate radio button is selected
+	tmpCheck = document.getElementById("dnssec-pref-useoptdnsserver").selected;
+	document.getElementById("dnssec-pref-optdnsserveraddr").disabled = !tmpCheck;
+
+	tmpCheck = document.getElementById("dnssec-pref-usefilter").checked;
+	document.getElementById("dnssec-pref-domains").disabled = !tmpCheck;
+
+	tmpCheck = document.getElementById("dnssec-pref-tlsaonoff").checked;
+	document.getElementById("dnssec-pref-tlsablock").disabled = !tmpCheck;
+	document.getElementById("dnssec-pref-clearcache").disabled = !tmpCheck;
+	document.getElementById("dnssec-pref-checkallhttps").disabled = !tmpCheck;
+	document.getElementById("dnssec-pref-usebrowsercertchain").disabled = !tmpCheck;
+//	document.getElementById("dnssec-pref-tlsablock").disabled = !tmpCheck;
+//	document.getElementById("dnssec-pref-clearcache").disabled = !tmpCheck;
+	if (tmpCheck) {
+		var tmp = document.getElementById("dnssec-pref-checkallhttps").checked;
+		document.getElementById("dnssec-pref-tlsablock").disabled = !tmp;
+		document.getElementById("dnssec-pref-clearcache").disabled = !tmp;
+	}
+
+},
+
+get _dnssecok () {
+	delete this._dnssecok;
+	return this._dnssecok = document.getElementById("dnssecok");
+},
+
+get _dnssecbogus () {
+	delete this._dnssecbogus;
+	return this._dnssecbogus = document.getElementById("dnssecbogus");
+},
+
+get _dnssecerror() {
+	delete this._dnssecerror;
+	return this._dnssecerror = document.getElementById("dnssecerror");
+},
+
+get _wrongip() {
+	delete this._wrongip;
+	return this._wrongip = document.getElementById("wrongip");
+},
+
+pane1Load : function() {
+	delete this._stringBundle;
+	this._stringBundle = document.getElementById("dnssec-strings-pref");
+	this._dnssecok.textContent = this._stringBundle.getString("dnssecok");
+	this._dnssecbogus.textContent = this._stringBundle.getString("dnssecbogus");
+	this._dnssecerror.textContent = this._stringBundle.getString("dnssecerror");
+	this._wrongip.textContent = this._stringBundle.getString("wrongip");
+	this.setElementsattributes();
+},
+
+dnsserverchooseCommand : function() {
+	this.setElementsattributes();
+	if (this.instantApply) {
+		this.windowDialogaccept();
+	}
+},
+
+dnsserverpresetchooseCommand : function() {
+	this.dnsserverchooseCommand();
+},
+
+optdnsserveraddrInput : function() {
+	this.setElementsattributes();
+	if (this.instantApply) {
+		this.windowDialogaccept();
+	}
+},
+
+testdnssec : function() {
+
+	var dnsseclib = null;
+
+	var options = 6;
+	var ip = false;
+	var testnic = 0;
+	var dn = "www.nic.cz";
+	var addr = "217.31.205.50";
+	var nameserver = "";
+	switch (document.getElementById("dnssec-pref-dnsserverchoose").value) {
+	case '0': // System setting
+		nameserver = "";
+		break;
+	case '2': // Custom
+		nameserver = document.getElementById("dnssec-pref-optdnsserveraddr").value;
+		if (!this.checkOptdnsserveraddr()) {
+			ip = true;
 		}
-	},
+		break;
+	case '3': // Self-validation
+		nameserver = "nofwd";
+		options = 4;
+		break;
+	default:
+		nameserver = "";
+		break;
+	} //switch
 
-setChar :
-	function(prefName, prefValue) {
-		try {
-			return this.prefObj.setCharPref(this.prefBranch + prefName,
-			                                prefValue);
-		} catch (ex) {
-			return null;
-		}
-	},
-
-setBool :
-	function(prefName, prefValue) {
-		try {
-			return this.prefObj.setBoolPref(this.prefBranch + prefName,
-			                                prefValue);
-		} catch (ex) {
-			return null;
-		}
-	},
-
-setInt :
-	function(prefName, prefValue) {
-		try {
-			return this.prefObj.setIntPref(this.prefBranch + prefName,
-			                               prefValue);
-		} catch (ex) {
-			return null;
-		}
-	},
-
-resetUserPref :
-	function(prefName) {
-		try {
-			this.prefObj.clearUserPref(this.prefBranch + prefName);
-		} catch (ex) {
-		}
-	},
-
-hasUserValue :
-	function(prefName) {
-		try {
-			return this.prefObj.prefHasUserValue(this.prefBranch + prefName);
-		} catch (ex) {
-			return null;
-		}
-	},
-
-checkOptdnsserveraddr :
-	function() {
-		var str = document.getElementById("dnssec-pref-optdnsserveraddr").value;
-		var n = str.split(" ");
-		var c = 0;
-		for(c = 0; c < n.length; c++) {
-			if (!this.test_ip(n[c])) {
-				return false;
-			} //if
-		} //for
-		return true;
-	},
-
-
-checkdomainlist :
-	function() {
-		var str=document.getElementById("dnssec-pref-domains").value;
-		var match = str.match(/^[a-z0-9.-]+(, [a-z0-9.-]+)*$/);
-		return match != null;
-	},
-
-savePrefs :
-	function() {
-		switch (document.getElementById("dnssec-pref-dnsserverchoose").value) {
-		case '2': // Custom resolver
-			if (this.checkOptdnsserveraddr()) {
-				this.setChar("dnsserveraddr", document.getElementById("dnssec-pref-optdnsserveraddr").value);
-				document.getElementById("dnssec-pref-optdnsserveraddr").setAttribute("style", "color: black");
-			} else {
-				document.getElementById("dnssec-pref-optdnsserveraddr").setAttribute("style", "color: red");
-			}
-			break;
-		case '3': // System
-			this.setChar("dnsserveraddr", "nofwd"); // empty string for using system resolver conf
-			break;
-		case '0': // System
-		default:
-			this.setChar("dnsserveraddr", ""); // empty string for using system resolver conf
-			break;
-		}
-		if (!document.getElementById("dnssec-pref-domains").disabled)
-		{
-			if (this.checkdomainlist()) {
-				this.setChar("domainlist", document.getElementById("dnssec-pref-domains").value);
-				document.getElementById("dnssec-pref-domains").setAttribute("style", "color: black");
-			} else {
-				document.getElementById("dnssec-pref-domains").setAttribute("style", "color: red");
-			}
-		}
-	},
-
-setElementsattributes :
-	function() {
-		var tmpCheck;
-		document.getElementById("dnssecok").style.display = 'none';
-		document.getElementById("dnssecbogus").style.display = 'none';
-		document.getElementById("dnssecerror").style.display = 'none';
-		document.getElementById("wrongip").style.display = 'none';
-		document.getElementById("space").style.display = 'block';
-
-
-		// enable optional DNS address textbox only if appropriate radio button is selected
-		tmpCheck = document.getElementById("dnssec-pref-useoptdnsserver").selected;
-		document.getElementById("dnssec-pref-optdnsserveraddr").disabled = !tmpCheck;
-
-		tmpCheck = document.getElementById("dnssec-pref-usefilter").checked;
-		document.getElementById("dnssec-pref-domains").disabled = !tmpCheck;
-
-		tmpCheck = document.getElementById("dnssec-pref-tlsaonoff").checked;
-		document.getElementById("dnssec-pref-tlsablock").disabled = !tmpCheck;
-		document.getElementById("dnssec-pref-clearcache").disabled = !tmpCheck;
-		document.getElementById("dnssec-pref-checkallhttps").disabled = !tmpCheck;
-		document.getElementById("dnssec-pref-usebrowsercertchain").disabled = !tmpCheck;
-//		document.getElementById("dnssec-pref-tlsablock").disabled = !tmpCheck;
-//		document.getElementById("dnssec-pref-clearcache").disabled = !tmpCheck;
-		if (tmpCheck) {
-			var tmp = document.getElementById("dnssec-pref-checkallhttps").checked;
-			document.getElementById("dnssec-pref-tlsablock").disabled = !tmp;
-			document.getElementById("dnssec-pref-clearcache").disabled = !tmp;
-		}
-
-	},
-
-	get _dnssecok () {
-		delete this._dnssecok;
-		return this._dnssecok =
-		               document.getElementById("dnssecok");
-	},
-
-	get _dnssecbogus () {
-		delete this._dnssecbogus;
-		return this._dnssecbogus =
-		               document.getElementById("dnssecbogus");
-	},
-
-	get _dnssecerror() {
-		delete this._dnssecerror;
-		return this._dnssecerror =
-		               document.getElementById("dnssecerror");
-	},
-
-	get _wrongip() {
-		delete this._wrongip;
-		return this._wrongip =
-		               document.getElementById("wrongip");
-	},
-
-
-pane1Load :
-	function() {
-		delete this._stringBundle;
-		this._stringBundle = document.getElementById("dnssec-strings-pref");
-		this._dnssecok.textContent = this._stringBundle.getString("dnssecok");
-		this._dnssecbogus.textContent = this._stringBundle.getString("dnssecbogus");
-		this._dnssecerror.textContent = this._stringBundle.getString("dnssecerror");
-		this._wrongip.textContent = this._stringBundle.getString("wrongip");
-		this.setElementsattributes();
-	},
-
-dnsserverchooseCommand :
-	function() {
-		this.setElementsattributes();
-
-		if (this.instantApply) {
-			this.windowDialogaccept();
-		}
-	},
-
-dnsserverpresetchooseCommand :
-	function() {
-		this.dnsserverchooseCommand();
-	},
-
-optdnsserveraddrInput :
-	function() {
-		this.setElementsattributes();
-		if (this.instantApply) {
-			this.windowDialogaccept();
-		}
-	},
-
-testdnssec :
-	function() {
-
-		var dnsseclib = null;
-			
-		var options = 6;
-		var ip = false;
-		var testnic = 0;
-		var dn = "www.nic.cz";
-		var addr = "217.31.205.50";
-		var nameserver = "";
-		switch (document.getElementById("dnssec-pref-dnsserverchoose").value) {
-		case '0': // System setting
-			nameserver = "";
-			break;
-		case '2': // Custom
-			nameserver = document.getElementById("dnssec-pref-optdnsserveraddr").value;
-			if (!this.checkOptdnsserveraddr()) {
-				ip = true;
-			}
-			break;
-		case '3': // Self-validation
-			nameserver = "nofwd";
-			options = 4;
-			break;
-		default:
-			nameserver = "";
-			break;
-		} //switch
-		
 	if (!ip) {
 		try {
 			if (window.arguments == undefined) {
-	
-				//set plugin path and open lib
-				this.dnssec_path();
+
+				//set plug-in path and open lib
+				if (!this.sync_dnssec_init()) {
+					/*
+					 * TODO -- Print error message because
+					 * extension library could not be
+					 * initialised.
+					 */
+				}
 				this.pluginlib.dnssec_validation_deinit();
 				this.pluginlib.dnssec_validation_init();
 				var outputParam = new ctypes.char.ptr();
-				testnic = this.pluginlib.dnssec_validate(dn, options, nameserver, addr, outputParam.address());			
+				testnic = this.pluginlib.dnssec_validate(dn, options, nameserver, addr, outputParam.address());
 				this.pluginlib.close();
 			} else {
 
-				window.arguments[0].dnssec_validation_deinit_core();	
+				window.arguments[0].dnssec_validation_deinit_core();
 				testnic = window.arguments[0].dnssec_validate_core(dn, options, nameserver, addr);
 				testnic = testnic[0];
 			}
@@ -419,56 +499,51 @@ testdnssec :
 	}
 },
 
-windowDialogaccept :
-	function() {
-		this.savePrefs();
-	},
+windowDialogaccept : function() {
+	this.savePrefs();
+},
 
-onUnload :
-	function(prefwindow) {
-		this.setBool("dnsseccachefree", true);
-		this.setBool("tlsacachefree", true);
-		//if (window.arguments != undefined) {
-		//	window.arguments[0].dnssec_validation_deinit_core();
-		//	window.arguments[1].dane_validation_deinit_core();
-		//}
-		return true;
-	},
+onUnload : function(prefwindow) {
+	this.setBool("dnsseccachefree", true);
+	this.setBool("tlsacachefree", true);
+	//if (window.arguments != undefined) {
+	//	window.arguments[0].dnssec_validation_deinit_core();
+	//	window.arguments[1].dane_validation_deinit_core();
+	//}
+	return true;
+},
 
 
-setLoading :
-	function(state) {
-		document.getElementById("identifier").style.display = (state) ? 'block' : 'none';
-		document.getElementById('identifier').mode =
-		        (state) ? 'undetermined' : 'determined';
-	},
+setLoading : function(state) {
+	document.getElementById("identifier").style.display = (state) ? 'block' : 'none';
+	document.getElementById('identifier').mode =
+	        (state) ? 'undetermined' : 'determined';
+},
 
-showPrefWindow :
-	function(dnssecLibCore, daneLibCore) {
-		var optionsURL = "chrome://dnssec/content/preferences.xul";
-		// Check if the pref window is not already opened
-		var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-		         .getService(Components.interfaces.nsIWindowMediator);
-		var enumerator = wm.getEnumerator(null);
-		while(enumerator.hasMoreElements()) {
-			var win = enumerator.getNext();
-			if (win.document.documentURI == optionsURL) {
-				win.focus();
-				return;
-			}
+showPrefWindow : function(dnssecLibCore, daneLibCore) {
+	var optionsURL = "chrome://dnssec/content/preferences.xul";
+	// Check if the pref window is not already opened
+	var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+	         .getService(Components.interfaces.nsIWindowMediator);
+	var enumerator = wm.getEnumerator(null);
+	while(enumerator.hasMoreElements()) {
+		var win = enumerator.getNext();
+		if (win.document.documentURI == optionsURL) {
+			win.focus();
+			return;
 		}
-		// Open the pref window
-		var features = "chrome,titlebar,toolbar,centerscreen,dialog=yes";
-		window.openDialog(optionsURL, "", features, dnssecLibCore, daneLibCore);
-	},
+	}
+	// Open the pref window
+	var features = "chrome,titlebar,toolbar,centerscreen,dialog=yes";
+	window.openDialog(optionsURL, "", features, dnssecLibCore, daneLibCore);
+},
 
 // Functions for IP address with port notation validation
-test_ip :
-	function(ip) {
-		var expression = /((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(@\d{1,5})?\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?(@\d{1,5})?\s*$))/;
+test_ip : function(ip) {
+	var expression = /((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(@\d{1,5})?\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?(@\d{1,5})?\s*$))/;
 
-		var match = ip.match(expression);
-		return match != null;
-	},
+	var match = ip.match(expression);
+	return match != null;
+},
 
 };
