@@ -26,12 +26,12 @@ DNSSEC Validator Add-on 2.x.  If not, see <http://www.gnu.org/licenses/>.
 //	You must update the version of plugin in the following defines
 //
 #define APS_MAJORNUMBER          2	// major
-#define APS_MINORNUMBER          1	// minor
-#define APS_BUILDNUMBER          2	// lastbuild
+#define APS_MINORNUMBER          2	// minor
+#define APS_BUILDNUMBER          0	// lastbuild
 #define APS_MODIFICATIONNUMBER   0	// always must be 0
-#define	EN_VERSION_LABEL "Version 2.1.2"
-#define	CZ_VERSION_LABEL "Verze 2.1.2"
-#define PL_VERSION_LABEL "Wersja 2.1.2"
+#define	EN_VERSION_LABEL "Version 2.2.0"
+#define	CZ_VERSION_LABEL "Verze 2.2.0"
+#define PL_VERSION_LABEL "Wersja 2.2.0"
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -73,7 +73,7 @@ BEGIN
             VALUE "CompanyName", "CZ.NIC Labs"
             VALUE "FileDescription", "DNSSEC/TLSA Validator"
             VALUE "FileVersion", APS_FULLVERSION_STR
-            VALUE "LegalCopyright", "Copyright © 2014 CZ.NIC"
+            VALUE "LegalCopyright", "Copyright CZ.NIC 2014"
             VALUE "InternalName", "dnssec-tlsa-validator.dll"
             VALUE "OriginalFilename", "dnssec-tlsa-validator.dll"
             VALUE "ProductName", "DNSSEC/TLSA Validator"
