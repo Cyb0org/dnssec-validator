@@ -11,10 +11,14 @@ dnssec_de_DE_LOCALE_CR = \
 dnssec_en_US_LOCALE_CR = \
 	$(top_srcdir)/add-on/chrome-dnssec/common/_locales/en/messages.json
 
+dnssec_pl_PL_LOCALE_CR = \
+	$(top_srcdir)/add-on/chrome-dnssec/common/_locales/pl/messages.json
+
 dnssec_validator_LOCALES_CR = \
 	$(dnssec_cs_CZ_LOCALE_CR) \
 	$(dnssec_de_DE_LOCALE_CR) \
-	$(dnssec_en_US_LOCALE_CR)
+	$(dnssec_en_US_LOCALE_CR) \
+	$(dnssec_pl_PL_LOCALE_CR)
 
 dnssec_validator_CONTENT_CR = \
 	$(top_srcdir)/add-on/chrome-dnssec/common/detail-info.html \

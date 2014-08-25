@@ -24,10 +24,18 @@ en_US_LOCALE_MOZZ = \
 	$(top_srcdir)/add-on/firefox/common/locale/en-US/dnssec.properties \
 	$(top_srcdir)/add-on/firefox/common/locale/en-US/prefwindow.dtd
 
+pl_PL_LOCALE_MOZZ = \
+	$(top_srcdir)/add-on/firefox/common/locale/pl-PL/aboutwindow.dtd \
+	$(top_srcdir)/add-on/firefox/common/locale/pl-PL/dnssec.dtd \
+	$(top_srcdir)/add-on/firefox/common/locale/pl-PL/dnssec.preferences \
+	$(top_srcdir)/add-on/firefox/common/locale/pl-PL/dnssec.properties \
+	$(top_srcdir)/add-on/firefox/common/locale/pl-PL/prefwindow.dtd
+
 dnssec_tlsa_validator_LOCALES_MOZZ = \
 	$(cs_CZ_LOCALE_MOZZ) \
 	$(de_DE_LOCALE_MOZZ) \
-	$(en_US_LOCALE_MOZZ)
+	$(en_US_LOCALE_MOZZ) \
+	$(pl_PL_LOCALE_MOZZ)
 
 dnssec_tlsa_validator_CONTENT_MOZZ = \
 	$(top_srcdir)/add-on/firefox/common/about.xul

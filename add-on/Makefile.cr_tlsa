@@ -11,10 +11,14 @@ tlsa_de_DE_LOCALE_CR = \
 tlsa_en_US_LOCALE_CR = \
 	$(top_srcdir)/add-on/chrome-tlsa/common/_locales/en/messages.json
 
+tlsa_pl_PL_LOCALE_CR = \
+	$(top_srcdir)/add-on/chrome-tlsa/common/_locales/pl/messages.json
+
 tlsa_validator_LOCALES_CR = \
 	$(tlsa_cs_CZ_LOCALE_CR) \
 	$(tlsa_de_DE_LOCALE_CR) \
-	$(tlsa_en_US_LOCALE_CR)
+	$(tlsa_en_US_LOCALE_CR) \
+	$(tlsa_pl_PL_LOCALE_CR)
 
 tlsa_validator_CONTENT_CR = \
 	$(top_srcdir)/add-on/chrome-tlsa/common/detail-tlsa.html \
