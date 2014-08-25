@@ -1172,7 +1172,7 @@ hideAddInfoIP :
 showAddInfo :
 	function(id) {
 		document.getElementById(id).style.display = 'block';
-		document.getElementById("link").style.display = 'none';
+		document.getElementById("dnssec-link").style.display = 'none';
 		document.getElementById("dnssec-popup-homepage").style.display = 'block';
 		if (this.valstate == cz.nic.extension.dnssecExtNPAPIConst.DNSSEC_COT_DOMAIN_SECURED_BAD_IP ||
 			this.valstate == cz.nic.extension.dnssecExtNPAPIConst.DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP) {
@@ -1183,7 +1183,7 @@ showAddInfo :
 hideAddInfo :
 	function() {
 		document.getElementById("dnssec-popup-security-detail").style.display = 'none';
-		document.getElementById("link").style.display = 'block';
+		document.getElementById("dnssec-link").style.display = 'block';
 		document.getElementById("dnssec-popup-homepage").style.display = 'none';
 		if (this.valstate == cz.nic.extension.dnssecExtNPAPIConst.DNSSEC_COT_DOMAIN_SECURED_BAD_IP ||
 			this.valstate == cz.nic.extension.dnssecExtNPAPIConst.DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP) {

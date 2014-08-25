@@ -81,16 +81,16 @@ dnssec_path: function() {
 
 		if (os.match("Darwin")) {
 			dnssecLibName =
-			    "plugins/libDNSSECcore-macosx" + abiStr + ".dylib";
+			    "platform/libDNSSECcore-macosx" + abiStr + ".dylib";
 		} else if (os.match("FreeBSD")) {
 			dnssecLibName =
-			    "plugins/libDNSSECcore-freebsd" + abiStr + ".so";
+			    "platform/libDNSSECcore-freebsd" + abiStr + ".so";
 		} else if(os.match("Linux")) {
 			dnssecLibName =
-			    "plugins/libDNSSECcore-linux" + abiStr + ".so";
+			    "platform/libDNSSECcore-linux" + abiStr + ".so";
 		} else if(os.match("WINNT")) {
 			dnssecLibName =
-			    "plugins/libDNSSECcore-windows-x86.dll";
+			    "platform/libDNSSECcore-windows-x86.dll";
 		}
 	
 		dnssecLibName = addonObj.getResourceURI(dnssecLibName)

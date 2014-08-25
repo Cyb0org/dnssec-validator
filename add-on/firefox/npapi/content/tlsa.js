@@ -1162,76 +1162,76 @@ _utf8HostName : null,
 
 	get _tlsaPopup () {
 		delete this._tlsaPopup;
-		return this._tlsaPopup = document.getElementById("tlsa-popup");
+		return this._tlsaPopup = document.getElementById("dnssec-tlsa-popup");
 	},
 	get _tlsaPopupfwd () {
 		delete this._tlsaPopupfwd;
-		return this._tlsaPopupfwd = document.getElementById("tlsa-popup-fwd");
+		return this._tlsaPopupfwd = document.getElementById("dnssec-tlsa-popup-fwd");
 	},
 	get _tlsaBox () {
 		delete this._tlsaBox;
-		return this._tlsaBox = document.getElementById("tlsa-box");
+		return this._tlsaBox = document.getElementById("dnssec-tlsa-box");
 	},
 	get _tlsaPopupContentBox () {
 		delete this._tlsaPopupContentBox;
 		return this._tlsaPopupContentBox =
-		               document.getElementById("tlsa-popup-content-box");
+		               document.getElementById("dnssec-tlsa-popup-content-box");
 	},
 	get _tlsaPopupContentBox2 () {
 		delete this._tlsaPopupContentBox2;
 		return this._tlsaPopupContentBox2 =
-		               document.getElementById("tlsa-popup-content-box2");
+		               document.getElementById("dnssec-tlsa-popup-content-box2");
 	},
 	get _tlsaPopupContentBox3 () {
 		delete this._tlsaPopupContentBox3;
 		return this._tlsaPopupContentBox3 =
-		               document.getElementById("tlsa-popup-content-box3");
+		               document.getElementById("dnssec-tlsa-popup-content-box3");
 	},
 	get _tlsaPopupContentBox4 () {
 		delete this._tlsaPopupContentBox4;
 		return this._tlsaPopupContentBox4 =
-		               document.getElementById("tlsa-popup-content-box4");
+		               document.getElementById("dnssec-tlsa-popup-content-box4");
 	},
 	get _tlsaPopupContentHost () {
 		delete this._tlsaPopupContentHost;
 		return this._tlsaPopupContentHost =
-		               document.getElementById("tlsa-popup-content-host");
+		               document.getElementById("dnssec-tlsa-popup-content-host");
 	},
 	get _tlsaPopupSecLabel () {
 		delete this._tlsaPopupSecLabel;
 		return this._tlsaPopupSecLabel =
-		               document.getElementById("tlsa-popup-security-text");
+		               document.getElementById("dnssec-tlsa-popup-security-text");
 	},
 	get _tlsaPopupSecLabel2 () {
 		delete this._tlsaPopupSecLabel2;
 		return this._tlsaPopupSecLabel2 =
-		               document.getElementById("tlsa-popup-security-label");
+		               document.getElementById("dnssec-tlsa-popup-security-label");
 	},
 	get _tlsaPopupSecDetail () {
 		delete this._tlsaPopupSecDetail;
 		return this._tlsaPopupSecDetail =
-		               document.getElementById("tlsa-popup-security-detail");
+		               document.getElementById("dnssec-tlsa-popup-security-detail");
 	},
 	get _tlsaPopupfwdDetail () {
 		delete this._tlsaPopupfwdDetail;
 		return this._tlsaPopupfwdDetail =
-		               document.getElementById("tlsa-popup-fwd-text");
+		               document.getElementById("dnssec-tlsa-popup-fwd-text");
 	},
 	get _tlsaPopupIpBrowser () {
 		delete this._tlsaPopupIpBrowser;
 		return this._tlsaPopupIpBrowser =
-		               document.getElementById("tlsa-popup-ipbrowser-ip");
+		               document.getElementById("dnssec-tlsa-popup-ipbrowser-ip");
 	},
 	get _tlsaPopupIpValidator () {
 		delete this._tlsaPopupIpValidator;
 		return this._tlsaPopupIpValidator =
-		               document.getElementById("tlsa-popup-ipvalidator-ip");
+		               document.getElementById("dnssec-tlsa-popup-ipvalidator-ip");
 	},
 	// Build out a cache of the elements that we need frequently
 _cacheElements :
 	function() {
 		delete this._tlsaBox;
-		this._tlsaBox = document.getElementById("tlsa-box");
+		this._tlsaBox = document.getElementById("dnssec-tlsa-box");
 	},
 
 	// Set appropriate DANE security state
@@ -1455,37 +1455,37 @@ hideTlsaPopup :
 
 showAddInfoIP :
 	function() {
-		document.getElementById("tlsa-popup-ipbrowser-title").style.display = 'block';
-		document.getElementById("tlsa-popup-ipbrowser-ip").style.display = 'block';
-		document.getElementById("tlsa-popup-ipvalidator-title").style.display = 'block';
-		document.getElementById("tlsa-popup-ipvalidator-ip").style.display = 'block';
+		document.getElementById("dnssec-tlsa-popup-ipbrowser-title").style.display = 'block';
+		document.getElementById("dnssec-tlsa-popup-ipbrowser-ip").style.display = 'block';
+		document.getElementById("dnssec-tlsa-popup-ipvalidator-title").style.display = 'block';
+		document.getElementById("dnssec-tlsa-popup-ipvalidator-ip").style.display = 'block';
 	},
 
 hideAddInfoIP :
 	function() {
-		document.getElementById("tlsa-popup-ipbrowser-title").style.display = 'none';
-		document.getElementById("tlsa-popup-ipbrowser-ip").style.display = 'none';
-		document.getElementById("tlsa-popup-ipvalidator-title").style.display = 'none';
-		document.getElementById("tlsa-popup-ipvalidator-ip").style.display = 'none';
+		document.getElementById("dnssec-tlsa-popup-ipbrowser-title").style.display = 'none';
+		document.getElementById("dnssec-tlsa-popup-ipbrowser-ip").style.display = 'none';
+		document.getElementById("dnssec-tlsa-popup-ipvalidator-title").style.display = 'none';
+		document.getElementById("dnssec-tlsa-popup-ipvalidator-ip").style.display = 'none';
 	},
 
 showAddInfo :
 	function(id) {
 		document.getElementById(id).style.display = 'block';
-		document.getElementById("linkt").style.display = 'none';
-		document.getElementById("tlsa-popup-homepage").style.display = 'block';
+		document.getElementById("dnssec-linkt").style.display = 'none';
+		document.getElementById("dnssec-tlsa-popup-homepage").style.display = 'block';
 	},
 
 hideAddInfo :
 	function() {
-		document.getElementById("tlsa-popup-security-detail").style.display = 'none';
-		document.getElementById("linkt").style.display = 'block';
-		document.getElementById("tlsa-popup-homepage").style.display = 'none';
+		document.getElementById("dnssec-tlsa-popup-security-detail").style.display = 'none';
+		document.getElementById("dnssec-linkt").style.display = 'block';
+		document.getElementById("dnssec-tlsa-popup-homepage").style.display = 'none';
 	},
 
 
 	/**
-	 * Click handler for the tlsa-box element in primary chrome.
+	 * Click handler for the dnssec-tlsa-box element in primary chrome.
 	 */
 handleTlsaButtonEvent :
 	function(event) {
