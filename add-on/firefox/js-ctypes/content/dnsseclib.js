@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-//Define our namespace
+// Define our namespace.
 if(!cz) var cz={};
 if(!cz.nic) cz.nic={};
 if(!cz.nic.extension) cz.nic.extension={};
@@ -78,8 +78,8 @@ dnssec_init: function() {
 			cz.nic.extension.dnssecLibCore._initDnssecLib(dnssecLibName);
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix +
-				    "Loaded DNSSEC library:\n        " +
-				    dnssecLibName + "\n");
+				    "Loaded DNSSEC library:\n        '" +
+				    dnssecLibName + "'\n");
 			}
 			return true;
 		} catch(e) {
@@ -100,8 +100,8 @@ dnssec_init: function() {
 			cz.nic.extension.dnssecLibCore._initDnssecLib(dnssecLibName);
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix +
-				    "Loaded DNSSEC library:\n        " +
-				    dnssecLibName + "\n");
+				    "Loaded DNSSEC library:\n        '" +
+				    dnssecLibName + "'\n");
 			}
 			return true;
 		} catch(e) {
@@ -148,8 +148,8 @@ dnssec_init: function() {
 			cz.nic.extension.dnssecLibCore._initDnssecLib(dnssecLibName);
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix +
-				    "Loaded DNSSEC library:\n        " +
-				    dnssecLibName + "\n");
+				    "Loaded DNSSEC library:\n        '" +
+				    dnssecLibName + "'\n");
 			}
 			return true;
 		} catch(e) {
@@ -173,8 +173,8 @@ dnssec_init: function() {
 			cz.nic.extension.dnssecLibCore._initDnssecLib(dnssecLibName);
 			if (cz.nic.extension.dnssecExtension.debugOutput) {
 				dump(cz.nic.extension.dnssecExtension.debugPrefix +
-				    "Loaded DNSSEC library:\n        " +
-				    dnssecLibName + "\n");
+				    "Loaded DNSSEC library:\n        '" +
+				    dnssecLibName + "'\n");
 			}
 			return true;
 		} catch(e) {
@@ -194,10 +194,11 @@ _initDnssecLib: function(dnssecLibName) {
 
 	++this.initAttempt;
 
-	//open library
+	/* Open library. */
 	this.dnsseclib = ctypes.open(dnssecLibName);
 
-	//declare dnssec API functions
+	/* Declare dnssec API functions. */
+
 	this.dnssec_validation_init =
 	    this.dnsseclib.declare("dnssec_validation_init",
 	    ctypes.default_abi,

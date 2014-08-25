@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License along with
 DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-//Define our namespace
+// Define our namespace.
 if(!cz) var cz={};
 if(!cz.nic) cz.nic={};
 if(!cz.nic.extension) cz.nic.extension={};
@@ -78,8 +78,8 @@ dane_init: function() {
 			cz.nic.extension.daneLibCore._initTlsaLib(tlsaLibName);
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(cz.nic.extension.daneExtension.debugPrefix +
-				    "Loaded DANE library:\n        " +
-				    tlsaLibName + "\n");
+				    "Loaded DANE library:\n        '" +
+				    tlsaLibName + "'\n");
 			}
 			return true;
 		} catch(e) {
@@ -100,8 +100,8 @@ dane_init: function() {
 			cz.nic.extension.daneLibCore._initTlsaLib(tlsaLibName);
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(cz.nic.extension.daneExtension.debugPrefix +
-				    "Loaded DANE library:\n        " +
-				    tlsaLibName + "\n");
+				    "Loaded DANE library:\n        '" +
+				    tlsaLibName + "'\n");
 			}
 			return true;
 		} catch(e) {
@@ -148,8 +148,8 @@ dane_init: function() {
 			cz.nic.extension.daneLibCore._initTlsaLib(tlsaLibName);
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(cz.nic.extension.daneExtension.debugPrefix +
-				    "Loaded DANE library:\n        " +
-				    tlsaLibName + "\n");
+				    "Loaded DANE library:\n        '" +
+				    tlsaLibName + "'\n");
 			}
 			return true;
 		} catch(e) {
@@ -173,8 +173,8 @@ dane_init: function() {
 			cz.nic.extension.daneLibCore._initTlsaLib(tlsaLibName);
 			if (cz.nic.extension.daneExtension.debugOutput) {
 				dump(cz.nic.extension.daneExtension.debugPrefix +
-				    "Loaded DANE library:\n        " +
-				    tlsaLibName + "\n");
+				    "Loaded DANE library:\n        '" +
+				    tlsaLibName + "'\n");
 			}
 			return true;
 		} catch(e) {
@@ -194,10 +194,11 @@ _initTlsaLib: function(tlsaLibName) {
 
 	++this.initAttempt;
 
-	//open library
+	/* Open library. */
 	this.tlsalib = ctypes.open(tlsaLibName);
 
-	//declare tlsa API functions
+	/* Declare tlsa API functions. */
+
 	this.dane_validation_init =
 	    this.tlsalib.declare("dane_validation_init",
 	    ctypes.default_abi,
