@@ -24,11 +24,11 @@ dnssec_plug_LDADD += \
 	@CORE_LIBS@
 
 if STATIC_CORE
+# The order of libraries does matter.
 dnssec_plug_LDADD += \
-	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libcrypto.a \
+	$(abs_top_builddir)/static-libs/libs-built/unbound/lib/libunbound.a \
 	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libssl.a \
-	$(abs_top_builddir)/static-libs/libs-built/ldns/lib/libldns.a \
-	$(abs_top_builddir)/static-libs/libs-built/unbound/lib/libunbound.a
+	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libcrypto.a
 endif
 
 
@@ -45,9 +45,10 @@ dane_plug_LDADD += \
 	@CORE_LIBS@
 
 if STATIC_CORE
+# The order of libraries does matter.
 dane_plug_LDADD += \
-	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libcrypto.a \
-	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libssl.a \
 	$(abs_top_builddir)/static-libs/libs-built/ldns/lib/libldns.a \
-	$(abs_top_builddir)/static-libs/libs-built/unbound/lib/libunbound.a
+	$(abs_top_builddir)/static-libs/libs-built/unbound/lib/libunbound.a \
+	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libssl.a \
+	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libcrypto.a
 endif

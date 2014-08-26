@@ -10,6 +10,8 @@ AM_INIT_AUTOMAKE([1.10 foreign dist-xz -Wall -Werror])
 
 AC_CANONICAL_HOST
 
+sinclude(ax_pthread.m4)
+
 # Config header file prefix
 AH_TOP([#ifndef _CONFIG_H_])
 AH_TOP([#define _CONFIG_H_])
@@ -96,7 +98,7 @@ AC_SUBST(XPCOM_ABI)
 
 BITS=auto
 AC_ARG_WITH([force-bits],
-  [AS_HELP_STRING(["--with-force-bits=[auto|32|64|fat]"], [Architecture bits, auto is default.])],
+  [AS_HELP_STRING([--with-force-bits=[auto|32|64|fat]], [Architecture bits, 'auto' is default.])],
   [
     # Values are defined in dane-plug.c .
     AS_CASE([$withval],
@@ -125,7 +127,7 @@ AC_MSG_CHECKING([Whether to build core with statically linked libraries.])
 AC_ARG_ENABLE([static-linking],
   AS_HELP_STRING([--enable-static-linking], [Enable statically linked core.]))
 AS_IF([test "x$enable_static_linking" = "xyes"], [
-  AC_MSG_RESULT([yes])
+  AC_MSG_RESULT([yes]) # Static linking.
 
   # FIXME: get the CONFIGURE_FLAGS from the environment.
 
@@ -163,8 +165,43 @@ AS_IF([test "x$enable_static_linking" = "xyes"], [
   AC_SUBST(OPENSSL_ARGS)
   AC_SUBST(CONFIGURE_ARGS)
 
+  # libdl
+  # The dlopen() function is in the C library on *BSD systems and in libdl on
+  # glibc based systems.
+  CPPFLAGS="$PASSED_CPPFLAGS"
+  CFLAGS="$PASSED_CFLAGS"; CXXFLAGS="$PASSED_CXXFLAGS";
+  LDFLAGS="$PASSED_LDFLAGS"; LIBS=""
+  AC_SEARCH_LIBS([dlopen], [dl dld], , [
+    AC_MSG_ERROR([Could not find dlopen() in expected locations. Install or/and add the comprising library into the list of tested libraries.])
+  ])
+  CORE_LDFLAGS+=" $LDFLAGS"
+  CORE_LIBS+=" $LIBS"
+
+  # libpthread
+  CPPFLAGS="$PASSED_CPPFLAGS"
+  CFLAGS="$PASSED_CFLAGS"; CXXFLAGS="$PASSED_CXXFLAGS";
+  LDFLAGS="$PASSED_LDFLAGS"; LIBS=""
+  AX_PTHREAD([
+    AC_DEFINE(HAVE_PTHREAD, 1, [Define to 1 if libpthread available.])
+    CFLAGS=" $PTHREAD_CFLAGS $CFLAGS"
+    LDFLAGS=" $LDFLAGS"
+    LIBS=" $PTHREAD_LIBS $LIBS"
+    CC="$PTHREAD_CC"
+
+    AC_CHECK_FUNCS([ \
+      pthread_kill \
+      pthread_spin_init \
+    ])
+
+    CORE_CFLAGS+=" $CFLAGS"
+    CORE_LDFLAGS+=" $LDFLAGS"
+    CORE_LIBS+=" $LIBS"
   ], [
-  AC_MSG_RESULT([no])
+    AC_MSG_ERROR([Could not find pthread library.])
+  ])
+
+  ], [
+  AC_MSG_RESULT([no]) # Dynamic linking.
 
   CPPFLAGS="$PASSED_CPPFLAGS"
   CFLAGS="$PASSED_CFLAGS"; CXXFLAGS="$PASSED_CXXFLAGS";
@@ -173,7 +210,6 @@ AS_IF([test "x$enable_static_linking" = "xyes"], [
   AC_SEARCH_LIBS([OpenSSL_add_all_digests], [crypto], [], [AC_MSG_ERROR([libcrypto not found])])
   AC_SEARCH_LIBS([ldns_dname_new_frm_str], [ldns], [], [AC_MSG_ERROR([libldns not found])])
   AC_SEARCH_LIBS([ub_ctx_create], [unbound], [], [AC_MSG_ERROR([libunbound not found])])
-
   CORE_LDFLAGS+=" $LDFLAGS"
   CORE_LIBS+=" $LIBS"
   ])
@@ -190,7 +226,7 @@ AM_CONDITIONAL([STATIC_CORE], [test "x$enable_static_linking" = "xyes"])
 # Pick correct CA store, auto is default.
 CA_STORE=-1
 AC_ARG_WITH([ca-store],
-  [AS_HELP_STRING(["--with-ca-store=[auto|directory|none|nss|nss_cert8|osx|win]"], [Which CA store to use, auto is default.])],
+  [AS_HELP_STRING([--with-ca-store=[auto|directory|none|nss|nss_cert8|osx|win]], [Which CA store to use, 'auto' is default.])],
   [
     # Values are defined in dane-plug.c .
     AS_CASE([$withval],
@@ -223,7 +259,7 @@ AM_CONDITIONAL([CA_STORE_OSX], [test $CA_STORE = 4])
 # Select a log target.
 LOG_TGT=-1
 AC_ARG_WITH([log-tgt],
-  [AS_HELP_STRING(["--with-log-tgt=[auto,dflt,osx]"], [Which log target to use, auto is default.])],
+  [AS_HELP_STRING([--with-log-tgt=[auto,dflt,osx]], [Which log target to use, 'auto' is default.])],
   [
     AS_CASE([$withval],
       [auto], [LOG_TGT=-1],

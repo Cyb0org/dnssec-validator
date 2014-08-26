@@ -47,11 +47,16 @@ libDNSSECcore_la_LIBADD = \
 	@CORE_LIBS@
 
 if STATIC_CORE
-libDNSSECcore_la_LIBADD += \
-	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libcrypto.a \
+#libDNSSECcore_la_LDFLAGS += \
+#	-Wl,--whole-archive,$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libcrypto.a,--no-whole-archive \
+#	-Wl,--whole-archive,$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libssl.a,--no-whole-archive \
+#	-Wl,--whole-archive,$(abs_top_builddir)/static-libs/libs-built/ldns/lib/libldns.a,--no-whole-archive \
+#	-Wl,--whole-archive,$(abs_top_builddir)/static-libs/libs-built/unbound/lib/libunbound.a,--no-whole-archive
+# The order of libraries does matter.
+libDNSSECcore_la_LDFLAGS += \
+	$(abs_top_builddir)/static-libs/libs-built/unbound/lib/libunbound.a \
 	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libssl.a \
-	$(abs_top_builddir)/static-libs/libs-built/ldns/lib/libldns.a \
-	$(abs_top_builddir)/static-libs/libs-built/unbound/lib/libunbound.a
+	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libcrypto.a
 endif
 
 
@@ -60,7 +65,6 @@ libDANEcore_la_SOURCES = \
 	$(top_srcdir)/plugin-source/common/common.h \
 	$(top_srcdir)/plugin-source/common/log.h \
 	$(top_srcdir)/plugin-source/TLSAValidatorPlugin/dane-plug.c
-
 
 if CA_STORE_DIR
 libDANEcore_la_SOURCES += \
@@ -97,11 +101,17 @@ libDANEcore_la_LIBADD = \
 	@CORE_LIBS@
 
 if STATIC_CORE
-libDANEcore_la_LIBADD += \
-	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libcrypto.a \
-	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libssl.a \
+#libDANEcore_la_LDFLAGS += \
+#	-Wl,--whole-archive,$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libcrypto.a,--no-whole-archive \
+#	-Wl,--whole-archive,$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libssl.a,--no-whole-archive \
+#	-Wl,--whole-archive,$(abs_top_builddir)/static-libs/libs-built/ldns/lib/libldns.a,--no-whole-archive \
+#	-Wl,--whole-archive,$(abs_top_builddir)/static-libs/libs-built/unbound/lib/libunbound.a,--no-whole-archive
+# The order of libraries does matter.
+libDANEcore_la_LDFLAGS += \
 	$(abs_top_builddir)/static-libs/libs-built/ldns/lib/libldns.a \
-	$(abs_top_builddir)/static-libs/libs-built/unbound/lib/libunbound.a
+	$(abs_top_builddir)/static-libs/libs-built/unbound/lib/libunbound.a \
+	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libssl.a \
+	$(abs_top_builddir)/static-libs/libs-built/openssl/lib/libcrypto.a
 endif
 
 
