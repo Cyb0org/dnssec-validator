@@ -7,6 +7,7 @@ SUBDIRS = \
 	static-libs \
 	core_js-ctypes \
 	core_native-msg \
+	core_npapi \
 	add-on
 
 EXTRA_DIST = \

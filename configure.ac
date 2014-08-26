@@ -212,11 +212,24 @@ AS_IF([test "x$enable_static_linking" = "xyes"], [
   AC_SEARCH_LIBS([ub_ctx_create], [unbound], [], [AC_MSG_ERROR([libunbound not found])])
   CORE_LDFLAGS+=" $LDFLAGS"
   CORE_LIBS+=" $LIBS"
-  ])
+  ]
+)
 dnl conditional compilation
 AM_CONDITIONAL([STATIC_CORE], [test "x$enable_static_linking" = "xyes"])
 
-#AC_SEARCH_LIBS([pthread_create], [pthread], [], [AC_MSG_ERROR([pthreads not found])])
+
+# Check whether to build NPAPI core -- default off.
+AC_MSG_CHECKING([Whether to build NPAPI-based extensions.])
+AC_ARG_ENABLE([npapi-extensions],
+  AS_HELP_STRING([--enable-npapi-extensions], [Build NPAPI extensions.]))
+AS_IF([test "x$enable_npapi_extensions" = "xyes"], [
+    AC_MSG_RESULT([yes]) # Enable NPAPI.
+  ], [
+    AC_MSG_RESULT([no]) # Disable NPAPI.
+  ]
+)
+dnl conditional compilation
+AM_CONDITIONAL([NPAPI_CORE], [test "x$enable_npapi_extensions" = "xyes"])
 
 
 ###############################################################################
@@ -348,6 +361,7 @@ AC_CONFIG_FILES([ \
   static-libs/Makefile \
   core_js-ctypes/Makefile \
   core_native-msg/Makefile \
+  core_npapi/Makefile \
   add-on/Makefile \
   Version
 ])
