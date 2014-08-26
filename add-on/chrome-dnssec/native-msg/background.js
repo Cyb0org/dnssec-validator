@@ -36,6 +36,7 @@ var currentIPList= new Array();
 var currentIPListDomain= new Array();
 var initplugin = false;
 var native_msg_port = null;
+var os = "Unknown";
 
 // DNSSEC NPAPI constant returned by binary plugin
 var dnssecExtNPAPIConst = {
@@ -105,6 +106,39 @@ var dnssecModes = {
 	DNSSEC_TOOLTIP_WRONG_RES: "dnssecwrongres",
 	DNSSEC_TOOLTIP_DNSSEC_OFF: "validatoroff",
 };
+
+
+//****************************************************************
+// return OS name
+//****************************************************************
+function GetOS() {
+	var OSName = "Unknown";
+
+	if (navigator.appVersion.indexOf("Win")!= -1) OSName = "Windows";
+	if (navigator.appVersion.indexOf("Mac")!= -1) OSName = "MacOS";
+	if (navigator.appVersion.indexOf("X11")!= -1) OSName = "UNIX";
+	if (navigator.appVersion.indexOf("Linux")!= -1) {
+		if (navigator.platform.indexOf("x86_64") != -1) {
+			OSName = "Linux-x86_64";
+		} else {
+			OSName = "Linux-x86";
+		}
+	}
+	
+	if (navigator.appVersion.indexOf("FreeBSD")!= -1) {
+		if (navigator.platform.indexOf("amd64") != -1) {
+			OSName = "FreeBSD-x86_64";
+		} else {
+			OSName = "FreeBSD-x86";
+		}		
+	}
+
+	if (debuglogout) {
+		console.log(DNSSEC + "Your OS: " + OSName);
+	}	
+
+	return OSName; 
+}
 
 
 //****************************************************************
@@ -696,8 +730,8 @@ function handle_native_response(resp) {
 		if (ADDON_VERSION != coreversion) {
 			if (debuglogout) {
 				console.log(DNSSEC
-				    + "Version mismatch!\n" +
-				    + "        Core is version " + coreversion + "\n" +
+				    + "Version mismatch!\n"
+				    + "        Core is version " + coreversion + "\n"
 				    + "        Add-on is version " + ADDON_VERSION);
 			}
 			setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_VERSION_ERROR,
@@ -740,6 +774,8 @@ if (!initplugin) {
 	localStorage["deldnssecctx"] = false;
 
 	debuglogout = StringToBool(localStorage["DebugOutput"]);
+
+	os = GetOS();
 
 	native_msg_port =
 	    chrome.runtime.connectNative('cz.nic.validator.dnssec');
