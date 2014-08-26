@@ -4,7 +4,7 @@ PLUGIN_DIR="${HOME}/Library/Internet Plug-Ins"
 
 DNSSEC_DIR=npDNSSECValidatorPlugin.plugin
 TLSA_DIR=npTLSAValidatorPlugin.plugin
-SAFARIEXT=safari2.safariextz
+SAFARIEXT=safari.safariextz
 
 uuencode=0
 binary=1

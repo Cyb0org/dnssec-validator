@@ -23,7 +23,7 @@ ADDON_SRC_DIR=add-on
 
 DNSSEC_DIR=npDNSSECValidatorPlugin.plugin
 TLSA_DIR=npTLSAValidatorPlugin.plugin
-SAFARIEXT=safari2.safariextz
+SAFARIEXT=safari.safariextz
 
 function cleanup() {
 	rm -f "${TAR_FILE}" "${TARGZ_FILE}" "${PKGS_DIR}/${TARGET_FILE}"
