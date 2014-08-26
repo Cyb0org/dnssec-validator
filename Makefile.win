@@ -174,19 +174,6 @@ xpi_x86:
 	cd $(ADDON_PATH_CR_DNSSEC) && mv npapi_built chrome2dnssec && tar -czf CR-dnssec_validator-$(EXTENSION_VERSION)-windows-x86-npapi.tar.gz chrome2dnssec && mv chrome2dnssec npapi_built && mv CR-dnssec_validator-$(EXTENSION_VERSION)-windows-x86-npapi.tar.gz ../../$(PLUGIN_ADD_ON)
 	cd $(ADDON_PATH_CR_TLSA) && mv npapi_built chrome2tlsa && tar -czf CR-tlsa_validator-$(EXTENSION_VERSION)-windows-x86-npapi.tar.gz chrome2tlsa && mv chrome2tlsa npapi_built && mv CR-tlsa_validator-$(EXTENSION_VERSION)-windows-x86-npapi.tar.gz ../../$(PLUGIN_ADD_ON)
 	@echo '### DONE... ###'
-	@echo '--------------------------------------------------'
-	@echo '### Creating package for Opera windows x86... ###'
-	cp $(PLUGIN_LIB_DEST)/$(PLUGIN_NAME_DNSSEC_LIB) $(ADDON_PATH_OP_DNSSEC)
-	cp $(PLUGIN_LIB_DEST)/$(PLUGIN_NAME_TLSA_LIB) $(ADDON_PATH_OP_TLSA)
-	cp $(PLUGIN_LIB_DEST)/np$(PLUGIN_NAME_DNSSEC).dll $(ADDON_PATH_OP_DNSSEC)
-	cp $(PLUGIN_LIB_DEST)/np$(PLUGIN_NAME_TLSA).dll $(ADDON_PATH_OP_TLSA)
-	sed -e 's/dnssecplugin/np$(PLUGIN_NAME_DNSSEC).dll/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_DNSSEC)/manifest.json.template > $(ADDON_PATH_OP_DNSSEC)/manifest.json
-	sed -e 's/tlsaplugin/np$(PLUGIN_NAME_TLSA).dll/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_TLSA)/manifest.json.template > $(ADDON_PATH_OP_TLSA)/manifest.json
-	cd add-on && tar -czf OP-dnssec_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz opera2dnssec && mv OP-dnssec_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz ../$(PLUGIN_ADD_ON)
-	cd add-on && tar -czf OP-tlsa_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz opera2tlsa && mv OP-tlsa_validator-$(EXTENSION_VERSION)-windows-x86.tar.gz ../$(PLUGIN_ADD_ON)
-	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf np$(PLUGIN_NAME_DNSSEC).dll manifest.json $(PLUGIN_NAME_DNSSEC_LIB)
-	cd $(ADDON_PATH_OP_TLSA) && rm -rf manifest.json np$(PLUGIN_NAME_TLSA).dll $(PLUGIN_NAME_TLSA_LIB)
-	@echo '### DONE... ###'
 
 clean:
 	rm -rf  $(PLUGIN_TMP)
