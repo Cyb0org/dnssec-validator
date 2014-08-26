@@ -155,17 +155,6 @@ xpi_x86:
 	echo '# TODO -- Compile and bundle core application?'
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
-	@echo '### Creating package for Opera $(OSNAME) x86... ###'
-	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86.plugin $(ADDON_PATH_OP_DNSSEC)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
-	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86.plugin $(ADDON_PATH_OP_TLSA)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin
-	sed -e 's/dnssecplugin/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_DNSSEC)/manifest.json.template > $(ADDON_PATH_OP_DNSSEC)/manifest.json
-	sed -e 's/tlsaplugin/np$(NPAPI_PLUGIN_NAME_TLSA).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_TLSA)/manifest.json.template > $(ADDON_PATH_OP_TLSA)/manifest.json
-	cd add-on && tar -czf OP-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86.tar.gz opera2dnssec && mv OP-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86.tar.gz ../$(PLUGIN_ADD_ON)
-	cd add-on && tar -czf OP-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86.tar.gz opera2tlsa && mv OP-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86.tar.gz ../$(PLUGIN_ADD_ON)
-	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
-	cd $(ADDON_PATH_OP_TLSA) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_TLSA).plugin
-	@echo '### DONE... ###'
-	@echo '--------------------------------------------------'
 	@echo '### Creating package for Safari $(OSNAME) ... ###'
 	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86.plugin $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
 	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86.plugin $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin
@@ -268,17 +257,6 @@ xpi_x86_64:
 	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_DNSSEC)/native-msg/background.js > $(ADDON_PATH_CR_DNSSEC)/native-msg_built/background.js
 	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/native-msg/background.js > $(ADDON_PATH_CR_TLSA)/native-msg_built/background.js
 	echo '# TODO -- Compile and bundle core application?'
-	@echo '### DONE... ###'
-	@echo '--------------------------------------------------'
-	@echo '### Creating package for Opera $(OSNAME) x86_64... ###'
-	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_DNSSEC)_x86_64.plugin $(ADDON_PATH_OP_DNSSEC)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
-	cp -R $(PLUGIN_NAME_LIB)/np$(NPAPI_PLUGIN_NAME_TLSA)_x86_64.plugin $(ADDON_PATH_OP_TLSA)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin
-	sed -e 's/dnssecplugin/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_DNSSEC)/manifest.json.template > $(ADDON_PATH_OP_DNSSEC)/manifest.json
-	sed -e 's/tlsaplugin/np$(NPAPI_PLUGIN_NAME_TLSA).plugin/g' -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_OP_TLSA)/manifest.json.template > $(ADDON_PATH_OP_TLSA)/manifest.json
-	cd add-on && tar -czf OP-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86_64.tar.gz opera2dnssec && mv OP-dnssec_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86_64.tar.gz ../$(PLUGIN_ADD_ON)
-	cd add-on && tar -czf OP-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86_64.tar.gz opera2tlsa && mv OP-tlsa_validator-$(EXTENSION_VERSION)-$(OSNAME)-x86_64.tar.gz ../$(PLUGIN_ADD_ON)
-	cd $(ADDON_PATH_OP_DNSSEC) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin
-	cd $(ADDON_PATH_OP_TLSA) && rm -rf manifest.json np$(NPAPI_PLUGIN_NAME_TLSA).plugin
 	@echo '### DONE... ###'
 	@echo '--------------------------------------------------'
 	@echo '### Creating package for Safari $(OSNAME) ... ###'
