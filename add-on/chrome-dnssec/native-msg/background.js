@@ -96,6 +96,8 @@ var dnssecModes = {
 	DNSSEC_MODE_OFF					: "dnsseOff",
 	// Wrong resovler for DNSSEC
 	DNSSEC_MODE_WRONG_RES				: "dnssecWrongResolver",
+	// plugin core not install	
+	DNSSEC_MODE_PLUGIN_INIT_ERR			: "dnssecnoplugin",
 
 	// Tooltips states
 	DNSSEC_TOOLTIP_SECURED	: "dnssecok",
@@ -257,6 +259,13 @@ function setModeDNSSEC(newMode, tabId, domain, addr, ipval) {
 		break;
 	// version mismasch
 	case this.dnssecModes.DNSSEC_MODE_VERSION_ERROR:
+		icon = "dnssec_error.png";
+		title = this.dnssecModes.DNSSEC_TOOLTIP_ERROR;
+		domainpre = "domain";
+		tooltiptitle = chrome.i18n.getMessage(this.dnssecModes.DNSSEC_TOOLTIP_ERROR);
+		break;
+	// nop lugin core
+	case this.dnssecModes.DNSSEC_MODE_PLUGIN_INIT_ERR:
 		icon = "dnssec_error.png";
 		title = this.dnssecModes.DNSSEC_TOOLTIP_ERROR;
 		domainpre = "domain";
@@ -665,8 +674,8 @@ function onUrlChange(tabId, changeInfo, tab) {
         }//if
 
 	if (!initplugin) {
-		setDNSSECSecurityState(tabId, domain,
-		    this.dnssecExtNPAPIConst.DNSSEC_ERROR_GENERIC, "n/a", "n/a");
+		setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_PLUGIN_INIT_ERR,
+		    tabId, domain, ADDON_VERSION, "n/a");
 		return;
 	}
 

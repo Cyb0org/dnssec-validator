@@ -200,6 +200,12 @@
     "dm_errorversionInfo": {
         "message": "Dodatek wersja i wersja rdzenia walidatora są różne, co może prowadzić do niepożądanego zachowania walidator. Proszę, zainstaluj dodatek i / lub weryfikatora rdzeń i uruchom ponownie przeglądarkę"
     },
+    "dm_noplugin": {
+        "message": "Certyfikat zdalnego serwera dla tej nazwy domenowej nie mógł zostać zweryfikowany przy użyciu protokołu DANE, ponieważ wystąpił błąd w rdzeniu walidatora TLSA."
+    },
+    "dm_nopluginInfo": {
+        "message": "Nie udało się zainicjować TLSA walidacji wtyczki. Proszę zainstalować TLSA sprawdzania wersji wtyczki na dodatek ze strony głównej i ponownie uruchom przeglądarkę."
+    },
     "addonversiontext": {
         "message": "Dodatek wersji:"
     },

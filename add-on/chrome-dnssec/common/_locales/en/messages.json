@@ -173,6 +173,12 @@
     "dnssecErrorVersionInfo": {
         "message": "The add-on version and version of validator core are different, which may lead to undesirable behavior of the validator. Please, reinstall the add-on and/or the validator core and restart your browser."
     },
+    "dnssecnoplugin": {
+        "message": " was not verified by DNSSEC."
+    },
+    "dnssecnopluginInfo": {
+        "message": "The DNSSEC validating core could not be initialised. Please install the DNSSEC validating core in the version matching this extension and then restart your browser."
+    },
     "ipbrowsertext": {
         "message": "IP addresses obtained by browser:"
     },

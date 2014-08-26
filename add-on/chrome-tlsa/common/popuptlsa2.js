@@ -53,7 +53,7 @@ function TLSAicon2(icon){
 	addText("tlsa-info", chrome.i18n.getMessage(info));
 	addText("homepage", chrome.i18n.getMessage("homepage"));
 
-	if (statusString == "dm_errorversion") {
+	if (statusString == "dm_errorversion" || statusString == "dm_noplugin") {
 		document.getElementById("ver-info-ah").style.display = 'block';
 		document.getElementById("ver-info-a").style.display = 'block';
 	  	document.getElementById("ver-info-ph").style.display = 'block';

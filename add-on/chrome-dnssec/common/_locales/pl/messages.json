@@ -173,6 +173,12 @@
     "dnssecErrorVersionInfo": {
         "message": "Dodatek wersja i wersja rdzenia walidatora są różne, co może prowadzić do niepożądanego zachowania walidator. Proszę, zainstaluj dodatek i / lub weryfikatora rdzeń i uruchom ponownie przeglądarkę"
     },
+    "dnssecnoplugin": {
+        "message": " nie potwierdzono przez DNSSEC."
+    },
+    "dnssecnopluginInfo": {
+        "message": "Nie udało się zainicjować DNSSEC walidacji wtyczki. Proszę zainstalować DNSSEC sprawdzania wersji wtyczki na dodatek ze strony głównej i ponownie uruchom przeglądarkę."
+    },
     "ipbrowsertext": {
         "message": "Adres IP uzyskany przez przeglądarkę:"
     },

@@ -167,6 +167,7 @@ var tlsaModes = {
 	DANE_MODE_VALIDATION_SUCCESS_TYPE3	: "dm_vs3",
 	DANE_MODE_ERROR_GENERIC			: "dm_errgen",
 	DANE_MODE_WRONG_RES			: "dnssecWrongResolver",
+	DANE_MODE_PLUGIN_INIT_ERR		: "dm_noplugin",
 
   //DANE/TLSA tooltip
 	DANE_TOOLTIP_VALIDATION_SUCCESS 	: "dmvsTooltip",
@@ -240,112 +241,120 @@ function setModeTLSA(newMode, tabId, domain, scheme, addonv, pluginv) {
 	switch (newMode) {
             /* green icon */
             // Both domain and connection are secured
-            case this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE0:
-	    case this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE1:
-            case this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE2:
-	    case this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE3:
-              	icon = "tlsa_valid.png";
-	      	title = this.tlsaModes.DANE_TOOLTIP_VALIDATION_SUCCESS;
-	      	domainpre = scheme;
-        	tooltiptitle = chrome.i18n.getMessage(
-			this.tlsaModes.DANE_TOOLTIP_VALIDATION_SUCCESS);
-              break;
-            case this.tlsaModes.DANE_MODE_VALIDATION_FALSE:
-	    case this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE1:
-            case this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE2:
-	    case this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE3:
-	    case this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE0:
-              	icon = "tlsa_invalid.png";
-	      	title = this.tlsaModes.DANE_TOOLTIP_VALIDATION_FALSE;
-	      	domainpre = scheme;
-        	tooltiptitle = chrome.i18n.getMessage(
-			this.tlsaModes.DANE_TOOLTIP_VALIDATION_FALSE);
-              break;
-	    case this.tlsaModes.DANE_MODE_CERT_ERROR:
-	    case this.tlsaModes.DANE_MODE_NO_CERT_CHAIN:
-              	icon = "tlsa_orange.png";
-	      	title = this.tlsaModes.DANE_TOOLTIP_NO_CERT_CHAIN;
-	      	domainpre = scheme;
-        	tooltiptitle = chrome.i18n.getMessage(
+	case this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE0:
+	case this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE1:
+        case this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE2:
+	case this.tlsaModes.DANE_MODE_VALIDATION_SUCCESS_TYPE3:
+        	icon = "tlsa_valid.png";
+		title = this.tlsaModes.DANE_TOOLTIP_VALIDATION_SUCCESS;
+		domainpre = scheme;
+	        tooltiptitle = chrome.i18n.getMessage(
+		    this.tlsaModes.DANE_TOOLTIP_VALIDATION_SUCCESS);
+		break;
+        case this.tlsaModes.DANE_MODE_VALIDATION_FALSE:
+	case this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE1:
+        case this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE2:
+	case this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE3:
+	case this.tlsaModes.DANE_MODE_VALIDATION_FALSE_TYPE0:
+        	icon = "tlsa_invalid.png";
+		title = this.tlsaModes.DANE_TOOLTIP_VALIDATION_FALSE;
+		domainpre = scheme;
+		tooltiptitle = chrome.i18n.getMessage(
+		    this.tlsaModes.DANE_TOOLTIP_VALIDATION_FALSE);
+		break;
+	case this.tlsaModes.DANE_MODE_CERT_ERROR:
+	case this.tlsaModes.DANE_MODE_NO_CERT_CHAIN:
+		icon = "tlsa_orange.png";
+		title = this.tlsaModes.DANE_TOOLTIP_NO_CERT_CHAIN;
+		domainpre = scheme;
+		tooltiptitle = chrome.i18n.getMessage(
 			this.tlsaModes.DANE_TOOLTIP_NO_CERT_CHAIN);
-              break;
-	    case this.tlsaModes.DANE_MODE_TLSA_PARAM_WRONG:
-              	icon = "tlsa_invalid.png";
-	      	title = this.tlsaModes.DANE_TOOLTIP_PARAM_WRONG;
-	      	domainpre = scheme;
-        	tooltiptitle = chrome.i18n.getMessage(
+		break;
+	case this.tlsaModes.DANE_MODE_TLSA_PARAM_WRONG:
+		icon = "tlsa_invalid.png";
+		title = this.tlsaModes.DANE_TOOLTIP_PARAM_WRONG;
+		domainpre = scheme;
+		tooltiptitle = chrome.i18n.getMessage(
 			this.tlsaModes.DANE_TOOLTIP_PARAM_WRONG);
-              break;
-	    case this.tlsaModes.DANE_MODE_NO_TLSA_RECORD:
-              	icon = "tlsa_no.png";
-	      	title = this.tlsaModes.DANE_TOOLTIP_NO_TLSA_RECORD;
-	      	domainpre = scheme;
-        	tooltiptitle = chrome.i18n.getMessage(
+		break;
+	case this.tlsaModes.DANE_MODE_NO_TLSA_RECORD:
+		icon = "tlsa_no.png";
+		title = this.tlsaModes.DANE_TOOLTIP_NO_TLSA_RECORD;
+		domainpre = scheme;
+		tooltiptitle = chrome.i18n.getMessage(
 			this.tlsaModes.DANE_TOOLTIP_NO_TLSA_RECORD);
-              break;
-	    case this.tlsaModes.DANE_MODE_NO_HTTPS:
-              	icon = "tlsa_nohttps.png";
-	      	title = this.tlsaModes.DANE_TOOLTIP_NO_HTTPS;
-	      	domainpre = scheme;
-        	tooltiptitle = chrome.i18n.getMessage(
-			this.tlsaModes.DANE_TOOLTIP_NO_HTTPS);
-              break;
-	    case this.tlsaModes.DANE_MODE_DNSSEC_UNSECURED:
-              	icon = "tlsa_nodnssec.png";
-	      	title = this.tlsaModes.DANE_TOOLTIP_DNSSEC_UNSECURED;
-	      	domainpre = scheme;
-        	tooltiptitle = chrome.i18n.getMessage(
-			this.tlsaModes.DANE_TOOLTIP_DNSSEC_UNSECURED);
-              break;
-	    case this.tlsaModes.DANE_MODE_VALIDATION_OFF:
-              	icon = "tlsa_off.png";
-	      	title = this.tlsaModes.DANE_TOOLTIP_OFF;
-	      	domainpre = scheme;
-        	tooltiptitle = chrome.i18n.getMessage(
-			this.tlsaModes.DANE_TOOLTIP_OFF);
-              break;
-	    case this.tlsaModes.DANE_MODE_DNSSEC_BOGUS:
-              	icon = "tlsa_invalid.png";
-	      	title = this.tlsaModes.DANE_TOOLTIP_DNSSEC_BOGUS;
-	      	domainpre = scheme;
-        	tooltiptitle = chrome.i18n.getMessage(
-			this.tlsaModes.DANE_TOOLTIP_DNSSEC_BOGUS);
-              break;
-	    case this.tlsaModes.DANE_MODE_ACTION:
-              	icon = "tlsa_action.gif";
-	      	title = this.tlsaModes.DANE_TOOLTIP_ACTION;
-	      	domainpre = scheme;
-        	tooltiptitle = chrome.i18n.getMessage(
-			this.tlsaModes.DANE_TOOLTIP_ACTION);
-              break;
-	    case this.tlsaModes.DANE_MODE_RESOLVER_FAILED:
+		break;
+	case this.tlsaModes.DANE_MODE_NO_HTTPS:
+		icon = "tlsa_nohttps.png";
+		title = this.tlsaModes.DANE_TOOLTIP_NO_HTTPS;
+		domainpre = scheme;
+		tooltiptitle = chrome.i18n.getMessage(
+		    this.tlsaModes.DANE_TOOLTIP_NO_HTTPS);
+		break;
+	case this.tlsaModes.DANE_MODE_DNSSEC_UNSECURED:
+		icon = "tlsa_nodnssec.png";
+		title = this.tlsaModes.DANE_TOOLTIP_DNSSEC_UNSECURED;
+		domainpre = scheme;
+		tooltiptitle = chrome.i18n.getMessage(
+		    this.tlsaModes.DANE_TOOLTIP_DNSSEC_UNSECURED);
+		break;
+	case this.tlsaModes.DANE_MODE_VALIDATION_OFF:
+		icon = "tlsa_off.png";
+		title = this.tlsaModes.DANE_TOOLTIP_OFF;
+		domainpre = scheme;
+		tooltiptitle = chrome.i18n.getMessage(
+		    this.tlsaModes.DANE_TOOLTIP_OFF);
+		break;
+	case this.tlsaModes.DANE_MODE_DNSSEC_BOGUS:
+		icon = "tlsa_invalid.png";
+		title = this.tlsaModes.DANE_TOOLTIP_DNSSEC_BOGUS;
+		domainpre = scheme;
+		tooltiptitle = chrome.i18n.getMessage(
+		    this.tlsaModes.DANE_TOOLTIP_DNSSEC_BOGUS);
+		break;
+	case this.tlsaModes.DANE_MODE_ACTION:
+		icon = "tlsa_action.gif";
+		title = this.tlsaModes.DANE_TOOLTIP_ACTION;
+		domainpre = scheme;
+		tooltiptitle = chrome.i18n.getMessage(
+		    this.tlsaModes.DANE_TOOLTIP_ACTION);
+		break;
+	case this.tlsaModes.DANE_MODE_RESOLVER_FAILED:
 		icon = "tlsa_error.png";
 		title = this.tlsaModes.DANE_TOOLTIP_FAILED_RESOLVER;
 		domainpre = scheme;
 		tooltiptitle = chrome.i18n.getMessage(
-			this.tlsaModes.DANE_TOOLTIP_FAILED_RESOLVER);
-              break;
-	    case this.tlsaModes.DANE_MODE_WRONG_RES:
+		    this.tlsaModes.DANE_TOOLTIP_FAILED_RESOLVER);
+		break;
+	case this.tlsaModes.DANE_MODE_WRONG_RES:
 		icon = "tlsa_error.png";
 		title = this.tlsaModes.DANE_TOOLTIP_WRONG_RES;
 		domainpre = scheme;
 		tooltiptitle = chrome.i18n.getMessage(
-			this.tlsaModes.DANE_TOOLTIP_WRONG_RES);
-              break;
-		// version mismasch
-		case this.tlsaModes.DANE_MODE_VERSION_ERROR:
-		icon = "tlsa_error.png";
-		title = this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC;
-		domainpre = scheme;
-		tooltiptitle = chrome.i18n.getMessage(
-			this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC);
+		    this.tlsaModes.DANE_TOOLTIP_WRONG_RES);
 		break;
-            default:
+	// version mismasch
+	case this.tlsaModes.DANE_MODE_VERSION_ERROR:
 		icon = "tlsa_error.png";
 		title = this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC;
 		domainpre = scheme;
 		tooltiptitle = chrome.i18n.getMessage(
-			this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC);
+		    this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC);
+		break;
+	// no plugin core
+	case this.tlsaModes.DANE_MODE_PLUGIN_INIT_ERR:
+		icon = "tlsa_error.png";
+		title = this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC;
+		domainpre = scheme;
+		tooltiptitle = chrome.i18n.getMessage(
+		    this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC);
+		break;
+        default:
+		icon = "tlsa_error.png";
+		title = this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC;
+		domainpre = scheme;
+		tooltiptitle = chrome.i18n.getMessage(
+		     this.tlsaModes.DANE_TOOLTIP_ERROR_GENERIC);
      	}
 
 	if (debuglogout) {
@@ -715,13 +724,6 @@ function tlsaValidationPrepare(tabId, url, action) {
 		return;
 	}
 
-
-	if (!initplugin) {
-		setTLSASecurityState(tabId, domainport,
-			c.DANE_ERROR_GENERIC, scheme);
-		return;
-	}
-
 	// prepare https/http port number representation
 	if (scheme == "https" || scheme == "http") {
 		portplugin = (domainandport[1] == undefined)
@@ -739,6 +741,12 @@ function tlsaValidationPrepare(tabId, url, action) {
 	}
 
 	var domainport = domain + portpopup;
+
+	if (!initplugin) {
+		setModeTLSA(this.tlsaModes.DANE_MODE_PLUGIN_INIT_ERR,
+			    tabId, domainport, scheme, ADDON_VERSION, "n/a");
+		return;
+	}
 
 	// return if not https or ftps connection
 	if (scheme != "https" && scheme != "ftps") {

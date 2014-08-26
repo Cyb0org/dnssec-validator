@@ -173,6 +173,12 @@
     "dnssecErrorVersionInfo": {
         "message": "Die Versionen des Add-ons und des Validatorkerns unterscheiden sich, dies kann zu unerwünschtem Verhalten führen. Installieren sie das Add-on und/oder das Validatorkern wieder und starten sie ihren Browser von neuem."
     },
+    "dnssecnoplugin": {
+        "message": " war nicht mit DNSSEC überprüft."
+    },
+    "dnssecnopluginInfo": {
+        "message": "Das Kernprogramm dieser Erweiterung konnte nicht initialisiert werden. Installieren sie bitte das DNSSEC-validierende Kernprogramm in Version entsprechend dieser Erweiterung und starten sie ihren Browser von neuem."
+    },
     "ipbrowsertext": {
         "message": "Von Webbrowser benutzte IP-Adresse:"
     },

@@ -171,7 +171,13 @@
         "message": " nelze ověřit pomocí DNSSEC technologie."
     },
     "dnssecErrorVersionInfo": {
-        "message": "Verze doplňku a validujícího pluginu jsou rozdílné, což může vést k nežádoucímu chování validátoru. Prosím, přeinstalujte doplněk a/nebo validující plugin a restartujte prohlížeč."
+        "message": "Verze doplňku a validujícího pluginu jsou rozdílné, což může vést k nežádoucímu chování validátoru. Prosím, přeinstalujte doplněk a/nebo validující plugin na shodné verze a restartujte prohlížeč."
+    },
+    "dnssecnoplugin": {
+        "message": " nelze ověřit pomocí DNSSEC technologie."
+    },
+    "dnssecnopluginInfo": {
+        "message": "Nepodařilo se inicializovat DNSSEC validující plugin. Prosím, nainstalujte DNSSEC validující plugin ve verzi doplňku z domovské stránky a restartujte prohlížeč."
     },
     "ipbrowsertext": {
         "message": "IP adresy použité prohlížečem:"

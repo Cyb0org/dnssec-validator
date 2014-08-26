@@ -224,6 +224,12 @@
     "dm_errorversionInfo": {
         "message": "Die Versionen des Add-ons und des Validatorkerns unterscheiden sich, dies kann zu unerwünschtem Verhalten führen. Installieren sie das Add-on und/oder das Validatorkern wieder und starten sie ihren Browser von neuem."
     },
+    "dm_noplugin": {
+        "message": "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Es kam zu einem Fehler während Erwerbs der TLSA Validator core."
+    },
+    "dm_nopluginInfo": {
+        "message": "Das Kernprogramm dieser Erweiterung konnte nicht initialisiert werden. Installieren sie bitte das TLSA-validierende Kernprogramm in Version entsprechend dieser Erweiterung und starten sie ihren Browser von neuem."
+    },
     "addonversiontext": {
         "message": "Add-on-Version:"
     },
