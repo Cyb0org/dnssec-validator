@@ -1033,7 +1033,6 @@ void CDNSSECToolBarBand::SetSecurityDNSSECStatus()
 {
 	if (debug) ATLTRACE("SetSecurityDNSSECStatus(%d):\n", dnssecresult);
 	// DNSSEC status tooltipinfo
-	WORD tiicon = TTI_NONE;		// icon in tooltipinfo
 	WORD tiicontitle = IDS_NONE;// main title of tooltipinfo
 	WORD tipref = IDS_NONE;		// prefix
 	WORD tistatus = IDS_NONE;	// DNSSEC status
@@ -1045,8 +1044,7 @@ void CDNSSECToolBarBand::SetSecurityDNSSECStatus()
 	// state 1
 	case DNSSEC_DOMAIN_UNSECURED:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_NO);
-		dnsseciconBar = IDI_DNSSEC_ICON_NO;
-		tiicon = TTI_INFO;
+		dnsseciconBar = IDI_DNSSEC_ICON_NO;		
 		tiicontitle = IDS_STATE1_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
 		tistatus = IDS_STATE1_TEXT_DOMAIN;
@@ -1056,7 +1054,6 @@ void CDNSSECToolBarBand::SetSecurityDNSSECStatus()
 	case DNSSEC_COT_DOMAIN_SECURED:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_VALID);
 		dnsseciconBar = IDI_DNSSEC_ICON_VALID;
-		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE2_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
 		tistatus = IDS_STATE2_TEXT_DOMAIN;
@@ -1066,7 +1063,6 @@ void CDNSSECToolBarBand::SetSecurityDNSSECStatus()
 	case DNSSEC_COT_DOMAIN_SECURED_BAD_IP:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_IP);
 		dnsseciconBar = IDI_DNSSEC_ICON_IP;
-		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE3_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
 		tistatus = IDS_STATE3_TEXT_DOMAIN;
@@ -1076,7 +1072,6 @@ void CDNSSECToolBarBand::SetSecurityDNSSECStatus()
 	case DNSSEC_COT_DOMAIN_BOGUS:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_BOGUS);
 		dnsseciconBar = IDI_DNSSEC_ICON_BOGUS;
-		tiicon = TTI_ERROR;
 		tiicontitle = IDS_STATE4_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
 		tistatus = IDS_STATE4_TEXT_DOMAIN;
@@ -1086,7 +1081,6 @@ void CDNSSECToolBarBand::SetSecurityDNSSECStatus()
 	case DNSSEC_NXDOMAIN_UNSECURED:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_NO);
 		dnsseciconBar = IDI_DNSSEC_ICON_NO;
-		tiicon = TTI_WARNING;
 		tiicontitle = IDS_STATE5_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_NODOMAIN;
 		tistatus = IDS_STATE5_TEXT_DOMAIN;
@@ -1096,7 +1090,6 @@ void CDNSSECToolBarBand::SetSecurityDNSSECStatus()
 	case DNSSEC_NXDOMAIN_SIGNATURE_VALID:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_VALID);
 		dnsseciconBar = IDI_DNSSEC_ICON_VALID;
-		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE6_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_NODOMAIN;
 		tistatus = IDS_STATE6_TEXT_DOMAIN;
@@ -1106,17 +1099,24 @@ void CDNSSECToolBarBand::SetSecurityDNSSECStatus()
 	case DNSSEC_NXDOMAIN_SIGNATURE_INVALID:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_BOGUS);
 		dnsseciconBar = IDI_DNSSEC_ICON_BOGUS;
-		tiicon = TTI_ERROR;
 		tiicontitle = IDS_STATE7_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_NODOMAIN;
 		tistatus = IDS_STATE7_TEXT_DOMAIN;
 		titext = IDS_STATE7_TEXT_MAIN;
- 		break;  
+ 		break;
+	// state 8
+	case DNSSEC_NXDOMAIN_SIGNATURE_VALID_BAD_IP:
+		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_ORANGE);
+		dnsseciconBar = IDI_DNSSEC_ICON_ORANGE;
+		tiicontitle = IDS_STATE8_TEXT_TOOLTIP;
+		tipref = IDS_PRE_TEXT_NODOMAIN;
+		tistatus = IDS_STATE8_TEXT_DOMAIN;
+		titext = IDS_STATE8_TEXT_MAIN;
+ 		break;
     // state 0
 	case DNSSEC_OFF:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_OFF);
 		dnsseciconBar = IDI_DNSSEC_ICON_OFF;
-		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE01_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
 		tistatus = IDS_STATE01_TEXT_DOMAIN;
@@ -1126,7 +1126,6 @@ void CDNSSECToolBarBand::SetSecurityDNSSECStatus()
 	case DNSSEC_RESOLVER_NO_DNSSEC:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_ERROR);
 		dnsseciconBar = IDI_DNSSEC_ICON_ERROR;
-		tiicon = TTI_INFO;
 		tiicontitle = IDS_STATE02_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_DOMAIN;
 		tistatus = IDS_STATE02_TEXT_DOMAIN;
@@ -1136,7 +1135,6 @@ void CDNSSECToolBarBand::SetSecurityDNSSECStatus()
     case DNSSEC_ERROR_RESOLVER:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_ERROR);
 		dnsseciconBar = IDI_DNSSEC_ICON_ERROR;
-		tiicon = TTI_ERROR;
 		tiicontitle = IDS_STATE0_TEXT_TOOLTIP;
 		tipref = IDS_PRE_TEXT_ERROR;
 		tistatus = IDS_STATE0_TEXT_DOMAIN;
@@ -1144,19 +1142,17 @@ void CDNSSECToolBarBand::SetSecurityDNSSECStatus()
 		break;
 	// state -4
     case DNSSEC_UNBOUND_NO_DATA:
-		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_ERROR);
-		dnsseciconBar = IDI_DNSSEC_ICON_ERROR;
-		tiicon = TTI_ERROR;
-		tiicontitle = IDS_STATE0_TEXT_TOOLTIP;
-		tipref = IDS_PRE_TEXT_ERROR;
-		tistatus = IDS_STATE0_TEXT_DOMAIN;
-		titext = IDS_STATEx4_TEXT_MAIN;
+		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_NO);
+		dnsseciconBar = IDI_DNSSEC_ICON_NO;
+		tiicontitle = IDS_STATE1_TEXT_TOOLTIP;
+		tipref = IDS_PRE_TEXT_DOMAIN;
+		tistatus = IDS_STATE1_TEXT_DOMAIN;
+		titext = IDS_STATE1_TEXT_MAIN;
 		break;
 	// generic error
 	default:
 		dnssecicon = GetIconIndex(IDI_DNSSEC_ICON_ERROR);
 		dnsseciconBar = IDI_DNSSEC_ICON_ERROR;
-		tiicon = TTI_ERROR;
 		tiicontitle = IDS_DNSSEC_ERROR_GEN_TOOLTIP;
 		tipref = IDS_PRE_TEXT_ERROR;
 		tistatus = IDS_DNSSEC_ERROR_GEN_DOMAIN;
@@ -1171,7 +1167,7 @@ void CDNSSECToolBarBand::SetSecurityDNSSECStatus()
 	paneldomainname = (char *)domain;
 	panelpostdomain  = tistatus;
 	paneltext  = titext;
-	res=dnssecresult;
+	res = dnssecresult;
 }//
 
 /**************************************************************************/

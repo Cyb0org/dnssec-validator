@@ -321,66 +321,59 @@ BEGIN
 	// Deafult
 	IDS_PRE_TEXT_ERROR		"Security of the domain name"
 	IDS_PRE_TEXT_DOMAIN		"Domain name"	
-	IDS_PRE_TEXT_NODOMAIN	"Nonexistence of the domain name"
-    
+	IDS_PRE_TEXT_NODOMAIN	"Nonexistence of the domain name"    
 	// state 0 - GREY ? 
 	IDS_STATE0_TEXT_TOOLTIP "DNSSEC status unknown"
 	IDS_STATE0_TEXT_DOMAIN  "can not be verified by DNSSEC."
 	IDS_STATE0_TEXT_MAIN	"An error occurred while getting the DNSSEC status of this domain name. This may be caused by loss of connection to the DNS server or the user-chosen validating resolver IP address is not an address of a validating resolver."	
-
 	IDS_STATEx4_TEXT_MAIN "An error occurred while getting the DNSSEC status of this domain name. This may be caused by using a proxy server in your network. The validator is in such cases unable to prove the server's IP-address records."
-
 	//state 1 - GREY	
 	IDS_STATE1_TEXT_TOOLTIP "Not secured by DNSSEC"
 	IDS_STATE1_TEXT_DOMAIN  "is not secured by DNSSEC."
 	IDS_STATE1_TEXT_MAIN	"This domain name is not secured by DNSSEC, so it is not possible to verify validity of obtained data and you are not secured against domain name spoofing."
-
 	//state 2 - GREEN
 	IDS_STATE2_TEXT_TOOLTIP "Secured by DNSSEC"
 	IDS_STATE2_TEXT_DOMAIN  "is correctly secured by DNSSEC."
 	IDS_STATE2_TEXT_MAIN	"Information about the IP address of this domain name was validated using DNSSEC. Because this domain name is secured by DNSSEC, you are protected against domain name spoofing."
-
 	//state 3 - RED IP
 	IDS_STATE3_TEXT_TOOLTIP "Secured by DNSSEC"
 	IDS_STATE3_TEXT_DOMAIN  "is correctly secured by DNSSEC but browser's IP address is invalid."
 	IDS_STATE3_TEXT_MAIN	"This domain name is secured by DNSSEC but the IP address which the browser is using differs from the address obtained by the DNSSEC add-on. This may have a legitimate reason but can also point at a DNS spoofing attempt!"
-
 	//state 4 - RED
 	IDS_STATE4_TEXT_TOOLTIP "Bogus DNSSEC signature"
 	IDS_STATE4_TEXT_DOMAIN  "is secured by DNSSEC but invalid domain name signature has been detected!"
 	IDS_STATE4_TEXT_MAIN	"This domain name is secured by DNSSEC but invalid domain name signature has been detected. It could indicate spoofed domain name!"
-
 	//state 5 - GREY
 	IDS_STATE5_TEXT_TOOLTIP "Not secured by DNSSEC"
 	IDS_STATE5_TEXT_DOMAIN  "can not be verified with DNSSEC."
 	IDS_STATE5_TEXT_MAIN	"The parent domain is not secured by DNSSEC, thus it was not possible to verify nonexistence of this domain name."
-
 	//state 6 - GREEN
 	IDS_STATE6_TEXT_TOOLTIP "Secured by DNSSEC"
 	IDS_STATE6_TEXT_DOMAIN  "was validated by DNSSEC."
 	IDS_STATE6_TEXT_MAIN	"The parent domain is secured by DNSSEC, thus it was possible to successfully verify nonexistence of this domain name."
-
 	//state 7 - RED
 	IDS_STATE7_TEXT_TOOLTIP "Bogus DNSSEC signature"
 	IDS_STATE7_TEXT_DOMAIN  "was not correctly validated by DNSSEC because invalid signature has been detected!"
 	IDS_STATE7_TEXT_MAIN	"The parent domain is secured by DNSSEC but the received domain name nonexistence response does not contain a valid signature. This may signalise a domain name spoofing attempt in order to deny the access to the domain."
-
+		//state 8 - ORANGE
+	IDS_STATE8_TEXT_TOOLTIP "Secured by DNSSEC"
+	IDS_STATE8_TEXT_DOMAIN  "was validated by DNSSEC technology."
+	IDS_STATE8_TEXT_MAIN	"The browser obtained an IP address which was proven to be non-existent in the DNS hierarchy. The Validator may use another resolver than the system resolver. The browser is very likely to utilise a modified resolver. This technique is sometimes used to make some network parts available which are normally hard to reach."
 		//state -1 - WHITE
 	IDS_STATE01_TEXT_TOOLTIP "Not verified by DNSSEC"
 	IDS_STATE01_TEXT_DOMAIN  "was not verified by DNSSEC."
 	IDS_STATE01_TEXT_MAIN	"DNSSEC validation was not performed because this domain or its parent domain is mentioned in the list of excluded domains."
-
 		//state -2 - WHITE
 	IDS_STATE02_TEXT_TOOLTIP "DNSSEC status unknown"
 	IDS_STATE02_TEXT_DOMAIN  "can not be verified by DNSSEC."
-	IDS_STATE02_TEXT_MAIN	"Current DNS server or resolver does not support DNSSEC technology. Please, change the validator settings (choice 'Without resolver')."
-	
+	IDS_STATE02_TEXT_MAIN	"Current DNS server or resolver does not support DNSSEC technology. Please, change the validator settings (choice 'Without resolver')."	
 	//state -1
 	IDS_DNSSEC_ERROR_GEN_TOOLTIP "DNSSEC status unknown"
 	IDS_DNSSEC_ERROR_GEN_DOMAIN  "can not be verified by DNSSEC because an error occurred in DNSSEC validator core."
 	IDS_DNSSEC_ERROR_GEN_MAIN	"Please, restart your web-browser..."
 
-		// state 10
+	// DANE
+	// state 10
 	IDS_DANE_STATE10_LABEL "Certificate corresponds to TLSA"
 	IDS_DANE_STATE10_TEXT_MAIN "The remote server certificate for this domain name was verified by DANE protocol. The certificate corresponds to TLSA record which is secured by DNSSEC technology."
 	IDS_DANE_STATE10_TEXT_ADD "The authenticity of TLS/SSL remote server certificate for this domain name was verified by DANE protocol. Certificate passed the PKIX validation and corresponds with the CA certificate in the TLSA record (type 0). TLSA record is secured by DNSSEC technology."
@@ -535,67 +528,59 @@ BEGIN
 	// Deafult
 	IDS_PRE_TEXT_ERROR		"Zabezpeèení doménového jména"
 	IDS_PRE_TEXT_DOMAIN		"Doménové jméno"	
-	IDS_PRE_TEXT_NODOMAIN	"Neexistence doménového jména"
-    
+	IDS_PRE_TEXT_NODOMAIN	"Neexistence doménového jména"   
 	// state 0 - GREY ? 
 	IDS_STATE0_TEXT_TOOLTIP "Stav DNSSEC neznámı"
 	IDS_STATE0_TEXT_DOMAIN  "nelze ovìøit pomocí DNSSEC technologie."
 	IDS_STATE0_TEXT_MAIN	"Pøi zjišování stavu zabezpeèení doménového jména technologií DNSSEC došlo k chybì. Pøíèinou mùe bıt buï vıpadek spojení ke vzdálenému serveru nebo aktuálnì nastavená IP adresa DNS serveru není platnou adresou serveru pro pøeklad doménového jména."	
-
 	IDS_STATEx4_TEXT_MAIN "Pøi zjišování stavu zabezpeèení doménového jména technologií DNSSEC došlo k chybì. Chyba mùe bıt zpùsobena pouitím proxy serveru ve vaší síti. DNSSEC validátor v tomto pøípadì není schopen ovìøit záznamy o IP adrese serveru."
-
-
 	//state 1 - GREY	
 	IDS_STATE1_TEXT_TOOLTIP "Nezabezpeèeno DNSSEC"
 	IDS_STATE1_TEXT_DOMAIN  "není zabezpeèeno DNSSEC technologií."
 	IDS_STATE1_TEXT_MAIN	"Jeliko toto doménové jméno není zabezpeèeno technologií DNSSEC, neexistuje monost ovìøení platnosti získanıch údajù a nejste tedy chránìni proti podvrení doménového jména."
-
 	//state 2 - GREEN
 	IDS_STATE2_TEXT_TOOLTIP "Zabezpeèeno DNSSEC"
 	IDS_STATE2_TEXT_DOMAIN  "je korektnì zabezpeèeno DNSSEC technologií."
 	IDS_STATE2_TEXT_MAIN	"Informace o IP adrese pro toto doménové jméno byla ovìøena technologií DNSSEC. Jeliko je doménové jméno touto technologií korektnì zabezpeèeno, jste ochránìní proti podvrení doménového jména."
-
 	//state 3 - RED IP
 	IDS_STATE3_TEXT_TOOLTIP "Zabezpeèeno DNSSEC"
 	IDS_STATE3_TEXT_DOMAIN  "je zabezpeèeno DNSSEC technologií, ale IP adresa prohlíeèe je odlišná."
 	IDS_STATE3_TEXT_MAIN	"Toto doménové jméno je zabezpeèeno technologií DNSSEC, avšak IP adresa serveru získaná prohlíeèem je odlišná od IP adresy získané DNSSEC doplòkem. To mùe mít legitimní dùvod, ale mùe se také jednat o podvrení doménového jména!"
-
 	//state 4 - RED
 	IDS_STATE4_TEXT_TOOLTIP "Neplatnı DNSSEC podpis"
 	IDS_STATE4_TEXT_DOMAIN  "je zabezpeèeno DNSSEC technologií, byl však odhalen neplatnı podpis!"
 	IDS_STATE4_TEXT_MAIN	"Toto doménové jméno je zabezpeèeno technologií DNSSEC, nebylo však moné vytvoøit øetìzec dùvìry a ovìøit tak platnost podpisu nebo podpis záznamù je neplatnı. To mùe signalizovat podvrení doménového jména útoèníkem!"
-
 	//state 5 - GREY
 	IDS_STATE5_TEXT_TOOLTIP "Nezabezpeèeno DNSSEC"
 	IDS_STATE5_TEXT_DOMAIN  "nemohla bıt ovìøena pomocí technologie DNSSEC."
 	IDS_STATE5_TEXT_MAIN	"Nadøazená doména není zabezpeèena technologií DNSSEC. Není tedy moné ovìøit, zdali toto doménové jméno skuteènì neexistuje."
-
 	//state 6 - GREEN
 	IDS_STATE6_TEXT_TOOLTIP "Zabezpeèeno DNSSEC"
 	IDS_STATE6_TEXT_DOMAIN  "byla korektnì ovìøena technologií DNSSEC."
 	IDS_STATE6_TEXT_MAIN	"Nadøazená doména je zabezpeèena technologií DNSSEC. Bylo tedy mono úspìšnì ovìøit neexistenci tohoto doménového jména."
-
 	//state 7 - RED
 	IDS_STATE7_TEXT_TOOLTIP "Neplatnı DNSSEC podpis"
 	IDS_STATE7_TEXT_DOMAIN  "nebyla korektnì ovìøena technologií DNSSEC, protoe byl odhalen neplatnı podpis záznamù!"
 	IDS_STATE7_TEXT_MAIN	"Nadøazená doména je zabezpeèena technologií DNSSEC, ale získaná odpovìï dokazující neexistenci domény neobsahuje platnı podpis. Mùe se jednat o podvrení doménového jména za úèelem odepøení pøístupu k doménì."
-
+	//state 8 - ORANGE
+	IDS_STATE8_TEXT_TOOLTIP "Zabezpeèeno DNSSEC"
+	IDS_STATE8_TEXT_DOMAIN  "byla korektnì ovìøena technologií DNSSEC."
+	IDS_STATE8_TEXT_MAIN	"Prohlíeè získal IP adresu pro doménové jméno, jeho DNS záznam prokazatelnì neexistuje v hierarchii DNS. Toto mùe bıt zpùsobeno tím, e validátor vyuívá jinı ne systémovı resolver, zatímco prohlíeè pouívá resolver, kterı byl pravdìpodobnì upraven. Tato praktika se nìkdy vyuívá pro zpøístupnìní èástí sítí, které nejsou bìnì dostupné."
 	//state -1 - WHITE
 	IDS_STATE01_TEXT_TOOLTIP "Neovìøeno DNSSEC"
 	IDS_STATE01_TEXT_DOMAIN  "nebylo ovìøeno pomocí technologie DNSSEC."
 	IDS_STATE01_TEXT_MAIN	"DNSSEC validace nebyla provedena, protoe tato doména nebo její nadøazená doména je uvedena v seznamu vylouèenıch doménovıch jmen."
-
 	//state -2 - WHITE
 	IDS_STATE02_TEXT_TOOLTIP "Stav DNSSEC neznámı"
 	IDS_STATE02_TEXT_DOMAIN  "nelze ovìøit pomocí DNSSEC technologie."
 	IDS_STATE02_TEXT_MAIN	"Aktuálnì nastavenı resolver nepodporuje DNSSEC technologii. Prosím, zmìòte nastavení validátoru (nastavte volbu 'Bez resolveru')."
-
-		//state -1
+	//state -1
 	IDS_DNSSEC_ERROR_GEN_TOOLTIP "Stav DNSSEC neznámı"
 	IDS_DNSSEC_ERROR_GEN_DOMAIN  "nelze ovìøit pomocí DNSSEC technologie, protoe došlo k selhání DNSSEC validátoru."
 	IDS_DNSSEC_ERROR_GEN_MAIN	"Prosím, restartujte webovı prohlíeè pro jeho opìtovnou inicializaci..."
-
-		// state 10
+	
+	//DANE
+	// state 10
 	IDS_DANE_STATE10_LABEL "Certifikát odpovídá TLSA"
 	IDS_DANE_STATE10_TEXT_MAIN "Certifikát vzdáleného serveru pro toto doménové jméno byl ovìøen protokolem DANE. Certifikát odpovídá záznamu TLSA, kterı je zabezpeèen technologií DNSSEC."
 	IDS_DANE_STATE10_TEXT_ADD "Dùvìryhodnost TLS/SSL certifikátu vzdáleného serveru pro toto doménové jméno byla ovìøena protokolem DANE. Certifikát prošel validací PKIX a odpovídá CA certifikátu v TLSA záznamu (typ 0). Obdrenı TLSA záznam je korektnì podepsán technologií DNSSEC."
@@ -1003,64 +988,58 @@ BEGIN
 	IDS_PRE_TEXT_ERROR		"Der Domänenname"
 	IDS_PRE_TEXT_DOMAIN		"Der Domänenname"	
 	IDS_PRE_TEXT_NODOMAIN	"Die Nichtexistenz des Domänennamen"
-
-
 	// state 0 - GREY ? 
 	IDS_STATE0_TEXT_TOOLTIP "DNSSEC-Zustand unbekannt"
 	IDS_STATE0_TEXT_DOMAIN  "kann nicht mit DNSSEC überprüft werden."
 	IDS_STATE0_TEXT_MAIN	"Während der Ermittlung des DNSSEC-Zustandes kam es zu einem Fehler. Dieser kann durch einen Anschlussausfall zum DNS-Server oder eine falsch angegebene IP-Adresse eines validierenden Resolvers verursacht sein."	
-
 	IDS_STATEx4_TEXT_MAIN "Die DNSSEC-Validierung wurde nicht ausgeführt. Dies kann durch eine Anwesenheit eines Proxy-Servers in ihrem Netzwerk verursacht werden. In diesem Fall können die IP-Adresseneinträge des Servers nicht bestätigt werden."
-
 	//state 1 - GREY	
 	IDS_STATE1_TEXT_TOOLTIP "Nicht durch DNSSEC gesichert"
 	IDS_STATE1_TEXT_DOMAIN  "ist nicht durch DNSSEC gesichert."
 	IDS_STATE1_TEXT_MAIN	"Weil der Domänenname nicht durch DNSSEC gesichert ist, gibt es keinen Weg die Gültigkeit der gewonnenen IP-Adressdaten zu gewährleisten. Sie sind somit nicht gegen DNS-Spoofing gesichert."
-
 	//state 2 - GREEN
 	IDS_STATE2_TEXT_TOOLTIP "Gesichert durch DNSSEC"
 	IDS_STATE2_TEXT_DOMAIN  "ist korrekt durch DNSSEC gesichert."
 	IDS_STATE2_TEXT_MAIN	"Die zu diesem Domänennamen angehörige IP-Adresse war mit DNSSEC überprüft und bestätigt. Diese Domäne ist durch DNSSEC gesichert, sie sind somit gegen DNS-Spoofing gesichert."
-
 	//state 3 - RED IP
 	IDS_STATE3_TEXT_TOOLTIP "Gesichert durch DNSSEC"
 	IDS_STATE3_TEXT_DOMAIN  "ist durch DNSSEC gesichert, aber die vom Webbrowser benutzte IP-Adresse ist ungültig."
 	IDS_STATE3_TEXT_MAIN	"Die zu diesem Domänennamen angehörige IP-Adresse war mit DNSSEC überprüft und nicht bestätigt. Es mag einen legitimen Grund für die Verwendung einer anderen IP-Adresse geben, es kann sich auch allerdings um DNS-Spoofing handeln."
-
 	//state 4 - RED
 	IDS_STATE4_TEXT_TOOLTIP "Ungültige DNSSEC-Signatur"
 	IDS_STATE4_TEXT_DOMAIN  "ist durch DNSSEC gesichert, allerdings ist die DNSSEC-Signatur inkorrekt."
 	IDS_STATE4_TEXT_MAIN	"Dieser Domänenname ist durch DNSSEC gesichert, aber keine gültige Vertrauenskette konnte zusammengestellt werden. Dies kann auf DNS-Spoofing hindeuten."
-
 	//state 5 - GREY
 	IDS_STATE5_TEXT_TOOLTIP "Nicht durch DNSSEC gesichert"
 	IDS_STATE5_TEXT_DOMAIN  "kann nicht mit DNSSEC überprüft werden."
 	IDS_STATE5_TEXT_MAIN	"Die übergeordnete Domäne ist nicht durch DNSSEC gesichert, deswegen kann dieser Domänenname nicht überprüft werden."
-
 	//state 6 - GREEN
 	IDS_STATE6_TEXT_TOOLTIP "Gesichert durch DNSSEC"
 	IDS_STATE6_TEXT_DOMAIN  "war mit DNSSEC überprüft und bestätigt."
 	IDS_STATE6_TEXT_MAIN	"Die übergeordnete Domäne ist durch DNSSEC gesichert, darum ist es möglich die Nichtexistenz des Domänennamen zu bestätigen."
-
 	//state 7 - RED
 	IDS_STATE7_TEXT_TOOLTIP "Ungültige DNSSEC-Signatur"
 	IDS_STATE7_TEXT_DOMAIN  "war mit DNSSEC überprüft, konnte aber wegen einer ungültigen Signatur nicht bestätigt werden."
 	IDS_STATE7_TEXT_MAIN	"Die übergeordnete Domäne ist durch DNSSEC gesichert. Die erworbene Antwort, welche die Nichtexistenz der Domäne bestätigen soll, enthält eine ungültige Signatur. Dies deutet auf einen DNS-Spoofing Versuch zur Anschlussverweigerung hin."
-
+	//state 8 - ORANGE
+	IDS_STATE8_TEXT_TOOLTIP "Gesichert durch DNSSEC"
+	IDS_STATE8_TEXT_DOMAIN  "war nicht mit DNSSEC überprüft."
+	IDS_STATE8_TEXT_MAIN	"Die Versionen des Add-ons und des Validatorkerns unterscheiden sich, dies kann zu unerwünschtem Verhalten führen. Installieren sie das Add-on und/oder das Validatorkern wieder und starten sie ihren Browser von neuem."
 	//state -1 - WHITE
 	IDS_STATE01_TEXT_TOOLTIP "Nicht durch DNSSEC geprüft"
 	IDS_STATE01_TEXT_DOMAIN  "wurde nicht durch DNSSEC überprüft."
 	IDS_STATE01_TEXT_MAIN	"Die DNSSEC-Validierung wurde nicht ausgeführt, weil diese Domäne oder ihre übergeordnete Domäne in der Liste der ausgeschlossenen Domänen erwähnt ist."
-
-			//state -2 - WHITE
+	//state -2 - WHITE
 	IDS_STATE02_TEXT_TOOLTIP "DNSSEC-Zustand unbekannt"
 	IDS_STATE02_TEXT_DOMAIN  "kann nicht mit DNSSEC überprüft werden."
 	IDS_STATE02_TEXT_MAIN	"Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht. Ändern Sie bitte die Einstellungen des Resolvers (Wahl 'Ohne Resolver')."
-			//state -1
+	//state -1
 	IDS_DNSSEC_ERROR_GEN_TOOLTIP "DNSSEC-Zustand unbekannt"
 	IDS_DNSSEC_ERROR_GEN_DOMAIN  "kann nicht mit DNSSEC überprüft werden. Es kam zu einem Fehler während Erwerbs der DNSSEC Validator core."
 	IDS_DNSSEC_ERROR_GEN_MAIN	"Bitte alle Browserfenster schließen und den Browser neu starten..."
-			// state 10
+	
+	//DANE
+	// state 10
 	IDS_DANE_STATE10_LABEL "Zertifikat entspricht TLSA"
 	IDS_DANE_STATE10_TEXT_MAIN "Das Serverzertifikat für diese Domäne wurde durch DANE Protokoll bestätigt. Das Zertifikat entspricht dem durch DNSSEC gesicherten TLSA Eintrag."
 	IDS_DANE_STATE10_TEXT_ADD "Die Vertrauenswürdigkeit des TLS/SSL Serverzertifikat wurde durch DANE Protokoll bestätigt. Das Zertifikat lief eine PKIX Validierung durch und entspricht dem CA Zertifikat im TLSA Eintrag (Typ 0). Der erhaltene TLSA Eintrag ist durch DNSSEC gesichert."
@@ -1140,7 +1119,7 @@ BEGIN
 	 IDS_DANE_STATEx99_LABEL "TLSA Status unbekannt"	
 	 IDS_DANE_STATEx99_TEXT_MAIN "Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht."	 
 	 IDS_DANE_STATEx99_TEXT_ADD	 "Der zur Zeit eingestellte Resolver unterstützt DNSSEC nicht. Ändern Sie bitte die Einstellungen des Resolvers (Wahl 'Ohne Resolver')."	
-	 	 	 // state -1
+	 // state -1
 	 IDS_DANE_ERROR_GEN_LABEL	"TLSA Status unbekannt"	
 	 IDS_DANE_ERROR_GEN_TEXT_MAIN	"Das Serverzertifikat für diese Domäne konnte nicht durch DANE Protokoll bestätigt werden. Es kam zu einem Fehler während Erwerbs der TLSA Validator core."	 
 	 IDS_DANE_ERROR_GEN_TEXT_ADD	"Bitte alle Browserfenster schließen und den Browser neu starten..."
@@ -1212,67 +1191,59 @@ BEGIN
 	// Deafult
 	IDS_PRE_TEXT_ERROR		"Zabezpieczenie nazwy domenowej"
 	IDS_PRE_TEXT_DOMAIN		"Nazwa domenowa"	
-	IDS_PRE_TEXT_NODOMAIN	"Nieobecnoœæ nazwy domenowej"
-    
+	IDS_PRE_TEXT_NODOMAIN	"Nieobecnoœæ nazwy domenowej"    
 	// state 0 - GREY ? 
 	IDS_STATE0_TEXT_TOOLTIP "Stan DNSSEC nieznany"
 	IDS_STATE0_TEXT_DOMAIN  "nie mo¿e zostaæ zweryfikowana przy u¿yciu DNSSEC."
 	IDS_STATE0_TEXT_MAIN	"Wyst¹pi³ b³¹d podczas sprawdzania stanu DNSSEC tej nazwy domenowej. Mo¿e to byæ spowodowane utrat¹ ³¹cznoœci z serwerem DNS lub tym, ¿e podany przez u¿ytkownika adres IP waliduj¹cego resolvera nie jest adresem waliduj¹cego resolvera."	
-
 	IDS_STATEx4_TEXT_MAIN "Wyst¹pi³ b³¹d podczas sprawdzania stanu DNSSEC tej nazwy domenowej. Ten b³¹d mo¿e byæ spowodowany za pomoc¹ serwera proxy w sieci. DNSSEC walidator w tym przypadku nie jest w stanie zweryfikowaæ zapisy na adres IP serwera."
-
-
 	//state 1 - GREY	
 	IDS_STATE1_TEXT_TOOLTIP "Niezabezpieczona przez DNSSEC"
 	IDS_STATE1_TEXT_DOMAIN  "nie jest zabezpieczona przez DNSSEC."
 	IDS_STATE1_TEXT_MAIN	"Ta nazwa domenowa nie jest zabezpieczona przez DNSSEC, wiêc nie jest mo¿liwe zweryfikowanie poprawnoœci otrzymanych danych i nie jesteœ chroniony(-a) przed fa³szowaniem nazw domenowych."
-
 	//state 2 - GREEN
 	IDS_STATE2_TEXT_TOOLTIP "Zabezpieczona przez DNSSEC"
 	IDS_STATE2_TEXT_DOMAIN  "jest poprawnie zabezpieczona przez DNSSEC."
 	IDS_STATE2_TEXT_MAIN	"Informacje o adresie IP tej nazwy domenowej zosta³y zweryfikowane przy u¿yciu DNSSEC. Ta nazwa domenowa jest zabezpieczona przez DNSSEC, wiêc jesteœ chroniony(-a) przed fa³szowaniem nazw domenowych."
-
 	//state 3 - RED IP
 	IDS_STATE3_TEXT_TOOLTIP "Zabezpieczona przez DNSSEC"
 	IDS_STATE3_TEXT_DOMAIN  "jest zabezpieczona przez DNSSEC, ale adres IP w przegl¹darce jest niew³aœciwy."
 	IDS_STATE3_TEXT_MAIN	"Ta nazwa domenowa jest zabezpieczona przez DNSSEC, ale adres IP wykorzystywany przez przegl¹darkê ró¿ni siê od adresu uzyskanego przez dodatek DNSSEC. Mo¿e byæ ku temu s³uszny powód, ale mo¿e to te¿ oznaczaæ próbê sfa³szowania odpowiedzi DNS!"
-
 	//state 4 - RED
 	IDS_STATE4_TEXT_TOOLTIP "Fa³szywy podpis DNSSEC"
 	IDS_STATE4_TEXT_DOMAIN  "jest zabezpieczona przez DNSSEC, ale wykryto niew³aœciwy podpis nazwy domenowej!"
 	IDS_STATE4_TEXT_MAIN	"Ta nazwa domenowa jest zabezpieczona przez DNSSEC, ale wykryto niew³aœciwy podpis nazwy domenowej. Mo¿e to oznaczaæ sfa³szowanie nazwy domenowej!"
-
 	//state 5 - GREY
 	IDS_STATE5_TEXT_TOOLTIP "Zabezpieczona przez DNSSEC"
 	IDS_STATE5_TEXT_DOMAIN  "nie mo¿e zostaæ zweryfikowana przy u¿yciu DNSSEC."
 	IDS_STATE5_TEXT_MAIN	"Domena nadrzêdna nie jest zabezpieczona przez DNSSEC, wiêc nie by³o mo¿liwe zweryfikowanie nieobecnoœci tej nazwy domenowej."
-
 	//state 6 - GREEN
 	IDS_STATE6_TEXT_TOOLTIP "Zabezpieczona przez DNSSEC"
 	IDS_STATE6_TEXT_DOMAIN  "zosta³a zweryfikowana przy u¿yciu DNSSEC."
 	IDS_STATE6_TEXT_MAIN	"Domena nadrzêdna jest zabezpieczona przez DNSSEC, wiêc mo¿na by³o pomyœlnie zweryfikowaæ nieobecnoœæ tej nazwy domenowej."
-
 	//state 7 - RED
 	IDS_STATE7_TEXT_TOOLTIP "Fa³szywy podpis DNSSEC"
 	IDS_STATE7_TEXT_DOMAIN  "nie zosta³a pomyœlnie zweryfikowana przy u¿yciu DNSSEC, poniewa¿ wykryto niew³aœciwy podpis!"
 	IDS_STATE7_TEXT_MAIN	"Domena nadrzêdna jest zabezpieczona przez DNSSEC, ale odpowiedŸ otrzymana dla nieobecnej nazwy domenowej nie zawiera poprawnego podpisu. Mo¿e to oznaczaæ próbê sfa³szowania nazwy domenowej w celu uniemo¿liwienia dostêpu do domeny."
-
+	//state 8 - ORANGE
+	IDS_STATE8_TEXT_TOOLTIP "Zabezpieczona przez DNSSEC"
+	IDS_STATE8_TEXT_DOMAIN  "zosta³a zweryfikowana przy u¿yciu DNSSEC."
+	IDS_STATE8_TEXT_MAIN	"Przegl¹darka otrzyma³a adres IP dla nazwy domeny, której zapis DNS najwyraŸniej nie istnieje w hierarchii DNS. Mo¿e to byæ spowodowane faktem, i¿ weryfikator stosuje inny ni¿ systemowy resolwer, podczas gdy przegl¹darka korzysta z resolwera, który by³ prawdopodobnie zmodyfikowany. Ta praktyka jest czasem u¿ywana do dostêpu czêœci sieci, które nie s¹ powszechnie dostêpne."
 	//state -1 - WHITE
 	IDS_STATE01_TEXT_TOOLTIP "Niezweryfikowana przy u¿yciu DNSSEC"
 	IDS_STATE01_TEXT_DOMAIN  "nie zosta³a zweryfikowana przy u¿yciu DNSSEC."
 	IDS_STATE01_TEXT_MAIN	"Walidacja DNSSEC nie zosta³a przeprowadzona, poniewa¿ ta domena lub jej domena nadrzêdna jest wymieniona na liœcie wykluczonych domen."
-
 	//state -2 - WHITE
 	IDS_STATE02_TEXT_TOOLTIP "Stan DNSSEC nieznany"
 	IDS_STATE02_TEXT_DOMAIN  "nie mo¿e zostaæ zweryfikowana przy u¿yciu DNSSEC."
 	IDS_STATE02_TEXT_MAIN	"Obecny serwer DNS lub resolver nie obs³uguje technologii DNSSEC. Proszê zmieniæ ustawienia walidatora (opcja 'Bez resolvera')."
-
-		//state -1
+	//state -1
 	IDS_DNSSEC_ERROR_GEN_TOOLTIP "Stan DNSSEC nieznany"
 	IDS_DNSSEC_ERROR_GEN_DOMAIN  "nie mo¿e zostaæ zweryfikowana przy u¿yciu DNSSEC, poniewa¿ wyst¹pi³ b³¹d w rdzeniu walidatora DNSSEC."
 	IDS_DNSSEC_ERROR_GEN_MAIN	"Proszê zrestartowaæ przegl¹darkê..."
-
-		// state 10
+	
+	//DANE
+	// state 10
 	IDS_DANE_STATE10_LABEL "Certyfikat odpowiada TLSA"
 	IDS_DANE_STATE10_TEXT_MAIN "Certyfikat zdalnego serwera dla tej nazwy domenowej zosta³ zweryfikowany przy u¿yciu protoko³u DANE. Certyfikat odpowiada rekordowi TLSA, który jest zabezpieczony przez technologiê DNSSEC."
 	IDS_DANE_STATE10_TEXT_ADD "Autentycznoœæ certyfikatu TLS/SSL zdalnego serwera dla tej nazwy domenowej zosta³a zweryfikowana przy u¿yciu protoko³u DANE. Certyfikat przeszed³ walidacjê PKIX i odpowiada certyfikatowi CA w rekordzie TLSA (typu 0). Rekord TLSA jest zabezpieczony przez technologiê DNSSEC."

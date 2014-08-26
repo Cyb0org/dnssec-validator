@@ -96,14 +96,18 @@ DNSSEC Validator Add-on 2.x.  If not, see <http://www.gnu.org/licenses/>.
 #define	IDS_STATE5_TEXT_TOOLTIP			118
 #define	IDS_STATE5_TEXT_DOMAIN			119
 #define	IDS_STATE5_TEXT_MAIN			120
-//state 6 - GREY
+//state 6 - GREEN
 #define	IDS_STATE6_TEXT_TOOLTIP			121
 #define	IDS_STATE6_TEXT_DOMAIN			122
 #define	IDS_STATE6_TEXT_MAIN			123
-	//state 7 - ORANGE
+	//state 7 - RED
 #define IDS_STATE7_TEXT_TOOLTIP			124
 #define IDS_STATE7_TEXT_DOMAIN			125
 #define	IDS_STATE7_TEXT_MAIN			126
+	//state 8 - ORANGE
+#define IDS_STATE8_TEXT_TOOLTIP			1261
+#define IDS_STATE8_TEXT_DOMAIN			1262
+#define	IDS_STATE8_TEXT_MAIN			1263
 	//state -1
 #define	IDS_STATE01_TEXT_TOOLTIP		127
 #define	IDS_STATE01_TEXT_DOMAIN			128
