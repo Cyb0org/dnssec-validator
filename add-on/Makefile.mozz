@@ -1,8 +1,4 @@
 
-TARGETS += \
-	MF-dnssec-validator-@VERSION@-js-ctypes.xpi
-
-
 cs_CZ_LOCALE_MOZZ = \
 	$(top_srcdir)/add-on/firefox/common/locale/cs-CZ/aboutwindow.dtd \
 	$(top_srcdir)/add-on/firefox/common/locale/cs-CZ/dnssec.dtd \
@@ -40,6 +36,34 @@ dnssec_tlsa_validator_LOCALES_MOZZ = \
 dnssec_tlsa_validator_CONTENT_MOZZ = \
 	$(top_srcdir)/add-on/firefox/common/about.xul
 
+dnssec_tlsa_validator_SKIN_MOZZ = \
+	$(top_srcdir)/add-on/firefox/common/skin/dnssec_action.gif \
+	$(top_srcdir)/add-on/firefox/common/skin/dnssec_action.png \
+	$(top_srcdir)/add-on/firefox/common/skin/dnssec_bogus.png \
+	$(top_srcdir)/add-on/firefox/common/skin/dnssec_error.png \
+	$(top_srcdir)/add-on/firefox/common/skin/dnssec_init.png \
+	$(top_srcdir)/add-on/firefox/common/skin/dnssec_ip.png \
+	$(top_srcdir)/add-on/firefox/common/skin/dnssec_no.png \
+	$(top_srcdir)/add-on/firefox/common/skin/dnssec_off.png \
+	$(top_srcdir)/add-on/firefox/common/skin/dnssec_orange.png \
+	$(top_srcdir)/add-on/firefox/common/skin/dnssec_valid.png \
+	$(top_srcdir)/add-on/firefox/common/skin/icon.png \
+	$(top_srcdir)/add-on/firefox/common/skin/overlay.css \
+	$(top_srcdir)/add-on/firefox/common/skin/overlay-dnssec.css \
+	$(top_srcdir)/add-on/firefox/common/skin/overlay-tlsa.css \
+	$(top_srcdir)/add-on/firefox/common/skin/overlay-win-ff4.css \
+	$(top_srcdir)/add-on/firefox/common/skin/tlsa_action.gif \
+	$(top_srcdir)/add-on/firefox/common/skin/tlsa_action.png \
+	$(top_srcdir)/add-on/firefox/common/skin/tlsa_error.png \
+	$(top_srcdir)/add-on/firefox/common/skin/tlsa_init.png \
+	$(top_srcdir)/add-on/firefox/common/skin/tlsa_invalid.png \
+	$(top_srcdir)/add-on/firefox/common/skin/tlsa_no.png \
+	$(top_srcdir)/add-on/firefox/common/skin/tlsa_nodnssec.png \
+	$(top_srcdir)/add-on/firefox/common/skin/tlsa_nohttps.png \
+	$(top_srcdir)/add-on/firefox/common/skin/tlsa_off.png \
+	$(top_srcdir)/add-on/firefox/common/skin/tlsa_orange.png \
+	$(top_srcdir)/add-on/firefox/common/skin/tlsa_valid.png
+
 dnssec_tlsa_validator_BALLAST_MOZZ = \
 	$(top_srcdir)/add-on/firefox/common/COPYING \
 	$(top_srcdir)/add-on/firefox/common/README \
@@ -64,6 +88,9 @@ $(top_srcdir)/add-on/firefox/common/install.rdf: $(top_srcdir)/add-on/firefox/co
 	$(do_subst) < $< > $@
 
 if EXTPKG_MOZZ_JC
+
+TARGETS += \
+	MF-dnssec-validator-@VERSION@-js-ctypes.xpi
 
 BUILT_SOURCES += \
 	$(top_srcdir)/add-on/firefox/js-ctypes/content/dnsseclib.js \
@@ -90,34 +117,6 @@ dnssec_tlsa_validator_CONTENT_MOZZ_JC = \
 	$(top_srcdir)/add-on/firefox/js-ctypes/content/tlsa.js \
 	$(top_srcdir)/add-on/firefox/js-ctypes/content/tlsalib.js
 
-dnssec_tlsa_validator_SKIN_MOZZ_JC = \
-	$(top_srcdir)/add-on/firefox/common/skin/dnssec_action.gif \
-	$(top_srcdir)/add-on/firefox/common/skin/dnssec_action.png \
-	$(top_srcdir)/add-on/firefox/common/skin/dnssec_bogus.png \
-	$(top_srcdir)/add-on/firefox/common/skin/dnssec_error.png \
-	$(top_srcdir)/add-on/firefox/common/skin/dnssec_init.png \
-	$(top_srcdir)/add-on/firefox/common/skin/dnssec_ip.png \
-	$(top_srcdir)/add-on/firefox/common/skin/dnssec_no.png \
-	$(top_srcdir)/add-on/firefox/common/skin/dnssec_off.png \
-	$(top_srcdir)/add-on/firefox/common/skin/dnssec_orange.png \
-	$(top_srcdir)/add-on/firefox/common/skin/dnssec_valid.png \
-	$(top_srcdir)/add-on/firefox/common/skin/icon.png \
-	$(top_srcdir)/add-on/firefox/common/skin/overlay.css \
-	$(top_srcdir)/add-on/firefox/common/skin/overlay-dnssec.css \
-	$(top_srcdir)/add-on/firefox/common/skin/overlay-tlsa.css \
-	$(top_srcdir)/add-on/firefox/common/skin/overlay-win-ff4.css \
-	$(top_srcdir)/add-on/firefox/common/skin/tlsa_action.gif \
-	$(top_srcdir)/add-on/firefox/common/skin/tlsa_action.png \
-	$(top_srcdir)/add-on/firefox/common/skin/tlsa_error.png \
-	$(top_srcdir)/add-on/firefox/common/skin/tlsa_init.png \
-	$(top_srcdir)/add-on/firefox/common/skin/tlsa_invalid.png \
-	$(top_srcdir)/add-on/firefox/common/skin/tlsa_nodnssec.png \
-	$(top_srcdir)/add-on/firefox/common/skin/tlsa_nohttps.png \
-	$(top_srcdir)/add-on/firefox/common/skin/tlsa_no.png \
-	$(top_srcdir)/add-on/firefox/common/skin/tlsa_off.png \
-	$(top_srcdir)/add-on/firefox/common/skin/tlsa_orange.png \
-	$(top_srcdir)/add-on/firefox/common/skin/tlsa_valid.png
-
 dtvmjc-locales-stamp: $(dnssec_tlsa_validator_LOCALES_MOZZ)
 	-rm -rf _dtvmjc_workdir/locale
 	$(INSTALL) -d _dtvmjc_workdir/locale
@@ -135,7 +134,7 @@ dtvmjc-content-stamp: $(dnssec_tlsa_validator_CONTENT_MOZZ) $(dnssec_tlsa_valida
 	done
 	touch $@
 
-dtvmjc-skin-stamp: $(dnssec_tlsa_validator_SKIN_MOZZ_JC)
+dtvmjc-skin-stamp: $(dnssec_tlsa_validator_SKIN_MOZZ)
 	-rm -rf _dtvmjc_workdir/skin
 	$(INSTALL) -d _dtvmjc_workdir/skin
 	for f in $^; do \
@@ -189,5 +188,101 @@ CLEANFILES += \
 	dtvmjc-prefs-stamp \
 	dtvmjc-ballast-stamp \
 	MF-dnssec-validator-@VERSION@-js-ctypes.xpi
+
+endif
+
+
+if EXTPKG_MOZZ_NP
+
+TARGETS += \
+	MF-dnssec-validator-@VERSION@-npapi.xpi
+
+#BUILT_SOURCES +=
+
+#CLEANFILES +=
+
+NPAPI_PLUGIN_NAME_DNSSEC = DNSSECValidatorPlugin
+NPAPI_PLUGIN_NAME_TLSA = TLSAValidatorPlugin
+
+dnssec_tlsa_validator_CONTENT_MOZZ_NP = \
+	$(top_srcdir)/add-on/firefox/npapi/content/about.js \
+	$(top_srcdir)/add-on/firefox/npapi/content/firefoxOverlay.xul \
+	$(top_srcdir)/add-on/firefox/npapi/content/npapi_const.js \
+	$(top_srcdir)/add-on/firefox/npapi/content/overlay.js \
+	$(top_srcdir)/add-on/firefox/npapi/content/preferences.js \
+	$(top_srcdir)/add-on/firefox/npapi/content/preferences.xul \
+	$(top_srcdir)/add-on/firefox/npapi/content/tlsa.js
+
+dtvmnp-locales-stamp: $(dnssec_tlsa_validator_LOCALES_MOZZ)
+	-rm -rf _dtvmnp_workdir/locale
+	$(INSTALL) -d _dtvmnp_workdir/locale
+	for f in $^; do \
+		mkdir -p _dtvmnp_workdir/locale/$$(basename $$(dirname $$f))/; \
+		$(INSTALL) -m 644 $$f _dtvmnp_workdir/locale/$$(basename $$(dirname $$f))/; \
+	done
+	touch $@
+
+dtvmnp-content-stamp: $(dnssec_tlsa_validator_CONTENT_MOZZ) $(dnssec_tlsa_validator_CONTENT_MOZZ_NP)
+	-rm -rf _dtvmnp_workdir/content
+	$(INSTALL) -d _dtvmnp_workdir/content
+	for f in $^; do \
+		$(INSTALL) -m 644 $$f _dtvmnp_workdir/content/; \
+	done
+	touch $@
+
+dtvmnp-skin-stamp: $(dnssec_tlsa_validator_SKIN_MOZZ)
+	-rm -rf _dtvmnp_workdir/skin
+	$(INSTALL) -d _dtvmnp_workdir/skin
+	for f in $^; do \
+		$(INSTALL) -m 644 $$f _dtvmnp_workdir/skin/; \
+	done
+	touch $@
+
+dtvmnp-jar-stamp: dtvmnp-locales-stamp dtvmnp-content-stamp dtvmnp-skin-stamp
+	-rm -rf _dtvmnp_workdir/chrome
+	$(INSTALL) -d _dtvmnp_workdir/chrome
+	cd _dtvmnp_workdir; zip -0 -r chrome/dnssec.jar content locale skin; cd ..
+	touch $@
+
+dtvmnp-prefs-stamp: $(top_srcdir)/add-on/firefox/common/defaults/preferences/dnssec.js
+	-rm -rf _dtvmnp_workdir/defaults/preferences
+	$(INSTALL) -d -m 755 _dtvmnp_workdir/defaults/preferences
+	$(INSTALL) -m 644 $< _dtvmnp_workdir/defaults/preferences/
+	touch $@
+
+dtvmnp-ballast-stamp: $(dnssec_tlsa_validator_BALLAST_MOZZ)
+	for f in $^; do \
+		$(INSTALL) -m 644 $$f _dtvmnp_workdir/; \
+	done
+	touch $@
+
+_dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI).so: $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI).so
+	-rm -f $@
+	$(INSTALL) -d -m 755 _dtvmnp_workdir/plugins
+	$(INSTALL) -s -m 644 $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI).so $@ # FIXME: Ugly
+
+_dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI).so: $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI).so
+	-rm -f $@
+	$(INSTALL) -d -m 755 _dtvmnp_workdir/plugins
+	$(INSTALL) -s -m 644 $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI).so $@ # FIXME: Ugly
+
+MF-dnssec-validator-@VERSION@-npapi.xpi: dtvmnp-jar-stamp dtvmnp-prefs-stamp dtvmnp-ballast-stamp _dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI).so _dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI).so
+	-rm -f $@
+	cd _dtvmnp_workdir; \
+	zip -r $@ COPYING README icon.png Version CHANGELOG plugins defaults chrome install.rdf chrome.manifest; \
+	$(INSTALL) -m 644 $@ ../; \
+	cd ..
+
+WORKDIRS += \
+	_dtvmnp_workdir
+
+CLEANFILES += \
+	dtvmnp-locales-stamp \
+	dtvmnp-content-stamp \
+	dtvmnp-skin-stamp \
+	dtvmnp-jar-stamp \
+	dtvmnp-prefs-stamp \
+	dtvmnp-ballast-stamp \
+	MF-dnssec-validator-@VERSION@-npapi.xpi
 
 endif

@@ -301,6 +301,7 @@ AM_CONDITIONAL([LOG_OSX], [test $LOG_TGT = 1])
 
 AM_CONDITIONAL([EXTPKG_MOZZ_JC], [true]) # Mozilla Firefox js-ctypes.
 AM_CONDITIONAL([EXTPKG_CR_NM], [true]) # Chromium/Chrome native messaging.
+AM_CONDITIONAL([EXTPKG_MOZZ_NP], [test "x$enable_npapi_extensions" = "xyes"]) # Mozilla Firefox NPAPI.
 
 
 CPPFLAGS="${CORE_CPPFLAGS}"

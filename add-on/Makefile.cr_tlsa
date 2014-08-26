@@ -1,7 +1,4 @@
 
-TARGETS += \
-	tvcnm-directory-stamp
-
 tlsa_cs_CZ_LOCALE_CR = \
 	$(top_srcdir)/add-on/chrome-tlsa/common/_locales/cs/messages.json
 
@@ -42,6 +39,9 @@ tlsa_validator_BALLAST_CR = \
 	$(top_srcdir)/add-on/chrome-tlsa/common/COPYING
 
 if EXTPKG_CR_NM
+
+TARGETS += \
+	tvcnm-directory-stamp
 
 BUILT_SOURCES += \
 	$(top_srcdir)/add-on/chrome-tlsa/native-msg/manifest.json

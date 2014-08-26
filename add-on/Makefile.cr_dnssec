@@ -1,7 +1,4 @@
 
-TARGETS += \
-	dvcnm-directory-stamp
-
 dnssec_cs_CZ_LOCALE_CR = \
 	$(top_srcdir)/add-on/chrome-dnssec/common/_locales/cs/messages.json
 
@@ -41,6 +38,9 @@ dnssec_validator_BALLAST_CR = \
 	$(top_srcdir)/add-on/chrome-dnssec/common/COPYING
 
 if EXTPKG_CR_NM
+
+TARGETS += \
+	dvcnm-directory-stamp
 
 BUILT_SOURCES += \
 	$(top_srcdir)/add-on/chrome-dnssec/native-msg/manifest.json
