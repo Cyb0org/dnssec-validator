@@ -5,7 +5,9 @@ all: libDNSSECcore$(SO_SUFF) libDANEcore$(SO_SUFF)
 
 
 AM_CPPFLAGS = \
-	-include $(top_srcdir)/plugin-source/config.h
+	-include $(top_srcdir)/plugin-source/config.h \
+	@CORE_CPPFLAGS@ \
+	-I$(top_srcdir)/plugin-source/common/
 
 
 EXTRA_LTLIBRARIES = \
@@ -34,9 +36,6 @@ if LOG_OSX
 libDNSSECcore_la_SOURCES += \
 	$(top_srcdir)/plugin-source/common/log_osx.m
 endif
-
-libDNSSECcore_la_CFLAGS = \
-	-I$(top_srcdir)/plugin-source/common/
 
 libDNSSECcore_la_LDFLAGS = \
 	-avoid-version \
@@ -77,7 +76,7 @@ libDANEcore_la_SOURCES += \
 endif
 if CA_STORE_OSX
 libDANEcore_la_SOURCES += \
-	$(top_srcdir)/plugin-source/TLSAValidatorPlugin/ca_store_osx.c
+	$(top_srcdir)/plugin-source/TLSAValidatorPlugin/ca_store_osx.m
 endif
 
 if LOG_DFLT
@@ -88,9 +87,6 @@ if LOG_OSX
 libDANEcore_la_SOURCES += \
 	$(top_srcdir)/plugin-source/common/log_osx.m
 endif
-
-libDANEcore_la_CFLAGS = \
-	-I$(top_srcdir)/plugin-source/common/
 
 libDANEcore_la_LDFLAGS = \
 	-avoid-version \
@@ -117,7 +113,9 @@ endif
 
 
 libDNSSECcore$(SO_SUFF): libDNSSECcore.la
-	$(INSTALL) -s -m 644 .libs/libDNSSECcore$(SO_SUFF) $@ # FIXME: Ugly
+	$(INSTALL) -m 644 .libs/libDNSSECcore$(SO_SUFF) $@ # FIXME: Ugly
+	$(STRIP) $@
 
 libDANEcore$(SO_SUFF): libDANEcore.la
-	$(INSTALL) -s -m 644 .libs/libDANEcore$(SO_SUFF) $@ # FIXME: Ugly
+	$(INSTALL) -m 644 .libs/libDANEcore$(SO_SUFF) $@ # FIXME: Ugly
+	$(STRIP) $@

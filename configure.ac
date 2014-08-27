@@ -65,6 +65,7 @@ AC_PROG_MAKE_SET # Set make command.
 AC_PROG_MKDIR_P # mkdir -p
 AC_PROG_OBJC # OS X only.
 AC_PROG_SED
+AC_PROG_STRIP
 
 # Checks for libraries.
 AC_PROG_LIBTOOL
@@ -150,6 +151,10 @@ AS_IF([test "x$enable_static_linking" = "xyes"], [
 
   # FIXME: get the CONFIGURE_FLAGS from the environment.
 
+  CORE_CPPFLAGS+=' -I$(top_srcdir)/libs-built/openssl/include'
+  CORE_CPPFLAGS+=' -I$(top_srcdir)/libs-built/ldns/include'
+  CORE_CPPFLAGS+=' -I$(top_srcdir)/libs-built/unbound/include'
+
   LIB_CFLAGS=""
   OPENSSL_ARGS=""
   CONFIGURE_ARGS=""
@@ -172,6 +177,8 @@ AS_IF([test "x$enable_static_linking" = "xyes"], [
           OPENSSL_ARGS="darwin64-x86_64-cc ${LIB_CFLAGS}"
         ]
       )
+      CORE_LIBS+=" -framework Cocoa -framework Security"
+      STRIP+=" -x -S"
     ],
     [linux*], [
       AS_CASE([${BITS}],
