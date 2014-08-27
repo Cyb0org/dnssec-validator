@@ -21,7 +21,7 @@ libs-built:
 
 libs-built/openssl: libs-srcs
 	$(INSTALL) -d $@
-	(cd $</openssl && sed -e 's/\(^"BSD-[^"]*",[^g]*\)gcc\(.*\$\)/\1cc\2/g' < Configure > ConfigureBSD || cp Configure ConfigureBSD; chmod +x ConfigureBSD)
+	(cd $</openssl && $(SED) -e 's/\(^"BSD-[^"]*",[^g]*\)gcc\(.*\$\)/\1cc\2/g' < Configure > ConfigureBSD || cp Configure ConfigureBSD; chmod +x ConfigureBSD)
 	(cd $</openssl && ./ConfigureBSD no-shared no-krb5 --prefix="$(abs_builddir)/$@" $(OPENSSL_ARGS) $(CROSSCOMPILE_OPENSSL_FLAGS) && $(MAKE) -j1 && $(MAKE) -j1 install && $(MAKE) clean)
 
 libs-built/ldns: libs-srcs libs-built/openssl

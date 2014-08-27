@@ -6,7 +6,7 @@ AC_INIT([dnssec-validator], [2.2.0], [dnssec-validator-users@lists.nic.cz])
 AC_CONFIG_SRCDIR([plugin-source/common/common.h])
 AC_CONFIG_HEADERS([plugin-source/config.h])
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE([1.10 foreign dist-xz -Wall -Werror])
+AM_INIT_AUTOMAKE([1.10 foreign dist-xz -Wall])
 
 AC_CANONICAL_HOST
 
@@ -63,7 +63,8 @@ AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET # Set make command.
 AC_PROG_MKDIR_P # mkdir -p
-AC_PROG_OBJC
+AC_PROG_OBJC # OS X only.
+AC_PROG_SED
 
 # Checks for libraries.
 AC_PROG_LIBTOOL
@@ -93,7 +94,7 @@ AC_SUBST(XPCOM_ABI)
 
 # Set shared library prefixes and suffixes.
 AS_CASE([$host_os],
-  [darwin], [
+  [darwin*], [
     SO_PREF='lib'
     SO_SUFF='.dylib'
   ],
@@ -155,9 +156,21 @@ AS_IF([test "x$enable_static_linking" = "xyes"], [
   AS_CASE([$host_os],
     [darwin*], [
       AS_CASE([${BITS}],
-        [32], [],
-        [64], [],
-        [fat], []
+        [32], [
+          CONFIGURE_ARGS="--target=i686-pc-linux-gnu"
+          LIB_CFLAGS="-fPIC -m32"
+          OPENSSL_ARGS="darwin-i386-cc ${LIB_CFLAGS}"
+        ],
+        [64], [
+          CONFIGURE_ARGS="--target=x86_64-pc-linux-gnu"
+          LIB_CFLAGS="-fPIC -m64"
+          OPENSSL_ARGS="darwin64-x86_64-cc ${LIB_CFLAGS}"
+        ],
+        [fat], [
+          CONFIGURE_ARGS=""
+          LIB_CFLAGS="${LIB_CFLAGS_MAC} -arch i386 -arch x86_64"
+          OPENSSL_ARGS="darwin64-x86_64-cc ${LIB_CFLAGS}"
+        ]
       )
     ],
     [linux*], [

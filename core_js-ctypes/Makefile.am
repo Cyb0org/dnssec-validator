@@ -32,7 +32,7 @@ libDNSSECcore_la_SOURCES += \
 endif
 if LOG_OSX
 libDNSSECcore_la_SOURCES += \
-	$(top_srcdir)/plugin-source/common/log_osx.c
+	$(top_srcdir)/plugin-source/common/log_osx.m
 endif
 
 libDNSSECcore_la_CFLAGS = \
@@ -86,7 +86,7 @@ libDANEcore_la_SOURCES += \
 endif
 if LOG_OSX
 libDANEcore_la_SOURCES += \
-	$(top_srcdir)/plugin-source/common/log_osx.c
+	$(top_srcdir)/plugin-source/common/log_osx.m
 endif
 
 libDANEcore_la_CFLAGS = \
