@@ -91,6 +91,24 @@ AS_CASE([$host_cpu],
 )
 AC_SUBST(XPCOM_ABI)
 
+# Set shared library prefixes and suffixes.
+AS_CASE([$host_os],
+  [darwin], [
+    SO_PREF='lib'
+    SO_SUFF='.dylib'
+  ],
+  [mingw*], [
+    SO_PREF=''
+    SO_SUFF='.dll'
+  ],
+  [
+    SO_PREF='lib'
+    SO_SUFF='.so'
+  ]
+)
+AC_SUBST(SO_PREF)
+AC_SUBST(SO_SUFF)
+
 
 ###############################################################################
 # Force bits.
@@ -106,14 +124,14 @@ AC_ARG_WITH([force-bits],
       [32], [BITS=32],
       [64], [BITS=64],
       [fat], [BITS=fat],
-      [*], [AC_MSG_WARN(["Unknown force bits option '$withval'."])]
+      [AC_MSG_WARN(["Unknown force bits option '$withval'."])]
     )
   ])
 AS_IF([test "x${BITS}" = "xauto"], [
   AS_CASE([$XPCOM_ABI],
     [x86], [BITS=32],
     [x86_64], [BITS=64],
-    [*], [AC_MSG_ERROR([Could not determine architecture.])]
+    [AC_MSG_ERROR([Could not determine architecture.])]
   )
 ])
 
@@ -250,7 +268,7 @@ AC_ARG_WITH([ca-store],
       [nss_cert8], [CA_STORE=3],
       [osx], [CA_STORE=4],
       [win], [CA_STORE=5],
-      [*], [AC_MSG_WARN(["Unknown CA store option '$withval'."])]
+      [AC_MSG_WARN(["Unknown CA store option '$withval'."])]
     )
   ])
 # Set default value according to the target system.
@@ -258,7 +276,7 @@ AC_ARG_WITH([ca-store],
 AS_IF([test $CA_STORE = -1], [
   AS_CASE([$host_os],
     [darwin*], [CA_STORE=4],
-    [*], [CA_STORE=1]
+    [CA_STORE=1]
   )
 ])
 AS_IF([test $CA_STORE = -1], [
@@ -278,14 +296,14 @@ AC_ARG_WITH([log-tgt],
       [auto], [LOG_TGT=-1],
       [dflt], [LOG_TGT=0],
       [osx], [LOG_TGT=1],
-      [*], [AC_MSG_WARN(["Unknown log target option '$withval'."])]
+      [AC_MSG_WARN(["Unknown log target option '$withval'."])]
     )
   ])
 # Set default value according to the target system.
 AS_IF([test $LOG_TGT = -1], [
   AS_CASE([$host_os],
     [darwin*], [LOG_TGT=1],
-    [*], [LOG_TGT=0]
+    [LOG_TGT=0]
   )
 ])
 AS_IF([test $LOG_TGT = -1], [

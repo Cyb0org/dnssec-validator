@@ -11,8 +11,8 @@ WORKDIRS = $(EMPTY)
 # FIXME: Different suffixes on differemt systems.
 if NPAPI_CORE
 NPAPI_TARGETS = \
-	np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI).so \
-	np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI).so
+	np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI)$(SO_SUFF) \
+	np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI)$(SO_SUFF)
 endif
 
 if STATIC_CORE
@@ -55,11 +55,11 @@ fb-compile-stamp: fb-projects-stamp WDFireBreath/projects
 	$(MAKE) -C WDFireBreath/build
 	touch $@
 
-np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI).so: fb-compile-stamp
-	$(INSTALL) -m 644 -s WDFireBreath/build/bin/$(NPAPI_PLUGIN_NAME_DNSSEC)/np$(NPAPI_PLUGIN_NAME_DNSSEC).so $@
+np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI)$(SO_SUFF): fb-compile-stamp
+	$(INSTALL) -m 644 -s WDFireBreath/build/bin/$(NPAPI_PLUGIN_NAME_DNSSEC)/np$(NPAPI_PLUGIN_NAME_DNSSEC)$(SO_SUFF) $@
 
-np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI).so: fb-compile-stamp
-	$(INSTALL) -m 644 -s WDFireBreath/build/bin/$(NPAPI_PLUGIN_NAME_TLSA)/np$(NPAPI_PLUGIN_NAME_TLSA).so $@
+np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI)$(SO_SUFF): fb-compile-stamp
+	$(INSTALL) -m 644 -s WDFireBreath/build/bin/$(NPAPI_PLUGIN_NAME_TLSA)/np$(NPAPI_PLUGIN_NAME_TLSA)$(SO_SUFF) $@
 
 CLEANFILES = \
 	fb-workdir-stamp \

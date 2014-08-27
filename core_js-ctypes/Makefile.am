@@ -1,8 +1,7 @@
 
 #ACLOCAL_AMFLAGS = -I $(top_srcdir)/m4
 
-# FIXME: Different suffixes on differemt systems.
-all: libDNSSECcore.so libDANEcore.so
+all: libDNSSECcore$(SO_SUFF) libDANEcore$(SO_SUFF)
 
 
 AM_CPPFLAGS = \
@@ -15,8 +14,10 @@ EXTRA_LTLIBRARIES = \
 
 
 CLEANFILES = \
-	libDNSSECcore.so \
-	libDANEcore.so
+	libDNSSECcore.la \
+	libDNSSECcore$(SO_SUFF) \
+	libDANEcore.la \
+	libDANEcore$(SO_SUFF)
 
 
 libDNSSECcore_la_SOURCES = \
@@ -115,8 +116,8 @@ libDANEcore_la_LDFLAGS += \
 endif
 
 
-libDNSSECcore.so: libDNSSECcore.la
-	$(INSTALL) -s -m 644 .libs/libDNSSECcore.so $@ # FIXME: Ugly
+libDNSSECcore$(SO_SUFF): libDNSSECcore.la
+	$(INSTALL) -s -m 644 .libs/libDNSSECcore$(SO_SUFF) $@ # FIXME: Ugly
 
-libDANEcore.so: libDANEcore.la
-	$(INSTALL) -s -m 644 .libs/libDANEcore.so $@ # FIXME: Ugly
+libDANEcore$(SO_SUFF): libDANEcore.la
+	$(INSTALL) -s -m 644 .libs/libDANEcore$(SO_SUFF) $@ # FIXME: Ugly

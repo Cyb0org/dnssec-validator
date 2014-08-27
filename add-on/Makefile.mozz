@@ -160,17 +160,17 @@ dtvmjc-ballast-stamp: $(dnssec_tlsa_validator_BALLAST_MOZZ)
 	done
 	touch $@
 
-_dtvmjc_workdir/platform/libDNSSECcore-$(OS_TARGET)-$(XPCOM_ABI).so: $(top_srcdir)/core_js-ctypes/libDNSSECcore.la
+_dtvmjc_workdir/platform/libDNSSECcore-$(OS_TARGET)-$(XPCOM_ABI)$(SO_SUFF): $(top_srcdir)/core_js-ctypes/libDNSSECcore.la
 	-rm -f $@
 	$(INSTALL) -d -m 755 _dtvmjc_workdir/platform
-	$(INSTALL) -s -m 644 $(top_srcdir)/core_js-ctypes/.libs/libDNSSECcore.so $@ # FIXME: Ugly
+	$(INSTALL) -s -m 644 $(top_srcdir)/core_js-ctypes/.libs/libDNSSECcore$(SO_SUFF) $@ # FIXME: Ugly
 
-_dtvmjc_workdir/platform/libDANEcore-$(OS_TARGET)-$(XPCOM_ABI).so: $(top_srcdir)/core_js-ctypes/libDANEcore.la
+_dtvmjc_workdir/platform/libDANEcore-$(OS_TARGET)-$(XPCOM_ABI)$(SO_SUFF): $(top_srcdir)/core_js-ctypes/libDANEcore.la
 	-rm -f $@
 	$(INSTALL) -d -m 755 _dtvmjc_workdir/platform
-	$(INSTALL) -s -m 644 $(top_srcdir)/core_js-ctypes/.libs/libDANEcore.so $@ # FIXME: Ugly
+	$(INSTALL) -s -m 644 $(top_srcdir)/core_js-ctypes/.libs/libDANEcore$(SO_SUFF) $@ # FIXME: Ugly
 
-MF-dnssec-validator-@VERSION@-js-ctypes.xpi: dtvmjc-jar-stamp dtvmjc-prefs-stamp dtvmjc-ballast-stamp _dtvmjc_workdir/platform/libDNSSECcore-$(OS_TARGET)-$(XPCOM_ABI).so _dtvmjc_workdir/platform/libDANEcore-$(OS_TARGET)-$(XPCOM_ABI).so
+MF-dnssec-validator-@VERSION@-js-ctypes.xpi: dtvmjc-jar-stamp dtvmjc-prefs-stamp dtvmjc-ballast-stamp _dtvmjc_workdir/platform/libDNSSECcore-$(OS_TARGET)-$(XPCOM_ABI)$(SO_SUFF) _dtvmjc_workdir/platform/libDANEcore-$(OS_TARGET)-$(XPCOM_ABI)$(SO_SUFF)
 	-rm -f $@
 	cd _dtvmjc_workdir; \
 	zip -r $@ COPYING README icon.png Version CHANGELOG platform defaults chrome install.rdf chrome.manifest; \
@@ -256,17 +256,17 @@ dtvmnp-ballast-stamp: $(dnssec_tlsa_validator_BALLAST_MOZZ)
 	done
 	touch $@
 
-_dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI).so: $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI).so
+_dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI)$(SO_SUFF): $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI)$(SO_SUFF)
 	-rm -f $@
 	$(INSTALL) -d -m 755 _dtvmnp_workdir/plugins
-	$(INSTALL) -s -m 644 $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI).so $@ # FIXME: Ugly
+	$(INSTALL) -s -m 644 $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI)$(SO_SUFF) $@ # FIXME: Ugly
 
-_dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI).so: $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI).so
+_dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI)$(SO_SUFF): $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI)$(SO_SUFF)
 	-rm -f $@
 	$(INSTALL) -d -m 755 _dtvmnp_workdir/plugins
-	$(INSTALL) -s -m 644 $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI).so $@ # FIXME: Ugly
+	$(INSTALL) -s -m 644 $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI)$(SO_SUFF) $@ # FIXME: Ugly
 
-MF-dnssec-validator-@VERSION@-npapi.xpi: dtvmnp-jar-stamp dtvmnp-prefs-stamp dtvmnp-ballast-stamp _dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI).so _dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI).so
+MF-dnssec-validator-@VERSION@-npapi.xpi: dtvmnp-jar-stamp dtvmnp-prefs-stamp dtvmnp-ballast-stamp _dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI)$(SO_SUFF) _dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI)$(SO_SUFF)
 	-rm -f $@
 	cd _dtvmnp_workdir; \
 	zip -r $@ COPYING README icon.png Version CHANGELOG plugins defaults chrome install.rdf chrome.manifest; \
