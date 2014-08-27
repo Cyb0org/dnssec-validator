@@ -121,8 +121,8 @@ cp ../chrome_dnssec_validator.pem ${TEMP_DIR}/chrome_dnssec_validator.pem
 rm ${TEMP_DIR}/chrome_dnssec_validator.pem
 #
 cd ${TEMP_DIR}; tar -czf "${TARGZ_FILE}" cz.nic.validator.dnssec.json.in dnssec-plug dnssec-pkg.crx; cd ..
-cp "${SCRIPT_STUB}" "${TARGET_DNSSEC}"
-echo "PAYLOAD:" >> "${TARGET_DNSSEC}"
+cp "${SCRIPT_STUB}" "${PACKAGES_DIR}/${TARGET_DNSSEC}"
+echo "PAYLOAD:" >> "${PACKAGES_DIR}/${TARGET_DNSSEC}"
 cat "${TEMP_DIR}/${TARGZ_FILE}" >> "${PACKAGES_DIR}/${TARGET_DNSSEC}"
 chmod +x "${PACKAGES_DIR}/${TARGET_DNSSEC}"
 rm -f ${TARGZ_FILE}
@@ -153,8 +153,8 @@ cp ../chrome_tlsa_validator.pem ${TEMP_DIR}/chrome_tlsa_validator.pem
 rm ${TEMP_DIR}/chrome_tlsa_validator.pem
 #
 cd ${TEMP_DIR}; tar -czf "${TARGZ_FILE}" cz.nic.validator.tlsa.json.in dane-plug tlsa-pkg.crx; cd ..
-cp "${SCRIPT_STUB}" "${TARGET_TLSA}"
-echo "PAYLOAD:" >> "${TARGET_TLSA}"
+cp "${SCRIPT_STUB}" "${PACKAGES_DIR}/${TARGET_TLSA}"
+echo "PAYLOAD:" >> "${PACKAGES_DIR}/${TARGET_TLSA}"
 cat "${TEMP_DIR}/${TARGZ_FILE}" >> "${PACKAGES_DIR}/${TARGET_TLSA}"
 chmod +x "${PACKAGES_DIR}/${TARGET_TLSA}"
 
