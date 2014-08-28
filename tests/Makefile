@@ -52,6 +52,8 @@ endif
 
 TARGETS += dane-plug dnssec-plug checkDNSSEClib checkDANElib
 
+CLEANFILES += dane-plug* dnssec-plug*
+
 all: $(TARGETS)
 
 run: all
@@ -62,25 +64,25 @@ checkDNSSEClib.o: checkDNSSEClib.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/DNSSECValidatorPlugin
 
 checkDNSSEClib: checkDNSSEClib.o libDNSSECcore-$(OSNAME)-$(HWARCH).$(SHLIB_SUFF)
-	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDNSSECcore-$(OSNAME)-$(HWARCH)
+	$(CC) $^ -o $@ $(CFLAGS) -L. -Wl,-rpath,. -lDNSSECcore-$(OSNAME)-$(HWARCH)
 
 dnssec-main.o: ../plugin-source/DNSSECValidatorPlugin/dnssec-main.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
 dnssec-plug: dnssec-main.o dnssec-plug.o common.o $(LOG_OBJ) $(STATIC_LIBS)
-	$(CC) $^ -o $@ $(LDFLAGS)
+	$(CC) $^ -o $@ $(LDFLAGS) $(CFLAGS)
 
 checkDANElib.o: checkDANElib.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD) -I../plugin-source/TLSAValidatorPlugin
 
 checkDANElib: checkDANElib.o libDANEcore-$(OSNAME)-$(HWARCH).$(SHLIB_SUFF)
-	$(CC) $^ -o $@ -L. -Wl,-rpath,. -lDANEcore-$(OSNAME)-$(HWARCH)
+	$(CC) $^ -o $@ $(CFLAGS) -L. -Wl,-rpath,. -lDANEcore-$(OSNAME)-$(HWARCH)
 
 dane-main.o: ../plugin-source/TLSAValidatorPlugin/dane-main.c
 	$(CC) -c $< -o $@ $(CPPFLAGS) $(CFLAGS) $(CFLAGS_STD)
 
 dane-plug: dane-main.o dane-plug.o common.o $(CA_STORE_OBJ) $(LOG_OBJ) $(STATIC_LIBS)
-	$(CC) $^ -o $@ $(LDFLAGS)
+	$(CC) $^ -o $@ $(LDFLAGS) $(CFLAGS)
 
 
 #PUGIN_INCLUDES := -I$(OPENSSL_LIB)/include -I$(LDNS_LIB)/include -I$(UNBOUND_LIB)/include

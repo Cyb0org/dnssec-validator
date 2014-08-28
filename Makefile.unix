@@ -50,13 +50,13 @@ JSCTYPES_PLUGIN_NAME_DANE = libDANEcore-$(OSNAME)
 # Rather use LIBRARY_LOC.
 #CMAKE_LIBRARY_PATH_FLAG = /usr/local/lib
 
-.PHONY: clean sys_$(OSNAME)_x86 sys_$(OSNAME)_x86_64 npapi_x86 npapi_x86_64 js-ctypes_x86 js-ctypes_x86_64 xpi_x86 xpi_x86_64
+.PHONY: clean sys_$(OSNAME)_x86 sys_$(OSNAME)_x86_64 npapi_x86 npapi_x86_64 js-ctypes_x86 js-ctypes_x86_64 native-messaging_x86 native-messaging_x86_64 xpi_x86 xpi_x86_64
 
 #all: sys_$(OSNAME)_x86 sys_$(OSNAME)_x86_64 xpi_x86 xpi_x86_64
 
-sys_$(OSNAME)_x86: npapi_x86 js-ctypes_x86
+sys_$(OSNAME)_x86: npapi_x86 js-ctypes_x86 native-messaging_x86
 
-sys_$(OSNAME)_x86_64: npapi_x86_64 js-ctypes_x86_64
+sys_$(OSNAME)_x86_64: npapi_x86_64 js-ctypes_x86_64 native-messaging_x86_64
 
 npapi_x86:
 	@echo '### ...Creating NPAPI plugin library for $(OSNAME) x86... ###'
@@ -85,6 +85,15 @@ js-ctypes_x86:
 	strip $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x86.so
 	$(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x86 clean
 	@echo '### ...js-ctypes plugin x86 $(OSNAME) ... Done. ###'
+
+native-messaging_x86:
+	@echo '### ...Creating native messaging plugin for $(OSNAME) x86... ###'
+	$(MAKE_CMD) -C tests clean
+	CFLAGS="$(CFLAGS)" $(MAKE_CMD) -C tests OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x86 all
+	-rm -f tests/*.o
+	strip tests/dnssec-plug*
+	strip tests/dane-plug*
+	@echo '### ...native messaging plugin x86 $(OSNAME) ... Done. ###'
 
 xpi_x86:
 	@echo '### Creating NPAPI package for Firefox $(OSNAME) x86... ###'
@@ -189,6 +198,15 @@ js-ctypes_x86_64:
 	strip $(PLUGIN_NAME_LIB)/$(JSCTYPES_PLUGIN_NAME_DANE)-x86_64.so
 	$(MAKE_CMD) -C core_js-ctypes OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x86_64 clean
 	@echo '### ...js-ctypes plugin x86_64 $(OSNAME) ... Done. ###'
+
+native-messaging_x86_64:
+	@echo '### ...Creating native messaging plugin for $(OSNAME) x86_64... ###'
+	$(MAKE_CMD) -C tests clean
+	CFLAGS="$(CFLAGS)" $(MAKE_CMD) -C tests OSNAME=$(OSNAME) OSNAME_LC=$(OSNAME_LC) MAKE_CMD=$(MAKE_CMD) INCLUDE_LOC=$(INCLUDE_LOC) LIBRARY_LOC=$(LIBRARY_LOC) STATIC_LINKING=$(STATIC_LINKING) HWARCH=x86_64 all
+	-rm -f tests/*.o
+	strip tests/dnssec-plug*
+	strip tests/dane-plug*
+	@echo '### ...native messaging plugin x86_64 $(OSNAME) ... Done. ###'
 
 xpi_x86_64:
 	@echo '### Creating NPAPI package for Firefox $(OSNAME) x86_64... ###'

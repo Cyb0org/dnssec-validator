@@ -156,10 +156,12 @@ CPPFLAGS += -DVERSION="\"$(VERSION)\""
 
 TARGETS = libDNSSECcore-$(OSNAME)-$(HWARCH).$(SHLIB_SUFF) libDANEcore-$(OSNAME)-$(HWARCH).$(SHLIB_SUFF)
 
+CLEANFILES = $(EMPTY)
+
 all: $(TARGETS)
 
 clean:
-	rm -f *.o $(TARGETS)
+	rm -f *.o $(TARGETS) $(CLEANFILES)
 
 ## Separate test builds
 
