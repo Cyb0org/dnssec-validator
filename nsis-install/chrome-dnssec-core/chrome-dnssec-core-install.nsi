@@ -8,8 +8,8 @@ SetCompressor /solid /final lzma
 !include ReplaceInFile.nsh
 !include StrRep.nsh
 
-!define VERSION "2.1.2"
-!define QUADVERSION "2.1.2.0"
+!define VERSION "2.2.0"
+!define QUADVERSION "2.2.0.0"
 !define guid '{669695BC-A811-4A9D-8CDF-BA8C795F261A}'
 !define PROGRAM_NAME "Chrome DNSSEC Validator"
 outFile "Chrome-dnssec-validator-core-${VERSION}.exe"
