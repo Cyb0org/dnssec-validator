@@ -83,6 +83,7 @@ tvcnm-ballast-stamp: $(tlsa_validator_BALLAST_CR)
 # FIXME -- tvcnm-directory-stamp is only a temporary solution.
 tvcnm-directory-stamp: tvcnm-locales-stamp tvcnm-content-stamp tvcnm-ballast-stamp $(top_srcdir)/add-on/chrome-tlsa/native-msg/cz.nic.validator.tlsa.json.in
 	$(INSTALL) -m 644 $(top_srcdir)/add-on/chrome-tlsa/native-msg/cz.nic.validator.tlsa.json.in _dtvcnm_workdir
+	-rm -f $(top_srcdir)/core_native-msg/*.o
 	$(INSTALL) -m 755 $(top_srcdir)/core_native-msg/dane-plug* _dtvcnm_workdir
 	touch $@
 

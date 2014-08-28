@@ -163,12 +163,14 @@ dtvmjc-ballast-stamp: $(dnssec_tlsa_validator_BALLAST_MOZZ)
 _dtvmjc_workdir/platform/libDNSSECcore-$(OS_TARGET)-$(XPCOM_ABI)$(SO_SUFF): $(top_srcdir)/core_js-ctypes/libDNSSECcore.la
 	-rm -f $@
 	$(INSTALL) -d -m 755 _dtvmjc_workdir/platform
-	$(INSTALL) -s -m 644 $(top_srcdir)/core_js-ctypes/.libs/libDNSSECcore$(SO_SUFF) $@ # FIXME: Ugly
+	$(INSTALL) -m 644 $(top_srcdir)/core_js-ctypes/.libs/libDNSSECcore$(SO_SUFF) $@ # FIXME: Ugly
+	$(STRIP) $@
 
 _dtvmjc_workdir/platform/libDANEcore-$(OS_TARGET)-$(XPCOM_ABI)$(SO_SUFF): $(top_srcdir)/core_js-ctypes/libDANEcore.la
 	-rm -f $@
 	$(INSTALL) -d -m 755 _dtvmjc_workdir/platform
-	$(INSTALL) -s -m 644 $(top_srcdir)/core_js-ctypes/.libs/libDANEcore$(SO_SUFF) $@ # FIXME: Ugly
+	$(INSTALL) -m 644 $(top_srcdir)/core_js-ctypes/.libs/libDANEcore$(SO_SUFF) $@ # FIXME: Ugly
+	$(STRIP) $@
 
 MF-dnssec-validator-@VERSION@-js-ctypes.xpi: dtvmjc-jar-stamp dtvmjc-prefs-stamp dtvmjc-ballast-stamp _dtvmjc_workdir/platform/libDNSSECcore-$(OS_TARGET)-$(XPCOM_ABI)$(SO_SUFF) _dtvmjc_workdir/platform/libDANEcore-$(OS_TARGET)-$(XPCOM_ABI)$(SO_SUFF)
 	-rm -f $@
@@ -256,17 +258,29 @@ dtvmnp-ballast-stamp: $(dnssec_tlsa_validator_BALLAST_MOZZ)
 	done
 	touch $@
 
-_dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI)$(SO_SUFF): $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI)$(SO_SUFF)
-	-rm -f $@
+dtvmnp-dnssec-core-stamp:
 	$(INSTALL) -d -m 755 _dtvmnp_workdir/plugins
-	$(INSTALL) -s -m 644 $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI)$(SO_SUFF) $@ # FIXME: Ugly
+	if [ -d $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin ]; then \
+		cp -R $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin _dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin; \
+	elif [ -f $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI)$(SO_SUFF) ]; then \
+		$(INSTALL) -m 644 $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI)$(SO_SUFF) _dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI)$(SO_SUFF); \
+	else \
+		false; \
+	fi
+	touch $@
 
-_dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI)$(SO_SUFF): $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI)$(SO_SUFF)
-	-rm -f $@
+dtvmnp-tlsa-core-stamp:
 	$(INSTALL) -d -m 755 _dtvmnp_workdir/plugins
-	$(INSTALL) -s -m 644 $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI)$(SO_SUFF) $@ # FIXME: Ugly
+	if [ -d $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_TLSA).plugin ]; then \
+		cp -R $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_TLSA).plugin _dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_TLSA).plugin; \
+	elif [ -f $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI)$(SO_SUFF) ]; then \
+		$(INSTALL) -m 644 $(top_srcdir)/core_npapi/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI)$(SO_SUFF) _dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI); \
+	else \
+		false; \
+	fi
+	touch $@
 
-MF-dnssec-validator-@VERSION@-npapi.xpi: dtvmnp-jar-stamp dtvmnp-prefs-stamp dtvmnp-ballast-stamp _dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI)$(SO_SUFF) _dtvmnp_workdir/plugins/np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI)$(SO_SUFF)
+MF-dnssec-validator-@VERSION@-npapi.xpi: dtvmnp-jar-stamp dtvmnp-prefs-stamp dtvmnp-ballast-stamp dtvmnp-dnssec-core-stamp dtvmnp-tlsa-core-stamp
 	-rm -f $@
 	cd _dtvmnp_workdir; \
 	zip -r $@ COPYING README icon.png Version CHANGELOG plugins defaults chrome install.rdf chrome.manifest; \
@@ -283,6 +297,8 @@ CLEANFILES += \
 	dtvmnp-jar-stamp \
 	dtvmnp-prefs-stamp \
 	dtvmnp-ballast-stamp \
+	dtvmnp-dnssec-core-stamp \
+	dtvmnp-tlsa-core-stamp \
 	MF-dnssec-validator-@VERSION@-npapi.xpi
 
 endif

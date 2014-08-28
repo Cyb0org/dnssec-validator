@@ -22,12 +22,14 @@ AH_BOTTOM([#endif /* !_CONFIG_H_ */])
 PASSED_CPPFLAGS="$CPPFLAGS"
 PASSED_CFLAGS="$CFLAGS"
 PASSED_CXXFLAGS="$CXXFLAGS"
+PASSED_OBJCFLAGS="$OBJCFLAGS"
 PASSED_LDFLAGS="$LDFLAGS"
 #PASSED_LIBS="$LIBS"
 # Default flags
 CORE_CPPFLAGS="$PASSED_CPPFLAGS"
 CORE_CFLAGS="$PASSED_CFLAGS -Wall -Wextra -pedantic -std=c99 -Wno-variadic-macros"
 CORE_CXXFLAGS="$PASSED_CXXFLAGS -Wall -Wextra -pedantic -std=c++98 -Wno-variadic-macros -fno-exceptions -fno-rtti -fno-common"
+CORE_OBJCFLAGS="$PASSED_OBJCFLAGS -Wall -Wextra -pedantic"
 CORE_LDFLAGS="$PASSED_LDFLAGS"
 CORE_LIBS=""
 
@@ -51,6 +53,7 @@ AS_IF([test "x$enable_debug" = "xyes"], [
 AC_SUBST(CORE_CPPFLAGS)
 AC_SUBST(CORE_CFLAGS)
 AC_SUBST(CORE_CXXFLAGS)
+AC_SUBST(CORE_OBJCFLAGS)
 AC_SUBST(CORE_LDFLAGS)
 AC_SUBST(CORE_LIBS)
 
@@ -74,7 +77,7 @@ LT_INIT
 # Set Mozilla OS_TARGET
 # https://developer.mozilla.org/en-US/docs/OS_TARGET
 AS_CASE([$host_os],
-  [darwin*], [OS_NAME=Darwin],
+  [darwin*], [OS_TARGET=Darwin],
   [linux*], [OS_TARGET=Linux],
   [freebsd*], [OS_TARGET=FreeBSD],
   [dragonfly*], [OS_TARGET=DragonFly],
@@ -155,18 +158,19 @@ AS_IF([test "x$enable_static_linking" = "xyes"], [
   CORE_CPPFLAGS+=' -I$(top_srcdir)/libs-built/unbound/include'
 
   LIB_CFLAGS=""
+  LIB_OBJCFLAGS=""
   OPENSSL_ARGS=""
   CONFIGURE_ARGS=""
   AS_CASE([$host_os],
     [darwin*], [
       AS_CASE([${BITS}],
         [32], [
-          CONFIGURE_ARGS="--target=i686-pc-linux-gnu"
+          CONFIGURE_ARGS=""
           LIB_CFLAGS="-fPIC -m32"
           OPENSSL_ARGS="darwin-i386-cc ${LIB_CFLAGS}"
         ],
         [64], [
-          CONFIGURE_ARGS="--target=x86_64-pc-linux-gnu"
+          CONFIGURE_ARGS=""
           LIB_CFLAGS="-fPIC -m64"
           OPENSSL_ARGS="darwin64-x86_64-cc ${LIB_CFLAGS}"
         ],
@@ -199,6 +203,7 @@ AS_IF([test "x$enable_static_linking" = "xyes"], [
     ]
   )
   AC_SUBST(LIB_CFLAGS)
+  AC_SUBST(LIB_OBJCFLAGS)
   AC_SUBST(OPENSSL_ARGS)
   AC_SUBST(CONFIGURE_ARGS)
 

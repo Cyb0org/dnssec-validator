@@ -82,6 +82,7 @@ dvcnm-ballast-stamp: $(dnssec_validator_BALLAST_CR)
 # FIXME -- dvcnm-directory-stamp is only a temporary solution.
 dvcnm-directory-stamp: dvcnm-locales-stamp dvcnm-content-stamp dvcnm-ballast-stamp $(top_srcdir)/add-on/chrome-dnssec/native-msg/cz.nic.validator.dnssec.json.in
 	$(INSTALL) -m 644 $(top_srcdir)/add-on/chrome-dnssec/native-msg/cz.nic.validator.dnssec.json.in _dtvcnm_workdir
+	-rm -f $(top_srcdir)/core_native-msg/*.o
 	$(INSTALL) -m 755 $(top_srcdir)/core_native-msg/dnssec-plug* _dtvcnm_workdir
 	touch $@
 
