@@ -1,6 +1,8 @@
 
 #ACLOCAL_AMFLAGS = -I $(top_srcdir)/m4
 
+include Makefile.core
+
 all: libDNSSECcore$(SO_SUFF) libDANEcore$(SO_SUFF)
 
 
@@ -8,6 +10,9 @@ AM_CPPFLAGS = \
 	-include $(top_srcdir)/plugin-source/config.h \
 	@CORE_CPPFLAGS@ \
 	-I$(top_srcdir)/plugin-source/common/
+
+AM_CFLAGS = \
+	@CORE_CFLAGS@
 
 
 EXTRA_LTLIBRARIES = \
@@ -23,24 +28,13 @@ CLEANFILES = \
 
 
 libDNSSECcore_la_SOURCES = \
-	$(top_srcdir)/plugin-source/common/common.c \
-	$(top_srcdir)/plugin-source/common/common.h \
-	$(top_srcdir)/plugin-source/common/log.h \
-	$(top_srcdir)/plugin-source/DNSSECValidatorPlugin/dnssec-plug.c
-
-if LOG_DFLT
-libDNSSECcore_la_SOURCES += \
-	$(top_srcdir)/plugin-source/common/log_dflt.c
-endif
-if LOG_OSX
-libDNSSECcore_la_SOURCES += \
-	$(top_srcdir)/plugin-source/common/log_osx.m
-endif
+	$(DNSSEC_CORE_SRCS)
 
 libDNSSECcore_la_LDFLAGS = \
 	-avoid-version \
 	-export-symbols-regex "^(dnssec)_" \
 	-rpath "/usr/lib" \
+	-shared \
 	@CORE_LDFLAGS@
 
 libDNSSECcore_la_LIBADD = \
@@ -61,37 +55,13 @@ endif
 
 
 libDANEcore_la_SOURCES = \
-	$(top_srcdir)/plugin-source/common/common.c \
-	$(top_srcdir)/plugin-source/common/common.h \
-	$(top_srcdir)/plugin-source/common/log.h \
-	$(top_srcdir)/plugin-source/TLSAValidatorPlugin/dane-plug.c
-
-if CA_STORE_DIR
-libDANEcore_la_SOURCES += \
-	$(top_srcdir)/plugin-source/TLSAValidatorPlugin/ca_store_directory.c
-endif
-if CA_STORE_NSS
-libDANEcore_la_SOURCES += \
-	$(top_srcdir)/plugin-source/TLSAValidatorPlugin/ca_store_nss.c
-endif
-if CA_STORE_OSX
-libDANEcore_la_SOURCES += \
-	$(top_srcdir)/plugin-source/TLSAValidatorPlugin/ca_store_osx.m
-endif
-
-if LOG_DFLT
-libDANEcore_la_SOURCES += \
-	$(top_srcdir)/plugin-source/common/log_dflt.c
-endif
-if LOG_OSX
-libDANEcore_la_SOURCES += \
-	$(top_srcdir)/plugin-source/common/log_osx.m
-endif
+	$(DANE_CORE_SRCS)
 
 libDANEcore_la_LDFLAGS = \
 	-avoid-version \
 	-export-symbols-regex "^(dane)_" \
 	-rpath "/usr/lib" \
+	-shared \
 	@CORE_LDFLAGS@
 
 libDANEcore_la_LIBADD = \

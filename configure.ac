@@ -65,7 +65,6 @@ AC_PROG_MAKE_SET # Set make command.
 AC_PROG_MKDIR_P # mkdir -p
 AC_PROG_OBJC # OS X only.
 AC_PROG_SED
-AC_PROG_STRIP
 
 # Checks for libraries.
 AC_PROG_LIBTOOL
@@ -222,7 +221,7 @@ AS_IF([test "x$enable_static_linking" = "xyes"], [
   AX_PTHREAD([
     AC_DEFINE(HAVE_PTHREAD, 1, [Define to 1 if libpthread available.])
     CFLAGS=" $PTHREAD_CFLAGS $CFLAGS"
-    LDFLAGS=" $LDFLAGS"
+    LDFLAGS=" $LDFLAGS $PTHREAD_CFLAGS"
     LIBS=" $PTHREAD_LIBS $LIBS"
     CC="$PTHREAD_CC"
 
