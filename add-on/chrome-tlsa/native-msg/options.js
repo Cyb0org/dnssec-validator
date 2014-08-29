@@ -3,34 +3,36 @@ Copyright 2014 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz>
 
-This file is part of DNSSEC/TLSA Validator 2.x Add-on.
+This file is part of TLSA Validator 2.x Add-on.
 
-DNSSEC Validator 2.x Add-on is free software: you can redistribute it and/or
+TLSA Validator 2.x Add-on is free software: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or (at your
 option) any later version.
 
-DNSSEC/TLSA Validator 2.x Add-on is distributed in the hope that it will be useful,
+TLSA Validator 2.x Add-on is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 more details.
 
 You should have received a copy of the GNU General Public License along with
-DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
+TLSA Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-var defaultResolver = "nofwd"; // LDNS will use system resolver if empty string is passed
+
+var defaultResolver = "nofwd";
 var defaultCustomResolver = "217.31.204.130";
-// debug pretext
 var DANE = "DANE: ";
-// enable print debug info into debug console
 var debuglogout = false;
+var initplugin = false;
+var port = null;
 
 
 //--------------------------------------------------------
 // Set string in the web element
 //--------------------------------------------------------
 function addText(id, str){
+
 	if (document.createTextNode){
 		var tn = document.createTextNode(str);
 		document.getElementById(id).appendChild(tn);
@@ -42,6 +44,7 @@ function addText(id, str){
 // text bool value from LocalStorage to bool
 //--------------------------------------------------------
 function StringToBool(value) {
+
 	if (value == undefined) return false;
 	else if (value == "false") return false;
 	else if (value == "true") return true;
@@ -53,11 +56,13 @@ function StringToBool(value) {
 // check correct format of IP addresses in the textarea
 //--------------------------------------------------------
 function test_ip(ip) {
+
 	var expression = /((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(@\d{1,5})?\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?(@\d{1,5})?\s*$))/;
 
 	var match = ip.match(expression);
 	return match != null;
 }
+
 
 //--------------------------------------------------------
 // check correct format of IP addresses in the textarea
@@ -74,14 +79,17 @@ function checkOptdnsserveraddr(str) {
 	return true;
 }
 
+
 //--------------------------------------------------------
 // check correct format of domain and TLD in the textarea
 //--------------------------------------------------------
 function checkdomainlist() {
+
 	var str = document.getElementById("domainlist").value;
 	var match = str.match(/^[a-z0-9.-]+(, [a-z0-9.-]+)*$/);
 	return match != null;
 }
+
 
 //--------------------------------------------------------
 // Cancel settings without saving on the localstorage
@@ -91,10 +99,12 @@ function cancelOptions() {
 	window.close();
 }
 
+
 //--------------------------------------------------------
 // Save settings on the localstorage
 //--------------------------------------------------------
 function saveOptions() {
+
 	var radiogroup = document.tlsaSettings.resolver;
 	var resolver;
 	for (var i = 0; i < radiogroup.length; i++) {
@@ -104,6 +114,7 @@ function saveOptions() {
 			    break;
 		}
 	}
+
 	localStorage["dnssecResolver"] = resolver;
 	localStorage["dnssecCustomResolver"] = document.tlsaSettings.customResolver.value;
 	localStorage["DebugOutput"] = document.tlsaSettings.DebugOutput.checked;
@@ -113,10 +124,34 @@ function saveOptions() {
 	localStorage["AllHttps"] = document.tlsaSettings.AllHttps.checked;
 	localStorage["domainlist"] = document.tlsaSettings.domainlist.value;
 	localStorage["deltlsactx"] = true;
+	localStorage["cachefree"] = true;
+
+	if (initplugin) {	
+		port.postMessage("finish");
+	}
+
 	document.write("<div>Settings were saved...</div>");
 	document.write("<div>Please, close this window...Thanks</div>");
-	localStorage["cachefree"] = true;
 	window.close();
+}
+
+
+//--------------------------------------------------------
+// reset elements on the settings page
+//--------------------------------------------------------
+function resetTesting() {
+
+	var elems = document.getElementsByTagName('input');
+	var len = elems.length;
+
+	for (var i = 0; i < len; i++) {
+    		elems[i].disabled = false;
+	}
+
+	document.getElementById("actionimg").style.display = 'none';
+	document.getElementById("testbutton").style.display = 'block';
+	document.getElementById("testbutton").value = 
+	    chrome.i18n.getMessage("testbutton");
 }
 
 
@@ -124,43 +159,48 @@ function saveOptions() {
 // Callback to handle native message response.
 //--------------------------------------------------------
 function handle_test_response(resp) {
+
 	var retval = resp.split("~");
-	var testnic = retval[4];
 
-	if (debuglogout) {
-		console.log(DANE + "Received response:" + resp + " " + testnic);
-	}
+	switch (retval[0]) {
 
-	if (testnic == 13) {
-		document.getElementById("messageok").style.display = 'block';
-		document.getElementById("messagebogus").style.display = 'none';
-		document.getElementById("messageerror").style.display = 'none';
-		document.getElementById("messageip").style.display = 'none';
-	}
-	else if (testnic == 16) {
-		document.getElementById("messageok").style.display = 'none';
-		document.getElementById("messagebogus").style.display = 'block';
-		document.getElementById("messageerror").style.display = 'none';
-		document.getElementById("messageip").style.display = 'none';
-	}
-	else {
-		document.getElementById("messageok").style.display = 'none';
-		document.getElementById("messagebogus").style.display = 'none';
-		document.getElementById("messageerror").style.display = 'block';
-		document.getElementById("messageip").style.display = 'none';
-	}
+	case "initialiseRet":
+		initplugin = true;
+		if (debuglogout) {
+			console.log(DANE
+			    + "Load TLSA native messaging core");
+		}
+		break;
 
-	var elems = document.getElementsByTagName('input');
-	var len = elems.length;
+	case "validateRet":
+		var testnic = retval[4];
 
-	for (var i = 0; i < len; i++) {
-	    elems[i].disabled = false;
+		if (debuglogout) {
+			console.log(DANE + "Received response:" + resp + " " + testnic);
+		}
+
+		if (testnic == 13) {
+			document.getElementById("messageok").style.display = 'block';
+			document.getElementById("messagebogus").style.display = 'none';
+			document.getElementById("messageerror").style.display = 'none';
+			document.getElementById("messageip").style.display = 'none';
+		} else if (testnic == 16) {
+			document.getElementById("messageok").style.display = 'none';
+			document.getElementById("messagebogus").style.display = 'block';
+			document.getElementById("messageerror").style.display = 'none';
+			document.getElementById("messageip").style.display = 'none';
+		} else {
+			document.getElementById("messageok").style.display = 'none';
+			document.getElementById("messagebogus").style.display = 'none';
+			document.getElementById("messageerror").style.display = 'block';
+			document.getElementById("messageip").style.display = 'none';
+		}
+
+		resetTesting();
+		break;
+	default:
+		break;
 	}
-
-	document.getElementById("actionimg").style.display = 'none';
-	document.getElementById("testbutton").style.display = 'block';
-	document.getElementById("testbutton").value = 
-		chrome.i18n.getMessage("testbutton");
 }
 
 
@@ -174,7 +214,7 @@ function testdnssec() {
 	var len = elems.length;
 
 	for (var i = 0; i < len; i++) {
-	    elems[i].disabled = true;
+		elems[i].disabled = true;
 	}
 
 	document.getElementById("messageok").style.display = 'none';
@@ -199,26 +239,26 @@ function testdnssec() {
 		var child = radiogroup[i];
 		if (child.checked == true) {
 			switch (i) {
-				case 0: // System setting
-					nameserver = "sysresolver";
-					chioce = 0;
-					break;
-				case 1: // Custom
-					chioce = 1;
-					if (!checkOptdnsserveraddr(tmp)) {
-						ip = true;
-					} else {
-						nameserver = tmp;
-					}
-					break;
-				case 2: // NOFWD
-					chioce = 2;
-					nameserver = "nofwd";
-					options = 5;
-					break;
-			} //switch
-		} // if
-	} // for
+			case 0: // System setting
+				nameserver = "sysresolver";
+				chioce = 0;
+				break;
+			case 1: // Custom
+				chioce = 1;
+				if (!checkOptdnsserveraddr(tmp)) {
+					ip = true;
+				} else {
+					nameserver = tmp;
+				}
+				break;
+			case 2: // NOFWD
+				chioce = 2;
+				nameserver = "nofwd";
+				options = 5;
+				break;
+			}
+		}
+	}
 
 	if (ip) {
 
@@ -226,7 +266,7 @@ function testdnssec() {
 		var len = elems.length;
 
 		for (var i = 0; i < len; i++) {
-		    elems[i].disabled = false;
+			elems[i].disabled = false;
 		}
 
 		document.getElementById("messageok").style.display = 'none';
@@ -235,11 +275,12 @@ function testdnssec() {
 		document.getElementById("messageip").style.display = 'block';
 		document.getElementById("actionimg").style.display = 'none';
 		document.getElementById("testbutton").style.display = 'block';
-	
 		document.getElementById("testbutton").value = 
 			chrome.i18n.getMessage("testbutton");
-	}
-	else {
+	} else {
+
+		port.postMessage("initialise");
+
 		var queryParams = "validate" + '~' + options + '~' + nameserver 
 				+ '~' + dn + '~443~tcp~3~noTab~https';
 
@@ -247,24 +288,16 @@ function testdnssec() {
 			console.log(DANE + queryParams);
 		}
 
-		var port = chrome.runtime.connectNative(
-		    "cz.nic.validator.tlsa");
-		port.onMessage.addListener(handle_test_response);
-		port.onDisconnect.addListener(function() {
-			if (debuglogout) {
-				console.log(DANE + "Helper host disconnected.");
-			}
-		});
 		port.postMessage(queryParams);
-		port.postMessage("finish");
-	}//if ip
+	}
 }
 
 
 //--------------------------------------------------------
-// help function for clear TLSA localestorage
+// help function for clear TLSA localestorage, not use.
 //--------------------------------------------------------
 function eraseOptions() {
+
 	localStorage.removeItem("dnssecResolver");
 	localStorage.removeItem("dnssecCustomResolver");
 	localStorage.removeItem("DebugOutput");	
@@ -315,6 +348,7 @@ function RefreshExclude() {
 // Replaces onclick for the option buttons
 //--------------------------------------------------------
 window.onload = function(){
+
 	document.querySelector('input[id="savebutton"]').onclick = saveOptions;
 	document.querySelector('input[id="testbutton"]').onclick = testdnssec;
 	document.querySelector('input[id="cancelbutton"]').onclick = cancelOptions;
@@ -324,10 +358,12 @@ window.onload = function(){
 	domainfilteron[0].onchange = RefreshExclude; 
 }
 
+
 //--------------------------------------------------------
 // show DNSSEC text about resover settings
 //--------------------------------------------------------
 function testinfodisplay(state){
+
 	if (state == 0) {
 		document.getElementById("messageok").style.display = 'none';
 		document.getElementById("messagebogus").style.display = 'none';
@@ -365,6 +401,8 @@ function testinfodisplay(state){
 // Settings window initialization
 //--------------------------------------------------------
 window.addEventListener('load',function() {
+
+	debuglogout = StringToBool(localStorage["DebugOutput"]);
 
 	resultRegexp = /\?([^?,]+),([^,]+),([^,]+)$/;
 	matches = resultRegexp.exec(document.location.href);
@@ -461,8 +499,7 @@ window.addEventListener('load',function() {
 				    break;
 			}
 		}
-	}
-	else {
+	} else {
 		localStorage["deltlsactx"] = false;
 
 
@@ -509,7 +546,35 @@ window.addEventListener('load',function() {
 		}
 		DebugOutput = (DebugOutput == undefined || DebugOutput == "false") ? false : true;
 		document.tlsaSettings.DebugOutput.checked = DebugOutput;		
-	}  //state
+	}
+
+	document.getElementById("testbutton").disabled = true;
+
+	port = chrome.runtime.connectNative("cz.nic.validator.tlsa");
+	port.onMessage.addListener(handle_test_response);
+	port.onDisconnect.addListener(function() {
+		if (debuglogout) {
+			console.log(DANE + "Helper host disconnected.");
+		}
+	});
+
+	port.postMessage("initialise");
+
+	setTimeout(function() {
+		if (!initplugin) {
+			document.getElementById("messageerror").innerHTML = "";
+			addText("messageerror", chrome.i18n.getMessage("dm_nopluginInfo"));
+			document.getElementById("testbutton").style.display = 'none';
+			document.getElementById("messageerror").style.display = 'block';
+			if (debuglogout) {
+				console.log(DANE
+			 	   + "Cannot load TLSA native messaging core!");
+			}
+		} else {
+			document.getElementById("testbutton").disabled = false;
+		}
+	}, 1000);
+
 });
 
 

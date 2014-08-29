@@ -114,6 +114,7 @@ var dnssecModes = {
 // return OS name
 //****************************************************************
 function GetOS() {
+
 	var OSName = "Unknown";
 
 	if (navigator.appVersion.indexOf("Win")!= -1) OSName = "Windows";
@@ -147,6 +148,7 @@ function GetOS() {
 // text bool value from LocalStorage to bool
 //****************************************************************
 function StringToBool(value) {
+
 	if (value == undefined) return false;
 	else if (value == "false") return false;
 	else if (value == "true") return true;
@@ -158,6 +160,7 @@ function StringToBool(value) {
 // this function sets DNSSEC mode, ICON and popup text
 //****************************************************************
 function setModeDNSSEC(newMode, tabId, domain, addr, ipval) {
+
 	var icon;
 	var title;
 	var domainpre;
@@ -301,6 +304,7 @@ function setModeDNSSEC(newMode, tabId, domain, addr, ipval) {
 // get information about custom resolver
 //****************************************************************
 function getResolver() {
+
 	var resolver = "nofwd";
 	var dnssecResolver = localStorage["dnssecResolver"];
 	if (dnssecResolver != undefined) {
@@ -602,14 +606,6 @@ function onUrlChange(tabId, changeInfo, tab) {
 
 	debuglogout = StringToBool(localStorage["DebugOutput"]);
 
-	var clearcdnssectx = StringToBool(localStorage["deldnssecctx"]);
-
-	if (clearcdnssectx) {
-		native_msg_port.postMessage("reinitialise");
-		localStorage["deldnssecctx"] = false;
-	}
-
-
 	if (changeInfo.status == "undefined") {
 		//chrome.pageAction.hide(tabId);
 		return;
@@ -678,6 +674,15 @@ function onUrlChange(tabId, changeInfo, tab) {
 		    tabId, domain, ADDON_VERSION, "n/a");
 		return;
 	}
+
+	var clearcdnssectx = StringToBool(localStorage["deldnssecctx"]);
+
+
+	if (clearcdnssectx) {
+		native_msg_port.postMessage("reinitialise");
+		localStorage["deldnssecctx"] = false;
+	}
+
 
         if (debuglogout) {
 		console.log("\nBrowser: onUrlChange(TabID: " + tabId
@@ -815,6 +820,7 @@ if (!initplugin) {
 // get IP address of URL
 //****************************************************************
 chrome.webRequest.onResponseStarted.addListener(function(info) {
+
 	currentIPList[ info.url ] = info.ip;
 	var urldomain = info.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
 	currentIPListDomain[ urldomain ] = info.ip;

@@ -3,58 +3,66 @@ Copyright 2014 CZ.NIC, z.s.p.o.
 
 Authors: Martin Straka <martin.straka@nic.cz>
 
-This file is part of DNSSEC Validator 2.0 Add-on.
+This file is part of DNSSEC Validator 2.x Add-on.
 
-DNSSEC Validator 2.0 Add-on is free software: you can redistribute it and/or
+DNSSEC Validator 2.x Add-on is free software: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or (at your
 option) any later version.
 
-DNSSEC Validator 2.0 Add-on is distributed in the hope that it will be useful,
+DNSSEC Validator 2.x Add-on is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 more details.
 
 You should have received a copy of the GNU General Public License along with
-DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
+DNSSEC Validator 2.x Add-on.  If not, see <http://www.gnu.org/licenses/>.
 ***** END LICENSE BLOCK ***** */
 
-var defaultResolver = "nofwd"; // LDNS will use system resolver if empty string is passed
+
+var defaultResolver = "nofwd";
 var defaultCustomResolver = "217.31.204.130";
-// debug pretext
 var DNSSEC = "DNSSEC: ";
-// enable print debug info into debug console
 var debuglogout = false;
+var initplugin = false;
+var port = null;
+
 
 //--------------------------------------------------------
-// Set string in the web element
+// Set string in the page element
 //--------------------------------------------------------
 function addText(id, str){
+
 	if (document.createTextNode){
 		var tn = document.createTextNode(str);
 		document.getElementById(id).appendChild(tn);
 	}
 }
 
+
 //--------------------------------------------------------
 // text bool value from LocalStorage to bool
 //--------------------------------------------------------
 function StringToBool(value) {
+
 	if (value == undefined) return false;
 	else if (value == "false") return false;
 	else if (value == "true") return true;
 	else return false;
 }
 
+
 //--------------------------------------------------------
 // check correct format of IP addresses in the textarea
 //--------------------------------------------------------
 function test_ip(ip) {
-		var expression = /((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(@\d{1,5})?\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?(@\d{1,5})?\s*$))/;
 
-		var match = ip.match(expression);
-		return match != null;
+	var expression = /((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(@\d{1,5})?\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?(@\d{1,5})?\s*$))/;
+
+	var match = ip.match(expression);
+	return match != null;
 }
+
 
 //--------------------------------------------------------
 // check correct format of IP addresses in the text area
@@ -71,14 +79,17 @@ function checkOptdnsserveraddr(str) {
 	return true;
 }
 
+
 //--------------------------------------------------------
 // check correct format of domain and TLD in the text area
 //--------------------------------------------------------
 function checkdomainlist() {
+
 	var str = document.getElementById("domainlist").value;
 	var match = str.match(/^[a-z0-9.-]+(, [a-z0-9.-]+)*$/);
 	return match != null;
 }
+
 
 //--------------------------------------------------------
 // Cancel settings without saving on the local storage
@@ -103,12 +114,18 @@ function saveOptions() {
 			break;
 		}
 	}
+
 	localStorage["dnssecResolver"] = resolver;
 	localStorage["dnssecCustomResolver"] = document.dnssecSettings.customResolver.value;
 	localStorage["DebugOutput"] = document.dnssecSettings.DebugOutput.checked;
 	localStorage["domainfilteron"] = document.dnssecSettings.domainfilteron.checked;
 	localStorage["domainlist"] = document.dnssecSettings.domainlist.value;
 	localStorage["deldnssecctx"] = true;
+	
+	if (initplugin) {	
+		port.postMessage("finish");
+	}
+
 	document.write("<div>Settings were saved...</div>");
 	document.write("<div>Please, close this window...Thanks</div>");
 	window.close();
@@ -116,46 +133,70 @@ function saveOptions() {
 
 
 //--------------------------------------------------------
-// Callback to handle native message response.
+// reset elements on the settings page
 //--------------------------------------------------------
-function handle_test_response(resp) {
-	var retval = resp.split("~");
-	var testnic = retval[2];
-
-	if (debuglogout) {
-		console.log(DNSSEC + "Received response:" + resp + " " + testnic);
-	}
-
-	if (testnic == 2) {
-		document.getElementById("messageok").style.display = 'block';
-		document.getElementById("messagebogus").style.display = 'none';
-		document.getElementById("messageerror").style.display = 'none';
-		document.getElementById("messageip").style.display = 'none';
-	}
-	else if (testnic == 4) {
-		document.getElementById("messageok").style.display = 'none';
-		document.getElementById("messagebogus").style.display = 'block';
-		document.getElementById("messageerror").style.display = 'none';
-		document.getElementById("messageip").style.display = 'none';
-	}
-	else {
-		document.getElementById("messageok").style.display = 'none';
-		document.getElementById("messagebogus").style.display = 'none';
-		document.getElementById("messageerror").style.display = 'block';
-		document.getElementById("messageip").style.display = 'none';
-	}
+function resetTesting() {
 
 	var elems = document.getElementsByTagName('input');
 	var len = elems.length;
 
 	for (var i = 0; i < len; i++) {
-	    elems[i].disabled = false;
+    		elems[i].disabled = false;
 	}
 
 	document.getElementById("actionimg").style.display = 'none';
 	document.getElementById("testbutton").style.display = 'block';
 	document.getElementById("testbutton").value = 
-		chrome.i18n.getMessage("testbutton");
+	    chrome.i18n.getMessage("testbutton");
+}
+
+
+//--------------------------------------------------------
+// Callback to handle native message response.
+//--------------------------------------------------------
+function handle_test_response(resp) {
+
+	var retval = resp.split("~");
+
+	switch (retval[0]) {
+
+	case "initialiseRet":
+		initplugin = true;
+		if (debuglogout) {
+			console.log(DNSSEC
+			    + "Load DNSSEC native messaging core");
+		}
+		break;
+
+	case "validateRet":
+		var testnic = retval[2];
+
+		if (debuglogout) {
+			console.log(DNSSEC + "Received response:" + resp + " " + testnic);
+		}
+
+		if (testnic == 2) {
+			document.getElementById("messageok").style.display = 'block';
+			document.getElementById("messagebogus").style.display = 'none';
+			document.getElementById("messageerror").style.display = 'none';
+			document.getElementById("messageip").style.display = 'none';
+		} else if (testnic == 4) {
+			document.getElementById("messageok").style.display = 'none';
+			document.getElementById("messagebogus").style.display = 'block';
+			document.getElementById("messageerror").style.display = 'none';
+			document.getElementById("messageip").style.display = 'none';
+		} else {
+			document.getElementById("messageok").style.display = 'none';
+			document.getElementById("messagebogus").style.display = 'none';
+			document.getElementById("messageerror").style.display = 'block';
+			document.getElementById("messageip").style.display = 'none';
+		}
+
+		resetTesting();
+		break;
+	default:
+		break;
+	}
 }
 
 
@@ -164,12 +205,11 @@ function handle_test_response(resp) {
 //--------------------------------------------------------
 function testdnssec() {
 
-
 	var elems = document.getElementsByTagName('input');
 	var len = elems.length;
 
 	for (var i = 0; i < len; i++) {
-	    elems[i].disabled = true;
+		elems[i].disabled = true;
 	}
 
 	document.getElementById("messageok").style.display = 'none';
@@ -194,26 +234,26 @@ function testdnssec() {
 		var child = radiogroup[i];
 		if (child.checked == true) {
 			switch (i) {
-				case 0: // System setting
-					nameserver = "sysresolver";
-					chioce = 0;
-					break;
-				case 1: // Custom
-					chioce = 1;
-					if (!checkOptdnsserveraddr(tmp)) {
-						ip = true;
-					} else {
-						nameserver = tmp;
-					}
-					break;
-				case 2: // NOFWD
-					chioce = 2;
-					nameserver = "nofwd";
-					options = 5;
-					break;
-			} //switch
-		} // if
-	} // for
+			case 0: // System setting
+				nameserver = "sysresolver";
+				chioce = 0;
+				break;
+			case 1: // Custom
+				chioce = 1;
+				if (!checkOptdnsserveraddr(tmp)) {
+					ip = true;
+				} else {
+					nameserver = tmp;
+				}
+				break;
+			case 2: // NOFWD
+				chioce = 2;
+				nameserver = "nofwd";
+				options = 5;
+				break;
+			}
+		}
+	}
 
 	if (ip) {
 
@@ -221,7 +261,7 @@ function testdnssec() {
 		var len = elems.length;
 
 		for (var i = 0; i < len; i++) {
-		    elems[i].disabled = false;
+			elems[i].disabled = false;
 		}
 
 		document.getElementById("messageok").style.display = 'none';
@@ -229,12 +269,12 @@ function testdnssec() {
 		document.getElementById("messageerror").style.display = 'none'
 		document.getElementById("messageip").style.display = 'block';
 		document.getElementById("actionimg").style.display = 'none';
-		document.getElementById("testbutton").style.display = 'block';
-	
+		document.getElementById("testbutton").style.display = 'block';	
 		document.getElementById("testbutton").value = 
 			chrome.i18n.getMessage("testbutton");
-	}
-	else {
+	} else {
+
+		port.postMessage("initialise");
 
 		var queryParams = "validate~" + dn + '~' + options + '~' +
 		    nameserver + '~' + addr + '~notab';
@@ -243,24 +283,16 @@ function testdnssec() {
 			console.log(DNSSEC + queryParams);
 		}
 
-		var port = chrome.runtime.connectNative(
-		    "cz.nic.validator.dnssec");
-		port.onMessage.addListener(handle_test_response);
-		port.onDisconnect.addListener(function() {
-			if (debuglogout) {
-				console.log(DNSSEC + "Helper host disconnected.");
-			}
-		});
 		port.postMessage(queryParams);
-		port.postMessage("finish");
-	}//if ip
+	}
 }
 
 
 //--------------------------------------------------------
-// help function for clear DNSSEC localestorage
+// help function for clear DNSSEC localestorage, not use.
 //--------------------------------------------------------
 function eraseOptions() {
+
 	localStorage.removeItem("dnssecResolver");
 	localStorage.removeItem("dnssecCustomResolver");
 	localStorage.removeItem("DebugOutput");
@@ -288,11 +320,11 @@ function RefreshExclude() {
 }
 
 
-
 //--------------------------------------------------------
 // Replaces onclick for the option buttons
 //--------------------------------------------------------
 window.onload = function(){
+
 	document.querySelector('input[id="savebutton"]').onclick = saveOptions;
 	document.querySelector('input[id="testbutton"]').onclick = testdnssec;
 	document.querySelector('input[id="cancelbutton"]').onclick = cancelOptions;
@@ -304,6 +336,7 @@ window.onload = function(){
 // show DNSSEC text about resover settings
 //--------------------------------------------------------
 function testinfodisplay(state){
+
 	if (state == 0) {
 		document.getElementById("messageok").style.display = 'none';
 		document.getElementById("messagebogus").style.display = 'none';
@@ -335,6 +368,7 @@ function testinfodisplay(state){
 		document.getElementById("messageip").style.display = 'none';
 	}
 }
+
 
 //--------------------------------------------------------
 // Settings window initialization
@@ -412,8 +446,7 @@ window.addEventListener('load',function(){
 				    break;
 			}
 		}
-	}
-	else {
+	} else {
 		localStorage["deldnssecctx"] = false;
 
 		document.dnssecSettings.customResolver.value = unescape(resolver);
@@ -440,7 +473,33 @@ window.addEventListener('load',function(){
 
 		DebugOutput = (DebugOutput == undefined || DebugOutput == "false") ? false : true;
 		document.dnssecSettings.DebugOutput.checked = DebugOutput;
-	} //state
-});
+	}
 
+	document.getElementById("testbutton").disabled = true;
+
+	port = chrome.runtime.connectNative("cz.nic.validator.dnssec");
+	port.onMessage.addListener(handle_test_response);
+	port.onDisconnect.addListener(function() {
+		if (debuglogout) {
+			console.log(DNSSEC + "Helper host disconnected.");
+		}
+	});
+
+	port.postMessage("initialise");
+
+	setTimeout(function() {
+		if (!initplugin) {
+			document.getElementById("messageerror").innerHTML = "";
+			addText("messageerror", chrome.i18n.getMessage("dnssecnopluginInfo"));
+			document.getElementById("testbutton").style.display = 'none';
+			document.getElementById("messageerror").style.display = 'block';
+			if (debuglogout) {
+				console.log(DNSSEC
+			 	   + "Cannot load DNSSEC native messaging core!");
+			}
+		} else {
+			document.getElementById("testbutton").disabled = false;
+		}
+	}, 1000);
+});
 

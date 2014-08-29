@@ -190,6 +190,7 @@ var tlsaModes = {
 // return OS name
 //****************************************************************
 function GetOS() {
+
 	var OSName = "Unknown";
 
 	if (navigator.appVersion.indexOf("Win")!= -1) OSName = "Windows";
@@ -223,6 +224,7 @@ function GetOS() {
 // text bool value from LocalStorage to bool
 //****************************************************************
 function StringToBool(value) {
+
 	if (value == undefined) return false;
 	else if (value == "false") return false;
 	else if (value == "true") return true;
@@ -233,6 +235,7 @@ function StringToBool(value) {
 // this function sets TLSA mode. status ICON and popup text
 //****************************************************************
 function setModeTLSA(newMode, tabId, domain, scheme, addonv, pluginv) {
+
 	var icon;
 	var title;
 	var domainpre;
@@ -376,6 +379,7 @@ function setModeTLSA(newMode, tabId, domain, scheme, addonv, pluginv) {
 // get information about custom resolver
 //****************************************************************
 function getResolver() {
+
 	var resolver = "nofwd";
 	var dnssecResolver = localStorage["dnssecResolver"];
 	if (dnssecResolver != undefined) {
@@ -648,6 +652,7 @@ function IsValidUrl(tabId, url) {
 // return domain name and port number of url
 //****************************************************************
 function getDomainAndPort(url) {
+
 	var tmp = url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(:[0-9]+)*(:)?/);
 	return [tmp[1], tmp[2]];
 }
@@ -699,17 +704,7 @@ function tlsaValidationPrepare(tabId, url, action) {
 			    + ", URL: " + url +");");
 	}
 
-	// delete internal dane cache and unbound context
-	if (StringToBool(localStorage["cachefree"])) {
-		tlsaExtCache.delAllRecords();
-		localStorage["cachefree"] = false;
-		localStorage["deltlsactx"] = false;
-		wrongresolver = false;
-		native_msg_port.postMessage("reinitialise");
-	}
-
 	// deactivate popup if exist
-
 	if (action == "onUrlChange") {
 		chrome.pageAction.setPopup({tabId: tabId, popup: ""});
 	}
@@ -746,6 +741,15 @@ function tlsaValidationPrepare(tabId, url, action) {
 		setModeTLSA(this.tlsaModes.DANE_MODE_PLUGIN_INIT_ERR,
 			    tabId, domainport, scheme, ADDON_VERSION, "n/a");
 		return;
+	}
+
+	// delete internal dane cache and unbound context
+	if (StringToBool(localStorage["cachefree"])) {
+		tlsaExtCache.delAllRecords();
+		localStorage["cachefree"] = false;
+		localStorage["deltlsactx"] = false;
+		wrongresolver = false;
+		native_msg_port.postMessage("reinitialise");
 	}
 
 	// return if not https or ftps connection
