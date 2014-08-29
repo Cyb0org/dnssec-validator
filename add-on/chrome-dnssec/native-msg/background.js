@@ -606,14 +606,9 @@ function onUrlChange(tabId, changeInfo, tab) {
 
 	debuglogout = StringToBool(localStorage["DebugOutput"]);
 
-	if (changeInfo.status == "undefined") {
-		//chrome.pageAction.hide(tabId);
-		return;
-	}
-
 	if (changeInfo.status != "loading") {
 		if (changeInfo.status != "complete") {
-			chrome.pageAction.hide(tabId);
+			//chrome.pageAction.hide(tabId);
 			return;
 		}
 	}
@@ -625,26 +620,13 @@ function onUrlChange(tabId, changeInfo, tab) {
         if (tab.url.match(/^chrome(?:-extension)?:\/\//)) {
               chrome.pageAction.hide(tabId);
               return;
-        }//if
+        }
 
 	// deactive other tabs
         if (tab.url.match(/^chrome(?:-devtools)?:\/\//)) {
                 chrome.pageAction.hide(tabId);
                 return;
-         }//if
-
-
-	// deactive other tabs
-        if (tab.url.match(/^(?:-devtools)?:\/\//)) {
-                chrome.pageAction.hide(tabId);
-                return;
-         }//if
-
-	// deactive other tabs
-        if (tab.url.match(/^(?:-devtools)?:\/\//)) {
-                chrome.pageAction.hide(tabId);
-                return;
-         }//if
+         }
 
 	if (tab.url.indexOf("local-ntp") != -1) {
                 chrome.pageAction.hide(tabId);
@@ -659,7 +641,7 @@ function onUrlChange(tabId, changeInfo, tab) {
 	      //console.log("Browser: URL: " + domain);
               chrome.pageAction.hide(tabId);
               return;
-        }//if
+        }
 
 	var domain = tab.url.match(/^(?:[\w-]+:\/+)?\[?([\w\.-]+)\]?(?::)*(?::\d+)?/)[1];
 	// ipv4
@@ -667,7 +649,7 @@ function onUrlChange(tabId, changeInfo, tab) {
 	      //console.log("Browser: URL: " + domain);
               chrome.pageAction.hide(tabId);
               return;
-        }//if
+        }
 
 	if (!initplugin) {
 		setModeDNSSEC(this.dnssecModes.DNSSEC_MODE_PLUGIN_INIT_ERR,
