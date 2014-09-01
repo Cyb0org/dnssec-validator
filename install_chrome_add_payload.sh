@@ -22,6 +22,16 @@ USAGE="${USAGE}\t\t-- name of the Chrome executable (e.g. chromium, google-chrom
 
 PRESERVE_CTX="no"
 
+VERSION="unknown_version"
+OS_NAME="unknown_os"
+HWARCH="unknown_hwarch"
+
+if [ -f install_chrome_variables.sh ]; then
+	. ./install_chrome_variables.sh
+else
+	echo >&2 "File install_chrome_variables.sh. Build package content first."
+fi
+
 # Parse options.
 set -- `getopt "${GETOPT}" "$@"`
 if [ $# -lt 1 ]; then
@@ -68,22 +78,24 @@ fi
 
 TARGZ_FILE=arch_$$.tar.gz
 
-VERSION_FILE="Version"
-if [ -f ${VERSION_FILE} ]; then
-	VERSION=`cat ${VERSION_FILE}`
-else
-	VERSION="x.y.z"
-fi
+#VERSION_FILE="Version"
+#if [ -f ${VERSION_FILE} ]; then
+#	VERSION=`cat ${VERSION_FILE}`
+#else
+#	VERSION="x.y.z"
+#fi
 
-if [ "x${HWARCH}" = "x" ]; then
-	echo >&2 "Variable HWARCH is not set. Consider setting its proper value."
-	HWARCH=unknown
-fi
+#if [ "x${HWARCH}" = "x" ]; then
+#	echo >&2 "Variable HWARCH is not set. Consider setting its proper value."
+#	HWARCH=unknown
+#fi
 
-SYSTEM=`uname -s | tr '[:upper:]' '[:lower:]'`
+#SYSTEM=`uname -s | tr '[:upper:]' '[:lower:]'`
 
-TARGET_DNSSEC="GC-dnssec_validator-${VERSION}-${SYSTEM}-${HWARCH}.sh"
-TARGET_TLSA="GC-tlsa_validator-${VERSION}-${SYSTEM}-${HWARCH}.sh"
+TARGET_DNSSEC="dnssec-plugin-${VERSION}.x-${OS_NAME}-${HWARCH}.sh"
+DNSSEC_CRX="gc-dnssec-validator-add-on-${VERSION}.crx"
+TARGET_TLSA="tlsa-plugin-${VERSION}.x-${OS_NAME}-${HWARCH}.sh"
+TLSA_CRX="gc-tlsa-validator-add-on-${VERSION}.crx"
 
 SCRIPT_STUB="install_chrome_stub.sh"
 
@@ -128,7 +140,7 @@ chmod +x "${PACKAGES_DIR}/${TARGET_DNSSEC}"
 rm -f ${TARGZ_FILE}
 
 if [ "x${PRESERVE_CTX}" = "xyes" ]; then
-	cp "${TEMP_DIR}/dnssec-pkg.crx" "${PACKAGES_DIR}/"
+	cp "${TEMP_DIR}/dnssec-pkg.crx" "${PACKAGES_DIR}/${DNSSEC_CRX}"
 fi
 
 #cleanup
@@ -159,7 +171,7 @@ cat "${TEMP_DIR}/${TARGZ_FILE}" >> "${PACKAGES_DIR}/${TARGET_TLSA}"
 chmod +x "${PACKAGES_DIR}/${TARGET_TLSA}"
 
 if [ "x${PRESERVE_CTX}" = "xyes" ]; then
-	cp "${TEMP_DIR}/tlsa-pkg.crx" "${PACKAGES_DIR}/"
+	cp "${TEMP_DIR}/tlsa-pkg.crx" "${PACKAGES_DIR}/${TLSA_CRX}"
 fi
 
 rm -f ${TARGZ_FILE}
