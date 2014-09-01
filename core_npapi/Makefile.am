@@ -56,7 +56,6 @@ fb-compile-stamp: fb-projects-stamp WDFireBreath/projects
 	touch $@
 
 fb-dnssec-stamp: fb-compile-stamp
-np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI)$(SO_SUFF): fb-compile-stamp
 	if [ -d WDFireBreath/build/projects/$(NPAPI_PLUGIN_NAME_DNSSEC)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin ]; then \
 		cp -R WDFireBreath/build/projects/$(NPAPI_PLUGIN_NAME_DNSSEC)/np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin; \
 		$(STRIP) np$(NPAPI_PLUGIN_NAME_DNSSEC).plugin/Contents/MacOS/np$(NPAPI_PLUGIN_NAME_DNSSEC); \
@@ -65,9 +64,9 @@ np$(NPAPI_PLUGIN_NAME_DNSSEC)_$(XPCOM_ABI)$(SO_SUFF): fb-compile-stamp
 	else \
 		false; \
 	fi
+	touch $@
 
 fb-tlsa-stamp: fb-compile-stamp
-np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI)$(SO_SUFF): fb-compile-stamp
 	if [ -d WDFireBreath/build/projects/$(NPAPI_PLUGIN_NAME_TLSA)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin ]; then \
 		cp -R WDFireBreath/build/projects/$(NPAPI_PLUGIN_NAME_TLSA)/np$(NPAPI_PLUGIN_NAME_TLSA).plugin np$(NPAPI_PLUGIN_NAME_TLSA).plugin; \
 		$(STRIP) np$(NPAPI_PLUGIN_NAME_TLSA).plugin/Contents/MacOS/np$(NPAPI_PLUGIN_NAME_TLSA); \
@@ -76,6 +75,7 @@ np$(NPAPI_PLUGIN_NAME_TLSA)_$(XPCOM_ABI)$(SO_SUFF): fb-compile-stamp
 	else \
 		false; \
 	fi
+	touch $@
 
 CLEANFILES = \
 	fb-workdir-stamp \
