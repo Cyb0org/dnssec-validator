@@ -285,40 +285,8 @@ init:
 		gBrowser.addProgressListener(cz.nic.extension.daneExtUrlBarListener);
 
 		cz.nic.extension.tlsaExtCache.init();
-
-//		var clearcache = cz.nic.extension.dnssecExtPrefs.getBool("clearcache");
-//		if (clearcache) {
-//			this.clearMFcache('all');
-//		}
-
-	},
-/*
-getService:
-	function(service_type) {
-		return Components.classes["@mozilla.org/network/cache-service;1"]
-		       .getService(Components.interfaces.nsICacheService);
 	},
 
-clearMFcache :
-	function(cache) {
-		if (cache == 'all') {
-			this.getService('cache').evictEntries(Components.interfaces.nsICache.STORE_ON_DISK);
-			this.getService('cache').evictEntries(Components.interfaces.nsICache.STORE_IN_MEMORY);
-			//this.getService('cache').evictEntries(Components.interfaces.nsICache.STORE_OFFLINE);
-		} else {
-			if (cache == 'disk') {
-				this.getService('cache').evictEntries(Components.interfaces.nsICache.STORE_ON_DISK);
-			}
-			if (cache == 'memory') {
-				this.getService('cache').evictEntries(Components.interfaces.nsICache.STORE_IN_MEMORY);
-			}
-		}
-
-		if (this.debugOutput) {
-			dump(this.debugPrefix + 'Clear main MF cache\n');
-		}
-	},
-*/
 getDebugOutputFlag:
 	function() {
 		this.debugOutput = cz.nic.extension.dnssecExtPrefs.getBool("danedebug");
