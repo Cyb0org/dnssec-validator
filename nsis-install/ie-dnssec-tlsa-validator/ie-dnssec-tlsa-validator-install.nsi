@@ -12,7 +12,7 @@ SetCompressor /solid /final lzma
 !define PROGRAM_NAME "DNSSEC/TLSA Validator"
 !define PROGRAM_NAME_OLD "DNSSEC Validator 2.0"
 
-outFile "IE-dnssec-tlsa-validator-${VERSION}.exe"
+outFile ".\..\..\packages\ie-dnssec-tlsa-validator-${VERSION}-windows.exe"
 Name "${PROGRAM_NAME} ${VERSION}"
 
 # default install directory

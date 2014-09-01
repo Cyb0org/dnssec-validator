@@ -12,7 +12,7 @@ SetCompressor /solid /final lzma
 !define QUADVERSION "2.2.0.0"
 !define guid '{669695BC-A811-4A9D-8CDF-BA8C795F261A}'
 !define PROGRAM_NAME "Chrome DNSSEC Validator"
-outFile "Chrome-dnssec-validator-core-${VERSION}.exe"
+outFile ".\..\..\packages\dnssec-plugin-${VERSION}.x-windows-x86.exe"
 Name "Chrome DNSSEC Validator ${VERSION}"
 
 # default install directory
@@ -76,7 +76,6 @@ section "-hidden.postinstall"
   Var /GLOBAL INSTDIRCOPY
   StrCpy $INSTDIRCOPY $INSTDIR
     
-	File ".\..\..\packages\dnssec-pkg.crx"
 	File ".\..\..\plugins-lib\DNSSECcore-windows-x86.exe"  
 	File ".\..\..\add-on\chrome-dnssec\native-msg\cz.nic.validator.dnssec.json.in"
   Rename cz.nic.validator.dnssec.json.in cz.nic.validator.dnssec.json
@@ -131,7 +130,6 @@ section "un.Unbound"
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}"
   DeleteRegKey HKCU "Software\Google\Chrome\NativeMessagingHosts\cz.nic.validator.dnssec"
   DeleteRegKey HKCU "Software\Chromium\NativeMessagingHosts\cz.nic.validator.dnssec"  
-	Delete "$INSTDIR\dnssec-pkg.crx"
   Delete "$INSTDIR\DNSSECcore-windows-x86.exe"
   Delete "$INSTDIR\cz.nic.validator.dnssec.json"
   Delete "$INSTDIR\uninst.exe"    
