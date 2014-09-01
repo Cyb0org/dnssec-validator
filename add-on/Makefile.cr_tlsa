@@ -44,10 +44,15 @@ TARGETS += \
 	tvcnm-directory-stamp
 
 BUILT_SOURCES += \
+	$(top_srcdir)/add-on/chrome-tlsa/native-msg/background.js \
 	$(top_srcdir)/add-on/chrome-tlsa/native-msg/manifest.json
 
 CLEANFILES += \
+	$(top_srcdir)/add-on/chrome-tlsa/native-msg/background.js \
 	$(top_srcdir)/add-on/chrome-tlsa/native-msg/manifest.json
+
+$(top_srcdir)/add-on/chrome-tlsa/native-msg/background.js: $(top_srcdir)/add-on/chrome-tlsa/native-msg/background.js.in Makefile
+	$(do_subst) < $< > $@
 
 $(top_srcdir)/add-on/chrome-tlsa/native-msg/manifest.json: $(top_srcdir)/add-on/chrome-tlsa/native-msg/manifest.json.in Makefile
 	$(do_subst) < $< > $@
