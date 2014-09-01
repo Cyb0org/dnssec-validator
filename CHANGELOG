@@ -1,5 +1,26 @@
 V2.x.x / (release date)
-- Moved to unbound 1.4.22
+- Deleted nsICache service in js-ctypes extension.
+  (Compatibility issue Firefox >= 32.* .)
+- OpenSSL 1.0.1i.
+- Updated prefixes for DOM nodes in Firefox js-ctypes extension.
+- Fixed bug in type 2 TLSA record validation.
+- Polish localisation.
+- New validator implementation for Chromium/Chrome based
+  on Native Messaging.
+- Fixed some another bugs.
+
+V2.1.2 / 30.7.2014
+- New js-ctypes-based implementation for Firefox.
+- Build mechanism fixes.
+- Extension can be build/linked against system libunbound.
+- Added name-spaces to Firefox javascript code.
+- Updated FireBreath version.
+- OpenSSL 1.0.1h.
+- Added new state notifying about entering a non-existent (according
+  to DNSSEC) web site.
+- Fixed some warnings reported from AMO.
+- Unbound 1.4.22.
+- Fixed some another bugs.
 
 v2.1.1 / 13.3.2014
 
