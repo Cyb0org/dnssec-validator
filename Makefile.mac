@@ -405,6 +405,8 @@ xpi_fat:
 	rm $(ADDON_PATH_CR_TLSA)/native-msg_built/manifest.json.template
 	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_DNSSEC)/native-msg/manifest.json.template > $(ADDON_PATH_CR_DNSSEC)/native-msg_built/manifest.json
 	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/native-msg/manifest.json.template > $(ADDON_PATH_CR_TLSA)/native-msg_built/manifest.json
+	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_DNSSEC)/native-msg/background.js > $(ADDON_PATH_CR_DNSSEC)/native-msg_built/background.js
+	sed -e 's/version-of-add-on/$(EXTENSION_VERSION_CR)/g' $(ADDON_PATH_CR_TLSA)/native-msg/background.js > $(ADDON_PATH_CR_TLSA)/native-msg_built/background.js
 	echo "VERSION=\"`cat Version`\"" > install_chrome_variables.sh
 	echo "OS_NAME=\"$(OSNAME_LC)\"" >> install_chrome_variables.sh
 	echo "HWARCH=\"fat\"" >> install_chrome_variables.sh
