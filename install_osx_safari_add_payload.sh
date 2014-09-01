@@ -16,7 +16,7 @@ fi
 
 PKGS_DIR=packages
 SCRIPT_STUB=install_osx_safari_stub.sh
-TARGET_FILE="AS-dnssec-tlsa_validator-${VERSION}-macosx-${HWARCH}.sh"
+TARGET_FILE="as-dnssec-tlsa-validator-${VERSION}-macosx-${HWARCH}.sh"
 
 PLUGIN_SRC_DIR=plugins-lib
 ADDON_SRC_DIR=add-on
