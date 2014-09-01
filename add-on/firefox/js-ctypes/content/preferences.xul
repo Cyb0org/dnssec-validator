@@ -86,7 +86,7 @@ DNSSEC Validator 2.0 Add-on.  If not, see <http://www.gnu.org/licenses/>.
 		<checkbox id="dnssec-pref-usebrowsercertchain" label="&usebrowsercertchain.label;" preference="usebrowsercertchain" accesskey="&usebrowsercertchain.accesskey;" checked="true" oncommand="cz.nic.extension.dnssecExtPrefs.dnsserverchooseCommand();"/>
 		<checkbox id="dnssec-pref-checkallhttps" label="&checkallhttps.label;" preference="checkhttpsrequestsonpages" accesskey="&checkallhttps.accesskey;" checked="false" oncommand="cz.nic.extension.dnssecExtPrefs.dnsserverchooseCommand();"/>
 		<checkbox id="dnssec-pref-tlsablock" label="&tlsablock.label;" preference="tlsablocking" accesskey="&tlsablock.accesskey;" checked="true" oncommand="cz.nic.extension.dnssecExtPrefs.dnsserverchooseCommand();"/>
-		<checkbox id="dnssec-pref-clearcache" label="&clearcache.label;" preference="clearcache" accesskey="&clearcache.accesskey;" checked="false" oncommand="cz.nic.extension.dnssecExtPrefs.dnsserverchooseCommand();"/>
+		<!-- <checkbox id="dnssec-pref-clearcache" label="&clearcache.label;" preference="clearcache" accesskey="&clearcache.accesskey;" checked="false" oncommand="cz.nic.extension.dnssecExtPrefs.dnsserverchooseCommand();"/> -->
 	</groupbox>
 	<description id="dnssec-xblank" value="" style="display: block; min-height: 40px;"/>
 	<separator class="groove-thin"/>

@@ -286,13 +286,13 @@ init:
 
 		cz.nic.extension.tlsaExtCache.init();
 
-		var clearcache = cz.nic.extension.dnssecExtPrefs.getBool("clearcache");
-		if (clearcache) {
-			this.clearMFcache('all');
-		}
+//		var clearcache = cz.nic.extension.dnssecExtPrefs.getBool("clearcache");
+//		if (clearcache) {
+//			this.clearMFcache('all');
+//		}
 
 	},
-
+/*
 getService:
 	function(service_type) {
 		return Components.classes["@mozilla.org/network/cache-service;1"]
@@ -318,7 +318,7 @@ clearMFcache :
 			dump(this.debugPrefix + 'Clear main MF cache\n');
 		}
 	},
-
+*/
 getDebugOutputFlag:
 	function() {
 		this.debugOutput = cz.nic.extension.dnssecExtPrefs.getBool("danedebug");

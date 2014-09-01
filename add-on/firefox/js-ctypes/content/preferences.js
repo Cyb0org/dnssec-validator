@@ -382,7 +382,7 @@ setElementsattributes : function() {
 
 	tmpCheck = document.getElementById("dnssec-pref-tlsaonoff").checked;
 	document.getElementById("dnssec-pref-tlsablock").disabled = !tmpCheck;
-	document.getElementById("dnssec-pref-clearcache").disabled = !tmpCheck;
+	//document.getElementById("dnssec-pref-clearcache").disabled = !tmpCheck;
 	document.getElementById("dnssec-pref-checkallhttps").disabled =
 	    !tmpCheck;
 	document.getElementById("dnssec-pref-usebrowsercertchain").disabled =
@@ -394,8 +394,8 @@ setElementsattributes : function() {
 		    .checked;
 		document.getElementById("dnssec-pref-tlsablock").disabled =
 		    !tmp;
-		document.getElementById("dnssec-pref-clearcache").disabled =
-		    !tmp;
+		//document.getElementById("dnssec-pref-clearcache").disabled =
+		//    !tmp;
 	}
 
 },
