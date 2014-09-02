@@ -1,4 +1,7 @@
 V2.x.x / (release date)
+-
+
+V2.2.0
 - Deleted nsICache service in js-ctypes extension.
   (Compatibility issue Firefox >= 32.* .)
 - OpenSSL 1.0.1i.
