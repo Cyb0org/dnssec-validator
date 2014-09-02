@@ -5,7 +5,7 @@
 	<key>Author</key>
 	<string>CZ.NIC Labs</string>
 	<key>Builder Version</key>
-	<string>9537.73.11</string>
+	<string>9537.78.2</string>
 	<key>CFBundleDisplayName</key>
 	<string>DNSSEC/TLSA Validator</string>
 	<key>CFBundleIdentifier</key>
